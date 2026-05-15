@@ -1,0 +1,403 @@
+<!doctype html>
+<html><head><meta charset='utf-8'><title>Projection totals dashboard</title>
+<style>
+  body { font: 14px -apple-system, Segoe UI, system-ui, sans-serif; padding: 24px;
+          background: #f7f7f9; color: #222; }
+  h1 { font-weight: 600; margin: 0 0 4px 0; }
+  .sub { color: #888; margin-bottom: 18px; font-size: 12px; }
+  .filters { background: white; border-radius: 12px; padding: 16px 20px;
+              margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 14px;
+              align-items: center;
+              box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03); }
+  .filters label { font-size: 12px; color: #666; text-transform: uppercase;
+                     letter-spacing: 0.3px; margin-right: 4px; }
+  .filters select, .filters input {
+      padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px;
+      background: white; font-size: 13px; color: #222; }
+  .filters input[type=text] { width: 200px; }
+  .filters .reset { padding: 6px 12px; border: 1px solid #ddd;
+                      border-radius: 6px; background: #f3f4f6; cursor: pointer;
+                      font-size: 12px; color: #444; }
+  .filters .reset:hover { background: #e8eaee; }
+  .filters .pdf { padding: 6px 12px; border: 1px solid #3b77d6; border-radius: 6px;
+                    background: #3b77d6; color: white; cursor: pointer; font-size: 12px; }
+  .filters .pdf:hover { background: #2c62b8; }
+  .scope { color: #666; font-size: 12px; margin-bottom: 14px; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+            margin-bottom: 24px; }
+  .card { background: white; border-radius: 12px; padding: 20px;
+           box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03); }
+  .card .label { color: #666; font-size: 12px; letter-spacing: 0.3px;
+                  text-transform: uppercase; margin-bottom: 8px; }
+  .card .value { font-size: 28px; font-weight: 600; color: #111; }
+  .card .sub   { font-size: 12px; color: #888; margin-top: 6px; margin-bottom:0;}
+  .pos { color: #c9342d; }
+  .neg { color: #0d8a3b; }
+  .neu { color: #666; }
+  .section { background: white; border-radius: 12px; padding: 20px;
+              margin-bottom: 16px;
+              box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03); }
+  .section h2 { font-size: 14px; letter-spacing: 0.3px; text-transform: uppercase;
+                 color: #666; margin: 0 0 14px 0; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #eee; }
+  th { color: #888; font-weight: 500; font-size: 12px;
+         text-transform: uppercase; letter-spacing: 0.3px; }
+  td:first-child { font-weight: 500; }
+  .records-table td { font-variant-numeric: tabular-nums; }
+  .records-table th { position: sticky; top: 0; background: #f7f7f9; z-index: 1; }
+  .records-table tbody tr:hover { background: #f9fafb; cursor: default; }
+  .detail-btn { padding: 4px 10px; border: 1px solid #3b77d6; border-radius: 5px;
+                  background: white; color: #3b77d6; cursor: pointer; font-size: 11px; }
+  .detail-btn:hover { background: #3b77d6; color: white; }
+  .bar-row { display: grid; grid-template-columns: 140px 1fr 120px; gap: 12px;
+              align-items: center; margin-bottom: 8px; }
+  .bar-row .label { color: #444; }
+  .bar-row .bar { background: #eef1f4; border-radius: 6px; height: 22px;
+                    position: relative; overflow: hidden; }
+  .bar-row .bar .fill { position: absolute; top: 0; left: 0; bottom: 0;
+                          background: #3b77d6; border-radius: 6px; transition: width .2s; }
+  .bar-row .val { text-align: right; color: #444; font-variant-numeric: tabular-nums; }
+  .gen { color: #999; font-size: 11px; margin-top: 20px; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0;
+                     background: rgba(0,0,0,0.5); z-index: 100;
+                     align-items: flex-start; justify-content: center;
+                     padding: 40px 20px; overflow-y: auto; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: 12px; max-width: 1200px; width: 100%;
+            padding: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+  .modal h3 { margin: 0 0 4px 0; font-size: 18px; }
+  .modal .meta { color: #666; font-size: 12px; margin-bottom: 18px; }
+  .modal .close { float: right; padding: 4px 12px; border: 1px solid #ddd;
+                    border-radius: 6px; background: white; cursor: pointer;
+                    font-size: 13px; }
+  .modal .close:hover { background: #f3f4f6; }
+  .modal table { font-size: 12px; }
+  .modal table th, .modal table td { padding: 6px 8px; text-align: right;
+                                       white-space: nowrap; }
+  .modal table th:first-child, .modal table td:first-child { text-align: left;
+                                                                font-weight: 500; }
+  .modal .totals-row td { border-top: 2px solid #333; font-weight: 600; }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .filters, .detail-btn, .modal-overlay { display: none !important; }
+    .section, .card { box-shadow: none; border: 1px solid #e1e1e1; page-break-inside: avoid; }
+  }
+</style></head>
+<body>
+  <h1>Projection totals dashboard</h1>
+  <div class='sub'>Generated 2026-04-26 04:25 · 0 active records</div>
+
+  <div class='filters'>
+    <label>Importance</label>
+    <select id='f_imp'>
+      <option value='all'>All</option>
+      <option value='critical'>Critical</option>
+      <option value='medium'>Medium</option>
+      <option value='low'>Low</option>
+    </select>
+    <label>Variation vs manual</label>
+    <select id='f_var'>
+      <option value='all'>All</option>
+      <option value='gt10'>&gt; 10%</option>
+      <option value='gt25'>&gt; 25%</option>
+      <option value='gt50'>&gt; 50%</option>
+    </select>
+    <label>Weekly volume (AI)</label>
+    <select id='f_vol'>
+      <option value='all'>All</option>
+      <option value='lt100'>&lt; 100 / wk</option>
+      <option value='100_500'>100 – 500 / wk</option>
+      <option value='501_1000'>501 – 1,000 / wk</option>
+      <option value='gt1000'>&gt; 1,000 / wk</option>
+    </select>
+    <label>Brand</label>
+    <select id='f_brand'>
+      <option value='all'>All</option>
+      
+    </select>
+    <label>Model</label>
+    <select id='f_model'>
+      <option value='all'>All</option>
+      
+    </select>
+    <input id='f_search' type='text' placeholder='Search key / mstyle / cust ...'>
+    <button class='reset' onclick='resetFilters()'>Reset</button>
+    <button class='pdf' onclick='exportPDF()'>Export PDF</button>
+    <button class='pdf' style='background:#0d8a3b;border-color:#0d8a3b;'
+            onclick='openValidationViewer()'>Open Validation Viewer</button>
+  </div>
+
+  <div class='scope' id='scope'>Showing all records</div>
+
+  <div class='cards'>
+    <div class='card'>
+      <div class='label'>Manual total</div>
+      <div class='value' id='v_manual'>0</div>
+      <div class='sub'>13w planned (W1-W13)</div>
+    </div>
+    <div class='card'>
+      <div class='label'>AI total</div>
+      <div class='value' id='v_ai'>0</div>
+      <div class='sub'>13w AI forecast (W1-W13)</div>
+    </div>
+    <div class='card'>
+      <div class='label'>Suggested total</div>
+      <div class='value' id='v_sugg'>0</div>
+      <div class='sub'>13w suggested (W1-W13)</div>
+    </div>
+    <div class='card'>
+      <div class='label'>L13 orders actual</div>
+      <div class='value' id='v_l26'>0</div>
+      <div class='sub'>L13 actual orders</div>
+    </div>
+  </div>
+
+  <div class='section'>
+    <h2>Side-by-side comparisons</h2>
+    <div class='sub' style='margin-bottom:14px;'>
+      Each cell shows how the <b>row total</b> compares to the <b>column baseline</b>.
+      Positive = row is higher than column; negative = row is lower.
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style='min-width:200px;'>Projection</th>
+          <th>Total (13w)</th>
+          <th>vs Manual</th>
+          <th>vs AI</th>
+          <th>vs Suggested</th>
+          <th>vs L13 orders</th>
+        </tr>
+      </thead>
+      <tbody id='matrix'></tbody>
+    </table>
+  </div>
+
+  <div class='section'>
+    <h2>Variance vs manual plan — AI forecast</h2>
+    <div class='sub' id='ai_scope' style='margin-bottom:14px;'></div>
+    <div class='bar-row'>
+      <span class='label'>&gt; 10% off</span>
+      <div class='bar'><div class='fill' id='ai10_bar'></div></div>
+      <span class='val' id='ai10_val'></span>
+    </div>
+    <div class='bar-row'>
+      <span class='label'>&gt; 25% off</span>
+      <div class='bar'><div class='fill' id='ai25_bar' style='background:#c98a2d;'></div></div>
+      <span class='val' id='ai25_val'></span>
+    </div>
+    <div class='bar-row'>
+      <span class='label'>&gt; 50% off</span>
+      <div class='bar'><div class='fill' id='ai50_bar' style='background:#c9342d;'></div></div>
+      <span class='val' id='ai50_val'></span>
+    </div>
+  </div>
+
+  <div class='section'>
+    <h2>Variance vs manual plan — Suggested projection</h2>
+    <div class='sub' id='sg_scope' style='margin-bottom:14px;'></div>
+    <div class='bar-row'>
+      <span class='label'>&gt; 10% off</span>
+      <div class='bar'><div class='fill' id='sg10_bar'></div></div>
+      <span class='val' id='sg10_val'></span>
+    </div>
+    <div class='bar-row'>
+      <span class='label'>&gt; 25% off</span>
+      <div class='bar'><div class='fill' id='sg25_bar' style='background:#c98a2d;'></div></div>
+      <span class='val' id='sg25_val'></span>
+    </div>
+    <div class='bar-row'>
+      <span class='label'>&gt; 50% off</span>
+      <div class='bar'><div class='fill' id='sg50_bar' style='background:#c9342d;'></div></div>
+      <span class='val' id='sg50_val'></span>
+    </div>
+  </div>
+
+  <div class='section'>
+    <h2>Projection comparison by Master Brand (13w)</h2>
+    <div class='sub' style='margin-bottom:14px;'>
+      Each row aggregates all records of that brand within the active filter set.
+      Sorted by Manual total (desc).  All variance % cells are vs the Manual plan.
+    </div>
+    <table class='records-table'>
+      <thead>
+        <tr>
+          <th>Brand</th>
+          <th style='text-align:right;'># SKUs</th>
+          <th style='text-align:right;'>Manual</th>
+          <th style='text-align:right;'>AI</th>
+          <th style='text-align:right;'>Suggested</th>
+          <th style='text-align:right;'>L13 orders</th>
+          <th style='text-align:right;'>AI vs Manual</th>
+          <th style='text-align:right;'>Sug vs Manual</th>
+          <th style='text-align:right;'>AI vs L13 ord</th>
+        </tr>
+      </thead>
+      <tbody id='brand_table'></tbody>
+    </table>
+  </div>
+
+  <div class='gen'>Dashboard data pulled from Quickbase1.InventoryTrack.Projections + ProductTrack.Styles · filter Status_Cust LIKE 'A%'</div>
+
+<script>
+const DATA       = [];
+const PRJ_LABELS = ["04_26_W1", "05_03_W2", "05_10_W3", "05_17_W4", "05_24_W5", "05_31_W6", "06_07_W7", "06_14_W8", "06_21_W9", "06_28_W10", "07_05_W11", "07_12_W12", "07_19_W13"];
+const ORD_LABELS = ["W-26", "W-25", "W-24", "W-23", "W-22", "W-21", "W-20", "W-19", "W-18", "W-17", "W-16", "W-15", "W-14", "W-13", "W-12", "W-11", "W-10", "W-9", "W-8", "W-7", "W-6", "W-5", "W-4", "W-3", "W-2", "W-1"];
+const MAX_ROWS   = 500;   // table cap to keep browser happy
+
+function fmt(n) { return Math.round(n).toLocaleString(); }
+function pct(num, den) { return den ? (num/den*100) : 0; }
+function arrow(p) { return (p > 0 ? "+" : "") + p.toFixed(1) + "%"; }
+function cell(row, col) {
+  if (row === col) return "<td class='neu' style='color:#ccc;'>—</td>";
+  const p = pct(row - col, col);
+  const cls = p > 0 ? "pos" : "neg";
+  return "<td class='" + cls + "'>" + arrow(p) + "</td>";
+}
+
+function applyFilters() {
+  const fi    = document.getElementById('f_imp').value;
+  const fv    = document.getElementById('f_var').value;
+  const fvol  = document.getElementById('f_vol').value;
+  const fb    = document.getElementById('f_brand').value;
+  const fm    = document.getElementById('f_model').value;
+  const fs    = document.getElementById('f_search').value.trim().toLowerCase();
+  const varTh = {gt10:10, gt25:25, gt50:50};
+
+  const rows = DATA.filter(r => {
+    if (fi   !== 'all' && r.imp   !== fi)   return false;
+    if (fvol !== 'all' && r.vb    !== fvol) return false;
+    if (fb   !== 'all' && r.brand !== fb)   return false;
+    if (fm   !== 'all' && r.model !== fm)   return false;
+    if (fv !== 'all') {
+      const worst = Math.max(Math.abs(r.aip), Math.abs(r.sgp));
+      if (worst <= varTh[fv]) return false;
+    }
+    if (fs) {
+      const blob = (r.k+' '+r.ms+' '+r.cust+' '+r.brand+' '+r.model).toLowerCase();
+      if (!blob.includes(fs)) return false;
+    }
+    return true;
+  });
+
+  // Totals
+  let tm=0, ta=0, ts=0, to=0;
+  rows.forEach(r => { tm+=r.m; ta+=r.a; ts+=r.s; to+=r.o; });
+  document.getElementById('v_manual').textContent = fmt(tm);
+  document.getElementById('v_ai').textContent     = fmt(ta);
+  document.getElementById('v_sugg').textContent   = fmt(ts);
+  document.getElementById('v_l26').textContent    = fmt(to);
+
+  // Matrix
+  const mtx = document.getElementById('matrix');
+  mtx.innerHTML =
+    "<tr><td><b>Manual plan</b></td><td>"+fmt(tm)+"</td>"
+      + cell(tm,tm)+cell(tm,ta)+cell(tm,ts)+cell(tm,to)+"</tr>"
+    + "<tr><td><b>AI forecast</b></td><td>"+fmt(ta)+"</td>"
+      + cell(ta,tm)+cell(ta,ta)+cell(ta,ts)+cell(ta,to)+"</tr>"
+    + "<tr><td><b>Suggested projection</b></td><td>"+fmt(ts)+"</td>"
+      + cell(ts,tm)+cell(ts,ta)+cell(ts,ts)+cell(ts,to)+"</tr>"
+    + "<tr><td><b>L13 orders (actual)</b></td><td>"+fmt(to)+"</td>"
+      + cell(to,tm)+cell(to,ta)+cell(to,ts)+cell(to,to)+"</tr>";
+
+  // Variance
+  const withM = rows.filter(r => r.has_m);
+  const n = withM.length;
+  let a10=0,a25=0,a50=0,s10=0,s25=0,s50=0;
+  withM.forEach(r => {
+    const ap = Math.abs(r.aip), sp = Math.abs(r.sgp);
+    if (ap>10) a10++; if (ap>25) a25++; if (ap>50) a50++;
+    if (sp>10) s10++; if (sp>25) s25++; if (sp>50) s50++;
+  });
+  const setBar = (id, cnt) => {
+    document.getElementById(id+'_bar').style.width = pct(cnt,n).toFixed(1)+'%';
+    document.getElementById(id+'_val').textContent = cnt.toLocaleString()
+      + ' (' + pct(cnt,n).toFixed(1) + '%)';
+  };
+  setBar('ai10',a10); setBar('ai25',a25); setBar('ai50',a50);
+  setBar('sg10',s10); setBar('sg25',s25); setBar('sg50',s50);
+
+  // Scope strings
+  document.getElementById('scope').textContent =
+    'Showing ' + rows.length.toLocaleString() + ' of '
+      + DATA.length.toLocaleString() + ' records';
+  const subTxt = 'Out of ' + n.toLocaleString() + ' records with a non-zero manual plan';
+  document.getElementById('ai_scope').textContent = subTxt;
+  document.getElementById('sg_scope').textContent = subTxt;
+
+  // Brand breakdown table — group filtered records by Master Brand and aggregate.
+  const groups = {};
+  rows.forEach(r => {
+    const b = r.brand || '(unbranded)';
+    if (!groups[b]) groups[b] = { n:0, m:0, a:0, s:0, o:0 };
+    groups[b].n += 1;
+    groups[b].m += r.m;
+    groups[b].a += r.a;
+    groups[b].s += r.s;
+    groups[b].o += r.o;
+  });
+  // Sort by Manual desc; brands with zero manual go to the bottom.
+  const brandRows = Object.entries(groups).sort((x, y) => y[1].m - x[1].m);
+  const tbody = document.getElementById('brand_table');
+  const pctCell = (num, den) => {
+    if (!den) return "<td style='text-align:right;color:#ccc;'>—</td>";
+    const p = (num/den)*100;
+    const cls = p > 0 ? 'pos' : (p < 0 ? 'neg' : 'neu');
+    return "<td style='text-align:right;' class='"+cls+"'>" + arrow(p) + "</td>";
+  };
+  let h = '';
+  brandRows.forEach(([brand, g]) => {
+    h += "<tr>"
+       + "<td>"+brand+"</td>"
+       + "<td style='text-align:right;'>"+g.n.toLocaleString()+"</td>"
+       + "<td style='text-align:right;'>"+fmt(g.m)+"</td>"
+       + "<td style='text-align:right;'>"+fmt(g.a)+"</td>"
+       + "<td style='text-align:right;'>"+fmt(g.s)+"</td>"
+       + "<td style='text-align:right;'>"+fmt(g.o)+"</td>"
+       + pctCell(g.a - g.m, g.m)
+       + pctCell(g.s - g.m, g.m)
+       + pctCell(g.a - g.o, g.o)
+       + "</tr>";
+  });
+  // Totals row
+  h += "<tr style='border-top:2px solid #333;font-weight:600;'>"
+     + "<td>Total ("+brandRows.length+" brands)</td>"
+     + "<td style='text-align:right;'>"+rows.length.toLocaleString()+"</td>"
+     + "<td style='text-align:right;'>"+fmt(tm)+"</td>"
+     + "<td style='text-align:right;'>"+fmt(ta)+"</td>"
+     + "<td style='text-align:right;'>"+fmt(ts)+"</td>"
+     + "<td style='text-align:right;'>"+fmt(to)+"</td>"
+     + pctCell(ta - tm, tm)
+     + pctCell(ts - tm, tm)
+     + pctCell(ta - to, to)
+     + "</tr>";
+  tbody.innerHTML = h;
+}
+
+function resetFilters() {
+  ['f_imp','f_var','f_vol','f_brand','f_model'].forEach(id =>
+    document.getElementById(id).value = 'all');
+  document.getElementById('f_search').value = '';
+  applyFilters();
+}
+
+function exportPDF() { window.print(); }
+
+function openValidationViewer() {
+  // The viewer is a local HTTP server launched separately via:
+  //     python scripts/viewer.py --results validation_results.json
+  // Mode is determined by the JSON file the viewer loaded (validation vs forecast)
+  // — the URL is just the root, no query params.
+  window.open('http://127.0.0.1:8765', '_blank');
+}
+
+['f_imp','f_var','f_vol','f_brand','f_model'].forEach(id =>
+  document.getElementById(id).addEventListener('change', applyFilters));
+document.getElementById('f_search').addEventListener('input', applyFilters);
+applyFilters();
+</script>
+</body></html>

@@ -1,0 +1,32 @@
+Today: 2026-04-30.  LW = week ending 2026-04-25 (04/19 – 04/25/26)
+
+[1/3] Pulling current Projections for 10 keys ...
+      10 records loaded
+
+[2/3] Pulling Order_History for acct 1864 ...
+  [FAIL] CData query failed (OH acct 1864): IncompleteRead(0 bytes read)
+      0 order rows pulled
+
+[3/3] Computing corrections ...
+      0 keys with Order_History activity
+
+
+1864-FF10159: no Order_History found (might be Inactive)
+
+1864-FF7115: no Order_History found (might be Inactive)
+
+1864-FF7112: no Order_History found (might be Inactive)
+
+1864-FF25895: no Order_History found (might be Inactive)
+
+1864-BB11483: no Order_History found (might be Inactive)
+
+1864-FF27266: no Order_History found (might be Inactive)
+
+1864-FF6305PCS2: no Order_History found (might be Inactive)
+
+1864-BB12010: no Order_History found (might be Inactive)
+
+1864-FF18956: no Order_History found (might be Inactive)
+
+1864-BB16180: no Order_History found (might be Inactive)

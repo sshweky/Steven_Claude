@@ -1,0 +1,269 @@
+============================================================
+  PHASE A — Validation pass (read-only)
+  Started: Sun, May  3, 2026  7:40:27 PM
+  (auto-throttle + 5-retry CData + abort-on-empty guards)
+============================================================
+  [auto-throttle] --all detected → workers=2, rate_limit_ms=150, bulk_writeback=on, lean_pull=off
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  Manual projection columns: 05_03_W1 → 10_25_W26
+
+[1/4] Pulling projections from Quickbase ...
+      4203 records retrieved
+
+[2/4] Pulling master pack + Season from Styles ...
+      1823 master pack records loaded (150 with Season tag)
+
+[2.5] Pulling Amazon catalog POS for 1566 mstyles ...
+      1350 mstyles with POS data loaded
+
+[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 4203 keys ...
+      [vp-q4] fetching open POs (Qty_Open>0) shipping 2026-05-03 .. 2026-11-01 across 119 accounts ...
+      [vp-q4] 5742 open-PO lines aggregated across 1238 keys (1035 skipped: outside forward 26w window)
+      1238 keys have confirmed forward POs (total open qty: 763,263 units)
+
+[3/3] Validating manual projections for 4203 records ...
+      100/4203 validated ...
+      200/4203 validated ...
+      300/4203 validated ...
+      400/4203 validated ...
+      500/4203 validated ...
+      600/4203 validated ...
+      700/4203 validated ...
+      800/4203 validated ...
+      900/4203 validated ...
+      1000/4203 validated ...
+      1100/4203 validated ...
+      1200/4203 validated ...
+      1300/4203 validated ...
+      1400/4203 validated ...
+      1500/4203 validated ...
+      1600/4203 validated ...
+      1700/4203 validated ...
+      1800/4203 validated ...
+      1900/4203 validated ...
+      2000/4203 validated ...
+      2100/4203 validated ...
+      2200/4203 validated ...
+      2300/4203 validated ...
+      2400/4203 validated ...
+      2500/4203 validated ...
+      2600/4203 validated ...
+      2700/4203 validated ...
+      2800/4203 validated ...
+      2900/4203 validated ...
+      3000/4203 validated ...
+      3100/4203 validated ...
+      3200/4203 validated ...
+      3300/4203 validated ...
+      3400/4203 validated ...
+      3500/4203 validated ...
+      3600/4203 validated ...
+      3700/4203 validated ...
+      3800/4203 validated ...
+      3900/4203 validated ...
+      4000/4203 validated ...
+      4100/4203 validated ...
+      4200/4203 validated ...
+      Validation complete in 1.1s
+      Saved → validation_results.json
+
+  ── Validation Summary ──
+  Total records:   4203
+  CRITICAL:        2285
+  WARNING:         1271
+  Clean:           647
+  Total flags:     48198
+
+  Top flagged records:
+    ☢ 12446-BB0234CAN                 CRITICAL  26 flags  Proj:   75,000  Exp:   63,160  Δ +18.7%
+    ☢ 12446-BB0761CAN                 CRITICAL  26 flags  Proj:   51,400  Exp:   29,808  Δ +72.4%
+    ☢ 23685-BB36524                   CRITICAL  21 flags  Proj:   39,000  Exp:   33,785  Δ +15.4%
+    ☢ 12835-BB22272                   CRITICAL  20 flags  Proj:  102,700  Exp:   44,832  Δ +129.1%
+    ☢ 1864-FF9298EC                   CRITICAL  19 flags  Proj:   93,550  Exp:   96,686  Δ -3.2%
+    ☢ 1864-FF12689                    CRITICAL  17 flags  Proj:  134,800  Exp:   63,395  Δ +112.6%
+    ☢ 1864-FF10479EC                  CRITICAL  16 flags  Proj:   75,640  Exp:   55,622  Δ +36.0%
+    ☢ 1864-FF8654                     CRITICAL  16 flags  Proj:   87,000  Exp:   46,561  Δ +86.9%
+    ☢ 1885-FF17578                    CRITICAL  15 flags  Proj:   29,000  Exp:   28,543  Δ +1.6%
+    ☢ 1864-FF12655EC                  CRITICAL  14 flags  Proj:   45,230  Exp:   45,162  Δ +0.2%
+
+      Open viewer: python scripts/viewer.py --results validation_results.json
+============================================================
+  PHASE A complete (exit=0)
+============================================================
+
+============================================================
+  PHASE B — Forecast + deep analysis + bulk REST write-back
+  Started: Sun, May  3, 2026  7:54:17 PM
+  (--bulk-writeback auto-on for --all → ~9 calls vs 4500)
+============================================================
+  [auto-throttle] --all detected → workers=2, rate_limit_ms=150, bulk_writeback=on, lean_pull=off
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  Manual projection columns: 05_03_W1 → 10_25_W26
+
+[1/4] Pulling projections from Quickbase ...
+      4203 records retrieved
+
+[2/4] Pulling master pack + Season from Styles ...
+      1823 master pack records loaded (150 with Season tag)
+
+[2.5] Pulling Amazon catalog POS for 1566 mstyles ...
+      1350 mstyles with POS data loaded
+
+[2.7] VP-Q2 OOS smoothing: reconstructing clean demand for 4203 keys ...
+      [oos] fetching Order_History since 2025-04-27 across 119 accounts covering 4203 keys ...
+      [oos]   acct 1003: 49 rows pulled, 49 kept (in-scope keys)
+      [oos]   acct 1047: 10 rows pulled, 10 kept (in-scope keys)
+      [oos]   acct 1420: 463 rows pulled, 450 kept (in-scope keys)
+      [oos]   acct 1579: 1416 rows pulled, 787 kept (in-scope keys)
+      [oos]   acct 1587: 906 rows pulled, 763 kept (in-scope keys)
+      [oos]   acct 1704: 46 rows pulled, 4 kept (in-scope keys)
+      [oos]   acct 1745: 235 rows pulled, 231 kept (in-scope keys)
+      [oos]   acct 1768: 47 rows pulled, 16 kept (in-scope keys)
+      [oos]   acct 1770: 96 rows pulled, 71 kept (in-scope keys)
+      [oos]   acct 1864: 171665 rows pulled, 120837 kept (in-scope keys)
+      [oos]   acct 1884: 4257 rows pulled, 3107 kept (in-scope keys)
+      [oos]   acct 1885: 955 rows pulled, 851 kept (in-scope keys)
+      [oos]   acct 2342: 357 rows pulled, 56 kept (in-scope keys)
+      [oos]   acct 2659: 1715 rows pulled, 1295 kept (in-scope keys)
+      [oos]   acct 2953: 267 rows pulled, 255 kept (in-scope keys)
+      [oos]   acct 2973: 28 rows pulled, 28 kept (in-scope keys)
+      [oos]   acct 3080: 171 rows pulled, 168 kept (in-scope keys)
+      [oos]   acct 3102: 38702 rows pulled, 33398 kept (in-scope keys)
+      [oos]   acct 3460: 69 rows pulled, 50 kept (in-scope keys)
+      [oos]   acct 3466: 762 rows pulled, 674 kept (in-scope keys)
+      [oos]   acct 3700: 736 rows pulled, 420 kept (in-scope keys)
+      [oos]   acct 3837: 75 rows pulled, 71 kept (in-scope keys)
+      [oos]   acct 3882: 19 rows pulled, 16 kept (in-scope keys)
+      [oos]   acct 3892: 415 rows pulled, 390 kept (in-scope keys)
+      [oos]   acct 3896: 56 rows pulled, 9 kept (in-scope keys)
+      [oos]   acct 4167: 7 rows pulled, 4 kept (in-scope keys)
+      [oos]   acct 4485: 43 rows pulled, 0 kept (in-scope keys)
+      [oos]   acct 4524: 1122 rows pulled, 63 kept (in-scope keys)
+      [oos]   acct 4651: 1799 rows pulled, 1408 kept (in-scope keys)
+      [oos]   acct 5330: 47 rows pulled, 27 kept (in-scope keys)
+      [oos]   acct 6111: 215 rows pulled, 107 kept (in-scope keys)
+      [oos]   acct 6386: 106 rows pulled, 19 kept (in-scope keys)
+      [oos]   acct 6478: 52 rows pulled, 38 kept (in-scope keys)
+      [oos]   acct 6579: 63 rows pulled, 20 kept (in-scope keys)
+      [oos]   acct 6946: 6 rows pulled, 6 kept (in-scope keys)
+      [oos]   acct 7291: 144 rows pulled, 143 kept (in-scope keys)
+      [oos]   acct 7919: 1050 rows pulled, 13 kept (in-scope keys)
+      [oos]   acct 8055: 37 rows pulled, 35 kept (in-scope keys)
+      [oos]   acct 8423: 52 rows pulled, 44 kept (in-scope keys)
+      [oos]   acct 8478: 12 rows pulled, 0 kept (in-scope keys)
+      [oos]   acct 8692: 148 rows pulled, 23 kept (in-scope keys)
+      [oos]   acct 8919: 726 rows pulled, 183 kept (in-scope keys)
+      [oos]   acct 8940: 220 rows pulled, 134 kept (in-scope keys)
+      [oos]   acct 9108: 2510 rows pulled, 1931 kept (in-scope keys)
+      [oos]   acct 9278: 269 rows pulled, 162 kept (in-scope keys)
+      [oos]   acct 11145: 53 rows pulled, 38 kept (in-scope keys)
+      [oos]   acct 11169: 12589 rows pulled, 9031 kept (in-scope keys)
+      [oos]   acct 11393: 88 rows pulled, 88 kept (in-scope keys)
+      [oos]   acct 12002: 385 rows pulled, 195 kept (in-scope keys)
+      [oos]   acct 12428: 187 rows pulled, 107 kept (in-scope keys)
+      [oos]   acct 12446: 224 rows pulled, 209 kept (in-scope keys)
+      [oos]   acct 12835: 2822 rows pulled, 413 kept (in-scope keys)
+      [oos]   acct 12893: 212 rows pulled, 86 kept (in-scope keys)
+      [oos]   acct 13032: 1016 rows pulled, 673 kept (in-scope keys)
+      [oos]   acct 13149: 1418 rows pulled, 792 kept (in-scope keys)
+      [oos]   acct 13177: 809 rows pulled, 460 kept (in-scope keys)
+      [oos]   acct 13185: 2 rows pulled, 2 kept (in-scope keys)
+      [oos]   acct 13225: 5819 rows pulled, 5703 kept (in-scope keys)
+      [oos]   acct 13640: 939 rows pulled, 442 kept (in-scope keys)
+      [oos]   acct 13646: 521 rows pulled, 54 kept (in-scope keys)
+      [oos]   acct 13825: 455 rows pulled, 369 kept (in-scope keys)
+      [oos]   acct 13872: 1028 rows pulled, 987 kept (in-scope keys)
+      [oos]   acct 13894: 142 rows pulled, 139 kept (in-scope keys)
+      [oos]   acct 14023: 979 rows pulled, 883 kept (in-scope keys)
+      [oos]   acct 14182: 63 rows pulled, 21 kept (in-scope keys)
+      [oos]   acct 14719: 562 rows pulled, 71 kept (in-scope keys)
+      [oos]   acct 14721: 108 rows pulled, 6 kept (in-scope keys)
+      [oos]   acct 15339: 280 rows pulled, 206 kept (in-scope keys)
+      [oos]   acct 16014: 22 rows pulled, 20 kept (in-scope keys)
+      [oos]   acct 16128: 614 rows pulled, 605 kept (in-scope keys)
+      [oos]   acct 16156: 3 rows pulled, 0 kept (in-scope keys)
+      [oos]   acct 16157: 12 rows pulled, 0 kept (in-scope keys)
+      [oos]   acct 16176: 92 rows pulled, 1 kept (in-scope keys)
+      [oos]   acct 16415: 46 rows pulled, 21 kept (in-scope keys)
+      [oos]   acct 16502: 13 rows pulled, 1 kept (in-scope keys)
+      [oos]   acct 16553: 12453 rows pulled, 11018 kept (in-scope keys)
+      [oos]   acct 16554: 477 rows pulled, 388 kept (in-scope keys)
+      [oos]   acct 16579: 3337 rows pulled, 1933 kept (in-scope keys)
+      [oos]   acct 16645: 127 rows pulled, 71 kept (in-scope keys)
+      [oos]   acct 16648: 1481 rows pulled, 378 kept (in-scope keys)
+      [oos]   acct 16651: 1456 rows pulled, 966 kept (in-scope keys)
+      [oos]   acct 16820: 1167 rows pulled, 932 kept (in-scope keys)
+      [oos]   acct 16851: 183 rows pulled, 62 kept (in-scope keys)
+      [oos]   acct 18109: 36 rows pulled, 36 kept (in-scope keys)
+      [oos]   acct 18360: 772 rows pulled, 202 kept (in-scope keys)
+      [oos]   acct 19054: 140 rows pulled, 104 kept (in-scope keys)
+      [oos]   acct 19645: 152 rows pulled, 22 kept (in-scope keys)
+      [oos]   acct 19718: 29 rows pulled, 27 kept (in-scope keys)
+      [oos]   acct 19726: 20 rows pulled, 15 kept (in-scope keys)
+      [oos]   acct 19742: 10 rows pulled, 3 kept (in-scope keys)
+      [oos]   acct 19790: 222 rows pulled, 194 kept (in-scope keys)
+      [oos]   acct 20006: 13958 rows pulled, 9264 kept (in-scope keys)
+      [oos]   acct 20215: 4 rows pulled, 3 kept (in-scope keys)
+      [oos]   acct 20227: 270 rows pulled, 235 kept (in-scope keys)
+      [oos]   acct 20474: 695 rows pulled, 586 kept (in-scope keys)
+      [oos]   acct 20595: 1210 rows pulled, 1150 kept (in-scope keys)
+      [oos]   acct 20614: 46 rows pulled, 1 kept (in-scope keys)
+      [oos]   acct 21023: 123 rows pulled, 15 kept (in-scope keys)
+      [oos]   acct 21025: 276 rows pulled, 227 kept (in-scope keys)
+      [oos]   acct 21152: 152 rows pulled, 67 kept (in-scope keys)
+      [oos]   acct 21154: full pull failed, chunking by 13w ...
+      [oos]   acct 22008: 1167 rows pulled, 157 kept (in-scope keys)
+      [oos]   acct 22020: 38 rows pulled, 22 kept (in-scope keys)
+      [oos]   acct 22233: 35 rows pulled, 28 kept (in-scope keys)
+      [oos]   acct 22258: 92 rows pulled, 3 kept (in-scope keys)
+      [oos]   acct 23011: 48944 rows pulled, 33906 kept (in-scope keys)
+      [oos]   acct 23018: 853 rows pulled, 822 kept (in-scope keys)
+      [oos]   acct 23219: 13 rows pulled, 13 kept (in-scope keys)
+      [oos]   acct 23302: full pull failed, chunking by 13w ...
+      [oos]   acct 23651: 242 rows pulled, 145 kept (in-scope keys)
+      [oos]   acct 23685: 178 rows pulled, 174 kept (in-scope keys)
+      [oos]   acct 26175: 31 rows pulled, 18 kept (in-scope keys)
+      [oos]   acct 30000: 24 rows pulled, 22 kept (in-scope keys)
+      [oos]   acct 33011: 433 rows pulled, 270 kept (in-scope keys)
+      [oos]   acct 33012: 13 rows pulled, 2 kept (in-scope keys)
+      [oos]   acct 61770: 10 rows pulled, 0 kept (in-scope keys)
+      [oos]   acct 99491: full pull failed, chunking by 13w ...
+      [oos]   acct 99999: full pull failed, chunking by 13w ...
+      [oos]   acct 9999516: full pull failed, chunking by 13w ...
+      [oos] 253470 order lines aggregated across 3623 keys
+      3623 keys with order history; 1446 have ≥1 OOS week, 380 have Bucket-B (demand-invalid) cancels
+
+[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 4203 keys ...
+      [vp-q4] fetching open POs (Qty_Open>0) shipping 2026-05-03 .. 2026-11-01 across 119 accounts ...
+      [vp-q4] 5742 open-PO lines aggregated across 1238 keys (1035 skipped: outside forward 26w window)
+      1238 keys have confirmed forward POs (total open qty: 763,263 units)
+
+[EDA] Running analysis on 4203 records ...
+      EDA complete in 0.5s
+      Intermittency: Smooth=195 Erratic=303 Intermittent=2415 Lumpy=1290
+      Outliers detected: 1871
+      Calendar lifts — Prime Day: 1.04x  Fall Deal: 0.93x
+
+[3/4] Running forecasts ...
+      Mstyle-family index: 1609 mstyles with active siblings
+      Customer-baseline  : 110 customers  (global median wk-rate: 26.5)
+      4203 forecasts complete in 0.8s
+      APL Skip: 14  Croston's: 1051  Heuristic: 150  Inactive: 303  Inactive+Floor (R3): 8  Inactive+S6 (off-price): 15  New/Relaunch: 391  OTB (zero): 330  Reactivating: 69  Seasonal Baseline: 725  Sparse Intermittent: 1147  Bi-weekly enforced: 0  Alerts (>5%): 3526
+      Saved → forecast_results.json
+      Open viewer: python scripts/viewer.py --results forecast_results.json
+      Report saved → forecast_report.html
+
+[4/4] Writing 4203 records to Quickbase ...
+      4203 records  |  bulk REST → pim.quickbase.com/v1/records, batch=500
+
+[ABORT] Projections table is missing Acct_MStyle_Key_ field. Cannot upsert.
+============================================================
+  PHASE B complete (exit=1)
+  Finished: Sun, May  3, 2026  8:21:13 PM
+============================================================

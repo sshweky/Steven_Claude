@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "validation-viewer",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8801", "--bind", "127.0.0.1", "--directory", "C:\\Users\\steven\\.claude\\skills\\inventory-forecaster-cc"],
+      "port": 8801
+    }
+  ]
+}

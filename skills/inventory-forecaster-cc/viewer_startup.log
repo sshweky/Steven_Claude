@@ -1,0 +1,53 @@
+[InvMgmt] Cache stale (11.1h old, TTL 4h) — re-pulling from QB.
+[InvMgmt] Pulling Inventory Flow (mstyle grain)...
+  [CData] priming session (getInstructions) ...
+
+[InvMgmt] Serving at http://127.0.0.1:8766
+  [CData] session ready.
+  [InvMgmt] 11179 mstyles found — batching full pull...
+  [InvMgmt] inv-flow batch 1/56 — 200 rows
+  [InvMgmt] inv-flow batch 2/56 — 200 rows
+  [retry 1/4] CData inv-flow 3/56: IncompleteRead(0 bytes read) — re-priming + retrying in 2s ...
+  [InvMgmt] inv-flow batch 3/56 — 200 rows
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  [InvMgmt] inv-flow batch 4/56 — 200 rows
+  [InvMgmt] inv-flow batch 5/56 — 200 rows
+  [InvMgmt] inv-flow batch 6/56 — 199 rows
+  [InvMgmt] inv-flow batch 7/56 — 200 rows
+  [InvMgmt] inv-flow batch 8/56 — 200 rows
+  [InvMgmt] inv-flow batch 9/56 — 200 rows
+  [InvMgmt] inv-flow batch 10/56 — 200 rows
+  [InvMgmt] inv-flow batch 11/56 — 200 rows
+  [InvMgmt] inv-flow batch 12/56 — 200 rows
+  [InvMgmt] inv-flow batch 13/56 — 200 rows
+  [InvMgmt] inv-flow batch 14/56 — 200 rows
+  [InvMgmt] inv-flow batch 15/56 — 200 rows
+  [InvMgmt] inv-flow batch 16/56 — 200 rows
+  [InvMgmt] inv-flow batch 17/56 — 200 rows
+  [InvMgmt] inv-flow batch 18/56 — 200 rows
+  [InvMgmt] inv-flow batch 19/56 — 200 rows
+  [InvMgmt] inv-flow batch 20/56 — 200 rows
+  [InvMgmt] inv-flow batch 21/56 — 200 rows
+  [InvMgmt] inv-flow batch 22/56 — 200 rows
+  [InvMgmt] inv-flow batch 23/56 — 200 rows
+  [InvMgmt] inv-flow batch 24/56 — 200 rows
+  [InvMgmt] inv-flow batch 25/56 — 200 rows
+  [InvMgmt] inv-flow batch 26/56 — 200 rows
+  [InvMgmt] inv-flow batch 27/56 — 200 rows
+  [InvMgmt] inv-flow batch 28/56 — 200 rows
+  [InvMgmt] inv-flow batch 29/56 — 200 rows
+  [InvMgmt] inv-flow batch 30/56 — 200 rows
+  [InvMgmt] inv-flow batch 31/56 — 200 rows
+  [InvMgmt] inv-flow batch 32/56 — 200 rows
+  [InvMgmt] inv-flow batch 33/56 — 200 rows
+  [InvMgmt] inv-flow batch 34/56 — 200 rows
+  [retry 1/4] CData inv-flow 35/56: IncompleteRead(0 bytes read) — re-priming + retrying in 2s ...
+  [InvMgmt] inv-flow batch 35/56 — 200 rows
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  [InvMgmt] inv-flow batch 36/56 — 200 rows
+  [InvMgmt] inv-flow batch 37/56 — 200 rows
+  [InvMgmt] inv-flow batch 38/56 — 200 rows
+  [InvMgmt] inv-flow batch 39/56 — 200 rows
+  [InvMgmt] inv-flow batch 40/56 — 200 rows

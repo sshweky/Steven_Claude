@@ -1,0 +1,30 @@
+{
+  "sent_at": "April 20, 2026 07:07 PM",
+  "drafted": [
+    "taek@fetch4pets.com"
+  ],
+  "failed": [],
+  "sent_keys": [
+    "1864-FF12689"
+  ],
+  "records": [
+    {
+      "key": "1864-FF12689",
+      "cust": "AMAZON.COM.KYDC,INC",
+      "mstyle": "FF12689",
+      "desc": "A&H Pet Scents Deodorizing Gel Beads - Fresh Breeze",
+      "inv_manager": "taek@fetch4pets.com",
+      "priority": "CRITICAL",
+      "max_sev": "CRITICAL",
+      "n_flags": 17,
+      "proj_total": 114905,
+      "proj_wk": 4419.4,
+      "shp_wk": 2287.4,
+      "shpd_wk": 2199,
+      "ai_wk": 2286.5,
+      "pct_diff": 80.6,
+      "narrative": "The plan is back-loaded \u2014 only 53% of the volume is in the first 13 weeks. But this account's buying pattern shows stronger near-term demand (74% front-half). If they pull early, you may not have the inventory to support it. The plan is more than double what buying history supports in 19 weeks: W6 (5,235 planned vs. 1,776 expected), W7 (5,235 planned vs. 2,280 expected), W8 (4,330 planned vs. 1,200 expected) and 16 more weeks. That's 62,772 units above what we'd expect. If there's a known driver \u2014 promotion, new store rollout, distribution gain \u2014 this needs documentation. Otherwise this is a high risk of overstock.",
+      "comment": "this looks under projected vs history. Can you explain why?"
+    }
+  ]
+}

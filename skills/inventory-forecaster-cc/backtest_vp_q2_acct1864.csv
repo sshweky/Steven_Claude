@@ -1,0 +1,1512 @@
+key,cust,mstyle,model_base,model_vp2,baseline_mode_base,baseline_mode_vp2,old_wkly,new_wkly,old_26w,new_26w,delta_units,delta_pct
+1864-BB0235,"AMAZON.COM.KYDC,INC",BB0235,Sparse Intermittent,Sparse Intermittent,,,30.5,60.9,792,1584,792,100.0
+1864-BB35514,"AMAZON.COM.KYDC,INC",BB35514,Sparse Intermittent,Sparse Intermittent,,,0.7,1.4,18,36,18,100.0
+1864-BB14500CLR/9,"AMAZON.COM.KYDC,INC",BB14500CLR/9,Sparse Intermittent,Sparse Intermittent,,,162.0,243.0,4212,6318,2106,50.0
+1864-BB15258,"AMAZON.COM.KYDC,INC",BB15258,Croston's,Croston's,,,104.6,156.9,2720,4080,1360,50.0
+1864-BB31552CLR/9,"AMAZON.COM.KYDC,INC",BB31552CLR/9,Sparse Intermittent,Sparse Intermittent,,,165.5,248.2,4302,6453,2151,50.0
+1864-FF12653,"AMAZON.COM.KYDC,INC",FF12653,Sparse Intermittent,Sparse Intermittent,,,53.1,79.6,1380,2070,690,50.0
+1864-FF26536,"AMAZON.COM.KYDC,INC",FF26536,Sparse Intermittent,Sparse Intermittent,,,2.8,3.7,72,96,24,33.3
+1864-FF20206PCS6,"AMAZON.COM.KYDC,INC",FF20206PCS6,Croston's,Croston's,,,1.1,1.4,29,37,8,27.6
+1864-BB26737PCS10,"AMAZON.COM.KYDC,INC",BB26737PCS10,Croston's,Croston's,,,0.5,0.6,13,16,3,23.1
+1864-BB35041,"AMAZON.COM.KYDC,INC",BB35041,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 678 units),L13 nz-avg (OOS: fill-rate 6% over 678 units),46.6,55.8,1212,1452,240,19.8
+1864-BB11417FL/12,"AMAZON.COM.KYDC,INC",BB11417FL/12,Croston's,Croston's,,,5.5,6.5,144,168,24,16.7
+1864-FF31186,"AMAZON.COM.KYDC,INC",FF31186,Croston's,Croston's,,,18.7,21.8,486,567,81,16.7
+1864-BB15069,"AMAZON.COM.KYDC,INC",BB15069,Croston's,Croston's,,,12.0,13.8,312,360,48,15.4
+1864-BB26613PCS2,"AMAZON.COM.KYDC,INC",BB26613PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 225 units),L13 nz-avg (OOS: fill-rate 10% over 225 units),12.5,14.4,325,375,50,15.4
+1864-BB0018AMZ6,"AMAZON.COM.KYDC,INC",BB0018AMZ6,Croston's,Croston's,,,1.0,1.2,27,31,4,14.8
+1864-BB12019,"AMAZON.COM.KYDC,INC",BB12019,Croston's,Croston's,,,12.5,14.3,324,372,48,14.8
+1864-FF21789,"AMAZON.COM.KYDC,INC",FF21789,Croston's,Croston's,,,12.9,14.8,336,384,48,14.3
+1864-FF28400,"AMAZON.COM.KYDC,INC",FF28400,Croston's,Croston's,,,6.5,7.4,168,192,24,14.3
+1864-BB35096,"AMAZON.COM.KYDC,INC",BB35096,Croston's,Croston's,,,718.4,813.7,18678,21156,2478,13.3
+1864-FF20210PCS6,"AMAZON.COM.KYDC,INC",FF20210PCS6,Croston's,Croston's,,,0.6,0.7,15,17,2,13.3
+1864-BB26584,"AMAZON.COM.KYDC,INC",BB26584,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 1208 units),L13 nz-avg (OOS: fill-rate 6% over 1208 units),51.4,58.2,1336,1512,176,13.2
+1864-BB0092PCS2,"AMAZON.COM.KYDC,INC",BB0092PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 1004 units),L13 nz-avg (OOS: fill-rate 4% over 1004 units),56.5,63.9,1470,1662,192,13.1
+1864-FF33637,"AMAZON.COM.KYDC,INC",FF33637,Croston's,Croston's,,,5.3,6.0,138,156,18,13.0
+1864-BB16854PCS2,"AMAZON.COM.KYDC,INC",BB16854PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 708 units),L13 nz-avg (OOS: fill-rate 6% over 708 units),32.3,36.5,840,948,108,12.9
+1864-BB33526,"AMAZON.COM.KYDC,INC",BB33526,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 3918 units),L13 nz-avg (OOS: fill-rate 7% over 3918 units),214.8,242.3,5586,6300,714,12.8
+1864-BB15841,"AMAZON.COM.KYDC,INC",BB15841,Croston's,Croston's,,,101.5,114.5,2640,2976,336,12.7
+1864-BB26923,"AMAZON.COM.KYDC,INC",BB26923,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 1288 units),L13 nz-avg (OOS: fill-rate 5% over 1288 units),58.3,65.7,1516,1708,192,12.7
+1864-FF5776PCS2,"AMAZON.COM.KYDC,INC",FF5776PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 261 units),L13 nz-avg (OOS: fill-rate 6% over 261 units),12.7,14.3,330,372,42,12.7
+1864-BB16853PCS12,"AMAZON.COM.KYDC,INC",BB16853PCS12,Croston's,Croston's,,,2.5,2.8,64,72,8,12.5
+1864-FF29834PCS6,"AMAZON.COM.KYDC,INC",FF29834PCS6,Croston's,Croston's,,,1.8,2.1,48,54,6,12.5
+1864-FF4771PCS6,"AMAZON.COM.KYDC,INC",FF4771PCS6,Croston's,Croston's,,,1.5,1.7,40,45,5,12.5
+1864-FF9297PCS2,"AMAZON.COM.KYDC,INC",FF9297PCS2,Croston's,Croston's,,,7.4,8.3,192,216,24,12.5
+1864-BB0080PCS2,"AMAZON.COM.KYDC,INC",BB0080PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 402 units),L13 nz-avg (OOS: fill-rate 9% over 402 units),26.0,29.2,675,759,84,12.4
+1864-BB12010,"AMAZON.COM.KYDC,INC",BB12010,Croston's,Croston's,,,96.5,108.2,2508,2814,306,12.2
+1864-BB29489/12,"AMAZON.COM.KYDC,INC",BB29489/12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 737 units),L13 nz-avg (OOS: fill-rate 4% over 737 units),34.2,38.3,888,996,108,12.2
+1864-BB35101PCS6,"AMAZON.COM.KYDC,INC",BB35101PCS6,Croston's,Croston's,,,1.0,1.1,25,28,3,12.0
+1864-BB35032PCS6,"AMAZON.COM.KYDC,INC",BB35032PCS6,Croston's,Croston's,,,9.4,10.5,244,273,29,11.9
+1864-BB0092PCS12,"AMAZON.COM.KYDC,INC",BB0092PCS12,Croston's,Croston's,,,1.3,1.5,35,39,4,11.4
+1864-BB15258PCS10,"AMAZON.COM.KYDC,INC",BB15258PCS10,Croston's,Croston's,,,1.7,1.9,44,49,5,11.4
+1864-FF31324PCS6,"AMAZON.COM.KYDC,INC",FF31324PCS6,Croston's,Croston's,,,1.3,1.5,35,39,4,11.4
+1864-BB22025PCS2,"AMAZON.COM.KYDC,INC",BB22025PCS2,Croston's,Croston's,,,8.3,9.2,216,240,24,11.1
+1864-BB28480,"AMAZON.COM.KYDC,INC",BB28480,Croston's,Croston's,,,219.7,244.2,5712,6348,636,11.1
+1864-BB18835PCS12,"AMAZON.COM.KYDC,INC",BB18835PCS12,Croston's,Croston's,,,12.2,13.5,318,352,34,10.7
+1864-BB12068,"AMAZON.COM.KYDC,INC",BB12068,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 12360 units),L13 nz-avg (OOS: fill-rate 4% over 12360 units),381.2,420.0,9912,10920,1008,10.2
+1864-BB26739,"AMAZON.COM.KYDC,INC",BB26739,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 1952 units),L13 nz-avg (OOS: fill-rate 7% over 1952 units),169.2,186.5,4400,4848,448,10.2
+1864-BB35101,"AMAZON.COM.KYDC,INC",BB35101,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 876 units),L13 nz-avg (OOS: fill-rate 4% over 876 units),59.1,65.1,1536,1692,156,10.2
+1864-FF33139,"AMAZON.COM.KYDC,INC",FF33139,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 3% over 4134 units),L13 nz-avg (OOS: fill-rate 3% over 4134 units),159.0,175.2,4134,4554,420,10.2
+1864-FF6554PX2,"AMAZON.COM.KYDC,INC",FF6554PX2,Croston's,Croston's,,,2.3,2.5,60,66,6,10.0
+1864-BB13448PCS6,"AMAZON.COM.KYDC,INC",BB13448PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 195 units),L13 nz-avg (OOS: fill-rate 5% over 195 units),10.5,11.6,274,301,27,9.9
+1864-FF15585PCS3,"AMAZON.COM.KYDC,INC",FF15585PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 208 units),L13 nz-avg (OOS: fill-rate 5% over 208 units),9.4,10.3,244,268,24,9.8
+1864-FF33449,"AMAZON.COM.KYDC,INC",FF33449,Croston's,Croston's,,,283.8,311.5,7380,8100,720,9.8
+1864-BB35100PCS6,"AMAZON.COM.KYDC,INC",BB35100PCS6,Croston's,Croston's,,,11.1,12.2,289,317,28,9.7
+1864-FF27265,"AMAZON.COM.KYDC,INC",FF27265,Croston's,Croston's,,,369.9,405.9,9618,10554,936,9.7
+1864-FF31293,"AMAZON.COM.KYDC,INC",FF31293,Croston's,Croston's,,,7.2,7.8,186,204,18,9.7
+1864-FF34974,"AMAZON.COM.KYDC,INC",FF34974,Croston's,Croston's,,,57.0,62.5,1482,1626,144,9.7
+1864-FF8652,"AMAZON.COM.KYDC,INC",FF8652,Croston's,Croston's,,,229.6,252.0,5970,6552,582,9.7
+1864-BB0151PCS12,"AMAZON.COM.KYDC,INC",BB0151PCS12,Croston's,Croston's,,,5.6,6.2,146,160,14,9.6
+1864-BB14658PCS10,"AMAZON.COM.KYDC,INC",BB14658PCS10,Croston's,Croston's,,,4.4,4.8,114,125,11,9.6
+1864-BB16450PCS12,"AMAZON.COM.KYDC,INC",BB16450PCS12,Croston's,Croston's,,,8.8,9.6,228,250,22,9.6
+1864-BB25518PCS6,"AMAZON.COM.KYDC,INC",BB25518PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 95 units),L13 nz-avg (OOS: fill-rate 5% over 95 units),6.0,6.6,157,172,15,9.6
+1864-BB36237,"AMAZON.COM.KYDC,INC",BB36237,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 462 units),L13 nz-avg (OOS: fill-rate 2% over 462 units),24.0,26.3,624,684,60,9.6
+1864-FF33877,"AMAZON.COM.KYDC,INC",FF33877,Croston's,Croston's,,,243.9,267.2,6342,6948,606,9.6
+1864-BB33721,"AMAZON.COM.KYDC,INC",BB33721,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 1% over 666 units),L13 nz-avg (OOS: fill-rate 1% over 666 units),38.8,42.5,1008,1104,96,9.5
+1864-BB34389,"AMAZON.COM.KYDC,INC",BB34389,Croston's,Croston's,,,9.7,10.6,252,276,24,9.5
+1864-FF17828,"AMAZON.COM.KYDC,INC",FF17828,Croston's,Croston's,,,295.4,323.5,7680,8412,732,9.5
+1864-BB36235,"AMAZON.COM.KYDC,INC",BB36235,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 696 units),L13 nz-avg (OOS: fill-rate 7% over 696 units),29.5,32.3,768,840,72,9.4
+1864-BB36316,"AMAZON.COM.KYDC,INC",BB36316,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 516 units),L13 nz-avg (OOS: fill-rate 5% over 516 units),29.3,32.1,762,834,72,9.4
+1864-BB33708,"AMAZON.COM.KYDC,INC",BB33708,Croston's,Croston's,,,619.8,677.3,16116,17610,1494,9.3
+1864-BB21643PCS12,"AMAZON.COM.KYDC,INC",BB21643PCS12,Croston's,Croston's,,,4.2,4.6,109,119,10,9.2
+1864-BB34826,"AMAZON.COM.KYDC,INC",BB34826,Croston's,Croston's,,,80.3,87.7,2088,2280,192,9.2
+1864-BB35095PCS6,"AMAZON.COM.KYDC,INC",BB35095PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 163 units),L13 nz-avg (OOS: fill-rate 8% over 163 units),7.9,8.7,206,225,19,9.2
+1864-BB35099PCS2,"AMAZON.COM.KYDC,INC",BB35099PCS2,Croston's,Croston's,,,0.8,0.9,22,24,2,9.1
+1864-BB15073,"AMAZON.COM.KYDC,INC",BB15073,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 1032 units),L13 nz-avg (OOS: fill-rate 5% over 1032 units),74.5,81.2,1938,2112,174,9.0
+1864-BB30189,"AMAZON.COM.KYDC,INC",BB30189,Croston's,Croston's,,,270.9,295.4,7044,7680,636,9.0
+1864-BB13447CLR/12,"AMAZON.COM.KYDC,INC",BB13447CLR/12,Croston's,Croston's,,,129.7,141.2,3372,3672,300,8.9
+1864-BB26614PCS2,"AMAZON.COM.KYDC,INC",BB26614PCS2,Croston's,Croston's,,,6.9,7.5,180,196,16,8.9
+1864-FF31061,"AMAZON.COM.KYDC,INC",FF31061,Seasonal Baseline,Seasonal Baseline,L26 nz-avg (sparse L13),L26 nz-avg (sparse L13),25.8,28.2,672,732,60,8.9
+1864-BB21237,"AMAZON.COM.KYDC,INC",BB21237,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 1104 units),L13 nz-avg (OOS: fill-rate 5% over 1104 units),57.7,62.8,1500,1632,132,8.8
+1864-BB26614,"AMAZON.COM.KYDC,INC",BB26614,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 14% over 464 units),L13 nz-avg (OOS: fill-rate 14% over 464 units),31.4,34.2,816,888,72,8.8
+1864-FF31607,"AMAZON.COM.KYDC,INC",FF31607,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 564 units),L13 nz-avg (OOS: fill-rate 5% over 564 units),26.3,28.6,684,744,60,8.8
+1864-BB0096PCS12,"AMAZON.COM.KYDC,INC",BB0096PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 57 units),L13 nz-avg (OOS: fill-rate 7% over 57 units),1.8,1.9,46,50,4,8.7
+1864-BB0149PCS12,"AMAZON.COM.KYDC,INC",BB0149PCS12,Croston's,Croston's,,,18.2,19.8,473,514,41,8.7
+1864-BB15775PCS12,"AMAZON.COM.KYDC,INC",BB15775PCS12,Croston's,Croston's,,,14.5,15.8,378,411,33,8.7
+1864-FF20210EC,"AMAZON.COM.KYDC,INC",FF20210EC,Croston's,Croston's,,,103.6,112.6,2694,2928,234,8.7
+1864-BB0463,"AMAZON.COM.KYDC,INC",BB0463,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 780 units),L13 nz-avg (OOS: fill-rate 9% over 780 units),53.5,58.2,1392,1512,120,8.6
+1864-BB0578PCS12,"AMAZON.COM.KYDC,INC",BB0578PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 232 units),L13 nz-avg (OOS: fill-rate 6% over 232 units),9.4,10.2,244,265,21,8.6
+1864-BB35093PCS6,"AMAZON.COM.KYDC,INC",BB35093PCS6,Croston's,Croston's,,,5.8,6.3,151,164,13,8.6
+1864-BB35904,"AMAZON.COM.KYDC,INC",BB35904,Croston's,Croston's,,,13.4,14.5,348,378,30,8.6
+1864-FF31184,"AMAZON.COM.KYDC,INC",FF31184,Croston's,Croston's,,,9.3,10.2,243,264,21,8.6
+1864-BB24711,"AMAZON.COM.KYDC,INC",BB24711,Croston's,Croston's,,,22.7,24.6,590,640,50,8.5
+1864-BB35096PCS6,"AMAZON.COM.KYDC,INC",BB35096PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 307 units),L13 nz-avg (OOS: fill-rate 7% over 307 units),7.7,8.3,199,216,17,8.5
+1864-BB35094PCS6,"AMAZON.COM.KYDC,INC",BB35094PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 196 units),L13 nz-avg (OOS: fill-rate 6% over 196 units),9.7,10.5,251,272,21,8.4
+1864-BB0237PCS6,"AMAZON.COM.KYDC,INC",BB0237PCS6,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 3 legitimate zero weeks, fill-rate 6%)","L13 all-weeks avg (default: 3 legitimate zero weeks, fill-rate 6%)",3.2,3.5,84,91,7,8.3
+1864-BB0722,"AMAZON.COM.KYDC,INC",BB0722,Croston's,Croston's,,,5.5,6.0,144,156,12,8.3
+1864-BB19109PCS6,"AMAZON.COM.KYDC,INC",BB19109PCS6,Croston's,Croston's,,,0.5,0.5,12,13,1,8.3
+1864-BB20552PCS12,"AMAZON.COM.KYDC,INC",BB20552PCS12,Croston's,Croston's,,,0.9,1.0,24,26,2,8.3
+1864-BB33723,"AMAZON.COM.KYDC,INC",BB33723,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 596 units),L13 nz-avg (OOS: fill-rate 0% over 596 units),22.2,24.0,576,624,48,8.3
+1864-FF18912/24,"AMAZON.COM.KYDC,INC",FF18912/24,Croston's,Croston's,,,11.1,12.0,288,312,24,8.3
+1864-FF4930AMZ2,"AMAZON.COM.KYDC,INC",FF4930AMZ2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 3% over 855 units),L13 nz-avg (OOS: fill-rate 3% over 855 units),20.8,22.5,540,585,45,8.3
+1864-FF6639,"AMAZON.COM.KYDC,INC",FF6639,Croston's,Croston's,,,8.3,9.0,216,234,18,8.3
+1864-BB0217PCS6,"AMAZON.COM.KYDC,INC",BB0217PCS6,Croston's,Croston's,,,2.3,2.5,61,66,5,8.2
+1864-BB29122,"AMAZON.COM.KYDC,INC",BB29122,Croston's,Croston's,,,78.9,85.4,2052,2220,168,8.2
+1864-BB0520,"AMAZON.COM.KYDC,INC",BB0520,Croston's,Croston's,,,8.5,9.2,222,240,18,8.1
+1864-BB0578,"AMAZON.COM.KYDC,INC",BB0578,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 11832 units),L13 nz-avg (OOS: fill-rate 7% over 11832 units),923.1,997.4,24000,25932,1932,8.1
+1864-BB33534,"AMAZON.COM.KYDC,INC",BB33534,Croston's,Croston's,,,119.1,128.8,3096,3348,252,8.1
+1864-FF13880PCS2,"AMAZON.COM.KYDC,INC",FF13880PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 606 units),L13 nz-avg (OOS: fill-rate 4% over 606 units),28.6,30.9,744,804,60,8.1
+1864-BB16450,"AMAZON.COM.KYDC,INC",BB16450,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 816 units),L13 nz-avg (OOS: fill-rate 6% over 816 units),63.7,68.8,1656,1788,132,8.0
+1864-BB22118,"AMAZON.COM.KYDC,INC",BB22118,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 3276 units),L13 nz-avg (OOS: fill-rate 10% over 3276 units),159.2,171.9,4140,4470,330,8.0
+1864-FF27395,"AMAZON.COM.KYDC,INC",FF27395,Croston's,Croston's,,,23.1,24.9,600,648,48,8.0
+1864-FF32149,"AMAZON.COM.KYDC,INC",FF32149,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 1332 units),L13 nz-avg (OOS: fill-rate 10% over 1332 units),63.2,68.3,1644,1776,132,8.0
+1864-FF31032,"AMAZON.COM.KYDC,INC",FF31032,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 1992 units),L13 nz-avg (OOS: fill-rate 4% over 1992 units),75.7,81.7,1968,2124,156,7.9
+1864-BB0409EC,"AMAZON.COM.KYDC,INC",BB0409EC,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 486 units),L13 nz-avg (OOS: fill-rate 10% over 486 units),23.8,25.6,618,666,48,7.8
+1864-BB0015,"AMAZON.COM.KYDC,INC",BB0015,Heuristic,Heuristic,,,6.0,6.5,156,168,12,7.7
+1864-BB0466,"AMAZON.COM.KYDC,INC",BB0466,Croston's,Croston's,,,2719.8,2928.0,70716,76128,5412,7.7
+1864-BB14812PCS5,"AMAZON.COM.KYDC,INC",BB14812PCS5,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 720 units),L13 nz-avg (OOS: fill-rate 6% over 720 units),27.9,30.1,726,782,56,7.7
+1864-FF29834,"AMAZON.COM.KYDC,INC",FF29834,Croston's,Croston's,,,71.5,77.1,1860,2004,144,7.7
+1864-FF30114,"AMAZON.COM.KYDC,INC",FF30114,Croston's,Croston's,,,18.0,19.4,468,504,36,7.7
+1864-BB13437PCS3,"AMAZON.COM.KYDC,INC",BB13437PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 1176 units),L13 nz-avg (OOS: fill-rate 6% over 1176 units),132.7,142.8,3450,3712,262,7.6
+1864-BB15077,"AMAZON.COM.KYDC,INC",BB15077,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 2298 units),L13 nz-avg (OOS: fill-rate 9% over 2298 units),161.5,173.8,4200,4518,318,7.6
+1864-BB35095PCS2,"AMAZON.COM.KYDC,INC",BB35095PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 11% over 1428 units),L13 nz-avg (OOS: fill-rate 11% over 1428 units),159.8,171.9,4155,4470,315,7.6
+1864-FF27260,"AMAZON.COM.KYDC,INC",FF27260,Croston's,Croston's,,,12.2,13.2,318,342,24,7.5
+1864-FF32364,"AMAZON.COM.KYDC,INC",FF32364,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 810 units),L13 nz-avg (OOS: fill-rate 10% over 810 units),56.2,60.4,1460,1570,110,7.5
+1864-BB26587,"AMAZON.COM.KYDC,INC",BB26587,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 12420 units),L13 nz-avg (OOS: fill-rate 2% over 12420 units),736.5,790.8,19150,20560,1410,7.4
+1864-FF31327,"AMAZON.COM.KYDC,INC",FF31327,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 8088 units),L13 nz-avg (OOS: fill-rate 5% over 8088 units),306.5,328.2,7968,8532,564,7.1
+1864-FF33137,"AMAZON.COM.KYDC,INC",FF33137,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1800 units),L13 nz-avg (OOS: fill-rate 8% over 1800 units),84.7,90.7,2202,2358,156,7.1
+1864-BB33528,"AMAZON.COM.KYDC,INC",BB33528,Croston's,Croston's,,,9.9,10.6,258,276,18,7.0
+1864-BB31473,"AMAZON.COM.KYDC,INC",BB31473,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 4680 units),L13 nz-avg (OOS: fill-rate 6% over 4680 units),211.8,226.2,5508,5880,372,6.8
+1864-BB0098PCS12,"AMAZON.COM.KYDC,INC",BB0098PCS12,Croston's,Croston's,,,2.3,2.5,60,64,4,6.7
+1864-BB0231,"AMAZON.COM.KYDC,INC",BB0231,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 2514 units),L13 nz-avg (OOS: fill-rate 5% over 2514 units),166.2,177.2,4320,4608,288,6.7
+1864-FF29833,"AMAZON.COM.KYDC,INC",FF29833,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2028 units),L13 nz-avg (OOS: fill-rate 8% over 2028 units),78.0,83.1,2028,2160,132,6.5
+1864-FF7218,"AMAZON.COM.KYDC,INC",FF7218,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 1656 units),L13 nz-avg (OOS: fill-rate 5% over 1656 units),85.4,90.9,2220,2364,144,6.5
+1864-BB0098,"AMAZON.COM.KYDC,INC",BB0098,Croston's,Croston's,,,1199.1,1276.2,31176,33180,2004,6.4
+1864-FF31480,"AMAZON.COM.KYDC,INC",FF31480,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 2100 units),L13 nz-avg (OOS: fill-rate 7% over 2100 units),65.5,69.7,1704,1812,108,6.3
+1864-FF31605,"AMAZON.COM.KYDC,INC",FF31605,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1464 units),L13 nz-avg (OOS: fill-rate 8% over 1464 units),88.6,94.2,2304,2448,144,6.2
+1864-BB16853,"AMAZON.COM.KYDC,INC",BB16853,Croston's,Croston's,,,47.5,50.3,1236,1308,72,5.8
+1864-BB26280,"AMAZON.COM.KYDC,INC",BB26280,Croston's,Croston's,,,64.2,67.8,1668,1764,96,5.8
+1864-FF33135,"AMAZON.COM.KYDC,INC",FF33135,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 3180 units),L13 nz-avg (OOS: fill-rate 6% over 3180 units),211.8,223.8,5508,5820,312,5.7
+1864-BB33243,"AMAZON.COM.KYDC,INC",BB33243,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1308 units),L13 nz-avg (OOS: fill-rate 8% over 1308 units),65.5,69.2,1704,1800,96,5.6
+1864-BB15230,"AMAZON.COM.KYDC,INC",BB15230,Croston's,Croston's,,,148.1,156.2,3850,4060,210,5.5
+1864-BB0125PCS6,"AMAZON.COM.KYDC,INC",BB0125PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (post-event drawdown: 3/4 recent zeros after 100% active prior period),L13 nz-avg (post-event drawdown: 3/4 recent zeros after 100% active prior period),1.4,1.5,37,39,2,5.4
+1864-BB27359,"AMAZON.COM.KYDC,INC",BB27359,Croston's,Croston's,,,382.2,402.9,9936,10476,540,5.4
+1864-BB0092,"AMAZON.COM.KYDC,INC",BB0092,Croston's,Croston's,,,228.0,240.0,5928,6240,312,5.3
+1864-BB21641PCS2,"AMAZON.COM.KYDC,INC",BB21641PCS2,Croston's,Croston's,,,40.2,42.2,1044,1098,54,5.2
+1864-BB26922,"AMAZON.COM.KYDC,INC",BB26922,Croston's,Croston's,,,607.2,638.8,15786,16608,822,5.2
+1864-BB0152PCS12,"AMAZON.COM.KYDC,INC",BB0152PCS12,Croston's,Croston's,,,1.5,1.6,39,41,2,5.1
+1864-BB0216,"AMAZON.COM.KYDC,INC",BB0216,Croston's,Croston's,,,18.2,19.2,474,498,24,5.1
+1864-BB27773PCS10,"AMAZON.COM.KYDC,INC",BB27773PCS10,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 3 legitimate zero weeks, fill-rate 10%)","L13 all-weeks avg (default: 3 legitimate zero weeks, fill-rate 10%)",1.5,1.6,39,41,2,5.1
+1864-FF18908/24,"AMAZON.COM.KYDC,INC",FF18908/24,Heuristic,Heuristic,,,54.5,57.2,1416,1488,72,5.1
+1864-FF32840PCS4,"AMAZON.COM.KYDC,INC",FF32840PCS4,Croston's,Croston's,,,1.5,1.6,39,41,2,5.1
+1864-BB15075,"AMAZON.COM.KYDC,INC",BB15075,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1452 units),L13 nz-avg (OOS: fill-rate 8% over 1452 units),167.5,175.8,4356,4572,216,5.0
+1864-BB35093,"AMAZON.COM.KYDC,INC",BB35093,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 11% over 3336 units),L13 nz-avg (OOS: fill-rate 11% over 3336 units),253.4,266.1,6588,6918,330,5.0
+1864-BB0237,"AMAZON.COM.KYDC,INC",BB0237,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 31158 units),L13 nz-avg (OOS: fill-rate 7% over 31158 units),2478.9,2599.8,64452,67596,3144,4.9
+1864-BB25518,"AMAZON.COM.KYDC,INC",BB25518,Croston's,Croston's,,,37.6,39.5,978,1026,48,4.9
+1864-BB19109,"AMAZON.COM.KYDC,INC",BB19109,Croston's,Croston's,,,19.2,20.1,498,522,24,4.8
+1864-BB30587PCS6,"AMAZON.COM.KYDC,INC",BB30587PCS6,Croston's,Croston's,,,0.8,0.8,21,22,1,4.8
+1864-BB35094,"AMAZON.COM.KYDC,INC",BB35094,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 3408 units),L13 nz-avg (OOS: fill-rate 8% over 3408 units),233.5,244.8,6072,6366,294,4.8
+1864-BB36982,"AMAZON.COM.KYDC,INC",BB36982,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 873 units),L13 nz-avg (OOS: fill-rate 6% over 873 units),57.5,60.2,1494,1566,72,4.8
+1864-BB0236,"AMAZON.COM.KYDC,INC",BB0236,Croston's,Croston's,,,15.0,15.7,390,408,18,4.6
+1864-BB15073PCS6,"AMAZON.COM.KYDC,INC",BB15073PCS6,Croston's,Croston's,,,4.3,4.5,111,116,5,4.5
+1864-BB21641PCS12,"AMAZON.COM.KYDC,INC",BB21641PCS12,Croston's,Croston's,,,42.2,44.0,1097,1145,48,4.4
+1864-BB30587EC,"AMAZON.COM.KYDC,INC",BB30587EC,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 366 units),L13 nz-avg (OOS: fill-rate 7% over 366 units),21.0,21.9,546,570,24,4.4
+1864-BB35039PCS6,"AMAZON.COM.KYDC,INC",BB35039PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 12% over 113 units),L13 nz-avg (OOS: fill-rate 12% over 113 units),13.1,13.7,341,356,15,4.4
+1864-BB12752,"AMAZON.COM.KYDC,INC",BB12752,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1020 units),L13 nz-avg (OOS: fill-rate 8% over 1020 units),54.0,56.3,1404,1464,60,4.3
+1864-BB36989,"AMAZON.COM.KYDC,INC",BB36989,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 1932 units),L13 nz-avg (OOS: fill-rate 5% over 1932 units),162.7,169.6,4230,4410,180,4.3
+1864-FF10477EC,"AMAZON.COM.KYDC,INC",FF10477EC,Croston's,Croston's,,,227.5,237.2,5916,6168,252,4.3
+1864-BB0131AMZ6,"AMAZON.COM.KYDC,INC",BB0131AMZ6,Croston's,Croston's,,,16.6,17.3,431,449,18,4.2
+1864-BB0150PCS12,"AMAZON.COM.KYDC,INC",BB0150PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 741 units),L13 nz-avg (OOS: fill-rate 9% over 741 units),50.3,52.4,1308,1363,55,4.2
+1864-BB21642PCS12,"AMAZON.COM.KYDC,INC",BB21642PCS12,Croston's,Croston's,,,6.3,6.6,165,172,7,4.2
+1864-BB35043,"AMAZON.COM.KYDC,INC",BB35043,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 12% over 1992 units),L13 nz-avg (OOS: fill-rate 12% over 1992 units),232.2,241.8,6036,6288,252,4.2
+1864-BB35100,"AMAZON.COM.KYDC,INC",BB35100,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 702 units),L13 nz-avg (OOS: fill-rate 7% over 702 units),59.8,62.3,1554,1620,66,4.2
+1864-BB0712,"AMAZON.COM.KYDC,INC",BB0712,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 3% over 1198 units),L13 nz-avg (OOS: fill-rate 3% over 1198 units),56.5,58.8,1470,1530,60,4.1
+1864-BB0759,"AMAZON.COM.KYDC,INC",BB0759,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 834 units),L13 nz-avg (OOS: fill-rate 7% over 834 units),78.2,81.5,2034,2118,84,4.1
+1864-BB15230PCS10,"AMAZON.COM.KYDC,INC",BB15230PCS10,Croston's,Croston's,,,3.7,3.9,97,101,4,4.1
+1864-BB0009AMZ6,"AMAZON.COM.KYDC,INC",BB0009AMZ6,Croston's,Croston's,,,1.9,2.0,50,52,2,4.0
+1864-BB0080EC,"AMAZON.COM.KYDC,INC",BB0080EC,Croston's,Croston's,,,52.4,54.5,1362,1416,54,4.0
+1864-BB0083AMZ6,"AMAZON.COM.KYDC,INC",BB0083AMZ6,Croston's,Croston's,,,1.0,1.0,25,26,1,4.0
+1864-BB0102,"AMAZON.COM.KYDC,INC",BB0102,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 792 units),L13 nz-avg (OOS: fill-rate 8% over 792 units),91.8,95.5,2388,2484,96,4.0
+1864-BB0152,"AMAZON.COM.KYDC,INC",BB0152,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 288 units),L13 nz-avg (OOS: fill-rate 9% over 288 units),11.5,12.0,300,312,12,4.0
+1864-BB12479,"AMAZON.COM.KYDC,INC",BB12479,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 876 units),L13 nz-avg (OOS: fill-rate 8% over 876 units),62.8,65.3,1632,1698,66,4.0
+1864-BB29477,"AMAZON.COM.KYDC,INC",BB29477,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 1620 units),L13 nz-avg (OOS: fill-rate 9% over 1620 units),127.8,132.9,3324,3456,132,4.0
+1864-BB31202,"AMAZON.COM.KYDC,INC",BB31202,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 1692 units),L13 nz-avg (OOS: fill-rate 7% over 1692 units),197.1,204.9,5124,5328,204,4.0
+1864-BB33525,"AMAZON.COM.KYDC,INC",BB33525,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 1020 units),L13 nz-avg (OOS: fill-rate 9% over 1020 units),86.3,89.8,2244,2334,90,4.0
+1864-BB34403,"AMAZON.COM.KYDC,INC",BB34403,Croston's,Croston's,,,11.5,12.0,300,312,12,4.0
+1864-BB35917,"AMAZON.COM.KYDC,INC",BB35917,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 240 units),L13 nz-avg (OOS: fill-rate 4% over 240 units),23.3,24.2,606,630,24,4.0
+1864-BB35918,"AMAZON.COM.KYDC,INC",BB35918,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 237 units),L13 nz-avg (OOS: fill-rate 2% over 237 units),11.5,12.0,300,312,12,4.0
+1864-BB0082,"AMAZON.COM.KYDC,INC",BB0082,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 270 units),L13 nz-avg (OOS: fill-rate 7% over 270 units),23.8,24.7,618,642,24,3.9
+1864-BB11917,"AMAZON.COM.KYDC,INC",BB11917,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 12480 units),L13 nz-avg (OOS: fill-rate 4% over 12480 units),1090.6,1132.6,28356,29448,1092,3.9
+1864-BB13448PCS3,"AMAZON.COM.KYDC,INC",BB13448PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 2226 units),L13 nz-avg (OOS: fill-rate 6% over 2226 units),188.9,196.2,4912,5102,190,3.9
+1864-BB16534PCS12,"AMAZON.COM.KYDC,INC",BB16534PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 190 units),L13 nz-avg (OOS: fill-rate 8% over 190 units),8.9,9.2,231,240,9,3.9
+1864-BB28325,"AMAZON.COM.KYDC,INC",BB28325,Croston's,Croston's,,,19.6,20.4,510,530,20,3.9
+1864-BB28473,"AMAZON.COM.KYDC,INC",BB28473,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 6828 units),L13 nz-avg (OOS: fill-rate 10% over 6828 units),442.6,459.7,11508,11952,444,3.9
+1864-BB28720,"AMAZON.COM.KYDC,INC",BB28720,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 1415 units),L13 nz-avg (OOS: fill-rate 6% over 1415 units),165.2,171.7,4296,4464,168,3.9
+1864-BB28720PCS12,"AMAZON.COM.KYDC,INC",BB28720PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 15% over 68 units),L13 nz-avg (OOS: fill-rate 15% over 68 units),8.0,8.3,207,215,8,3.9
+1864-BB29561PCS12,"AMAZON.COM.KYDC,INC",BB29561PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 53 units),L13 nz-avg (OOS: fill-rate 8% over 53 units),5.9,6.1,153,159,6,3.9
+1864-BB33030,"AMAZON.COM.KYDC,INC",BB33030,Croston's,Croston's,,,29.3,30.5,762,792,30,3.9
+1864-BB0473,"AMAZON.COM.KYDC,INC",BB0473,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 2172 units),L13 nz-avg (OOS: fill-rate 9% over 2172 units),214.2,222.2,5568,5778,210,3.8
+1864-BB16853PCS2,"AMAZON.COM.KYDC,INC",BB16853PCS2,Croston's,Croston's,,,108.7,112.8,2826,2934,108,3.8
+1864-BB21058/6,"AMAZON.COM.KYDC,INC",BB21058/6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 5784 units),L13 nz-avg (OOS: fill-rate 7% over 5784 units),401.3,416.5,10434,10830,396,3.8
+1864-BB22272,"AMAZON.COM.KYDC,INC",BB22272,Croston's,Croston's,,,605.5,628.6,15744,16344,600,3.8
+1864-BB33532,"AMAZON.COM.KYDC,INC",BB33532,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 870 units),L13 nz-avg (OOS: fill-rate 8% over 870 units),67.4,69.9,1752,1818,66,3.8
+1864-BB34751,"AMAZON.COM.KYDC,INC",BB34751,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 204 units),L13 nz-avg (OOS: fill-rate 8% over 204 units),18.5,19.2,480,498,18,3.8
+1864-BB35039,"AMAZON.COM.KYDC,INC",BB35039,Croston's,Croston's,,,298.2,309.5,7752,8046,294,3.8
+1864-BB35099,"AMAZON.COM.KYDC,INC",BB35099,Croston's,Croston's,,,258.8,268.7,6730,6986,256,3.8
+1864-BB35103,"AMAZON.COM.KYDC,INC",BB35103,Croston's,Croston's,,,120.0,124.6,3120,3240,120,3.8
+1864-BB38638,"AMAZON.COM.KYDC,INC",BB38638,Croston's,Croston's,,,72.7,75.5,1890,1962,72,3.8
+1864-FF27268,"AMAZON.COM.KYDC,INC",FF27268,Croston's,Croston's,,,18.5,19.2,480,498,18,3.8
+1864-BB0100,"AMAZON.COM.KYDC,INC",BB0100,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1908 units),L13 nz-avg (OOS: fill-rate 8% over 1908 units),189.2,196.2,4920,5100,180,3.7
+1864-BB0473PCS6,"AMAZON.COM.KYDC,INC",BB0473PCS6,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 2 legitimate zero weeks, fill-rate 7%)","L13 all-weeks avg (default: 2 legitimate zero weeks, fill-rate 7%)",3.2,3.3,82,85,3,3.7
+1864-BB11150PCS6,"AMAZON.COM.KYDC,INC",BB11150PCS6,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 3 legitimate zero weeks, fill-rate 8%)","L13 all-weeks avg (default: 3 legitimate zero weeks, fill-rate 8%)",3.1,3.2,81,84,3,3.7
+1864-BB12383,"AMAZON.COM.KYDC,INC",BB12383,Croston's,Croston's,,,49.8,51.7,1296,1344,48,3.7
+1864-BB15067,"AMAZON.COM.KYDC,INC",BB15067,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 19% over 852 units),L13 nz-avg (OOS: fill-rate 19% over 852 units),99.7,103.4,2592,2688,96,3.7
+1864-BB15230PX5,"AMAZON.COM.KYDC,INC",BB15230PX5,Heuristic,Heuristic,,,6.3,6.5,164,170,6,3.7
+1864-BB15776PCS12,"AMAZON.COM.KYDC,INC",BB15776PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 93 units),L13 nz-avg (OOS: fill-rate 8% over 93 units),10.3,10.7,269,279,10,3.7
+1864-BB21626,"AMAZON.COM.KYDC,INC",BB21626,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 486 units),L13 nz-avg (OOS: fill-rate 8% over 486 units),37.4,38.8,972,1008,36,3.7
+1864-BB21641,"AMAZON.COM.KYDC,INC",BB21641,Croston's,Croston's,,,176.8,183.2,4596,4764,168,3.7
+1864-BB28480PCS12,"AMAZON.COM.KYDC,INC",BB28480PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 12% over 338 units),L13 nz-avg (OOS: fill-rate 12% over 338 units),39.5,41.0,1028,1066,38,3.7
+1864-BB33248,"AMAZON.COM.KYDC,INC",BB33248,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 2256 units),L13 nz-avg (OOS: fill-rate 7% over 2256 units),265.4,275.1,6900,7152,252,3.7
+1864-BB35097,"AMAZON.COM.KYDC,INC",BB35097,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 10026 units),L13 nz-avg (OOS: fill-rate 8% over 10026 units),919.2,953.1,23898,24780,882,3.7
+1864-BB35098,"AMAZON.COM.KYDC,INC",BB35098,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 3942 units),L13 nz-avg (OOS: fill-rate 7% over 3942 units),336.2,348.7,8742,9066,324,3.7
+1864-BB0094,"AMAZON.COM.KYDC,INC",BB0094,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2256 units),L13 nz-avg (OOS: fill-rate 8% over 2256 units),215.5,223.4,5604,5808,204,3.6
+1864-BB0096,"AMAZON.COM.KYDC,INC",BB0096,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 5004 units),L13 nz-avg (OOS: fill-rate 9% over 5004 units),371.1,384.5,9648,9996,348,3.6
+1864-BB0100PCS2,"AMAZON.COM.KYDC,INC",BB0100PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 376 units),L13 nz-avg (OOS: fill-rate 5% over 376 units),25.8,26.8,672,696,24,3.6
+1864-BB0150,"AMAZON.COM.KYDC,INC",BB0150,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 7332 units),L13 nz-avg (OOS: fill-rate 7% over 7332 units),855.2,885.7,22236,23028,792,3.6
+1864-BB11483,"AMAZON.COM.KYDC,INC",BB11483,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 7752 units),L13 nz-avg (OOS: fill-rate 7% over 7752 units),918.0,951.0,23868,24726,858,3.6
+1864-BB12028,"AMAZON.COM.KYDC,INC",BB12028,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 588 units),L13 nz-avg (OOS: fill-rate 7% over 588 units),57.0,59.1,1482,1536,54,3.6
+1864-BB19113,"AMAZON.COM.KYDC,INC",BB19113,Croston's,Croston's,,,316.2,327.7,8220,8520,300,3.6
+1864-BB19154,"AMAZON.COM.KYDC,INC",BB19154,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 14% over 162 units),L13 nz-avg (OOS: fill-rate 14% over 162 units),19.4,20.1,504,522,18,3.6
+1864-BB21250,"AMAZON.COM.KYDC,INC",BB21250,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 33192 units),L13 nz-avg (OOS: fill-rate 6% over 33192 units),2724.9,2821.8,70848,73368,2520,3.6
+1864-BB22116,"AMAZON.COM.KYDC,INC",BB22116,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 10002 units),L13 nz-avg (OOS: fill-rate 10% over 10002 units),820.8,850.4,21342,22110,768,3.6
+1864-BB28719PCS12,"AMAZON.COM.KYDC,INC",BB28719PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 852 units),L13 nz-avg (OOS: fill-rate 8% over 852 units),61.2,63.4,1591,1649,58,3.6
+1864-BB29477PCS12,"AMAZON.COM.KYDC,INC",BB29477PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 203 units),L13 nz-avg (OOS: fill-rate 7% over 203 units),17.3,17.9,449,465,16,3.6
+1864-BB30930,"AMAZON.COM.KYDC,INC",BB30930,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 25572 units),L13 nz-avg (OOS: fill-rate 7% over 25572 units),2030.3,2102.8,52788,54672,1884,3.6
+1864-BB31553PCS3,"AMAZON.COM.KYDC,INC",BB31553PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 517 units),L13 nz-avg (OOS: fill-rate 4% over 517 units),33.8,35.1,880,912,32,3.6
+1864-BB33530,"AMAZON.COM.KYDC,INC",BB33530,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 1308 units),L13 nz-avg (OOS: fill-rate 9% over 1308 units),136.2,141.0,3540,3666,126,3.6
+1864-BB0126,"AMAZON.COM.KYDC,INC",BB0126,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 732 units),L13 nz-avg (OOS: fill-rate 8% over 732 units),85.4,88.4,2220,2298,78,3.5
+1864-BB13435PCS3,"AMAZON.COM.KYDC,INC",BB13435PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2448 units),L13 nz-avg (OOS: fill-rate 8% over 2448 units),286.7,296.7,7454,7714,260,3.5
+1864-BB13437,"AMAZON.COM.KYDC,INC",BB13437,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 22176 units),L13 nz-avg (OOS: fill-rate 9% over 22176 units),2589.7,2680.6,67332,69696,2364,3.5
+1864-BB13439,"AMAZON.COM.KYDC,INC",BB13439,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 12% over 3480 units),L13 nz-avg (OOS: fill-rate 12% over 3480 units),283.8,293.8,7380,7638,258,3.5
+1864-BB16691,"AMAZON.COM.KYDC,INC",BB16691,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 4704 units),L13 nz-avg (OOS: fill-rate 7% over 4704 units),398.8,412.6,10368,10728,360,3.5
+1864-BB20552,"AMAZON.COM.KYDC,INC",BB20552,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 27528 units),L13 nz-avg (OOS: fill-rate 8% over 27528 units),2241.2,2319.2,58272,60300,2028,3.5
+1864-BB24877PCS2,"AMAZON.COM.KYDC,INC",BB24877PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 756 units),L13 nz-avg (OOS: fill-rate 7% over 756 units),70.5,72.9,1832,1896,64,3.5
+1864-BB26053PX2,"AMAZON.COM.KYDC,INC",BB26053PX2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 1404 units),L13 nz-avg (OOS: fill-rate 5% over 1404 units),65.2,67.5,1696,1756,60,3.5
+1864-BB27206,"AMAZON.COM.KYDC,INC",BB27206,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 4480 units),L13 nz-avg (OOS: fill-rate 10% over 4480 units),525.2,543.4,13656,14128,472,3.5
+1864-BB27773,"AMAZON.COM.KYDC,INC",BB27773,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 6900 units),L13 nz-avg (OOS: fill-rate 7% over 6900 units),338.1,350.0,8790,9100,310,3.5
+1864-BB28719,"AMAZON.COM.KYDC,INC",BB28719,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 11% over 10380 units),L13 nz-avg (OOS: fill-rate 11% over 10380 units),1213.4,1255.8,31548,32652,1104,3.5
+1864-BB30424,"AMAZON.COM.KYDC,INC",BB30424,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 2700 units),L13 nz-avg (OOS: fill-rate 10% over 2700 units),318.0,329.1,8268,8556,288,3.5
+1864-BB30930PCS12,"AMAZON.COM.KYDC,INC",BB30930PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 12% over 57 units),L13 nz-avg (OOS: fill-rate 12% over 57 units),6.7,6.9,173,179,6,3.5
+1864-BB13448,"AMAZON.COM.KYDC,INC",BB13448,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 11% over 4716 units),L13 nz-avg (OOS: fill-rate 11% over 4716 units),467.8,483.5,12162,12570,408,3.4
+1864-BB14658,"AMAZON.COM.KYDC,INC",BB14658,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 6140 units),L13 nz-avg (OOS: fill-rate 10% over 6140 units),676.5,699.2,17590,18180,590,3.4
+1864-BB15076,"AMAZON.COM.KYDC,INC",BB15076,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1152 units),L13 nz-avg (OOS: fill-rate 8% over 1152 units),94.2,97.4,2448,2532,84,3.4
+1864-BB16537,"AMAZON.COM.KYDC,INC",BB16537,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 552 units),L13 nz-avg (OOS: fill-rate 9% over 552 units),53.5,55.4,1392,1440,48,3.4
+1864-BB19110,"AMAZON.COM.KYDC,INC",BB19110,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 3318 units),L13 nz-avg (OOS: fill-rate 7% over 3318 units),308.8,319.2,8028,8298,270,3.4
+1864-BB21644,"AMAZON.COM.KYDC,INC",BB21644,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1368 units),L13 nz-avg (OOS: fill-rate 8% over 1368 units),148.2,153.2,3852,3984,132,3.4
+1864-BB26053,"AMAZON.COM.KYDC,INC",BB26053,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 11% over 3800 units),L13 nz-avg (OOS: fill-rate 11% over 3800 units),445.5,460.6,11584,11976,392,3.4
+1864-BB26921,"AMAZON.COM.KYDC,INC",BB26921,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 3162 units),L13 nz-avg (OOS: fill-rate 7% over 3162 units),250.8,259.4,6522,6744,222,3.4
+1864-BB33246,"AMAZON.COM.KYDC,INC",BB33246,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 2436 units),L13 nz-avg (OOS: fill-rate 7% over 2436 units),206.3,213.2,5364,5544,180,3.4
+1864-BB35639,"AMAZON.COM.KYDC,INC",BB35639,Croston's,Croston's,,,6.7,6.9,174,180,6,3.4
+1864-BB35916,"AMAZON.COM.KYDC,INC",BB35916,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 345 units),L13 nz-avg (OOS: fill-rate 5% over 345 units),20.5,21.2,534,552,18,3.4
+1864-BB38155,"AMAZON.COM.KYDC,INC",BB38155,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 4878 units),L13 nz-avg (OOS: fill-rate 6% over 4878 units),286.8,296.5,7458,7710,252,3.4
+1864-BB0098PCS2,"AMAZON.COM.KYDC,INC",BB0098PX2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 1755 units),L13 nz-avg (OOS: fill-rate 7% over 1755 units),127.4,131.5,3312,3420,108,3.3
+1864-BB0760,"AMAZON.COM.KYDC,INC",BB0760,Croston's,Croston's,,,6.9,7.2,180,186,6,3.3
+1864-BB11150,"AMAZON.COM.KYDC,INC",BB11150,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 1452 units),L13 nz-avg (OOS: fill-rate 9% over 1452 units),140.1,144.7,3642,3762,120,3.3
+1864-BB13436,"AMAZON.COM.KYDC,INC",BB13436,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 6828 units),L13 nz-avg (OOS: fill-rate 9% over 6828 units),733.8,757.8,19080,19704,624,3.3
+1864-BB19112,"AMAZON.COM.KYDC,INC",BB19112,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 2040 units),L13 nz-avg (OOS: fill-rate 6% over 2040 units),190.2,196.4,4944,5106,162,3.3
+1864-BB21949,"AMAZON.COM.KYDC,INC",BB21949,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1728 units),L13 nz-avg (OOS: fill-rate 8% over 1728 units),151.6,156.7,3942,4074,132,3.3
+1864-BB21950,"AMAZON.COM.KYDC,INC",BB21950,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 894 units),L13 nz-avg (OOS: fill-rate 9% over 894 units),105.2,108.7,2736,2826,90,3.3
+1864-BB26411PCS2,"AMAZON.COM.KYDC,INC",BB26411PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1904 units),L13 nz-avg (OOS: fill-rate 8% over 1904 units),159.5,164.8,4148,4284,136,3.3
+1864-BB26924,"AMAZON.COM.KYDC,INC",BB26924,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 984 units),L13 nz-avg (OOS: fill-rate 9% over 984 units),99.2,102.5,2580,2664,84,3.3
+1864-BB28473PCS12,"AMAZON.COM.KYDC,INC",BB28473PCS12,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 11% over 635 units),L13 nz-avg (OOS: fill-rate 11% over 635 units),62.5,64.5,1624,1678,54,3.3
+1864-BB29120,"AMAZON.COM.KYDC,INC",BB29120,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1824 units),L13 nz-avg (OOS: fill-rate 8% over 1824 units),145.6,150.5,3786,3912,126,3.3
+1864-BB0125,"AMAZON.COM.KYDC,INC",BB0125,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1482 units),L13 nz-avg (OOS: fill-rate 8% over 1482 units),137.3,141.7,3570,3684,114,3.2
+1864-BB13435,"AMAZON.COM.KYDC,INC",BB13435,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 9336 units),L13 nz-avg (OOS: fill-rate 7% over 9336 units),503.5,519.7,13092,13512,420,3.2
+1864-BB14812,"AMAZON.COM.KYDC,INC",BB14812,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 8940 units),L13 nz-avg (OOS: fill-rate 9% over 8940 units),898.5,927.3,23360,24110,750,3.2
+1864-BB15065,"AMAZON.COM.KYDC,INC",BB15065,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1440 units),L13 nz-avg (OOS: fill-rate 8% over 1440 units),114.5,118.2,2976,3072,96,3.2
+1864-BB20228,"AMAZON.COM.KYDC,INC",BB20228,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 9528 units),L13 nz-avg (OOS: fill-rate 8% over 9528 units),803.1,828.9,20880,21552,672,3.2
+1864-BB24877,"AMAZON.COM.KYDC,INC",BB24877,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 19640 units),L13 nz-avg (OOS: fill-rate 5% over 19640 units),1612.0,1664.3,41912,43272,1360,3.2
+1864-BB26411,"AMAZON.COM.KYDC,INC",BB26411,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 7112 units),L13 nz-avg (OOS: fill-rate 7% over 7112 units),605.5,624.6,15744,16240,496,3.2
+1864-BB26613,"AMAZON.COM.KYDC,INC",BB26613,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1350 units),L13 nz-avg (OOS: fill-rate 8% over 1350 units),118.5,122.3,3080,3180,100,3.2
+1864-FF23346,"AMAZON.COM.KYDC,INC",FF23346,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 192 units),L13 nz-avg (OOS: fill-rate 7% over 192 units),14.3,14.8,372,384,12,3.2
+1864-BB27019,"AMAZON.COM.KYDC,INC",BB27019,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 12% over 1170 units),L13 nz-avg (OOS: fill-rate 12% over 1170 units),138.5,142.7,3600,3710,110,3.1
+1864-BB29714,"AMAZON.COM.KYDC,INC",BB29714,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 702 units),L13 nz-avg (OOS: fill-rate 9% over 702 units),45.0,46.4,1170,1206,36,3.1
+1864-BB0082AMZ6,"AMAZON.COM.KYDC,INC",BB0082AMZ6,Croston's,Croston's,,,1.3,1.3,33,34,1,3.0
+1864-BB30276EC,"AMAZON.COM.KYDC,INC",BB30276EC,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 246 units),L13 nz-avg (OOS: fill-rate 7% over 246 units),15.2,15.7,396,408,12,3.0
+1864-BB35032,"AMAZON.COM.KYDC,INC",BB35032,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 11% over 1656 units),L13 nz-avg (OOS: fill-rate 11% over 1656 units),159.7,164.3,4152,4272,120,2.9
+1864-BB36990,"AMAZON.COM.KYDC,INC",BB36990,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 1248 units),L13 nz-avg (OOS: fill-rate 6% over 1248 units),65.4,67.3,1700,1750,50,2.9
+1864-BB15775,"AMAZON.COM.KYDC,INC",BB15775,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 5780 units),L13 nz-avg (OOS: fill-rate 7% over 5780 units),460.2,473.1,11964,12300,336,2.8
+1864-BB22094,"AMAZON.COM.KYDC,INC",BB22094,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2160 units),L13 nz-avg (OOS: fill-rate 8% over 2160 units),200.3,205.8,5208,5352,144,2.8
+1864-BB20227,"AMAZON.COM.KYDC,INC",BB20227,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 10824 units),L13 nz-avg (OOS: fill-rate 7% over 10824 units),914.8,939.7,23784,24432,648,2.7
+1864-BB22025,"AMAZON.COM.KYDC,INC",BB22025,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 6336 units),L13 nz-avg (OOS: fill-rate 8% over 6336 units),644.3,661.8,16752,17208,456,2.7
+1864-FF8990AMZ3,"AMAZON.COM.KYDC,INC",FF8990AMZ3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 4432 units),L13 nz-avg (OOS: fill-rate 6% over 4432 units),259.8,266.9,6756,6940,184,2.7
+1864-FF8651/8,"AMAZON.COM.KYDC,INC",FF8651/8,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 1707 units),L13 nz-avg (OOS: fill-rate 7% over 1707 units),78.5,80.3,2040,2088,48,2.4
+1864-BB0009,"AMAZON.COM.KYDC,INC",BB0009,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB0012,"AMAZON.COM.KYDC,INC",BB0012,Sparse Intermittent,Sparse Intermittent,,,0.7,0.7,18,18,0,0.0
+1864-BB0012AMZ6,"AMAZON.COM.KYDC,INC",BB0012AMZ6,Croston's,Croston's,,,1.0,1.0,27,27,0,0.0
+1864-BB0012PCS2,"AMAZON.COM.KYDC,INC",BB0012PCS2,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB0018,"AMAZON.COM.KYDC,INC",BB0018,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB0018EC,"AMAZON.COM.KYDC,INC",BB0018EC,Sparse Intermittent,Sparse Intermittent,,,38.8,38.8,1008,1008,0,0.0
+1864-BB0018PCS2,"AMAZON.COM.KYDC,INC",BB0018PCS2,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB0079,"AMAZON.COM.KYDC,INC",BB0079,Croston's,Croston's,,,5.1,5.1,132,132,0,0.0
+1864-BB0079AMZ6,"AMAZON.COM.KYDC,INC",BB0079AMZ6,Croston's,Croston's,,,1.0,1.0,26,26,0,0.0
+1864-BB0080,"AMAZON.COM.KYDC,INC",BB0080,Croston's,Croston's,,,177.5,177.5,4614,4614,0,0.0
+1864-BB0080AMZ6,"AMAZON.COM.KYDC,INC",BB0080AMZ6,Reactivating,Reactivating,,,2.0,2.0,52,52,0,0.0
+1864-BB0081,"AMAZON.COM.KYDC,INC",BB0081,Heuristic,Heuristic,,,20.5,20.5,534,534,0,0.0
+1864-BB0081AMZ6,"AMAZON.COM.KYDC,INC",BB0081AMZ6,Sparse Intermittent,Sparse Intermittent,,,0.5,0.5,14,14,0,0.0
+1864-BB0083,"AMAZON.COM.KYDC,INC",BB0083,Croston's,Croston's,,,6.0,6.0,156,156,0,0.0
+1864-BB0083AMZ2,"AMAZON.COM.KYDC,INC",BB0083AMZ2,Heuristic,Heuristic,,,1.2,1.2,30,30,0,0.0
+1864-BB0092AMZ12,"AMAZON.COM.KYDC,INC",BB0092AMZ12,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB0094AMZ12,"AMAZON.COM.KYDC,INC",BB0094AMZ12,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,2,2,0,0.0
+1864-BB0094PCS12,"AMAZON.COM.KYDC,INC",BB0094PCS12,Croston's,Croston's,,,3.3,3.3,86,86,0,0.0
+1864-BB0094PCS2,"AMAZON.COM.KYDC,INC",BB0094PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (post-event drawdown: 4/4 recent zeros after 89% active prior period),L13 nz-avg (post-event drawdown: 4/4 recent zeros after 89% active prior period),0.0,0.0,0,0,0,0
+1864-BB0096AMZ12,"AMAZON.COM.KYDC,INC",BB0096AMZ12,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB0096PCS2,"AMAZON.COM.KYDC,INC",BB0096PCS2,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 1 legitimate zero weeks, fill-rate 0%)","L13 all-weeks avg (default: 1 legitimate zero weeks, fill-rate 0%)",5.5,5.5,144,144,0,0.0
+1864-BB0098AMZ12,"AMAZON.COM.KYDC,INC",BB0098AMZ12,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB0100AMZ12,"AMAZON.COM.KYDC,INC",BB0100AMZ12,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB0100CFPCS12,"AMAZON.COM.KYDC,INC",BB0100CFPCS12,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB0100PCS12,"AMAZON.COM.KYDC,INC",BB0100PCS12,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB0102PCS2,"AMAZON.COM.KYDC,INC",BB0102PCS2,Sparse Intermittent,Sparse Intermittent,,,0.9,0.9,24,24,0,0.0
+1864-BB0102PX12,"AMAZON.COM.KYDC,INC",BB0102PX12,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB0126AMZ6,"AMAZON.COM.KYDC,INC",BB0126AMZ6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB0126PCS6,"AMAZON.COM.KYDC,INC",BB0126PCS6,Croston's,Croston's,,,0.2,0.2,4,4,0,0.0
+1864-BB0131,"AMAZON.COM.KYDC,INC",BB0131,New/Relaunch,New/Relaunch,,,4.6,4.6,120,120,0,0.0
+1864-BB0131EC,"AMAZON.COM.KYDC,INC",BB0131EC,Croston's,Croston's,,,431.3,431.3,11214,11214,0,0.0
+1864-BB0131PCS2,"AMAZON.COM.KYDC,INC",BB0131PCS2,Croston's,Croston's,,,55.7,55.7,1449,1449,0,0.0
+1864-BB0149,"AMAZON.COM.KYDC,INC",BB0149,Sparse Intermittent,Sparse Intermittent,,,18.0,18.0,468,468,0,0.0
+1864-BB0149PCS2,"AMAZON.COM.KYDC,INC",BB0149PCS2,Croston's,Croston's,,,57.2,57.2,1488,1488,0,0.0
+1864-BB0149PCS6,"AMAZON.COM.KYDC,INC",BB0149PCS6,Heuristic,Heuristic,,,90.5,90.5,2354,2354,0,0.0
+1864-BB0151,"AMAZON.COM.KYDC,INC",BB0151,Sparse Intermittent,Sparse Intermittent,,,14.8,14.8,384,384,0,0.0
+1864-BB0151PCS6,"AMAZON.COM.KYDC,INC",BB0151PCS6,Heuristic,Heuristic,,,5.0,5.0,130,130,0,0.0
+1864-BB0190,"AMAZON.COM.KYDC,INC",BB0190,Sparse Intermittent,Sparse Intermittent,,,1.4,1.4,36,36,0,0.0
+1864-BB0191,"AMAZON.COM.KYDC,INC",BB0191,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB0191PCS2,"AMAZON.COM.KYDC,INC",BB0191PCS2,Sparse Intermittent,Sparse Intermittent,,,36.7,36.7,954,954,0,0.0
+1864-BB0191PCS6,"AMAZON.COM.KYDC,INC",BB0191PCS6,Sparse Intermittent,Sparse Intermittent,,,0.7,0.7,18,18,0,0.0
+1864-BB0192,"AMAZON.COM.KYDC,INC",BB0192,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB0192PCS6,"AMAZON.COM.KYDC,INC",BB0192PCS6,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB0193,"AMAZON.COM.KYDC,INC",BB0193,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB0216PCS6,"AMAZON.COM.KYDC,INC",BB0216PCS6,Sparse Intermittent,Sparse Intermittent,,,2.0,2.0,52,52,0,0.0
+1864-BB0217,"AMAZON.COM.KYDC,INC",BB0217,Sparse Intermittent,Sparse Intermittent,,,5.8,5.8,150,150,0,0.0
+1864-BB0217PCS2,"AMAZON.COM.KYDC,INC",BB0217PCS2,Croston's,Croston's,,,1.5,1.5,39,39,0,0.0
+1864-BB0231PCS6,"AMAZON.COM.KYDC,INC",BB0231PCS6,Croston's,Croston's,,,1.0,1.0,27,27,0,0.0
+1864-BB0234,"AMAZON.COM.KYDC,INC",BB0234,Sparse Intermittent,Sparse Intermittent,,,18.0,18.0,468,468,0,0.0
+1864-BB0234PCS2,"AMAZON.COM.KYDC,INC",BB0234PCS2,Croston's,Croston's,,,8.4,8.4,219,219,0,0.0
+1864-BB0234PCS6,"AMAZON.COM.KYDC,INC",BB0234PCS6,Croston's,Croston's,,,1.3,1.3,33,33,0,0.0
+1864-BB0235PCS2,"AMAZON.COM.KYDC,INC",BB0235PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 351 units),L13 nz-avg (OOS: fill-rate 7% over 351 units),3.2,3.2,84,84,0,0.0
+1864-BB0235PCS6,"AMAZON.COM.KYDC,INC",BB0235PCS6,Croston's,Croston's,,,10.3,10.3,268,268,0,0.0
+1864-BB0236PCS6,"AMAZON.COM.KYDC,INC",BB0236PCS6,Croston's,Croston's,,,0.6,0.6,16,16,0,0.0
+1864-BB0332,"AMAZON.COM.KYDC,INC",BB0332,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB0332PCS5,"AMAZON.COM.KYDC,INC",BB0332PCS5,New/Relaunch,New/Relaunch,,,5.4,5.4,140,140,0,0.0
+1864-BB0409,"AMAZON.COM.KYDC,INC",BB0409,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB0409PCS2,"AMAZON.COM.KYDC,INC",BB0409PCS2,Sparse Intermittent,Sparse Intermittent,,,1.4,1.4,36,36,0,0.0
+1864-BB0409PCS6,"AMAZON.COM.KYDC,INC",BB0409PCS6,Sparse Intermittent,Sparse Intermittent,,,2.3,2.3,60,60,0,0.0
+1864-BB0424,"AMAZON.COM.KYDC,INC",BB0424,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB0424EC,"AMAZON.COM.KYDC,INC",BB0424EC,Croston's,Croston's,,,94.2,94.2,2448,2448,0,0.0
+1864-BB0424PCS2,"AMAZON.COM.KYDC,INC",BB0424PCS2,Sparse Intermittent,Sparse Intermittent,,,41.1,41.1,1068,1068,0,0.0
+1864-BB0435,"AMAZON.COM.KYDC,INC",BB0435,Croston's,Croston's,,,7.4,7.4,192,192,0,0.0
+1864-BB0435PCS6,"AMAZON.COM.KYDC,INC",BB0435PCS6,Croston's,Croston's,,,0.4,0.4,10,10,0,0.0
+1864-BB0466PCS6,"AMAZON.COM.KYDC,INC",BB0466PCS6,Heuristic,Heuristic,,,1.9,1.9,50,50,0,0.0
+1864-BB0705,"AMAZON.COM.KYDC,INC",BB0705,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB0705EC,"AMAZON.COM.KYDC,INC",BB0705EC,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 15124 units),L13 nz-avg (OOS: fill-rate 2% over 15124 units),1279.8,1279.8,33276,33276,0,0.0
+1864-BB0705PCS2,"AMAZON.COM.KYDC,INC",BB0705PCS2,Croston's,Croston's,,,20.7,20.7,537,537,0,0.0
+1864-BB0705PCS6,"AMAZON.COM.KYDC,INC",BB0705PCS6,Heuristic,Heuristic,,,4.4,4.4,115,115,0,0.0
+1864-BB0759PCS6,"AMAZON.COM.KYDC,INC",BB0759PCS6,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,3,3,0,0.0
+1864-BB11417,"AMAZON.COM.KYDC,INC",BB11417,Sparse Intermittent,Sparse Intermittent,,,7.4,7.4,192,192,0,0.0
+1864-BB11417PCS2,"AMAZON.COM.KYDC,INC",BB11417PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB11417PCS24,"AMAZON.COM.KYDC,INC",BB11417PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-BB11483PCS6,"AMAZON.COM.KYDC,INC",BB11483PCS6,Sparse Intermittent,Sparse Intermittent,,,11.7,11.7,303,303,0,0.0
+1864-BB11483PX6,"AMAZON.COM.KYDC,INC",BB11483PX6,New/Relaunch,New/Relaunch,,,5.3,5.3,138,138,0,0.0
+1864-BB11603,"AMAZON.COM.KYDC,INC",BB11603,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB11603EC,"AMAZON.COM.KYDC,INC",BB11603EC,Croston's,Croston's,,,264.9,264.9,6888,6888,0,0.0
+1864-BB12022/12,"AMAZON.COM.KYDC,INC",BB12022/12,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB12028PCS6,"AMAZON.COM.KYDC,INC",BB12028PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-BB12068PCS24,"AMAZON.COM.KYDC,INC",BB12068PCS24,Sparse Intermittent,Sparse Intermittent,,,0.3,0.3,9,9,0,0.0
+1864-BB12752PCS6,"AMAZON.COM.KYDC,INC",BB12752PCS6,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,3,3,0,0.0
+1864-BB13435PCS6,"AMAZON.COM.KYDC,INC",BB13435PCS6,Croston's,Croston's,,,11.8,11.8,308,308,0,0.0
+1864-BB13435PX3,"AMAZON.COM.KYDC,INC",BB13435PX3,New/Relaunch,New/Relaunch,,,5.2,5.2,136,136,0,0.0
+1864-BB13435PX6,"AMAZON.COM.KYDC,INC",BB13435PX6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB13436CLR/12,"AMAZON.COM.KYDC,INC",BB13436CLR/12,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB13436PCS6,"AMAZON.COM.KYDC,INC",BB13436PCS6,Sparse Intermittent,Sparse Intermittent,,,0.5,0.5,14,14,0,0.0
+1864-BB13436PX3,"AMAZON.COM.KYDC,INC",BB13436PX3,Sparse Intermittent,Sparse Intermittent,,,22.3,22.3,580,580,0,0.0
+1864-BB13437CLR/12,"AMAZON.COM.KYDC,INC",BB13437CLR/12,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB13437PCS6,"AMAZON.COM.KYDC,INC",BB13437PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB13437PX3,"AMAZON.COM.KYDC,INC",BB13437PX3,New/Relaunch,New/Relaunch,,,7.4,7.4,192,192,0,0.0
+1864-BB13437PX6,"AMAZON.COM.KYDC,INC",BB13437PX6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB13439PCS6,"AMAZON.COM.KYDC,INC",BB13439PCS6,Croston's,Croston's,,,8.6,8.6,224,224,0,0.0
+1864-BB13447,"AMAZON.COM.KYDC,INC",BB13447,New/Relaunch,New/Relaunch,,,5.5,5.5,144,144,0,0.0
+1864-BB13448CLR/12,"AMAZON.COM.KYDC,INC",BB13448CLR/12,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB14500,"AMAZON.COM.KYDC,INC",BB14500,Croston's,Croston's,,,227.8,227.8,5922,5922,0,0.0
+1864-BB14500PCS6,"AMAZON.COM.KYDC,INC",BB14500PCS6,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB14812PCS10,"AMAZON.COM.KYDC,INC",BB14812PCS10,Sparse Intermittent,Sparse Intermittent,,,0.5,0.5,14,14,0,0.0
+1864-BB15065PX12,"AMAZON.COM.KYDC,INC",BB15065PX12,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB15067PX12,"AMAZON.COM.KYDC,INC",BB15067PX12,Heuristic,Heuristic,,,0.5,0.5,13,13,0,0.0
+1864-BB15069PCS12,"AMAZON.COM.KYDC,INC",BB15069PCS12,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,2,2,0,0.0
+1864-BB15070PCS2,"AMAZON.COM.KYDC,INC",BB15070PCS2,New/Relaunch,New/Relaunch,,,5.5,5.5,144,144,0,0.0
+1864-BB15075PX12,"AMAZON.COM.KYDC,INC",BB15075PX12,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB15075PX2,"AMAZON.COM.KYDC,INC",BB15075PX2,Croston's,Croston's,,,0.5,0.5,12,12,0,0.0
+1864-BB15076PCS12,"AMAZON.COM.KYDC,INC",BB15076PCS12,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-BB15077PX6,"AMAZON.COM.KYDC,INC",BB15077PX6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB15258PCS5,"AMAZON.COM.KYDC,INC",BB15258PCS5,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 64 units),L13 nz-avg (OOS: fill-rate 2% over 64 units),5.0,5.0,130,130,0,0.0
+1864-BB15776,"AMAZON.COM.KYDC,INC",BB15776,Croston's,Croston's,,,1182.9,1182.9,30756,30756,0,0.0
+1864-BB16137,"AMAZON.COM.KYDC,INC",BB16137,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB16137PCS2,"AMAZON.COM.KYDC,INC",BB16137PCS2,Heuristic,Heuristic,,,0.0,0.0,0,0,0,0
+1864-BB16180,"AMAZON.COM.KYDC,INC",BB16180,Sparse Intermittent,Sparse Intermittent,,,30.5,30.5,792,792,0,0.0
+1864-BB16180PCS12,"AMAZON.COM.KYDC,INC",BB16180PCS12,Sparse Intermittent,Sparse Intermittent,,,0.3,0.3,8,8,0,0.0
+1864-BB16180PCS2,"AMAZON.COM.KYDC,INC",BB16180PCS2,Croston's,Croston's,,,2.1,2.1,54,54,0,0.0
+1864-BB16316,"AMAZON.COM.KYDC,INC",BB16316,Heuristic,Heuristic,,,6.0,6.0,156,156,0,0.0
+1864-BB16534,"AMAZON.COM.KYDC,INC",BB16534,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB16534PX12,"AMAZON.COM.KYDC,INC",BB16534PX12,New/Relaunch,New/Relaunch,,,5.4,5.4,141,141,0,0.0
+1864-BB16535,"AMAZON.COM.KYDC,INC",BB16535,Croston's,Croston's,,,13.4,13.4,348,348,0,0.0
+1864-BB16535PCS12,"AMAZON.COM.KYDC,INC",BB16535PCS12,Sparse Intermittent,Sparse Intermittent,,,0.5,0.5,12,12,0,0.0
+1864-BB16537PCS12,"AMAZON.COM.KYDC,INC",BB16537PCS12,Croston's,Croston's,,,1.1,1.1,29,29,0,0.0
+1864-BB16537PCS2,"AMAZON.COM.KYDC,INC",BB16537PCS2,Heuristic,Heuristic,,,6.9,6.9,180,180,0,0.0
+1864-BB16691PCS2,"AMAZON.COM.KYDC,INC",BB16691PCS2,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB16854,"AMAZON.COM.KYDC,INC",BB16854,Sparse Intermittent,Sparse Intermittent,,,26.3,26.3,684,684,0,0.0
+1864-BB16854PCS12,"AMAZON.COM.KYDC,INC",BB16854PCS12,Sparse Intermittent,Sparse Intermittent,,,1.3,1.3,33,33,0,0.0
+1864-BB18835,"AMAZON.COM.KYDC,INC",BB18835,Croston's,Croston's,,,47.1,47.1,1224,1224,0,0.0
+1864-BB19110PCS6,"AMAZON.COM.KYDC,INC",BB19110PCS6,Sparse Intermittent,Sparse Intermittent,,,5.3,5.3,138,138,0,0.0
+1864-BB19154PCS6,"AMAZON.COM.KYDC,INC",BB19154PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB19242,"AMAZON.COM.KYDC,INC",BB19242,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB19242PCS2,"AMAZON.COM.KYDC,INC",BB19242PCS2,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB19242PCS3,"AMAZON.COM.KYDC,INC",BB19242PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 53 units),L13 nz-avg (OOS: fill-rate 0% over 53 units),0.0,0.0,0,0,0,0
+1864-BB19943,"AMAZON.COM.KYDC,INC",BB19943,Sparse Intermittent,Sparse Intermittent,,,5.5,5.5,144,144,0,0.0
+1864-BB19943PCS24,"AMAZON.COM.KYDC,INC",BB19943PCS24,New/Relaunch,New/Relaunch,,,5.3,5.3,137,137,0,0.0
+1864-BB19944,"AMAZON.COM.KYDC,INC",BB19944,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB19944PCS24,"AMAZON.COM.KYDC,INC",BB19944PCS24,New/Relaunch,New/Relaunch,,,5.3,5.3,137,137,0,0.0
+1864-BB19948,"AMAZON.COM.KYDC,INC",BB19948,Croston's,Croston's,,,35.1,35.1,912,912,0,0.0
+1864-BB19948PCS24,"AMAZON.COM.KYDC,INC",BB19948PCS24,Croston's,Croston's,,,0.0,0.0,1,1,0,0.0
+1864-BB20227PCS24,"AMAZON.COM.KYDC,INC",BB20227PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-BB20228PCS24,"AMAZON.COM.KYDC,INC",BB20228PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB21038,"AMAZON.COM.KYDC,INC",BB21038,Croston's,Croston's,,,137.5,137.5,3576,3576,0,0.0
+1864-BB21235,"AMAZON.COM.KYDC,INC",BB21235,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB21235PCS12,"AMAZON.COM.KYDC,INC",BB21235PCS12,New/Relaunch,New/Relaunch,,,5.4,5.4,141,141,0,0.0
+1864-BB21235PCS2,"AMAZON.COM.KYDC,INC",BB21235PCS2,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB21237PCS12,"AMAZON.COM.KYDC,INC",BB21237PCS12,Heuristic,Heuristic,,,1.0,1.0,25,25,0,0.0
+1864-BB21488,"AMAZON.COM.KYDC,INC",BB21488,Sparse Intermittent,Sparse Intermittent,,,8.3,8.3,216,216,0,0.0
+1864-BB21489,"AMAZON.COM.KYDC,INC",BB21489,Sparse Intermittent,Sparse Intermittent,,,1.4,1.4,36,36,0,0.0
+1864-BB21626PCS2,"AMAZON.COM.KYDC,INC",BB21626PCS2,Heuristic,Heuristic,,,9.0,9.0,234,234,0,0.0
+1864-BB21642,"AMAZON.COM.KYDC,INC",BB21642,Sparse Intermittent,Sparse Intermittent,,,11.1,11.1,288,288,0,0.0
+1864-BB21642PCS2,"AMAZON.COM.KYDC,INC",BB21642PCS2,Croston's,Croston's,,,5.8,5.8,150,150,0,0.0
+1864-BB21643,"AMAZON.COM.KYDC,INC",BB21643,Croston's,Croston's,,,9.2,9.2,240,240,0,0.0
+1864-BB21643PCS2,"AMAZON.COM.KYDC,INC",BB21643PCS2,Sparse Intermittent,Sparse Intermittent,,,88.6,88.6,2304,2304,0,0.0
+1864-BB21644PCS12,"AMAZON.COM.KYDC,INC",BB21644PCS12,Sparse Intermittent,Sparse Intermittent,,,0.8,0.8,20,20,0,0.0
+1864-BB21949PCS6,"AMAZON.COM.KYDC,INC",BB21949PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB21950PCS2,"AMAZON.COM.KYDC,INC",BB21950PCS2,Sparse Intermittent,Sparse Intermittent,,,18.0,18.0,468,468,0,0.0
+1864-BB21950PCS6,"AMAZON.COM.KYDC,INC",BB21950PCS6,Heuristic,Heuristic,,,1.0,1.0,26,26,0,0.0
+1864-BB21951,"AMAZON.COM.KYDC,INC",BB21951,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 4542 units),L13 nz-avg (OOS: fill-rate 9% over 4542 units),465.7,465.7,12108,12108,0,0.0
+1864-BB21951PCS6,"AMAZON.COM.KYDC,INC",BB21951PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-BB22094PCS2,"AMAZON.COM.KYDC,INC",BB22094PCS2,Sparse Intermittent,Sparse Intermittent,,,6.5,6.5,168,168,0,0.0
+1864-BB22095,"AMAZON.COM.KYDC,INC",BB22095,Croston's,Croston's,,,1.4,1.4,36,36,0,0.0
+1864-BB22095PCS2,"AMAZON.COM.KYDC,INC",BB22095PCS2,Sparse Intermittent,Sparse Intermittent,,,4.2,4.2,108,108,0,0.0
+1864-BB22117,"AMAZON.COM.KYDC,INC",BB22117,Croston's,Croston's,,,13.6,13.6,354,354,0,0.0
+1864-BB22255,"AMAZON.COM.KYDC,INC",BB22255,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB22257,"AMAZON.COM.KYDC,INC",BB22257,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB22272PCS2,"AMAZON.COM.KYDC,INC",BB22272PCS2,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-BB23576,"AMAZON.COM.KYDC,INC",BB23576,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB23576PCS6,"AMAZON.COM.KYDC,INC",BB23576PCS6,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB24711PCS2,"AMAZON.COM.KYDC,INC",BB24711PCS2,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB24877PX8,"AMAZON.COM.KYDC,INC",BB24877PX8,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB25519,"AMAZON.COM.KYDC,INC",BB25519,Heuristic,Heuristic,,,19.6,19.6,510,510,0,0.0
+1864-BB25519PCS6,"AMAZON.COM.KYDC,INC",BB25519PCS6,Sparse Intermittent,Sparse Intermittent,,,0.6,0.6,16,16,0,0.0
+1864-BB26053PCS8,"AMAZON.COM.KYDC,INC",BB26053PCS8,Croston's,Croston's,,,0.8,0.8,22,22,0,0.0
+1864-BB26279,"AMAZON.COM.KYDC,INC",BB26279,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB26280PCS12,"AMAZON.COM.KYDC,INC",BB26280PCS12,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB26411PCS8,"AMAZON.COM.KYDC,INC",BB26411PCS8,Sparse Intermittent,Sparse Intermittent,,,1.2,1.2,30,30,0,0.0
+1864-BB26411PX2,"AMAZON.COM.KYDC,INC",BB26411PX2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB26584PCS8,"AMAZON.COM.KYDC,INC",BB26584PCS8,Croston's,Croston's,,,0.0,0.0,1,1,0,0.0
+1864-BB26587PCS10,"AMAZON.COM.KYDC,INC",BB26587PCS10,Heuristic,Heuristic,,,0.5,0.5,13,13,0,0.0
+1864-BB26612,"AMAZON.COM.KYDC,INC",BB26612,Croston's,Croston's,,,221.5,221.5,5760,5760,0,0.0
+1864-BB26612PCS12,"AMAZON.COM.KYDC,INC",BB26612PCS12,Croston's,Croston's,,,6.5,6.5,168,168,0,0.0
+1864-BB26612PCS2,"AMAZON.COM.KYDC,INC",BB26612PCS2,Sparse Intermittent,Sparse Intermittent,,,4.2,4.2,108,108,0,0.0
+1864-BB26613PCS10,"AMAZON.COM.KYDC,INC",BB26613PCS10,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,2,2,0,0.0
+1864-BB26614PCS8,"AMAZON.COM.KYDC,INC",BB26614PCS8,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB26737,"AMAZON.COM.KYDC,INC",BB26737,Sparse Intermittent,Sparse Intermittent,,,16.2,16.2,420,420,0,0.0
+1864-BB26739PCS8,"AMAZON.COM.KYDC,INC",BB26739PCS8,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB27019PCS2,"AMAZON.COM.KYDC,INC",BB27019PCS2,Croston's,Croston's,,,20.6,20.6,535,535,0,0.0
+1864-BB27019PX10,"AMAZON.COM.KYDC,INC",BB27019PX10,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB27206PX8,"AMAZON.COM.KYDC,INC",BB27206PX8,Sparse Intermittent,Sparse Intermittent,,,0.4,0.4,10,10,0,0.0
+1864-BB27359/10,"AMAZON.COM.KYDC,INC",BB27359/10,New/Relaunch,New/Relaunch,,,7.7,7.7,200,200,0,0.0
+1864-BB27359PCS12,"AMAZON.COM.KYDC,INC",BB27359PCS12,Croston's,Croston's,,,1.5,1.5,39,39,0,0.0
+1864-BB28325PCS10,"AMAZON.COM.KYDC,INC",BB28325PCS10,Sparse Intermittent,Sparse Intermittent,,,1.7,1.7,45,45,0,0.0
+1864-BB28360,"AMAZON.COM.KYDC,INC",BB28360,Croston's,Croston's,,,558.5,558.5,14520,14520,0,0.0
+1864-BB28360PCS12,"AMAZON.COM.KYDC,INC",BB28360PCS12,Croston's,Croston's,,,1.0,1.0,25,25,0,0.0
+1864-BB28360PX2,"AMAZON.COM.KYDC,INC",BB28360PX2,Sparse Intermittent,Sparse Intermittent,,,22.8,22.8,594,594,0,0.0
+1864-BB29120PCS6,"AMAZON.COM.KYDC,INC",BB29120PCS6,Croston's,Croston's,,,0.5,0.5,13,13,0,0.0
+1864-BB29489,"AMAZON.COM.KYDC,INC",BB29489,Croston's,Croston's,,,166.2,166.2,4320,4320,0,0.0
+1864-BB29489PCS2,"AMAZON.COM.KYDC,INC",BB29489PCS2,Sparse Intermittent,Sparse Intermittent,,,4.2,4.2,108,108,0,0.0
+1864-BB29561,"AMAZON.COM.KYDC,INC",BB29561,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 6828 units),L13 nz-avg (OOS: fill-rate 8% over 6828 units),718.6,718.6,18684,18684,0,0.0
+1864-BB29712,"AMAZON.COM.KYDC,INC",BB29712,Croston's,Croston's,,,34.2,34.2,888,888,0,0.0
+1864-BB29712PCS6,"AMAZON.COM.KYDC,INC",BB29712PCS6,Heuristic,Heuristic,,,1.3,1.3,35,35,0,0.0
+1864-BB29713,"AMAZON.COM.KYDC,INC",BB29713,Heuristic,Heuristic,,,51.2,51.2,1332,1332,0,0.0
+1864-BB29713PCS6,"AMAZON.COM.KYDC,INC",BB29713PCS6,Croston's,Croston's,,,0.5,0.5,13,13,0,0.0
+1864-BB29714PCS6,"AMAZON.COM.KYDC,INC",BB29714PCS6,Croston's,Croston's,,,0.9,0.9,23,23,0,0.0
+1864-BB30050,"AMAZON.COM.KYDC,INC",BB30050,Reactivating,Reactivating,,,12.0,12.0,312,312,0,0.0
+1864-BB30139,"AMAZON.COM.KYDC,INC",BB30139,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 11% over 544 units),L13 nz-avg (OOS: fill-rate 11% over 544 units),65.8,65.8,1712,1712,0,0.0
+1864-BB30139PCS2,"AMAZON.COM.KYDC,INC",BB30139PCS2,Sparse Intermittent,Sparse Intermittent,,,6.2,6.2,160,160,0,0.0
+1864-BB30139PCS8,"AMAZON.COM.KYDC,INC",BB30139PCS8,Croston's,Croston's,,,0.5,0.5,13,13,0,0.0
+1864-BB30176,"AMAZON.COM.KYDC,INC",BB30176,Sparse Intermittent,Sparse Intermittent,,,11.1,11.1,288,288,0,0.0
+1864-BB30188,"AMAZON.COM.KYDC,INC",BB30188,Croston's,Croston's,,,958.2,958.2,24912,24912,0,0.0
+1864-BB30276,"AMAZON.COM.KYDC,INC",BB30276,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB30276PCS6,"AMAZON.COM.KYDC,INC",BB30276PCS6,Sparse Intermittent,Sparse Intermittent,,,0.5,0.5,14,14,0,0.0
+1864-BB30278,"AMAZON.COM.KYDC,INC",BB30278,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB30279,"AMAZON.COM.KYDC,INC",BB30279,Croston's,Croston's,,,11.5,11.5,300,300,0,0.0
+1864-BB30317,"AMAZON.COM.KYDC,INC",BB30317,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB30317PCS12,"AMAZON.COM.KYDC,INC",BB30317PCS12,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB30371,"AMAZON.COM.KYDC,INC",BB30371,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB30371PCS12,"AMAZON.COM.KYDC,INC",BB30371PCS12,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB30371PCS2,"AMAZON.COM.KYDC,INC",BB30371PCS2,Heuristic,Heuristic,,,0.0,0.0,0,0,0,0
+1864-BB30424/10,"AMAZON.COM.KYDC,INC",BB30424/10,New/Relaunch,New/Relaunch,,,7.7,7.7,200,200,0,0.0
+1864-BB30424PCS12,"AMAZON.COM.KYDC,INC",BB30424PCS12,New/Relaunch,New/Relaunch,,,5.4,5.4,141,141,0,0.0
+1864-BB30587,"AMAZON.COM.KYDC,INC",BB30587,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB31165,"AMAZON.COM.KYDC,INC",BB31165,Sparse Intermittent,Sparse Intermittent,,,5.5,5.5,144,144,0,0.0
+1864-BB31203,"AMAZON.COM.KYDC,INC",BB31203,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB31203PCS4,"AMAZON.COM.KYDC,INC",BB31203PCS4,Croston's,Croston's,,,0.2,0.2,5,5,0,0.0
+1864-BB31204,"AMAZON.COM.KYDC,INC",BB31204,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB31204PCS6,"AMAZON.COM.KYDC,INC",BB31204PCS6,Heuristic,Heuristic,,,1.4,1.4,37,37,0,0.0
+1864-BB31205,"AMAZON.COM.KYDC,INC",BB31205,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB31205PCS4,"AMAZON.COM.KYDC,INC",BB31205PCS4,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB31256,"AMAZON.COM.KYDC,INC",BB31256,Sparse Intermittent,Sparse Intermittent,,,0.5,0.5,12,12,0,0.0
+1864-BB31256PCS2,"AMAZON.COM.KYDC,INC",BB31256PCS2,Croston's,Croston's,,,4.5,4.5,117,117,0,0.0
+1864-BB31374,"AMAZON.COM.KYDC,INC",BB31374,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 88 units),L13 nz-avg (OOS: fill-rate 0% over 88 units),0.0,0.0,0,0,0,0
+1864-BB31473PCS12,"AMAZON.COM.KYDC,INC",BB31473PCS12,Croston's,Croston's,,,3.5,3.5,90,90,0,0.0
+1864-BB31473PCS2,"AMAZON.COM.KYDC,INC",BB31473PCS2,Croston's,Croston's,,,11.1,11.1,288,288,0,0.0
+1864-BB31552,"AMAZON.COM.KYDC,INC",BB31552,Croston's,Croston's,,,1062.0,1062.0,27612,27612,0,0.0
+1864-BB31552PCS24,"AMAZON.COM.KYDC,INC",BB31552PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-BB31553,"AMAZON.COM.KYDC,INC",BB31553,Croston's,Croston's,,,166.8,166.8,4338,4338,0,0.0
+1864-BB31553CLR/9,"AMAZON.COM.KYDC,INC",BB31553CLR/9,New/Relaunch,New/Relaunch,,,6.9,6.9,180,180,0,0.0
+1864-BB31553PCS24,"AMAZON.COM.KYDC,INC",BB31553PCS24,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB31553PX3,"AMAZON.COM.KYDC,INC",BB31553PX3,New/Relaunch,New/Relaunch,,,7.4,7.4,192,192,0,0.0
+1864-BB31641,"AMAZON.COM.KYDC,INC",BB31641,Croston's,Croston's,,,133.4,133.4,3468,3468,0,0.0
+1864-BB31641PCS6,"AMAZON.COM.KYDC,INC",BB31641PCS6,Croston's,Croston's,,,2.9,2.9,76,76,0,0.0
+1864-BB31649,"AMAZON.COM.KYDC,INC",BB31649,Croston's,Croston's,,,30.5,30.5,792,792,0,0.0
+1864-BB31649PCS12,"AMAZON.COM.KYDC,INC",BB31649PCS12,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB32329,"AMAZON.COM.KYDC,INC",BB32329,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB32329PCS2,"AMAZON.COM.KYDC,INC",BB32329PCS2,New/Relaunch,New/Relaunch,,,5.1,5.1,132,132,0,0.0
+1864-BB32921,"AMAZON.COM.KYDC,INC",BB32921,Croston's,Croston's,,,10.2,10.2,264,264,0,0.0
+1864-BB33028,"AMAZON.COM.KYDC,INC",BB33028,Croston's,Croston's,,,15.7,15.7,408,408,0,0.0
+1864-BB33045,"AMAZON.COM.KYDC,INC",BB33045,Heuristic,Heuristic,,,28.6,28.6,744,744,0,0.0
+1864-BB33048,"AMAZON.COM.KYDC,INC",BB33048,Croston's,Croston's,,,3.7,3.7,96,96,0,0.0
+1864-BB33124,"AMAZON.COM.KYDC,INC",BB33124,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB33242,"AMAZON.COM.KYDC,INC",BB33242,Sparse Intermittent,Sparse Intermittent,,,0.0,2.8,0,72,72,0
+1864-BB33242PCS12,"AMAZON.COM.KYDC,INC",BB33242PCS12,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB33242PCS2,"AMAZON.COM.KYDC,INC",BB33242PCS2,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB33243PCS12,"AMAZON.COM.KYDC,INC",BB33243PCS12,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,3,3,0,0.0
+1864-BB33246PCS12,"AMAZON.COM.KYDC,INC",BB33246PCS12,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB33246PCS2,"AMAZON.COM.KYDC,INC",BB33246PCS2,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB33248PCS12,"AMAZON.COM.KYDC,INC",BB33248PCS12,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-BB33249,"AMAZON.COM.KYDC,INC",BB33249,Sparse Intermittent,Sparse Intermittent,,,0.0,20.3,0,528,528,0
+1864-BB33249PCS12,"AMAZON.COM.KYDC,INC",BB33249PCS12,Sparse Intermittent,Sparse Intermittent,,,0.5,0.5,12,12,0,0.0
+1864-BB33249PCS2,"AMAZON.COM.KYDC,INC",BB33249PCS2,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB33703,"AMAZON.COM.KYDC,INC",BB33703,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB33703PCS2,"AMAZON.COM.KYDC,INC",BB33703PCS2,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB33706,"AMAZON.COM.KYDC,INC",BB33706,Croston's,Croston's,,,177.7,177.7,4620,4620,0,0.0
+1864-BB33706PDQ,"AMAZON.COM.KYDC,INC",BB33706PDQ,Sparse Intermittent,Sparse Intermittent,,,122.5,122.5,3186,3186,0,0.0
+1864-BB33708PDQ,"AMAZON.COM.KYDC,INC",BB33708PDQ,Croston's,Croston's,,,651.0,651.0,16926,16926,0,0.0
+1864-BB33722,"AMAZON.COM.KYDC,INC",BB33722,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 242 units),L13 nz-avg (OOS: fill-rate 0% over 242 units),24.0,24.0,624,624,0,0.0
+1864-BB34390,"AMAZON.COM.KYDC,INC",BB34390,Heuristic,Heuristic,,,10.2,10.2,264,264,0,0.0
+1864-BB34682,"AMAZON.COM.KYDC,INC",BB34682,Sparse Intermittent,Sparse Intermittent,,,11.8,11.8,306,306,0,0.0
+1864-BB34682PCS2,"AMAZON.COM.KYDC,INC",BB34682PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB34682PCS6,"AMAZON.COM.KYDC,INC",BB34682PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-BB34683,"AMAZON.COM.KYDC,INC",BB34683,Sparse Intermittent,Sparse Intermittent,,,10.2,10.2,264,264,0,0.0
+1864-BB34683PCS2,"AMAZON.COM.KYDC,INC",BB34683PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB34683PCS6,"AMAZON.COM.KYDC,INC",BB34683PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-BB34711,"AMAZON.COM.KYDC,INC",BB34711,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 1848 units),L13 nz-avg (OOS: fill-rate 0% over 1848 units),172.6,172.6,4488,4488,0,0.0
+1864-BB34712,"AMAZON.COM.KYDC,INC",BB34712,Sparse Intermittent,Sparse Intermittent,,,11.1,11.1,288,288,0,0.0
+1864-BB35041PCS6,"AMAZON.COM.KYDC,INC",BB35041PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB35043PCS12,"AMAZON.COM.KYDC,INC",BB35043PCS12,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB35094CAN,"AMAZON.COM.KYDC,INC",BB35094CAN,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB35095,"AMAZON.COM.KYDC,INC",BB35095,Sparse Intermittent,Sparse Intermittent,,,126.9,126.9,3300,3300,0,0.0
+1864-BB35097PCS3,"AMAZON.COM.KYDC,INC",BB35097PCS3,Croston's,Croston's,,,0.1,0.1,3,3,0,0.0
+1864-BB35098PCS6,"AMAZON.COM.KYDC,INC",BB35098PCS6,Croston's,Croston's,,,3.5,3.5,92,92,0,0.0
+1864-BB35103PCS12,"AMAZON.COM.KYDC,INC",BB35103PCS12,Heuristic,Heuristic,,,0.0,0.0,0,0,0,0
+1864-BB35237,"AMAZON.COM.KYDC,INC",BB35237,Inactive+Floor (R3),Inactive+Floor (R3),,,3.0,3.0,78,78,0,0.0
+1864-BB35514PCS6,"AMAZON.COM.KYDC,INC",BB35514PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-BB35515,"AMAZON.COM.KYDC,INC",BB35515,Sparse Intermittent,Sparse Intermittent,,,3.2,3.2,84,84,0,0.0
+1864-BB35516,"AMAZON.COM.KYDC,INC",BB35516,Sparse Intermittent,Sparse Intermittent,,,0.9,0.9,24,24,0,0.0
+1864-BB35516PCS2,"AMAZON.COM.KYDC,INC",BB35516PCS2,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB35516PCS6,"AMAZON.COM.KYDC,INC",BB35516PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB35517,"AMAZON.COM.KYDC,INC",BB35517,Sparse Intermittent,Sparse Intermittent,,,1.4,1.4,36,36,0,0.0
+1864-BB35517PCS6,"AMAZON.COM.KYDC,INC",BB35517PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-BB35518,"AMAZON.COM.KYDC,INC",BB35518,Sparse Intermittent,Sparse Intermittent,,,3.2,3.2,84,84,0,0.0
+1864-BB35519,"AMAZON.COM.KYDC,INC",BB35519,Heuristic,Heuristic,,,15.2,15.2,396,396,0,0.0
+1864-BB35519PCS6,"AMAZON.COM.KYDC,INC",BB35519PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB35520,"AMAZON.COM.KYDC,INC",BB35520,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB35520PCS2,"AMAZON.COM.KYDC,INC",BB35520PCS2,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB35520PCS6,"AMAZON.COM.KYDC,INC",BB35520PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-BB35522,"AMAZON.COM.KYDC,INC",BB35522,Sparse Intermittent,Sparse Intermittent,,,19.4,19.4,504,504,0,0.0
+1864-BB35522PCS6,"AMAZON.COM.KYDC,INC",BB35522PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB35639PCS6,"AMAZON.COM.KYDC,INC",BB35639PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB35649,"AMAZON.COM.KYDC,INC",BB35649,Sparse Intermittent,Sparse Intermittent,,,5.1,5.1,132,132,0,0.0
+1864-BB35649PCS6,"AMAZON.COM.KYDC,INC",BB35649PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-BB35722,"AMAZON.COM.KYDC,INC",BB35722,Sparse Intermittent,Sparse Intermittent,,,6.9,6.9,180,180,0,0.0
+1864-BB35723,"AMAZON.COM.KYDC,INC",BB35723,Croston's,Croston's,,,8.1,8.1,210,210,0,0.0
+1864-BB35723PCS6,"AMAZON.COM.KYDC,INC",BB35723PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB35724,"AMAZON.COM.KYDC,INC",BB35724,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 106 units),L13 nz-avg (OOS: fill-rate 0% over 106 units),6.0,6.0,156,156,0,0.0
+1864-BB35913,"AMAZON.COM.KYDC,INC",BB35913,Sparse Intermittent,Sparse Intermittent,,,9.7,9.7,252,252,0,0.0
+1864-BB35913PCS2,"AMAZON.COM.KYDC,INC",BB35913PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB35913PCS6,"AMAZON.COM.KYDC,INC",BB35913PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-BB35914,"AMAZON.COM.KYDC,INC",BB35914,Sparse Intermittent,Sparse Intermittent,,,10.2,10.2,264,264,0,0.0
+1864-BB35914PCS2,"AMAZON.COM.KYDC,INC",BB35914PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB35914PCS6,"AMAZON.COM.KYDC,INC",BB35914PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-BB36058CLR/12,"AMAZON.COM.KYDC,INC",BB36058CLR/12,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB36083,"AMAZON.COM.KYDC,INC",BB36083,Heuristic,Heuristic,,,56.3,56.3,1464,1464,0,0.0
+1864-BB36083PCS8,"AMAZON.COM.KYDC,INC",BB36083PCS8,Heuristic,Heuristic,,,2.9,2.9,75,75,0,0.0
+1864-BB36086,"AMAZON.COM.KYDC,INC",BB36086,Heuristic,Heuristic,,,174.9,174.9,4548,4548,0,0.0
+1864-BB36086PCS12,"AMAZON.COM.KYDC,INC",BB36086PCS12,Heuristic,Heuristic,,,3.9,3.9,102,102,0,0.0
+1864-BB36089,"AMAZON.COM.KYDC,INC",BB36089,Heuristic,Heuristic,,,160.2,160.2,4164,4164,0,0.0
+1864-BB36089PCS12,"AMAZON.COM.KYDC,INC",BB36089PCS12,Heuristic,Heuristic,,,5.6,5.6,146,146,0,0.0
+1864-BB36134,"AMAZON.COM.KYDC,INC",BB36134,Heuristic,Heuristic,,,118.4,118.4,3078,3078,0,0.0
+1864-BB36134PCS6,"AMAZON.COM.KYDC,INC",BB36134PCS6,Heuristic,Heuristic,,,9.3,9.3,241,241,0,0.0
+1864-BB36137,"AMAZON.COM.KYDC,INC",BB36137,Heuristic,Heuristic,,,112.4,112.4,2922,2922,0,0.0
+1864-BB36137PCS6,"AMAZON.COM.KYDC,INC",BB36137PCS6,Heuristic,Heuristic,,,4.0,4.0,105,105,0,0.0
+1864-BB36140,"AMAZON.COM.KYDC,INC",BB36140,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB36140PCS6,"AMAZON.COM.KYDC,INC",BB36140PCS6,Heuristic,Heuristic,,,8.2,8.2,213,213,0,0.0
+1864-BB36234,"AMAZON.COM.KYDC,INC",BB36234,Croston's,Croston's,,,19.4,19.4,504,504,0,0.0
+1864-BB36316PCS6,"AMAZON.COM.KYDC,INC",BB36316PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB36317,"AMAZON.COM.KYDC,INC",BB36317,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-BB36317PCS6,"AMAZON.COM.KYDC,INC",BB36317PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB36318,"AMAZON.COM.KYDC,INC",BB36318,Croston's,Croston's,,,2.5,2.5,66,66,0,0.0
+1864-BB36318PCS6,"AMAZON.COM.KYDC,INC",BB36318PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB36319,"AMAZON.COM.KYDC,INC",BB36319,Croston's,Croston's,,,0.5,0.5,12,12,0,0.0
+1864-BB36319PCS6,"AMAZON.COM.KYDC,INC",BB36319PCS6,New/Relaunch,New/Relaunch,,,5.2,5.2,135,135,0,0.0
+1864-BB36558,"AMAZON.COM.KYDC,INC",BB36558,Sparse Intermittent,Sparse Intermittent,,,43.3,43.3,1125,1125,0,0.0
+1864-BB36670,"AMAZON.COM.KYDC,INC",BB36670,Sparse Intermittent,Sparse Intermittent,,,0.9,0.9,24,24,0,0.0
+1864-BB36671,"AMAZON.COM.KYDC,INC",BB36671,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB36671PCS3,"AMAZON.COM.KYDC,INC",BB36671PCS3,Sparse Intermittent,Sparse Intermittent,,,6.3,6.3,165,165,0,0.0
+1864-BB36796,"AMAZON.COM.KYDC,INC",BB36796,Sparse Intermittent,Sparse Intermittent,,,2.3,2.3,60,60,0,0.0
+1864-BB36896,"AMAZON.COM.KYDC,INC",BB36896,Sparse Intermittent,Sparse Intermittent,,,52.6,52.6,1368,1368,0,0.0
+1864-BB36898,"AMAZON.COM.KYDC,INC",BB36898,Sparse Intermittent,Sparse Intermittent,,,37.4,37.4,972,972,0,0.0
+1864-BB36976,"AMAZON.COM.KYDC,INC",BB36976,Sparse Intermittent,Sparse Intermittent,,,8.3,8.3,216,216,0,0.0
+1864-BB36979,"AMAZON.COM.KYDC,INC",BB36979,Heuristic,Heuristic,,,11.1,11.1,288,288,0,0.0
+1864-BB36980,"AMAZON.COM.KYDC,INC",BB36980,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-BB36981,"AMAZON.COM.KYDC,INC",BB36981,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 390 units),L13 nz-avg (OOS: fill-rate 2% over 390 units),20.3,20.3,528,528,0,0.0
+1864-BB36981PCS6,"AMAZON.COM.KYDC,INC",BB36981PCS6,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB36982PCS6,"AMAZON.COM.KYDC,INC",BB36982PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB36989PCS10,"AMAZON.COM.KYDC,INC",BB36989PCS10,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-BB36990PCS10,"AMAZON.COM.KYDC,INC",BB36990PCS10,Sparse Intermittent,Sparse Intermittent,,,0.7,0.7,18,18,0,0.0
+1864-BB37425,"AMAZON.COM.KYDC,INC",BB37425,Sparse Intermittent,Sparse Intermittent,,,13.8,13.8,360,360,0,0.0
+1864-BB37426,"AMAZON.COM.KYDC,INC",BB37426,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 1316 units),L13 nz-avg (OOS: fill-rate 7% over 1316 units),66.9,66.9,1740,1740,0,0.0
+1864-BB37426PCS10,"AMAZON.COM.KYDC,INC",BB37426PCS10,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-BB38258,"AMAZON.COM.KYDC,INC",BB38258,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-BB38262,"AMAZON.COM.KYDC,INC",BB38262,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB38263,"AMAZON.COM.KYDC,INC",BB38263,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB38264,"AMAZON.COM.KYDC,INC",BB38264,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-BB38480,"AMAZON.COM.KYDC,INC",BB38480,Sparse Intermittent,Sparse Intermittent,,,21.2,21.2,552,552,0,0.0
+1864-BB38562,"AMAZON.COM.KYDC,INC",BB38562,Heuristic,Heuristic,,,1.2,1.2,30,30,0,0.0
+1864-BB38564,"AMAZON.COM.KYDC,INC",BB38564,Sparse Intermittent,Sparse Intermittent,,,13.8,13.8,360,360,0,0.0
+1864-BB38924,"AMAZON.COM.KYDC,INC",BB38924,Sparse Intermittent,Sparse Intermittent,,,16.6,16.6,432,432,0,0.0
+1864-BB38925,"AMAZON.COM.KYDC,INC",BB38925,Sparse Intermittent,Sparse Intermittent,,,15.9,15.9,414,414,0,0.0
+1864-BB38937,"AMAZON.COM.KYDC,INC",BB38937,Sparse Intermittent,Sparse Intermittent,,,6.9,6.9,180,180,0,0.0
+1864-BB38938,"AMAZON.COM.KYDC,INC",BB38938,Sparse Intermittent,Sparse Intermittent,,,1.8,1.8,48,48,0,0.0
+1864-BB38972,"AMAZON.COM.KYDC,INC",BB38972,Sparse Intermittent,Sparse Intermittent,,,8.3,8.3,216,216,0,0.0
+1864-BB38976,"AMAZON.COM.KYDC,INC",BB38976,Sparse Intermittent,Sparse Intermittent,,,32.3,32.3,840,840,0,0.0
+1864-BB38993,"AMAZON.COM.KYDC,INC",BB38993,New/Relaunch,New/Relaunch,,,5.5,5.5,144,144,0,0.0
+1864-BB38994,"AMAZON.COM.KYDC,INC",BB38994,New/Relaunch,New/Relaunch,,,5.5,5.5,144,144,0,0.0
+1864-BB39056,"AMAZON.COM.KYDC,INC",BB39056,Sparse Intermittent,Sparse Intermittent,,,34.2,34.2,888,888,0,0.0
+1864-BB39057,"AMAZON.COM.KYDC,INC",BB39057,Sparse Intermittent,Sparse Intermittent,,,41.5,41.5,1080,1080,0,0.0
+1864-FF10159,"AMAZON.COM.KYDC,INC",FF10159,Croston's,Croston's,,,1928.5,1928.5,50142,50142,0,0.0
+1864-FF10159AMZ2,"AMAZON.COM.KYDC,INC",FF10159AMZ2,Croston's,Croston's,,,94.2,94.2,2448,2448,0,0.0
+1864-FF10159AMZ6,"AMAZON.COM.KYDC,INC",FF10159AMZ6,Sparse Intermittent,Sparse Intermittent,,,32.8,32.8,852,852,0,0.0
+1864-FF10159EC,"AMAZON.COM.KYDC,INC",FF10159EC,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 34782 units),L13 nz-avg (OOS: fill-rate 8% over 34782 units),2959.4,2959.4,76944,76944,0,0.0
+1864-FF10159PCS2,"AMAZON.COM.KYDC,INC",FF10159PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF10159PCS6,"AMAZON.COM.KYDC,INC",FF10159PCS6,Croston's,Croston's,,,52.6,52.6,1368,1368,0,0.0
+1864-FF10162,"AMAZON.COM.KYDC,INC",FF10162,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF10162AMZ2,"AMAZON.COM.KYDC,INC",FF10162AMZ2,Croston's,Croston's,,,3.0,3.0,78,78,0,0.0
+1864-FF10162PCS6,"AMAZON.COM.KYDC,INC",FF10162PCS6,Croston's,Croston's,,,3.7,3.7,95,95,0,0.0
+1864-FF10465,"AMAZON.COM.KYDC,INC",FF10465,Croston's,Croston's,,,168.9,168.9,4392,4392,0,0.0
+1864-FF10475,"AMAZON.COM.KYDC,INC",FF10475,Sparse Intermittent,Sparse Intermittent,,,235.4,235.4,6120,6120,0,0.0
+1864-FF10475AMZ2,"AMAZON.COM.KYDC,INC",FF10475AMZ2,Sparse Intermittent,Sparse Intermittent,,,1.4,1.4,36,36,0,0.0
+1864-FF10475AMZ6,"AMAZON.COM.KYDC,INC",FF10475AMZ6,Croston's,Croston's,,,1.1,1.1,28,28,0,0.0
+1864-FF10475EC,"AMAZON.COM.KYDC,INC",FF10475EC,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF10475PCS2,"AMAZON.COM.KYDC,INC",FF10475PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF10477,"AMAZON.COM.KYDC,INC",FF10477,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF10477AMZ2,"AMAZON.COM.KYDC,INC",FF10477AMZ2,Sparse Intermittent,Sparse Intermittent,,,19.8,19.8,516,516,0,0.0
+1864-FF10477AMZ6,"AMAZON.COM.KYDC,INC",FF10477AMZ6,Croston's,Croston's,,,2.0,2.0,52,52,0,0.0
+1864-FF10477PCS2,"AMAZON.COM.KYDC,INC",FF10477PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF10479,"AMAZON.COM.KYDC,INC",FF10479,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF10479EC,"AMAZON.COM.KYDC,INC",FF10479EC,Croston's,Croston's,,,1520.5,1520.5,39534,39534,0,0.0
+1864-FF10479PCS2,"AMAZON.COM.KYDC,INC",FF10479PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 13956 units),L13 nz-avg (OOS: fill-rate 7% over 13956 units),918.2,918.2,23874,23874,0,0.0
+1864-FF10479PCS6,"AMAZON.COM.KYDC,INC",FF10479PCS6,Sparse Intermittent,Sparse Intermittent,,,56.0,56.0,1456,1456,0,0.0
+1864-FF10479PX2,"AMAZON.COM.KYDC,INC",FF10479PX2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF10479PX6,"AMAZON.COM.KYDC,INC",FF10479PX6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF10530,"AMAZON.COM.KYDC,INC",FF10530,Croston's,Croston's,,,472.2,472.2,12276,12276,0,0.0
+1864-FF10530AMZ3,"AMAZON.COM.KYDC,INC",FF10530AMZ3,Sparse Intermittent,Sparse Intermittent,,,25.4,25.4,660,660,0,0.0
+1864-FF10530AMZ6,"AMAZON.COM.KYDC,INC",FF10530AMZ6,Heuristic,Heuristic,,,13.8,13.8,360,360,0,0.0
+1864-FF10530PCS12,"AMAZON.COM.KYDC,INC",FF10530PCS12,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF10556,"AMAZON.COM.KYDC,INC",FF10556,Heuristic,Heuristic,,,182.4,182.4,4742,4742,0,0.0
+1864-FF10556PCS2,"AMAZON.COM.KYDC,INC",FF10556PCS2,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 0 legitimate zero weeks, fill-rate 9%)","L13 all-weeks avg (default: 0 legitimate zero weeks, fill-rate 9%)",3.0,3.0,78,78,0,0.0
+1864-FF11348/6,"AMAZON.COM.KYDC,INC",FF11348/6,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF11353,"AMAZON.COM.KYDC,INC",FF11353,Croston's,Croston's,,,259.8,259.8,6756,6756,0,0.0
+1864-FF11353PCS12,"AMAZON.COM.KYDC,INC",FF11353PCS12,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,3,3,0,0.0
+1864-FF11899/24,"AMAZON.COM.KYDC,INC",FF11899/24,Sparse Intermittent,Sparse Intermittent,,,96.9,96.9,2520,2520,0,0.0
+1864-FF11899/24PCS2,"AMAZON.COM.KYDC,INC",FF11899/24PCS2,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF11899PCS2,"AMAZON.COM.KYDC,INC",FF11899PCS2,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF11926,"AMAZON.COM.KYDC,INC",FF11926,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF11926MX,"AMAZON.COM.KYDC,INC",FF11926MX,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF11926PCS3,"AMAZON.COM.KYDC,INC",FF11926PCS3,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-FF11926PX24,"AMAZON.COM.KYDC,INC",FF11926PX24,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF11927,"AMAZON.COM.KYDC,INC",FF11927,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 912 units),L13 nz-avg (OOS: fill-rate 0% over 912 units),41.5,41.5,1080,1080,0,0.0
+1864-FF11927PCS24,"AMAZON.COM.KYDC,INC",FF11927PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF12008/4,"AMAZON.COM.KYDC,INC",FF12008/4,New/Relaunch,New/Relaunch,,,4.0,4.0,104,104,0,0.0
+1864-FF12279,"AMAZON.COM.KYDC,INC",FF12279,Croston's,Croston's,,,121.4,121.4,3156,3156,0,0.0
+1864-FF12279PCS2,"AMAZON.COM.KYDC,INC",FF12279PCS2,Croston's,Croston's,,,0.3,0.3,9,9,0,0.0
+1864-FF12279PX6,"AMAZON.COM.KYDC,INC",FF12279PX6,Heuristic,Heuristic,,,0.0,0.0,1,1,0,0.0
+1864-FF12283,"AMAZON.COM.KYDC,INC",FF12283,Sparse Intermittent,Sparse Intermittent,,,41.5,41.5,1080,1080,0,0.0
+1864-FF12283PCS6,"AMAZON.COM.KYDC,INC",FF12283PCS6,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF12300/24,"AMAZON.COM.KYDC,INC",FF12300/24,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 38712 units),L13 nz-avg (OOS: fill-rate 10% over 38712 units),3247.4,3247.4,84432,84432,0,0.0
+1864-FF12301/24,"AMAZON.COM.KYDC,INC",FF12301/24,Croston's,Croston's,,,368.3,368.3,9576,9576,0,0.0
+1864-FF12301/24AU,AMAZON AUSTRALIA,FF12301/24AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF12302/24,"AMAZON.COM.KYDC,INC",FF12302/24,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF12302/24EC,"AMAZON.COM.KYDC,INC",FF12302/24EC,Croston's,Croston's,,,680.3,680.3,17688,17688,0,0.0
+1864-FF12302/24PCS2,"AMAZON.COM.KYDC,INC",FF12302/24PCS2,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF12302PCS2,"AMAZON.COM.KYDC,INC",FF12302PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1266 units),L13 nz-avg (OOS: fill-rate 8% over 1266 units),75.7,75.7,1968,1968,0,0.0
+1864-FF12353,"AMAZON.COM.KYDC,INC",FF12353,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF12353AMZ,"AMAZON.COM.KYDC,INC",FF12353AMZ,Sparse Intermittent,Sparse Intermittent,,,52.6,52.6,1368,1368,0,0.0
+1864-FF12353COS,"AMAZON.COM.KYDC,INC",FF12353COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF12353PCS2,"AMAZON.COM.KYDC,INC",FF12353PCS2,Sparse Intermittent,Sparse Intermittent,,,2.3,2.3,60,60,0,0.0
+1864-FF12354,"AMAZON.COM.KYDC,INC",FF12354,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 156 units),L13 nz-avg (OOS: fill-rate 6% over 156 units),17.1,17.1,444,444,0,0.0
+1864-FF12354COS,"AMAZON.COM.KYDC,INC",FF12354COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF12354PCS6,"AMAZON.COM.KYDC,INC",FF12354PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-FF12355,"AMAZON.COM.KYDC,INC",FF12355,Croston's,Croston's,,,69.2,69.2,1800,1800,0,0.0
+1864-FF12355COS,"AMAZON.COM.KYDC,INC",FF12355COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF12375,"AMAZON.COM.KYDC,INC",FF12375,Sparse Intermittent,Sparse Intermittent,,,416.3,416.3,10824,10824,0,0.0
+1864-FF12375PCS6,"AMAZON.COM.KYDC,INC",FF12375PCS6,Croston's,Croston's,,,2.0,2.0,52,52,0,0.0
+1864-FF12375PX2,"AMAZON.COM.KYDC,INC",FF12375PX2,Croston's,Croston's,,,6.2,6.2,162,162,0,0.0
+1864-FF12376,"AMAZON.COM.KYDC,INC",FF12376,Croston's,Croston's,,,808.8,808.8,21030,21030,0,0.0
+1864-FF12376PCS6,"AMAZON.COM.KYDC,INC",FF12376PCS6,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 3 legitimate zero weeks, fill-rate 6%)","L13 all-weeks avg (default: 3 legitimate zero weeks, fill-rate 6%)",3.1,3.1,80,80,0,0.0
+1864-FF12376PX2,"AMAZON.COM.KYDC,INC",FF12376PX2,Sparse Intermittent,Sparse Intermittent,,,4.2,4.2,108,108,0,0.0
+1864-FF12377,"AMAZON.COM.KYDC,INC",FF12377,Sparse Intermittent,Sparse Intermittent,,,38.8,38.8,1008,1008,0,0.0
+1864-FF12377PCS2,"AMAZON.COM.KYDC,INC",FF12377PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 141 units),L13 nz-avg (OOS: fill-rate 6% over 141 units),13.3,13.3,345,345,0,0.0
+1864-FF12377PCS6,"AMAZON.COM.KYDC,INC",FF12377PCS6,Croston's,Croston's,,,0.5,0.5,13,13,0,0.0
+1864-FF12378,"AMAZON.COM.KYDC,INC",FF12378,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 852 units),L13 nz-avg (OOS: fill-rate 8% over 852 units),56.5,56.5,1470,1470,0,0.0
+1864-FF12378PCS6,"AMAZON.COM.KYDC,INC",FF12378PCS6,Croston's,Croston's,,,0.7,0.7,18,18,0,0.0
+1864-FF12378PX2,"AMAZON.COM.KYDC,INC",FF12378PX2,Heuristic,Heuristic,,,7.8,7.8,204,204,0,0.0
+1864-FF12379/6,"AMAZON.COM.KYDC,INC",FF12379/6,Croston's,Croston's,,,38.5,38.5,1002,1002,0,0.0
+1864-FF12379/6PCS2,"AMAZON.COM.KYDC,INC",FF12379/6PCS2,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF12380/6,"AMAZON.COM.KYDC,INC",FF12380/6,Sparse Intermittent,Sparse Intermittent,,,195.7,195.7,5088,5088,0,0.0
+1864-FF12380/6PCS2,"AMAZON.COM.KYDC,INC",FF12380/6PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF12508,"AMAZON.COM.KYDC,INC",FF12508,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 20016 units),L13 nz-avg (OOS: fill-rate 7% over 20016 units),1686.5,1686.5,43848,43848,0,0.0
+1864-FF12649,"AMAZON.COM.KYDC,INC",FF12649,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 990 units),L13 nz-avg (OOS: fill-rate 2% over 990 units),57.9,57.9,1506,1506,0,0.0
+1864-FF12649PCS2,"AMAZON.COM.KYDC,INC",FF12649PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 489 units),L13 nz-avg (OOS: fill-rate 2% over 489 units),51.3,51.3,1335,1335,0,0.0
+1864-FF12653PCS2,"AMAZON.COM.KYDC,INC",FF12653PCS2,Croston's,Croston's,,,1.5,1.5,39,39,0,0.0
+1864-FF12655,"AMAZON.COM.KYDC,INC",FF12655,Reactivating,Reactivating,,,36.0,36.0,936,936,0,0.0
+1864-FF12655AU,AMAZON AUSTRALIA,FF12655AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF12655EC,"AMAZON.COM.KYDC,INC",FF12655EC,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 19998 units),L13 nz-avg (OOS: fill-rate 6% over 19998 units),1323.2,1323.2,34404,34404,0,0.0
+1864-FF12656,"AMAZON.COM.KYDC,INC",FF12656,Sparse Intermittent,Sparse Intermittent,,,48.9,48.9,1272,1272,0,0.0
+1864-FF12689,"AMAZON.COM.KYDC,INC",FF12689,Croston's,Croston's,,,3221.5,3221.5,83760,83760,0,0.0
+1864-FF12717,"AMAZON.COM.KYDC,INC",FF12717,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF12806,"AMAZON.COM.KYDC,INC",FF12806,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 7680 units),L13 nz-avg (OOS: fill-rate 9% over 7680 units),555.7,555.7,14448,14448,0,0.0
+1864-FF12806PCS48,"AMAZON.COM.KYDC,INC",FF12806PCS48,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF12823,"AMAZON.COM.KYDC,INC",FF12823,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 34128 units),L13 nz-avg (OOS: fill-rate 7% over 34128 units),2900.3,2900.3,75408,75408,0,0.0
+1864-FF12823PCS12,"AMAZON.COM.KYDC,INC",FF12823PCS12,Croston's,Croston's,,,6.8,6.8,178,178,0,0.0
+1864-FF12823PX12,"AMAZON.COM.KYDC,INC",FF12823PX12,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF12824,"AMAZON.COM.KYDC,INC",FF12824,Sparse Intermittent,Sparse Intermittent,,,103.8,103.8,2700,2700,0,0.0
+1864-FF12824PCS12,"AMAZON.COM.KYDC,INC",FF12824PCS12,Sparse Intermittent,Sparse Intermittent,,,0.3,0.3,8,8,0,0.0
+1864-FF12824PX12,"AMAZON.COM.KYDC,INC",FF12824PX12,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF12825,"AMAZON.COM.KYDC,INC",FF12825,Croston's,Croston's,,,155.1,155.1,4032,4032,0,0.0
+1864-FF12825PCS12,"AMAZON.COM.KYDC,INC",FF12825PCS12,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF12837,"AMAZON.COM.KYDC,INC",FF12837,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 9342 units),L13 nz-avg (OOS: fill-rate 7% over 9342 units),890.1,890.1,23142,23142,0,0.0
+1864-FF12837PCS2,"AMAZON.COM.KYDC,INC",FF12837PCS2,Croston's,Croston's,,,7.8,7.8,204,204,0,0.0
+1864-FF12837PCS6,"AMAZON.COM.KYDC,INC",FF12837PCS6,Croston's,Croston's,,,0.6,0.6,16,16,0,0.0
+1864-FF12842,"AMAZON.COM.KYDC,INC",FF12842,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 28320 units),L13 nz-avg (OOS: fill-rate 9% over 28320 units),2418.9,2418.9,62892,62892,0,0.0
+1864-FF12842PCS12,"AMAZON.COM.KYDC,INC",FF12842PCS12,Sparse Intermittent,Sparse Intermittent,,,4.7,4.7,122,122,0,0.0
+1864-FF12842PCS3,"AMAZON.COM.KYDC,INC",FF12842PCS3,Croston's,Croston's,,,203.5,203.5,5292,5292,0,0.0
+1864-FF12843,"AMAZON.COM.KYDC,INC",FF12843,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 11544 units),L13 nz-avg (OOS: fill-rate 7% over 11544 units),978.5,978.5,25440,25440,0,0.0
+1864-FF12843PCS12,"AMAZON.COM.KYDC,INC",FF12843PCS12,Croston's,Croston's,,,6.4,6.4,166,166,0,0.0
+1864-FF12843PCS3,"AMAZON.COM.KYDC,INC",FF12843PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 3732 units),L13 nz-avg (OOS: fill-rate 10% over 3732 units),424.8,424.8,11044,11044,0,0.0
+1864-FF12846,"AMAZON.COM.KYDC,INC",FF12846,Croston's,Croston's,,,330.5,330.5,8592,8592,0,0.0
+1864-FF12846PCS24,"AMAZON.COM.KYDC,INC",FF12846PCS24,Croston's,Croston's,,,1.2,1.2,30,30,0,0.0
+1864-FF12846PCS8,"AMAZON.COM.KYDC,INC",FF12846PCS8,Sparse Intermittent,Sparse Intermittent,,,84.8,84.8,2205,2205,0,0.0
+1864-FF12849,"AMAZON.COM.KYDC,INC",FF12849,Croston's,Croston's,,,157.4,157.4,4092,4092,0,0.0
+1864-FF12849PCS12,"AMAZON.COM.KYDC,INC",FF12849PCS12,Croston's,Croston's,,,2.0,2.0,52,52,0,0.0
+1864-FF12849PCS3,"AMAZON.COM.KYDC,INC",FF12849PCS3,Croston's,Croston's,,,56.3,56.3,1464,1464,0,0.0
+1864-FF12850,"AMAZON.COM.KYDC,INC",FF12850,Sparse Intermittent,Sparse Intermittent,,,290.8,290.8,7560,7560,0,0.0
+1864-FF12850PCS2,"AMAZON.COM.KYDC,INC",FF12850PCS2,Croston's,Croston's,,,6.0,6.0,156,156,0,0.0
+1864-FF12850PCS24,"AMAZON.COM.KYDC,INC",FF12850PCS24,Sparse Intermittent,Sparse Intermittent,,,0.3,0.3,9,9,0,0.0
+1864-FF12850PCS8,"AMAZON.COM.KYDC,INC",FF12850PCS8,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF12852,"AMAZON.COM.KYDC,INC",FF12852,Croston's,Croston's,,,100.2,100.2,2604,2604,0,0.0
+1864-FF12852PCS12,"AMAZON.COM.KYDC,INC",FF12852PCS12,Croston's,Croston's,,,0.2,0.2,4,4,0,0.0
+1864-FF12852PCS3,"AMAZON.COM.KYDC,INC",FF12852PCS3,Croston's,Croston's,,,142.2,142.2,3696,3696,0,0.0
+1864-FF12853,"AMAZON.COM.KYDC,INC",FF12853,Croston's,Croston's,,,1991.1,1991.1,51768,51768,0,0.0
+1864-FF12853PCS12,"AMAZON.COM.KYDC,INC",FF12853PCS12,Croston's,Croston's,,,2.8,2.8,73,73,0,0.0
+1864-FF12853PCS3,"AMAZON.COM.KYDC,INC",FF12853PCS3,Croston's,Croston's,,,70.6,70.6,1836,1836,0,0.0
+1864-FF12887,"AMAZON.COM.KYDC,INC",FF12887,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 3% over 33161 units),L13 nz-avg (OOS: fill-rate 3% over 33161 units),2745.2,2745.2,71376,71376,0,0.0
+1864-FF12887PCS12,"AMAZON.COM.KYDC,INC",FF12887PCS12,Croston's,Croston's,,,5.9,5.9,154,154,0,0.0
+1864-FF13115,"AMAZON.COM.KYDC,INC",FF13115,Sparse Intermittent,Sparse Intermittent,,,33.2,33.2,864,864,0,0.0
+1864-FF13116,"AMAZON.COM.KYDC,INC",FF13116,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF13154,"AMAZON.COM.KYDC,INC",FF13154,Sparse Intermittent,Sparse Intermittent,,,43.4,43.4,1128,1128,0,0.0
+1864-FF13154PCS2,"AMAZON.COM.KYDC,INC",FF13154PCS2,Croston's,Croston's,,,3.1,3.1,81,81,0,0.0
+1864-FF13421AU,AMAZON AUSTRALIA,FF13421AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF13874,"AMAZON.COM.KYDC,INC",FF13874,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 7176 units),L13 nz-avg (OOS: fill-rate 7% over 7176 units),749.8,749.8,19494,19494,0,0.0
+1864-FF13874PCS6,"AMAZON.COM.KYDC,INC",FF13874PCS6,Croston's,Croston's,,,8.6,8.6,224,224,0,0.0
+1864-FF13874PX6,"AMAZON.COM.KYDC,INC",FF13874PX6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF13875,"AMAZON.COM.KYDC,INC",FF13875,Croston's,Croston's,,,302.5,302.5,7866,7866,0,0.0
+1864-FF13875PCS6,"AMAZON.COM.KYDC,INC",FF13875PCS6,Sparse Intermittent,Sparse Intermittent,,,12.9,12.9,336,336,0,0.0
+1864-FF13875PX6,"AMAZON.COM.KYDC,INC",FF13875PX6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF13876,"AMAZON.COM.KYDC,INC",FF13876,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 7446 units),L13 nz-avg (OOS: fill-rate 7% over 7446 units),681.7,681.7,17724,17724,0,0.0
+1864-FF13876PCS2,"AMAZON.COM.KYDC,INC",FF13876PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2190 units),L13 nz-avg (OOS: fill-rate 8% over 2190 units),209.3,209.3,5442,5442,0,0.0
+1864-FF13876PCS6,"AMAZON.COM.KYDC,INC",FF13876PCS6,Croston's,Croston's,,,13.8,13.8,359,359,0,0.0
+1864-FF13876PX6,"AMAZON.COM.KYDC,INC",FF13876PX6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF13877,"AMAZON.COM.KYDC,INC",FF13877,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 9210 units),L13 nz-avg (OOS: fill-rate 8% over 9210 units),747.5,747.5,19434,19434,0,0.0
+1864-FF13877PCS2,"AMAZON.COM.KYDC,INC",FF13877PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 12% over 2268 units),L13 nz-avg (OOS: fill-rate 12% over 2268 units),115.8,115.8,3012,3012,0,0.0
+1864-FF13877PX6,"AMAZON.COM.KYDC,INC",FF13877PX6,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF13878,"AMAZON.COM.KYDC,INC",FF13878,Croston's,Croston's,,,327.5,327.5,8514,8514,0,0.0
+1864-FF13878PCS6,"AMAZON.COM.KYDC,INC",FF13878PCS6,Croston's,Croston's,,,8.1,8.1,210,210,0,0.0
+1864-FF13878PX6,"AMAZON.COM.KYDC,INC",FF13878PX6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF13879,"AMAZON.COM.KYDC,INC",FF13879,Croston's,Croston's,,,259.2,259.2,6738,6738,0,0.0
+1864-FF13879PCS2,"AMAZON.COM.KYDC,INC",FF13879PCS2,Croston's,Croston's,,,94.7,94.7,2463,2463,0,0.0
+1864-FF13879PCS6,"AMAZON.COM.KYDC,INC",FF13879PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 137 units),L13 nz-avg (OOS: fill-rate 7% over 137 units),5.3,5.3,138,138,0,0.0
+1864-FF13880,"AMAZON.COM.KYDC,INC",FF13880,Croston's,Croston's,,,65.3,65.3,1698,1698,0,0.0
+1864-FF13880PCS6,"AMAZON.COM.KYDC,INC",FF13880PCS6,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 0 legitimate zero weeks, fill-rate 6%)","L13 all-weeks avg (default: 0 legitimate zero weeks, fill-rate 6%)",3.5,3.5,90,90,0,0.0
+1864-FF13881,"AMAZON.COM.KYDC,INC",FF13881,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 5358 units),L13 nz-avg (OOS: fill-rate 8% over 5358 units),475.6,475.6,12366,12366,0,0.0
+1864-FF13881PCS6,"AMAZON.COM.KYDC,INC",FF13881PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 789 units),L13 nz-avg (OOS: fill-rate 8% over 789 units),67.4,67.4,1752,1752,0,0.0
+1864-FF13885,"AMAZON.COM.KYDC,INC",FF13885,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 6696 units),L13 nz-avg (OOS: fill-rate 7% over 6696 units),524.1,524.1,13626,13626,0,0.0
+1864-FF13885PCS2,"AMAZON.COM.KYDC,INC",FF13885PCS2,Croston's,Croston's,,,8.1,8.1,210,210,0,0.0
+1864-FF13885PCS3,"AMAZON.COM.KYDC,INC",FF13885PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 640 units),L13 nz-avg (OOS: fill-rate 7% over 640 units),77.1,77.1,2004,2004,0,0.0
+1864-FF13885PCS6,"AMAZON.COM.KYDC,INC",FF13885PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 162 units),L13 nz-avg (OOS: fill-rate 6% over 162 units),9.1,9.1,237,237,0,0.0
+1864-FF14076,"AMAZON.COM.KYDC,INC",FF14076,Reactivating,Reactivating,,,12.0,12.0,312,312,0,0.0
+1864-FF14302,"AMAZON.COM.KYDC,INC",FF14302,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF14303,"AMAZON.COM.KYDC,INC",FF14303,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF14364,"AMAZON.COM.KYDC,INC",FF14364,Croston's,Croston's,,,432.0,432.0,11232,11232,0,0.0
+1864-FF14364PCS12,"AMAZON.COM.KYDC,INC",FF14364PCS12,Croston's,Croston's,,,1.0,1.0,26,26,0,0.0
+1864-FF14364PCS3,"AMAZON.COM.KYDC,INC",FF14364PCS3,Croston's,Croston's,,,58.6,58.6,1524,1524,0,0.0
+1864-FF14365,"AMAZON.COM.KYDC,INC",FF14365,Sparse Intermittent,Sparse Intermittent,,,18.5,18.5,480,480,0,0.0
+1864-FF14365PCS12,"AMAZON.COM.KYDC,INC",FF14365PCS12,Croston's,Croston's,,,5.2,5.2,136,136,0,0.0
+1864-FF14365PCS3,"AMAZON.COM.KYDC,INC",FF14365PCS3,Croston's,Croston's,,,28.5,28.5,740,740,0,0.0
+1864-FF14584,"AMAZON.COM.KYDC,INC",FF14584,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 13712 units),L13 nz-avg (OOS: fill-rate 8% over 13712 units),1034.9,1034.9,26908,26908,0,0.0
+1864-FF14584PCS4,"AMAZON.COM.KYDC,INC",FF14584PCS4,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 192 units),L13 nz-avg (OOS: fill-rate 9% over 192 units),12.8,12.8,332,332,0,0.0
+1864-FF14646,"AMAZON.COM.KYDC,INC",FF14646,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF15308/24,"AMAZON.COM.KYDC,INC",FF15308/24,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF15584,"AMAZON.COM.KYDC,INC",FF15584,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 15648 units),L13 nz-avg (OOS: fill-rate 9% over 15648 units),1317.2,1317.2,34248,34248,0,0.0
+1864-FF15585,"AMAZON.COM.KYDC,INC",FF15585,Croston's,Croston's,,,189.7,189.7,4932,4932,0,0.0
+1864-FF15588,"AMAZON.COM.KYDC,INC",FF15588,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF15589,"AMAZON.COM.KYDC,INC",FF15589,Croston's,Croston's,,,1032.5,1032.5,26844,26844,0,0.0
+1864-FF15592,"AMAZON.COM.KYDC,INC",FF15592,Sparse Intermittent,Sparse Intermittent,,,210.5,210.5,5472,5472,0,0.0
+1864-FF15595,"AMAZON.COM.KYDC,INC",FF15595,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 1044 units),L13 nz-avg (OOS: fill-rate 7% over 1044 units),99.7,99.7,2592,2592,0,0.0
+1864-FF15718,"AMAZON.COM.KYDC,INC",FF15718,Croston's,Croston's,,,9.2,9.2,240,240,0,0.0
+1864-FF15747,"AMAZON.COM.KYDC,INC",FF15747,Sparse Intermittent,Sparse Intermittent,,,12.9,12.9,336,336,0,0.0
+1864-FF15850BL,"AMAZON.COM.KYDC,INC",FF15850BL,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF15982,"AMAZON.COM.KYDC,INC",FF15982,Heuristic,Heuristic,,,553.4,553.4,14388,14388,0,0.0
+1864-FF16027,"AMAZON.COM.KYDC,INC",FF16027,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF16704,"AMAZON.COM.KYDC,INC",FF16704,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 14412 units),L13 nz-avg (OOS: fill-rate 6% over 14412 units),1210.6,1210.6,31476,31476,0,0.0
+1864-FF16705,"AMAZON.COM.KYDC,INC",FF16705,Sparse Intermittent,Sparse Intermittent,,,44.3,44.3,1152,1152,0,0.0
+1864-FF16968,"AMAZON.COM.KYDC,INC",FF16968,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF16970,"AMAZON.COM.KYDC,INC",FF16970,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF16971,"AMAZON.COM.KYDC,INC",FF16971,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17544,"AMAZON.COM.KYDC,INC",FF17544,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17546,"AMAZON.COM.KYDC,INC",FF17546,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17547,"AMAZON.COM.KYDC,INC",FF17547,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17552,"AMAZON.COM.KYDC,INC",FF17552,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17553,"AMAZON.COM.KYDC,INC",FF17553,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17554,"AMAZON.COM.KYDC,INC",FF17554,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17555,"AMAZON.COM.KYDC,INC",FF17555,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17556,"AMAZON.COM.KYDC,INC",FF17556,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17557,"AMAZON.COM.KYDC,INC",FF17557,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17558,"AMAZON.COM.KYDC,INC",FF17558,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17561,"AMAZON.COM.KYDC,INC",FF17561,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17562,"AMAZON.COM.KYDC,INC",FF17562,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17564,"AMAZON.COM.KYDC,INC",FF17564,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17565,"AMAZON.COM.KYDC,INC",FF17565,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17570,"AMAZON.COM.KYDC,INC",FF17570,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17572,"AMAZON.COM.KYDC,INC",FF17572,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17574,"AMAZON.COM.KYDC,INC",FF17574,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17575,"AMAZON.COM.KYDC,INC",FF17575,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17576,"AMAZON.COM.KYDC,INC",FF17576,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17578,"AMAZON.COM.KYDC,INC",FF17578,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF17588,"AMAZON.COM.KYDC,INC",FF17588,Croston's,Croston's,,,79.2,79.2,2058,2058,0,0.0
+1864-FF17831,"AMAZON.COM.KYDC,INC",FF17831,Heuristic,Heuristic,,,528.9,528.9,13752,13752,0,0.0
+1864-FF17831PCS6,"AMAZON.COM.KYDC,INC",FF17831PCS6,Heuristic,Heuristic,,,22.9,22.9,596,596,0,0.0
+1864-FF17924,"AMAZON.COM.KYDC,INC",FF17924,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF18170,"AMAZON.COM.KYDC,INC",FF18170,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF18213-22,"AMAZON.COM.KYDC,INC",FF18213-22,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-FF18404/4,"AMAZON.COM.KYDC,INC",FF18404/4,Heuristic,Heuristic,,,6.0,6.0,156,156,0,0.0
+1864-FF18903/24,"AMAZON.COM.KYDC,INC",FF18903/24,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF18909/24,"AMAZON.COM.KYDC,INC",FF18909/24,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1320 units),L13 nz-avg (OOS: fill-rate 8% over 1320 units),127.4,127.4,3312,3312,0,0.0
+1864-FF18911/24,"AMAZON.COM.KYDC,INC",FF18911/24,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF18913,"AMAZON.COM.KYDC,INC",FF18913,Croston's,Croston's,,,55.4,55.4,1440,1440,0,0.0
+1864-FF18956,"AMAZON.COM.KYDC,INC",FF18956,Sparse Intermittent,Sparse Intermittent,,,18.5,18.5,480,480,0,0.0
+1864-FF18956PCS2,"AMAZON.COM.KYDC,INC",FF18956PCS2,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF18956PCS24,"AMAZON.COM.KYDC,INC",FF18956PCS24,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF18958,"AMAZON.COM.KYDC,INC",FF18958,Sparse Intermittent,Sparse Intermittent,,,204.9,204.9,5328,5328,0,0.0
+1864-FF18958PCS24,"AMAZON.COM.KYDC,INC",FF18958PCS24,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF18959,"AMAZON.COM.KYDC,INC",FF18959,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF18959AU,AMAZON AUSTRALIA,FF18959AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF18959PCS24,"AMAZON.COM.KYDC,INC",FF18959PCS24,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF19081CA,"AMAZON.COM.KYDC,INC",FF19081CA,Croston's,Croston's,,,89.5,89.5,2328,2328,0,0.0
+1864-FF19341,"AMAZON.COM.KYDC,INC",FF19341,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF19341N,"AMAZON.COM.KYDC,INC",FF19341N,Croston's,Croston's,,,20.8,20.8,540,540,0,0.0
+1864-FF19341PCS2,"AMAZON.COM.KYDC,INC",FF19341PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 1968 units),L13 nz-avg (OOS: fill-rate 6% over 1968 units),113.1,113.1,2940,2940,0,0.0
+1864-FF19341PCS6,"AMAZON.COM.KYDC,INC",FF19341PCS6,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 1 legitimate zero weeks, fill-rate 19%)","L13 all-weeks avg (default: 1 legitimate zero weeks, fill-rate 19%)",2.0,2.0,51,51,0,0.0
+1864-FF19534/24,"AMAZON.COM.KYDC,INC",FF19534/24,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF19536/24,"AMAZON.COM.KYDC,INC",FF19536/24,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF19546,"AMAZON.COM.KYDC,INC",FF19546,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 8088 units),L13 nz-avg (OOS: fill-rate 7% over 8088 units),728.3,728.3,18936,18936,0,0.0
+1864-FF19546PCS6,"AMAZON.COM.KYDC,INC",FF19546PCS6,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF20206,"AMAZON.COM.KYDC,INC",FF20206,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF20206EC,"AMAZON.COM.KYDC,INC",FF20206EC,Croston's,Croston's,,,217.8,217.8,5664,5664,0,0.0
+1864-FF20206PCS2,"AMAZON.COM.KYDC,INC",FF20206PCS2,Croston's,Croston's,,,0.3,0.3,9,9,0,0.0
+1864-FF20207,"AMAZON.COM.KYDC,INC",FF20207,Croston's,Croston's,,,19.2,19.2,498,498,0,0.0
+1864-FF20208,"AMAZON.COM.KYDC,INC",FF20208,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 30852 units),L13 nz-avg (OOS: fill-rate 8% over 30852 units),2609.5,2609.5,67848,67848,0,0.0
+1864-FF20208AU,AMAZON AUSTRALIA,FF20208AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF20208PCS3,"AMAZON.COM.KYDC,INC",FF20208PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2484 units),L13 nz-avg (OOS: fill-rate 8% over 2484 units),223.5,223.5,5812,5812,0,0.0
+1864-FF20209,"AMAZON.COM.KYDC,INC",FF20209,Sparse Intermittent,Sparse Intermittent,,,128.8,128.8,3348,3348,0,0.0
+1864-FF20209PCS6,"AMAZON.COM.KYDC,INC",FF20209PCS6,Sparse Intermittent,Sparse Intermittent,,,0.3,0.3,9,9,0,0.0
+1864-FF20210,"AMAZON.COM.KYDC,INC",FF20210,Reactivating,Reactivating,,,12.0,12.0,312,312,0,0.0
+1864-FF20210PCS2,"AMAZON.COM.KYDC,INC",FF20210PCS2,Sparse Intermittent,Sparse Intermittent,,,2.0,2.0,51,51,0,0.0
+1864-FF20816,"AMAZON.COM.KYDC,INC",FF20816,Sparse Intermittent,Sparse Intermittent,,,7.4,7.4,192,192,0,0.0
+1864-FF20868,"AMAZON.COM.KYDC,INC",FF20868,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 14% over 768 units),L13 nz-avg (OOS: fill-rate 14% over 768 units),93.2,93.2,2424,2424,0,0.0
+1864-FF21695,"AMAZON.COM.KYDC,INC",FF21695,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-FF21696,"AMAZON.COM.KYDC,INC",FF21696,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21700,"AMAZON.COM.KYDC,INC",FF21700,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21709,"AMAZON.COM.KYDC,INC",FF21709,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21788,"AMAZON.COM.KYDC,INC",FF21788,Croston's,Croston's,,,4.6,4.6,120,120,0,0.0
+1864-FF21817,"AMAZON.COM.KYDC,INC",FF21817,Sparse Intermittent,Sparse Intermittent,,,7.4,7.4,192,192,0,0.0
+1864-FF21826,"AMAZON.COM.KYDC,INC",FF21826,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF21827,"AMAZON.COM.KYDC,INC",FF21827,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21831,"AMAZON.COM.KYDC,INC",FF21831,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21832,"AMAZON.COM.KYDC,INC",FF21832,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21834,"AMAZON.COM.KYDC,INC",FF21834,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF21839,"AMAZON.COM.KYDC,INC",FF21839,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21862,"AMAZON.COM.KYDC,INC",FF21862,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21876,"AMAZON.COM.KYDC,INC",FF21876,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF21904,"AMAZON.COM.KYDC,INC",FF21904,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22031,"AMAZON.COM.KYDC,INC",FF22031,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 23484 units),L13 nz-avg (OOS: fill-rate 8% over 23484 units),1987.8,1987.8,51684,51684,0,0.0
+1864-FF22031PCS12,"AMAZON.COM.KYDC,INC",FF22031PCS12,Croston's,Croston's,,,8.8,8.8,228,228,0,0.0
+1864-FF22070,"AMAZON.COM.KYDC,INC",FF22070,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 1008 units),L13 nz-avg (OOS: fill-rate 9% over 1008 units),94.2,94.2,2448,2448,0,0.0
+1864-FF22071,"AMAZON.COM.KYDC,INC",FF22071,Croston's,Croston's,,,48.0,48.0,1248,1248,0,0.0
+1864-FF22072,"AMAZON.COM.KYDC,INC",FF22072,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 1536 units),L13 nz-avg (OOS: fill-rate 0% over 1536 units),123.7,123.7,3216,3216,0,0.0
+1864-FF22119,"AMAZON.COM.KYDC,INC",FF22119,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22122,"AMAZON.COM.KYDC,INC",FF22122,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF22123,"AMAZON.COM.KYDC,INC",FF22123,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF22128,"AMAZON.COM.KYDC,INC",FF22128,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22187,"AMAZON.COM.KYDC,INC",FF22187,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 2814 units),L13 nz-avg (OOS: fill-rate 4% over 2814 units),200.3,200.3,5208,5208,0,0.0
+1864-FF22187PCS3,"AMAZON.COM.KYDC,INC",FF22187PCS3,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF22317,"AMAZON.COM.KYDC,INC",FF22317,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 14% over 1080 units),L13 nz-avg (OOS: fill-rate 14% over 1080 units),119.1,119.1,3096,3096,0,0.0
+1864-FF22317PCS2,"AMAZON.COM.KYDC,INC",FF22317PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 420 units),L13 nz-avg (OOS: fill-rate 7% over 420 units),36.5,36.5,948,948,0,0.0
+1864-FF22318,"AMAZON.COM.KYDC,INC",FF22318,Heuristic,Heuristic,,,24.9,24.9,648,648,0,0.0
+1864-FF22323,"AMAZON.COM.KYDC,INC",FF22323,Croston's,Croston's,,,24.0,24.0,624,624,0,0.0
+1864-FF22715,"AMAZON.COM.KYDC,INC",FF22715,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF22912-23,"AMAZON.COM.KYDC,INC",FF22912-23,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22913,"AMAZON.COM.KYDC,INC",FF22913,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22914,"AMAZON.COM.KYDC,INC",FF22914,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22915,"AMAZON.COM.KYDC,INC",FF22915,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22916-23,"AMAZON.COM.KYDC,INC",FF22916-23,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22917,"AMAZON.COM.KYDC,INC",FF22917,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF22918,"AMAZON.COM.KYDC,INC",FF22918,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22919,"AMAZON.COM.KYDC,INC",FF22919,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22920,"AMAZON.COM.KYDC,INC",FF22920,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF22922,"AMAZON.COM.KYDC,INC",FF22922,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22923,"AMAZON.COM.KYDC,INC",FF22923,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22926,"AMAZON.COM.KYDC,INC",FF22926,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF22927,"AMAZON.COM.KYDC,INC",FF22927,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF22928,"AMAZON.COM.KYDC,INC",FF22928,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22929,"AMAZON.COM.KYDC,INC",FF22929,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22930,"AMAZON.COM.KYDC,INC",FF22930,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22931,"AMAZON.COM.KYDC,INC",FF22931,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22960,"AMAZON.COM.KYDC,INC",FF22960,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22961,"AMAZON.COM.KYDC,INC",FF22961,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22962,"AMAZON.COM.KYDC,INC",FF22962,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF22963,"AMAZON.COM.KYDC,INC",FF22963,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22964,"AMAZON.COM.KYDC,INC",FF22964,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22976,"AMAZON.COM.KYDC,INC",FF22976,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF22978,"AMAZON.COM.KYDC,INC",FF22978,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22979,"AMAZON.COM.KYDC,INC",FF22979,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22981,"AMAZON.COM.KYDC,INC",FF22981,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22982,"AMAZON.COM.KYDC,INC",FF22982,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF22988,"AMAZON.COM.KYDC,INC",FF22988,Sparse Intermittent,Sparse Intermittent,,,16.6,16.6,432,432,0,0.0
+1864-FF22989,"AMAZON.COM.KYDC,INC",FF22989,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-FF23008,"AMAZON.COM.KYDC,INC",FF23008,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23009,"AMAZON.COM.KYDC,INC",FF23009,Sparse Intermittent,Sparse Intermittent,,,5.5,5.5,144,144,0,0.0
+1864-FF23201,"AMAZON.COM.KYDC,INC",FF23201,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23218,"AMAZON.COM.KYDC,INC",FF23218,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23328,"AMAZON.COM.KYDC,INC",FF23328,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-FF23330,"AMAZON.COM.KYDC,INC",FF23330,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23331,"AMAZON.COM.KYDC,INC",FF23331,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23339/12,"AMAZON.COM.KYDC,INC",FF23339/12,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23348,"AMAZON.COM.KYDC,INC",FF23348,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-FF23348PCS2,"AMAZON.COM.KYDC,INC",FF23348PCS2,Sparse Intermittent,Sparse Intermittent,,,1.8,1.8,48,48,0,0.0
+1864-FF23433,"AMAZON.COM.KYDC,INC",FF23433,Sparse Intermittent,Sparse Intermittent,,,7.4,7.4,192,192,0,0.0
+1864-FF23445,"AMAZON.COM.KYDC,INC",FF23445,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23459,"AMAZON.COM.KYDC,INC",FF23459,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF23460,"AMAZON.COM.KYDC,INC",FF23460,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23461,"AMAZON.COM.KYDC,INC",FF23461,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF23468,"AMAZON.COM.KYDC,INC",FF23468,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF23544/24,"AMAZON.COM.KYDC,INC",FF23544/24,Reactivating,Reactivating,,,10.2,10.2,264,264,0,0.0
+1864-FF24120,"AMAZON.COM.KYDC,INC",FF24120,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF24123,"AMAZON.COM.KYDC,INC",FF24123,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF25556,"AMAZON.COM.KYDC,INC",FF25556,Croston's,Croston's,,,8.3,8.3,216,216,0,0.0
+1864-FF25667,"AMAZON.COM.KYDC,INC",FF25667,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 576 units),L13 nz-avg (OOS: fill-rate 9% over 576 units),50.8,50.8,1320,1320,0,0.0
+1864-FF25670,"AMAZON.COM.KYDC,INC",FF25670,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF25688,"AMAZON.COM.KYDC,INC",FF25688,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 816 units),L13 nz-avg (OOS: fill-rate 7% over 816 units),77.5,77.5,2016,2016,0,0.0
+1864-FF25689,"AMAZON.COM.KYDC,INC",FF25689,Croston's,Croston's,,,18.5,18.5,480,480,0,0.0
+1864-FF25701,"AMAZON.COM.KYDC,INC",FF25701,Croston's,Croston's,,,48.0,48.0,1248,1248,0,0.0
+1864-FF25708,"AMAZON.COM.KYDC,INC",FF25708,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-FF25895,"AMAZON.COM.KYDC,INC",FF25895,Croston's,Croston's,,,3024.0,3024.0,78624,78624,0,0.0
+1864-FF26385,"AMAZON.COM.KYDC,INC",FF26385,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF26577,"AMAZON.COM.KYDC,INC",FF26577,Sparse Intermittent,Sparse Intermittent,,,1.8,1.8,48,48,0,0.0
+1864-FF26777,"AMAZON.COM.KYDC,INC",FF26777,Croston's,Croston's,,,23.1,23.1,600,600,0,0.0
+1864-FF27258,"AMAZON.COM.KYDC,INC",FF27258,Croston's,Croston's,,,477.0,477.0,12402,12402,0,0.0
+1864-FF27259,"AMAZON.COM.KYDC,INC",FF27259,Croston's,Croston's,,,283.6,283.6,7374,7374,0,0.0
+1864-FF27261,"AMAZON.COM.KYDC,INC",FF27261,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 408 units),L13 nz-avg (OOS: fill-rate 10% over 408 units),35.3,35.3,918,918,0,0.0
+1864-FF27263,"AMAZON.COM.KYDC,INC",FF27263,Croston's,Croston's,,,416.1,416.1,10818,10818,0,0.0
+1864-FF27264,"AMAZON.COM.KYDC,INC",FF27264,Croston's,Croston's,,,227.5,227.5,5916,5916,0,0.0
+1864-FF27266,"AMAZON.COM.KYDC,INC",FF27266,Croston's,Croston's,,,215.8,215.8,5610,5610,0,0.0
+1864-FF27332,"AMAZON.COM.KYDC,INC",FF27332,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 528 units),L13 nz-avg (OOS: fill-rate 5% over 528 units),48.0,48.0,1248,1248,0,0.0
+1864-FF27385,"AMAZON.COM.KYDC,INC",FF27385,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF27391,"AMAZON.COM.KYDC,INC",FF27391,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF27394,"AMAZON.COM.KYDC,INC",FF27394,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF27687,"AMAZON.COM.KYDC,INC",FF27687,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 387 units),L13 nz-avg (OOS: fill-rate 10% over 387 units),46.7,46.7,1215,1215,0,0.0
+1864-FF27687PCS3,"AMAZON.COM.KYDC,INC",FF27687PCS3,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF27719,"AMAZON.COM.KYDC,INC",FF27719,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF27720,"AMAZON.COM.KYDC,INC",FF27720,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF27838,"AMAZON.COM.KYDC,INC",FF27838,Croston's,Croston's,,,0.9,0.9,24,24,0,0.0
+1864-FF27997,"AMAZON.COM.KYDC,INC",FF27997,Heuristic,Heuristic,,,182.8,182.8,4754,4754,0,0.0
+1864-FF27997PX2,"AMAZON.COM.KYDC,INC",FF27997PX2,Sparse Intermittent,Sparse Intermittent,,,6.5,6.5,168,168,0,0.0
+1864-FF28036,"AMAZON.COM.KYDC,INC",FF28036,Sparse Intermittent,Sparse Intermittent,,,28.4,28.4,738,738,0,0.0
+1864-FF28036N,"AMAZON.COM.KYDC,INC",FF28036N,Sparse Intermittent,Sparse Intermittent,,,40.2,40.2,1044,1044,0,0.0
+1864-FF28036PCS2,"AMAZON.COM.KYDC,INC",FF28036PCS2,Croston's,Croston's,,,0.6,0.6,15,15,0,0.0
+1864-FF28036PCS6,"AMAZON.COM.KYDC,INC",FF28036PCS6,Heuristic,Heuristic,,,4.5,4.5,116,116,0,0.0
+1864-FF28039AU,AMAZON AUSTRALIA,FF28039AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF28402,"AMAZON.COM.KYDC,INC",FF28402,Croston's,Croston's,,,138.5,138.5,3600,3600,0,0.0
+1864-FF28411,"AMAZON.COM.KYDC,INC",FF28411,Croston's,Croston's,,,24.0,24.0,624,624,0,0.0
+1864-FF28429,"AMAZON.COM.KYDC,INC",FF28429,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF28457,"AMAZON.COM.KYDC,INC",FF28457,Sparse Intermittent,Sparse Intermittent,,,43.8,43.8,1140,1140,0,0.0
+1864-FF28457N,"AMAZON.COM.KYDC,INC",FF28457N,Croston's,Croston's,,,42.0,42.0,1092,1092,0,0.0
+1864-FF28457PCS2,"AMAZON.COM.KYDC,INC",FF28457PCS2,Croston's,Croston's,,,5.8,5.8,150,150,0,0.0
+1864-FF28457PX6,"AMAZON.COM.KYDC,INC",FF28457PX6,Heuristic,Heuristic,,,0.0,0.0,0,0,0,0
+1864-FF28459,"AMAZON.COM.KYDC,INC",FF28459,Sparse Intermittent,Sparse Intermittent,,,136.6,136.6,3552,3552,0,0.0
+1864-FF28459N,"AMAZON.COM.KYDC,INC",FF28459N,Croston's,Croston's,,,25.8,25.8,672,672,0,0.0
+1864-FF28459PCS2,"AMAZON.COM.KYDC,INC",FF28459PCS2,Croston's,Croston's,,,10.6,10.6,276,276,0,0.0
+1864-FF28459PX6,"AMAZON.COM.KYDC,INC",FF28459PX6,Heuristic,Heuristic,,,0.0,0.0,0,0,0,0
+1864-FF28547,"AMAZON.COM.KYDC,INC",FF28547,Croston's,Croston's,,,15.7,15.7,408,408,0,0.0
+1864-FF29045,"AMAZON.COM.KYDC,INC",FF29045,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF29046,"AMAZON.COM.KYDC,INC",FF29046,Sparse Intermittent,Sparse Intermittent,,,1.8,1.8,48,48,0,0.0
+1864-FF29220,"AMAZON.COM.KYDC,INC",FF29220,Croston's,Croston's,,,155.1,155.1,4032,4032,0,0.0
+1864-FF29220PCS2,"AMAZON.COM.KYDC,INC",FF29220PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 340 units),L13 nz-avg (OOS: fill-rate 10% over 340 units),18.7,18.7,486,486,0,0.0
+1864-FF29319,"AMAZON.COM.KYDC,INC",FF29319,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 2562 units),L13 nz-avg (OOS: fill-rate 4% over 2562 units),150.5,150.5,3912,3912,0,0.0
+1864-FF29833PX6,"AMAZON.COM.KYDC,INC",FF29833PX6,Sparse Intermittent,Sparse Intermittent,,,4.2,4.2,108,108,0,0.0
+1864-FF30361,"AMAZON.COM.KYDC,INC",FF30361,Heuristic,Heuristic,,,27.7,27.7,720,720,0,0.0
+1864-FF30363,"AMAZON.COM.KYDC,INC",FF30363,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF30364,"AMAZON.COM.KYDC,INC",FF30364,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF30426,"AMAZON.COM.KYDC,INC",FF30426,Croston's,Croston's,,,188.8,188.8,4908,4908,0,0.0
+1864-FF30746,"AMAZON.COM.KYDC,INC",FF30746,Croston's,Croston's,,,17.5,17.5,456,456,0,0.0
+1864-FF30748PS,"AMAZON.COM.KYDC,INC",FF30748PS,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF30749,"AMAZON.COM.KYDC,INC",FF30749,Croston's,Croston's,,,123.7,123.7,3216,3216,0,0.0
+1864-FF30755,"AMAZON.COM.KYDC,INC",FF30755,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 25020 units),L13 nz-avg (OOS: fill-rate 7% over 25020 units),1346.1,1346.1,34998,34998,0,0.0
+1864-FF30755PCS6,"AMAZON.COM.KYDC,INC",FF30755PCS6,Croston's,Croston's,,,80.7,80.7,2097,2097,0,0.0
+1864-FF30757,"AMAZON.COM.KYDC,INC",FF30757,Croston's,Croston's,,,195.7,195.7,5088,5088,0,0.0
+1864-FF30758,"AMAZON.COM.KYDC,INC",FF30758,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF30758PCS3,"AMAZON.COM.KYDC,INC",FF30758PCS3,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF30759,"AMAZON.COM.KYDC,INC",FF30759,Croston's,Croston's,,,339.7,339.7,8832,8832,0,0.0
+1864-FF30760,"AMAZON.COM.KYDC,INC",FF30760,Sparse Intermittent,Sparse Intermittent,,,11.1,11.1,288,288,0,0.0
+1864-FF30784,"AMAZON.COM.KYDC,INC",FF30784,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF30879,"AMAZON.COM.KYDC,INC",FF30879,Sparse Intermittent,Sparse Intermittent,,,37.4,37.4,972,972,0,0.0
+1864-FF30879N,"AMAZON.COM.KYDC,INC",FF30879N,Sparse Intermittent,Sparse Intermittent,,,48.5,48.5,1260,1260,0,0.0
+1864-FF30879PCS2,"AMAZON.COM.KYDC,INC",FF30879PCS2,Croston's,Croston's,,,1.6,1.6,42,42,0,0.0
+1864-FF30879PX6,"AMAZON.COM.KYDC,INC",FF30879PX6,Heuristic,Heuristic,,,2.0,2.0,52,52,0,0.0
+1864-FF30880,"AMAZON.COM.KYDC,INC",FF30880,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 4092 units),L13 nz-avg (OOS: fill-rate 8% over 4092 units),175.4,175.4,4560,4560,0,0.0
+1864-FF30880PX6,"AMAZON.COM.KYDC,INC",FF30880PX6,Heuristic,Heuristic,,,0.5,0.5,14,14,0,0.0
+1864-FF31062,"AMAZON.COM.KYDC,INC",FF31062,Croston's,Croston's,,,121.6,121.6,3162,3162,0,0.0
+1864-FF31063,"AMAZON.COM.KYDC,INC",FF31063,Croston's,Croston's,,,156.9,156.9,4080,4080,0,0.0
+1864-FF31063PCS6,"AMAZON.COM.KYDC,INC",FF31063PCS6,Sparse Intermittent,Sparse Intermittent,,,0.9,0.9,24,24,0,0.0
+1864-FF31064,"AMAZON.COM.KYDC,INC",FF31064,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF31064N,"AMAZON.COM.KYDC,INC",FF31064N,Sparse Intermittent,Sparse Intermittent,,,38.8,38.8,1008,1008,0,0.0
+1864-FF31064PCS2,"AMAZON.COM.KYDC,INC",FF31064PCS2,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF31064PCS6,"AMAZON.COM.KYDC,INC",FF31064PCS6,Sparse Intermittent,Sparse Intermittent,,,0.9,0.9,24,24,0,0.0
+1864-FF31068,"AMAZON.COM.KYDC,INC",FF31068,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 11052 units),L13 nz-avg (OOS: fill-rate 9% over 11052 units),311.5,311.5,8100,8100,0,0.0
+1864-FF31068PCS6,"AMAZON.COM.KYDC,INC",FF31068PCS6,Croston's,Croston's,,,3.0,3.0,78,78,0,0.0
+1864-FF31075,"AMAZON.COM.KYDC,INC",FF31075,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 9144 units),L13 nz-avg (OOS: fill-rate 4% over 9144 units),875.5,875.5,22764,22764,0,0.0
+1864-FF31076,"AMAZON.COM.KYDC,INC",FF31076,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 4452 units),L13 nz-avg (OOS: fill-rate 7% over 4452 units),155.1,155.1,4032,4032,0,0.0
+1864-FF31183,"AMAZON.COM.KYDC,INC",FF31183,Croston's,Croston's,,,31.6,31.6,822,822,0,0.0
+1864-FF31196,"AMAZON.COM.KYDC,INC",FF31196,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF31198,"AMAZON.COM.KYDC,INC",FF31198,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF31198N,"AMAZON.COM.KYDC,INC",FF31198N,Sparse Intermittent,Sparse Intermittent,,,28.4,28.4,738,738,0,0.0
+1864-FF31198PCS2,"AMAZON.COM.KYDC,INC",FF31198PCS2,Sparse Intermittent,Sparse Intermittent,,,0.7,0.7,18,18,0,0.0
+1864-FF31287,"AMAZON.COM.KYDC,INC",FF31287,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 12904 units),L13 nz-avg (OOS: fill-rate 5% over 12904 units),978.5,978.5,25440,25440,0,0.0
+1864-FF31287PCS8,"AMAZON.COM.KYDC,INC",FF31287PCS8,Sparse Intermittent,Sparse Intermittent,,,2.5,2.5,64,64,0,0.0
+1864-FF31289,"AMAZON.COM.KYDC,INC",FF31289,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 3936 units),L13 nz-avg (OOS: fill-rate 8% over 3936 units),403.2,403.2,10482,10482,0,0.0
+1864-FF31289PCS6,"AMAZON.COM.KYDC,INC",FF31289PCS6,Croston's,Croston's,,,1.1,1.1,29,29,0,0.0
+1864-FF31292PCS2,"AMAZON.COM.KYDC,INC",FF31292PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF31293PCS2,"AMAZON.COM.KYDC,INC",FF31293PCS2,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF31295,"AMAZON.COM.KYDC,INC",FF31295,Heuristic,Heuristic,,,39.5,39.5,1026,1026,0,0.0
+1864-FF31295PCS6,"AMAZON.COM.KYDC,INC",FF31295PCS6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF31324,"AMAZON.COM.KYDC,INC",FF31324,Croston's,Croston's,,,75.9,75.9,1974,1974,0,0.0
+1864-FF31324AU,AMAZON AUSTRALIA,FF31324AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF31325,"AMAZON.COM.KYDC,INC",FF31325,Croston's,Croston's,,,378.0,378.0,9828,9828,0,0.0
+1864-FF31325PCS3,"AMAZON.COM.KYDC,INC",FF31325PCS3,Croston's,Croston's,,,27.1,27.1,704,704,0,0.0
+1864-FF31326,"AMAZON.COM.KYDC,INC",FF31326,Croston's,Croston's,,,1017.7,1017.7,26460,26460,0,0.0
+1864-FF31451,"AMAZON.COM.KYDC,INC",FF31451,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF31452,"AMAZON.COM.KYDC,INC",FF31452,Sparse Intermittent,Sparse Intermittent,,,5.5,5.5,144,144,0,0.0
+1864-FF31453,"AMAZON.COM.KYDC,INC",FF31453,Heuristic,Heuristic,,,24.0,24.0,624,624,0,0.0
+1864-FF31454,"AMAZON.COM.KYDC,INC",FF31454,Croston's,Croston's,,,24.0,24.0,624,624,0,0.0
+1864-FF31455,"AMAZON.COM.KYDC,INC",FF31455,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF31456,"AMAZON.COM.KYDC,INC",FF31456,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF31456PCS2,"AMAZON.COM.KYDC,INC",FF31456PCS2,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF31481,"AMAZON.COM.KYDC,INC",FF31481,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 13% over 1236 units),L13 nz-avg (OOS: fill-rate 13% over 1236 units),78.5,78.5,2040,2040,0,0.0
+1864-FF31605PCS12,"AMAZON.COM.KYDC,INC",FF31605PCS12,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF31606,"AMAZON.COM.KYDC,INC",FF31606,Croston's,Croston's,,,7.8,7.8,204,204,0,0.0
+1864-FF31606PCS12,"AMAZON.COM.KYDC,INC",FF31606PCS12,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,3,3,0,0.0
+1864-FF31607PCS12,"AMAZON.COM.KYDC,INC",FF31607PCS12,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-FF31608,"AMAZON.COM.KYDC,INC",FF31608,Sparse Intermittent,Sparse Intermittent,,,64.6,64.6,1680,1680,0,0.0
+1864-FF31608PCS12,"AMAZON.COM.KYDC,INC",FF31608PCS12,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF31823,"AMAZON.COM.KYDC,INC",FF31823,Croston's,Croston's,,,82.8,82.8,2154,2154,0,0.0
+1864-FF32041,"AMAZON.COM.KYDC,INC",FF32041,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF32148,"AMAZON.COM.KYDC,INC",FF32148,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 5640 units),L13 nz-avg (OOS: fill-rate 7% over 5640 units),205.4,205.4,5340,5340,0,0.0
+1864-FF32363,"AMAZON.COM.KYDC,INC",FF32363,Croston's,Croston's,,,324.2,324.2,8430,8430,0,0.0
+1864-FF32365,"AMAZON.COM.KYDC,INC",FF32365,Croston's,Croston's,,,66.2,66.2,1720,1720,0,0.0
+1864-FF32464,"AMAZON.COM.KYDC,INC",FF32464,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF32652,"AMAZON.COM.KYDC,INC",FF32652,Croston's,Croston's,,,6.0,6.0,156,156,0,0.0
+1864-FF32653,"AMAZON.COM.KYDC,INC",FF32653,Sparse Intermittent,Sparse Intermittent,,,11.1,11.1,288,288,0,0.0
+1864-FF32654,"AMAZON.COM.KYDC,INC",FF32654,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF32655,"AMAZON.COM.KYDC,INC",FF32655,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF32656,"AMAZON.COM.KYDC,INC",FF32656,Sparse Intermittent,Sparse Intermittent,,,12.9,12.9,336,336,0,0.0
+1864-FF32657,"AMAZON.COM.KYDC,INC",FF32657,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF32824,"AMAZON.COM.KYDC,INC",FF32824,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 13% over 1464 units),L13 nz-avg (OOS: fill-rate 13% over 1464 units),176.3,176.3,4584,4584,0,0.0
+1864-FF32826,"AMAZON.COM.KYDC,INC",FF32826,Heuristic,Heuristic,,,21.2,21.2,552,552,0,0.0
+1864-FF32826PCS2,"AMAZON.COM.KYDC,INC",FF32826PCS2,Croston's,Croston's,,,1.6,1.6,42,42,0,0.0
+1864-FF32829,"AMAZON.COM.KYDC,INC",FF32829,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF32840,"AMAZON.COM.KYDC,INC",FF32840,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 2400 units),L13 nz-avg (OOS: fill-rate 7% over 2400 units),259.2,259.2,6740,6740,0,0.0
+1864-FF32966,"AMAZON.COM.KYDC,INC",FF32966,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF33135AU,AMAZON AUSTRALIA,FF33135AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF33137AU,AMAZON AUSTRALIA,FF33137AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF33139AU,AMAZON AUSTRALIA,FF33139AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF33413,"AMAZON.COM.KYDC,INC",FF33413,Croston's,Croston's,,,276.0,276.0,7176,7176,0,0.0
+1864-FF33414,"AMAZON.COM.KYDC,INC",FF33414,Sparse Intermittent,Sparse Intermittent,,,5.5,5.5,144,144,0,0.0
+1864-FF33415,"AMAZON.COM.KYDC,INC",FF33415,Sparse Intermittent,Sparse Intermittent,,,1.8,1.8,48,48,0,0.0
+1864-FF33495,"AMAZON.COM.KYDC,INC",FF33495,Croston's,Croston's,,,99.4,99.4,2584,2584,0,0.0
+1864-FF33541,"AMAZON.COM.KYDC,INC",FF33541,Sparse Intermittent,Sparse Intermittent,,,13.8,13.8,360,360,0,0.0
+1864-FF33542,"AMAZON.COM.KYDC,INC",FF33542,Croston's,Croston's,,,24.0,24.0,624,624,0,0.0
+1864-FF33543,"AMAZON.COM.KYDC,INC",FF33543,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF33545,"AMAZON.COM.KYDC,INC",FF33545,Croston's,Croston's,,,8.3,8.3,216,216,0,0.0
+1864-FF33546,"AMAZON.COM.KYDC,INC",FF33546,Croston's,Croston's,,,28.6,28.6,744,744,0,0.0
+1864-FF33555,"AMAZON.COM.KYDC,INC",FF33555,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 456 units),L13 nz-avg (OOS: fill-rate 7% over 456 units),52.6,52.6,1368,1368,0,0.0
+1864-FF33559,"AMAZON.COM.KYDC,INC",FF33559,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF33567,"AMAZON.COM.KYDC,INC",FF33567,Sparse Intermittent,Sparse Intermittent,,,1.8,1.8,48,48,0,0.0
+1864-FF33567PCS2,"AMAZON.COM.KYDC,INC",FF33567PCS2,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF33568,"AMAZON.COM.KYDC,INC",FF33568,Croston's,Croston's,,,39.7,39.7,1032,1032,0,0.0
+1864-FF33568PCS2,"AMAZON.COM.KYDC,INC",FF33568PCS2,Sparse Intermittent,Sparse Intermittent,,,0.9,0.9,24,24,0,0.0
+1864-FF33569,"AMAZON.COM.KYDC,INC",FF33569,Heuristic,Heuristic,,,12.0,12.0,312,312,0,0.0
+1864-FF33570,"AMAZON.COM.KYDC,INC",FF33570,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF33571,"AMAZON.COM.KYDC,INC",FF33571,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF33572,"AMAZON.COM.KYDC,INC",FF33572,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF33573,"AMAZON.COM.KYDC,INC",FF33573,Croston's,Croston's,,,1.4,1.4,36,36,0,0.0
+1864-FF33638,"AMAZON.COM.KYDC,INC",FF33638,Croston's,Croston's,,,1.4,1.4,36,36,0,0.0
+1864-FF33641,"AMAZON.COM.KYDC,INC",FF33641,Croston's,Croston's,,,13.2,13.2,342,342,0,0.0
+1864-FF33867,"AMAZON.COM.KYDC,INC",FF33867,Heuristic,Heuristic,,,199.4,199.4,5184,5184,0,0.0
+1864-FF33868,"AMAZON.COM.KYDC,INC",FF33868,Sparse Intermittent,Sparse Intermittent,,,49.8,49.8,1296,1296,0,0.0
+1864-FF33871,"AMAZON.COM.KYDC,INC",FF33871,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF33872,"AMAZON.COM.KYDC,INC",FF33872,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 10944 units),L13 nz-avg (OOS: fill-rate 0% over 10944 units),598.2,598.2,15552,15552,0,0.0
+1864-FF33876,"AMAZON.COM.KYDC,INC",FF33876,Croston's,Croston's,,,19.6,19.6,510,510,0,0.0
+1864-FF34096,"AMAZON.COM.KYDC,INC",FF34096,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF34408,"AMAZON.COM.KYDC,INC",FF34408,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF34413,"AMAZON.COM.KYDC,INC",FF34413,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF34428,"AMAZON.COM.KYDC,INC",FF34428,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF34430,"AMAZON.COM.KYDC,INC",FF34430,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 1638 units),L13 nz-avg (OOS: fill-rate 7% over 1638 units),95.5,95.5,2484,2484,0,0.0
+1864-FF34466,"AMAZON.COM.KYDC,INC",FF34466,Heuristic,Heuristic,,,61.8,61.8,1608,1608,0,0.0
+1864-FF34468,"AMAZON.COM.KYDC,INC",FF34468,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF34709,"AMAZON.COM.KYDC,INC",FF34709,Croston's,Croston's,,,0.7,0.7,18,18,0,0.0
+1864-FF34942,"AMAZON.COM.KYDC,INC",FF34942,Sparse Intermittent,Sparse Intermittent,,,2.1,2.1,54,54,0,0.0
+1864-FF35147,"AMAZON.COM.KYDC,INC",FF35147,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 3% over 15360 units),L13 nz-avg (OOS: fill-rate 3% over 15360 units),925.8,925.8,24072,24072,0,0.0
+1864-FF35344,"AMAZON.COM.KYDC,INC",FF35344,Heuristic,Heuristic,,,32.3,32.3,840,840,0,0.0
+1864-FF35359,"AMAZON.COM.KYDC,INC",FF35359,Croston's,Croston's,,,22.6,22.6,588,588,0,0.0
+1864-FF35397,"AMAZON.COM.KYDC,INC",FF35397,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF35623,"AMAZON.COM.KYDC,INC",FF35623,Heuristic,Heuristic,,,16.6,16.6,432,432,0,0.0
+1864-FF35624,"AMAZON.COM.KYDC,INC",FF35624,Heuristic,Heuristic,,,0.9,0.9,24,24,0,0.0
+1864-FF35632,"AMAZON.COM.KYDC,INC",FF35632,Croston's,Croston's,,,13.4,13.4,348,348,0,0.0
+1864-FF35849,"AMAZON.COM.KYDC,INC",FF35849,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF35923,"AMAZON.COM.KYDC,INC",FF35923,Croston's,Croston's,,,0.9,0.9,24,24,0,0.0
+1864-FF35927,"AMAZON.COM.KYDC,INC",FF35927,Croston's,Croston's,,,26.3,26.3,684,684,0,0.0
+1864-FF36211,"AMAZON.COM.KYDC,INC",FF36211,Croston's,Croston's,,,35.0,35.0,910,910,0,0.0
+1864-FF36212,"AMAZON.COM.KYDC,INC",FF36212,Sparse Intermittent,Sparse Intermittent,,,13.8,13.8,360,360,0,0.0
+1864-FF36213,"AMAZON.COM.KYDC,INC",FF36213,Sparse Intermittent,Sparse Intermittent,,,15.2,15.2,396,396,0,0.0
+1864-FF36214,"AMAZON.COM.KYDC,INC",FF36214,Sparse Intermittent,Sparse Intermittent,,,32.3,32.3,840,840,0,0.0
+1864-FF36249,"AMAZON.COM.KYDC,INC",FF36249,Croston's,Croston's,,,69.0,69.0,1794,1794,0,0.0
+1864-FF36250,"AMAZON.COM.KYDC,INC",FF36250,Croston's,Croston's,,,49.2,49.2,1278,1278,0,0.0
+1864-FF36251,"AMAZON.COM.KYDC,INC",FF36251,Croston's,Croston's,,,127.2,127.2,3306,3306,0,0.0
+1864-FF36291,"AMAZON.COM.KYDC,INC",FF36291,Heuristic,Heuristic,,,24.9,24.9,648,648,0,0.0
+1864-FF36294,"AMAZON.COM.KYDC,INC",FF36294,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF36295,"AMAZON.COM.KYDC,INC",FF36295,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF36326,"AMAZON.COM.KYDC,INC",FF36326,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF36327,"AMAZON.COM.KYDC,INC",FF36327,Sparse Intermittent,Sparse Intermittent,,,9.0,9.0,234,234,0,0.0
+1864-FF36328,"AMAZON.COM.KYDC,INC",FF36328,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF36329,"AMAZON.COM.KYDC,INC",FF36329,Sparse Intermittent,Sparse Intermittent,,,3.5,3.5,90,90,0,0.0
+1864-FF36356,"AMAZON.COM.KYDC,INC",FF36356,Heuristic,Heuristic,,,2.3,2.3,60,60,0,0.0
+1864-FF36560,"AMAZON.COM.KYDC,INC",FF36560,Croston's,Croston's,,,44.1,44.1,1146,1146,0,0.0
+1864-FF36663,"AMAZON.COM.KYDC,INC",FF36663,Heuristic,Heuristic,,,25.8,25.8,672,672,0,0.0
+1864-FF36669,"AMAZON.COM.KYDC,INC",FF36669,Croston's,Croston's,,,0.9,0.9,24,24,0,0.0
+1864-FF37258,"AMAZON.COM.KYDC,INC",FF37258,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 1692 units),L13 nz-avg (OOS: fill-rate 5% over 1692 units),117.2,117.2,3048,3048,0,0.0
+1864-FF37259,"AMAZON.COM.KYDC,INC",FF37259,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 1002 units),L13 nz-avg (OOS: fill-rate 7% over 1002 units),105.2,105.2,2736,2736,0,0.0
+1864-FF37636,"AMAZON.COM.KYDC,INC",FF37636,Croston's,Croston's,,,81.5,81.5,2118,2118,0,0.0
+1864-FF37637,"AMAZON.COM.KYDC,INC",FF37637,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 942 units),L13 nz-avg (OOS: fill-rate 6% over 942 units),42.5,42.5,1104,1104,0,0.0
+1864-FF37638,"AMAZON.COM.KYDC,INC",FF37638,Croston's,Croston's,,,12.9,12.9,336,336,0,0.0
+1864-FF37778,"AMAZON.COM.KYDC,INC",FF37778,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 4506 units),L13 nz-avg (OOS: fill-rate 8% over 4506 units),103.2,103.2,2682,2682,0,0.0
+1864-FF37779,"AMAZON.COM.KYDC,INC",FF37779,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 8664 units),L13 nz-avg (OOS: fill-rate 8% over 8664 units),375.2,375.2,9756,9756,0,0.0
+1864-FF37780,"AMAZON.COM.KYDC,INC",FF37780,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 2364 units),L13 nz-avg (OOS: fill-rate 4% over 2364 units),114.5,114.5,2976,2976,0,0.0
+1864-FF37818,"AMAZON.COM.KYDC,INC",FF37818,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 576 units),L13 nz-avg (OOS: fill-rate 6% over 576 units),41.1,41.1,1068,1068,0,0.0
+1864-FF37819,"AMAZON.COM.KYDC,INC",FF37819,Sparse Intermittent,Sparse Intermittent,,,5.5,5.5,144,144,0,0.0
+1864-FF37822,"AMAZON.COM.KYDC,INC",FF37822,Croston's,Croston's,,,2.8,2.8,72,72,0,0.0
+1864-FF38327,"AMAZON.COM.KYDC,INC",FF38327,Sparse Intermittent,Sparse Intermittent,,,6.9,6.9,180,180,0,0.0
+1864-FF38330,"AMAZON.COM.KYDC,INC",FF38330,Sparse Intermittent,Sparse Intermittent,,,5.5,5.5,144,144,0,0.0
+1864-FF38331,"AMAZON.COM.KYDC,INC",FF38331,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,72,72,0,0.0
+1864-FF38367,"AMAZON.COM.KYDC,INC",FF38367,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF38368,"AMAZON.COM.KYDC,INC",FF38368,Sparse Intermittent,Sparse Intermittent,,,55.4,55.4,1440,1440,0,0.0
+1864-FF38488,"AMAZON.COM.KYDC,INC",FF38488,Croston's,Croston's,,,39.2,39.2,1020,1020,0,0.0
+1864-FF38640,"AMAZON.COM.KYDC,INC",FF38640,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF38641,"AMAZON.COM.KYDC,INC",FF38641,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF38642,"AMAZON.COM.KYDC,INC",FF38642,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF38675,"AMAZON.COM.KYDC,INC",FF38675,Sparse Intermittent,Sparse Intermittent,,,28.6,28.6,744,744,0,0.0
+1864-FF38676,"AMAZON.COM.KYDC,INC",FF38676,Sparse Intermittent,Sparse Intermittent,,,33.2,33.2,864,864,0,0.0
+1864-FF38677,"AMAZON.COM.KYDC,INC",FF38677,Sparse Intermittent,Sparse Intermittent,,,17.5,17.5,456,456,0,0.0
+1864-FF4517AU,AMAZON AUSTRALIA,FF4517AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4537AU,AMAZON AUSTRALIA,FF4537AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4577,"AMAZON.COM.KYDC,INC",FF4577,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4577PCS2,"AMAZON.COM.KYDC,INC",FF4577PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 3% over 1248 units),L13 nz-avg (OOS: fill-rate 3% over 1248 units),44.3,44.3,1152,1152,0,0.0
+1864-FF4577PCS24,"AMAZON.COM.KYDC,INC",FF4577PCS24,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF4771,"AMAZON.COM.KYDC,INC",FF4771,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4771AMZ,"AMAZON.COM.KYDC,INC",FF4771AMZ,Croston's,Croston's,,,234.2,234.2,6090,6090,0,0.0
+1864-FF4771AMZ2,"AMAZON.COM.KYDC,INC",FF4771AMZ2,Sparse Intermittent,Sparse Intermittent,,,70.5,70.5,1833,1833,0,0.0
+1864-FF4771AMZ3,"AMAZON.COM.KYDC,INC",FF4771AMZ3,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4771COS,"AMAZON.COM.KYDC,INC",FF4771COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4771PCS3,"AMAZON.COM.KYDC,INC",FF4771PCS3,Croston's,Croston's,,,2.8,2.8,74,74,0,0.0
+1864-FF4775,"AMAZON.COM.KYDC,INC",FF4775,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4775AMZ,"AMAZON.COM.KYDC,INC",FF4775AMZ,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 41802 units),L13 nz-avg (OOS: fill-rate 6% over 41802 units),3544.4,3544.4,92154,92154,0,0.0
+1864-FF4775COS,"AMAZON.COM.KYDC,INC",FF4775COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4775PCS2,"AMAZON.COM.KYDC,INC",FF4775PCS2,Sparse Intermittent,Sparse Intermittent,,,179.5,179.5,4668,4668,0,0.0
+1864-FF4775PCS6,"AMAZON.COM.KYDC,INC",FF4775PCS6,Heuristic,Heuristic,,,5.8,5.8,151,151,0,0.0
+1864-FF4776,"AMAZON.COM.KYDC,INC",FF4776,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4776AMZ,"AMAZON.COM.KYDC,INC",FF4776AMZ,Croston's,Croston's,,,522.7,522.7,13590,13590,0,0.0
+1864-FF4776AMZ2,"AMAZON.COM.KYDC,INC",FF4776AMZ2,Sparse Intermittent,Sparse Intermittent,,,88.6,88.6,2304,2304,0,0.0
+1864-FF4776CP6,"AMAZON.COM.KYDC,INC",FF4776CP6,Sparse Intermittent,Sparse Intermittent,,,4.8,4.8,124,124,0,0.0
+1864-FF4849,"AMAZON.COM.KYDC,INC",FF4849,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4849AMZ,"AMAZON.COM.KYDC,INC",FF4849AMZ,Croston's,Croston's,,,225.7,225.7,5868,5868,0,0.0
+1864-FF4849COS,"AMAZON.COM.KYDC,INC",FF4849COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4849CP6,"AMAZON.COM.KYDC,INC",FF4849CP6,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF4849PCS2,"AMAZON.COM.KYDC,INC",FF4849PCS2,Heuristic,Heuristic,,,80.1,80.1,2082,2082,0,0.0
+1864-FF4849PX2,"AMAZON.COM.KYDC,INC",FF4849PX2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4849PX6,"AMAZON.COM.KYDC,INC",FF4849PX6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF4923,"AMAZON.COM.KYDC,INC",FF4923,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4923AMZ,"AMAZON.COM.KYDC,INC",FF4923AMZ,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF4923AMZ2,"AMAZON.COM.KYDC,INC",FF4923AMZ2,Sparse Intermittent,Sparse Intermittent,,,1.8,1.8,48,48,0,0.0
+1864-FF4923PCS2,"AMAZON.COM.KYDC,INC",FF4923PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4923PCS6,"AMAZON.COM.KYDC,INC",FF4923PCS6,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4930,"AMAZON.COM.KYDC,INC",FF4930,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4930AMZ,"AMAZON.COM.KYDC,INC",FF4930AMZ,Sparse Intermittent,Sparse Intermittent,,,243.7,243.7,6336,6336,0,0.0
+1864-FF4930AMZ2COS,"AMAZON.COM.KYDC,INC",FF4930AMZ2COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF4930PCS6,"AMAZON.COM.KYDC,INC",FF4930PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 126 units),L13 nz-avg (OOS: fill-rate 5% over 126 units),6.7,6.7,173,173,0,0.0
+1864-FF4933,"AMAZON.COM.KYDC,INC",FF4933,Croston's,Croston's,,,23.1,23.1,600,600,0,0.0
+1864-FF4933AMZ,"AMAZON.COM.KYDC,INC",FF4933AMZ,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4933AU,AMAZON AUSTRALIA,FF4933AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4933PCS2,"AMAZON.COM.KYDC,INC",FF4933PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 264 units),L13 nz-avg (OOS: fill-rate 7% over 264 units),27.7,27.7,720,720,0,0.0
+1864-FF4933PCS24,"AMAZON.COM.KYDC,INC",FF4933PCS24,Heuristic,Heuristic,,,0.0,0.0,1,1,0,0.0
+1864-FF4934,"AMAZON.COM.KYDC,INC",FF4934,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4934AMZ,"AMAZON.COM.KYDC,INC",FF4934AMZ,Sparse Intermittent,Sparse Intermittent,,,609.2,609.2,15840,15840,0,0.0
+1864-FF4934AMZ2,"AMAZON.COM.KYDC,INC",FF4934AMZ2,Croston's,Croston's,,,618.9,618.9,16092,16092,0,0.0
+1864-FF4934PCS24,"AMAZON.COM.KYDC,INC",FF4934PCS24,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF4935,"AMAZON.COM.KYDC,INC",FF4935,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4935AMZ,"AMAZON.COM.KYDC,INC",FF4935AMZ,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4935PCS2,"AMAZON.COM.KYDC,INC",FF4935PCS2,Croston's,Croston's,,,101.5,101.5,2640,2640,0,0.0
+1864-FF4935PCS24,"AMAZON.COM.KYDC,INC",FF4935PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-FF4935PX2,"AMAZON.COM.KYDC,INC",FF4935PX2,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4936,"AMAZON.COM.KYDC,INC",FF4936,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF4936AMZ,"AMAZON.COM.KYDC,INC",FF4936AMZ,Sparse Intermittent,Sparse Intermittent,,,317.5,317.5,8256,8256,0,0.0
+1864-FF4936PCS2,"AMAZON.COM.KYDC,INC",FF4936PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 384 units),L13 nz-avg (OOS: fill-rate 8% over 384 units),25.8,25.8,672,672,0,0.0
+1864-FF4936PCS24,"AMAZON.COM.KYDC,INC",FF4936PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF4936PX2,"AMAZON.COM.KYDC,INC",FF4936PX2,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF5715,"AMAZON.COM.KYDC,INC",FF5715,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 7920 units),L13 nz-avg (OOS: fill-rate 8% over 7920 units),639.7,639.7,16632,16632,0,0.0
+1864-FF5715AMZ2,"AMAZON.COM.KYDC,INC",FF5715AMZ2,Sparse Intermittent,Sparse Intermittent,,,211.8,211.8,5508,5508,0,0.0
+1864-FF5715PCS72,"AMAZON.COM.KYDC,INC",FF5715PCS72,Sparse Intermittent,Sparse Intermittent,,,6.0,6.0,156,156,0,0.0
+1864-FF5716,"AMAZON.COM.KYDC,INC",FF5716,Heuristic,Heuristic,,,257.5,257.5,6696,6696,0,0.0
+1864-FF5716PCS72,"AMAZON.COM.KYDC,INC",FF5716PCS72,Heuristic,Heuristic,,,1.2,1.2,32,32,0,0.0
+1864-FF5766,"AMAZON.COM.KYDC,INC",FF5766,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF5766AMZ,"AMAZON.COM.KYDC,INC",FF5766AMZ,Croston's,Croston's,,,1524.7,1524.7,39642,39642,0,0.0
+1864-FF5766AMZ2,"AMAZON.COM.KYDC,INC",FF5766AMZ2,Sparse Intermittent,Sparse Intermittent,,,62.8,62.8,1632,1632,0,0.0
+1864-FF5766PCS6,"AMAZON.COM.KYDC,INC",FF5766PCS6,Seasonal Baseline,Seasonal Baseline,"L13 all-weeks avg (default: 2 legitimate zero weeks, fill-rate 7%)","L13 all-weeks avg (default: 2 legitimate zero weeks, fill-rate 7%)",2.6,2.6,67,67,0,0.0
+1864-FF5769,"AMAZON.COM.KYDC,INC",FF5769,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF5769AMZ,"AMAZON.COM.KYDC,INC",FF5769AMZ,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 10050 units),L13 nz-avg (OOS: fill-rate 7% over 10050 units),947.3,947.3,24630,24630,0,0.0
+1864-FF5769AMZ2,"AMAZON.COM.KYDC,INC",FF5769AMZ2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 315 units),L13 nz-avg (OOS: fill-rate 5% over 315 units),33.3,33.3,867,867,0,0.0
+1864-FF5769PCS6,"AMAZON.COM.KYDC,INC",FF5769PCS6,Sparse Intermittent,Sparse Intermittent,,,1.2,1.2,32,32,0,0.0
+1864-FF5772,"AMAZON.COM.KYDC,INC",FF5772,Sparse Intermittent,Sparse Intermittent,,,0.9,0.9,24,24,0,0.0
+1864-FF5772PCS6,"AMAZON.COM.KYDC,INC",FF5772PCS6,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF5773,"AMAZON.COM.KYDC,INC",FF5773,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 5634 units),L13 nz-avg (OOS: fill-rate 7% over 5634 units),473.5,473.5,12312,12312,0,0.0
+1864-FF5773PCS6,"AMAZON.COM.KYDC,INC",FF5773PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 72 units),L13 nz-avg (OOS: fill-rate 8% over 72 units),7.6,7.6,198,198,0,0.0
+1864-FF5776,"AMAZON.COM.KYDC,INC",FF5776,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF5776AMZ,"AMAZON.COM.KYDC,INC",FF5776AMZ,Sparse Intermittent,Sparse Intermittent,,,0.9,0.9,24,24,0,0.0
+1864-FF5776PCS6,"AMAZON.COM.KYDC,INC",FF5776PCS6,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF5777,"AMAZON.COM.KYDC,INC",FF5777,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF5777AMZ,"AMAZON.COM.KYDC,INC",FF5777AMZ,Croston's,Croston's,,,391.6,391.6,10182,10182,0,0.0
+1864-FF5777PCS2,"AMAZON.COM.KYDC,INC",FF5777PCS2,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF5777PCS6,"AMAZON.COM.KYDC,INC",FF5777PCS6,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,2,2,0,0.0
+1864-FF5780,"AMAZON.COM.KYDC,INC",FF5780,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 1554 units),L13 nz-avg (OOS: fill-rate 9% over 1554 units),133.4,133.4,3468,3468,0,0.0
+1864-FF5780PCS6,"AMAZON.COM.KYDC,INC",FF5780PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 170 units),L13 nz-avg (OOS: fill-rate 8% over 170 units),14.1,14.1,367,367,0,0.0
+1864-FF5807,"AMAZON.COM.KYDC,INC",FF5807,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF5807AMZ,"AMAZON.COM.KYDC,INC",FF5807AMZ,Reactivating,Reactivating,,,24.0,24.0,624,624,0,0.0
+1864-FF5807AMZ2,"AMAZON.COM.KYDC,INC",FF5807AMZ2,Sparse Intermittent,Sparse Intermittent,,,258.5,258.5,6720,6720,0,0.0
+1864-FF5807AMZN,"AMAZON.COM.KYDC,INC",FF5807AMZN,Croston's,Croston's,,,125.8,125.8,3270,3270,0,0.0
+1864-FF5807COS,"AMAZON.COM.KYDC,INC",FF5807COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF5952,"AMAZON.COM.KYDC,INC",FF5952,Sparse Intermittent,Sparse Intermittent,,,456.0,456.0,11856,11856,0,0.0
+1864-FF5952EC,"AMAZON.COM.KYDC,INC",FF5952EC,Heuristic,Heuristic,,,192.0,192.0,4992,4992,0,0.0
+1864-FF5952PCS2,"AMAZON.COM.KYDC,INC",FF5952PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 8388 units),L13 nz-avg (OOS: fill-rate 6% over 8388 units),761.5,761.5,19800,19800,0,0.0
+1864-FF5952PCS24,"AMAZON.COM.KYDC,INC",FF5952PCS24,Sparse Intermittent,Sparse Intermittent,,,2.8,2.8,74,74,0,0.0
+1864-FF6305,"AMAZON.COM.KYDC,INC",FF6305,Croston's,Croston's,,,683.1,683.1,17760,17760,0,0.0
+1864-FF6305AU,AMAZON AUSTRALIA,FF6305AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF6305PCS2,"AMAZON.COM.KYDC,INC",FF6305PCS2,Sparse Intermittent,Sparse Intermittent,,,180.0,180.0,4680,4680,0,0.0
+1864-FF6305PCS24,"AMAZON.COM.KYDC,INC",FF6305PCS24,Croston's,Croston's,,,0.6,0.6,15,15,0,0.0
+1864-FF6553,"AMAZON.COM.KYDC,INC",FF6553,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF6553AMZ,"AMAZON.COM.KYDC,INC",FF6553AMZ,Croston's,Croston's,,,396.5,396.5,10308,10308,0,0.0
+1864-FF6553COS,"AMAZON.COM.KYDC,INC",FF6553COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF6553PCS2,"AMAZON.COM.KYDC,INC",FF6553PCS2,Croston's,Croston's,,,9.7,9.7,252,252,0,0.0
+1864-FF6554,"AMAZON.COM.KYDC,INC",FF6554,Sparse Intermittent,Sparse Intermittent,,,96.9,96.9,2520,2520,0,0.0
+1864-FF6554COS,"AMAZON.COM.KYDC,INC",FF6554COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF6634,"AMAZON.COM.KYDC,INC",FF6634,Heuristic,Heuristic,,,52.8,52.8,1374,1374,0,0.0
+1864-FF6634AMZ,"AMAZON.COM.KYDC,INC",FF6634AMZ,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 3% over 1182 units),L13 nz-avg (OOS: fill-rate 3% over 1182 units),48.9,48.9,1272,1272,0,0.0
+1864-FF6634PCS6,"AMAZON.COM.KYDC,INC",FF6634PCS6,Croston's,Croston's,,,1.0,1.0,26,26,0,0.0
+1864-FF6636,"AMAZON.COM.KYDC,INC",FF6636,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF6636AMZ,"AMAZON.COM.KYDC,INC",FF6636AMZ,Croston's,Croston's,,,88.2,88.2,2292,2292,0,0.0
+1864-FF6639PCS2,"AMAZON.COM.KYDC,INC",FF6639PCS2,Sparse Intermittent,Sparse Intermittent,,,6.9,6.9,180,180,0,0.0
+1864-FF6639PCS6,"AMAZON.COM.KYDC,INC",FF6639PCS6,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,3,3,0,0.0
+1864-FF6989,"AMAZON.COM.KYDC,INC",FF6989,Croston's,Croston's,,,945.2,945.2,24576,24576,0,0.0
+1864-FF6989PCS2,"AMAZON.COM.KYDC,INC",FF6989PCS2,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF6989PCS48,"AMAZON.COM.KYDC,INC",FF6989PCS48,Croston's,Croston's,,,0.5,0.5,13,13,0,0.0
+1864-FF7110,"AMAZON.COM.KYDC,INC",FF7110,Heuristic,Heuristic,,,123.7,123.7,3216,3216,0,0.0
+1864-FF7110AU,AMAZON AUSTRALIA,FF7110AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF7110PX2,"AMAZON.COM.KYDC,INC",FF7110PX2,Heuristic,Heuristic,,,6.7,6.7,174,174,0,0.0
+1864-FF7112,"AMAZON.COM.KYDC,INC",FF7112,Croston's,Croston's,,,611.5,611.5,15900,15900,0,0.0
+1864-FF7112AMZ2,"AMAZON.COM.KYDC,INC",FF7112AMZ2,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF7112EC,"AMAZON.COM.KYDC,INC",FF7112EC,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7112PCS2,"AMAZON.COM.KYDC,INC",FF7112PCS2,Sparse Intermittent,Sparse Intermittent,,,19.8,19.8,516,516,0,0.0
+1864-FF7112PCS6,"AMAZON.COM.KYDC,INC",FF7112PCS6,Croston's,Croston's,,,2.2,2.2,57,57,0,0.0
+1864-FF7115,"AMAZON.COM.KYDC,INC",FF7115,Croston's,Croston's,,,292.2,292.2,7596,7596,0,0.0
+1864-FF7115EC,"AMAZON.COM.KYDC,INC",FF7115EC,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7115PCS6,"AMAZON.COM.KYDC,INC",FF7115PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 55 units),L13 nz-avg (OOS: fill-rate 7% over 55 units),3.5,3.5,90,90,0,0.0
+1864-FF7118,"AMAZON.COM.KYDC,INC",FF7118,Heuristic,Heuristic,,,62.5,62.5,1626,1626,0,0.0
+1864-FF7118PX2,"AMAZON.COM.KYDC,INC",FF7118PX2,Croston's,Croston's,,,10.7,10.7,279,279,0,0.0
+1864-FF7120,"AMAZON.COM.KYDC,INC",FF7120,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7120AMZ2,"AMAZON.COM.KYDC,INC",FF7120AMZ2,Croston's,Croston's,,,15.6,15.6,405,405,0,0.0
+1864-FF7120EC,"AMAZON.COM.KYDC,INC",FF7120EC,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 17910 units),L13 nz-avg (OOS: fill-rate 10% over 17910 units),505.4,505.4,13140,13140,0,0.0
+1864-FF7120PCS2,"AMAZON.COM.KYDC,INC",FF7120PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 723 units),L13 nz-avg (OOS: fill-rate 10% over 723 units),82.3,82.3,2139,2139,0,0.0
+1864-FF7120PX6,"AMAZON.COM.KYDC,INC",FF7120PX6,Heuristic,Heuristic,,,1.0,1.0,27,27,0,0.0
+1864-FF7210,"AMAZON.COM.KYDC,INC",FF7210,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2292 units),L13 nz-avg (OOS: fill-rate 8% over 2292 units),176.8,176.8,4596,4596,0,0.0
+1864-FF7215,"AMAZON.COM.KYDC,INC",FF7215,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2484 units),L13 nz-avg (OOS: fill-rate 8% over 2484 units),197.5,197.5,5136,5136,0,0.0
+1864-FF7216,"AMAZON.COM.KYDC,INC",FF7216,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 5652 units),L13 nz-avg (OOS: fill-rate 8% over 5652 units),312.9,312.9,8136,8136,0,0.0
+1864-FF7217,"AMAZON.COM.KYDC,INC",FF7217,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1500 units),L13 nz-avg (OOS: fill-rate 8% over 1500 units),123.2,123.2,3204,3204,0,0.0
+1864-FF7217AU,AMAZON AUSTRALIA,FF7217AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF7221,"AMAZON.COM.KYDC,INC",FF7221,Croston's,Croston's,,,739.4,739.4,19224,19224,0,0.0
+1864-FF7228,"AMAZON.COM.KYDC,INC",FF7228,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 7200 units),L13 nz-avg (OOS: fill-rate 8% over 7200 units),390.0,390.0,10140,10140,0,0.0
+1864-FF7258,"AMAZON.COM.KYDC,INC",FF7258,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7258AMZ,"AMAZON.COM.KYDC,INC",FF7258AMZ,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 26046 units),L13 nz-avg (OOS: fill-rate 8% over 26046 units),2199.9,2199.9,57198,57198,0,0.0
+1864-FF7258AMZ2,"AMAZON.COM.KYDC,INC",FF7258AMZ2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7258COS,"AMAZON.COM.KYDC,INC",FF7258COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7258CP6,"AMAZON.COM.KYDC,INC",FF7258CP6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF7258PCS2,"AMAZON.COM.KYDC,INC",FF7258PCS2,Croston's,Croston's,,,114.3,114.3,2973,2973,0,0.0
+1864-FF7258PCS6,"AMAZON.COM.KYDC,INC",FF7258PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 67 units),L13 nz-avg (OOS: fill-rate 7% over 67 units),6.0,6.0,156,156,0,0.0
+1864-FF7260,"AMAZON.COM.KYDC,INC",FF7260,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7260AMZ,"AMAZON.COM.KYDC,INC",FF7260AMZ,Croston's,Croston's,,,19.4,19.4,504,504,0,0.0
+1864-FF7260AMZ2,"AMAZON.COM.KYDC,INC",FF7260AMZ2,Croston's,Croston's,,,2.3,2.3,60,60,0,0.0
+1864-FF7260CP6,"AMAZON.COM.KYDC,INC",FF7260CP6,Sparse Intermittent,Sparse Intermittent,,,0.1,0.1,2,2,0,0.0
+1864-FF7261,"AMAZON.COM.KYDC,INC",FF7261,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7261AMZ,"AMAZON.COM.KYDC,INC",FF7261AMZ,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7261PCS2,"AMAZON.COM.KYDC,INC",FF7261PCS2,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF7261PCS2N,"AMAZON.COM.KYDC,INC",FF7261PCS2N,Sparse Intermittent,Sparse Intermittent,,,18.0,18.0,468,468,0,0.0
+1864-FF7261PCS6,"AMAZON.COM.KYDC,INC",FF7261PCS6,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF7263,"AMAZON.COM.KYDC,INC",FF7263,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7263AMZ,"AMAZON.COM.KYDC,INC",FF7263AMZ,Sparse Intermittent,Sparse Intermittent,,,3.2,3.2,84,84,0,0.0
+1864-FF7263AMZN,"AMAZON.COM.KYDC,INC",FF7263AMZN,Sparse Intermittent,Sparse Intermittent,,,17.5,17.5,456,456,0,0.0
+1864-FF7263PCS2,"AMAZON.COM.KYDC,INC",FF7263PCS2,Sparse Intermittent,Sparse Intermittent,,,12.7,12.7,330,330,0,0.0
+1864-FF7263PCS6,"AMAZON.COM.KYDC,INC",FF7263PCS6,Croston's,Croston's,,,1.0,1.0,26,26,0,0.0
+1864-FF7266,"AMAZON.COM.KYDC,INC",FF7266,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7266AMZ,"AMAZON.COM.KYDC,INC",FF7266AMZ,Sparse Intermittent,Sparse Intermittent,,,105.9,105.9,2754,2754,0,0.0
+1864-FF7266COS,"AMAZON.COM.KYDC,INC",FF7266COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7266CP6,"AMAZON.COM.KYDC,INC",FF7266CP6,Croston's,Croston's,,,1.6,1.6,41,41,0,0.0
+1864-FF7266PCS2,"AMAZON.COM.KYDC,INC",FF7266PCS2,Heuristic,Heuristic,,,9.5,9.5,246,246,0,0.0
+1864-FF7266PCS6,"AMAZON.COM.KYDC,INC",FF7266PCS6,Croston's,Croston's,,,0.7,0.7,18,18,0,0.0
+1864-FF7266PX2,"AMAZON.COM.KYDC,INC",FF7266PX2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7267,"AMAZON.COM.KYDC,INC",FF7267,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7267AMZ,"AMAZON.COM.KYDC,INC",FF7267AMZ,Reactivating,Reactivating,,,18.0,18.0,468,468,0,0.0
+1864-FF7267AMZ2,"AMAZON.COM.KYDC,INC",FF7267AMZ2,Heuristic,Heuristic,,,110.0,110.0,2859,2859,0,0.0
+1864-FF7267AMZN,"AMAZON.COM.KYDC,INC",FF7267AMZN,Sparse Intermittent,Sparse Intermittent,,,26.8,26.8,696,696,0,0.0
+1864-FF7267COS,"AMAZON.COM.KYDC,INC",FF7267COS,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7267CP6,"AMAZON.COM.KYDC,INC",FF7267CP6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF7267CP6N,"AMAZON.COM.KYDC,INC",FF7267CP6N,Sparse Intermittent,Sparse Intermittent,,,3.5,3.5,90,90,0,0.0
+1864-FF7297,"AMAZON.COM.KYDC,INC",FF7297,Croston's,Croston's,,,0.7,0.7,18,18,0,0.0
+1864-FF7297AMZ,"AMAZON.COM.KYDC,INC",FF7297AMZ,Sparse Intermittent,Sparse Intermittent,,,488.1,488.1,12690,12690,0,0.0
+1864-FF7297AMZ2,"AMAZON.COM.KYDC,INC",FF7297AMZ2,Sparse Intermittent,Sparse Intermittent,,,154.2,154.2,4008,4008,0,0.0
+1864-FF7297AMZN,"AMAZON.COM.KYDC,INC",FF7297AMZN,Heuristic,Heuristic,,,24.0,24.0,624,624,0,0.0
+1864-FF7297CP6,"AMAZON.COM.KYDC,INC",FF7297CP6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF7372,"AMAZON.COM.KYDC,INC",FF7372,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 11940 units),L13 nz-avg (OOS: fill-rate 9% over 11940 units),1011.2,1011.2,26292,26292,0,0.0
+1864-FF7372AMZ2,"AMAZON.COM.KYDC,INC",FF7372AMZ2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF7372PCS2,"AMAZON.COM.KYDC,INC",FF7372PCS2,Sparse Intermittent,Sparse Intermittent,,,56.8,56.8,1476,1476,0,0.0
+1864-FF7372PCS6,"AMAZON.COM.KYDC,INC",FF7372PCS6,Croston's,Croston's,,,1.5,1.5,39,39,0,0.0
+1864-FF7372PX3,"AMAZON.COM.KYDC,INC",FF7372PX3,Croston's,Croston's,,,16.5,16.5,428,428,0,0.0
+1864-FF7488,"AMAZON.COM.KYDC,INC",FF7488,Sparse Intermittent,Sparse Intermittent,,,142.6,142.6,3708,3708,0,0.0
+1864-FF7488CP6,"AMAZON.COM.KYDC,INC",FF7488CP6,Heuristic,Heuristic,,,41.6,41.6,1082,1082,0,0.0
+1864-FF7488PX2,"AMAZON.COM.KYDC,INC",FF7488PX2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 258 units),L13 nz-avg (OOS: fill-rate 8% over 258 units),9.5,9.5,246,246,0,0.0
+1864-FF7488PX3,"AMAZON.COM.KYDC,INC",FF7488PX3,Heuristic,Heuristic,,,2.0,2.0,52,52,0,0.0
+1864-FF7531,"AMAZON.COM.KYDC,INC",FF7531,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF7531PCS3,"AMAZON.COM.KYDC,INC",FF7531PCS3,Croston's,Croston's,,,0.9,0.9,24,24,0,0.0
+1864-FF7540,"AMAZON.COM.KYDC,INC",FF7540,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF7541,"AMAZON.COM.KYDC,INC",FF7541,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF7543,"AMAZON.COM.KYDC,INC",FF7543,Croston's,Croston's,,,9.7,9.7,252,252,0,0.0
+1864-FF7549,"AMAZON.COM.KYDC,INC",FF7549,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF7612,"AMAZON.COM.KYDC,INC",FF7612,Croston's,Croston's,,,386.8,386.8,10056,10056,0,0.0
+1864-FF7612PCS24,"AMAZON.COM.KYDC,INC",FF7612PCS24,Sparse Intermittent,Sparse Intermittent,,,0.3,0.3,8,8,0,0.0
+1864-FF7613,"AMAZON.COM.KYDC,INC",FF7613,Croston's,Croston's,,,258.5,258.5,6720,6720,0,0.0
+1864-FF7613PCS24,"AMAZON.COM.KYDC,INC",FF7613PCS24,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF7613PX4,"AMAZON.COM.KYDC,INC",FF7613PX4,Sparse Intermittent,Sparse Intermittent,,,3.7,3.7,96,96,0,0.0
+1864-FF7618,"AMAZON.COM.KYDC,INC",FF7618,Croston's,Croston's,,,1516.2,1516.2,39420,39420,0,0.0
+1864-FF7618PX60,"AMAZON.COM.KYDC,INC",FF7618PX60,Heuristic,Heuristic,,,1.1,1.1,29,29,0,0.0
+1864-FF7619,"AMAZON.COM.KYDC,INC",FF7619,Croston's,Croston's,,,853.8,853.8,22200,22200,0,0.0
+1864-FF7619PCS2,"AMAZON.COM.KYDC,INC",FF7619PCS2,Croston's,Croston's,,,93.5,93.5,2430,2430,0,0.0
+1864-FF7619PCS60,"AMAZON.COM.KYDC,INC",FF7619PCS60,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF7639,"AMAZON.COM.KYDC,INC",FF7639,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF7716,"AMAZON.COM.KYDC,INC",FF7716,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 104 units),L13 nz-avg (OOS: fill-rate 7% over 104 units),8.0,8.0,208,208,0,0.0
+1864-FF7717,"AMAZON.COM.KYDC,INC",FF7717,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 104 units),L13 nz-avg (OOS: fill-rate 8% over 104 units),8.0,8.0,208,208,0,0.0
+1864-FF7942AU,AMAZON AUSTRALIA,FF7942AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF8256,"AMAZON.COM.KYDC,INC",FF8256,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF8258,"AMAZON.COM.KYDC,INC",FF8258,Reactivating,Reactivating,,,36.0,36.0,936,936,0,0.0
+1864-FF8287,"AMAZON.COM.KYDC,INC",FF8287,Sparse Intermittent,Sparse Intermittent,,,138.5,138.5,3600,3600,0,0.0
+1864-FF8287PCS60,"AMAZON.COM.KYDC,INC",FF8287PCS60,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-FF8298,"AMAZON.COM.KYDC,INC",FF8298,Heuristic,Heuristic,,,224.3,224.3,5832,5832,0,0.0
+1864-FF8298AMZ3,"AMAZON.COM.KYDC,INC",FF8298AMZ3,Sparse Intermittent,Sparse Intermittent,,,61.2,61.2,1592,1592,0,0.0
+1864-FF8363,"AMAZON.COM.KYDC,INC",FF8363,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 1140 units),L13 nz-avg (OOS: fill-rate 0% over 1140 units),90.0,90.0,2340,2340,0,0.0
+1864-FF8423,"AMAZON.COM.KYDC,INC",FF8423,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 22716 units),L13 nz-avg (OOS: fill-rate 7% over 22716 units),1894.2,1894.2,49248,49248,0,0.0
+1864-FF8423AMZ3,"AMAZON.COM.KYDC,INC",FF8423AMZ3,Croston's,Croston's,,,236.8,236.8,6156,6156,0,0.0
+1864-FF8423AMZ4,"AMAZON.COM.KYDC,INC",FF8423AMZ4,Heuristic,Heuristic,,,199.0,199.0,5175,5175,0,0.0
+1864-FF8423MX,"AMAZON.COM.KYDC,INC",FF8423MX,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF8423PCS36,"AMAZON.COM.KYDC,INC",FF8423PCS36,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF8423PCS4,"AMAZON.COM.KYDC,INC",FF8423PCS4,New/Relaunch,New/Relaunch,,,9.0,9.0,234,234,0,0.0
+1864-FF8424,"AMAZON.COM.KYDC,INC",FF8424,Sparse Intermittent,Sparse Intermittent,,,138.5,138.5,3600,3600,0,0.0
+1864-FF8424AMZ3,"AMAZON.COM.KYDC,INC",FF8424AMZ3,Croston's,Croston's,,,22.2,22.2,576,576,0,0.0
+1864-FF8424AMZ4,"AMAZON.COM.KYDC,INC",FF8424AMZ4,Croston's,Croston's,,,10.7,10.7,279,279,0,0.0
+1864-FF8424PCS3,"AMAZON.COM.KYDC,INC",FF8424PCS3,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF8424PCS36,"AMAZON.COM.KYDC,INC",FF8424PCS36,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF8424PCS4,"AMAZON.COM.KYDC,INC",FF8424PCS4,New/Relaunch,New/Relaunch,,,9.0,9.0,234,234,0,0.0
+1864-FF8425,"AMAZON.COM.KYDC,INC",FF8425,Croston's,Croston's,,,819.7,819.7,21312,21312,0,0.0
+1864-FF8425AMZ4,"AMAZON.COM.KYDC,INC",FF8425AMZ4,Croston's,Croston's,,,27.7,27.7,720,720,0,0.0
+1864-FF8425PCS2,"AMAZON.COM.KYDC,INC",FF8425PCS2,Sparse Intermittent,Sparse Intermittent,,,76.8,76.8,1998,1998,0,0.0
+1864-FF8425PCS36,"AMAZON.COM.KYDC,INC",FF8425PCS36,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,6,6,0,0.0
+1864-FF8431,"AMAZON.COM.KYDC,INC",FF8431,Inactive+Floor (R3),Inactive+Floor (R3),,,24.0,24.0,624,624,0,0.0
+1864-FF8431PCS24,"AMAZON.COM.KYDC,INC",FF8431PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-FF8433,"AMAZON.COM.KYDC,INC",FF8433,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF8433PCS2,"AMAZON.COM.KYDC,INC",FF8433PCS2,Croston's,Croston's,,,3.2,3.2,84,84,0,0.0
+1864-FF8433PCS24,"AMAZON.COM.KYDC,INC",FF8433PCS24,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF8608AU,AMAZON AUSTRALIA,FF8608AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF8649,"AMAZON.COM.KYDC,INC",FF8649,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+1864-FF8649/24,"AMAZON.COM.KYDC,INC",FF8649/24,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 32928 units),L13 nz-avg (OOS: fill-rate 8% over 32928 units),2792.3,2792.3,72600,72600,0,0.0
+1864-FF8649PCS24,"AMAZON.COM.KYDC,INC",FF8649PCS24,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+1864-FF8649PCS48,"AMAZON.COM.KYDC,INC",FF8649PCS48,Croston's,Croston's,,,1.0,1.0,26,26,0,0.0
+1864-FF8651/8PCS2,"AMAZON.COM.KYDC,INC",FF8651/8PCS2,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF8651/8PCS8,"AMAZON.COM.KYDC,INC",FF8651/8PCS8,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF8651PCS2,"AMAZON.COM.KYDC,INC",FF8651PCS2,Croston's,Croston's,,,8.0,8.0,208,208,0,0.0
+1864-FF8651PCS8,"AMAZON.COM.KYDC,INC",FF8651PCS8,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF8652PCS6,"AMAZON.COM.KYDC,INC",FF8652PCS6,Croston's,Croston's,,,1.2,1.2,31,31,0,0.0
+1864-FF8653,"AMAZON.COM.KYDC,INC",FF8653,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 12432 units),L13 nz-avg (OOS: fill-rate 7% over 12432 units),999.2,999.2,25980,25980,0,0.0
+1864-FF8653PCS2,"AMAZON.COM.KYDC,INC",FF8653PCS2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF8653PCS4,"AMAZON.COM.KYDC,INC",FF8653PCS4,Croston's,Croston's,,,11.6,11.6,302,302,0,0.0
+1864-FF8653PX4,"AMAZON.COM.KYDC,INC",FF8653PX4,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF8654,"AMAZON.COM.KYDC,INC",FF8654,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 22350 units),L13 nz-avg (OOS: fill-rate 8% over 22350 units),1575.3,1575.3,40958,40958,0,0.0
+1864-FF8654PCS2,"AMAZON.COM.KYDC,INC",FF8654PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 615 units),L13 nz-avg (OOS: fill-rate 8% over 615 units),43.9,43.9,1142,1142,0,0.0
+1864-FF8654PX2,"AMAZON.COM.KYDC,INC",FF8654PX2,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF8831,"AMAZON.COM.KYDC,INC",FF8831,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF8831N,"AMAZON.COM.KYDC,INC",FF8831N,Sparse Intermittent,Sparse Intermittent,,,8.3,8.3,216,216,0,0.0
+1864-FF8831PCS12,"AMAZON.COM.KYDC,INC",FF8831PCS12,Sparse Intermittent,Sparse Intermittent,,,0.4,0.4,10,10,0,0.0
+1864-FF8831PCS3,"AMAZON.COM.KYDC,INC",FF8831PCS3,Croston's,Croston's,,,1.4,1.4,36,36,0,0.0
+1864-FF8832,"AMAZON.COM.KYDC,INC",FF8832,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 4512 units),L13 nz-avg (OOS: fill-rate 0% over 4512 units),127.4,127.4,3312,3312,0,0.0
+1864-FF8832PCS12,"AMAZON.COM.KYDC,INC",FF8832PCS12,Croston's,Croston's,,,0.5,0.5,13,13,0,0.0
+1864-FF8882,"AMAZON.COM.KYDC,INC",FF8882,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 21846 units),L13 nz-avg (OOS: fill-rate 8% over 21846 units),1850.1,1850.1,48102,48102,0,0.0
+1864-FF8882PCS2,"AMAZON.COM.KYDC,INC",FF8882PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2171 units),L13 nz-avg (OOS: fill-rate 8% over 2171 units),190.8,190.8,4962,4962,0,0.0
+1864-FF8882PCS6,"AMAZON.COM.KYDC,INC",FF8882PCS6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 159 units),L13 nz-avg (OOS: fill-rate 7% over 159 units),10.7,10.7,278,278,0,0.0
+1864-FF8882PX2,"AMAZON.COM.KYDC,INC",FF8882PX2,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF8882PX6,"AMAZON.COM.KYDC,INC",FF8882PX6,New/Relaunch,New/Relaunch,,,5.0,5.0,130,130,0,0.0
+1864-FF8990,"AMAZON.COM.KYDC,INC",FF8990,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 73872 units),L13 nz-avg (OOS: fill-rate 7% over 73872 units),6254.3,6254.3,162612,162612,0,0.0
+1864-FF8990PCS12,"AMAZON.COM.KYDC,INC",FF8990PCS12,Croston's,Croston's,,,2.2,2.2,57,57,0,0.0
+1864-FF8990PCS3,"AMAZON.COM.KYDC,INC",FF8990PCS3,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1792 units),L13 nz-avg (OOS: fill-rate 8% over 1792 units),174.2,174.2,4528,4528,0,0.0
+1864-FF8991,"AMAZON.COM.KYDC,INC",FF8991,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF8991AMZ3,"AMAZON.COM.KYDC,INC",FF8991AMZ3,Sparse Intermittent,Sparse Intermittent,,,30.2,30.2,784,784,0,0.0
+1864-FF8991EC,"AMAZON.COM.KYDC,INC",FF8991EC,Croston's,Croston's,,,461.5,461.5,12000,12000,0,0.0
+1864-FF8991PCS3,"AMAZON.COM.KYDC,INC",FF8991PCS3,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+1864-FF8991PCS6,"AMAZON.COM.KYDC,INC",FF8991PCS6,Sparse Intermittent,Sparse Intermittent,,,35.3,35.3,918,918,0,0.0
+1864-FF9059,"AMAZON.COM.KYDC,INC",FF9059,Croston's,Croston's,,,108.2,108.2,2814,2814,0,0.0
+1864-FF9060,"AMAZON.COM.KYDC,INC",FF9060,Croston's,Croston's,,,596.8,596.8,15516,15516,0,0.0
+1864-FF9250,"AMAZON.COM.KYDC,INC",FF9250,Heuristic,Heuristic,,,1.8,1.8,48,48,0,0.0
+1864-FF9256,"AMAZON.COM.KYDC,INC",FF9256,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+1864-FF9281AU,AMAZON AUSTRALIA,FF9281AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF9290/24,"AMAZON.COM.KYDC,INC",FF9290/24,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF9290/24PCS2,"AMAZON.COM.KYDC,INC",FF9290/24PCS2,Croston's,Croston's,,,5.5,5.5,144,144,0,0.0
+1864-FF9290PCS6,"AMAZON.COM.KYDC,INC",FF9290PCS6,Croston's,Croston's,,,2.2,2.2,56,56,0,0.0
+1864-FF9291/24,"AMAZON.COM.KYDC,INC",FF9291/24,Seasonal Baseline,Seasonal Baseline,L26 nz-avg (sparse L13),L26 nz-avg (sparse L13),445.8,445.8,11592,11592,0,0.0
+1864-FF9297/24,"AMAZON.COM.KYDC,INC",FF9297/24,Croston's,Croston's,,,2227.4,2227.4,57912,57912,0,0.0
+1864-FF9298,"AMAZON.COM.KYDC,INC",FF9298,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF9298EC,"AMAZON.COM.KYDC,INC",FF9298EC,Croston's,Croston's,,,2439.7,2439.7,63432,63432,0,0.0
+1864-FF9298PCS3,"AMAZON.COM.KYDC,INC",FF9298PCS3,Croston's,Croston's,,,568.9,568.9,14792,14792,0,0.0
+1864-FF9314AU,AMAZON AUSTRALIA,FF9314AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF9315AU,AMAZON AUSTRALIA,FF9315AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF9318AU,AMAZON AUSTRALIA,FF9318AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF9721AU,AMAZON AUSTRALIA,FF9721AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-FF9756,"AMAZON.COM.KYDC,INC",FF9756,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 1% over 4812 units),L13 nz-avg (OOS: fill-rate 1% over 4812 units),58.2,58.2,1512,1512,0,0.0
+1864-FF9757,"AMAZON.COM.KYDC,INC",FF9757,Croston's,Croston's,,,47.1,47.1,1224,1224,0,0.0
+1864-SF8167,"AMAZON.COM.KYDC,INC",SF8167,Croston's,Croston's,,,329.5,329.5,8568,8568,0,0.0
+1864-SF8167AMZ3,"AMAZON.COM.KYDC,INC",SF8167AMZ3,Heuristic,Heuristic,,,0.9,0.9,24,24,0,0.0
+1864-SF8167AU,AMAZON AUSTRALIA,SF8167AU,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-SF8167PCS72,"AMAZON.COM.KYDC,INC",SF8167PCS72,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 102 units),L13 nz-avg (OOS: fill-rate 8% over 102 units),10.3,10.3,267,267,0,0.0
+1864-SF8168,"AMAZON.COM.KYDC,INC",SF8168,Croston's,Croston's,,,299.1,299.1,7776,7776,0,0.0
+1864-SF8168PCS48,"AMAZON.COM.KYDC,INC",SF8168PCS48,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0
+1864-SF8169,"AMAZON.COM.KYDC,INC",SF8169,Heuristic,Heuristic,,,3500.3,3500.3,91008,91008,0,0.0
+1864-SF8169PCS72,"AMAZON.COM.KYDC,INC",SF8169PCS72,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 2% over 66 units),L13 nz-avg (OOS: fill-rate 2% over 66 units),6.3,6.3,164,164,0,0.0
+1864-SF8170,"AMAZON.COM.KYDC,INC",SF8170,Croston's,Croston's,,,697.8,697.8,18144,18144,0,0.0
+1864-SF8170PCS48,"AMAZON.COM.KYDC,INC",SF8170PCS48,Croston's,Croston's,,,2.0,2.0,52,52,0,0.0
+1864-SF8173,"AMAZON.COM.KYDC,INC",SF8173,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-SF8173EC,"AMAZON.COM.KYDC,INC",SF8173EC,Sparse Intermittent,Sparse Intermittent,,,692.3,692.3,18000,18000,0,0.0
+1864-SF8173PCS2,"AMAZON.COM.KYDC,INC",SF8173PCS2,Croston's,Croston's,,,284.8,284.8,7404,7404,0,0.0
+1864-SF8173PCS24,"AMAZON.COM.KYDC,INC",SF8173PCS24,Croston's,Croston's,,,2.0,2.0,52,52,0,0.0
+1864-SF8174,"AMAZON.COM.KYDC,INC",SF8174,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+1864-SF8174EC,"AMAZON.COM.KYDC,INC",SF8174EC,Croston's,Croston's,,,388.6,388.6,10104,10104,0,0.0
+1864-SF8174PCS2,"AMAZON.COM.KYDC,INC",SF8174PCS2,Croston's,Croston's,,,186.9,186.9,4860,4860,0,0.0
+1864-SF8174PCS24,"AMAZON.COM.KYDC,INC",SF8174PCS24,Sparse Intermittent,Sparse Intermittent,,,0.2,0.2,4,4,0,0.0

@@ -1,0 +1,101 @@
+key,mstyle,cust,desc,pattern,model,manual,ai,gap_pct,l13_nz_avg,l52_peak,bucket
+1864-FF8990,FF8990,AMAZON.COM.KYDC,INC,"Fresh Step Litter Box Scent Crystals in Fresh Scent  15oz",steady,Seasonal Baseline,135985,122424,-10.0,2476,8328,aligned
+1864-FF12689,FF12689,AMAZON.COM.KYDC,INC,"A&H Pet Scents Deodorizing Gel Beads - Fresh Breeze",steady,Seasonal Baseline,114905,91248,-20.6,11254,21888,under_forecast_other
+1864-BB0466,BB0466,AMAZON.COM.KYDC,INC,"Kingsford - Deluxe Charcoal Chimney Starter",steady,Seasonal Baseline,103080,59724,-42.1,1546,27180,seasonal_ramp_underforecast
+1864-FF10479EC,FF10479EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Super Deodorizing Spray - Kiwi Blossom",steady,Seasonal Baseline,91810,53742,-41.5,3271,8484,prime_day_prebuy_gap
+1864-FF22031,FF22031,AMAZON.COM.KYDC,INC,"Wags & Wiggles Cleanse Hypoallergenic Wipes 100ct",steady,Seasonal Baseline,91750,37224,-59.4,3142,7704,under_forecast_other
+1864-FF4775AMZ,FF4775AMZ,AMAZON.COM.KYDC,INC,"Burts Bees Tearless 2 in 1 Shampoo and Conditioner for Puppies with Buttermilk &",steady,Seasonal Baseline,91480,85338,-6.7,3917,8652,aligned
+1864-FF10159EC,FF10159EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Super Deodorizing Shampoo 20oz",steady,Seasonal Baseline,85145,75648,-11.2,4413,15066,aligned
+1864-FF7120EC,FF7120EC,AMAZON.COM.KYDC,INC,"BioSilk for Dogs Detangling and Shine Spray for Dogs  8 Ounces",steady,Seasonal Baseline,82505,52398,-36.5,2666,2928,under_forecast_other
+1864-FF8654,FF8654,AMAZON.COM.KYDC,INC,"Glad for Pets Activated Carbon Training Pads for Puppies and Senior Dogs  100 Co",steady,Seasonal Baseline,79500,63438,-20.2,961,3168,seasonal_ramp_underforecast
+1864-FF7258AMZ,FF7258AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Oatmeal Shampoo for Dogs 16oz",steady,Seasonal Baseline,75070,65886,-12.2,3882,16860,aligned
+1864-BB0237,BB0237,AMAZON.COM.KYDC,INC,"Glad - Assorted Cutlery  240ct - Clear",steady,Seasonal Baseline,71425,59280,-17.0,2440,6558,prime_day_prebuy_gap
+1864-FF15589,FF15589,AMAZON.COM.KYDC,INC,"Palmer's for Pets Paw Pad & Nose Balm with Cocoa Butter 3.5oz",steady,Seasonal Baseline,66770,34008,-49.1,3956,6060,under_forecast_other
+1864-FF8882,FF8882,AMAZON.COM.KYDC,INC,"Glad for Pets Jumbo Activated Carbon Training Pads For Large Breeds  30 Count",new_item,Seasonal Baseline,61645,47190,-23.4,3343,6582,under_forecast_other
+1864-BB20552,BB20552,AMAZON.COM.KYDC,INC,"Glad - Plastic Forks  70ct - Clear",steady,Seasonal Baseline,61625,58620,-4.9,1180,5736,aligned
+1864-FF12887,FF12887,AMAZON.COM.KYDC,INC,"A&H Pet Scents Solid Gel Deodorizer - Fresh Breeze",steady,Seasonal Baseline,61435,53508,-12.9,1774,4228,aligned
+1864-BB13437,BB13437,AMAZON.COM.KYDC,INC,"G4K - 8.5' Round Paper Plates  20ct - Unicorns",steady,Seasonal Baseline,59375,118620,99.8,1660,5790,declining_overforecast
+1864-BB22116,BB22116,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - In-Wash Scent Booster Crystals - 2 x 18oz - Ocean (Twin Pack ",steady,Seasonal Baseline,56485,32238,-42.9,1616,4086,under_forecast_other
+1864-FF12853,FF12853,AMAZON.COM.KYDC,INC,"Wet Ones Multipurpose Wipe for Cats - 50 ct Canister",new_item,Seasonal Baseline,53025,61188,15.4,1663,6636,aligned
+1864-BB21250,BB21250,AMAZON.COM.KYDC,INC,"Kingsford - Grill Brush",steady,Seasonal Baseline,52350,38736,-26.0,670,5424,seasonal_ramp_underforecast
+1864-FF12508,FF12508,AMAZON.COM.KYDC,INC,"A&H Pet Scents Deodorizing Gel Beads - Lavender Fields",steady,Seasonal Baseline,51925,33648,-35.2,2224,8208,seasonal_ramp_underforecast
+1864-FF12823,FF12823,AMAZON.COM.KYDC,INC,"Wags & Wiggles Nourish Moisturizing Wipes 100ct",steady,Seasonal Baseline,51035,47352,-7.2,869,6336,aligned
+1864-FF8423,FF8423,AMAZON.COM.KYDC,INC,"Fresh Step Drawstring Litter Box Liners Scented  Large Size  30' x 17' - 7 Count",steady,Seasonal Baseline,48750,40860,-16.2,4414,9360,aligned
+1864-FF5766AMZ,FF5766AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Hypoallergenic Shampoo for Cats 10oz",steady,Seasonal Baseline,46535,28902,-37.9,2607,4422,under_forecast_other
+1864-FF12655EC,FF12655EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Ultra Fresh Waterless Bath Spray with Cucumber & White Tea",steady,Seasonal Baseline,46050,53652,16.5,2039,2838,declining_overforecast
+1864-FF15584,FF15584,AMAZON.COM.KYDC,INC,"Palmer's for Pets Direct Relief Lotion Spray with Cocoa Butter 8oz",steady,Seasonal Baseline,45925,34872,-24.1,1749,2808,under_forecast_other
+1864-FF12842,FF12842,AMAZON.COM.KYDC,INC,"Wet Ones Antibacterial All-Purpose Wipe for Dogs - 5.7in x 7.5in - 50ct Canister",steady,Seasonal Baseline,45550,46920,3.0,2120,5328,aligned
+1864-BB0098,BB0098,AMAZON.COM.KYDC,INC,"Glad - 10' Round Paper Plates  50ct - Blue Flower",steady,Seasonal Baseline,44455,36600,-17.7,1333,4770,aligned
+1864-BB0131EC,BB0131EC,AMAZON.COM.KYDC,INC,"Kingsford - Grill Cleaner - Aerosol - 14.5oz",intermittent,Croston's,44200,23592,-46.6,188,5628,seasonal_unmatched
+1864-FF15982,FF15982,AMAZON.COM.KYDC,INC,"CLEANZE Antibacterial Hand Wipes- 6' x 8' -100ct",intermittent,Heuristic,41500,53772,29.6,1914,3672,over_forecast_other
+1864-BB30424,BB30424,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - 6pk Deodorizing Balls - Lavender w/Eucalyptus",steady,Seasonal Baseline,40825,11832,-71.0,1331,5388,seasonal_unmatched
+1864-FF17554,FF17554,AMAZON.COM.KYDC,INC,"Amazon Private Label: Rawhide-free Twists  Bacon & Cheese flavor  55-ct/12-oz Re",inactive,Inactive,40000,0,-100.0,0,0,under_forecast_other
+1864-BB30930,BB30930,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - 6pk Garbage Can Stick Ups IN TRAY - Lavender  w/Eucalyptus",steady,Seasonal Baseline,38960,38328,-1.6,1435,3468,aligned
+1864-FF17831,FF17831,AMAZON.COM.KYDC,INC,"CLEANZE Antibacterial Hand Wipes-Indiv. Wrapped-50ct in 6pc PDQ(Same UPC# as FFP",sparse_intermittent,Heuristic,38055,47592,25.1,792,912,declining_overforecast
+1864-FF7297AMZ,FF7297AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Waterless Shampoo for Cats 10oz",sparse_intermittent,Sparse Intermittent,38025,4524,-88.1,0,3336,sparse_baseline_too_low
+1864-FF16704,FF16704,AMAZON.COM.KYDC,INC,"Arm and Hammer Cat Litter Box Crystals- Lavender Zen",steady,Seasonal Baseline,37425,20580,-45.0,1032,1296,under_forecast_other
+1864-FF12376,FF12376,AMAZON.COM.KYDC,INC,"Biosilk for Dogs Silk Therapy Detangling Conditioner",steady,Seasonal Baseline,35135,24864,-29.2,1598,2148,under_forecast_other
+1864-FF7372,FF7372,AMAZON.COM.KYDC,INC,"Burts Bees Cat Dander Wipes-50ct",steady,Seasonal Baseline,34175,27918,-18.3,1447,2088,aligned
+1864-FF31068,FF31068,AMAZON.COM.KYDC,INC,"Palmer's for Pets Facial Cleansing Pads with Cocoa Butter 100ct",steady,Seasonal Baseline,33785,18144,-46.3,749,3168,seasonal_ramp_underforecast
+1864-FF10530,FF10530,AMAZON.COM.KYDC,INC,"A&H Heavy Duty Multi-Purpose Pet Wipes - Mango  100 Count",steady,Seasonal Baseline,33515,12024,-64.1,2945,5460,under_forecast_other
+1864-FF17574,FF17574,AMAZON.COM.KYDC,INC,"Amazon Private Label: Extruded Dental Stick  Large  Chicken flavor  40-ct/35-oz ",inactive,Inactive,32750,0,-100.0,0,0,under_forecast_other
+1864-BB12068,BB12068,AMAZON.COM.KYDC,INC,"Kingsford - Wooden Fire Starter Rolls - 32ct",steady,Seasonal Baseline,31680,9264,-70.8,708,2688,seasonal_ramp_underforecast
+1864-FF14584,FF14584,AMAZON.COM.KYDC,INC,"Glad for Pets Jumbo Activated Carbon Training Pads  50 Count",steady,Seasonal Baseline,31015,23568,-24.0,1149,2320,under_forecast_other
+1864-FF12302/24EC,FF12302/24EC,AMAZON.COM.KYDC,INC,"A&H Complete Care Dog Dental Spray in Mint Flavor - Value Size 6oz",intermittent,Croston's,29680,22128,-25.4,0,3408,under_forecast_other
+1864-FF17578,FF17578,AMAZON.COM.KYDC,INC,"Amazon Private Label: Extruded Dental Stick  Large  Beef flavor  40-ct/35-oz Res",inactive,Inactive,29500,0,-100.0,0,0,under_forecast_other
+1864-FF8653,FF8653,AMAZON.COM.KYDC,INC,"Glad for Pets Activated Carbon Training Pads for Puppies and Senior Dogs  50 Cou",steady,Seasonal Baseline,29355,20960,-28.6,1114,3712,seasonal_ramp_underforecast
+1864-BB14812,BB14812,AMAZON.COM.KYDC,INC,"G4K Paw Patrol - 8.5' Round Paper Plates  20ct - Core Pups Blue",steady,Seasonal Baseline,28680,13700,-52.2,1077,2460,under_forecast_other
+1864-BB0578,BB0578,AMAZON.COM.KYDC,INC,"Glad - Plastic Spoons  24ct - Clear",steady,Seasonal Baseline,28605,25044,-12.4,773,3444,aligned
+1864-BB27359,BB27359,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - 6pk Deodorizing Balls - Fresh Ocean Breeze",new_item,Seasonal Baseline,28370,21564,-24.0,2067,8040,seasonal_unmatched
+1864-BB26922,BB26922,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Air Freshener Beads Twin Pack - 2x12oz - Fresh Ocean Breeze &",steady,Seasonal Baseline,28340,15522,-45.2,548,6162,seasonal_unmatched
+1864-FF20206EC,FF20206EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Itch Relief Spray",new_item,Heuristic,27590,53628,94.4,1730,5586,spike_overforecast
+1864-FF31287,FF31287,AMAZON.COM.KYDC,INC,"Glad for Pets Heavy Duty Activated Carbon Training Pads - 24' x 24' 30ct",steady,Seasonal Baseline,26830,23600,-12.0,1341,3080,aligned
+1864-SF8173EC,SF8173EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Fresh Breath Dental Spray  Mint",sparse_intermittent,Sparse Intermittent,25715,15912,-38.1,2565,5304,sparse_baseline_too_low
+1864-BB31552,BB31552,AMAZON.COM.KYDC,INC,"Glad Kids - 12oz Paper Snack Bowls no lid - 20ct - Unicorns",new_item,Seasonal Baseline,25700,33306,29.6,1601,4872,spike_overforecast
+1864-FF5769AMZ,FF5769AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Tearless Kitten Shampoo 10oz",new_item,Croston's,25505,9264,-63.7,1985,2640,under_forecast_other
+1864-FF8991,FF8991,AMAZON.COM.KYDC,INC,"Fresh Step Litter Box Scent Crystals in Summer Breeze  15oz",sparse_intermittent,Sparse Intermittent,25140,8208,-67.4,1260,1668,sparse_baseline_too_low
+1864-FF5952EC,FF5952EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Clinical Care Dental Rinse for Adult Dogs  No Taste  No Odor  16oz",sparse_intermittent,Heuristic,24455,88368,261.3,3000,9240,spike_overforecast
+1864-FF13876,FF13876,AMAZON.COM.KYDC,INC,"Arm & Hammer Med. Diapers-16.5'-21' Waist - 12 Pack",steady,Seasonal Baseline,24325,17610,-27.6,416,1440,seasonal_ramp_underforecast
+1864-BB21951,BB21951,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - In-Wash Scent Booster Crystals - 70oz - Ocean",steady,Seasonal Baseline,24320,14676,-39.7,680,1446,under_forecast_other
+1864-BB28473,BB28473,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Lavender",steady,Seasonal Baseline,24155,45792,89.6,431,1764,declining_overforecast
+1864-FF13877,FF13877,AMAZON.COM.KYDC,INC,"Arm & Hammer Lrg. Diapers-18'-23' Waist - 12 Pack",steady,Seasonal Baseline,23945,18060,-24.6,758,1896,under_forecast_other
+1864-FF6989,FF6989,AMAZON.COM.KYDC,INC,"Arm & Hammer Tartar Control Dental Kit for Dogs  Banana Mint",intermittent,Croston's,23835,10416,-56.3,2234,3204,sparse_baseline_too_low
+1864-FF8298,FF8298,AMAZON.COM.KYDC,INC,"Fresh Step Litter Box Attractant Powder to Aid in Training  9 Ounces",sparse_intermittent,Heuristic,23815,35604,49.5,0,0,over_forecast_other
+1864-BB35096,BB35096,AMAZON.COM.KYDC,INC,"Gladware - Deep Dish 64oz - Large Rectangle - 3ct (BBG10316)",intermittent,Croston's,23310,17058,-26.8,294,1752,seasonal_ramp_underforecast
+1864-BB20227,BB20227,AMAZON.COM.KYDC,INC,"Glad Kids - Disposable Paper Bibs - Unicorns - 30ct",steady,Seasonal Baseline,23235,18648,-19.7,489,1512,aligned
+1864-FF13881,FF13881,AMAZON.COM.KYDC,INC,"Arm & Hammer Sm. Male Wraps-12' -19' Waist - 12 Pack",steady,Seasonal Baseline,23190,16170,-30.3,1127,3336,under_forecast_other
+1864-BB0150,BB0150,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Air Freshener Beads - 12oz JAR - Lavender w/Eucalyptus",intermittent,Croston's,23075,10344,-55.2,2112,3756,sparse_baseline_too_low
+1864-FF7221,FF7221,AMAZON.COM.KYDC,INC,"Chi Deodorizing Spray For Dogs",steady,Seasonal Baseline,22790,7656,-66.4,970,3648,seasonal_ramp_underforecast
+1864-BB28719,BB28719,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Fresh Ocean Breeze",steady,Seasonal Baseline,21810,20340,-6.7,1187,3504,aligned
+1864-BB20228,BB20228,AMAZON.COM.KYDC,INC,"Glad Kids - Disposable Paper Bibs - Sharks - 30ct",steady,Seasonal Baseline,21565,17856,-17.2,497,1656,aligned
+1864-SF8168,SF8168,AMAZON.COM.KYDC,INC,"Arm & Hammer Fresh Breath Dental Kit for Dogs  Chicken",steady,Seasonal Baseline,21445,9168,-57.2,1379,7248,seasonal_ramp_underforecast
+1864-BB0705EC,BB0705EC,AMAZON.COM.KYDC,INC,"Clorox Scentiva ÃÂ Refresher Spray ÃÂ 16.9oz ÃÂ Pacific Breeze & Coconut",steady,Seasonal Baseline,21400,18222,-14.9,767,2490,aligned
+1864-BB27206,BB27206,AMAZON.COM.KYDC,INC,"G4K Disney - 8.5' Round Paper Plates  40ct - Pink Minnie",steady,Seasonal Baseline,21210,33512,58.0,545,1504,spike_overforecast
+1864-FF4776AMZ,FF4776AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Oatmeal Dog Conditioner for Dogs 10oz",intermittent,Croston's,21170,13404,-36.7,1742,2280,sparse_baseline_too_low
+1864-FF5773,FF5773,AMAZON.COM.KYDC,INC,"Burts Bees Kitten wipes -50ct",steady,Seasonal Baseline,20950,9426,-55.0,227,1068,seasonal_ramp_underforecast
+1864-BB14658,BB14658,AMAZON.COM.KYDC,INC,"Glad for Kids Paw Patrol  - 9oz Paper Cup - 20ct -  Core Pups Blue",steady,Seasonal Baseline,20915,13240,-36.7,527,1700,seasonal_ramp_underforecast
+1864-BB35097,BB35097,AMAZON.COM.KYDC,INC,"Gladware - Family Size 104oz - XL Square - 3ct (BBG11107)",steady,Seasonal Baseline,20265,20601,1.7,556,2238,aligned
+1864-FF7112,FF7112,AMAZON.COM.KYDC,INC,"BioSilk for Dogs Whitening Shampoo  12 Ounces",inactive,Inactive,19935,0,-100.0,0,0,under_forecast_other
+1864-BB26411,BB26411,AMAZON.COM.KYDC,INC,"G4K Disney - 8.5' Round Paper Plates  40ct - Frozen - MIXED PACK",steady,Seasonal Baseline,19440,11264,-42.1,2127,2941,under_forecast_other
+1864-FF17546,FF17546,AMAZON.COM.KYDC,INC,"Amazon Private Label: Rawhide-free Twists  Peanut Butter flavor  55-ct/12-oz Res",inactive,Inactive,19250,0,-100.0,0,0,prime_day_prebuy_gap
+1864-BB13448,BB13448,AMAZON.COM.KYDC,INC,"Glad for Kids - 9oz Paper Cup - 20ct - Dinosaurs",steady,Seasonal Baseline,19245,18606,-3.3,518,1506,aligned
+1864-FF12656,FF12656,AMAZON.COM.KYDC,INC,"Arm & Hammer Ultra Fresh No-Rinse Deodorizing Foam with Cactus Water & Citrus",inactive,Inactive,19090,0,-100.0,0,0,under_forecast_other
+1864-FF31325,FF31325,AMAZON.COM.KYDC,INC,"Arm & Hammer Odor Control Wipes - 100 Count",steady,Seasonal Baseline,18735,16668,-11.0,605,1548,aligned
+1864-FF9060,FF9060,AMAZON.COM.KYDC,INC,"Chi Gentle 2 In 1 Shampoo And Conditioner",steady,Seasonal Baseline,18390,12144,-34.0,812,4332,seasonal_ramp_underforecast
+1864-FF7228,FF7228,AMAZON.COM.KYDC,INC,"Chi Detangling Finishing Spray For Dogs 10oz",steady,Seasonal Baseline,18135,12936,-28.7,440,1392,seasonal_ramp_underforecast
+1864-FF12806,FF12806,AMAZON.COM.KYDC,INC,"BioSilk Eco Friendly Detangling Pin Brush",steady,Seasonal Baseline,18035,24384,35.2,1035,1824,declining_overforecast
+1864-FF19546,FF19546,AMAZON.COM.KYDC,INC,"Glad for Pets OPP Scented Waste Bags Refill Rolls  6 rolls/90 Bags",steady,Seasonal Baseline,17555,14688,-16.3,628,1272,aligned
+1864-BB11483,BB11483,AMAZON.COM.KYDC,INC,"Kingsford - 10' Heavy Duty Round Paper Plates  35ct",intermittent,Croston's,17450,8736,-49.9,12,834,seasonal_unmatched
+1864-BB35099,BB35099,AMAZON.COM.KYDC,INC,"Gladware - Matchware Value Pack - 20ct (BBG26742)",steady,Seasonal Baseline,17245,6980,-59.5,1275,3166,under_forecast_other
+1864-BB35093,BB35093,AMAZON.COM.KYDC,INC,"Gladware - Soup & Salad 24oz - Medium Rectangle- 5ct (BBG10076)",steady,Seasonal Baseline,17120,4752,-72.2,2714,5682,under_forecast_other
+1864-BB21641,BB21641,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Air Freshener Beads - 12oz JAR - Fresh Ocean Breeze",intermittent,Croston's,16800,3912,-76.7,414,1788,seasonal_unmatched
+1864-FF10159AMZ2,FF10159AMZ2,AMAZON.COM.KYDC,INC,"Arm & Hammer Super Deodorizing Shampoo  20oz Bottle - 2 Pack",steady,Seasonal Baseline,16595,6027,-63.7,694,1155,under_forecast_other
+1864-FF5715,FF5715,AMAZON.COM.KYDC,INC,"Arm & Hammer Fresh Breath Enzymatic Toothpaste for Dogs  Vanilla Ginger",steady,Seasonal Baseline,16130,20736,28.6,487,1368,spike_overforecast
+1864-BB30188,BB30188,AMAZON.COM.KYDC,INC,"Fabuloso Small Scrub Brush w/ Handle (White Perf Case)",steady,Seasonal Baseline,16030,38196,138.3,2044,6096,declining_overforecast
+1864-BB13439,BB13439,AMAZON.COM.KYDC,INC,"G4K - 7' Round Paper Plates  20ct - Dinosaurs",steady,Seasonal Baseline,16030,15360,-4.2,474,2142,aligned
+1864-FF10556,FF10556,AMAZON.COM.KYDC,INC,"GLAD Training Pads 23' x 23' 150 Pack in Full Color Box",new_item,Heuristic,15940,7260,-54.5,389,1114,under_forecast_other
+1864-FF5952PCS2,FF5952PCS2,AMAZON.COM.KYDC,INC,"Arm & Hammer Clinical Care Dental Rinse for Adult Dogs  No Taste  No Odor  16oz ",steady,Seasonal Baseline,15685,19644,25.2,1371,3336,declining_overforecast
+1864-BB26053,BB26053,AMAZON.COM.KYDC,INC,"G4K Disney - 8.5' Round Paper Plates  40ct - Mickey & Friends",steady,Seasonal Baseline,15145,12208,-19.4,385,1168,aligned
+1864-FF6553AMZ,FF6553AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Oatmeal Dog Shampoo for Dogs 32oz",steady,Seasonal Baseline,15090,12450,-17.5,634,1200,aligned
+1864-FF4849AMZ,FF4849AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Hypoallergenic Shampoo for Dogs 16oz",sparse_intermittent,Sparse Intermittent,15080,12300,-18.4,1470,1518,aligned
+1864-FF8425,FF8425,AMAZON.COM.KYDC,INC,"Fresh Step Drawstring Litter Box Liners Scented  Jumbo Size  36' x 19' - 7 Count",intermittent,Croston's,14960,12096,-19.1,1296,10368,aligned

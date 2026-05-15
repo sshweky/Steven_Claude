@@ -1,0 +1,982 @@
+{
+  "results": [
+    {
+      "schema": [
+        {
+          "ordinal": 0,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Sales_Activities",
+          "columnName": "Account_Name",
+          "columnLabel": "Account_Name",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 1,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Sales_Activities",
+          "columnName": "Activity_Date",
+          "columnLabel": "Activity_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 2,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Sales_Activities",
+          "columnName": "Activity_Type",
+          "columnLabel": "Activity_Type",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 3,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Sales_Activities",
+          "columnName": "Activity",
+          "columnLabel": "Activity",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 4,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Sales_Activities",
+          "columnName": "Notes",
+          "columnLabel": "Notes",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 5,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Sales_Activities",
+          "columnName": "Slsprsn_Name",
+          "columnLabel": "Slsprsn_Name",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 6,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Sales_Activities",
+          "columnName": "Related_Brand",
+          "columnLabel": "Related_Brand",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        }
+      ],
+      "rows": [
+        [
+          " GRUP CONOCIDO S.A. IMPORT",
+          "2026-03-25",
+          "Trade Show",
+          "Alex Gonzalez: 03-25-2026 - Trade Show",
+          "[MAR-29-26 Caroline McIntosh] GPE meeting 3/25\nAgreed that next Direct Import orders they Freight Forwarder will be palletizing the orders so they can control the packing and maximize shipping.",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "00000",
+          "2026-04-16",
+          "Email",
+          ": 04-16-2026 - Email",
+          "[APR-17-26 Daniel Sawford] Costech / Palmer's  Australia (Prospective Order)\nContact: Via ES Sutton: Joseph Sutton, Director-Inbound, Sutton Warehousing | JSutton@nj.essutton.com\nSummary: I am exploring a potential direct shipment order of 12,000 units of FFP31064 (Palmer's for Pets Itch & Hot Spot Relief Spray 8oz) for a customer routed via Costech, with destination Brisbane (BNE). I consulted Joseph Sutton (ES Sutton) on whether a 20ft container is the right call and current freight rates. Joseph noted the volume looks tight (estimating ~18 CBM of dead space in a 20ft) and suggested LCL might be more competitive. He has reached out for rates on JacksonvilleBrisbane and will revert. I confirmed I am trying to help facilitate this if possible.\n12,000 units FFP31064 - Palmer's for Pets Itch & Hot Spot Relief Spray 8oz\nRoute: Jacksonville, FL &#8594; Brisbane (BNE)\nJoseph Sutton queried whether customer is responsible for freight\nLCL may be more competitive than 20ft container  freight rates being obtained\nFollow-up needed: Await freight rates from Joseph Sutton (Jacksonville &#8594; Brisbane); confirm freight responsibility with Costech customer; revert to customer with shipping options",
+          null,
+          null
+        ],
+        [
+          "00000",
+          "2026-04-17",
+          "Email",
+          ": 04-17-2026 - Email",
+          "[APR-17-26 Daniel Sawford] Japell Co. Ltd  Japan\nContact: M. Matsuzawa | m_matsuzawa@japell.com\nSummary: I supported Japell with logistics coordination around their SuperZoo / Dole treats Japan import requirements. I provided the ES Sutton warehouse contact details (Raquel Vega) to assist with their shipment arrangements from the New Jersey facility.\nProvided ES Sutton NJ warehouse contact: Raquel Vega (732-721-0022 EXT. 5180)\nSupport relates to SuperZoo / Dole treats Japan import logistics\nFollow-up needed: Confirm Japell has been able to connect with ES Sutton and that logistics arrangements are progressing",
+          null,
+          null
+        ],
+        [
+          "00000",
+          "2026-04-21",
+          "Email",
+          ": 04-21-2026 - Email",
+          "[APR-22-26 Daniel Sawford] Spark Global / Alba Wheels (FC31809)\nContact: Wendy Wu | via internal freight coordination\nSummary: Wendy Wu sent through an ARN (Arrival Notification) for incoming container FC31809, with an ETA of 11 May 2026 in Brisbane. Wendy is requesting confirmation of the delivery address for Fetch for Pets. The address on file is 1-23 Wattlebird CT, Berrinba 4117  this needs to be confirmed.\nARN received for FC31809  ETA 11 May 2026, Brisbane\nDelivery address requested: 1-23 Wattlebird CT, Berrinba 4117 (to be confirmed)\nFollow-up needed: Confirm delivery address with Wendy Wu for FC31809; ensure warehouse is expecting the container arrival on 11 May",
+          null,
+          null
+        ],
+        [
+          "1616 HOLDING, INC.",
+          "2026-04-01",
+          "Meeting Notes",
+          ": 04-01-2026 - Meeting Notes",
+          "[APR-08-26 Daniel Sawford] \nAlmir Begi&#263; (ALM Group  CEE Distribution)\nInbox  Global Pet Expo / Meeting Scheduling\nAlmirs Communication\nAlmir responded regarding Teams meeting scheduling:\nAcknowledged your availability constraints due to Global Pet Expo.\nConfirmed:\nNo issue delaying the meeting\nHappy to reconnect next week once you return\nWished success for the Expo.\nContext\nOngoing discussions around:\nCEE distribution opportunity (Bosnia + wider region)\nLogistics, pricing, and commercial structure\nMeeting is required to:\nProgress distribution planning and next steps\nOverall Position\nPositive engagement maintained  no urgency pressure from customer.\nOpportunity remains open and warm.\nNext steps:\nReschedule Teams call for next week\nPrepare for discussion on:\nDistribution model\nProduct selection\nCommercial terms\nRelationship remains supportive and progressing at a steady pace.",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "ACE HARDWARE CORPORATION",
+          "2026-04-16",
+          "Funding",
+          ": 04-16-2026 - Funding",
+          "[APR-16-26 Isaac Sasson] Ace- 2024 Q4 elevate remodel product- OBMDES325Q47",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "Albertsons ",
+          "2026-04-23",
+          "Sales Update",
+          ": 04-23-2026 - Sales Update",
+          "[APR-23-26 Jeannine Duggins] \nLot of movement at Albertsons (ACI) recently and below is our high-level recap of these changes as of 4/23/26.\nWe will continue to update you all as soon as possible with any more changes from the ACI national team.  \nMeals & Ingredients Lane\nVP - Open - Demetri Promoted to GVP of Center Store, Courtney Talbott Hicks accepted position but since recently resigned \nReady to Eat Lane \nVP - Monica Lightfoot - formerly at Kroger (Portland) taking over as lane VP from Buster Huston (Buster to Frozen & Dairy lane) \nACM - Salty Desk - Tony Reyes - promoted to NCD and moving to Boise (Desk TBD) \nNCD - Front End Candy - Hannah Ratez - formerly Portland COS Director, moved to Boise to lead the front-end confection desk \nACM - Cookie Crackers -  Michelle Caldwell  -  formerly Pet Desk, lateral move to the front end candy team \nACM - Cookie Crackers -  Kindle Coharic  -  Sandy Sayre retired and Kindle is stepping into that role \nACM - Amanda Wirth - was on Bake desk and moved into Breakfast desk with Tobi Seriki\nFrozen & Dairy Lane\nVP - Buster Huston  - lateral move from the Ready to Eat lane,  backfilling Matt Boyd \nGeneral  Merchandise (HHLD and Personal Consumables - Lanes now combined)\nVP - OPEN - Austin Johnson  - recently announced he will be Senior Director of Merchandising for the Seattle Division, leaving the GM VP position open \nNCD - Pet Desk - Open  - Lynn Warin has moved into Pharmacy - OTC NCD role (back filling Ron Scheuber)  \nNCD - OTC - Retired - Ron Scheuber \nDS - Shave & Deo - Maribel Garza - taking procurement role (buying at ACI now back onshore)  ",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "ALBERTSONS, INC",
+          "2026-04-14",
+          null,
+          ": 04-14-2026 - ",
+          "[APR-14-26 Jeannine Duggins] Warehouse DC , City, Address and DC Code Name\nACME\nLancaster\n500 S Muddy Creek Rd, Denver PA 17517\nWLAN\n SAFEWAY\nTracy\n16900 W. Schulte Road Tracy, CA  95377\nWNCA\nALBERTSONS\nBrea\n200 N Puente Brea, California 92821\nWBRE\nALBERTSONS\nPonca City\n2500 Industrial Blvd. Ponca City, OK 74601\nWPON\nALBERTSONS\nMeridian/Sundries\n3649 E. Commercial Court  Meridian, Idaho 83642\nWSUN\n[APR-14-26 Jeannine Duggins] All DC' Addresses",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "ALBERTSONS, INC",
+          "2026-04-20",
+          null,
+          ": 04-20-2026 - ",
+          "[APR-20-26 Jeannine Duggins] Changed account name from fetch fpr cool pets to fetch for pets.... \nStill movig forward with Wet ones - waiting on store counts",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "ALBERTSONS, INC",
+          "2026-04-20",
+          null,
+          ": 04-20-2026 - ",
+          "[APR-20-26 Jeannine Duggins] Jennifer Sebre is new Ass category manager",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "ALBERTSONS, INC",
+          "2026-04-23",
+          null,
+          ": 04-23-2026 - ",
+          "[APR-23-26 Jeannine Duggins] \nLot of movement at Albertsons (ACI) recently and below is our high-level recap of these changes as of 4/23/26.\nWe will continue to update you all as soon as possible with any more changes from the ACI national team.  \nMeals & Ingredients Lane\nVP - Open - Demetri Promoted to GVP of Center Store, Courtney Talbott Hicks accepted position but since recently resigned \nReady to Eat Lane \nVP - Monica Lightfoot - formerly at Kroger (Portland) taking over as lane VP from Buster Huston (Buster to Frozen & Dairy lane) \nACM - Salty Desk - Tony Reyes - promoted to NCD and moving to Boise (Desk TBD) \nNCD - Front End Candy - Hannah Ratez - formerly Portland COS Director, moved to Boise to lead the front-end confection desk \nACM - Cookie Crackers -  Michelle Caldwell  -  formerly Pet Desk, lateral move to the front end candy team \nACM - Cookie Crackers -  Kindle Coharic  -  Sandy Sayre retired and Kindle is stepping into that role \nACM - Amanda Wirth - was on Bake desk and moved into Breakfast desk with Tobi Seriki\nFrozen & Dairy Lane\nVP - Buster Huston  - lateral move from the Ready to Eat lane,  backfilling Matt Boyd \nGeneral  Merchandise (HHLD and Personal Consumables - Lanes now combined)\nVP - OPEN - Austin Johnson  - recently announced he will be Senior Director of Merchandising for the Seattle Division, leaving the GM VP position open \nNCD - Pet Desk - Open  - Lynn Warin has moved into Pharmacy - OTC NCD role (back filling Ron Scheuber)  \nNCD - OTC - Retired - Ron Scheuber \nDS - Shave & Deo - Maribel Garza - taking procurement role (buying at ACI now back onshore)  ",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "AMAZON AUSTRALIA",
+          "2026-04-16",
+          "Email",
+          ": 04-16-2026 - Email",
+          "[APR-17-26 Daniel Sawford] Amazon Vendor Central (Amazon.com.au)  Australia\nContact: Aarthi SenthilKumar, Amazon Vendor Team | aartkuma@amazon.com\nSummary: Amazon sent automated PO cancellation notices for 7 line items (39 units total) across multiple POs, with some cancel dates falling today (16 April). I escalated this to Aarthi directly, noting that we now video-record the entire order process  from packing through to truck departure  to dispute recurring short-delivery claims. I stated I have concerns about Amazon's receiving accuracy and warned we may need to switch to outer carton quantities only (larger packs) if the situation does not improve. I asked for Aarthi's thoughts and noted we cannot keep submitting support cases for every second order.\nPO 2VADIZ9W  Palmer's Cocoa Butter Dog Balm (B08PDM2BFG): 7 units outstanding  cancel date 16/04/2026 &#9888;&#65039;\nPO 6AH48Z6O  A&H Beef Dental Kit (B00B5RFJB2): 5 units outstanding  cancel date 18/04/2026\nPO 2QNF512M  A&H Cucumber Mint Shampoo: 6 units; A&H Super Deodorising Shampoo: 4 units; Biosilk Detangling Conditioner: 6 units; A&H Cat Dental Kit: 5 units; Biosilk Grooming Kit: 6 units  cancel dates 1618/04/2026 &#9888;&#65039;\nI have communicated our video-verification process as evidence; outcome of conversation with Aarthi still pending\nFollow-up needed: Confirm Amazon has updated shipment info in Vendor Central for all 7 items before cancel dates; follow up with Aarthi on receiving accuracy concerns and whether she will escalate internally",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "ASSOCIATED FOOD STORES",
+          "2026-04-20",
+          null,
+          ": 04-20-2026 - ",
+          "[APR-20-26 Jeannine Duggins] working to add scoops but 8.99 MAP costing is high since he is looking to replace a cheap China made on from Petmste. NOt confident will get in.",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "ASSOCIATED WHOLESALE GROCERS",
+          "2026-04-20",
+          null,
+          ": 04-20-2026 - ",
+          "[APR-20-26 Jeannine Duggins] Met with Rouses 60 stores. to get Glad for Kids inline. Feel confident we will get something in - will know Mid May.",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "Associated Wholesale Grocers",
+          "2026-04-20",
+          null,
+          ": 04-20-2026 - ",
+          "[APR-20-26 Jeannine Duggins] I am working on gathering a deck for the AH Grooming & Toys, Dole Treats, BB grooming and tools, and Milk Bone, Jif and Meow toys. ",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "B J'S WHOLESALE CLUB 800",
+          "2026-03-27",
+          "Terms Review",
+          ": 03-27-2026 - Terms Review",
+          "[MAR-27-26 Jason Shorr] BJ's GM Facility & Products Compliance Manual (notes from 3/26/26 Webinar)",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "BASHA'S",
+          "2026-03-27",
+          "Funding",
+          ": 03-27-2026 - Funding",
+          "[MAR-27-26 Isaac Sasson] Promo",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "BEALLS OUTLET",
+          "2026-04-20",
+          "Inventory/Orders",
+          ": 04-20-2026 - Inventory/Orders",
+          "[APR-20-26 Joseph Chalom] Holiday POs received. all from stock ",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BISEK & COMPANY INC",
+          "2026-03-31",
+          "Inventory Request",
+          ": 03-31-2026 - Inventory Request",
+          "[MAR-31-26 Joseph Shweky] 409 Swap in - RPL\nBBP16316 | 409 - Fume Free Oven Cleaner - Aerosol -",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BISEK & COMPANY INC",
+          "2026-04-20",
+          "Meeting Notes",
+          ": 04-20-2026 - Meeting Notes",
+          "[APR-20-26 Joseph Chalom] Fabric Softener, Detergent review - buyer prefaced by saying she does a regular maintenance to the set and not looking to make any changes for this review but is open since Fraganzia brand doing well in Air care.\nshe like smaller sizes of detergents, new innovative single dose skus \nfabric refreshers will go in air care set \ndecisions in June ",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BISEK & COMPANY INC",
+          "2026-04-20",
+          "Meeting Notes",
+          ": 04-20-2026 - Meeting Notes",
+          "[APR-20-26 Joseph Chalom] buyer has been challenged by needing increased space for private label skus. but she really likes the Glad for kids styles and will look to add them if space permits",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BISEK & COMPANY INC",
+          "2026-04-20",
+          "Customer Terms",
+          ": 04-20-2026 - Customer Terms",
+          "[APR-20-26 Joseph Chalom] customer is funneling all orders fromt he GA DC to VA. there will be a $1 per carton transfer fee for all units needed in GA. after analysis it will save us $ shipping to the 1 DC and transferring. also will avoid slow movers and aged inventory at DC",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BISEK & COMPANY INC",
+          "2026-04-23",
+          "Inventory/Orders",
+          ": 04-23-2026 - Inventory/Orders",
+          "[APR-23-26 Joseph Chalom] Gladware shipper oppty sent. on closeout sheet. estimated 200 shippers ",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BLAIN SUPPLY INC",
+          "2026-04-01",
+          "Trade Show",
+          "Lindsey Carter: 04-01-2026 - Trade Show",
+          "[APR-01-26 Caroline McIntosh] Asked PSI to represent us at Blains Farm & Fleet Pet Seminar\nWednesday, May 13, 2026\nHello,\nWe are excited to extend the opportunity for you and Pets People to participate in this years Pet Seminar!  The seminar will be held on Wednesday, May 13, 2026 in the Conference Center located at the Blain Supply Corporate Offices, 3507 E. Racine Drive, Janesville, Wisconsin 53546. ",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "BLAIN SUPPLY INC",
+          "2026-04-01",
+          "POG Review Decisions",
+          "Karen Edwards: 04-01-2026 - POG Review Decisions",
+          "[APR-01-26 Caroline McIntosh] Grooming POG  in Store Sep 2026\nPOs issued  8/15/2026\nAssortmeent selection  - 24 New SKUs \nFETCH FOR COOL PETS (13163)\tFFP4771\t10oz Burt's Bees Waterless Dog Shampoo\t965942\nFETCH FOR COOL PETS (13163)\tFFP7258\t16oz Burt's Bees Oatmeal Shampoo Dogs\t965944\nFETCH FOR COOL PETS (13163)\tFFP7263\t16oz Burt's Bees Tearless Puppy Shampoo\t965945\nFETCH FOR COOL PETS (13163)\tFFP4936\tBurts Bees Paw & Nose Lotion 4oz\t1335631\nFETCH FOR COOL PETS (13163)\tFFP9297/24\tA&H Complete Dog Dental Kit 2.5oz Chk\t \nFETCH FOR COOL PETS (13163)\tFFP11899/24\tA&H Complete Puppy Dental Kit 2.5oz PB\t \nFETCH FOR COOL PETS (13163)\tFFP35147\tA&H Complete Dental Rinse w/Measure 16oz\t \nFETCH FOR COOL PETS (13163)\tFFP12302/24\tA&H Complete Dental Spray Mint Flvr 6oz\t \nFETCH FOR COOL PETS (13163)\tFFP12300/24\tA&H Complete Toothpaste 6.2oz Chk\t \nFETCH FOR COOL PETS (13163)\tFFP33868\tA&H Complete Brushless Oral Gel, 4 oz\t \nFETCH FOR COOL PETS (13163)\tFFP33871\tA&H Complete Brushless Dental Kit\t \nFETCH FOR COOL PETS (13163)\tFFP33872\tA&H Complete Gel Dental Kit Chk\t \nFETCH FOR COOL PETS (13163)\tFFP37778\tA&H Odor Cntrl Shampoo 20oz Blueberry\t \nFETCH FOR COOL PETS (13163)\tFFP37779\tA&H Odor Control Spray 8oz Blueberry\t \nFETCH FOR COOL PETS (13163)\tFFP37780\tA&H Odor Control Wipes 100ct Blueberry\t \nFETCH FOR COOL PETS (13163)\tFFP31327\tA&H Odor Control Powder  4.2oz\t \nFETCH FOR COOL PETS (13163)\tFFP33567\tA&H Self Cleaning Slicker Brush\t \nFETCH FOR COOL PETS (13163)\tFFP33569\tA&H Grooming Pet Glove\t \nFETCH FOR COOL PETS (13163)\tFFP33568\tA&H Pin/Bristle Duo Brush\t \nFETCH FOR COOL PETS (13163)\tFFP33573\tA&H Soap Dispensing Palm Brush\t \nFETCH FOR COOL PETS (13163)\tFFP31196\tBurt's Bees Shampoo 16oz Lemongrass/Sage\t \nFETCH FOR COOL PETS (13163)\tFFP31198\tBurt's Bees  Spray10oz Lemongrass/Sage\t \nFETCH FOR COOL PETS (13163)\tFFP4930\tBurt's Bees Hot Spot Spray 10oz\t \nFETCH FOR COOL PETS (13163)\tFFP33415\tBurt's Bees Ear Cleaning Powder\t \nFETCH FOR COOL PETS (13163)\tFFP4933\tBurt's Bees Ear Cleaner for Dogs 4oz\t \nFETCH FOR COOL PETS (13163)\tFFP4934\tBurt's Bees Eye Wash for Dogs 4oz\t \nFETCH FOR COOL PETS (13163)\tFFP30757\tWet Ones Antibacterial Paw Wipes 50ct \t \nFETCH FOR COOL PETS (13163)\tFFP30755\tWet Ones Antibacterial Paw Foam 5oz\t ",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "BLAIN SUPPLY INC",
+          "2026-04-01",
+          "Inventory Request",
+          ": 04-01-2026 - Inventory Request",
+          "[APR-01-26 Joseph Shweky] OCt26  POG Reset Blain Supplies Dog Grooming_Dental - RPL\nFFP11899/24 | A&H Complete Care Puppy Dental Kit - Inc \nFFP12300/24 | A&H Complete Care Adult Boxed Toothpaste \nFFP12302/24 | A&H Complete Care Dog Dental Spray in Mi \nFFP30755 | Wet One's - Antibacterial Paw Cleansing  \nFFP30757 | Wet Ones - Antibacterial Heavy Duty Paw  \nFFP31196 | Burts Bees Deodorizing Shampoo with Witc \nFFP31198 | Burts Bees Deodorizing Spray with Witch  \nFFP31327 | Arm & Hammer Odor Control Powder - 4.2 o \nFFP33415 | Burt's Bees Ear Cleaning Powder \nFFP33567 | Arm & Hammer: Simply Calm Self Cleaning  \nFFP33568 | Arm & Hammer: Simply Calm Pin/Bristle Du \nFFP33569 | Arm & Hammer: Simply Calm Grooming Pet G \nFFP33573 | Arm & Hammer: Simply Grooming Soap Dispe \nFFP33868 | Arm & Hammer Complete Care Brushless Ora \nFFP33871 | Arm & Hammer Complete Care Brushless Den \nFFP33872 | Arm & Hammer Complete Care Gel Dental Ki \nFFP35147 | Arm & Hammer Complete Care Dog Dental Ri \nFFP37778 | Arm & Hammer Odor Control Shampoo - 20 f \nFFP37779 | Arm & Hammer Odor Control Spray - 8 fl o \nFFP37780 | Arm & Hammer Odor Control Wipes - 100 co \nFFP4930 | Burt's Bees Soothing Hot Spot Spray for  \nFFP4933 | Burt's Bees Ear Cleaner for Dogs 4oz \nFFP4934 | Burt's Bees Eye Wash for Dogs 4oz \nFFP9297/24 | A&H Complete Care Dog Dental Kit - Inclu",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "BOMGAAR'S",
+          "2026-03-27",
+          "Trade Show",
+          "Michael Lindsay: 03-27-2026 - Trade Show",
+          "[MAR-27-26 Caroline McIntosh] Met Michael at GPE  - he is really excited about adding below list of items inline - they made it to the main planogram 84 stores and they are still finalizing the smaller sets. Lauren at PSI is to confirm if they have select to go Collect or Prepaid - items set up in their system.\nFFP7258\tBurt's Bees Oatmeal Shampoo for Dogs 16oz\nFFP4775\tBurts Bees Tearless 2 in 1 Shampoo and Conditioner for Puppies with Buttermilk & Linseed Oil, 16 Ounces\nFFP7266\tBurt's Bees Itch Soothing Shampoo for Dogs 16oz\nFFP4930\tBurt's Bees Soothing Hot Spot Spray for Dogs 10oz\nFFP7267\tBurt's Bees Itch Soothing Spray for Dogs 10oz\nFFP4936\tBurt's Bees Paw & Nose Lotion for Dogs 4oz\nFFP33413\tBurt's Bees Eye & Ear Cleansing Wipes - 100ct\nFFP31326\tArm & Hammer Odor Control 5-in-1 Shampoo\nFFP20210\tArm & Hammer Itch Relief Shampoo - Chamomile & Peppermint\nFFP31324\tArm & Hammer Odor Control No-Rinse Foam\nFFP20206\tArm & Hammer Itch Relief Spray\nFFP31327\tArm & Hammer Odor Control Powder - 4.2 oz\nFFP12842\tWet Ones Antibacterial All-Purpose Wipe for Dogs -- 50ct Canister - Tropical Splash\nFFP12853\tWet Ones Multipurpose Wipe for Cats - 50 ct Canister",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "BOMGAAR'S",
+          "2026-04-15",
+          "POG Review Decisions",
+          "Michael Lindsay: 04-15-2026 - POG Review Decisions",
+          "[APR-15-26 Caroline McIntosh] Bomgaar's initial POs will be place by 4/24 Value $21,600\nFreight Collect \nItems\nFFP7258\tSHAMPOO,OATMEAL FOR DOGS \nFFP4775\tSHAMPOO,TEARLESS,2-IN-1, \nFFP7266\tSHAMPOO,ITCH SOOTHING,DO \nFFP4930\tSPRAY,HOT SPOT SOOTHING, \nFFP7267\tSPRAY,ITCH SOOTHING,DOGS \nFFP4936\tLOTION,PAW AND NOSE,DOGS \nFFP33413\tWIPES,EYE/EAR CLEANSING  \nFFP31326\tSHAMPOO,ODOR CONTROL,5N1 \nFFP20210\tSHAMPOO,ITCH RELIEF,DOGS \nFFP31324\tFOAM,ODOR CONTROL,DOGS   \nFFP20206\tSPRAY,ITCH RELIEF        \nFFP31327\tPOWDER,ODOR CONTROL,DOGS \nFFP12842\tWIPES,ALL PURPOSE,DOGS   \nFFP12853\tWIPES,MULTI PURPOSE,CATS ",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "Budget Pet Products",
+          "2026-04-06",
+          "Inventory/Orders",
+          ": 04-06-2026 - Inventory/Orders",
+          "[APR-08-26 Daniel Sawford] Allie (Budget Pet Products)\nInbox  PO #70869 (QLD Delivery)\n Customer Communication\nAllie issued Purchase Order #70869 with the following details:\nDelivery Address: Molendinar, QLD (Warehouse)\nTotal Units: 150 across 4 SKUs\nKey SKUs Ordered\nFFP8608  Kitten Dental Kit (12 units)\nSFB8170  Dog Dental Kit (72 units)\nFFP5952  Dental Water Additive (36 units)\nSFB8169  Enzymatic Toothpaste (30 units)\nDelivery Requirements\nDelivery Hours: MonFri, 7:00am1:00pm\nMandatory:\nCourier must call ahead with ETA\nContact number provided for coordination\n Additional Request\nIf any items are short or unavailable:\nProvide ETA for supply so they can update records",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "BURLINGTON COAT FACTORY",
+          "2026-03-26",
+          "Inventory Request",
+          ": 03-26-2026 - Inventory Request",
+          "[MAR-26-26 Joseph Shweky] April Confirmed - OTB\nFFP10162 | Arm & Hammer Tearless Puppy Shampoo 20oz \nFFP26777 | Arm & Hammer Ultra Fresh 2-in-1 Detangli \nFFP33638 | Arm & Hammer 2-in-1 Shampoo & Conditione \nFFP7110 | BioSilk for Dogs Moisturizing Shampoo, 1",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BURLINGTON COAT FACTORY",
+          "2026-03-26",
+          "Inventory Request",
+          ": 03-26-2026 - Inventory Request",
+          "[MAR-26-26 Joseph Shweky] May Confirmed - OTB\nFFP10162 | Arm & Hammer Tearless Puppy Shampoo 20oz \nFFP10530 | A&H Heavy Duty Multi-Purpose Pet Wipes - \nFFP20208 | Arm & Hammer Gentle Puppy Wipes - Coconu \nFFP31068 | Palmer's for Pets Facial Cleansing Pads",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BURLINGTON COAT FACTORY",
+          "2026-03-26",
+          "Inventory Request",
+          ": 03-26-2026 - Inventory Request",
+          "[MAR-26-26 Joseph Shweky] June Confirmed - OTB\nFFP10159 | Arm & Hammer Super Deodorizing Shampoo 2 \nFFP10162 | Arm & Hammer Tearless Puppy Shampoo 20oz \nFFP10477 | Arm & Hammer 2-in1 Shampoo & Conditioner \nFFP12649 | Arm & Hammer Ultra Fresh 2-in-1 Tearless \nFFP12653 | Arm & Hammer Ultra Fresh 2-in-1 Detangli \nFFP20209 | Arm & Hammer Shed Control Shampoo - Juic \nFFP31061 | Arm & Hammer Ultra Fresh Deep Cleansing  \nFFP31062 | Arm & Hammer Ultra Fresh Itch Relief Sha \nFFP31068 | Palmer's for Pets Facial Cleansing Pads  \nFFP33637 | Arm & Hammer Odor Control Shampoo - Valu \nFFP33638 | Arm & Hammer 2-in-1 Shampoo & Conditione \nFFP37778 | Arm & Hammer Odor Control Shampoo - 20 f",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BURLINGTON COAT FACTORY",
+          "2026-03-26",
+          "Inventory Request",
+          ": 03-26-2026 - Inventory Request",
+          "[MAR-26-26 Joseph Shweky] July Confirmed - OTB\nFFP10159 | Arm & Hammer Super Deodorizing Shampoo 2 \nFFP10475 | Arm & Hammer Soothing Oatmeal Shampoo fo \nFFP10477 | Arm & Hammer 2-in1 Shampoo & Conditioner \nFFP12649 | Arm & Hammer Ultra Fresh 2-in-1 Tearless \nFFP20208 | Arm & Hammer Gentle Puppy Wipes - Coconu \nFFP20209 | Arm & Hammer Shed Control Shampoo - Juic \nFFP26777 | Arm & Hammer Ultra Fresh 2-in-1 Detangli \nFFP31061 | Arm & Hammer Ultra Fresh Deep Cleansing  \nFFP31062 | Arm & Hammer Ultra Fresh Itch Relief Sha \nFFP31068 | Palmer's for Pets Facial Cleansing Pads  \nFFP33637 | Arm & Hammer Odor Control Shampoo - Valu \nFFP37778 | Arm & Hammer Odor Control Shampoo - 20 f \nFFP37780 | Arm & Hammer Odor Control Wipes - 100 co \nFFP38488 | Arm & Hammer Hypoallergenic Wipes - 100",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BURLINGTON COAT FACTORY",
+          "2026-03-26",
+          "Inventory Request",
+          ": 03-26-2026 - Inventory Request",
+          "[MAR-26-26 Joseph Shweky] August Confirmed - OTB\nFFP10159 | Arm & Hammer Super Deodorizing Shampoo 2 \nFFP10162 | Arm & Hammer Tearless Puppy Shampoo 20oz \nFFP10477 | Arm & Hammer 2-in1 Shampoo & Conditioner \nFFP20208 | Arm & Hammer Gentle Puppy Wipes - Coconu \nFFP20210 | Arm & Hammer Itch Relief Shampoo - Chamo \nFFP31068 | Palmer's for Pets Facial Cleansing Pads  \nFFP31326 | Arm & Hammer Odor Control 5-in-1 Shampoo \nFFP33638 | Arm & Hammer 2-in-1 Shampoo & Conditione \nFFP37778 | Arm & Hammer Odor Control Shampoo - 20 f \nFFP37780 | Arm & Hammer Odor Control Wipes - 100 co",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "BURLINGTON COAT FACTORY",
+          "2026-03-30",
+          "Sales Order",
+          ": 03-30-2026 - Sales Order",
+          "[MAR-30-26 Joseph Shweky] BURLINGTON COAT FACTORY\nBBP39512 | Clorox Fraganzia - Toilet Bowl Cleaner T \nBBP39576 | Clorox Fraganzia - Toilet Bowl Cleaner T",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "BURLINGTON COAT FACTORY",
+          "2026-03-30",
+          "Sales Order",
+          ": 03-30-2026 - Sales Order",
+          "[MAR-30-26 Joseph Shweky] BURLINGTON COAT FACTORY\nBBP39512 | Clorox Fraganzia - Toilet Bowl Cleaner T \nBBP39576 | Clorox Fraganzia - Toilet Bowl Cleaner T",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "C & S WHOLESALE",
+          "2026-04-16",
+          "POG Review Decisions",
+          "Bryan Black: 04-16-2026 - POG Review Decisions",
+          "[APR-23-26 George Tuttle] Received disco notes from Giant & Stop & Shop.\nThey are only removing 2 SKU's which do not do much business\nFFP15134 / Star Wars \"The Child\" toy / $1,122 YTD / $8,486 2025 Total\nFFP7372 / Burt's Cat Dander Wipes / $4,400 YTD / $32K 2025 Total",
+          "George Tuttle",
+          null
+        ],
+        [
+          "C & S WHOLESALE",
+          "2026-04-20",
+          null,
+          ": 04-20-2026 - ",
+          "[APR-20-26 Jeannine Duggins] added Glad 4 Kids to the promotions we do monthly to generate some sales - started in may. ",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "CARIBBEAN CHEMICALS AND",
+          "2026-04-16",
+          "Inventory/Orders",
+          ": 04-16-2026 - Inventory/Orders",
+          "[APR-17-26 Daniel Sawford] Caribbean Chemicals & Agencies Ltd (Caribchem)  Trinidad\nContact: Mrs Ramona Ramroop, Purchasing & Logistics Coordinator | agri.tt@caribchem.com\nSummary: Ramona requested a quote for internal US shipping to their Florida pick-up address (2205N Forsyth Rd, Suite E, Orlando FL 32807). I provided a shipping price of $1,475 and asked for their decision soonest.\nCustomer requested internal US shipping quote (presumably from NJ warehouse to their Orlando FL pick-up point)\nI quoted $1,475  awaiting their approval or further discussion\nFollow-up needed: Chase Caribchem for confirmation of the $1,475 shipping quote",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "CARIBBEAN CHEMICALS AND",
+          "2026-04-17",
+          "Inventory/Orders",
+          ": 04-17-2026 - Inventory/Orders",
+          "[APR-17-26 Daniel Sawford] Caribbean Chemicals & Agencies Ltd (Caribchem)  Trinidad\nContact: Mrs Ramona Ramroop, Purchasing & Logistics Coordinator | agri.tt@caribchem.com\nSummary: A busy day with Caribchem across several topics. I urgently sent Ramona the Health Certificate for dental treats, which she needed for the APHD import permit application  this was a time-sensitive request with an attachment. I also coordinated internally to request Certificates of Analysis (COAs) for multiple A&H products from our production team on Caribchem's behalf. Separately, I initiated a shipping quote inquiry, asking Ramona to send their pick-up address so I could obtain a rate for internal US shipping.\nHealth Certificate for dental treats sent urgently with attachment  required for APHD import permit\nCOAs requested internally for multiple A&H products on Caribchem's behalf\nShipping quote inquiry initiated  asked Ramona to provide their US pick-up address\nFollow-up needed: Confirm Ramona received the Health Certificate and that APHD permit application can proceed; chase COAs from internal production team once ready; await Ramona's shipping address to obtain freight quote",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "CARIBBEAN CHEMICALS AND",
+          "2026-04-20",
+          "Email",
+          ": 04-20-2026 - Email",
+          "[APR-22-26 Daniel Sawford] Caribbean Chemicals & Agencies Ltd (Caribchem)  Trinidad\nContact: Mrs Ramona Ramroop, Purchasing & Logistics Coordinator | agri.tt@caribchem.com\nSummary: Ramona replied to my earlier query seeking clarification on her message about the $1,475 US internal shipping quote. She confirmed it was just a quote  \"there is no order at this point in time.\" This closes out the immediate shipping quote conversation, though a potential order may still follow.\nRamona confirmed the $1,475 shipping quote discussion was exploratory  no order currently\nFollow-up needed: Monitor to see if Caribchem progresses to an actual order; follow up if no contact within 2 weeks",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "CARIBBEAN CHEMICALS AND",
+          "2026-04-21",
+          "Just Notes",
+          ": 04-21-2026 - Just Notes",
+          "[APR-22-26 Daniel Sawford] Caribbean Chemicals & Agencies Ltd (Caribchem)  Trinidad\nContact: Mrs Ramona Ramroop, Purchasing & Logistics Coordinator | agri.tt@caribchem.com\nInternal: Emily Guo\nSummary: Progress on the COAs for Caribchem's order CC11032026NJ. Emily Guo (internal team) came through to assist with gathering the required Certificates of Analysis. I thanked the team and noted that every Caribbean order requires all product COAs  this is a standing requirement. Some COAs are still outstanding and awaiting completion.\nEmily Guo (internal) assisting with COAs for order CC11032026NJ\nConfirmed standing requirement: all Caribbean orders require full product COAs\nSome COAs still outstanding\nFollow-up needed: Chase remaining COAs from internal team; once all COAs received, forward complete set to Ramona at Caribchem",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "CAVALLARO FOODS, LLC",
+          "2026-04-20",
+          null,
+          ": 04-20-2026 - ",
+          "[APR-20-26 Jeannine Duggins] Adding Dole Floor stands to Q4 ......",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "CERTCO INC.",
+          "2026-03-26",
+          "Opportunity Buy",
+          ": 03-26-2026 - Opportunity Buy",
+          "[MAR-26-26 Isaac Sasson] Woodmans will be taking ½ truck of 70oz crystals and ½ truck for Matchware. \nWill be ~$40k hopeful. ",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "CERTCO INC.",
+          "2026-03-26",
+          "Inventory Request",
+          ": 03-26-2026 - Inventory Request",
+          "[MAR-26-26 Joseph Shweky] BBP35099 - OTB\nBBP35099 | Gladware - Matchware Value Pack - 20ct (",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "CERTCO INC.",
+          "2026-04-14",
+          "POG Review",
+          ": 04-14-2026 - POG Review",
+          "[APR-14-26 Isaac Sasson] Certco interested in bringing in the sharks and unicorns  3 SKUs of each. (plates, bowls, and snack cups). \nneed to confirm promos and sku assortment. ",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "CERTCO INC.",
+          "2026-04-15",
+          "Inventory Request",
+          ": 04-15-2026 - Inventory Request",
+          "[APR-15-26 Joseph Shweky] Certco G4K - RPL\nBBP13436CLR/12 | Glad Kids - 8.5\" Round Paper Plate - 20c \nBBP13437CLR/12 | Glad Kids - 8.5\" Round Paper Plate - 20c \nBBP13447CLR/12 | Glad Kids - 9oz Paper Cup - 20ct - Unico \nBBP14500CLR/9 | Glad Kids - 12oz Paper Snack Bowls no li \nBBP31552CLR/9 | Glad Kids - 12oz Paper Snack Bowl no lid \nBBP36058CLR/12 | Glad Kids - 9oz Paper Cup - 20ct - Shark",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "CHEWY.COM",
+          "2026-03-27",
+          "New Item Submission",
+          ": 03-27-2026 - New Item Submission",
+          "[MAR-27-26 Joshua Rosario] \nSubmission #:\n18491\nQuote #:\n13012\nCategory:\nTREATS\nStyles:\nFFP38327",
+          "George Tuttle",
+          null
+        ],
+        [
+          "CHEWY.COM",
+          "2026-04-02",
+          "Sales Data",
+          "Olivia Jackson: 04-02-2026 - Sales Data",
+          "[APR-22-26 George Tuttle] Attached is monthly sales data for March",
+          "George Tuttle",
+          null
+        ],
+        [
+          "CHEWY.COM",
+          "2026-04-06",
+          "MAP Notification",
+          "Olivia Jackson: 04-06-2026 - MAP Notification",
+          "[APR-23-26 George Tuttle] Sent MAP notifications for all items to all buyers. ",
+          "George Tuttle",
+          null
+        ],
+        [
+          "CHEWY.COM",
+          "2026-04-15",
+          "Promotional",
+          "Olivia Jackson: 04-15-2026 - Promotional",
+          "[APR-23-26 George Tuttle] Working with Olivia & Adrienne at Chewy to finalize the list of items to do review seeding on. Already reviewed with Trent & Tiffany as well. \nSubmitted the attached list to the buyer for review. Awaiting feedback. ",
+          "George Tuttle",
+          null
+        ],
+        [
+          "CHEWY.COM",
+          "2026-04-16",
+          "Terms Review",
+          "Olivia Jackson: 04-16-2026 - Terms Review",
+          "[APR-23-26 George Tuttle] Finalized 2026 Terms with Tiffany & Trent and sent to Olivia. Still waiting for the Docusign from her.\nSee attached for final terms.",
+          "George Tuttle",
+          null
+        ],
+        [
+          "CIV'S AUTO AND DISTIBUTION",
+          "2026-04-20",
+          "Inventory/Orders",
+          ": 04-20-2026 - Inventory/Orders",
+          "[APR-22-26 Daniel Sawford] CIVS Distribution\nContact: Stephen Siriram | civsdistribution@gmail.com\nSummary: Stephen sent through what he described as \"our order\" with an attachment. I queried the file as it contained no quantities. Stephen subsequently sent the correct updated file (Wags Wiggles 2026 - Updated(2).xlsx) and confirmed this was the right one. Awaiting review and quotation to be issued.\nOrder file initially sent with no quantities  correct file subsequently received and confirmed\nOrder relates to Wags & Wiggles 2026 range\nFollow-up needed: Review the Wags & Wiggles 2026 order file from CIVS and issue quotation",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "CIV'S AUTO AND DISTIBUTION",
+          "2026-04-21",
+          "Email",
+          ": 04-21-2026 - Email",
+          "[APR-22-26 Daniel Sawford] CIVS Distribution\nContact: Stephen Siriram | civsdistribution@gmail.com\nSummary: Continuing from Monday, I had suggested that CIVS switch to ordering online given the low order values involved. Stephen replied asking whether prices would be the same online and explained that his low order quantities are a direct result of zero-stock items in the range. In a second message, Stephen sought clarification on his distributor status if he were to switch to online ordering  he said he prefers to keep a direct account management relationship but is open to exploring options.\nStephen querying whether online pricing would match his current distributor pricing\nLow order volumes attributed to zero-stock items in the range\nStephen prefers direct account management; open to options if distributor status is maintained\nFollow-up needed: Clarify with Stephen whether online pricing will be equivalent to his distributor pricing; confirm whether his distributor account status would be maintained if he orders online; resolve to avoid losing the relationship",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "COLES GROUP LIMITED-AUSTRALIA",
+          "2026-04-08",
+          "Email",
+          ": 04-08-2026 - Email",
+          "[APR-13-26 Daniel Sawford] Good afternoon\nJust reaching out to let you know that today is my last day with Swaggle. I will be re-joining Coles Group as Category Manager within the Pet space.\nIts been great to collaborate on so much together in this role and I thank you for your support over this time.\nFor anything Swaggle related, please reach out to Paul Carroll (paul@swaggle.com.au) or Emily Wong (emily@swaggle.com.au) as needed.\nMy new contact details are:\n0418 910 796 (same number)\ndaniel.devincentis@coles.com.au\nPlease dont hesitate to reach out. Wishing you all the very best moving forward.\n \tDaniel De Vincentis\nCategory Manager  Flea, Tick & Worming, Litter, Accessories & Other Pets\nM: +61418 910 796  E: daniel@swaggle.com.au\nW:  swaggle.com.au",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "Crystal Pet Lovers_Argentina",
+          "2026-03-29",
+          "Trade Show",
+          ": 03-29-2026 - Trade Show",
+          "[MAR-29-26 Caroline McIntosh] Follow up email sent\nI am sorry I was not able to meet you in person  I am sure our team took you through the details of our company and the Brands available for International Market.\nI am including our complete Arm & Hammer Catalog for reference  We are interested in exploring the opportunity to partner for distribution in Argentina.\nNote we do not do the Litter we have the license for Dental / Health and Grooming products.\nI am available for a video Call any day Week starting 4/13/2026  I am based in San Diego so Pacific Standard Time. Let me know what works for you.",
+          null,
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-03-31",
+          "Just Notes",
+          ": 03-31-2026 - Just Notes",
+          "[APR-08-26 Daniel Sawford] Erin Carroll (DATS)\nInbox  Artwork & Product Data Request (PO 46855)\n Erins Communication\nErin confirmed:\nSamples have been received successfully\nNow requesting urgent follow-up information to proceed\n&#128203; Key Requests\n1. Artwork Files (All SKUs)\nRequired for:\n74700  5-in-1 Shampoo (Vanilla Sandalwood)\n74701  Odour Control Shampoo (Blueberry Coconut)\n74703  Odour Control Spray\n74704  Itch Soothing Spray\n74705  Odour Control Wipes\n2. Product Data\nConfirmation of:\nInner / Outer carton details (already listed)\nBarcodes (unit, inner, outer)\nAdditional:\nDimensions of individual wipes (SKU 74705)",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-06",
+          "Sales Order",
+          ": 04-06-2026 - Sales Order",
+          "[APR-06-26 Joseph Shweky] DATS PTY LTD",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-16",
+          "Email",
+          ": 04-16-2026 - Email",
+          "[APR-17-26 Daniel Sawford] Pet Brands UK  United Kingdom\nContact: Joshua Wilson, Supply Chain Coordinator | joshua.wilson@petbrands.com\nCC: Amy Birdsall, Amy Spratt (Paramount Retail Group), Heather Smith, Megan McCarron (JAG)\nSummary: I received a new PO from Pet Brands UK (PO 25186) and confirmed with Joshua that the order is entered and awaiting final stock confirmations. Pet Brands has requested a Proforma Invoice confirming CBM, Port of Loading, and Goods Ready Date; they also noted artwork and carton marks will follow separately from their teams.\nPO 25186 received and entered into system\nAwaiting final stock confirmations before PI can be issued\nPet Brands has also separately asked us to forward their PO to our internal ops team (Gus Rosario) for processing\nPI must confirm: CBM, Port of Loading, and Goods Ready Date\nFollow-up needed: Issue PI to Joshua Wilson once stock confirmations received; confirm GRD and Port of Loading",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-17",
+          "Inventory Request",
+          ": 04-17-2026 - Inventory Request",
+          "[APR-17-26 Daniel Sawford] DATS Pty Ltd  Australia\nContact: Ronald Ren | ronald@dats.com.au · Gary Young | gary@dats.com.au\nSummary: DATS confirmed they revised PO#47022, increasing item 72991 (A&H Itch & Hot Spot H&O product, FC50488) to 6,000 units to meet our MOQ and avoid LCL freight charges. I confirmed receipt and updated the order. I also sent Gary the Arm & Hammer Discounters product information pack (presentation and Brandfolder image link) as requested. Separately, I forwarded to Gary the internal factory notes on the DATS Dalian Daxin AH Wipes order (FC50481/PO 46855), which has a shipment pending  I flagged that 4 other items on the same order from HANGZHOU HUIJI BIOTECH LTD also need ready date confirmation.\nPO#47022: MOQ on item 72991 increased to 6,000 units  order updated; PI still outstanding\nArm & Hammer Discounters: Presentation and image assets sent to Gary\nFC50481 / PO 46855 (Dalian Daxin AH Wipes): Shipment pending  factory ready date still being confirmed by Qisi (internal ops); 4 additional items on same order from HANGZHOU HUIJI BIOTECH also need ready date confirmation\nFollow-up needed: Send PI to DATS for PO#47022; follow up internally on ready dates for FC50481 wipes and HANGZHOU items",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-17",
+          "Email",
+          ": 04-17-2026 - Email",
+          "[APR-17-26 Daniel Sawford] DATS Pty Ltd  Australia\nContact: Gary Young | gary@dats.com.au\nSummary: I sent Gary an updates email covering several items. We confirmed an Interzoo meeting for 2pm on Day 1 and dinner at 7pm (venue TBC). I also let Gary know that Palmer's spray pricing is underway, and that product setups are ready and awaiting order submission on their end.\nInterzoo: Meeting confirmed 2pm Day 1; dinner 7pm (venue TBC)\nPalmer's spray pricing being worked on\nProduct setups complete  awaiting DATS order submission\nFollow-up needed: Confirm Interzoo dinner venue once known; send Palmer's spray pricing to Gary once finalised; follow up on DATS order submission",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-20",
+          "Email",
+          ": 04-20-2026 - Email",
+          "[APR-22-26 Daniel Sawford] DATS Pty Ltd  Australia\nContact: Gary Young | gary@dats.com.au (via internal coordination with Q.Huang, V.Guina)\nSummary: Two DATS-related threads today. On PO#47022 (A&H Itch & Hot Spot, 6,000 units), there was a misunderstanding flagged by Qisi  I clarified that the system always operates in units not dollars, and that I will absorb the LCL surcharge. I confirmed to proceed with the 6,000-unit quantity as updated. On the Dalian Daxin wipes order (FC50481 / PO 46855), I acknowledged Qisi's Saturday update with \"noted with thanks.\" Separately, Lina at Dalian Daxin confirmed in a direct email that she has informed the freight forwarder to change the discharge port from Sydney to Brisbane for this order.\nPO#47022: Units vs $ misunderstanding resolved  proceeding with 6,000 units; LCL charge absorbed internally; PI still to be issued\nFC50481 / PO 46855 (Dalian Daxin AH Wipes): Discharge port changed from Sydney to Brisbane  forwarder notified by Lina\nFollow-up needed: Issue PI to DATS for PO#47022; confirm shipment details for wipes order reflecting Brisbane as discharge port",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-21",
+          "Sales Order",
+          ": 04-21-2026 - Sales Order",
+          "[APR-21-26 Joseph Shweky] DATS PTY LTD\nFFP8831 | Arm & Hammer Super Treadz Gorilla Toy fo \nFFP8832 | Arm & Hammer: Super Treadz Gator Toy for",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-21",
+          "Sales Order",
+          ": 04-21-2026 - Sales Order",
+          "[APR-21-26 Joseph Shweky] DATS PTY LTD\nFFP31325 | Arm & Hammer Odor Control Wipes - 100 Co",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-21",
+          "Email",
+          ": 04-21-2026 - Email",
+          "[APR-22-26 Daniel Sawford] DATS Pty Ltd  Australia\nContact: Gary Young | gary@dats.com.au (via internal coordination with Q.Huang, V.Guina)\nSummary: A brief but important update on PO#47022. Following Monday's resolution of the units vs. dollars misunderstanding and the decision to proceed with 6,000 units absorbing the LCL surcharge, I confirmed internally: \"Yes, please proceed.\" The order is now moving forward.\nConfirmed internally to proceed with PO#47022 (6,000 units, LCL surcharge absorbed)\nFollow-up needed: Issue PI to DATS for PO#47022; confirm shipment schedule",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DATS PTY LTD",
+          "2026-04-22",
+          "Email",
+          ": 04-22-2026 - Email",
+          "[APR-22-26 Daniel Sawford] DATS Pty Ltd  Australia\nContacts: Gary Young (Buying Manager) | gary@dats.com.au\nRonald Ren | ronald@dats.com.au\nErin Carroll (Buying Assistant) | ecarroll@dats.com.au\nA. Green | agreen@dats.com.au\nSummary: A very busy day with DATS across multiple threads. Gary came back with the full A&H range he wants to list at Bunnings  seven SKUs in total  and asked for the UPC, inner barcode, and outer GTIN numbers for each product, plus the same for Arm & Hammer Odour Control Pet Wipes 100pk (FFP31325). The seven SKUs requested are: FFP10159 (Super Deodorizing Shampoo 20oz), FFP10162 (Tearless Puppy Shampoo 20oz), FFP10475 (Soothing Oatmeal Shampoo 20oz Vanilla Coconut), FFP10477 (2-in-1 Shampoo & Conditioner 20oz Vanilla Cucumber Mint), FFP10479 (Super Deodorizing Spray Kiwi Blossom), FFP20206 (Itch Relief Spray), and SFB8169 (Tartar Control Enzymatic Toothpaste Beef).\nOn PO 47142 and 47143, A. Green apologised for previously supplied incorrect barcodes and confirmed she will follow up with the remaining inner/outer barcode numbers shortly.\nRonald chased me directly on PO#47022, noting DATS is still waiting for the PI. I separately requested CRDs from Qisi for all items on PO#47022 now that the units/dollars confusion is resolved.\nA brand new PO also landed: PO#47144 from Erin Carroll, with a ship date of 15 June 2026. Erin is requesting confirmation and PI ASAP, along with 2x product samples of each item and artwork for approval. DATS also require a final shipping sample from the first production run (or at least 2 weeks before shipment) and a pre-shipment inspection report before any new item can be cleared to ship.\nBunnings range: UPC, inner barcode and outer GTIN required for 7 A&H SKUs + FFP31325 wipes\nPO 47142 & 47143: Barcode corrections coming from A. Green  awaiting\nPO#47022: Ronald chasing PI  still outstanding; CRDs requested from Qisi\nPO#47144: New PO received, ship 15 June 2026; confirmation + PI required urgently; samples and artwork also needed; pre-shipment inspection report required before loading\nFollow-up needed: Provide UPC/inner/outer GTINs to Gary for all Bunnings SKUs; issue PI for PO#47022 and PO#47144; confirm PO#47144; send 2x samples and artwork; obtain CRDs for PO#47022 from Qisi",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "DD'S DISCOUNTS",
+          "2026-03-25",
+          "Phone Call",
+          "Erica Siminerio-Kolenberg: 03-25-2026 - Phone Call",
+          "[MAR-25-26 Isaac Sasson] Will send over May-July orders in next few days. \nAppear to be in line with budget so no boosting there. \nGot them to test some new skus so if those do well maybe there is upside in back half of the year.  ",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "DD'S DISCOUNTS",
+          "2026-03-25",
+          "Sales Update",
+          "Kristin  Peters-Cella: 03-25-2026 - Sales Update",
+          "[MAR-25-26 Isaac Sasson] We are going to pass on these.  The disposable styles have continued to be tough for us.  ",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "DD'S DISCOUNTS",
+          "2026-03-27",
+          "Inventory/Orders",
+          ": 03-27-2026 - Inventory/Orders",
+          "[MAR-27-26 Isaac Sasson] received May-July POs and actualized in system. ",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "DD'S DISCOUNTS",
+          "2026-04-01",
+          "Sales Order",
+          ": 04-01-2026 - Sales Order",
+          "[APR-01-26 Joseph Shweky] DD'S DISCOUNTS\nBBP0759DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP11150DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP12028DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP12752DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP33528DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP36270DDDF | Clorox Fraganzia - In-Wash Scent Booster",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "DD'S DISCOUNTS",
+          "2026-04-01",
+          "Sales Order",
+          ": 04-01-2026 - Sales Order",
+          "[APR-01-26 Joseph Shweky] DD'S DISCOUNTS\nBBP0473DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP21951DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP22117DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP29120DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP33532DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP36457DDDF | Clorox Fraganzia - In-Wash Scent Booster",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "DD'S DISCOUNTS",
+          "2026-04-20",
+          "Opportunity Buy",
+          "Christina Wong: 04-20-2026 - Opportunity Buy",
+          "[APR-23-26 George Tuttle] Received and negotiated a stock offer from Christina, reviewed with Tiffany. Waiting for final commitment. PO should be around $40K",
+          "George Tuttle",
+          null
+        ],
+        [
+          "DD'S DISCOUNTS",
+          "2026-04-22",
+          "Sales Order",
+          ": 04-22-2026 - Sales Order",
+          "[APR-22-26 Joseph Shweky] DD'S DISCOUNTS\nBBP0759DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP12752DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP21951DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP22117DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP29120DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP36270DDDF | Clorox Fraganzia - In-Wash Scent Booster",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "DD'S DISCOUNTS",
+          "2026-04-22",
+          "Sales Order",
+          ": 04-22-2026 - Sales Order",
+          "[APR-22-26 Joseph Shweky] DD'S DISCOUNTS\nBBP0473DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP11150DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP21950DDDF | Clorox Fraganzia - In-Wash Scent Booster \nBBP36468DDDF | Clorox Fraganzia - In-Wash Scent Booster",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "DEMOULAS SUPER MARKETS INC",
+          "2026-04-10",
+          "Seasonal",
+          "Peter Gulezian: 04-10-2026 - Seasonal",
+          "[APR-10-26 Jason Shorr] Market Basket wants to buy red plaid for Holiday 2026 and possibly a gladware style or two.  last year had markdowns on our holiday buy for the first time as shoppers are more cautious with discretionary spending (per buyer).  \nBuyer requested we resend the proposal next week/ASAP so it's including packaging and display case visuals/renderings.  If sent early next week he said he'd be able to get us commitments before end of this month.  ",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "DOLGEN CORP. INC.",
+          "2026-03-24",
+          "Sales Order",
+          "Jeff Cawiezelle: 03-24-2026 - Sales Order",
+          "[MAR-24-26 Jason Shorr] Hi - Wk33 commitments just came in from DG and we have 3 items that will ship in July:\n1. Pumpkin Gel Cones \tBBP33759DG - requested status update to RTS\n2. Duo Cube with bleach 2x50g blue/white \tBBP38466DG\t\n3. Glad Kids zoomie dog 25ct bath cups in box \tBBP39044DG - requested status update to RTS. \nCleaning needs to ship 7/13-7/24\nPaper needs to ship 6/29-7/10\nMust confirm the buy back to DG by Fri 3/27",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "DOLGEN CORP. INC.",
+          "2026-03-24",
+          "Sales Order",
+          "Jeff Cawiezelle: 03-24-2026 - Sales Order",
+          "[MAR-24-26 Jason Shorr] Good News for DG VV WK33, buyer agreed to add 130K pcs (of 240K pcs in whse) for BBP29728DGPLCF, G4K Sharks 6oz/12ct snack bowls. \nwill update hold PO and budgets to reflect July ship date and continue offering balance of qty as closeout (DT, etc). ",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "DOLGEN CORP. INC.",
+          "2026-03-25",
+          "Quote Sheet",
+          "Jordan Bond: 03-25-2026 - Quote Sheet",
+          "[MAR-25-26 Jason Shorr] A&H grooming quotes sent to Jordan for consideration as OTB.  Awaiting details on timing/qtys/terms. ",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "DOLGEN CORP. INC.",
+          "2026-03-30",
+          "Sales Order",
+          ": 03-30-2026 - Sales Order",
+          "[MAR-30-26 Joseph Shweky] DOLGEN CORP. INC.\nBBP33759DGPL | Clorox Fraganzia - Gel Air Freshener Con \nBBP38466DGPL | Clorox Fraganzia - Duo Cube Toilet Bowl",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "DOLGEN CORP. INC.",
+          "2026-04-01",
+          "Sales Order",
+          ": 04-01-2026 - Sales Order",
+          "[APR-01-26 Joseph Shweky] DOLGEN CORP. INC.\nBBP39044DGPL | Glad 4 Kids - 3oz Plastic Bath Cup - 25c",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "DOLGEN CORP. INC.",
+          "2026-04-10",
+          "New Item Submission",
+          ": 04-10-2026 - New Item Submission",
+          "[APR-10-26 Jason Shorr] new dollar sku list shared by PD for  about 80 skus for VV items we can pick from.  Narrowed to top 5-6 skus and awaiting next steps from Brent on quoting (quick cost sheet will worik if we have all inputs needed / aren't able to create new RTQ styles in PT.  \nWill connect with Brent about Fraganzia powder detergent (request still pending in PT and Tiffany mentioned waiting to decide if we wanted to do powder or not)",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "DOLGEN CORP. INC.",
+          "2026-04-10",
+          "Sales Update",
+          ": 04-10-2026 - Sales Update",
+          "[APR-10-26 Jason Shorr] Brent and I met with the Badia sales lead and Sally from OSA team to talk Kingsford activation at DG and trying to launch spices next season.  \nI suggested looking at cross sampling/coupon type programs where we could offer free sample of spices on our item to drive trial and support future x-purchase/basket building and to make a bigger impression in store (brand blocking).  They are sending samples of trial sizes that might work and we will mention the option to the buyer when we review for 2027 (should start reviewing next month once back from China import buy trip).  \nI asked Badia team to send a snapshot of distribution so we could try to overlap with one another and secure new business (if they have placement and we don't, visaversa). ",
+          "Jason Shorr",
+          null
+        ],
+        [
+          "DOLLAR TREE IMPORT",
+          "2026-04-20",
+          "Sales Order",
+          ": 04-20-2026 - Sales Order",
+          "[APR-20-26 Joseph Shweky] DOLLAR TREE IMPORT\nFFP29884CADF | Fresh Step Scented Litter Crystals in 15",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "DOLLAR TREE MERCHANDISING",
+          "2026-04-13",
+          "Sales Order",
+          ": 04-13-2026 - Sales Order",
+          "[APR-13-26 Joseph Shweky] DOLLAR TREE MERCHANDISING\nFFP33131PDQ | Dole for Pets Dog Biscuits, Assorted Bag",
+          "Joseph Chalom",
+          null
+        ],
+        [
+          "EUROPRIS AS",
+          "2026-04-21",
+          "Inventory/Orders",
+          ": 04-21-2026 - Inventory/Orders",
+          "[APR-22-26 Daniel Sawford] Europris (via Maersk)\nContact: Darko Karagjuleski, Maersk Agent\nSummary: Maersk's agent Darko Karagjuleski requested shipping documents for Europris FC033. The cargo has been received at the terminal. Documents need to be provided to allow the shipment to proceed.\nCargo received for Europris FC033  shipping documents requested by Maersk agent\nFollow-up needed: Provide required shipping documents to Darko Karagjuleski at Maersk for Europris FC033 without delay",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "Farmacia Siman_EconoMascotas",
+          "2026-03-29",
+          "Email",
+          "Jose Siman: 03-29-2026 - Email",
+          "[MAR-29-26 Caroline McIntosh] Follow up email post GPE 2026\nIncluded AH Brand Deck and Wholesale Pricing Delivered Miami.\nalso asked for References and Business Plan.",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "FINNEYS IMPORTERS AND",
+          "2026-04-17",
+          "Email",
+          ": 04-17-2026 - Email",
+          "[APR-17-26 Daniel Sawford] Finneys Importers & Distributors  New Zealand\nContact: Joel Blyde | joel@finneys.co.nz\nSummary: A productive exchange with Joel covering several topics. I updated him on PO-693: the NJ order is ready, but we are still awaiting final product dimensions needed for their product submission. Joel arranged a Burt's Bees cat shampoo trial with Animates and asked for 300 units of FFP5766 to be added to the order; I sent him the relevant product details (with one minor error subsequently corrected). On a personal note, Joel confirmed his Interzoo attendance has been rebooked via Hong Kong, and proposed catching up for dinner on Thursday during the show.\nPO-693: NJ order ready  awaiting final product dimensions for Joel's product submission\nJoel has arranged a Burt's Bees cat shampoo trial with Animates\n300 units of FFP5766 requested to be added to the current order\nProduct details sent to Joel (one error was corrected after sending)\nInterzoo: Joel rebooked via Hong Kong  proposed Thursday dinner during the show\nFollow-up needed: Provide final product dimensions to Joel so he can complete the product submission; confirm FFP5766 addition to PO-693; confirm Interzoo Thursday dinner plans",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "FINNEYS IMPORTERS AND",
+          "2026-04-20",
+          "Just Notes",
+          ": 04-20-2026 - Just Notes",
+          "[APR-22-26 Daniel Sawford] Finneys Importers & Distributors  New Zealand\nContact: Joel Blyde | joel@finneys.co.nz\nFinneys Importers and Distributors Ltd | Phone: 03 389 9878 | Mobile: 021 461 715\nSummary: A busy back-and-forth with Joel covering two separate order topics. Joel forwarded a pre-alert from Compass Global Logistics (S00025379) and asked me to provide shipping documents for PO-674 along with the invoice date so he can make payment on time. I immediately requested the CI and PL from Manny at ES Sutton and advised Joel I would revert. On PO-693, Joel asked for a status update and whether the order is ready to go. I confirmed the additional product we added has caused a delay and that I'm working through it. I also sent Joel an Equine product details document (noting the last few slides are for internal purposes only). Later Joel asked about pricing for rubber chew toys  I confirmed these are all ex-New Jersey, made at our new rubber factory in Colombia, with no stock available until June and only 3D-printed samples at present.\nPO-674: Joel requested CI, PL and invoice date  I requested docs from ES Sutton (Manny); awaiting\nPO-693: Delayed due to additional product added to the order  working through resolution\nEquine (Burt's Bees): Product details sent to Joel; last few slides marked internal only\nRubber chew toys: All ex-NJ, new Colombia factory; stock not available until June; 3D-printed samples only for now\nAlso chased Lorraine at ES Sutton to confirm whether the Finneys Ediscope Excel load (PO-674) is ready to go\nFollow-up needed: Obtain CI/PL from ES Sutton and forward to Joel with invoice date; provide a clear ETA on PO-693 delay resolution; send rubber toy pricing once June stock is confirmed",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "FINNEYS IMPORTERS AND",
+          "2026-04-21",
+          "Just Notes",
+          ": 04-21-2026 - Just Notes",
+          "[APR-22-26 Daniel Sawford] Finneys Importers & Distributors  New Zealand\nContact: Joel Blyde | joel@finneys.co.nz\nFinneys Importers and Distributors Ltd | Phone: 03 389 9878 | Mobile: 021 461 715\nSummary: A positive update with Joel on PO-674. I sent Joel the CI and PL documents he had been waiting on and provided the invoice date so he could arrange payment. Joel confirmed promptly that he had made payment of the invoice. I forwarded the BNZ payment notification through to ES Sutton for their remittance records. The Ediscope/Excel load for PO-674 is still waiting on Gus (back tomorrow) to upload the orders.\nCI and PL sent to Joel with invoice date for PO-674  payment confirmed received\nBNZ payment notification forwarded to ES Sutton for remittance\nEdiscope Excel load pending  awaiting Gus's return to upload orders\nFollow-up needed: Confirm Gus has uploaded the Ediscope Excel load for PO-674; monitor Ediscope submission completion",
+          "Daniel Sawford",
+          null
+        ],
+        [
+          "GENERAL TRADING CO. INC",
+          "2026-04-07",
+          "Funding",
+          ": 04-07-2026 - Funding",
+          "[APR-07-26 Isaac Sasson] General Trading Invoice 171405",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "GENERAL TRADING CO. INC",
+          "2026-04-07",
+          "Funding",
+          ": 04-07-2026 - Funding",
+          "[APR-07-26 Isaac Sasson] General Trading Invoice 171411\nIf you have problems opening attachments, click on or copy link(s) below and paste in browser:\nhttps://login.general-trading.com/circulars/2026_03_29.pdf\nhttps://login.general-trading.com/circulars/2026_03_15.pdf\nhttps://login.general-trading.com/circulars/2026_02_22.pdf\nhttps://login.general-trading.com/circulars/2026_02_15.pdf\nhttps://login.general-trading.com/circulars/2026_01_25.pdf\nhttps://login.general-trading.com/circulars/2026_01_18.pdf ",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "GENERAL TRADING CO. INC",
+          "2026-04-21",
+          "Sales Update",
+          ": 04-21-2026 - Sales Update",
+          "[APR-21-26 Isaac Sasson] Regarding Glad Holiday: \nWe would need the Gladware in a shipper.\nI dont want the plates. ",
+          "Isaac Sasson",
+          null
+        ],
+        [
+          "GRUP CONOCIDO S.A. DE C.V",
+          "2026-03-29",
+          "Trade Show",
+          "Alex Gonzalez: 03-29-2026 - Trade Show",
+          "[MAR-29-26 Caroline McIntosh] GPE Meetings Follow up email:\nnotes and a few additional follow-ups for you and your team:\n1-\tDirect Import POs  We agreed that Factories are probably not to best to Palletize goods  we suggest for future orders your Freight Forwarder palletizes the Goods.\n2-\tLiverpool Mx  interested in:\na.\tCat New line\nb.\tDog new Coconut Blueberry scen odor control lines\nc.\tWashable Diapers &Wraps\nd.\tQuick Sweep as soon as available  Caroline to send samples and pricing\ne.\tFresh Step additional lines\n3-\tHEB Mx\na.\tThey are interested in additional lines all New AH Grooming items\n4-\tThe Home Depot Mx\na.\tThey want to expand the new AH assortment all new lines very interested.\n5-\tNew Customer Pet Brothers Contact Daniel Teigeiro email: petbrothers.dt@gmail,com  Ph: +52 5528885228\na.\tInterested in Dole and AH please have your Commerciales contact them\nIve also attached the new Product Presentation slides.",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "GRUP CONOCIDO S.A. DE C.V",
+          "2026-04-16",
+          "Presentation",
+          "Alex Gonzalez: 04-16-2026 - Presentation",
+          "[APR-16-26 Caroline McIntosh] Shared the Most up to date Band Decks including: Share via https://fetch4pets.filemail.com/t/bAAk5S5j\nAH Full Catalog\nFresh Step latest Catalog\nNew Quick Sweep sell sheet\nNew Diapers Sell Sheet",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "GRUP CONOCIDO S.A. DE C.V",
+          "2026-04-17",
+          "Quote Update",
+          "jorge Perez: 04-17-2026 - Quote Update",
+          "[APR-17-26 Caroline McIntosh] Follow up from GPE\n- Could you please share the Dole agreement with Pets + People  attached the original letter which Ive asked our licensing team to update.\n- When will the Dole lickables be available- in Production now  Arrival in our US Warehouse 10th  Aug 2026\n- What is the required MOQ to begin Spanish packaging in China for the AH and Fresh Step brands?  Packaging MOQs are 30,000 units  that said it would need to be approved internally since it would be direct import  it could be approved as long as you purchase 30,000 to 50,000 units per year of each  the process would be as follows:\n1- start with a small list of product with highest possible annual purchases.\n2- provide you absolute must have for the copy on the packaging\n3- our team will have a professional translation of the Copy\n4- you will get a copy for approval  once you have approved we send to the Brand for approval.\n5- Plates are done at the factory  proofs are sent for approval\n6- you will get unique style numbers to place your orders\nExpect the whole process to be 6-9 months based on our experience\n- Could you please provide the costs for both the U.S. and China for the following new product lines:\nSince the below products are new can you please provide an estimated quantity you would want to order and when so I can check with inventory team  also for all you products we really need a forecast for the items you will be purchasing for the USA just units  for the next months and again in 6 months. This will be very helpful to make sure we order stock including your needs.\n- Cat New Line  Added to price list  Available now\n- Dog New Coconut Blueberry Scent Odor Control Lines  Added to price list  Available now\n- Quick Sweep  in production will be in our warehouse in USA  by 7/30/2026  added to AH price list\n- Fresh Step Additional Lines  Updated Price Listes Attached with all active Fresh Step items  please send me you selection for Direct China and I will update the pricing also.\n- Arm & Hammer grooming tools  we gave exclusivity to Petco MX  that said we have new essential tools that will be available later this year better priced  just deodorizing not scented.",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "GRUP CONOCIDO S.A. DE C.V",
+          "2026-04-23",
+          "New Item Submission",
+          "jorge Perez: 04-23-2026 - New Item Submission",
+          "[APR-23-26 Caroline McIntosh] Distributor looking at adding new items to their assortment - next steps as follows:\nDue to our  Stock inventory management in the US  we are implementing a new rule for the 1st order of any new item  please allow 4 months from confirmation to 1st shipment. Or at least provided us with estimated initial order quantity and Forecast so we can confirm when we will be able to 1st supply.\nFor example: \nFFP37780          742797123110 Arm & Hammer Odor Control Wipes - 100 count - Blueberry Coconut  your customer confirms ranging next week  Send us the initial order Quantity and Forecast for 1st 6 month and then @Katherine Bloom will work with our team to confirm when we can ship the 1st order.\nAs per my communication when we shared the Price list the following items have now been listed by Petco MX and are Exclusive  so no longer available to purchase by Petmarkt.\nFFP33573\t742797081045\tArm & Hammer: Simply Grooming Soap Dispensing Palm Brush\nFFP33572\t742797081038\tArm & Hammer: Simply Glam Comb Dog (Sweet Apple & Rose)\nFFP33571\t742797081021\tArm & Hammer: Simply Glam Pin/Bristle Duo Brush Dog (Sweet Apple & Rose)\nFFP33570\t742797081014\tArm & Hammer: Simply Glam Self Cleaning Slicker Brush Dog (Sweet Apple & Rose)\nFFP33569\t742797081007\tArm & Hammer: Simply Calm Grooming Pet Glove (Sweet Lily & Vanilla)\nFFP33568\t742797080994\tArm & Hammer: Simply Calm Pin/Bristle Duo Brush (Sweet Lily & Vanilla)\nFFP33567\t742797080987\tArm & Hammer: Simply Calm Self Cleaning Slicker Brush (Sweet Lily & Vanilla)\n@Katherine Bloom  Please provide Unredacted SDS for following products (Make sure it included Product ingredients/Formulation)\nFFP33868\t742797083995\tArm & Hammer Complete Care Brushless Oral Gel, 4 oz\nFFP33871\t742797084022\tArm & Hammer Complete Care Brushless Dental Kit\nFFP37780\t742797123110\tArm & Hammer Odor Control Wipes - 100 count - Blueberry Coconut\nFFP37778\t742797123097\tArm & Hammer Odor Control Shampoo - 20 fl oz - Blueberry Coconut\nFFP31327\t742797058580\tArm & Hammer Odor Control Powder - 4.2 oz\nFFP10475\t742797815145\tArm & Hammer Soothing Oatmeal Shampoo for Pets - Vanilla Coconut\nFFP37637\t742797121680\tArm & Hammer Cat Odor Control & Dander Reducing Shampoo - 20oz - Violet Cedarwood\nFFP37636\t742797121673\tArm & Hammer Cat Odor Control & Dander Reducing Spray - 8oz - Violet Cedarwood\nFFP37638\t742797121697\tArm & Hammer Cat Odor Control & Dander Reducing Wipes - 100ct - Violet Cedarwood\nFFP9290/24\t742797844695\tArm & Hammer Complete Care Cat Dental Rinse, 8 Ounces\nFFP15589\t\tPalmer's for Pets All Over Relief Balm with Cocoa Butter, 3.5oz\nFFP15588\t\tPalmer's for Pets Intensive Paw Repair Swivel Stick with Cocoa Butter, 0.5 oz\nPlease note the following items are still in development and not in production yet  they will not be available until later in the year.\n@Katherine Bloom please share the Material list with  Petmakt team\nFFP38597\t742797131283\tArm & Hammer Essentials Duo Brush - Small\nFFP38397\t742797129280\tArm & Hammer Essentials Duo Brush - Large\nFFP38396\t742797129273\tArm & Hammer Essentials Slicker Brush\nFFP38398\t742797129297\tArm & Hammer Essentials Silicone Bath Brush\nFFP37640\t742797121710\tA&H WASHABLE DOG DIAPER 3 CT SM\nFFP37641\t742797121727\tA&H WASHABLE DOG DIAPER 3 CT MED\nFFP37642\t742797121734\tA&H WASHABLE DOG DIAPER 3 CT LRG",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "GRUP CONOCIDO S.A. DE C.V",
+          "2026-04-23",
+          "Quote Sheet",
+          "jorge Perez: 04-23-2026 - Quote Sheet",
+          "[APR-23-26 Caroline McIntosh] Provided Quote Sheet delivered to Laredo, TX for the 2 Palmers items potentially added to their portfolio",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "Grupo MOR Brazil",
+          "2026-03-29",
+          "Trade Show",
+          "sergio Gomes: 03-29-2026 - Trade Show",
+          "[MAR-29-26 Caroline McIntosh] Meeting at GPE - introduced by Trent ( used them as distributors in previous role)\nHe knows Barbara at Be Pets and we will be looking at a Solution to Scale up the Brazil market.\nSent follow up email 3/29/2026\nI am enclosing our Complete Brand Deck for Arm & Hammer as well as Sizzle deck on new products coming soon later in 2026.\nAs per discussed our goal is to expand to all Channel in Brazil not just Social Media independents and independent Pet Specialty retailers.\nBe Pets has done an amazing job at creating brand awareness for Arm & Hammer dental products after 5 years we need to Scale up and the only way we can do this is by importing directly from China and purchasing in MOQs into Brazil and listing with major retail Groups  this would save considerably in Tariffs and Shipping cost.\nWe would like as much as possible a solution inclusive of Barbaras talent  we thank you in advance for taking the lead on discussing a way forward with Be Pets and I look forward to a potential future collaboration.\nThank you also for introducing Franco and Silvio from Crystal Pet Lovers Argentina to the Booth  I will send a separate email to them to initiate the conversation.",
+          "Caroline McIntosh",
+          null
+        ],
+        [
+          "HEB",
+          "2026-04-13",
+          "Inventory Request",
+          ": 04-13-2026 - Inventory Request",
+          "[APR-13-26 Joseph Shweky] ISO and replen for G4K HEB - RPL\n |  \nBBP13435 | Glad Kids - 8.5\" Round Paper Plate - 20c \nBBP13436 | Glad Kids - 8.5\" Round Paper Plate - 20c \nBBP13437 | Glad Kids - 8.5\" Round Paper Plate - 20c \nBBP13447 | Glad for Kids - 9oz Paper Cup - 20ct - U \nBBP13448 | Glad for Kids - 9oz Paper Cup - 20ct - D \nBBP14500 | Glad Kids - 12oz Paper Snack Bowls no li \nBBP31552 | Glad Kids - 12oz Paper Snack Bowls no li \nBBP31553 | Glad Kids - 12oz Paper Snack Bowls no li \nBBP36058 | Glad 4 Kids - 9oz Paper Cup - 20ct - Sha",
+          "Jeannine Duggins",
+          null
+        ],
+        [
+          "HEB",
+          "2026-04-20",
+          "New Item Placement",
+          ": 04-20-2026 - New Item Placement",
+          "[APR-20-26 Jeannine Duggins] 300 stores - Shark Dino and Unicorns\nCups, 12 oz bowls and paper cups \ninline 7-1",
+          "Jeannine Duggins",
+          null
+        ]
+      ],
+      "affectedRows": -1,
+      "rowsTruncated": false
+    }
+  ]
+}

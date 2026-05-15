@@ -1,0 +1,13 @@
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  Manual projection columns: 04_19_W1 → 10_11_W26
+
+[1/4] Pulling projections from Quickbase ...
+  [FAIL] CData query failed (projections): IncompleteRead(0 bytes read)
+ERROR: No records returned. Check scope filters and CData connection.
+
+[run] BASELINE (no smoothing)
+      C:\Python314\python.exe C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py --acct 1864 --dry-run --out C:\Users\steven\.claude\skills\inventory-forecaster-cc\backtest_vp_q2_base.json
+forecaster exited 1 on BASELINE (no smoothing)

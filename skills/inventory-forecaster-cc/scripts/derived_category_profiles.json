@@ -1,0 +1,5408 @@
+{
+  "generated_at": "2026-05-04",
+  "source": "direct /v1/records/query on table bpaxk2v8t",
+  "window": {
+    "start_year": 2024,
+    "end_year": 2026
+  },
+  "method": "monthly Qty_Shpd index, mean=1.0, weighted+OOS-adjusted, consistent-MStyle filter (no promo blasts)",
+  "year_weights": {
+    "2024": 2.0,
+    "2025": 1.0,
+    "2026": 1.0
+  },
+  "oos_dropped": [
+    [
+      2025,
+      5
+    ],
+    [
+      2025,
+      6
+    ],
+    [
+      2025,
+      7
+    ],
+    [
+      2025,
+      8
+    ],
+    [
+      2025,
+      9
+    ]
+  ],
+  "strategic_customer_keywords": [
+    "AMAZON",
+    "WAL MART",
+    "WALMART",
+    "PETSMART"
+  ],
+  "strategic_customer_weight": 2.0,
+  "planner_overrides": [
+    "Disposable Tabletop"
+  ],
+  "holiday_lead_uplift": {
+    "9": 1.1,
+    "10": 1.2,
+    "11": 1.15
+  },
+  "gates": {
+    "min_total_units": 100000,
+    "min_active_months": 3,
+    "min_peak_trough": 1.3,
+    "min_years": 2,
+    "min_consistent_skus": 3,
+    "mstyle_min_active_months": 10,
+    "mstyle_min_lifespan": 12,
+    "mstyle_min_activity_rate": 0.5
+  },
+  "by_category": {
+    "Foils & Pans": {
+      "profile": [
+        0.893,
+        1.115,
+        1.892,
+        1.19,
+        1.015,
+        0.709,
+        0.687,
+        0.333,
+        1.018,
+        1.406,
+        1.064,
+        0.678
+      ],
+      "stats": {
+        "total_units": 2592764,
+        "consistent_skus": 27,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.05,
+        "raw_trough_idx": 0.3602,
+        "raw_peak_trough": 5.68,
+        "clamped_peak": 1.89,
+        "clamped_trough": 0.33,
+        "active_months": 12,
+        "raw_profile": [
+          0.965,
+          1.205,
+          2.046,
+          1.286,
+          1.097,
+          0.767,
+          0.742,
+          0.36,
+          0.547,
+          1.267,
+          0.986,
+          0.733
+        ]
+      }
+    },
+    "Dog Dental Care": {
+      "profile": [
+        1.477,
+        1.299,
+        1.077,
+        0.955,
+        0.725,
+        0.723,
+        0.594,
+        0.858,
+        1.029,
+        1.122,
+        1.334,
+        0.807
+      ],
+      "stats": {
+        "total_units": 10766384,
+        "consistent_skus": 78,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.58,
+        "raw_trough_idx": 0.6355,
+        "raw_peak_trough": 2.48,
+        "clamped_peak": 1.48,
+        "clamped_trough": 0.59,
+        "active_months": 12,
+        "raw_profile": [
+          1.579,
+          1.388,
+          1.152,
+          1.021,
+          0.775,
+          0.773,
+          0.635,
+          0.917,
+          0.731,
+          0.925,
+          1.24,
+          0.863
+        ]
+      }
+    },
+    "Cat Dental Care": {
+      "profile": [
+        1.406,
+        1.308,
+        0.846,
+        1.137,
+        0.44,
+        0.823,
+        0.7,
+        0.769,
+        1.04,
+        1.317,
+        1.195,
+        1.019
+      ],
+      "stats": {
+        "total_units": 1395546,
+        "consistent_skus": 19,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.49,
+        "raw_trough_idx": 0.4651,
+        "raw_peak_trough": 3.2,
+        "clamped_peak": 1.41,
+        "clamped_trough": 0.44,
+        "active_months": 12,
+        "raw_profile": [
+          1.486,
+          1.383,
+          0.894,
+          1.202,
+          0.465,
+          0.87,
+          0.74,
+          0.813,
+          0.81,
+          1.16,
+          1.098,
+          1.077
+        ]
+      }
+    },
+    "Grooming": {
+      "profile": [
+        1.349,
+        1.281,
+        1.34,
+        1.146,
+        0.749,
+        0.575,
+        0.682,
+        0.627,
+        1.023,
+        1.116,
+        1.186,
+        0.925
+      ],
+      "stats": {
+        "total_units": 44612082,
+        "consistent_skus": 364,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.45,
+        "raw_trough_idx": 0.6177,
+        "raw_peak_trough": 2.35,
+        "clamped_peak": 1.35,
+        "clamped_trough": 0.57,
+        "active_months": 12,
+        "raw_profile": [
+          1.45,
+          1.378,
+          1.44,
+          1.232,
+          0.806,
+          0.618,
+          0.733,
+          0.675,
+          0.624,
+          0.942,
+          1.109,
+          0.995
+        ]
+      }
+    },
+    "Grooming Tools": {
+      "profile": [
+        1.194,
+        1.136,
+        1.263,
+        1.261,
+        1.019,
+        0.67,
+        0.772,
+        0.75,
+        1.008,
+        1.1,
+        1.054,
+        0.775
+      ],
+      "stats": {
+        "total_units": 6747006,
+        "consistent_skus": 49,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.38,
+        "raw_trough_idx": 0.6884,
+        "raw_peak_trough": 2.0,
+        "clamped_peak": 1.26,
+        "clamped_trough": 0.67,
+        "active_months": 12,
+        "raw_profile": [
+          1.303,
+          1.24,
+          1.378,
+          1.376,
+          1.112,
+          0.731,
+          0.842,
+          0.818,
+          0.688,
+          0.814,
+          0.853,
+          0.846
+        ]
+      }
+    },
+    "Small Animal Care": {
+      "profile": [
+        1.217,
+        1.131,
+        1.012,
+        1.211,
+        0.677,
+        0.643,
+        0.641,
+        0.646,
+        1.015,
+        1.63,
+        1.174,
+        1.002
+      ],
+      "stats": {
+        "total_units": 976750,
+        "consistent_skus": 9,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 10,
+        "raw_peak_idx": 1.47,
+        "raw_trough_idx": 0.5565,
+        "raw_peak_trough": 2.65,
+        "clamped_peak": 1.63,
+        "clamped_trough": 0.64,
+        "active_months": 12,
+        "raw_profile": [
+          1.319,
+          1.225,
+          1.096,
+          1.312,
+          0.734,
+          0.697,
+          0.694,
+          0.701,
+          0.557,
+          1.472,
+          1.107,
+          1.086
+        ]
+      }
+    },
+    "Litter Accessories": {
+      "profile": [
+        1.287,
+        0.565,
+        1.94,
+        1.299,
+        0.732,
+        0.53,
+        0.787,
+        0.608,
+        0.993,
+        1.135,
+        1.038,
+        1.086
+      ],
+      "stats": {
+        "total_units": 12360151,
+        "consistent_skus": 55,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.15,
+        "raw_trough_idx": 0.3765,
+        "raw_peak_trough": 5.71,
+        "clamped_peak": 1.94,
+        "clamped_trough": 0.53,
+        "active_months": 12,
+        "raw_profile": [
+          1.425,
+          0.626,
+          2.149,
+          1.438,
+          0.811,
+          0.587,
+          0.871,
+          0.673,
+          0.376,
+          1.048,
+          0.794,
+          1.202
+        ]
+      }
+    },
+    "Training": {
+      "profile": [
+        1.258,
+        1.4,
+        2.485,
+        0.364,
+        0.664,
+        0.75,
+        0.537,
+        0.393,
+        0.979,
+        1.068,
+        1.023,
+        1.078
+      ],
+      "stats": {
+        "total_units": 458658,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.79,
+        "raw_trough_idx": 0.4094,
+        "raw_peak_trough": 6.82,
+        "clamped_peak": 2.49,
+        "clamped_trough": 0.36,
+        "active_months": 12,
+        "raw_profile": [
+          1.413,
+          1.573,
+          2.792,
+          0.409,
+          0.747,
+          0.843,
+          0.603,
+          0.442,
+          0.478,
+          0.491,
+          0.997,
+          1.212
+        ]
+      }
+    },
+    "Food Protection": {
+      "profile": [
+        1.232,
+        1.257,
+        0.941,
+        0.874,
+        1.202,
+        0.521,
+        0.575,
+        1.021,
+        1.105,
+        1.14,
+        1.094,
+        1.038
+      ],
+      "stats": {
+        "total_units": 5157265,
+        "consistent_skus": 56,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.32,
+        "raw_trough_idx": 0.5484,
+        "raw_peak_trough": 2.41,
+        "clamped_peak": 1.26,
+        "clamped_trough": 0.52,
+        "active_months": 12,
+        "raw_profile": [
+          1.297,
+          1.323,
+          0.99,
+          0.92,
+          1.266,
+          0.548,
+          0.605,
+          1.075,
+          1.057,
+          0.823,
+          1.001,
+          1.093
+        ]
+      }
+    },
+    "Disposable Tabletop": {
+      "profile": [
+        0.444,
+        0.489,
+        0.978,
+        1.333,
+        1.333,
+        1.156,
+        1.156,
+        1.067,
+        0.978,
+        1.378,
+        1.244,
+        0.444
+      ],
+      "stats": {
+        "total_units": 14208453,
+        "consistent_skus": 214,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.64,
+        "raw_trough_idx": 0.513,
+        "raw_peak_trough": 3.2,
+        "clamped_peak": 1.49,
+        "clamped_trough": 0.49,
+        "active_months": 12,
+        "raw_profile": [
+          1.292,
+          1.263,
+          1.64,
+          1.441,
+          1.253,
+          0.541,
+          0.643,
+          0.663,
+          0.513,
+          0.726,
+          1.161,
+          0.862
+        ],
+        "planner_override": true,
+        "pre_override_profile": [
+          1.172,
+          1.145,
+          1.487,
+          1.307,
+          1.136,
+          0.49,
+          0.583,
+          0.601,
+          0.997,
+          1.088,
+          1.211,
+          0.782
+        ]
+      }
+    },
+    "Laundry": {
+      "profile": [
+        1.18,
+        1.233,
+        0.94,
+        1.089,
+        0.708,
+        0.811,
+        1.025,
+        0.958,
+        1.037,
+        1.131,
+        1.167,
+        0.722
+      ],
+      "stats": {
+        "total_units": 5483042,
+        "consistent_skus": 78,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.31,
+        "raw_trough_idx": 0.7515,
+        "raw_peak_trough": 1.74,
+        "clamped_peak": 1.23,
+        "clamped_trough": 0.71,
+        "active_months": 12,
+        "raw_profile": [
+          1.252,
+          1.308,
+          0.997,
+          1.156,
+          0.752,
+          0.86,
+          1.088,
+          1.016,
+          0.783,
+          0.944,
+          1.076,
+          0.766
+        ]
+      }
+    },
+    "Hand Care": {
+      "profile": [
+        0.841,
+        1.26,
+        1.168,
+        1.204,
+        0.471,
+        0.998,
+        1.089,
+        1.21,
+        1.027,
+        1.12,
+        1.284,
+        0.329
+      ],
+      "stats": {
+        "total_units": 517960,
+        "consistent_skus": 13,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.35,
+        "raw_trough_idx": 0.3521,
+        "raw_peak_trough": 3.83,
+        "clamped_peak": 1.28,
+        "clamped_trough": 0.33,
+        "active_months": 12,
+        "raw_profile": [
+          0.901,
+          1.35,
+          1.252,
+          1.29,
+          0.504,
+          1.07,
+          1.166,
+          1.297,
+          0.802,
+          0.82,
+          1.196,
+          0.352
+        ]
+      }
+    },
+    "Air Care": {
+      "profile": [
+        1.276,
+        1.685,
+        2.089,
+        0.741,
+        0.644,
+        0.84,
+        0.418,
+        0.695,
+        0.991,
+        1.081,
+        1.036,
+        0.505
+      ],
+      "stats": {
+        "total_units": 11563484,
+        "consistent_skus": 64,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.32,
+        "raw_trough_idx": 0.4641,
+        "raw_peak_trough": 5.0,
+        "clamped_peak": 2.09,
+        "clamped_trough": 0.42,
+        "active_months": 12,
+        "raw_profile": [
+          1.416,
+          1.871,
+          2.32,
+          0.822,
+          0.715,
+          0.933,
+          0.464,
+          0.772,
+          0.61,
+          0.617,
+          0.898,
+          0.561
+        ]
+      }
+    },
+    "Cleaning Tools": {
+      "profile": [
+        1.277,
+        1.125,
+        1.254,
+        1.429,
+        0.589,
+        1.148,
+        0.584,
+        0.783,
+        0.986,
+        1.076,
+        1.031,
+        0.718
+      ],
+      "stats": {
+        "total_units": 4308044,
+        "consistent_skus": 21,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 1.59,
+        "raw_trough_idx": 0.6347,
+        "raw_peak_trough": 2.51,
+        "clamped_peak": 1.43,
+        "clamped_trough": 0.58,
+        "active_months": 12,
+        "raw_profile": [
+          1.424,
+          1.254,
+          1.398,
+          1.594,
+          0.657,
+          1.28,
+          0.651,
+          0.874,
+          0.755,
+          0.635,
+          0.679,
+          0.8
+        ]
+      }
+    },
+    "Cleaning": {
+      "profile": [
+        1.534,
+        1.12,
+        1.354,
+        0.891,
+        0.713,
+        0.856,
+        0.672,
+        1.254,
+        0.997,
+        1.088,
+        1.042,
+        0.48
+      ],
+      "stats": {
+        "total_units": 3377042,
+        "consistent_skus": 42,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.69,
+        "raw_trough_idx": 0.5296,
+        "raw_peak_trough": 3.2,
+        "clamped_peak": 1.53,
+        "clamped_trough": 0.48,
+        "active_months": 12,
+        "raw_profile": [
+          1.693,
+          1.235,
+          1.494,
+          0.983,
+          0.787,
+          0.944,
+          0.741,
+          1.384,
+          0.751,
+          0.711,
+          0.747,
+          0.53
+        ]
+      }
+    },
+    "Grilling Tools": {
+      "profile": [
+        0.943,
+        0.965,
+        1.401,
+        2.044,
+        1.26,
+        0.813,
+        0.708,
+        0.283,
+        0.95,
+        1.037,
+        0.994,
+        0.604
+      ],
+      "stats": {
+        "total_units": 1648183,
+        "consistent_skus": 15,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 2.37,
+        "raw_trough_idx": 0.327,
+        "raw_peak_trough": 7.23,
+        "clamped_peak": 2.04,
+        "clamped_trough": 0.28,
+        "active_months": 12,
+        "raw_profile": [
+          1.091,
+          1.116,
+          1.621,
+          2.365,
+          1.458,
+          0.941,
+          0.819,
+          0.327,
+          0.425,
+          0.617,
+          0.52,
+          0.699
+        ]
+      }
+    },
+    "Pro Hand Care": {
+      "profile": [
+        1.115,
+        0.939,
+        1.823,
+        1.249,
+        0.483,
+        0.449,
+        1.046,
+        1.34,
+        1.0,
+        1.091,
+        1.045,
+        0.42
+      ],
+      "stats": {
+        "total_units": 955560,
+        "consistent_skus": 21,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.01,
+        "raw_trough_idx": 0.4623,
+        "raw_peak_trough": 4.34,
+        "clamped_peak": 1.82,
+        "clamped_trough": 0.42,
+        "active_months": 12,
+        "raw_profile": [
+          1.226,
+          1.034,
+          2.006,
+          1.374,
+          0.532,
+          0.494,
+          1.151,
+          1.475,
+          0.902,
+          0.618,
+          0.725,
+          0.462
+        ]
+      }
+    },
+    "Waste Management": {
+      "profile": [
+        1.231,
+        1.199,
+        1.34,
+        1.083,
+        0.756,
+        0.446,
+        0.628,
+        0.747,
+        1.021,
+        1.211,
+        1.156,
+        1.183
+      ],
+      "stats": {
+        "total_units": 12679980,
+        "consistent_skus": 101,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.44,
+        "raw_trough_idx": 0.481,
+        "raw_peak_trough": 3.0,
+        "clamped_peak": 1.34,
+        "clamped_trough": 0.45,
+        "active_months": 12,
+        "raw_profile": [
+          1.326,
+          1.292,
+          1.444,
+          1.167,
+          0.814,
+          0.481,
+          0.676,
+          0.805,
+          0.548,
+          1.088,
+          1.083,
+          1.275
+        ]
+      }
+    },
+    "Dental Toys": {
+      "profile": [
+        1.374,
+        1.008,
+        1.035,
+        0.774,
+        0.974,
+        0.495,
+        0.622,
+        0.732,
+        1.012,
+        1.288,
+        1.938,
+        0.748
+      ],
+      "stats": {
+        "total_units": 2080758,
+        "consistent_skus": 52,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.83,
+        "raw_trough_idx": 0.5384,
+        "raw_peak_trough": 3.4,
+        "clamped_peak": 1.94,
+        "clamped_trough": 0.5,
+        "active_months": 12,
+        "raw_profile": [
+          1.494,
+          1.096,
+          1.126,
+          0.842,
+          1.059,
+          0.538,
+          0.676,
+          0.795,
+          0.561,
+          1.167,
+          1.832,
+          0.814
+        ]
+      }
+    },
+    "Cat Grooming": {
+      "profile": [
+        1.32,
+        1.3,
+        1.269,
+        1.42,
+        0.675,
+        0.628,
+        0.612,
+        0.535,
+        1.025,
+        1.195,
+        1.187,
+        0.834
+      ],
+      "stats": {
+        "total_units": 4107791,
+        "consistent_skus": 44,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 1.52,
+        "raw_trough_idx": 0.5744,
+        "raw_peak_trough": 2.65,
+        "clamped_peak": 1.42,
+        "clamped_trough": 0.54,
+        "active_months": 12,
+        "raw_profile": [
+          1.417,
+          1.396,
+          1.362,
+          1.524,
+          0.725,
+          0.675,
+          0.657,
+          0.574,
+          0.598,
+          1.069,
+          1.108,
+          0.895
+        ]
+      }
+    },
+    "Treats & Chews": {
+      "profile": [
+        1.356,
+        1.012,
+        1.05,
+        1.434,
+        0.838,
+        0.375,
+        0.73,
+        0.649,
+        1.012,
+        1.22,
+        1.336,
+        0.989
+      ],
+      "stats": {
+        "total_units": 3411602,
+        "consistent_skus": 63,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 1.56,
+        "raw_trough_idx": 0.4069,
+        "raw_peak_trough": 3.83,
+        "clamped_peak": 1.43,
+        "clamped_trough": 0.37,
+        "active_months": 12,
+        "raw_profile": [
+          1.473,
+          1.099,
+          1.141,
+          1.558,
+          0.911,
+          0.407,
+          0.793,
+          0.705,
+          0.471,
+          1.105,
+          1.262,
+          1.074
+        ]
+      }
+    },
+    "Pet Air Care": {
+      "profile": [
+        1.003,
+        1.332,
+        0.956,
+        1.155,
+        0.563,
+        1.073,
+        0.608,
+        0.775,
+        0.985,
+        1.074,
+        1.461,
+        1.014
+      ],
+      "stats": {
+        "total_units": 1869552,
+        "consistent_skus": 8,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.49,
+        "raw_trough_idx": 0.4531,
+        "raw_peak_trough": 3.28,
+        "clamped_peak": 1.46,
+        "clamped_trough": 0.56,
+        "active_months": 12,
+        "raw_profile": [
+          1.121,
+          1.487,
+          1.068,
+          1.29,
+          0.629,
+          1.199,
+          0.679,
+          0.866,
+          0.453,
+          0.656,
+          1.419,
+          1.133
+        ]
+      }
+    },
+    "Dog Toys": {
+      "profile": [
+        0.611,
+        0.954,
+        0.441,
+        1.434,
+        1.574,
+        0.721,
+        0.352,
+        0.957,
+        1.02,
+        1.203,
+        1.55,
+        1.183
+      ],
+      "stats": {
+        "total_units": 2552666,
+        "consistent_skus": 93,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 5,
+        "raw_peak_idx": 1.7,
+        "raw_trough_idx": 0.3791,
+        "raw_peak_trough": 4.48,
+        "clamped_peak": 1.57,
+        "clamped_trough": 0.35,
+        "active_months": 12,
+        "raw_profile": [
+          0.659,
+          1.028,
+          0.475,
+          1.546,
+          1.697,
+          0.777,
+          0.379,
+          1.032,
+          0.597,
+          1.081,
+          1.454,
+          1.275
+        ]
+      }
+    },
+    "Dog Supplements": {
+      "profile": [
+        1.482,
+        1.004,
+        1.264,
+        1.222,
+        0.89,
+        0.368,
+        0.687,
+        0.879,
+        0.974,
+        1.062,
+        1.018,
+        1.151
+      ],
+      "stats": {
+        "total_units": 1418840,
+        "consistent_skus": 11,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.67,
+        "raw_trough_idx": 0.3587,
+        "raw_peak_trough": 4.67,
+        "clamped_peak": 1.48,
+        "clamped_trough": 0.37,
+        "active_months": 12,
+        "raw_profile": [
+          1.674,
+          1.134,
+          1.427,
+          1.381,
+          1.005,
+          0.416,
+          0.776,
+          0.993,
+          0.359,
+          0.758,
+          0.777,
+          1.3
+        ]
+      }
+    },
+    "Dog Remedies": {
+      "profile": [
+        1.347,
+        1.009,
+        1.344,
+        1.18,
+        0.729,
+        0.826,
+        0.68,
+        0.617,
+        1.031,
+        1.125,
+        1.335,
+        0.776
+      ],
+      "stats": {
+        "total_units": 662497,
+        "consistent_skus": 11,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.44,
+        "raw_trough_idx": 0.6578,
+        "raw_peak_trough": 2.18,
+        "clamped_peak": 1.35,
+        "clamped_trough": 0.62,
+        "active_months": 12,
+        "raw_profile": [
+          1.436,
+          1.076,
+          1.433,
+          1.259,
+          0.777,
+          0.881,
+          0.726,
+          0.658,
+          0.847,
+          0.842,
+          1.238,
+          0.827
+        ]
+      }
+    },
+    "Cat Grooming Tools": {
+      "profile": [
+        1.065,
+        1.412,
+        1.84,
+        1.413,
+        0.706,
+        0.503,
+        0.75,
+        0.69,
+        1.0,
+        1.091,
+        1.045,
+        0.483
+      ],
+      "stats": {
+        "total_units": 797600,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.02,
+        "raw_trough_idx": 0.4774,
+        "raw_peak_trough": 4.24,
+        "clamped_peak": 1.84,
+        "clamped_trough": 0.48,
+        "active_months": 12,
+        "raw_profile": [
+          1.172,
+          1.554,
+          2.024,
+          1.554,
+          0.777,
+          0.554,
+          0.825,
+          0.759,
+          0.477,
+          0.936,
+          0.835,
+          0.532
+        ]
+      }
+    },
+    "Cat Stain & Odor": {
+      "profile": [
+        1.22,
+        0.967,
+        1.092,
+        0.902,
+        1.026,
+        0.568,
+        0.934,
+        1.047,
+        1.03,
+        1.189,
+        1.076,
+        0.95
+      ],
+      "stats": {
+        "total_units": 703934,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.3,
+        "raw_trough_idx": 0.6069,
+        "raw_peak_trough": 2.15,
+        "clamped_peak": 1.22,
+        "clamped_trough": 0.57,
+        "active_months": 12,
+        "raw_profile": [
+          1.304,
+          1.033,
+          1.167,
+          0.963,
+          1.096,
+          0.607,
+          0.997,
+          1.118,
+          0.673,
+          1.058,
+          0.968,
+          1.015
+        ]
+      }
+    },
+    "Apparel": {
+      "profile": [
+        0.583,
+        0.28,
+        0.264,
+        3.223,
+        0.788,
+        0.959,
+        0.739,
+        0.985,
+        1.015,
+        1.107,
+        1.457,
+        0.6
+      ],
+      "stats": {
+        "total_units": 374400,
+        "consistent_skus": 17,
+        "years": [
+          2024,
+          2025
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 3.49,
+        "raw_trough_idx": 0.2862,
+        "raw_peak_trough": 12.21,
+        "clamped_peak": 3.22,
+        "clamped_trough": 0.26,
+        "active_months": 12,
+        "raw_profile": [
+          0.632,
+          0.304,
+          0.286,
+          3.495,
+          0.854,
+          1.04,
+          0.802,
+          1.068,
+          0.585,
+          0.911,
+          1.374,
+          0.651
+        ]
+      }
+    },
+    "Hand Care (Fetch)": {
+      "profile": [
+        0.624,
+        0.796,
+        0.773,
+        0.488,
+        0.831,
+        0.72,
+        0.545,
+        1.687,
+        1.399,
+        1.57,
+        1.636,
+        0.93
+      ],
+      "stats": {
+        "total_units": 501924,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 8,
+        "raw_peak_idx": 1.78,
+        "raw_trough_idx": 0.5139,
+        "raw_peak_trough": 3.46,
+        "clamped_peak": 1.69,
+        "clamped_trough": 0.49,
+        "active_months": 12,
+        "raw_profile": [
+          0.657,
+          0.838,
+          0.814,
+          0.514,
+          0.875,
+          0.759,
+          0.574,
+          1.776,
+          1.339,
+          1.377,
+          1.498,
+          0.98
+        ]
+      }
+    },
+    "Stain & Odor": {
+      "profile": [
+        0.548,
+        0.423,
+        1.21,
+        0.635,
+        1.62,
+        0.217,
+        1.447,
+        0.706,
+        1.02,
+        1.112,
+        2.458,
+        0.605
+      ],
+      "stats": {
+        "total_units": 459408,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 2.31,
+        "raw_trough_idx": 0.2338,
+        "raw_peak_trough": 9.86,
+        "clamped_peak": 2.46,
+        "clamped_trough": 0.22,
+        "active_months": 12,
+        "raw_profile": [
+          0.591,
+          0.456,
+          1.305,
+          0.685,
+          1.748,
+          0.234,
+          1.561,
+          0.761,
+          0.941,
+          0.759,
+          2.306,
+          0.653
+        ]
+      }
+    },
+    "Collars/Leads": {
+      "profile": [
+        0.24,
+        0.343,
+        0.329,
+        3.11,
+        1.38,
+        0.737,
+        0.361,
+        1.438,
+        1.009,
+        1.101,
+        1.431,
+        0.52
+      ],
+      "stats": {
+        "total_units": 146304,
+        "consistent_skus": 6,
+        "years": [
+          2024,
+          2025
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 3.39,
+        "raw_trough_idx": 0.2618,
+        "raw_peak_trough": 12.95,
+        "clamped_peak": 3.11,
+        "clamped_trough": 0.24,
+        "active_months": 12,
+        "raw_profile": [
+          0.262,
+          0.374,
+          0.358,
+          3.39,
+          1.504,
+          0.803,
+          0.394,
+          1.567,
+          0.634,
+          0.791,
+          1.356,
+          0.567
+        ]
+      }
+    }
+  },
+  "by_subcategory": {
+    "Foils & Pans||Pans & Grillers": {
+      "profile": [
+        0.912,
+        1.158,
+        1.568,
+        1.012,
+        0.929,
+        0.602,
+        0.668,
+        0.342,
+        0.993,
+        1.938,
+        1.038,
+        0.84
+      ],
+      "stats": {
+        "total_units": 1637034,
+        "consistent_skus": 19,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 10,
+        "raw_peak_idx": 1.79,
+        "raw_trough_idx": 0.3787,
+        "raw_peak_trough": 4.73,
+        "clamped_peak": 1.94,
+        "clamped_trough": 0.34,
+        "active_months": 12,
+        "raw_profile": [
+          1.011,
+          1.284,
+          1.738,
+          1.122,
+          1.029,
+          0.668,
+          0.74,
+          0.379,
+          0.646,
+          1.79,
+          0.662,
+          0.931
+        ]
+      }
+    },
+    "Foils & Pans||Rolled Foil": {
+      "profile": [
+        0.844,
+        0.977,
+        2.213,
+        1.23,
+        0.89,
+        0.791,
+        0.532,
+        0.313,
+        0.963,
+        1.051,
+        1.825,
+        0.37
+      ],
+      "stats": {
+        "total_units": 781328,
+        "consistent_skus": 6,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.53,
+        "raw_trough_idx": 0.3572,
+        "raw_peak_trough": 7.08,
+        "clamped_peak": 2.21,
+        "clamped_trough": 0.31,
+        "active_months": 12,
+        "raw_profile": [
+          0.964,
+          1.116,
+          2.527,
+          1.405,
+          1.017,
+          0.904,
+          0.608,
+          0.357,
+          0.447,
+          0.42,
+          1.812,
+          0.422
+        ]
+      }
+    },
+    "Dog Dental Care||Dental Kit": {
+      "profile": [
+        1.466,
+        1.233,
+        1.163,
+        1.07,
+        0.784,
+        0.771,
+        0.563,
+        0.88,
+        1.036,
+        1.13,
+        1.23,
+        0.674
+      ],
+      "stats": {
+        "total_units": 6083970,
+        "consistent_skus": 31,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.56,
+        "raw_trough_idx": 0.5985,
+        "raw_peak_trough": 2.6,
+        "clamped_peak": 1.47,
+        "clamped_trough": 0.56,
+        "active_months": 12,
+        "raw_profile": [
+          1.557,
+          1.309,
+          1.236,
+          1.137,
+          0.833,
+          0.819,
+          0.598,
+          0.935,
+          0.811,
+          0.912,
+          1.136,
+          0.716
+        ]
+      }
+    },
+    "Dog Dental Care||Toothpaste": {
+      "profile": [
+        1.655,
+        1.355,
+        0.881,
+        0.912,
+        0.624,
+        0.714,
+        0.714,
+        0.915,
+        1.014,
+        1.106,
+        1.249,
+        0.862
+      ],
+      "stats": {
+        "total_units": 2907840,
+        "consistent_skus": 21,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.8,
+        "raw_trough_idx": 0.5585,
+        "raw_peak_trough": 3.22,
+        "clamped_peak": 1.66,
+        "clamped_trough": 0.62,
+        "active_months": 12,
+        "raw_profile": [
+          1.796,
+          1.47,
+          0.956,
+          0.989,
+          0.677,
+          0.775,
+          0.775,
+          0.992,
+          0.559,
+          0.898,
+          1.178,
+          0.935
+        ]
+      }
+    },
+    "Cat Dental Care||Dental Kit": {
+      "profile": [
+        1.45,
+        1.438,
+        0.855,
+        1.219,
+        0.299,
+        0.737,
+        0.692,
+        0.941,
+        1.032,
+        1.443,
+        1.125,
+        0.77
+      ],
+      "stats": {
+        "total_units": 905906,
+        "consistent_skus": 10,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.55,
+        "raw_trough_idx": 0.3192,
+        "raw_peak_trough": 4.84,
+        "clamped_peak": 1.45,
+        "clamped_trough": 0.3,
+        "active_months": 12,
+        "raw_profile": [
+          1.546,
+          1.533,
+          0.911,
+          1.299,
+          0.319,
+          0.786,
+          0.738,
+          1.003,
+          0.719,
+          1.282,
+          1.043,
+          0.821
+        ]
+      }
+    },
+    "Grooming||Shampoo": {
+      "profile": [
+        1.276,
+        1.225,
+        1.389,
+        1.192,
+        0.814,
+        0.592,
+        0.754,
+        0.649,
+        1.021,
+        1.114,
+        1.103,
+        0.871
+      ],
+      "stats": {
+        "total_units": 24035155,
+        "consistent_skus": 179,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.5,
+        "raw_trough_idx": 0.5963,
+        "raw_peak_trough": 2.51,
+        "clamped_peak": 1.39,
+        "clamped_trough": 0.59,
+        "active_months": 12,
+        "raw_profile": [
+          1.375,
+          1.32,
+          1.496,
+          1.285,
+          0.878,
+          0.638,
+          0.813,
+          0.7,
+          0.596,
+          0.927,
+          1.034,
+          0.939
+        ]
+      }
+    },
+    "Grooming||Spray": {
+      "profile": [
+        1.428,
+        1.295,
+        1.155,
+        1.14,
+        0.69,
+        0.58,
+        0.743,
+        0.607,
+        1.032,
+        1.125,
+        1.186,
+        1.018
+      ],
+      "stats": {
+        "total_units": 8343706,
+        "consistent_skus": 65,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.52,
+        "raw_trough_idx": 0.6184,
+        "raw_peak_trough": 2.46,
+        "clamped_peak": 1.43,
+        "clamped_trough": 0.58,
+        "active_months": 12,
+        "raw_profile": [
+          1.523,
+          1.381,
+          1.232,
+          1.216,
+          0.736,
+          0.618,
+          0.793,
+          0.647,
+          0.678,
+          0.991,
+          1.1,
+          1.085
+        ]
+      }
+    },
+    "Grooming Tools||Nail Clippers": {
+      "profile": [
+        1.427,
+        1.55,
+        1.123,
+        1.334,
+        0.56,
+        0.675,
+        0.67,
+        0.605,
+        1.002,
+        1.093,
+        1.512,
+        0.449
+      ],
+      "stats": {
+        "total_units": 449806,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.7,
+        "raw_trough_idx": 0.4058,
+        "raw_peak_trough": 4.19,
+        "clamped_peak": 1.55,
+        "clamped_trough": 0.45,
+        "active_months": 12,
+        "raw_profile": [
+          1.567,
+          1.702,
+          1.233,
+          1.465,
+          0.616,
+          0.741,
+          0.736,
+          0.665,
+          0.406,
+          0.931,
+          1.444,
+          0.493
+        ]
+      }
+    },
+    "Grooming Tools||Pin/Bristle Brush": {
+      "profile": [
+        1.122,
+        0.98,
+        1.417,
+        1.103,
+        1.187,
+        0.791,
+        0.855,
+        0.745,
+        1.003,
+        1.095,
+        1.049,
+        0.654
+      ],
+      "stats": {
+        "total_units": 739551,
+        "consistent_skus": 8,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.55,
+        "raw_trough_idx": 0.5315,
+        "raw_peak_trough": 2.92,
+        "clamped_peak": 1.42,
+        "clamped_trough": 0.65,
+        "active_months": 12,
+        "raw_profile": [
+          1.23,
+          1.074,
+          1.553,
+          1.209,
+          1.302,
+          0.867,
+          0.938,
+          0.817,
+          0.531,
+          0.774,
+          0.989,
+          0.717
+        ]
+      }
+    },
+    "Grooming Tools||Slicker": {
+      "profile": [
+        1.237,
+        1.117,
+        1.302,
+        1.273,
+        0.97,
+        0.629,
+        0.729,
+        0.744,
+        0.995,
+        1.085,
+        1.04,
+        0.881
+      ],
+      "stats": {
+        "total_units": 1212699,
+        "consistent_skus": 9,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.44,
+        "raw_trough_idx": 0.6952,
+        "raw_peak_trough": 2.07,
+        "clamped_peak": 1.3,
+        "clamped_trough": 0.63,
+        "active_months": 12,
+        "raw_profile": [
+          1.368,
+          1.235,
+          1.44,
+          1.408,
+          1.073,
+          0.695,
+          0.807,
+          0.822,
+          0.764,
+          0.706,
+          0.707,
+          0.974
+        ]
+      }
+    },
+    "Grooming Tools||Rake": {
+      "profile": [
+        1.38,
+        1.426,
+        1.134,
+        1.25,
+        1.101,
+        0.358,
+        1.082,
+        0.218,
+        1.013,
+        1.106,
+        1.06,
+        0.872
+      ],
+      "stats": {
+        "total_units": 257904,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.55,
+        "raw_trough_idx": 0.2367,
+        "raw_peak_trough": 6.54,
+        "clamped_peak": 1.43,
+        "clamped_trough": 0.22,
+        "active_months": 12,
+        "raw_profile": [
+          1.497,
+          1.548,
+          1.231,
+          1.357,
+          1.195,
+          0.389,
+          1.175,
+          0.237,
+          0.938,
+          0.602,
+          0.886,
+          0.947
+        ]
+      }
+    },
+    "Grooming Tools||Glove": {
+      "profile": [
+        0.979,
+        1.192,
+        1.164,
+        1.368,
+        1.233,
+        0.713,
+        0.905,
+        0.769,
+        0.994,
+        1.084,
+        1.039,
+        0.56
+      ],
+      "stats": {
+        "total_units": 1108111,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 1.51,
+        "raw_trough_idx": 0.5338,
+        "raw_peak_trough": 2.83,
+        "clamped_peak": 1.37,
+        "clamped_trough": 0.56,
+        "active_months": 12,
+        "raw_profile": [
+          1.083,
+          1.319,
+          1.288,
+          1.513,
+          1.364,
+          0.789,
+          1.001,
+          0.85,
+          0.534,
+          0.954,
+          0.684,
+          0.62
+        ]
+      }
+    },
+    "Grooming||Wipes": {
+      "profile": [
+        1.511,
+        1.431,
+        1.417,
+        1.116,
+        0.625,
+        0.552,
+        0.394,
+        0.617,
+        1.026,
+        1.119,
+        1.309,
+        0.883
+      ],
+      "stats": {
+        "total_units": 7140851,
+        "consistent_skus": 72,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.62,
+        "raw_trough_idx": 0.4225,
+        "raw_peak_trough": 3.84,
+        "clamped_peak": 1.51,
+        "clamped_trough": 0.39,
+        "active_months": 12,
+        "raw_profile": [
+          1.62,
+          1.534,
+          1.519,
+          1.197,
+          0.67,
+          0.592,
+          0.422,
+          0.661,
+          0.661,
+          0.956,
+          1.221,
+          0.947
+        ]
+      }
+    },
+    "Small Animal Care||Wipes": {
+      "profile": [
+        1.331,
+        1.355,
+        1.293,
+        1.376,
+        0.697,
+        0.576,
+        0.663,
+        0.559,
+        1.008,
+        1.099,
+        1.179,
+        0.864
+      ],
+      "stats": {
+        "total_units": 529512,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 1.5,
+        "raw_trough_idx": 0.533,
+        "raw_peak_trough": 2.82,
+        "clamped_peak": 1.38,
+        "clamped_trough": 0.56,
+        "active_months": 12,
+        "raw_profile": [
+          1.453,
+          1.479,
+          1.411,
+          1.502,
+          0.76,
+          0.629,
+          0.723,
+          0.61,
+          0.533,
+          0.835,
+          1.119,
+          0.944
+        ]
+      }
+    },
+    "Litter Accessories||Crystals": {
+      "profile": [
+        1.26,
+        0.419,
+        2.11,
+        1.361,
+        0.743,
+        0.468,
+        0.782,
+        0.561,
+        0.979,
+        1.11,
+        1.024,
+        1.182
+      ],
+      "stats": {
+        "total_units": 9970481,
+        "consistent_skus": 25,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.37,
+        "raw_trough_idx": 0.294,
+        "raw_peak_trough": 8.06,
+        "clamped_peak": 2.11,
+        "clamped_trough": 0.42,
+        "active_months": 12,
+        "raw_profile": [
+          1.415,
+          0.471,
+          2.37,
+          1.529,
+          0.834,
+          0.526,
+          0.878,
+          0.63,
+          0.294,
+          1.038,
+          0.687,
+          1.327
+        ]
+      }
+    },
+    "Grooming Tools||Palm Brush": {
+      "profile": [
+        1.119,
+        1.124,
+        1.409,
+        1.395,
+        1.038,
+        0.587,
+        0.714,
+        0.714,
+        0.985,
+        1.075,
+        1.03,
+        0.81
+      ],
+      "stats": {
+        "total_units": 1915420,
+        "consistent_skus": 5,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.57,
+        "raw_trough_idx": 0.4875,
+        "raw_peak_trough": 3.23,
+        "clamped_peak": 1.41,
+        "clamped_trough": 0.59,
+        "active_months": 12,
+        "raw_profile": [
+          1.249,
+          1.255,
+          1.573,
+          1.557,
+          1.159,
+          0.656,
+          0.797,
+          0.797,
+          0.487,
+          0.913,
+          0.652,
+          0.904
+        ]
+      }
+    },
+    "Training||Spray": {
+      "profile": [
+        1.258,
+        1.4,
+        2.485,
+        0.364,
+        0.664,
+        0.75,
+        0.537,
+        0.393,
+        0.979,
+        1.068,
+        1.023,
+        1.078
+      ],
+      "stats": {
+        "total_units": 458658,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.79,
+        "raw_trough_idx": 0.4094,
+        "raw_peak_trough": 6.82,
+        "clamped_peak": 2.49,
+        "clamped_trough": 0.36,
+        "active_months": 12,
+        "raw_profile": [
+          1.413,
+          1.573,
+          2.792,
+          0.409,
+          0.747,
+          0.843,
+          0.603,
+          0.442,
+          0.478,
+          0.491,
+          0.997,
+          1.212
+        ]
+      }
+    },
+    "Food Protection||Disposable Food Containers": {
+      "profile": [
+        1.232,
+        1.257,
+        0.941,
+        0.874,
+        1.202,
+        0.521,
+        0.575,
+        1.021,
+        1.105,
+        1.14,
+        1.094,
+        1.038
+      ],
+      "stats": {
+        "total_units": 5157265,
+        "consistent_skus": 56,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.32,
+        "raw_trough_idx": 0.5484,
+        "raw_peak_trough": 2.41,
+        "clamped_peak": 1.26,
+        "clamped_trough": 0.52,
+        "active_months": 12,
+        "raw_profile": [
+          1.297,
+          1.323,
+          0.99,
+          0.92,
+          1.266,
+          0.548,
+          0.605,
+          1.075,
+          1.057,
+          0.823,
+          1.001,
+          1.093
+        ]
+      }
+    },
+    "Disposable Tabletop||Paper Bowls": {
+      "profile": [
+        1.578,
+        1.333,
+        1.102,
+        0.904,
+        0.95,
+        0.573,
+        0.799,
+        0.452,
+        0.984,
+        1.073,
+        1.45,
+        0.802
+      ],
+      "stats": {
+        "total_units": 1764715,
+        "consistent_skus": 48,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.76,
+        "raw_trough_idx": 0.4503,
+        "raw_peak_trough": 3.92,
+        "clamped_peak": 1.58,
+        "clamped_trough": 0.45,
+        "active_months": 12,
+        "raw_profile": [
+          1.764,
+          1.49,
+          1.232,
+          1.011,
+          1.062,
+          0.641,
+          0.894,
+          0.506,
+          0.45,
+          0.642,
+          1.41,
+          0.897
+        ]
+      }
+    },
+    "Disposable Tabletop||Paper Plates": {
+      "profile": [
+        1.406,
+        1.21,
+        1.094,
+        1.348,
+        1.03,
+        0.624,
+        0.633,
+        0.566,
+        0.997,
+        1.088,
+        1.097,
+        0.906
+      ],
+      "stats": {
+        "total_units": 6223174,
+        "consistent_skus": 100,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.55,
+        "raw_trough_idx": 0.5269,
+        "raw_peak_trough": 2.94,
+        "clamped_peak": 1.41,
+        "clamped_trough": 0.57,
+        "active_months": 12,
+        "raw_profile": [
+          1.552,
+          1.335,
+          1.207,
+          1.487,
+          1.137,
+          0.689,
+          0.699,
+          0.625,
+          0.527,
+          0.691,
+          1.053,
+          1.0
+        ]
+      }
+    },
+    "Disposable Tabletop||Cutlery": {
+      "profile": [
+        0.654,
+        1.106,
+        1.004,
+        1.223,
+        0.894,
+        0.388,
+        0.663,
+        1.243,
+        1.027,
+        1.196,
+        1.9,
+        0.702
+      ],
+      "stats": {
+        "total_units": 2560830,
+        "consistent_skus": 15,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.77,
+        "raw_trough_idx": 0.415,
+        "raw_peak_trough": 4.26,
+        "clamped_peak": 1.9,
+        "clamped_trough": 0.39,
+        "active_months": 12,
+        "raw_profile": [
+          0.7,
+          1.184,
+          1.075,
+          1.309,
+          0.957,
+          0.415,
+          0.709,
+          1.331,
+          0.732,
+          1.067,
+          1.769,
+          0.751
+        ]
+      }
+    },
+    "Laundry||Crystals": {
+      "profile": [
+        1.224,
+        1.351,
+        0.919,
+        1.116,
+        0.663,
+        0.683,
+        1.14,
+        1.0,
+        1.022,
+        1.115,
+        1.069,
+        0.697
+      ],
+      "stats": {
+        "total_units": 4111858,
+        "consistent_skus": 35,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.45,
+        "raw_trough_idx": 0.681,
+        "raw_peak_trough": 2.13,
+        "clamped_peak": 1.35,
+        "clamped_trough": 0.66,
+        "active_months": 12,
+        "raw_profile": [
+          1.317,
+          1.453,
+          0.988,
+          1.201,
+          0.714,
+          0.735,
+          1.226,
+          1.076,
+          0.681,
+          0.989,
+          0.869,
+          0.75
+        ]
+      }
+    },
+    "Hand Care||Antibacterial Hand Soap": {
+      "profile": [
+        0.894,
+        1.313,
+        0.655,
+        1.028,
+        0.561,
+        1.285,
+        0.991,
+        1.241,
+        1.011,
+        1.103,
+        1.613,
+        0.304
+      ],
+      "stats": {
+        "total_units": 372090,
+        "consistent_skus": 6,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.53,
+        "raw_trough_idx": 0.3305,
+        "raw_peak_trough": 4.62,
+        "clamped_peak": 1.61,
+        "clamped_trough": 0.3,
+        "active_months": 12,
+        "raw_profile": [
+          0.973,
+          1.429,
+          0.712,
+          1.119,
+          0.611,
+          1.398,
+          1.078,
+          1.35,
+          0.794,
+          0.679,
+          1.526,
+          0.331
+        ]
+      }
+    },
+    "Air Care||Beads": {
+      "profile": [
+        0.89,
+        0.834,
+        1.215,
+        1.006,
+        1.107,
+        1.951,
+        0.379,
+        0.753,
+        1.014,
+        1.107,
+        1.06,
+        0.685
+      ],
+      "stats": {
+        "total_units": 3697636,
+        "consistent_skus": 30,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 6,
+        "raw_peak_idx": 2.12,
+        "raw_trough_idx": 0.4112,
+        "raw_peak_trough": 5.14,
+        "clamped_peak": 1.95,
+        "clamped_trough": 0.38,
+        "active_months": 12,
+        "raw_profile": [
+          0.965,
+          0.904,
+          1.317,
+          1.091,
+          1.2,
+          2.115,
+          0.411,
+          0.817,
+          0.673,
+          0.788,
+          0.976,
+          0.742
+        ]
+      }
+    },
+    "Disposable Tabletop||Paper Cups": {
+      "profile": [
+        0.875,
+        0.807,
+        3.149,
+        1.488,
+        1.629,
+        0.143,
+        0.266,
+        0.141,
+        0.926,
+        1.011,
+        0.969,
+        0.596
+      ],
+      "stats": {
+        "total_units": 2694138,
+        "consistent_skus": 35,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 3.74,
+        "raw_trough_idx": 0.1274,
+        "raw_peak_trough": 29.36,
+        "clamped_peak": 3.15,
+        "clamped_trough": 0.14,
+        "active_months": 12,
+        "raw_profile": [
+          1.039,
+          0.958,
+          3.739,
+          1.766,
+          1.935,
+          0.17,
+          0.316,
+          0.168,
+          0.127,
+          0.465,
+          0.61,
+          0.708
+        ]
+      }
+    },
+    "Disposable Tabletop||Bib": {
+      "profile": [
+        1.01,
+        1.449,
+        1.092,
+        1.386,
+        1.086,
+        0.573,
+        0.749,
+        0.861,
+        0.949,
+        1.035,
+        0.992,
+        0.819
+      ],
+      "stats": {
+        "total_units": 327648,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.68,
+        "raw_trough_idx": 0.1547,
+        "raw_peak_trough": 10.86,
+        "clamped_peak": 1.45,
+        "clamped_trough": 0.57,
+        "active_months": 12,
+        "raw_profile": [
+          1.171,
+          1.681,
+          1.266,
+          1.607,
+          1.259,
+          0.665,
+          0.868,
+          0.999,
+          0.155,
+          0.545,
+          0.837,
+          0.949
+        ]
+      }
+    },
+    "Air Care||Air Fresheners": {
+      "profile": [
+        1.123,
+        0.674,
+        1.143,
+        0.905,
+        0.546,
+        0.43,
+        0.569,
+        1.27,
+        1.012,
+        1.208,
+        1.877,
+        1.243
+      ],
+      "stats": {
+        "total_units": 1505926,
+        "consistent_skus": 16,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.77,
+        "raw_trough_idx": 0.4678,
+        "raw_peak_trough": 3.79,
+        "clamped_peak": 1.88,
+        "clamped_trough": 0.43,
+        "active_months": 12,
+        "raw_profile": [
+          1.221,
+          0.733,
+          1.243,
+          0.984,
+          0.594,
+          0.468,
+          0.619,
+          1.381,
+          0.537,
+          1.094,
+          1.775,
+          1.351
+        ]
+      }
+    },
+    "Air Care||Gel Cone": {
+      "profile": [
+        1.544,
+        2.43,
+        2.813,
+        0.509,
+        0.399,
+        0.269,
+        0.391,
+        0.462,
+        0.948,
+        1.034,
+        0.991,
+        0.211
+      ],
+      "stats": {
+        "total_units": 5916630,
+        "consistent_skus": 11,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 3.26,
+        "raw_trough_idx": 0.2446,
+        "raw_peak_trough": 13.34,
+        "clamped_peak": 2.81,
+        "clamped_trough": 0.21,
+        "active_months": 12,
+        "raw_profile": [
+          1.791,
+          2.819,
+          3.263,
+          0.59,
+          0.463,
+          0.312,
+          0.453,
+          0.536,
+          0.561,
+          0.351,
+          0.617,
+          0.245
+        ]
+      }
+    },
+    "Laundry||Dryer Sheets": {
+      "profile": [
+        0.967,
+        1.095,
+        1.056,
+        1.045,
+        0.544,
+        1.162,
+        0.704,
+        1.194,
+        0.999,
+        1.09,
+        1.501,
+        0.643
+      ],
+      "stats": {
+        "total_units": 566156,
+        "consistent_skus": 14,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.44,
+        "raw_trough_idx": 0.5566,
+        "raw_peak_trough": 2.58,
+        "clamped_peak": 1.5,
+        "clamped_trough": 0.54,
+        "active_months": 12,
+        "raw_profile": [
+          1.064,
+          1.205,
+          1.162,
+          1.15,
+          0.599,
+          1.279,
+          0.775,
+          1.314,
+          0.751,
+          0.557,
+          1.436,
+          0.707
+        ]
+      }
+    },
+    "Disposable Tabletop||Plastic Cups": {
+      "profile": [
+        0.922,
+        1.254,
+        0.562,
+        1.192,
+        1.167,
+        0.788,
+        0.39,
+        0.677,
+        1.563,
+        1.288,
+        1.744,
+        0.454
+      ],
+      "stats": {
+        "total_units": 634564,
+        "consistent_skus": 12,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.59,
+        "raw_trough_idx": 0.4095,
+        "raw_peak_trough": 3.89,
+        "clamped_peak": 1.74,
+        "clamped_trough": 0.39,
+        "active_months": 12,
+        "raw_profile": [
+          0.969,
+          1.319,
+          0.59,
+          1.253,
+          1.227,
+          0.828,
+          0.409,
+          0.712,
+          1.494,
+          1.128,
+          1.594,
+          0.477
+        ]
+      }
+    },
+    "Hand Care||Hand Soap": {
+      "profile": [
+        0.646,
+        1.035,
+        2.369,
+        1.556,
+        0.21,
+        0.208,
+        1.256,
+        1.047,
+        0.992,
+        1.277,
+        1.037,
+        0.367
+      ],
+      "stats": {
+        "total_units": 145870,
+        "consistent_skus": 7,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.63,
+        "raw_trough_idx": 0.231,
+        "raw_peak_trough": 11.38,
+        "clamped_peak": 2.37,
+        "clamped_trough": 0.21,
+        "active_months": 12,
+        "raw_profile": [
+          0.717,
+          1.148,
+          2.628,
+          1.726,
+          0.233,
+          0.231,
+          1.393,
+          1.161,
+          0.822,
+          1.181,
+          0.355,
+          0.407
+        ]
+      }
+    },
+    "Laundry||Refresher Spray": {
+      "profile": [
+        1.076,
+        0.622,
+        0.847,
+        1.027,
+        1.177,
+        0.599,
+        0.369,
+        0.569,
+        1.419,
+        1.114,
+        2.462,
+        0.719
+      ],
+      "stats": {
+        "total_units": 592096,
+        "consistent_skus": 16,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 2.31,
+        "raw_trough_idx": 0.3972,
+        "raw_peak_trough": 5.81,
+        "clamped_peak": 2.46,
+        "clamped_trough": 0.37,
+        "active_months": 12,
+        "raw_profile": [
+          1.159,
+          0.67,
+          0.913,
+          1.107,
+          1.268,
+          0.645,
+          0.397,
+          0.613,
+          1.39,
+          0.757,
+          2.307,
+          0.774
+        ]
+      }
+    },
+    "Cleaning||Glass Care": {
+      "profile": [
+        1.154,
+        0.721,
+        1.749,
+        0.583,
+        0.477,
+        0.825,
+        0.987,
+        1.919,
+        0.983,
+        1.101,
+        1.028,
+        0.471
+      ],
+      "stats": {
+        "total_units": 668998,
+        "consistent_skus": 10,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 8,
+        "raw_peak_idx": 2.15,
+        "raw_trough_idx": 0.4155,
+        "raw_peak_trough": 5.17,
+        "clamped_peak": 1.92,
+        "clamped_trough": 0.47,
+        "active_months": 12,
+        "raw_profile": [
+          1.291,
+          0.807,
+          1.957,
+          0.653,
+          0.534,
+          0.923,
+          1.104,
+          2.147,
+          0.616,
+          1.027,
+          0.415,
+          0.527
+        ]
+      }
+    },
+    "Cleaning||Dish Care": {
+      "profile": [
+        1.226,
+        1.363,
+        1.133,
+        0.874,
+        0.741,
+        0.994,
+        0.739,
+        1.076,
+        1.027,
+        1.12,
+        1.161,
+        0.546
+      ],
+      "stats": {
+        "total_units": 1431876,
+        "consistent_skus": 18,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.46,
+        "raw_trough_idx": 0.5848,
+        "raw_peak_trough": 2.5,
+        "clamped_peak": 1.36,
+        "clamped_trough": 0.55,
+        "active_months": 12,
+        "raw_profile": [
+          1.313,
+          1.46,
+          1.213,
+          0.937,
+          0.793,
+          1.065,
+          0.791,
+          1.153,
+          0.985,
+          0.622,
+          1.082,
+          0.585
+        ]
+      }
+    },
+    "Cleaning Tools||Glove": {
+      "profile": [
+        1.795,
+        2.329,
+        1.481,
+        1.664,
+        0.236,
+        0.1,
+        0.099,
+        0.099,
+        0.989,
+        1.164,
+        1.337,
+        0.707
+      ],
+      "stats": {
+        "total_units": 335478,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 2.59,
+        "raw_trough_idx": 0.0189,
+        "raw_peak_trough": 137.14,
+        "clamped_peak": 2.33,
+        "clamped_trough": 0.1,
+        "active_months": 12,
+        "raw_profile": [
+          1.996,
+          2.59,
+          1.647,
+          1.851,
+          0.263,
+          0.111,
+          0.035,
+          0.019,
+          0.331,
+          1.079,
+          1.293,
+          0.786
+        ]
+      }
+    },
+    "Cleaning Tools||Microfiber Cloths": {
+      "profile": [
+        1.248,
+        1.297,
+        1.016,
+        1.843,
+        0.512,
+        1.254,
+        0.672,
+        0.703,
+        0.973,
+        1.062,
+        1.018,
+        0.401
+      ],
+      "stats": {
+        "total_units": 945860,
+        "consistent_skus": 5,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 2.08,
+        "raw_trough_idx": 0.3326,
+        "raw_peak_trough": 6.26,
+        "clamped_peak": 1.84,
+        "clamped_trough": 0.4,
+        "active_months": 12,
+        "raw_profile": [
+          1.411,
+          1.466,
+          1.148,
+          2.083,
+          0.578,
+          1.417,
+          0.76,
+          0.795,
+          0.554,
+          0.333,
+          1.001,
+          0.453
+        ]
+      }
+    },
+    "Laundry||Detergent": {
+      "profile": [
+        0.628,
+        0.539,
+        0.377,
+        0.325,
+        0.47,
+        1.611,
+        1.762,
+        0.167,
+        1.279,
+        2.11,
+        1.212,
+        1.521
+      ],
+      "stats": {
+        "total_units": 117984,
+        "consistent_skus": 6,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 7,
+        "raw_peak_idx": 1.86,
+        "raw_trough_idx": 0.1758,
+        "raw_peak_trough": 10.58,
+        "clamped_peak": 2.11,
+        "clamped_trough": 0.17,
+        "active_months": 12,
+        "raw_profile": [
+          0.663,
+          0.569,
+          0.398,
+          0.343,
+          0.496,
+          1.7,
+          1.859,
+          0.176,
+          1.227,
+          1.855,
+          1.112,
+          1.605
+        ]
+      }
+    },
+    "Pro Hand Care||Antimicrobial Hand Soap": {
+      "profile": [
+        0.636,
+        0.773,
+        0.973,
+        0.978,
+        0.323,
+        0.1,
+        1.4,
+        2.663,
+        1.017,
+        1.11,
+        1.429,
+        0.597
+      ],
+      "stats": {
+        "total_units": 189384,
+        "consistent_skus": 7,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 8,
+        "raw_peak_idx": 2.88,
+        "raw_trough_idx": 0.0613,
+        "raw_peak_trough": 46.95,
+        "clamped_peak": 2.66,
+        "clamped_trough": 0.1,
+        "active_months": 12,
+        "raw_profile": [
+          0.688,
+          0.836,
+          1.052,
+          1.058,
+          0.35,
+          0.061,
+          1.514,
+          2.88,
+          0.62,
+          0.952,
+          1.343,
+          0.646
+        ]
+      }
+    },
+    "Pro Hand Care||Wipes": {
+      "profile": [
+        0.814,
+        1.03,
+        1.807,
+        1.38,
+        0.883,
+        0.518,
+        0.805,
+        1.024,
+        1.259,
+        1.072,
+        1.027,
+        0.381
+      ],
+      "stats": {
+        "total_units": 422176,
+        "consistent_skus": 7,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.02,
+        "raw_trough_idx": 0.4265,
+        "raw_peak_trough": 4.74,
+        "clamped_peak": 1.81,
+        "clamped_trough": 0.38,
+        "active_months": 12,
+        "raw_profile": [
+          0.912,
+          1.154,
+          2.023,
+          1.546,
+          0.989,
+          0.58,
+          0.902,
+          1.147,
+          1.282,
+          0.542,
+          0.497,
+          0.426
+        ]
+      }
+    },
+    "Cleaning||Oven & Grill Care": {
+      "profile": [
+        1.443,
+        1.067,
+        1.628,
+        1.277,
+        0.976,
+        0.494,
+        0.38,
+        1.398,
+        0.925,
+        1.009,
+        0.967,
+        0.434
+      ],
+      "stats": {
+        "total_units": 859364,
+        "consistent_skus": 10,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.94,
+        "raw_trough_idx": 0.3718,
+        "raw_peak_trough": 5.2,
+        "clamped_peak": 1.63,
+        "clamped_trough": 0.38,
+        "active_months": 12,
+        "raw_profile": [
+          1.716,
+          1.268,
+          1.935,
+          1.518,
+          1.16,
+          0.587,
+          0.452,
+          1.662,
+          0.372,
+          0.4,
+          0.413,
+          0.516
+        ]
+      }
+    },
+    "Waste Management||Training Pads": {
+      "profile": [
+        1.304,
+        1.383,
+        1.144,
+        1.067,
+        0.646,
+        0.402,
+        0.661,
+        0.746,
+        1.015,
+        1.188,
+        1.184,
+        1.261
+      ],
+      "stats": {
+        "total_units": 9040161,
+        "consistent_skus": 56,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.5,
+        "raw_trough_idx": 0.4356,
+        "raw_peak_trough": 3.44,
+        "clamped_peak": 1.38,
+        "clamped_trough": 0.4,
+        "active_months": 12,
+        "raw_profile": [
+          1.413,
+          1.498,
+          1.24,
+          1.156,
+          0.7,
+          0.436,
+          0.716,
+          0.808,
+          0.482,
+          1.072,
+          1.115,
+          1.366
+        ]
+      }
+    },
+    "Litter Accessories||Litter Attractant": {
+      "profile": [
+        1.233,
+        1.04,
+        0.835,
+        0.764,
+        0.836,
+        1.202,
+        0.908,
+        0.491,
+        1.142,
+        1.208,
+        1.447,
+        0.893
+      ],
+      "stats": {
+        "total_units": 331888,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.31,
+        "raw_trough_idx": 0.5122,
+        "raw_peak_trough": 2.56,
+        "clamped_peak": 1.45,
+        "clamped_trough": 0.49,
+        "active_months": 12,
+        "raw_profile": [
+          1.286,
+          1.085,
+          0.871,
+          0.797,
+          0.872,
+          1.254,
+          0.947,
+          0.512,
+          1.083,
+          1.05,
+          1.313,
+          0.931
+        ]
+      }
+    },
+    "Dental Toys||Dental Toy": {
+      "profile": [
+        1.371,
+        0.998,
+        1.23,
+        0.574,
+        1.145,
+        0.623,
+        0.452,
+        0.855,
+        0.999,
+        1.09,
+        2.089,
+        0.575
+      ],
+      "stats": {
+        "total_units": 1159242,
+        "consistent_skus": 36,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 2.0,
+        "raw_trough_idx": 0.4971,
+        "raw_peak_trough": 4.02,
+        "clamped_peak": 2.09,
+        "clamped_trough": 0.45,
+        "active_months": 12,
+        "raw_profile": [
+          1.509,
+          1.099,
+          1.354,
+          0.632,
+          1.26,
+          0.686,
+          0.497,
+          0.941,
+          0.597,
+          0.793,
+          1.999,
+          0.633
+        ]
+      }
+    },
+    "Cat Grooming||Spray": {
+      "profile": [
+        1.292,
+        1.31,
+        1.203,
+        1.493,
+        0.866,
+        0.701,
+        0.67,
+        0.69,
+        1.002,
+        1.094,
+        1.048,
+        0.632
+      ],
+      "stats": {
+        "total_units": 1718702,
+        "consistent_skus": 13,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 1.64,
+        "raw_trough_idx": 0.6207,
+        "raw_peak_trough": 2.64,
+        "clamped_peak": 1.49,
+        "clamped_trough": 0.63,
+        "active_months": 12,
+        "raw_profile": [
+          1.418,
+          1.438,
+          1.32,
+          1.638,
+          0.95,
+          0.769,
+          0.735,
+          0.757,
+          0.621,
+          0.695,
+          0.967,
+          0.693
+        ]
+      }
+    },
+    "Cat Grooming||Shampoo": {
+      "profile": [
+        1.435,
+        1.31,
+        1.405,
+        1.336,
+        0.52,
+        0.581,
+        0.647,
+        0.375,
+        1.01,
+        1.298,
+        1.268,
+        0.816
+      ],
+      "stats": {
+        "total_units": 1044368,
+        "consistent_skus": 14,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.56,
+        "raw_trough_idx": 0.4084,
+        "raw_peak_trough": 3.83,
+        "clamped_peak": 1.43,
+        "clamped_trough": 0.38,
+        "active_months": 12,
+        "raw_profile": [
+          1.562,
+          1.426,
+          1.529,
+          1.454,
+          0.566,
+          0.633,
+          0.705,
+          0.408,
+          0.45,
+          1.178,
+          1.2,
+          0.888
+        ]
+      }
+    },
+    "Litter Accessories||Litter Box Liners": {
+      "profile": [
+        1.24,
+        1.353,
+        1.23,
+        1.074,
+        0.71,
+        0.539,
+        0.589,
+        0.762,
+        1.032,
+        1.294,
+        1.485,
+        0.694
+      ],
+      "stats": {
+        "total_units": 1294504,
+        "consistent_skus": 20,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.44,
+        "raw_trough_idx": 0.5742,
+        "raw_peak_trough": 2.51,
+        "clamped_peak": 1.48,
+        "clamped_trough": 0.54,
+        "active_months": 12,
+        "raw_profile": [
+          1.321,
+          1.441,
+          1.311,
+          1.144,
+          0.756,
+          0.574,
+          0.627,
+          0.812,
+          0.751,
+          1.148,
+          1.376,
+          0.739
+        ]
+      }
+    },
+    "Grooming||Conditioner": {
+      "profile": [
+        1.361,
+        1.526,
+        1.407,
+        0.895,
+        0.992,
+        0.578,
+        0.593,
+        0.558,
+        1.008,
+        1.1,
+        1.161,
+        0.822
+      ],
+      "stats": {
+        "total_units": 1502591,
+        "consistent_skus": 16,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 1.66,
+        "raw_trough_idx": 0.5302,
+        "raw_peak_trough": 3.14,
+        "clamped_peak": 1.53,
+        "clamped_trough": 0.56,
+        "active_months": 12,
+        "raw_profile": [
+          1.485,
+          1.665,
+          1.535,
+          0.976,
+          1.082,
+          0.63,
+          0.647,
+          0.609,
+          0.53,
+          0.843,
+          1.101,
+          0.897
+        ]
+      }
+    },
+    "Treats & Chews||Treats": {
+      "profile": [
+        1.353,
+        1.169,
+        1.011,
+        1.819,
+        0.577,
+        0.255,
+        0.62,
+        0.461,
+        1.008,
+        1.1,
+        1.3,
+        1.327
+      ],
+      "stats": {
+        "total_units": 1477656,
+        "consistent_skus": 40,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 1.99,
+        "raw_trough_idx": 0.278,
+        "raw_peak_trough": 7.14,
+        "clamped_peak": 1.82,
+        "clamped_trough": 0.25,
+        "active_months": 12,
+        "raw_profile": [
+          1.477,
+          1.276,
+          1.104,
+          1.985,
+          0.63,
+          0.278,
+          0.677,
+          0.503,
+          0.475,
+          0.915,
+          1.234,
+          1.448
+        ]
+      }
+    },
+    "Cat Grooming||Wipes": {
+      "profile": [
+        1.213,
+        1.226,
+        1.197,
+        1.333,
+        0.522,
+        0.546,
+        0.483,
+        0.438,
+        1.024,
+        1.636,
+        1.304,
+        1.078
+      ],
+      "stats": {
+        "total_units": 1343461,
+        "consistent_skus": 16,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 10,
+        "raw_peak_idx": 1.46,
+        "raw_trough_idx": 0.4702,
+        "raw_peak_trough": 3.11,
+        "clamped_peak": 1.64,
+        "clamped_trough": 0.44,
+        "active_months": 12,
+        "raw_profile": [
+          1.304,
+          1.317,
+          1.287,
+          1.432,
+          0.561,
+          0.587,
+          0.519,
+          0.47,
+          0.682,
+          1.465,
+          1.219,
+          1.158
+        ]
+      }
+    },
+    "Waste Management||Waste Bags": {
+      "profile": [
+        1.42,
+        0.935,
+        1.25,
+        1.344,
+        1.611,
+        0.467,
+        0.461,
+        0.641,
+        0.991,
+        1.081,
+        1.431,
+        0.367
+      ],
+      "stats": {
+        "total_units": 1042236,
+        "consistent_skus": 8,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 5,
+        "raw_peak_idx": 1.79,
+        "raw_trough_idx": 0.4073,
+        "raw_peak_trough": 4.39,
+        "clamped_peak": 1.61,
+        "clamped_trough": 0.37,
+        "active_months": 12,
+        "raw_profile": [
+          1.577,
+          1.038,
+          1.387,
+          1.492,
+          1.789,
+          0.518,
+          0.512,
+          0.712,
+          0.501,
+          0.684,
+          1.382,
+          0.407
+        ]
+      }
+    },
+    "Pet Air Care||Beads": {
+      "profile": [
+        0.613,
+        0.964,
+        1.131,
+        1.184,
+        0.892,
+        1.147,
+        0.773,
+        0.953,
+        0.927,
+        1.012,
+        1.344,
+        1.059
+      ],
+      "stats": {
+        "total_units": 847380,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 1.4,
+        "raw_trough_idx": 0.0734,
+        "raw_peak_trough": 19.12,
+        "clamped_peak": 1.34,
+        "clamped_trough": 0.61,
+        "active_months": 12,
+        "raw_profile": [
+          0.727,
+          1.143,
+          1.342,
+          1.404,
+          1.058,
+          1.361,
+          0.916,
+          1.131,
+          0.073,
+          0.202,
+          1.386,
+          1.256
+        ]
+      }
+    },
+    "Waste Management||Diapers/Wraps": {
+      "profile": [
+        1.171,
+        1.088,
+        1.388,
+        1.174,
+        0.785,
+        0.52,
+        0.591,
+        0.762,
+        1.009,
+        1.101,
+        1.624,
+        0.785
+      ],
+      "stats": {
+        "total_units": 1412955,
+        "consistent_skus": 30,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.54,
+        "raw_trough_idx": 0.5384,
+        "raw_peak_trough": 2.86,
+        "clamped_peak": 1.62,
+        "clamped_trough": 0.52,
+        "active_months": 12,
+        "raw_profile": [
+          1.276,
+          1.186,
+          1.513,
+          1.28,
+          0.856,
+          0.567,
+          0.644,
+          0.831,
+          0.538,
+          0.913,
+          1.54,
+          0.856
+        ]
+      }
+    },
+    "Dog Toys||Toys: Fabric - Plush": {
+      "profile": [
+        0.663,
+        1.316,
+        0.477,
+        1.005,
+        1.555,
+        0.584,
+        0.413,
+        0.598,
+        1.023,
+        1.263,
+        1.77,
+        1.333
+      ],
+      "stats": {
+        "total_units": 1101092,
+        "consistent_skus": 62,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 5,
+        "raw_peak_idx": 1.67,
+        "raw_trough_idx": 0.4445,
+        "raw_peak_trough": 3.76,
+        "clamped_peak": 1.77,
+        "clamped_trough": 0.41,
+        "active_months": 12,
+        "raw_profile": [
+          0.714,
+          1.416,
+          0.513,
+          1.081,
+          1.673,
+          0.628,
+          0.444,
+          0.644,
+          0.666,
+          1.132,
+          1.656,
+          1.434
+        ]
+      }
+    },
+    "Grooming||Balm": {
+      "profile": [
+        1.335,
+        1.19,
+        1.226,
+        1.122,
+        0.507,
+        0.64,
+        0.819,
+        0.652,
+        1.022,
+        1.115,
+        1.069,
+        1.301
+      ],
+      "stats": {
+        "total_units": 1428383,
+        "consistent_skus": 6,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.44,
+        "raw_trough_idx": 0.5456,
+        "raw_peak_trough": 2.63,
+        "clamped_peak": 1.33,
+        "clamped_trough": 0.51,
+        "active_months": 12,
+        "raw_profile": [
+          1.436,
+          1.28,
+          1.32,
+          1.207,
+          0.546,
+          0.688,
+          0.882,
+          0.702,
+          0.709,
+          0.93,
+          0.901,
+          1.4
+        ]
+      }
+    },
+    "Dog Toys||Fabric - Plush": {
+      "profile": [
+        0.703,
+        1.532,
+        0.544,
+        0.846,
+        0.874,
+        0.453,
+        0.659,
+        0.597,
+        1.033,
+        1.961,
+        2.328,
+        0.469
+      ],
+      "stats": {
+        "total_units": 291561,
+        "consistent_skus": 12,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 2.16,
+        "raw_trough_idx": 0.482,
+        "raw_peak_trough": 4.47,
+        "clamped_peak": 2.33,
+        "clamped_trough": 0.45,
+        "active_months": 12,
+        "raw_profile": [
+          0.749,
+          1.632,
+          0.579,
+          0.901,
+          0.93,
+          0.482,
+          0.701,
+          0.636,
+          0.994,
+          1.74,
+          2.156,
+          0.5
+        ]
+      }
+    },
+    "Treats & Chews||Mints": {
+      "profile": [
+        0.961,
+        0.764,
+        0.705,
+        1.217,
+        0.831,
+        0.716,
+        1.186,
+        0.984,
+        0.947,
+        1.033,
+        2.029,
+        0.628
+      ],
+      "stats": {
+        "total_units": 526494,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 2.05,
+        "raw_trough_idx": 0.186,
+        "raw_peak_trough": 11.02,
+        "clamped_peak": 2.03,
+        "clamped_trough": 0.63,
+        "active_months": 12,
+        "raw_profile": [
+          1.117,
+          0.888,
+          0.819,
+          1.414,
+          0.965,
+          0.831,
+          1.378,
+          1.143,
+          0.186,
+          0.477,
+          2.05,
+          0.73
+        ]
+      }
+    },
+    "Dog Dental Care||Water Additive": {
+      "profile": [
+        0.997,
+        1.232,
+        1.033,
+        0.715,
+        0.645,
+        0.559,
+        0.48,
+        0.847,
+        1.024,
+        1.262,
+        1.994,
+        1.211
+      ],
+      "stats": {
+        "total_units": 1247751,
+        "consistent_skus": 11,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.86,
+        "raw_trough_idx": 0.5153,
+        "raw_peak_trough": 3.61,
+        "clamped_peak": 1.99,
+        "clamped_trough": 0.48,
+        "active_months": 12,
+        "raw_profile": [
+          1.071,
+          1.323,
+          1.109,
+          0.768,
+          0.693,
+          0.6,
+          0.515,
+          0.91,
+          0.718,
+          1.13,
+          1.862,
+          1.301
+        ]
+      }
+    },
+    "Dog Dental Care||Dental Spray": {
+      "profile": [
+        1.712,
+        1.884,
+        1.282,
+        0.366,
+        0.832,
+        0.527,
+        0.541,
+        0.243,
+        1.016,
+        1.109,
+        1.46,
+        1.028
+      ],
+      "stats": {
+        "total_units": 459303,
+        "consistent_skus": 10,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 2,
+        "raw_peak_idx": 2.04,
+        "raw_trough_idx": 0.263,
+        "raw_peak_trough": 7.75,
+        "clamped_peak": 1.88,
+        "clamped_trough": 0.24,
+        "active_months": 12,
+        "raw_profile": [
+          1.853,
+          2.039,
+          1.388,
+          0.396,
+          0.9,
+          0.57,
+          0.586,
+          0.263,
+          0.769,
+          0.749,
+          1.374,
+          1.113
+        ]
+      }
+    },
+    "Dog Supplements||Soft Chew": {
+      "profile": [
+        1.482,
+        1.003,
+        1.263,
+        1.222,
+        0.889,
+        0.368,
+        0.687,
+        0.88,
+        0.974,
+        1.062,
+        1.018,
+        1.151
+      ],
+      "stats": {
+        "total_units": 1417652,
+        "consistent_skus": 10,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.67,
+        "raw_trough_idx": 0.359,
+        "raw_peak_trough": 4.66,
+        "clamped_peak": 1.48,
+        "clamped_trough": 0.37,
+        "active_months": 12,
+        "raw_profile": [
+          1.674,
+          1.133,
+          1.427,
+          1.381,
+          1.005,
+          0.416,
+          0.776,
+          0.994,
+          0.359,
+          0.759,
+          0.777,
+          1.3
+        ]
+      }
+    },
+    "Treats & Chews||Dental Chew": {
+      "profile": [
+        1.481,
+        0.918,
+        1.202,
+        1.075,
+        1.095,
+        0.354,
+        0.643,
+        0.697,
+        1.016,
+        1.706,
+        1.063,
+        0.749
+      ],
+      "stats": {
+        "total_units": 1407452,
+        "consistent_skus": 20,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.6,
+        "raw_trough_idx": 0.3835,
+        "raw_peak_trough": 4.18,
+        "clamped_peak": 1.71,
+        "clamped_trough": 0.35,
+        "active_months": 12,
+        "raw_profile": [
+          1.603,
+          0.993,
+          1.301,
+          1.163,
+          1.185,
+          0.384,
+          0.696,
+          0.755,
+          0.574,
+          1.539,
+          0.997,
+          0.811
+        ]
+      }
+    },
+    "Dog Remedies||Eye Care": {
+      "profile": [
+        1.146,
+        0.994,
+        1.721,
+        1.34,
+        0.705,
+        0.67,
+        0.765,
+        0.582,
+        1.032,
+        1.126,
+        1.079,
+        0.84
+      ],
+      "stats": {
+        "total_units": 370027,
+        "consistent_skus": 8,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.83,
+        "raw_trough_idx": 0.6197,
+        "raw_peak_trough": 2.96,
+        "clamped_peak": 1.72,
+        "clamped_trough": 0.58,
+        "active_months": 12,
+        "raw_profile": [
+          1.221,
+          1.059,
+          1.833,
+          1.428,
+          0.751,
+          0.714,
+          0.815,
+          0.62,
+          0.844,
+          0.864,
+          0.957,
+          0.895
+        ]
+      }
+    },
+    "Dental Toys||Toys: Plastic - Nylon": {
+      "profile": [
+        1.366,
+        0.891,
+        0.639,
+        1.186,
+        0.452,
+        0.244,
+        0.826,
+        0.485,
+        0.993,
+        2.277,
+        1.553,
+        1.089
+      ],
+      "stats": {
+        "total_units": 439776,
+        "consistent_skus": 8,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 10,
+        "raw_peak_idx": 2.1,
+        "raw_trough_idx": 0.2698,
+        "raw_peak_trough": 7.79,
+        "clamped_peak": 2.28,
+        "clamped_trough": 0.24,
+        "active_months": 12,
+        "raw_profile": [
+          1.513,
+          0.986,
+          0.707,
+          1.314,
+          0.5,
+          0.27,
+          0.914,
+          0.537,
+          0.456,
+          2.101,
+          1.496,
+          1.206
+        ]
+      }
+    },
+    "Grooming||Lotion": {
+      "profile": [
+        1.264,
+        1.265,
+        0.926,
+        1.066,
+        0.745,
+        0.594,
+        0.829,
+        0.651,
+        1.01,
+        1.102,
+        1.498,
+        1.051
+      ],
+      "stats": {
+        "total_units": 634212,
+        "consistent_skus": 12,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.42,
+        "raw_trough_idx": 0.4814,
+        "raw_peak_trough": 2.95,
+        "clamped_peak": 1.5,
+        "clamped_trough": 0.59,
+        "active_months": 12,
+        "raw_profile": [
+          1.377,
+          1.378,
+          1.008,
+          1.162,
+          0.812,
+          0.648,
+          0.903,
+          0.709,
+          0.481,
+          0.961,
+          1.418,
+          1.145
+        ]
+      }
+    },
+    "Grooming Tools||Brush": {
+      "profile": [
+        1.358,
+        0.83,
+        0.927,
+        0.766,
+        0.796,
+        0.675,
+        0.635,
+        1.03,
+        1.482,
+        1.119,
+        1.35,
+        1.031
+      ],
+      "stats": {
+        "total_units": 858390,
+        "consistent_skus": 13,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.46,
+        "raw_trough_idx": 0.6662,
+        "raw_peak_trough": 2.19,
+        "clamped_peak": 1.48,
+        "clamped_trough": 0.63,
+        "active_months": 12,
+        "raw_profile": [
+          1.456,
+          0.89,
+          0.994,
+          0.822,
+          0.854,
+          0.724,
+          0.681,
+          1.104,
+          1.445,
+          0.666,
+          1.259,
+          1.106
+        ]
+      }
+    },
+    "Cat Dental Care||Water Additive": {
+      "profile": [
+        1.3,
+        1.259,
+        0.931,
+        0.923,
+        0.521,
+        0.919,
+        0.765,
+        0.427,
+        1.086,
+        1.139,
+        1.317,
+        1.414
+      ],
+      "stats": {
+        "total_units": 393640,
+        "consistent_skus": 8,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 12,
+        "raw_peak_idx": 1.49,
+        "raw_trough_idx": 0.4497,
+        "raw_peak_trough": 3.31,
+        "clamped_peak": 1.41,
+        "clamped_trough": 0.43,
+        "active_months": 12,
+        "raw_profile": [
+          1.369,
+          1.326,
+          0.98,
+          0.972,
+          0.548,
+          0.968,
+          0.806,
+          0.45,
+          1.04,
+          0.846,
+          1.206,
+          1.489
+        ]
+      }
+    },
+    "Cat Grooming Tools||Slicker": {
+      "profile": [
+        1.072,
+        1.404,
+        1.837,
+        1.443,
+        0.724,
+        0.496,
+        0.762,
+        0.681,
+        0.995,
+        1.086,
+        1.04,
+        0.459
+      ],
+      "stats": {
+        "total_units": 774600,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.03,
+        "raw_trough_idx": 0.3993,
+        "raw_peak_trough": 5.09,
+        "clamped_peak": 1.84,
+        "clamped_trough": 0.46,
+        "active_months": 12,
+        "raw_profile": [
+          1.185,
+          1.552,
+          2.031,
+          1.595,
+          0.8,
+          0.548,
+          0.843,
+          0.753,
+          0.399,
+          0.955,
+          0.832,
+          0.508
+        ]
+      }
+    },
+    "Dental Toys||Toys: Plastic - PP": {
+      "profile": [
+        1.225,
+        1.091,
+        0.886,
+        0.848,
+        1.054,
+        0.41,
+        0.849,
+        0.651,
+        1.013,
+        1.335,
+        1.797,
+        0.842
+      ],
+      "stats": {
+        "total_units": 456864,
+        "consistent_skus": 6,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 1.7,
+        "raw_trough_idx": 0.4451,
+        "raw_peak_trough": 3.81,
+        "clamped_peak": 1.8,
+        "clamped_trough": 0.41,
+        "active_months": 12,
+        "raw_profile": [
+          1.33,
+          1.184,
+          0.962,
+          0.921,
+          1.145,
+          0.445,
+          0.922,
+          0.707,
+          0.564,
+          1.208,
+          1.697,
+          0.915
+        ]
+      }
+    },
+    "Dog Toys||Toys: Plastic - Nylon": {
+      "profile": [
+        0.497,
+        0.339,
+        0.412,
+        1.834,
+        1.849,
+        1.287,
+        0.1,
+        1.357,
+        0.988,
+        1.078,
+        1.033,
+        1.225
+      ],
+      "stats": {
+        "total_units": 612861,
+        "consistent_skus": 5,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 5,
+        "raw_peak_idx": 2.06,
+        "raw_trough_idx": 0.051,
+        "raw_peak_trough": 40.36,
+        "clamped_peak": 1.85,
+        "clamped_trough": 0.1,
+        "active_months": 12,
+        "raw_profile": [
+          0.553,
+          0.377,
+          0.459,
+          2.041,
+          2.058,
+          1.433,
+          0.051,
+          1.51,
+          0.341,
+          0.995,
+          0.818,
+          1.364
+        ]
+      }
+    },
+    "Cat Stain & Odor||Litter Box Care": {
+      "profile": [
+        1.22,
+        0.967,
+        1.092,
+        0.902,
+        1.026,
+        0.568,
+        0.934,
+        1.047,
+        1.03,
+        1.189,
+        1.076,
+        0.95
+      ],
+      "stats": {
+        "total_units": 703934,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 1.3,
+        "raw_trough_idx": 0.6069,
+        "raw_peak_trough": 2.15,
+        "clamped_peak": 1.22,
+        "clamped_trough": 0.57,
+        "active_months": 12,
+        "raw_profile": [
+          1.304,
+          1.033,
+          1.167,
+          0.963,
+          1.096,
+          0.607,
+          0.997,
+          1.118,
+          0.673,
+          1.058,
+          0.968,
+          1.015
+        ]
+      }
+    },
+    "Air Care||Aerosol": {
+      "profile": [
+        0.816,
+        1.096,
+        1.686,
+        1.091,
+        0.431,
+        0.904,
+        0.504,
+        1.429,
+        1.057,
+        1.29,
+        1.136,
+        0.559
+      ],
+      "stats": {
+        "total_units": 443292,
+        "consistent_skus": 7,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.75,
+        "raw_trough_idx": 0.4481,
+        "raw_peak_trough": 3.92,
+        "clamped_peak": 1.69,
+        "clamped_trough": 0.43,
+        "active_months": 12,
+        "raw_profile": [
+          0.849,
+          1.141,
+          1.755,
+          1.135,
+          0.448,
+          0.941,
+          0.525,
+          1.487,
+          0.991,
+          1.118,
+          1.028,
+          0.582
+        ]
+      }
+    },
+    "Cleaning||Furniture Care": {
+      "profile": [
+        3.392,
+        1.024,
+        0.761,
+        0.536,
+        0.377,
+        1.224,
+        0.551,
+        0.358,
+        1.039,
+        1.3,
+        1.086,
+        0.352
+      ],
+      "stats": {
+        "total_units": 416804,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 1,
+        "raw_peak_idx": 3.59,
+        "raw_trough_idx": 0.3728,
+        "raw_peak_trough": 9.64,
+        "clamped_peak": 3.39,
+        "clamped_trough": 0.35,
+        "active_months": 12,
+        "raw_profile": [
+          3.593,
+          1.085,
+          0.806,
+          0.567,
+          0.399,
+          1.297,
+          0.584,
+          0.379,
+          0.95,
+          1.147,
+          0.821,
+          0.373
+        ]
+      }
+    },
+    "Pro Hand Care||Hand Sanitizer": {
+      "profile": [
+        1.672,
+        0.871,
+        2.197,
+        1.17,
+        0.1,
+        0.549,
+        1.1,
+        0.967,
+        0.963,
+        1.05,
+        1.007,
+        0.355
+      ],
+      "stats": {
+        "total_units": 344000,
+        "consistent_skus": 7,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.51,
+        "raw_trough_idx": 0.0707,
+        "raw_peak_trough": 35.48,
+        "clamped_peak": 2.2,
+        "clamped_trough": 0.1,
+        "active_months": 12,
+        "raw_profile": [
+          1.909,
+          0.995,
+          2.51,
+          1.336,
+          0.071,
+          0.627,
+          1.256,
+          1.104,
+          0.592,
+          0.527,
+          0.666,
+          0.405
+        ]
+      }
+    },
+    "Grilling Tools||Fire Starter": {
+      "profile": [
+        0.855,
+        1.07,
+        0.564,
+        1.828,
+        1.503,
+        0.791,
+        0.988,
+        0.477,
+        0.958,
+        1.045,
+        1.002,
+        0.919
+      ],
+      "stats": {
+        "total_units": 305086,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 2.1,
+        "raw_trough_idx": 0.338,
+        "raw_peak_trough": 6.21,
+        "clamped_peak": 1.83,
+        "clamped_trough": 0.48,
+        "active_months": 12,
+        "raw_profile": [
+          0.981,
+          1.228,
+          0.648,
+          2.098,
+          1.726,
+          0.908,
+          1.135,
+          0.548,
+          0.338,
+          0.449,
+          0.887,
+          1.055
+        ]
+      }
+    },
+    "Waste Management||Washable Diapers/Wraps": {
+      "profile": [
+        0.435,
+        0.099,
+        2.709,
+        0.708,
+        0.658,
+        0.54,
+        0.505,
+        0.732,
+        1.076,
+        1.936,
+        1.004,
+        1.598
+      ],
+      "stats": {
+        "total_units": 1125312,
+        "consistent_skus": 6,
+        "years": [
+          2024,
+          2025
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 3.1,
+        "raw_trough_idx": 0.4982,
+        "raw_peak_trough": 6.23,
+        "clamped_peak": 2.71,
+        "clamped_trough": 0.1,
+        "active_months": 10,
+        "raw_profile": [
+          0.498,
+          0.0,
+          3.103,
+          0.811,
+          0.753,
+          0.618,
+          0.579,
+          0.838,
+          1.121,
+          1.848,
+          0.0,
+          1.83
+        ]
+      }
+    },
+    "Small Animal Care||Cleaner": {
+      "profile": [
+        0.697,
+        0.622,
+        0.597,
+        1.061,
+        0.686,
+        0.723,
+        0.721,
+        0.767,
+        0.997,
+        3.437,
+        1.042,
+        0.649
+      ],
+      "stats": {
+        "total_units": 237288,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025
+        ],
+        "peak_month": 10,
+        "raw_peak_idx": 3.16,
+        "raw_trough_idx": 0.653,
+        "raw_peak_trough": 4.84,
+        "clamped_peak": 3.44,
+        "clamped_trough": 0.6,
+        "active_months": 12,
+        "raw_profile": [
+          0.769,
+          0.687,
+          0.659,
+          1.171,
+          0.757,
+          0.799,
+          0.796,
+          0.847,
+          0.653,
+          3.162,
+          0.983,
+          0.716
+        ]
+      }
+    },
+    "Cleaning Tools||Sponge": {
+      "profile": [
+        0.676,
+        1.288,
+        1.275,
+        0.855,
+        0.549,
+        2.003,
+        0.13,
+        1.362,
+        1.11,
+        1.09,
+        1.044,
+        0.619
+      ],
+      "stats": {
+        "total_units": 828762,
+        "consistent_skus": 7,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 6,
+        "raw_peak_idx": 2.21,
+        "raw_trough_idx": 0.1428,
+        "raw_peak_trough": 15.45,
+        "clamped_peak": 2.0,
+        "clamped_trough": 0.13,
+        "active_months": 12,
+        "raw_profile": [
+          0.745,
+          1.418,
+          1.404,
+          0.941,
+          0.605,
+          2.206,
+          0.143,
+          1.5,
+          1.111,
+          0.556,
+          0.688,
+          0.682
+        ]
+      }
+    },
+    "Dog Toys||Toys: Fabric - Oxford": {
+      "profile": [
+        0.391,
+        0.136,
+        0.323,
+        2.226,
+        2.14,
+        0.61,
+        0.2,
+        1.486,
+        0.969,
+        1.057,
+        1.343,
+        1.12
+      ],
+      "stats": {
+        "total_units": 336888,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 2.53,
+        "raw_trough_idx": 0.1547,
+        "raw_peak_trough": 16.34,
+        "clamped_peak": 2.23,
+        "clamped_trough": 0.14,
+        "active_months": 12,
+        "raw_profile": [
+          0.444,
+          0.155,
+          0.367,
+          2.528,
+          2.43,
+          0.692,
+          0.227,
+          1.688,
+          0.301,
+          0.571,
+          1.326,
+          1.272
+        ]
+      }
+    },
+    "Grilling Tools||Glove": {
+      "profile": [
+        0.484,
+        0.714,
+        2.459,
+        1.765,
+        0.782,
+        1.381,
+        0.099,
+        0.58,
+        0.941,
+        1.026,
+        0.984,
+        0.785
+      ],
+      "stats": {
+        "total_units": 151297,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 2.87,
+        "raw_trough_idx": 0.0152,
+        "raw_peak_trough": 188.78,
+        "clamped_peak": 2.46,
+        "clamped_trough": 0.1,
+        "active_months": 12,
+        "raw_profile": [
+          0.566,
+          0.834,
+          2.875,
+          2.064,
+          0.914,
+          1.614,
+          0.015,
+          0.678,
+          0.251,
+          0.495,
+          0.776,
+          0.918
+        ]
+      }
+    },
+    "Hand Care (Fetch)||Wipes": {
+      "profile": [
+        0.624,
+        0.796,
+        0.773,
+        0.488,
+        0.831,
+        0.72,
+        0.545,
+        1.687,
+        1.399,
+        1.57,
+        1.636,
+        0.93
+      ],
+      "stats": {
+        "total_units": 501924,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 8,
+        "raw_peak_idx": 1.78,
+        "raw_trough_idx": 0.5139,
+        "raw_peak_trough": 3.46,
+        "clamped_peak": 1.69,
+        "clamped_trough": 0.49,
+        "active_months": 12,
+        "raw_profile": [
+          0.657,
+          0.838,
+          0.814,
+          0.514,
+          0.875,
+          0.759,
+          0.574,
+          1.776,
+          1.339,
+          1.377,
+          1.498,
+          0.98
+        ]
+      }
+    },
+    "Grooming||Paw Care": {
+      "profile": [
+        0.943,
+        1.533,
+        1.682,
+        0.579,
+        0.802,
+        0.37,
+        0.865,
+        0.791,
+        1.015,
+        1.107,
+        1.318,
+        0.994
+      ],
+      "stats": {
+        "total_units": 539229,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 3,
+        "raw_peak_idx": 1.82,
+        "raw_trough_idx": 0.4009,
+        "raw_peak_trough": 4.55,
+        "clamped_peak": 1.68,
+        "clamped_trough": 0.37,
+        "active_months": 12,
+        "raw_profile": [
+          1.022,
+          1.661,
+          1.823,
+          0.628,
+          0.869,
+          0.401,
+          0.937,
+          0.857,
+          0.937,
+          0.547,
+          1.242,
+          1.077
+        ]
+      }
+    },
+    "Apparel||T-Shirt": {
+      "profile": [
+        0.607,
+        0.259,
+        0.1,
+        3.314,
+        0.888,
+        0.849,
+        0.691,
+        1.008,
+        1.032,
+        1.126,
+        1.396,
+        0.73
+      ],
+      "stats": {
+        "total_units": 112584,
+        "consistent_skus": 5,
+        "years": [
+          2024,
+          2025
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 3.53,
+        "raw_trough_idx": 0.1049,
+        "raw_peak_trough": 33.68,
+        "clamped_peak": 3.31,
+        "clamped_trough": 0.1,
+        "active_months": 12,
+        "raw_profile": [
+          0.647,
+          0.276,
+          0.105,
+          3.533,
+          0.946,
+          0.906,
+          0.737,
+          1.074,
+          0.711,
+          0.993,
+          1.294,
+          0.778
+        ]
+      }
+    },
+    "Apparel||Hoodie": {
+      "profile": [
+        0.658,
+        0.436,
+        0.386,
+        2.805,
+        0.738,
+        0.674,
+        0.541,
+        0.753,
+        0.997,
+        1.088,
+        2.1,
+        0.822
+      ],
+      "stats": {
+        "total_units": 106116,
+        "consistent_skus": 4,
+        "years": [
+          2024,
+          2025
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 3.09,
+        "raw_trough_idx": 0.4261,
+        "raw_peak_trough": 7.26,
+        "clamped_peak": 2.81,
+        "clamped_trough": 0.39,
+        "active_months": 12,
+        "raw_profile": [
+          0.726,
+          0.48,
+          0.426,
+          3.094,
+          0.814,
+          0.744,
+          0.597,
+          0.83,
+          0.494,
+          0.874,
+          2.014,
+          0.906
+        ]
+      }
+    },
+    "Collars/Leads||Harness": {
+      "profile": [
+        0.257,
+        0.356,
+        0.335,
+        3.02,
+        1.455,
+        0.85,
+        0.388,
+        1.39,
+        1.021,
+        1.113,
+        1.258,
+        0.557
+      ],
+      "stats": {
+        "total_units": 123816,
+        "consistent_skus": 5,
+        "years": [
+          2024,
+          2025
+        ],
+        "peak_month": 4,
+        "raw_peak_idx": 3.25,
+        "raw_trough_idx": 0.2768,
+        "raw_peak_trough": 11.76,
+        "clamped_peak": 3.02,
+        "clamped_trough": 0.26,
+        "active_months": 12,
+        "raw_profile": [
+          0.277,
+          0.384,
+          0.361,
+          3.254,
+          1.568,
+          0.916,
+          0.419,
+          1.498,
+          0.661,
+          0.884,
+          1.179,
+          0.6
+        ]
+      }
+    },
+    "Stain & Odor||Carpet Care": {
+      "profile": [
+        0.59,
+        0.418,
+        0.634,
+        0.638,
+        1.729,
+        0.221,
+        1.552,
+        0.737,
+        1.02,
+        1.113,
+        2.694,
+        0.654
+      ],
+      "stats": {
+        "total_units": 418080,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 11,
+        "raw_peak_idx": 2.53,
+        "raw_trough_idx": 0.2383,
+        "raw_peak_trough": 10.6,
+        "clamped_peak": 2.69,
+        "clamped_trough": 0.22,
+        "active_months": 12,
+        "raw_profile": [
+          0.637,
+          0.451,
+          0.683,
+          0.687,
+          1.864,
+          0.238,
+          1.674,
+          0.795,
+          0.963,
+          0.777,
+          2.526,
+          0.705
+        ]
+      }
+    },
+    "Grooming||Foam": {
+      "profile": [
+        1.095,
+        0.551,
+        1.508,
+        1.004,
+        1.661,
+        0.294,
+        0.103,
+        0.73,
+        1.869,
+        1.386,
+        1.172,
+        0.628
+      ],
+      "stats": {
+        "total_units": 130348,
+        "consistent_skus": 3,
+        "years": [
+          2024,
+          2025,
+          2026
+        ],
+        "peak_month": 9,
+        "raw_peak_idx": 1.78,
+        "raw_trough_idx": 0.1079,
+        "raw_peak_trough": 16.51,
+        "clamped_peak": 1.87,
+        "clamped_trough": 0.1,
+        "active_months": 12,
+        "raw_profile": [
+          1.148,
+          0.578,
+          1.581,
+          1.053,
+          1.741,
+          0.308,
+          0.108,
+          0.765,
+          1.781,
+          1.211,
+          1.068,
+          0.659
+        ]
+      }
+    }
+  }
+}

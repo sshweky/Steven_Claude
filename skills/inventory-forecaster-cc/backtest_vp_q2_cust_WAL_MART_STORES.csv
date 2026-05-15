@@ -1,0 +1,167 @@
+key,cust,mstyle,model_base,model_vp2,baseline_mode_base,baseline_mode_vp2,old_wkly,new_wkly,old_26w,new_26w,delta_units,delta_pct
+23011-FF27687,WAL MART STORES,FF27687,Croston's,Croston's,,,2.4,0.0,63,0,-63,-100.0
+23011-FF29833,WAL MART STORES,FF29833,Croston's,Croston's,,,12.0,23.1,312,600,288,92.3
+23011-FF19341,WAL MART STORES,FF19341,Sparse Intermittent,Croston's,,,44.1,73.8,1146,1920,774,67.5
+23011-BB0098PCS2,WAL MART STORES,BB0098PCS2,Sparse Intermittent,Sparse Intermittent,,,4.2,1.4,108,36,-72,-66.7
+23011-FF7217,WAL MART STORES,FF7217,Croston's,Seasonal Baseline,,L13 nz-avg (OOS: fill-rate 8% over 300 units),18.0,30.0,468,780,312,66.7
+23011-FF12660,WAL MART STORES,FF12660,Seasonal Baseline,Croston's,L13 nz-avg (OOS: fill-rate 2% over 47160 units),,3378.5,1374.0,87840,35724,-52116,-59.3
+23011-BB0083,WAL MART STORES,BB0083,Heuristic,Reactivating,,,13.4,6.0,348,156,-192,-55.2
+23011-FF7228,WAL MART STORES,FF7228,Croston's,Croston's,,,15.2,23.5,396,612,216,54.5
+23011-FF7120,WAL MART STORES,FF7120,Croston's,Croston's,,,567.0,872.8,14742,22692,7950,53.9
+23011-FF30114,WAL MART STORES,FF30114,Croston's,Croston's,,,12.0,6.0,312,156,-156,-50.0
+23011-FF4935,WAL MART STORES,FF4935,Croston's,Croston's,,,24.0,12.0,624,312,-312,-50.0
+23011-FF8991,WAL MART STORES,FF8991,Sparse Intermittent,Sparse Intermittent,,,0.5,0.7,12,18,6,50.0
+23011-FF31287,WAL MART STORES,FF31287,Croston's,Croston's,,,8.0,11.7,208,304,96,46.2
+23011-FF7216,WAL MART STORES,FF7216,Croston's,Croston's,,,12.0,17.5,312,456,144,46.2
+23011-BB0100PCS2,WAL MART STORES,BB0100PCS2,Sparse Intermittent,Sparse Intermittent,,,2.3,3.2,60,84,24,40.0
+23011-FF31607,WAL MART STORES,FF31607,Sparse Intermittent,Sparse Intermittent,,,8.3,11.5,216,300,84,38.9
+23011-FF31606,WAL MART STORES,FF31606,Sparse Intermittent,Sparse Intermittent,,,12.0,16.6,312,432,120,38.5
+23011-FF32824,WAL MART STORES,FF32824,Croston's,Croston's,,,12.0,7.4,312,192,-120,-38.5
+23011-FF8258,WAL MART STORES,FF8258,Sparse Intermittent,Sparse Intermittent,,,5.5,7.6,144,198,54,37.5
+23011-FF8423,WAL MART STORES,FF8423,Croston's,Seasonal Baseline,,L13 nz-avg (OOS: fill-rate 8% over 6912 units),504.0,688.2,13104,17892,4788,36.5
+23011-FF31605,WAL MART STORES,FF31605,Sparse Intermittent,Sparse Intermittent,,,6.5,8.8,168,228,60,35.7
+23011-FF16705,WAL MART STORES,FF16705,Croston's,Croston's,,,36.0,24.0,936,624,-312,-33.3
+23011-FF7210,WAL MART STORES,FF7210,Croston's,Croston's,,,18.0,24.0,468,624,156,33.3
+23011-FF7263,WAL MART STORES,FF7263,Croston's,Croston's,,,8.8,6.0,228,156,-72,-31.6
+23011-FF6554,WAL MART STORES,FF6554,Croston's,Croston's,,,3.0,2.1,78,54,-24,-30.8
+23011-FF4934,WAL MART STORES,FF4934,Seasonal Baseline,Croston's,L13 nz-avg (OOS: fill-rate 7% over 456 units),,36.9,48.0,960,1248,288,30.0
+23011-BB13436CLR/12,WAL MART STORES,BB13436CLR/12,Croston's,Croston's,,,3549.7,2535.7,92292,65928,-26364,-28.6
+23011-BB0237,WAL MART STORES,BB0237,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 9192 units),L13 nz-avg (OOS: fill-rate 8% over 9120 units),343.2,246.0,8922,6396,-2526,-28.3
+23011-FF13885,WAL MART STORES,FF13885,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 588 units),L13 nz-avg (OOS: fill-rate 9% over 564 units),38.1,48.7,990,1266,276,27.9
+23011-FF12689,WAL MART STORES,FF12689,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1152 units),L13 nz-avg (OOS: fill-rate 8% over 1248 units),89.5,113.5,2328,2952,624,26.8
+23011-FF12659,WAL MART STORES,FF12659,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 27972 units),L13 nz-avg (OOS: fill-rate 6% over 21546 units),2259.7,1740.5,58752,45252,-13500,-23.0
+23011-FF22187,WAL MART STORES,FF22187,Seasonal Baseline,Croston's,L13 nz-avg (OOS: fill-rate 8% over 546 units),,46.6,36.0,1212,936,-276,-22.8
+23011-FF8990,WAL MART STORES,FF8990,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 336 units),L13 nz-avg (OOS: fill-rate 7% over 324 units),29.1,35.5,756,924,168,22.2
+23011-FF13877,WAL MART STORES,FF13877,Croston's,Croston's,,,7.6,6.0,198,156,-42,-21.2
+23011-FF12887,WAL MART STORES,FF12887,Croston's,Croston's,,,30.0,36.0,780,936,156,20.0
+23011-FF38641,WAL MART STORES,FF38641,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 36432 units),L13 nz-avg (OOS: fill-rate 10% over 33192 units),1259.1,1021.4,32736,26556,-6180,-18.9
+23011-FF31289,WAL MART STORES,FF31289,Croston's,Croston's,,,17.5,20.5,456,534,78,17.1
+23011-FF14468,WAL MART STORES,FF14468,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 8190 units),L13 nz-avg (OOS: fill-rate 6% over 9576 units),750.9,877.6,19524,22818,3294,16.9
+23011-FF5777,WAL MART STORES,FF5777,Seasonal Baseline,Croston's,L13 nz-avg (OOS: fill-rate 8% over 684 units),,57.7,48.0,1500,1248,-252,-16.8
+23011-FF13154,WAL MART STORES,FF13154,Croston's,Croston's,,,35.1,40.8,912,1062,150,16.4
+23011-FF13878,WAL MART STORES,FF13878,Croston's,Croston's,,,27.0,22.6,702,588,-114,-16.2
+23011-FF38640,WAL MART STORES,FF38640,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 9% over 84432 units),L13 nz-avg (OOS: fill-rate 10% over 80208 units),4818.0,4069.8,125268,105816,-19452,-15.5
+23011-FF7261,WAL MART STORES,FF7261,Croston's,Seasonal Baseline,,L13 nz-avg (OOS: fill-rate 0% over 1218 units),90.0,103.8,2340,2700,360,15.4
+23011-FF8882/2,WAL MART STORES,FF8882/2,Croston's,Croston's,,,1713.0,1956.0,44538,50856,6318,14.2
+23011-FF15589,WAL MART STORES,FF15589,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 28800 units),L13 nz-avg (OOS: fill-rate 8% over 28800 units),2041.4,2326.2,53076,60480,7404,13.9
+23011-FF32363,WAL MART STORES,FF32363,Croston's,Croston's,,,72.7,63.1,1890,1640,-250,-13.2
+23011-FF15592,WAL MART STORES,FF15592,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 5% over 31428 units),L13 nz-avg (OOS: fill-rate 5% over 31560 units),2348.3,2041.8,61056,53088,-7968,-13.1
+23011-FF35059,WAL MART STORES,FF35059,Croston's,Seasonal Baseline,,L13 nz-avg (OOS: fill-rate 8% over 79056 units),5649.0,6385.4,146874,166020,19146,13.0
+23011-SF8174,WAL MART STORES,SF8174,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 768 units),L13 nz-avg (OOS: fill-rate 8% over 696 units),58.2,64.6,1512,1680,168,11.1
+23011-BB13435CLR/12,WAL MART STORES,BB13435CLR/12,Croston's,Croston's,,,1848.5,1647.7,48060,42840,-5220,-10.9
+23011-FF10556,WAL MART STORES,FF10556,Croston's,Croston's,,,27.5,30.5,715,793,78,10.9
+23011-FF12837,WAL MART STORES,FF12837,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 570 units),L13 nz-avg (OOS: fill-rate 7% over 582 units),40.4,44.8,1050,1164,114,10.9
+23011-FF28457,WAL MART STORES,FF28457,Croston's,Croston's,,,327.2,291.7,8508,7584,-924,-10.9
+23011-FF14584,WAL MART STORES,FF14584,Croston's,Croston's,,,40.0,44.0,1040,1144,104,10.0
+23011-FF31075,WAL MART STORES,FF31075,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 1637 units),L13 nz-avg (OOS: fill-rate 3% over 1877 units),143.1,156.9,3720,4080,360,9.7
+23011-FF9298,WAL MART STORES,FF9298,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 4% over 1560 units),L13 nz-avg (OOS: fill-rate 4% over 1656 units),153.2,168.0,3984,4368,384,9.6
+23011-FF14469,WAL MART STORES,FF14469,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 16800 units),L13 nz-avg (OOS: fill-rate 7% over 17808 units),1315.8,1438.2,34212,37392,3180,9.3
+23011-FF19598,WAL MART STORES,FF19598,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2346 units),L13 nz-avg (OOS: fill-rate 7% over 2526 units),230.5,209.7,5994,5451,-543,-9.1
+23011-FF34937,WAL MART STORES,FF34937,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 7392 units),L13 nz-avg (OOS: fill-rate 8% over 7392 units),616.2,672.2,16020,17478,1458,9.1
+23011-FF8882,WAL MART STORES,FF8882,Croston's,Croston's,,,353.1,321.5,9180,8358,-822,-9.0
+23011-FF12858,WAL MART STORES,FF12858,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 10% over 25488 units),L13 nz-avg (OOS: fill-rate 9% over 27504 units),2059.8,2221.8,53556,57768,4212,7.9
+23011-FF32840,WAL MART STORES,FF32840,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 224 units),L13 nz-avg (OOS: fill-rate 8% over 240 units),24.5,26.3,636,684,48,7.5
+23011-BB31553PCS3,WAL MART STORES,BB31553PCS3,Croston's,Croston's,,,20.9,19.4,544,504,-40,-7.4
+23011-FF9757,WAL MART STORES,FF9757,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 576 units),L13 nz-avg (OOS: fill-rate 0% over 684 units),63.7,68.3,1656,1776,120,7.2
+23011-FF13881,WAL MART STORES,FF13881,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 0% over 4548 units),L13 nz-avg (OOS: fill-rate 0% over 4230 units),269.5,250.4,7008,6510,-498,-7.1
+23011-FF31481,WAL MART STORES,FF31481,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 288 units),L13 nz-avg (OOS: fill-rate 7% over 288 units),26.3,24.5,684,636,-48,-7.0
+23011-FF13874,WAL MART STORES,FF13874,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 498 units),L13 nz-avg (OOS: fill-rate 7% over 468 units),30.0,27.9,780,726,-54,-6.9
+23011-FF34936,WAL MART STORES,FF34936,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 4062 units),L13 nz-avg (OOS: fill-rate 7% over 4230 units),355.8,380.4,9252,9891,639,6.9
+23011-FF5952,WAL MART STORES,FF5952,Heuristic,Heuristic,,,165.2,154.2,4296,4008,-288,-6.7
+23011-BB21058/6,WAL MART STORES,BB21058/6,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 23040 units),L13 nz-avg (OOS: fill-rate 8% over 24480 units),1861.4,1977.7,48396,51420,3024,6.2
+23011-FF19998,WAL MART STORES,FF19998,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 27840 units),L13 nz-avg (OOS: fill-rate 7% over 29376 units),2249.1,2372.8,58476,61692,3216,5.5
+23011-FF12377,WAL MART STORES,FF12377,Croston's,Croston's,,,4.4,4.6,114,120,6,5.3
+23011-FF8651/8,WAL MART STORES,FF8651/8,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 163192 units),L13 nz-avg (OOS: fill-rate 7% over 171592 units),12553.2,13199.1,326384,343176,16792,5.1
+23011-FF28459,WAL MART STORES,FF28459,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 4152 units),L13 nz-avg (OOS: fill-rate 6% over 3984 units),377.5,360.5,9816,9372,-444,-4.5
+23011-FF7372,WAL MART STORES,FF7372,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 6900 units),L13 nz-avg (OOS: fill-rate 8% over 6600 units),574.8,550.2,14946,14304,-642,-4.3
+23011-FF12859,WAL MART STORES,FF12859,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 42768 units),L13 nz-avg (OOS: fill-rate 7% over 44352 units),3454.2,3584.3,89808,93192,3384,3.8
+23011-FF31032,WAL MART STORES,FF31032,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 540 units),L13 nz-avg (OOS: fill-rate 7% over 564 units),48.9,50.8,1272,1320,48,3.8
+23011-FF6553,WAL MART STORES,FF6553,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1062 units),L13 nz-avg (OOS: fill-rate 9% over 1032 units),62.8,60.5,1632,1572,-60,-3.7
+23011-FF12376,WAL MART STORES,FF12376,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 9408 units),L13 nz-avg (OOS: fill-rate 8% over 9744 units),783.7,811.8,20376,21108,732,3.6
+23011-FF10159,WAL MART STORES,FF10159,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 130176 units),L13 nz-avg (OOS: fill-rate 7% over 134784 units),10515.0,10886.3,273390,283044,9654,3.5
+23011-FF7267COS,WAL MART STORES,FF7267COS,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 23256 units),L13 nz-avg (OOS: fill-rate 7% over 24066 units),1789.2,1851.5,46518,48138,1620,3.5
+23011-FF30755,WAL MART STORES,FF30755,Sparse Intermittent,Sparse Intermittent,,,6.7,6.9,174,180,6,3.4
+23011-BB0096PCS2,WAL MART STORES,BB0096PCS2,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 426 units),L13 nz-avg (OOS: fill-rate 7% over 414 units),49.8,48.2,1296,1254,-42,-3.2
+23011-FF7266COS,WAL MART STORES,FF7266COS,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 49338 units),L13 nz-avg (OOS: fill-rate 8% over 50928 units),3795.0,3916.8,98670,101838,3168,3.2
+23011-FF13880,WAL MART STORES,FF13880,Croston's,Croston's,,,30.0,29.1,780,756,-24,-3.1
+23011-FF4771COS,WAL MART STORES,FF4771COS,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 6450 units),L13 nz-avg (OOS: fill-rate 8% over 6270 units),495.9,482.1,12894,12534,-360,-2.8
+23011-FF15595,WAL MART STORES,FF15595,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 15012 units),L13 nz-avg (OOS: fill-rate 7% over 14652 units),1155.2,1127.1,30036,29304,-732,-2.4
+23011-FF7258COS,WAL MART STORES,FF7258COS,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 54588 units),L13 nz-avg (OOS: fill-rate 8% over 55878 units),4199.3,4298.3,109182,111756,2574,2.4
+23011-BB0094PCS2,WAL MART STORES,BB0094PCS2,Heuristic,Heuristic,,,57.5,56.3,1494,1464,-30,-2.0
+23011-FF9060,WAL MART STORES,FF9060,Croston's,Croston's,,,23.1,23.5,600,612,12,2.0
+23011-FF30880,WAL MART STORES,FF30880,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 1008 units),L13 nz-avg (OOS: fill-rate 7% over 1092 units),100.6,98.8,2616,2568,-48,-1.8
+23011-FF38642,WAL MART STORES,FF38642,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 36864 units),L13 nz-avg (OOS: fill-rate 8% over 37344 units),2922.5,2873.1,75984,74700,-1284,-1.7
+23011-FF4775COS,WAL MART STORES,FF4775COS,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 65580 units),L13 nz-avg (OOS: fill-rate 8% over 66714 units),5045.1,5131.8,131172,133428,2256,1.7
+23011-FF31608,WAL MART STORES,FF31608,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 996 units),L13 nz-avg (OOS: fill-rate 7% over 1008 units),84.0,85.4,2184,2220,36,1.6
+23011-FF15585,WAL MART STORES,FF15585,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 51840 units),L13 nz-avg (OOS: fill-rate 8% over 51192 units),3672.9,3626.8,95496,94296,-1200,-1.3
+23011-FF5807COS,WAL MART STORES,FF5807COS,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 6552 units),L13 nz-avg (OOS: fill-rate 7% over 6630 units),504.5,510.0,13116,13260,144,1.1
+23011-FF29319,WAL MART STORES,FF29319,Croston's,Croston's,,,29.1,29.3,756,762,6,0.8
+23011-FF4776,WAL MART STORES,FF4776,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 432 units),L13 nz-avg (OOS: fill-rate 8% over 426 units),42.5,42.2,1104,1098,-6,-0.5
+23011-FF8654,WAL MART STORES,FF8654,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 76342 units),L13 nz-avg (OOS: fill-rate 8% over 76210 units),5848.1,5879.3,152050,152862,812,0.5
+23011-FF13879,WAL MART STORES,FF13879,Croston's,Croston's,,,55.6,55.4,1446,1440,-6,-0.4
+23011-FF4849COS,WAL MART STORES,FF4849COS,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 10746 units),L13 nz-avg (OOS: fill-rate 8% over 10740 units),826.6,825.7,21492,21468,-24,-0.1
+23011-FF7112,WAL MART STORES,FF7112,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 11088 units),L13 nz-avg (OOS: fill-rate 7% over 11088 units),895.6,895.2,23286,23274,-12,-0.1
+23011-BB0082,WAL MART STORES,BB0082,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+23011-BB0092PCS2,WAL MART STORES,BB0092PCS2,Sparse Intermittent,Sparse Intermittent,,,0.7,0.7,18,18,0,0.0
+23011-BB0102PCS2,WAL MART STORES,BB0102PCS2,Croston's,Croston's,,,20.5,20.5,534,534,0,0.0
+23011-BB12479,WAL MART STORES,BB12479,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+23011-BB24711,WAL MART STORES,BB24711,New/Relaunch,New/Relaunch,,,10.0,10.0,260,260,0,0.0
+23011-BB29490/6,WAL MART STORES,BB29490/6,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+23011-BB34403,WAL MART STORES,BB34403,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+23011-BB35904,WAL MART STORES,BB35904,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+23011-FF10530,WAL MART STORES,FF10530,New/Relaunch,New/Relaunch,,,12.0,12.0,312,312,0,0.0
+23011-FF11353,WAL MART STORES,FF11353,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+23011-FF11926,WAL MART STORES,FF11926,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+23011-FF11927,WAL MART STORES,FF11927,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+23011-FF12375,WAL MART STORES,FF12375,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 7728 units),L13 nz-avg (OOS: fill-rate 8% over 7728 units),643.8,644.1,16740,16746,6,0.0
+23011-FF12508,WAL MART STORES,FF12508,Croston's,Croston's,,,18.5,18.5,480,480,0,0.0
+23011-FF13875,WAL MART STORES,FF13875,Croston's,Croston's,,,3.0,3.0,78,78,0,0.0
+23011-FF13876,WAL MART STORES,FF13876,Croston's,Croston's,,,26.3,26.3,684,684,0,0.0
+23011-FF15584,WAL MART STORES,FF15584,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 25920 units),L13 nz-avg (OOS: fill-rate 8% over 25920 units),2092.6,2092.6,54408,54408,0,0.0
+23011-FF15718,WAL MART STORES,FF15718,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+23011-FF16704,WAL MART STORES,FF16704,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 336 units),L13 nz-avg (OOS: fill-rate 8% over 336 units),36.0,36.0,936,936,0,0.0
+23011-FF18956,WAL MART STORES,FF18956,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+23011-FF19546,WAL MART STORES,FF19546,Croston's,Croston's,,,11.1,11.1,288,288,0,0.0
+23011-FF19592,WAL MART STORES,FF19592,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 17820 units),L13 nz-avg (OOS: fill-rate 8% over 17820 units),1438.8,1439.3,37410,37422,12,0.0
+23011-FF20001,WAL MART STORES,FF20001,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 57960 units),L13 nz-avg (OOS: fill-rate 8% over 57960 units),4680.0,4681.4,121680,121716,36,0.0
+23011-FF20208,WAL MART STORES,FF20208,New/Relaunch,New/Relaunch,,,12.0,12.0,312,312,0,0.0
+23011-FF22070,WAL MART STORES,FF22070,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+23011-FF22071,WAL MART STORES,FF22071,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+23011-FF22072,WAL MART STORES,FF22072,Sparse Intermittent,Sparse Intermittent,,,12.9,12.9,336,336,0,0.0
+23011-FF22317,WAL MART STORES,FF22317,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+23011-FF23346,WAL MART STORES,FF23346,Sparse Intermittent,Sparse Intermittent,,,7.4,7.4,192,192,0,0.0
+23011-FF25556,WAL MART STORES,FF25556,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+23011-FF25667,WAL MART STORES,FF25667,Heuristic,Heuristic,,,24.0,24.0,624,624,0,0.0
+23011-FF25670,WAL MART STORES,FF25670,Croston's,Croston's,,,24.0,24.0,624,624,0,0.0
+23011-FF25689,WAL MART STORES,FF25689,Sparse Intermittent,Sparse Intermittent,,,9.2,9.2,240,240,0,0.0
+23011-FF25895,WAL MART STORES,FF25895,Heuristic,Heuristic,,,0.0,0.0,0,0,0,0
+23011-FF27997,WAL MART STORES,FF27997,Croston's,Croston's,,,10.0,10.0,260,260,0,0.0
+23011-FF28402,WAL MART STORES,FF28402,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+23011-FF28429,WAL MART STORES,FF28429,Heuristic,Inactive,,,0.0,0.0,0,0,0,0
+23011-FF29220,WAL MART STORES,FF29220,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+23011-FF29834,WAL MART STORES,FF29834,Croston's,Croston's,,,48.0,48.0,1248,1248,0,0.0
+23011-FF30361,WAL MART STORES,FF30361,Croston's,Croston's,,,1.8,1.8,48,48,0,0.0
+23011-FF30363,WAL MART STORES,FF30363,Croston's,Croston's,,,24.0,24.0,624,624,0,0.0
+23011-FF30364,WAL MART STORES,FF30364,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+23011-FF30426,WAL MART STORES,FF30426,New/Relaunch,New/Relaunch,,,6.0,6.0,156,156,0,0.0
+23011-FF31076,WAL MART STORES,FF31076,Croston's,Croston's,,,23.5,23.5,612,612,0,0.0
+23011-FF32148,WAL MART STORES,FF32148,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 6% over 1008 units),L13 nz-avg (OOS: fill-rate 6% over 1008 units),99.7,99.7,2592,2592,0,0.0
+23011-FF32149,WAL MART STORES,FF32149,Sparse Intermittent,Sparse Intermittent,,,6.5,6.5,168,168,0,0.0
+23011-FF32364,WAL MART STORES,FF32364,Croston's,Croston's,,,19.6,19.6,510,510,0,0.0
+23011-FF34938,WAL MART STORES,FF34938,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 7% over 29400 units),L13 nz-avg (OOS: fill-rate 7% over 29400 units),2374.6,2374.6,61740,61740,0,0.0
+23011-FF4577,WAL MART STORES,FF4577,Sparse Intermittent,Sparse Intermittent,,,1.8,1.8,48,48,0,0.0
+23011-FF7215,WAL MART STORES,FF7215,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+23011-FF7218,WAL MART STORES,FF7218,Croston's,Croston's,,,12.0,12.0,312,312,0,0.0
+23011-FF7221,WAL MART STORES,FF7221,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+23011-FF8256,WAL MART STORES,FF8256,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+23011-FF8298,WAL MART STORES,FF8298,Croston's,Croston's,,,18.0,18.0,468,468,0,0.0
+23011-FF8424,WAL MART STORES,FF8424,Croston's,Croston's,,,36.0,36.0,936,936,0,0.0
+23011-FF8425,WAL MART STORES,FF8425,Seasonal Baseline,Seasonal Baseline,L13 nz-avg (OOS: fill-rate 8% over 2484 units),L13 nz-avg (OOS: fill-rate 8% over 2412 units),144.0,144.0,3744,3744,0,0.0
+23011-FF8431,WAL MART STORES,FF8431,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+23011-FF8649,WAL MART STORES,FF8649,Inactive,Inactive,,,0.0,0.0,0,0,0,0
+23011-FF8652,WAL MART STORES,FF8652,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+23011-FF8653,WAL MART STORES,FF8653,Croston's,Croston's,,,0.0,0.0,0,0,0,0
+23011-FF8832,WAL MART STORES,FF8832,Croston's,Croston's,,,9.2,9.2,240,240,0,0.0
+23011-FF9290/24,WAL MART STORES,FF9290/24,OTB (zero),OTB (zero),,,0.0,0.0,0,0,0,0
+23011-SF8167,WAL MART STORES,SF8167,Inactive,Reactivating,,,0.0,0.0,0,0,0,0
+23011-SF8169,WAL MART STORES,SF8169,Croston's,Croston's,,,210.5,210.5,5472,5472,0,0.0

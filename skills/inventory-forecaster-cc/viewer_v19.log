@@ -1,0 +1,77 @@
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:3180: SyntaxWarning: "\d" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\d"? A raw string is also an option.
+  flush=True)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:3173: SyntaxWarning: "\s" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\s"? A raw string is also an option.
+  </html>"""
+  Enriching validation records from Quickbase (Status_Cust, PT_Item_Status, L26 history)...
+  Cache hit: 4159/5048 keys loaded from viewer_enrichment_cache.json
+  --no-enrich set: skipping live CData query (889 uncached keys remain blank)
+  Enrichment: matched 4159/5048 keys (cache + live)
+  Loaded AI numbers from forecast_results.json (5048 keys)
+  Mode: validate
+  Loaded 5048 records  |  columns 05_03_W1 → 10_25_W26
+  Pre-building HTML page and records payload...
+  build_validation_page_html: built in 0.22s (html=87KB, records=11817KB raw, 1160KB gzip)
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 56059)
+Traceback (most recent call last):
+  File "C:\Python314\Lib\socketserver.py", line 318, in _handle_request_noblock
+    self.process_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\socketserver.py", line 349, in process_request
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "C:\Python314\Lib\http\server.py", line 496, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python314\Lib\http\server.py", line 484, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py", line 3210, in do_GET
+    self._send(200, "text/html; charset=utf-8", build_validation_page_html())
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py", line 3201, in _send
+    self.wfile.write(body)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Python314\Lib\socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+ConnectionAbortedError: [WinError 10053] An established connection was aborted by the software in your host machine
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 61770)
+Traceback (most recent call last):
+  File "C:\Python314\Lib\socketserver.py", line 318, in _handle_request_noblock
+    self.process_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\socketserver.py", line 349, in process_request
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "C:\Python314\Lib\http\server.py", line 496, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python314\Lib\http\server.py", line 484, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py", line 3210, in do_GET
+    console.log(`Viewer bootstrap completed in ${{_ms}}ms`);
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py", line 3201, in _send
+    populateFilters();
+        ^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+ConnectionAbortedError: [WinError 10053] An established connection was aborted by the software in your host machine
+----------------------------------------

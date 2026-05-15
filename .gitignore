@@ -1,0 +1,32 @@
+# --- Sensitive / credentials ---
+settings.json
+mcp-needs-auth-cache.json
+remote-settings.json
+policy-limits.json
+session-env/
+
+# --- Conversation & session data ---
+history.jsonl
+*.jsonl
+sessions/
+
+# --- Runtime data (not useful in source control) ---
+telemetry/
+debug/
+shell-snapshots/
+backups/
+downloads/
+plans/
+
+# --- Large data caches (files exceed GitHub 100 MB limit) ---
+cache/
+**/cache/
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+
+# --- Misc ---
+.DS_Store
+Thumbs.db

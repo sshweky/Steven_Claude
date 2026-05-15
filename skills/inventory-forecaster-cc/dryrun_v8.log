@@ -1,0 +1,53 @@
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  Manual projection columns: 05_03_W1 → 10_25_W26
+
+[1/4] Pulling projections from Quickbase ...
+      1518 records retrieved
+
+[2/4] Pulling master pack + Season from Styles ...
+      1515 master pack records loaded (150 with Season tag)
+
+[2.5] Pulling Amazon catalog POS for 1518 mstyles ...
+      1357 mstyles with POS data loaded
+      viewer_pos_cache.json refreshed (1357 mstyles)
+
+[2.6] Pulling Amazon Catalog US (F38 signals) for 1518 mstyles ...
+      1357 mstyles with Amazon Catalog US signals loaded
+
+[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 1518 keys ...
+      [vp-q4] BULK fetch: running QB report #27 on table bp8r4dejr (replaces per-account loop) ...
+      [vp-q4] 9,696 rows in 2.5s (1 API call vs ~1 per-account calls)
+      [vp-q4] cached → open_pos_report.json (reused for 0h)
+      [vp-q4] bucketed 1,904 in-scope rows across 351 keys (skipped: 7,011 out-of-scope · 0 zero-qty · 0 no-date · 781 outside-26w)
+      351 keys have confirmed forward POs (total open qty: 137,477 units)
+
+[3/4] Running forecasts ...
+      Mstyle-family index: 1237 mstyles with active siblings
+      Customer-baseline  : 1 customers  (global median wk-rate: 21.2)
+Traceback (most recent call last):
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 7607, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 7311, in main
+    r = forecast_record(row, master_pack, account_interval=acct_iv,
+                        amazon_pos=amazon_pos, season_map=season_map,
+                        oos_entry=oos_ent, open_po_wk=po_wk,
+                        amazon_catalog_us=amazon_catalog_us)
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 4798, in forecast_record
+    fcst, cap, meta = seasonal_baseline(hist_for_model, mp, is_amazon=is_amazon,
+                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        pos_data=pos_data, description=description,
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                                        is_new_launch=_f34_is_new_launch,
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        amz_catalog=amz_catalog)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 1564, in seasonal_baseline
+    meta.setdefault("drivers", []).append(
+    ^^^^
+UnboundLocalError: cannot access local variable 'meta' where it is not associated with a value

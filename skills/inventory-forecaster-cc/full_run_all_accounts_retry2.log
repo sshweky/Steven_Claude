@@ -1,0 +1,17 @@
+============================================================
+  PHASE A — Validation pass (read-only)
+  Started: Sun, May  3, 2026  3:52:34 PM
+============================================================
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  Manual projection columns: 04_19_W1 → 10_11_W26
+
+[1/4] Pulling projections from Quickbase ...
+  [FAIL] CData query failed (projections) after 5 attempts: IncompleteRead(0 bytes read)
+ERROR: No records returned. Check scope filters and CData connection.
+============================================================
+  PHASE A complete (exit=1)
+============================================================
+[STOP] Validation pass failed. NOT proceeding to forecast write-back.

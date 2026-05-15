@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Projection Validation Review</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+  body  { font-family: "Segoe UI", Arial, sans-serif; font-size: 13px;
+          background: #f0f2f5; color: #222; }
+  .topbar { background:#8b2252; color:#fff; padding:10px 18px;
+            display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .topbar h1 { font-size:16px; font-weight:600; flex:1; }
+  .badge { padding:2px 10px; border-radius:12px;
+           font-size:12px; font-weight:700; }
+  .badge-total    { background:#fff; color:#8b2252; }
+  .badge-critical { background:#c62828; color:#fff; cursor:pointer; transition:opacity .15s; }
+  .badge-warning  { background:#f9a825; color:#333; cursor:pointer; transition:opacity .15s; }
+  .badge-clean    { background:#2e7d32; color:#fff; cursor:pointer; transition:opacity .15s; }
+  .badge-critical:hover, .badge-warning:hover, .badge-clean:hover { opacity:.8; }
+  .badge-active   { outline:3px solid #fff; outline-offset:2px; }
+  .toolbar { background:#fff; border-bottom:1px solid #ddd; padding:8px 18px;
+             display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .toolbar input, .toolbar select {
+    font-size:12px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; }
+  .toolbar input { width:200px; }
+  .stat { font-size:12px; color:#666; margin-left:auto; }
+  table { width:100%; border-collapse:collapse; }
+  thead th { position:sticky; top:0; background:#f8f9fa; border-bottom:2px solid #ddd;
+             padding:6px 8px; text-align:left; font-size:12px; font-weight:600; cursor:pointer; z-index:5; }
+  tbody td { padding:5px 8px; border-bottom:1px solid #eee; font-size:12px; }
+  tbody tr:hover { background:#eef4ff; }
+  .clickable { cursor:pointer; color:#1565c0; text-decoration:underline; }
+  .sev-crit { color:#c62828; font-weight:700; }
+  .sev-warn { color:#e65100; font-weight:700; }
+  .sev-ok   { color:#2e7d32; }
+  .border-crit { border-left: 4px solid #c62828; }
+  .border-warn { border-left: 4px solid #f9a825; }
+  .border-ok   { border-left: 4px solid #e0e0e0; }
+  .pct-up   { color:#2e7d32; font-weight:600; }
+  .pct-down { color:#c62828; font-weight:600; }
+  .pct-flat { color:#888; }
+  .detail-pane { display:none; background:#fffbe6; }
+  .detail-pane td { padding:8px 12px; }
+  .dtbl { width:100%; border-collapse:collapse; font-size:11px; }
+  .dtbl th, .dtbl td { border:1px solid #ddd; padding:3px 6px; text-align:right;
+                       min-width:60px; }
+  .dtbl th { background:#f0f4f8; text-align:center; font-weight:600; }
+  .dtbl .row-label { text-align:left; font-weight:600; background:#fafafa; min-width:80px; }
+  .wk-crit { background:#ffcdd2; font-weight:700; }
+  .wk-warn { background:#fff9c4; font-weight:600; }
+  .wk-ok   { background:#fff; }
+  .tag { display:inline-block; font-size:10px; padding:1px 6px; border-radius:8px;
+         margin-left:4px; }
+  .tag-bw { background:#e3f2fd; color:#1565c0; }
+  .pri-crit { background:#c62828; color:#fff; padding:2px 8px; border-radius:10px;
+              font-size:11px; font-weight:700; }
+  .pri-med  { background:#e65100; color:#fff; padding:2px 8px; border-radius:10px;
+              font-size:11px; font-weight:700; }
+  .pri-low  { background:#9e9e9e; color:#fff; padding:2px 8px; border-radius:10px;
+              font-size:11px; font-weight:600; }
+  .flag-btn { background:none; border:1px solid #ccc; border-radius:4px; cursor:pointer;
+              padding:2px 6px; font-size:16px; line-height:1; color:#555; }
+  .flag-btn:hover { background:#ffebee; border-color:#c62828; }
+  .flag-btn.flagged { color:#c62828; border-color:#ccc; background:none; }
+  .flag-btn.saving { opacity:.5; }
+  .comment-input { font-size:11px; width:160px; padding:2px 5px; border:1px solid #ddd;
+                   border-radius:3px; resize:vertical; min-height:24px; font-family:inherit; }
+  .comment-input:focus { border-color:#1565c0; outline:none; }
+  .comment-input.saving { background:#e3f2fd; }
+  .comment-input.saved  { background:#c8e6c9; transition: background 1s; }
+  .use-btn { font-size:10px; padding:3px 6px; border:1px solid #ccc; border-radius:3px;
+             background:#fff; cursor:pointer; font-weight:600; white-space:nowrap; }
+  .use-btn.use-ai  { color:#1565c0; border-color:#90caf9; }
+  .use-btn.use-ai:hover  { background:#e3f2fd; }
+  .use-btn.use-sug { color:#555;    border-color:#ccc; }
+  .use-btn.use-sug:hover { background:#eeeeee; }
+  .use-btn:disabled { opacity:0.6; cursor:wait; }
+  .use-btn.done  { background:#c8e6c9; color:#1b5e20; border-color:#81c784; }
+  .use-btn.failed{ background:#ffcdd2; color:#b71c1c; border-color:#ef9a9a; }
+  .wk-input:focus { background:#e3f2fd !important; outline:2px solid #1565c0; outline-offset:-2px; }
+  .wk-input.dirty  { background:#fff3cd !important; box-shadow: inset 0 0 0 2px #f9a825; }
+  .wk-input.saving { background:#fff9c4 !important; }
+  .wk-input.saved  { background:#c8e6c9 !important; transition: background 1s; }
+  .wk-input.failed { background:#ffcdd2 !important; }
+  .wk-input::-webkit-inner-spin-button { opacity: 0.2; }
+  .wk-input:hover { background:#f5f5f5 !important; }
+  .save-bar { position:sticky; top:0; z-index:20; background:#fffbe6; border-bottom:2px solid #f9a825;
+              padding:6px 18px; display:none; align-items:center; gap:12px; font-size:13px; }
+  .save-bar.active { display:flex; }
+  .save-bar .pending-count { font-weight:700; color:#8b4500; }
+  .save-btn  { background:#2e7d32; color:#fff; border:none; border-radius:4px; padding:6px 18px;
+               font-size:13px; font-weight:700; cursor:pointer; }
+  .save-btn:hover:not(:disabled)  { background:#1b5e20; }
+  .save-btn:disabled { opacity:0.6; cursor:wait; }
+  .discard-btn { background:#fff; color:#c62828; border:1px solid #c62828; border-radius:4px;
+                 padding:5px 14px; font-size:12px; cursor:pointer; }
+  .discard-btn:hover { background:#ffebee; }
+  .save-status { margin-left:auto; font-size:12px; color:#555; }
+  .save-status.ok   { color:#2e7d32; font-weight:600; }
+  .save-status.err  { color:#c62828; font-weight:600; }
+  .bottom-bar { position:fixed; bottom:0; left:0; right:0; z-index:20;
+                background:#263238; color:#fff; padding:8px 18px;
+                display:flex; align-items:center; gap:12px; font-size:13px;
+                box-shadow:0 -2px 8px rgba(0,0,0,.2); }
+  .bottom-bar .flag-count { font-weight:700; padding:2px 10px; border-radius:12px;
+                            background:#c62828; color:#fff; }
+  .bottom-bar .flag-count.zero { background:#455a64; }
+  .bottom-bar .spacer { flex:1; }
+  .bottom-btn  { background:#1565c0; color:#fff; border:none; border-radius:4px;
+                 padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; }
+  .bottom-btn:hover:not(:disabled) { background:#0d47a1; }
+  .bottom-btn:disabled { opacity:0.5; cursor:not-allowed; }
+  .bottom-btn.danger { background:#c62828; }
+  .bottom-btn.danger:hover:not(:disabled) { background:#b71c1c; }
+  body { padding-bottom:52px; }  /* room for bottom-bar */
+  .loading  { text-align:center; padding:40px; color:#888; }
+  .err-msg  { padding:20px; background:#ffebee; border-left:4px solid #c62828;
+              color:#b71c1c; margin:12px 18px; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>📋 Projection Validation Review</h1>
+  <span class="badge badge-total"  id="badgeTotal">… records</span>
+  <span class="badge badge-critical" id="btn-high" onclick="filterVol('CRITICAL')">… high vol</span>
+  <span class="badge badge-warning"  id="btn-med"  onclick="filterVol('MEDIUM')">… med vol</span>
+  <span class="badge badge-clean"    id="btn-low"  onclick="filterVol('LOW')">… low vol</span>
+</div>
+
+<div class="toolbar">
+  <input id="search" type="text" placeholder="Search key / customer / mstyle ..." oninput="applyFilters()">
+  <select id="sevFilter" onchange="applyFilters()">
+    <option value="">All severities</option>
+    <option value="CRITICAL">Critical only</option>
+    <option value="WARNING">Warning only</option>
+    <option value="OK">Clean only</option>
+  </select>
+  <select id="priFilter" onchange="applyFilters()">
+    <option value="">All priorities</option>
+    <option value="CRITICAL,MEDIUM">Critical + Medium (&ge;200/wk)</option>
+    <option value="CRITICAL">Critical only (&ge;1,000/wk)</option>
+    <option value="MEDIUM">Medium only (200-1,000/wk)</option>
+    <option value="LOW">Low only (&lt;200/wk)</option>
+  </select>
+  <select id="patFilter" onchange="applyFilters()">
+    <option value="">All patterns</option>
+    <option value="steady">Steady</option>
+    <option value="intermittent">Intermittent</option>
+    <option value="new_item">New Item</option>
+    <option value="inactive">Inactive</option>
+  </select>
+  <select id="aiDiffFilter" onchange="applyFilters()">
+    <option value="0">All (any difference)</option>
+    <option value="10">AI vs Proj &gt; 10%</option>
+    <option value="25">AI vs Proj &gt; 25%</option>
+    <option value="50">AI vs Proj &gt; 50%</option>
+  </select>
+  <span class="stat" id="statLine">Loading…</span>
+</div>
+
+<div id="saveBar" class="save-bar">
+  <span><span class="pending-count" id="pendingCount">0</span> unsaved edit(s)</span>
+  <button class="save-btn"    id="saveAllBtn"    onclick="window._pv.saveAll()">💾 Save All</button>
+  <button class="discard-btn" id="discardAllBtn" onclick="window._pv.discardAll()">Discard changes</button>
+  <span class="save-status" id="saveStatus"></span>
+</div>
+
+<table id="mainTable" style="display:none">
+<thead>
+  <tr>
+    <th style="width:28px;"></th>
+    <th>Key</th>
+    <th>Customer</th>
+    <th>Mstyle</th>
+    <th>Description</th>
+    <th>Priority</th>
+    <th>Ord/Wk L13W</th>
+    <th>Shpd/Wk L13W</th>
+    <th>Proj/Wk</th>
+    <th>AI Fcst/Wk</th>
+    <th>AI vs Proj</th>
+    <th>AI vs Shpd</th>
+    <th>Flags</th>
+    <th style="width:70px;">Use AI</th>
+    <th style="width:90px;">Use Sugg</th>
+    <th style="width:40px;">Flag</th>
+    <th style="width:170px;">Comments</th>
+  </tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<div id="loadingMsg" class="loading">Authenticating with Quickbase…</div>
+<div id="errContainer"></div>
+
+<div class="bottom-bar" id="bottomBar">
+  <span class="flag-count zero" id="flagCount">0 flagged</span>
+  <span style="color:#b0bec5">Review flags across <span id="mgrCount">0</span> manager(s)</span>
+  <div class="spacer"></div>
+  <button class="bottom-btn" id="emailBtn" onclick="window._pv.composeEmails()" disabled>📧 Compose Emails</button>
+  <button class="bottom-btn danger" id="clearBtn" onclick="window._pv.clearFlagsAndComments()" disabled>🗑 Clear All Flags & Comments</button>
+</div>
+
+<script>
+(function() {
+"use strict";
+
+// ─── CONFIG ─────────────────────────────────────────────────────────
+const REALM    = "pim.quickbase.com";
+const API_HOST = "https://api.quickbase.com";
+const APP_ID   = "bpd24h9wy";
+const TABLE_ID = "bpd237tvm";
+// Projections table key field is 292 (Acct_MStyle_Key), NOT 3 (Record ID#).
+// QB requires upserts to use the designated key field.
+const KEY_FID  = 292;
+
+// Core field IDs
+const FID = {
+  rid: 3,
+  key: 292,
+  cust: 363,
+  mstyle: 196,
+  desc: 205,
+  invMgr: 936,
+  invMgrEmail: 1540,
+  ordWk: 446,      // Ord/Wk L13 (numeric formula)
+  shpdWk: 454,     // Shpd/Wk L13W (cust)
+  aiAvg: 1537,     // AI PRJ Average
+  sugAvg: 1539,    // Suggested Projection Average
+  // Validation result fields (populated by forecaster --push-validation)
+  vFlag:    1572,
+  vComments:1573,
+  vPriority:1574,
+  vPattern: 1575,
+  vMaxSev:  1576,
+  vNFlags:  1577,
+  vBiweekly:1578,
+  vNarrative:1579,
+  vAiModel: 1580,
+  vProjWk:  1581,
+  // Use-Suggested / Use AI URL-formula button fields
+  btnUseSug: 1570,
+  btnUseAi:  1571,
+};
+
+// Week field ID arrays
+const MAN_FIDS = [22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97];
+const AI_FIDS  = []; for (let i=1511;i<=1536;i++) AI_FIDS.push(i);
+const SUG_FIDS = []; for (let i=905; i<=930; i++) SUG_FIDS.push(i);
+
+// ─── STATE ──────────────────────────────────────────────────────────
+let tempToken  = null;
+let allRecords = [];
+let managers   = new Set();
+
+// W1 = most recent Sunday on or before today
+const W1_DATE = (() => {
+  const t = new Date();
+  const daysSinceSun = (t.getDay());  // 0=Sun
+  const d = new Date(t);
+  d.setDate(t.getDate() - daysSinceSun);
+  d.setHours(0,0,0,0);
+  return d;
+})();
+
+function weekLabel(i) {
+  const d = new Date(W1_DATE);
+  d.setDate(d.getDate() + i * 7);
+  return (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0');
+}
+
+// ─── QB API helpers ─────────────────────────────────────────────────
+async function qbFetch(path, opts = {}) {
+  const url = `${API_HOST}${path}`;
+  const headers = Object.assign({
+    "QB-Realm-Hostname": REALM,
+    "Content-Type": "application/json",
+  }, opts.headers || {});
+  if (tempToken) headers["Authorization"] = `QB-TEMP-TOKEN ${tempToken}`;
+  const resp = await fetch(url, Object.assign({ credentials:"include" }, opts, { headers }));
+  if (!resp.ok) {
+    const body = await resp.text();
+    throw new Error(`QB ${resp.status}: ${body.slice(0,200)}`);
+  }
+  return resp.json();
+}
+
+async function getTempToken() {
+  const resp = await fetch(
+    `${API_HOST}/v1/auth/temporary/${TABLE_ID}`,
+    { method:"GET", credentials:"include", headers:{"QB-Realm-Hostname":REALM} }
+  );
+  if (!resp.ok) {
+    const body = await resp.text();
+    throw new Error(`Temp-token fetch failed: ${resp.status}. ${body.slice(0,200)}`);
+  }
+  const data = await resp.json();
+  return data.temporaryAuthorization;
+}
+
+async function queryProjections() {
+  const selectFids = Object.values(FID)
+    .concat(MAN_FIDS, AI_FIDS, SUG_FIDS)
+    .filter((v,i,a)=>a.indexOf(v)===i);
+  const body = {
+    from: TABLE_ID,
+    select: selectFids,
+    // No filter — show all records. If Validation_* fields are empty (forecaster
+    // hasn't been pushed yet) we fall back to client-side derivation.
+    options: { top: 10000 },
+  };
+  const data = await qbFetch("/v1/records/query", { method:"POST", body: JSON.stringify(body) });
+  return data.data || [];
+}
+
+// Resolve the key-field value for a given record-id (needed because the
+// Projections table uses a composite key, not Record ID#)
+function keyFor(rid) {
+  const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+  if (!r) throw new Error(`No cached record for rid ${rid}`);
+  const k = val(r, KEY_FID);
+  if (k === null || k === undefined || k === '') {
+    throw new Error(`Record ${rid} has empty key field (${KEY_FID})`);
+  }
+  return k;
+}
+
+async function saveField(rid, fid, value) {
+  if (!tempToken) tempToken = await getTempToken();
+  const body = {
+    to: TABLE_ID,
+    data: [{ [KEY_FID]: { value: keyFor(rid) }, [fid]: { value } }],
+  };
+  return qbFetch("/v1/records", { method:"POST", body: JSON.stringify(body) });
+}
+
+// ─── Client-side derivations ────────────────────────────────────────
+function val(r, fid) {
+  const v = r[fid]; if (!v) return null;
+  return v.value;
+}
+function numv(r, fid) {
+  const v = r[fid]; if (!v) return 0;
+  return Number(v.value) || 0;
+}
+
+function recordAnalysis(r, threshold=0.25) {
+  const weeks = [];
+  let worst = 0;
+  for (let i = 0; i < 26; i++) {
+    const man = numv(r, MAN_FIDS[i]);
+    const ai  = numv(r, AI_FIDS[i]);
+    const sug = numv(r, SUG_FIDS[i]);
+    let sev = "OK";
+    if (man > 0) {
+      const diff = Math.abs(ai - man) / man;
+      if (diff >= threshold)       sev = diff >= 0.50 ? "CRITICAL" : "WARNING";
+      worst = Math.max(worst, diff);
+    }
+    weeks.push({ week: i+1, man, ai, sug, severity: sev });
+  }
+  return { weeks, worst };
+}
+
+// ─── Rendering ──────────────────────────────────────────────────────
+function fmtN(n) { return (n === null || n === undefined) ? '-' : Number(Math.round(n)).toLocaleString(); }
+
+function priLabel(p) {
+  if (p === 'CRITICAL') return '<span class="pri-crit">CRITICAL</span>';
+  if (p === 'MEDIUM')   return '<span class="pri-med">MEDIUM</span>';
+  return '<span class="pri-low">LOW</span>';
+}
+
+function borderClass(s) {
+  if (s === 'CRITICAL') return 'border-crit';
+  if (s === 'WARNING')  return 'border-warn';
+  return 'border-ok';
+}
+function weekCellClass(sev) {
+  if (sev === 'CRITICAL') return 'wk-crit';
+  if (sev === 'WARNING')  return 'wk-warn';
+  return 'wk-ok';
+}
+
+function renderRow(r) {
+  const rid     = val(r, FID.rid);
+  const key     = val(r, FID.key) || "";
+  const cust    = val(r, FID.cust) || "";
+  const mstyle  = val(r, FID.mstyle) || "";
+  const desc    = val(r, FID.desc) || "";
+  const mgr     = (val(r, FID.invMgr)?.name) || val(r, FID.invMgr) || "";
+  const biwk    = !!val(r, FID.vBiweekly);
+  const ordWk   = numv(r, FID.ordWk);
+  const shpdWk  = numv(r, FID.shpdWk);
+  const aiWk    = numv(r, FID.aiAvg);
+  const vFlag   = !!val(r, FID.vFlag);
+  const vCmt    = val(r, FID.vComments) || "";
+
+  // Totals for AI vs Proj / AI vs Shpd (client-side from week fields)
+  let projTot = 0, aiTot = 0;
+  for (let i = 0; i < 26; i++) {
+    projTot += numv(r, MAN_FIDS[i]);
+    aiTot   += numv(r, AI_FIDS[i]);
+  }
+  const aiVsProj = projTot > 0 ? ((aiTot - projTot) / projTot * 100) : 0;
+  const aiVsShpd = shpdWk > 0 ? ((aiWk - shpdWk) / shpdWk * 100) : 0;
+
+  // Client-side fallbacks when Validation_* fields are empty (forecaster
+  // hasn't been pushed yet). Pushed values take precedence when present.
+  const projWkRaw = val(r, FID.vProjWk);
+  const projWk    = (projWkRaw !== null && projWkRaw !== undefined && projWkRaw !== '')
+                    ? Number(projWkRaw) : projTot / 26;
+
+  let pri = val(r, FID.vPriority);
+  if (!pri) {
+    if (projWk >= 1000)      pri = 'CRITICAL';
+    else if (projWk >= 200)  pri = 'MEDIUM';
+    else                     pri = 'LOW';
+  }
+
+  // Compute per-week severity client-side for sev/nFlags fallback
+  const analysis = recordAnalysis(r, 0.25);
+  let sev = val(r, FID.vMaxSev);
+  if (!sev) {
+    sev = analysis.weeks.some(w => w.severity === 'CRITICAL') ? 'CRITICAL'
+        : analysis.weeks.some(w => w.severity === 'WARNING')  ? 'WARNING'
+        : 'OK';
+  }
+  const nFlagsRaw = val(r, FID.vNFlags);
+  const nFlags = (nFlagsRaw !== null && nFlagsRaw !== undefined && nFlagsRaw !== '')
+                 ? Number(nFlagsRaw)
+                 : analysis.weeks.filter(w => w.severity !== 'OK').length;
+
+  const pat = val(r, FID.vPattern) || "";
+
+  const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+  const bwTag = biwk ? '<span class="tag tag-bw">BW</span>' : '';
+  const flagCls = vFlag ? 'flag-btn flagged' : 'flag-btn';
+
+  const tr = document.createElement("tr");
+  tr.className = borderClass(sev);
+  tr.dataset.key = key;
+  tr.dataset.rid = rid;
+  tr.dataset.sev = sev;
+  tr.dataset.pri = pri;
+  tr.dataset.pat = pat;
+  tr.dataset.flags = nFlags;
+  tr.dataset.aidiff = Math.abs(aiVsProj).toFixed(1);
+
+  tr.innerHTML = `
+    <td></td>
+    <td class="clickable" onclick="window._pv.toggleDetail('${key}')">${key}${bwTag}</td>
+    <td class="clickable" onclick="window._pv.toggleDetail('${key}')">${cust}</td>
+    <td>${mstyle}</td>
+    <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${desc}">${desc}</td>
+    <td>${priLabel(pri)}</td>
+    <td>${fmtN(ordWk)}</td>
+    <td>${fmtN(shpdWk)}</td>
+    <td>${fmtN(projWk)}</td>
+    <td style="color:#1565c0;font-weight:600">${fmtN(aiWk)}</td>
+    <td style="font-size:14px;font-weight:800;color:${aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888'}">${aiVsProj >= 0 ? '+' : ''}${aiVsProj.toFixed(1)}%</td>
+    <td style="font-size:14px;font-weight:800;color:${aiVsShpd > 0 ? '#2e7d32' : aiVsShpd < 0 ? '#c62828' : '#888'}">${aiVsShpd >= 0 ? '+' : ''}${aiVsShpd.toFixed(1)}%</td>
+    <td>${nFlags}</td>
+    <td style="text-align:center"><button class="use-btn use-ai" data-rid="${rid}" data-src="ai">Use AI</button></td>
+    <td style="text-align:center"><button class="use-btn use-sug" data-rid="${rid}" data-src="sug">Use Sugg</button></td>
+    <td style="text-align:center"><button id="flg-${safeKey}" class="${flagCls}" data-rid="${rid}" data-action="toggleFlag" title="Flag for inventory manager">⚑</button></td>
+    <td><textarea class="comment-input" data-rid="${rid}" data-action="saveComment" placeholder="Notes for manager...">${vCmt}</textarea></td>
+  `;
+
+  // Detail row
+  const dtr = document.createElement("tr");
+  dtr.className = "detail-pane";
+  dtr.id = "detail-" + safeKey;
+  dtr.dataset.loaded = '0';
+  dtr.dataset.key = key;
+  dtr.innerHTML = `<td colspan="17" style="padding:8px 12px;color:#888;font-style:italic">Loading detail…</td>`;
+
+  return [tr, dtr];
+}
+
+function renderAll() {
+  const tb = document.getElementById("tbody");
+  tb.innerHTML = '';
+  allRecords.forEach(r => {
+    const [tr, dtr] = renderRow(r);
+    tb.appendChild(tr);
+    tb.appendChild(dtr);
+  });
+  applyFilters();
+}
+
+// ─── Detail pane (local render from cached data) ────────────────────
+async function toggleDetail(key) {
+  const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+  const el = document.getElementById('detail-' + safeKey);
+  if (!el) return;
+  if (el.style.display === 'table-row') { el.style.display = 'none'; return; }
+
+  if (el.dataset.loaded === '0') {
+    el.style.display = 'table-row';
+    const r = allRecords.find(x => val(x, FID.key) === key);
+    if (!r) { el.innerHTML = `<td colspan="17">Record not found.</td>`; return; }
+
+    const analysis = recordAnalysis(r, 0.25);
+    const aiModel  = val(r, FID.vAiModel) || '';
+    const narr     = val(r, FID.vNarrative) || '';
+
+    let hdr = '<th class="row-label"></th>';
+    let pj  = '<td class="row-label">Projection</td>';
+    let ai  = `<td class="row-label" style="color:#1565c0;font-weight:600">AI Forecast<br><span style="font-weight:normal;font-size:10px">${aiModel}</span></td>`;
+    let sg  = '<td class="row-label" style="color:#555">Suggested</td>';
+
+    const rid = val(r, FID.rid);
+    let projTot = 0, aiTot = 0, sugTot = 0;
+    analysis.weeks.forEach((w, i) => {
+      hdr += `<th>W${w.week}<br><span style="font-weight:normal;font-size:10px">${weekLabel(i)}</span></th>`;
+      // Projection cells are EDITABLE inputs — save on blur to MAN_FIDS[i]
+      pj  += `<td class="${weekCellClass(w.severity)}" style="padding:0">
+                <input class="wk-input" type="number" step="1" value="${w.man}"
+                       data-rid="${rid}" data-fid="${MAN_FIDS[i]}" data-week="${i}"
+                       style="width:100%;border:none;background:transparent;text-align:right;font-size:11px;padding:3px 6px;font-family:inherit;">
+              </td>`;
+      const aiDiff = w.ai - w.man;
+      const aiCls  = aiDiff > 0 ? 'color:#2e7d32' : aiDiff < 0 ? 'color:#c62828' : 'color:#888';
+      ai  += `<td style="${aiCls};font-weight:600">${fmtN(w.ai)}</td>`;
+      sg  += `<td style="color:#555;font-size:10px">${fmtN(w.sug)}</td>`;
+      projTot += w.man; aiTot += w.ai; sugTot += w.sug;
+    });
+    hdr += '<th>Total</th>';
+    pj  += `<td style="font-weight:700">${fmtN(projTot)}</td>`;
+    ai  += `<td style="font-weight:700;color:#1565c0">${fmtN(aiTot)}</td>`;
+    sg  += `<td style="font-weight:700;color:#555">${fmtN(sugTot)}</td>`;
+
+    const narrHtml = narr
+      ? `<div style="padding:8px 12px;background:#f5f5f5;border-top:1px solid #ddd;font-size:12px;line-height:1.5;color:#333;"><strong>Analysis:</strong> ${narr}</div>`
+      : '';
+
+    el.innerHTML = `<td colspan="17" style="padding:0">
+      <div style="overflow-x:auto;padding:8px 12px;">
+        <table class="dtbl">
+          <tr>${hdr}</tr>
+          <tr>${pj}</tr>
+          <tr>${ai}</tr>
+          <tr>${sg}</tr>
+        </table>
+      </div>
+      ${narrHtml}
+    </td>`;
+    el.dataset.loaded = '1';
+  } else {
+    el.style.display = 'table-row';
+  }
+}
+
+// ─── Filters (badges + dropdowns) ───────────────────────────────────
+function filterVol(pri) {
+  const sel = document.getElementById('priFilter');
+  const btns = {'CRITICAL':'btn-high','MEDIUM':'btn-med','LOW':'btn-low'};
+  if (sel.value === pri) {
+    sel.value = '';
+    Object.values(btns).forEach(id => document.getElementById(id).classList.remove('badge-active'));
+  } else {
+    sel.value = pri;
+    Object.entries(btns).forEach(([p, id]) => {
+      document.getElementById(id).classList.toggle('badge-active', p === pri);
+    });
+  }
+  applyFilters();
+}
+
+function applyFilters() {
+  const search   = document.getElementById('search').value.toLowerCase();
+  const sevF     = document.getElementById('sevFilter').value;
+  const priF     = document.getElementById('priFilter').value.split(',').filter(Boolean);
+  const patF     = document.getElementById('patFilter').value;
+  const aiDiffMin= parseFloat(document.getElementById('aiDiffFilter').value);
+  const rows     = document.querySelectorAll('#tbody > tr:not(.detail-pane)');
+  let shown = 0;
+  rows.forEach(tr => {
+    const key = tr.dataset.key || '';
+    const sev = tr.dataset.sev || '';
+    const pri = tr.dataset.pri || '';
+    const pat = tr.dataset.pat || '';
+    const txt = tr.textContent.toLowerCase();
+    let vis = true;
+    if (search && !txt.includes(search)) vis = false;
+    if (sevF && sev !== sevF) vis = false;
+    if (priF.length && !priF.includes(pri)) vis = false;
+    if (patF && pat !== patF) vis = false;
+    const aidiff = parseFloat(tr.dataset.aidiff || '0');
+    if (aiDiffMin > 0 && aidiff < aiDiffMin) vis = false;
+    tr.style.display = vis ? '' : 'none';
+    const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+    const detail = document.getElementById('detail-' + safeKey);
+    if (detail && !vis) detail.style.display = 'none';
+    if (vis) shown++;
+  });
+  document.getElementById('statLine').textContent = shown + ' records shown';
+}
+
+// Derive priority from pushed value or from projection volume fallback
+function derivePriority(r) {
+  const p = val(r, FID.vPriority);
+  if (p) return p;
+  const projWkRaw = val(r, FID.vProjWk);
+  let projWk;
+  if (projWkRaw !== null && projWkRaw !== undefined && projWkRaw !== '') {
+    projWk = Number(projWkRaw);
+  } else {
+    let tot = 0;
+    for (let i = 0; i < 26; i++) tot += numv(r, MAN_FIDS[i]);
+    projWk = tot / 26;
+  }
+  if (projWk >= 1000) return 'CRITICAL';
+  if (projWk >= 200)  return 'MEDIUM';
+  return 'LOW';
+}
+
+// ─── Badge counts ───────────────────────────────────────────────────
+function updateBadges() {
+  let nCrit=0, nMed=0, nLow=0;
+  allRecords.forEach(r => {
+    const p = derivePriority(r);
+    if (p === 'CRITICAL') nCrit++;
+    else if (p === 'MEDIUM') nMed++;
+    else nLow++;
+  });
+  document.getElementById('badgeTotal').textContent = `${allRecords.length} records`;
+  document.getElementById('btn-high').textContent = `${nCrit} high vol`;
+  document.getElementById('btn-med').textContent  = `${nMed} med vol`;
+  document.getElementById('btn-low').textContent  = `${nLow} low vol`;
+}
+
+// ─── Row-level button + input handlers (event delegation) ───────────
+document.getElementById('tbody').addEventListener('click', async (ev) => {
+  const btn = ev.target.closest('button');
+  if (!btn) return;
+  if (btn.classList.contains('use-btn')) {
+    ev.stopPropagation();
+    await useCopy(btn);
+  } else if (btn.dataset.action === 'toggleFlag') {
+    ev.stopPropagation();
+    await toggleFlag(btn);
+  }
+});
+
+document.getElementById('tbody').addEventListener('change', async (ev) => {
+  const el = ev.target;
+  if (!el.classList) return;
+  if (el.classList.contains('comment-input')) {
+    await saveComment(el);  // Comments still auto-save (single field, always small)
+  }
+});
+
+// Week inputs mark dirty on every keystroke (input event) — batch via Save All
+document.getElementById('tbody').addEventListener('input', (ev) => {
+  const el = ev.target;
+  if (el.classList && el.classList.contains('wk-input')) {
+    markDirty(el);
+  }
+});
+
+// Keyboard shortcut: Ctrl/Cmd+S triggers Save All
+window.addEventListener('keydown', (ev) => {
+  if ((ev.ctrlKey || ev.metaKey) && ev.key === 's') {
+    ev.preventDefault();
+    if (pendingEdits.size > 0) saveAll();
+  }
+});
+
+// Pending edits keyed by `${rid}|${fid}` -> { rid, fid, value, el }
+const pendingEdits = new Map();
+
+function markDirty(el) {
+  const rid = el.dataset.rid;
+  const fid = Number(el.dataset.fid);
+  const raw = el.value.trim();
+  const newVal = raw === '' ? 0 : Number(raw);
+  if (Number.isNaN(newVal)) {
+    el.classList.add('failed');
+    setTimeout(() => el.classList.remove('failed'), 1500);
+    return;
+  }
+  const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+  const oldVal = r ? numv(r, fid) : null;
+  const pk = `${rid}|${fid}`;
+  if (oldVal !== null && newVal === oldVal) {
+    // Reverted to original — clear dirty
+    pendingEdits.delete(pk);
+    el.classList.remove('dirty');
+  } else {
+    pendingEdits.set(pk, { rid, fid, value: newVal, el });
+    el.classList.remove('saved','failed'); el.classList.add('dirty');
+  }
+  updateSaveBar();
+  // Live-update the summary row totals from the edited value so user sees impact
+  refreshRowTotalsLive(rid);
+}
+
+function updateSaveBar() {
+  const n = pendingEdits.size;
+  const bar = document.getElementById('saveBar');
+  document.getElementById('pendingCount').textContent = n;
+  bar.classList.toggle('active', n > 0);
+  if (n > 0) {
+    document.getElementById('saveStatus').textContent = '';
+    document.getElementById('saveStatus').className = 'save-status';
+  }
+  // Warn on unload
+  window.onbeforeunload = n > 0 ? (() => '') : null;
+}
+
+async function saveAll() {
+  if (pendingEdits.size === 0) return;
+  const btn  = document.getElementById('saveAllBtn');
+  const stat = document.getElementById('saveStatus');
+  btn.disabled = true; btn.textContent = '…';
+  stat.className = 'save-status'; stat.textContent = 'Refreshing auth…';
+
+  try {
+    // Always refresh token immediately before save (temp tokens expire ~5 min)
+    tempToken = await getTempToken();
+  } catch (e) {
+    stat.className = 'save-status err';
+    stat.textContent = `Auth failed: ${e.message}`;
+    btn.disabled = false; btn.textContent = '💾 Save All';
+    return;
+  }
+
+  // Group edits by rid (keyed by the composite-key field, not Record ID)
+  const byRid = new Map();
+  pendingEdits.forEach(({ rid, fid, value, el }) => {
+    if (!byRid.has(rid)) {
+      try {
+        byRid.set(rid, { el_list: [], data: { [KEY_FID]: { value: keyFor(rid) } } });
+      } catch (e) {
+        console.error(e);
+        el.classList.add('failed');
+        return;
+      }
+    }
+    const entry = byRid.get(rid);
+    if (!entry) return;
+    entry.data[fid] = { value };
+    entry.el_list.push(el);
+  });
+
+  // Mark saving
+  pendingEdits.forEach(({ el }) => {
+    el.classList.remove('dirty','saved','failed'); el.classList.add('saving');
+  });
+
+  let ok = 0, fail = 0;
+  const errors = [];
+  // Send one POST per record (atomic per-record update)
+  for (const [rid, { data, el_list }] of byRid.entries()) {
+    stat.textContent = `Saving record ${rid}…`;
+    try {
+      await qbFetch("/v1/records", {
+        method: "POST",
+        body: JSON.stringify({ to: TABLE_ID, data: [data] }),
+      });
+      // Update local cache so Use AI / Use Sugg sees new values
+      const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+      if (r) {
+        Object.keys(data).forEach(k => { if (k !== '3') r[k] = { value: data[k].value }; });
+      }
+      el_list.forEach(el => {
+        el.classList.remove('saving'); el.classList.add('saved');
+        setTimeout(() => el.classList.remove('saved'), 1500);
+      });
+      ok += el_list.length;
+      refreshRowTotals(rid);
+    } catch (e) {
+      console.error(`Record ${rid} save failed:`, e);
+      errors.push(`rid ${rid}: ${e.message}`);
+      el_list.forEach(el => {
+        el.classList.remove('saving'); el.classList.add('failed');
+        el.title = e.message;
+      });
+      fail += el_list.length;
+    }
+  }
+
+  // Clear only successfully saved entries
+  for (const [pk, { el }] of pendingEdits.entries()) {
+    if (el.classList.contains('saved')) pendingEdits.delete(pk);
+  }
+
+  if (fail === 0) {
+    stat.className = 'save-status ok';
+    stat.textContent = `Saved ${ok} edit${ok === 1 ? '' : 's'} ✓`;
+    setTimeout(() => {
+      if (pendingEdits.size === 0) { stat.textContent = ''; stat.className = 'save-status'; }
+    }, 4000);
+  } else {
+    stat.className = 'save-status err';
+    stat.textContent = `${fail} failed, ${ok} saved. ${errors[0] || ''}`.slice(0, 200);
+    alert(`Save errors:\n\n${errors.slice(0,5).join('\n')}`);
+  }
+  btn.disabled = false; btn.textContent = '💾 Save All';
+  updateSaveBar();
+}
+
+function discardAll() {
+  if (pendingEdits.size === 0) return;
+  if (!confirm(`Discard ${pendingEdits.size} unsaved edit(s)?`)) return;
+  pendingEdits.forEach(({ rid, fid, el }) => {
+    const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+    if (r) el.value = numv(r, fid);
+    el.classList.remove('dirty','failed');
+  });
+  pendingEdits.clear();
+  // Recompute row totals for affected records
+  document.querySelectorAll('button.use-btn').forEach(b => refreshRowTotals(b.dataset.rid));
+  updateSaveBar();
+  const stat = document.getElementById('saveStatus');
+  stat.className = 'save-status'; stat.textContent = '';
+}
+
+// Live totals using the CURRENT input values (including unsaved edits)
+function refreshRowTotalsLive(rid) {
+  const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+  if (!r) return;
+  let projTot = 0, aiTot = 0;
+  for (let i = 0; i < 26; i++) {
+    // Prefer the live input value if the detail pane is open
+    const inp = document.querySelector(`.wk-input[data-rid="${rid}"][data-fid="${MAN_FIDS[i]}"]`);
+    const manVal = inp ? (Number(inp.value) || 0) : numv(r, MAN_FIDS[i]);
+    projTot += manVal;
+    aiTot   += numv(r, AI_FIDS[i]);
+  }
+  const projWk  = projTot / 26;
+  const aiVsProj = projTot > 0 ? ((aiTot - projTot) / projTot * 100) : 0;
+  const btn = document.querySelector(`button.use-btn[data-rid="${rid}"]`);
+  if (!btn) return;
+  const tr = btn.closest('tr');
+  if (!tr) return;
+  const cells = tr.children;
+  if (cells[8])  cells[8].textContent = fmtN(projWk);
+  if (cells[10]) {
+    cells[10].textContent = `${aiVsProj >= 0 ? '+' : ''}${aiVsProj.toFixed(1)}%`;
+    cells[10].style.color = aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888';
+  }
+}
+
+// Recompute Proj/Wk + AI vs Proj columns in the summary row after an edit
+function refreshRowTotals(rid) {
+  const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+  if (!r) return;
+  let projTot = 0, aiTot = 0;
+  for (let i = 0; i < 26; i++) {
+    projTot += numv(r, MAN_FIDS[i]);
+    aiTot   += numv(r, AI_FIDS[i]);
+  }
+  const projWk  = projTot / 26;
+  const shpdWk  = numv(r, FID.shpdWk);
+  const aiWk    = numv(r, FID.aiAvg);
+  const aiVsProj = projTot > 0 ? ((aiTot - projTot) / projTot * 100) : 0;
+  // Find the summary row by data-rid on a descendant button (we set data-rid on Use AI button)
+  const btn = document.querySelector(`button.use-btn[data-rid="${rid}"]`);
+  if (!btn) return;
+  const tr = btn.closest('tr');
+  if (!tr) return;
+  const cells = tr.children;
+  // Column order: [0]spacer [1]Key [2]Cust [3]Mstyle [4]Desc [5]Pri [6]OrdWk [7]ShpdWk [8]ProjWk [9]AIWk [10]AIvsProj [11]AIvsShpd [12]Flags
+  if (cells[8]) cells[8].textContent = fmtN(projWk);
+  if (cells[10]) {
+    cells[10].textContent = `${aiVsProj >= 0 ? '+' : ''}${aiVsProj.toFixed(1)}%`;
+    cells[10].style.color = aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888';
+  }
+}
+
+async function useCopy(btn) {
+  const rid = btn.dataset.rid;
+  const src = btn.dataset.src;
+  const label = src === 'ai' ? 'AI PRJ' : 'Suggested';
+  if (!confirm(`Overwrite 26 weeks of MAN projections with ${label} for this record?`)) return;
+
+  const orig = btn.textContent;
+  btn.disabled = true; btn.classList.remove('done','failed'); btn.textContent = '…';
+  try {
+    // Copy week-by-week: build one update with all 26 MAN_FIDS set to AI_FIDS or SUG_FIDS values
+    const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+    if (!r) throw new Error("record not found");
+    const srcFids = src === 'ai' ? AI_FIDS : SUG_FIDS;
+    const data = { [KEY_FID]: { value: keyFor(rid) } };
+    for (let i = 0; i < 26; i++) {
+      data[MAN_FIDS[i]] = { value: numv(r, srcFids[i]) };
+    }
+    await qbFetch("/v1/records", { method:"POST", body: JSON.stringify({ to: TABLE_ID, data: [data] }) });
+
+    // Update cache
+    for (let i = 0; i < 26; i++) {
+      r[MAN_FIDS[i]] = { value: numv(r, srcFids[i]) };
+    }
+    btn.classList.add('done'); btn.textContent = 'Done ✓';
+    setTimeout(() => { btn.classList.remove('done'); btn.textContent = orig; btn.disabled = false; }, 2500);
+  } catch (e) {
+    console.error(e);
+    btn.classList.add('failed'); btn.textContent = 'Fail'; btn.title = e.message;
+    setTimeout(() => { btn.classList.remove('failed'); btn.textContent = orig; btn.disabled = false; }, 3000);
+  }
+}
+
+async function toggleFlag(btn) {
+  const rid = btn.dataset.rid;
+  const nowFlagged = !btn.classList.contains('flagged');
+  btn.classList.add('saving');
+  try {
+    await saveField(rid, FID.vFlag, nowFlagged);
+    // Update cache
+    const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+    if (r) r[FID.vFlag] = { value: nowFlagged };
+    btn.classList.toggle('flagged', nowFlagged);
+    updateFlagCount();
+  } catch (e) {
+    console.error(e);
+    alert("Save failed: " + e.message);
+  } finally {
+    btn.classList.remove('saving');
+  }
+}
+
+async function saveComment(el) {
+  const rid = el.dataset.rid;
+  el.classList.remove('saved'); el.classList.add('saving');
+  try {
+    await saveField(rid, FID.vComments, el.value);
+    const r = allRecords.find(x => String(val(x, FID.rid)) === String(rid));
+    if (r) r[FID.vComments] = { value: el.value };
+    el.classList.remove('saving'); el.classList.add('saved');
+    setTimeout(() => el.classList.remove('saved'), 1200);
+    updateFlagCount();
+  } catch (e) {
+    console.error(e);
+    el.classList.remove('saving');
+    alert("Save failed: " + e.message);
+  }
+}
+
+// ─── Boot ───────────────────────────────────────────────────────────
+async function refresh() {
+  const loadMsg = document.getElementById('loadingMsg');
+  const err     = document.getElementById('errContainer');
+  err.innerHTML = '';
+  document.getElementById('mainTable').style.display = 'none';
+  loadMsg.style.display = 'block';
+  loadMsg.textContent = 'Loading records…';
+
+  try {
+    if (!tempToken) tempToken = await getTempToken();
+    allRecords = await queryProjections();
+
+    // Sort: CRITICAL priority first, then by MaxSev, then by N Flags desc
+    const priOrd = { CRITICAL:0, MEDIUM:1, LOW:2 };
+    const sevOrd = { CRITICAL:0, WARNING:1, OK:2 };
+    allRecords.sort((a, b) => {
+      const pA = priOrd[derivePriority(a)];
+      const pB = priOrd[derivePriority(b)];
+      if (pA !== pB) return pA - pB;
+      const sA = sevOrd[val(a, FID.vMaxSev) || 'OK'];
+      const sB = sevOrd[val(b, FID.vMaxSev) || 'OK'];
+      if (sA !== sB) return sA - sB;
+      return numv(b, FID.vNFlags) - numv(a, FID.vNFlags);
+    });
+
+    updateBadges();
+    renderAll();
+    updateFlagCount();
+    loadMsg.style.display = 'none';
+    document.getElementById('mainTable').style.display = '';
+  } catch (e) {
+    console.error(e);
+    loadMsg.style.display = 'none';
+    err.innerHTML = `<div class="err-msg"><strong>Error:</strong> ${e.message}</div>`;
+  }
+}
+
+// ─── Flag roll-up & manager emails ──────────────────────────────────
+function getFlaggedByManager() {
+  const out = new Map();
+  allRecords.forEach(r => {
+    if (!val(r, FID.vFlag)) return;
+    const email = (val(r, FID.invMgrEmail) || '').trim();
+    if (!email) return;
+    const mgrRaw = val(r, FID.invMgr);
+    const mgrName = (mgrRaw && mgrRaw.name) || mgrRaw || '(unknown)';
+    if (!out.has(email)) out.set(email, { managerName: mgrName, items: [] });
+    let projTot = 0, aiTot = 0;
+    for (let i = 0; i < 26; i++) { projTot += numv(r, MAN_FIDS[i]); aiTot += numv(r, AI_FIDS[i]); }
+    const shpdWk = numv(r, FID.shpdWk);
+    const aiWk   = numv(r, FID.aiAvg);
+    const projWk = projTot / 26;
+    const aiVsProj = projTot > 0 ? ((aiTot - projTot) / projTot * 100) : 0;
+    const aiVsShpd = shpdWk > 0 ? ((aiWk - shpdWk) / shpdWk * 100) : 0;
+    out.get(email).items.push({
+      key:     val(r, FID.key) || '',
+      cust:    val(r, FID.cust) || '',
+      mstyle:  val(r, FID.mstyle) || '',
+      desc:    val(r, FID.desc) || '',
+      pri:     derivePriority(r),
+      ordWk:   numv(r, FID.ordWk),
+      shpdWk,
+      projWk,
+      aiWk,
+      aiVsProj,
+      aiVsShpd,
+      nFlags:  numv(r, FID.vNFlags),
+      comment: (val(r, FID.vComments) || '').trim(),
+    });
+  });
+  return out;
+}
+
+function updateFlagCount() {
+  const flagged = allRecords.filter(r => val(r, FID.vFlag));
+  const byMgr   = getFlaggedByManager();
+  const n = flagged.length;
+  const nMgr = byMgr.size;
+  const fc = document.getElementById('flagCount');
+  fc.textContent = `${n} flagged`;
+  fc.classList.toggle('zero', n === 0);
+  document.getElementById('mgrCount').textContent = nMgr;
+  const disable = n === 0;
+  document.getElementById('emailBtn').disabled = disable || nMgr === 0;
+  document.getElementById('clearBtn').disabled = disable;
+}
+
+// Helper for email table formatting
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function priHtml(p) {
+  const bg = p === 'CRITICAL' ? '#c62828' : p === 'MEDIUM' ? '#e65100' : '#9e9e9e';
+  return `<span style="background:${bg};color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">${p}</span>`;
+}
+
+function pctHtml(v) {
+  const color = v > 0 ? '#2e7d32' : v < 0 ? '#c62828' : '#888';
+  const sign  = v >= 0 ? '+' : '';
+  return `<span style="color:${color};font-weight:700;">${sign}${v.toFixed(1)}%</span>`;
+}
+
+// Render a flagged-items table that exactly mirrors the code page columns
+function buildEmailTableHtml(managerName, items) {
+  const rows = items.map(it => `
+    <tr>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;font-family:Consolas,monospace;font-size:11px;">${esc(it.key)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;">${esc(it.cust)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;">${esc(it.mstyle)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;font-size:11px;">${esc(it.desc)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;">${priHtml(it.pri)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">${fmtN(it.ordWk)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">${fmtN(it.shpdWk)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">${fmtN(it.projWk)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;color:#1565c0;font-weight:600;">${fmtN(it.aiWk)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">${pctHtml(it.aiVsProj)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">${pctHtml(it.aiVsShpd)}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">${it.nFlags || 0}</td>
+      <td style="padding:5px 8px;border-bottom:1px solid #eee;font-size:11px;color:#555;">${esc(it.comment)}</td>
+    </tr>`).join('');
+
+  return `
+<div style="font-family:Segoe UI,Arial,sans-serif;font-size:13px;color:#222;">
+  <p>Hi ${esc(managerName || 'there')},</p>
+  <p>The following <strong>${items.length}</strong> projection${items.length === 1 ? '' : 's'} ${items.length === 1 ? 'needs' : 'need'} your review:</p>
+  <table style="border-collapse:collapse;width:100%;font-size:12px;border:1px solid #ddd;">
+    <thead>
+      <tr style="background:#f8f9fa;">
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #ddd;">Key</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #ddd;">Customer</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #ddd;">Mstyle</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #ddd;">Description</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #ddd;">Priority</th>
+        <th style="padding:6px 8px;text-align:right;border-bottom:2px solid #ddd;">Ord/Wk L13W</th>
+        <th style="padding:6px 8px;text-align:right;border-bottom:2px solid #ddd;">Shpd/Wk L13W</th>
+        <th style="padding:6px 8px;text-align:right;border-bottom:2px solid #ddd;">Proj/Wk</th>
+        <th style="padding:6px 8px;text-align:right;border-bottom:2px solid #ddd;">AI Fcst/Wk</th>
+        <th style="padding:6px 8px;text-align:right;border-bottom:2px solid #ddd;">AI vs Proj</th>
+        <th style="padding:6px 8px;text-align:right;border-bottom:2px solid #ddd;">AI vs Shpd</th>
+        <th style="padding:6px 8px;text-align:right;border-bottom:2px solid #ddd;">Flags</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #ddd;">Comments</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <p style="color:#888;font-size:11px;margin-top:16px;">— Sent via Projection Validation Review</p>
+</div>`;
+}
+
+// Build a proper RFC-822 .eml file with an HTML body.
+// Outlook recognizes X-Unsent: 1 and opens the file as an editable draft —
+// the user just clicks Send. No copy-paste, full HTML formatting preserved.
+function buildEml({ fromName, fromAddr, toName, toAddr, subject, htmlBody, plainBody }) {
+  const boundary = '----=_PVRBoundary_' + Math.random().toString(36).slice(2);
+  const fromHeader = fromName ? `"${fromName}" <${fromAddr}>` : fromAddr;
+  const toHeader   = toName   ? `"${toName}" <${toAddr}>`     : toAddr;
+
+  // Base64-encode UTF-8 so non-ASCII (emojis, accents) survives cleanly.
+  const b64utf8 = s => {
+    const bytes = new TextEncoder().encode(s);
+    let bin = ''; for (const b of bytes) bin += String.fromCharCode(b);
+    // Wrap at 76 chars per RFC 2045
+    return btoa(bin).replace(/(.{76})/g, '$1\r\n');
+  };
+
+  const CRLF = '\r\n';
+  return [
+    `From: ${fromHeader}`,
+    `To: ${toHeader}`,
+    `Subject: ${subject}`,
+    `X-Unsent: 1`,                                 // ← tells Outlook: open as DRAFT
+    `MIME-Version: 1.0`,
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    ``,
+    `This is a multi-part message in MIME format.`,
+    `--${boundary}`,
+    `Content-Type: text/plain; charset="UTF-8"`,
+    `Content-Transfer-Encoding: base64`,
+    ``,
+    b64utf8(plainBody),
+    `--${boundary}`,
+    `Content-Type: text/html; charset="UTF-8"`,
+    `Content-Transfer-Encoding: base64`,
+    ``,
+    b64utf8(htmlBody),
+    `--${boundary}--`,
+    ``,
+  ].join(CRLF);
+}
+
+// Short plaintext fallback (the .eml also includes a plain part, and some
+// clients fall back to it if HTML is disabled).
+function buildEmailPlain(managerName, items) {
+  const lines = [`Hi ${managerName || 'there'},`, '',
+    `The following ${items.length} projection${items.length === 1 ? '' : 's'} need${items.length === 1 ? 's' : ''} your review:`, ''];
+  items.forEach((it, i) => {
+    lines.push(`${i+1}. ${it.cust} | ${it.mstyle} — ${it.desc}`);
+    lines.push(`   Priority: ${it.pri}  |  Proj/Wk: ${Math.round(it.projWk).toLocaleString()}  |  AI Fcst/Wk: ${Math.round(it.aiWk).toLocaleString()}  |  AI vs Proj: ${it.aiVsProj >= 0 ? '+' : ''}${it.aiVsProj.toFixed(1)}%`);
+    if (it.comment) lines.push(`   Comment: ${it.comment}`);
+    lines.push('');
+  });
+  lines.push('— Sent via Projection Validation Review');
+  return lines.join('\n');
+}
+
+// Sanitize a string to be safe as a filename
+function safeFname(s) { return (s || 'email').replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 60); }
+
+// Trigger download of a single .eml file
+function downloadEml(filename, emlText) {
+  const blob = new Blob([emlText], { type: 'message/rfc822' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+}
+
+function composeEmails() {
+  const byMgr = getFlaggedByManager();
+  if (byMgr.size === 0) { alert('No flagged items with manager email on file.'); return; }
+
+  const w = window.open('', '_blank', 'width=1100,height=800,scrollbars=yes');
+
+  // Build one payload per manager (email + full .eml)
+  const payloads = {};
+  let idx = 0;
+  const cards = [];
+  for (const [email, { managerName, items }] of byMgr.entries()) {
+    const id = `mgr_${idx++}`;
+    const subject  = `Projection review requested — ${items.length} item${items.length === 1 ? '' : 's'}`;
+    const htmlBody = buildEmailTableHtml(managerName, items);
+    const plain    = buildEmailPlain(managerName, items);
+    const eml = buildEml({
+      fromName: 'Projection Validation',
+      fromAddr: 's.shweky@petspeople.com',
+      toName:   managerName,
+      toAddr:   email,
+      subject, htmlBody, plainBody: plain,
+    });
+    const fname = `ProjReview_${safeFname(managerName)}_${items.length}items.eml`;
+    payloads[id] = { email, managerName, subject, eml, fname, count: items.length };
+    cards.push(`
+      <div class="mgr-card">
+        <div class="mgr-head">
+          <div>
+            <div class="mgr-to"><strong>To:</strong> ${esc(managerName)} &lt;${esc(email)}&gt;</div>
+            <div class="mgr-subject"><strong>Subject:</strong> ${esc(subject)}</div>
+            <div class="mgr-count">${items.length} flagged item${items.length === 1 ? '' : 's'}</div>
+          </div>
+          <div class="mgr-actions">
+            <button class="btn-download" data-id="${id}">📥 Download draft (.eml)</button>
+          </div>
+        </div>
+        <div class="mgr-body" id="body_${id}">${htmlBody}</div>
+      </div>`);
+  }
+
+  const totalItems = Array.from(byMgr.values()).reduce((s,m)=>s+m.items.length,0);
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Compose Emails</title>
+<style>
+  body { font-family:Segoe UI,Arial,sans-serif; font-size:13px; margin:0; background:#f0f2f5; color:#222; }
+  .header { background:#8b2252; color:#fff; padding:12px 20px; position:sticky; top:0; z-index:5;
+            display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+  .header h1 { font-size:16px; font-weight:600; margin:0; }
+  .header p  { margin:4px 0 0; font-size:12px; opacity:.9; }
+  .header-actions button {
+    background:#fff; color:#8b2252; border:none; border-radius:4px;
+    padding:8px 14px; font-size:13px; font-weight:700; cursor:pointer; }
+  .header-actions button:hover { background:#f3e5f5; }
+  .howto { background:#fff8dc; border-left:4px solid #f9a825; padding:10px 14px;
+           margin:0; font-size:12px; color:#6d4c00; }
+  .howto strong { color:#e65100; }
+  .container { padding:16px 20px 60px; }
+  .mgr-card { background:#fff; border:1px solid #ddd; border-radius:6px; margin-bottom:18px;
+              box-shadow:0 1px 3px rgba(0,0,0,.05); overflow:hidden; }
+  .mgr-head { background:#f8f9fa; padding:10px 14px; border-bottom:1px solid #ddd;
+              display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .mgr-to, .mgr-subject, .mgr-count { font-size:13px; }
+  .mgr-subject { color:#555; margin-top:2px; }
+  .mgr-count   { color:#777; margin-top:2px; font-size:11px; }
+  .mgr-body  { padding:14px; overflow-x:auto; }
+  .mgr-actions button, .header-actions button.primary {
+    background:#1565c0; color:#fff; border:none; border-radius:4px;
+    padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+  .mgr-actions button:hover { background:#0d47a1; }
+  .mgr-actions button.done  { background:#2e7d32; }
+  .toast { position:fixed; bottom:24px; right:24px; background:#263238; color:#fff;
+           padding:10px 18px; border-radius:4px; font-size:13px; opacity:0; transition:opacity .25s;
+           pointer-events:none; z-index:10; }
+  .toast.show { opacity:1; }
+</style>
+</head><body>
+<div class="header">
+  <div>
+    <h1>📧 Compose Emails — ${byMgr.size} manager(s), ${totalItems} flagged item${totalItems === 1 ? '' : 's'}</h1>
+    <p>Each download is a fully-formatted Outlook draft. Double-click to open → Send.</p>
+  </div>
+  <div class="header-actions">
+    <button id="downloadAllBtn">⬇ Download ALL drafts</button>
+  </div>
+</div>
+<p class="howto">
+  <strong>How it works:</strong> Click <strong>Download draft</strong> → the <code>.eml</code> file lands in your Downloads folder →
+  double-click it → Outlook opens it as an editable draft with the full formatted table already in the body →
+  review and click <strong>Send</strong>. No copy-paste, no manual formatting.
+</p>
+<div class="container">${cards.join('')}</div>
+<div class="toast" id="toast">Downloaded</div>
+<script>
+const payloads = ${JSON.stringify(payloads)};
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+function downloadEml(filename, emlText) {
+  const blob = new Blob([emlText], { type: 'message/rfc822' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+}
+function downloadOne(id, btn) {
+  const p = payloads[id]; if (!p) return;
+  downloadEml(p.fname, p.eml);
+  if (btn) {
+    btn.classList.add('done');
+    btn.textContent = '✓ Downloaded — open to Send';
+    setTimeout(() => {
+      btn.classList.remove('done');
+      btn.textContent = '📥 Download draft (.eml)';
+    }, 3000);
+  }
+  toast('Draft downloaded — double-click to open in Outlook');
+}
+function downloadAll() {
+  const ids = Object.keys(payloads);
+  ids.forEach((id, i) => setTimeout(() => downloadOne(id, null), i * 350));
+  toast('Downloading ' + ids.length + ' drafts…');
+}
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('button'); if (!b) return;
+  if (b.classList.contains('btn-download')) downloadOne(b.dataset.id, b);
+  else if (b.id === 'downloadAllBtn') downloadAll();
+});
+<\/script>
+</body></html>`;
+  w.document.write(html); w.document.close();
+}
+
+async function clearFlagsAndComments() {
+  const flagged = allRecords.filter(r => val(r, FID.vFlag) || (val(r, FID.vComments) || '').trim());
+  if (flagged.length === 0) return;
+  if (!confirm(`Clear flags AND comments on ${flagged.length} record(s)? This cannot be undone.`)) return;
+
+  const btn = document.getElementById('clearBtn');
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Clearing…';
+  try {
+    tempToken = await getTempToken();
+  } catch (e) { alert(`Auth failed: ${e.message}`); btn.disabled = false; btn.textContent = orig; return; }
+
+  // Batch payload: one entry per record, all keyed by KEY_FID
+  const data = flagged.map(r => ({
+    [KEY_FID]:    { value: val(r, KEY_FID) },
+    [FID.vFlag]:  { value: false },
+    [FID.vComments]: { value: '' },
+  }));
+  try {
+    await qbFetch("/v1/records", { method:"POST", body: JSON.stringify({ to: TABLE_ID, data }) });
+    // Update cache + UI
+    flagged.forEach(r => {
+      r[FID.vFlag]     = { value: false };
+      r[FID.vComments] = { value: '' };
+    });
+    document.querySelectorAll('.flag-btn.flagged').forEach(b => b.classList.remove('flagged'));
+    document.querySelectorAll('textarea.comment-input').forEach(t => t.value = '');
+    updateFlagCount();
+    btn.textContent = `Cleared ${flagged.length} ✓`;
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
+  } catch (e) {
+    console.error(e);
+    alert(`Clear failed: ${e.message}`);
+    btn.textContent = orig; btn.disabled = false;
+  }
+}
+
+// Expose helpers for inline onclicks
+window._pv = { toggleDetail, saveAll, discardAll, composeEmails, clearFlagsAndComments };
+window.filterVol    = filterVol;
+window.applyFilters = applyFilters;
+
+refresh();
+})();
+</script>
+
+</body>
+</html>
