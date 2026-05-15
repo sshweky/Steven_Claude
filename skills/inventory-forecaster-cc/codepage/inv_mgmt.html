@@ -1104,9 +1104,15 @@ async function boot() {
     await new Promise(function(r){setTimeout(r,350);});
     if(scr){scr.classList.add('hidden');setTimeout(function(){scr.style.display='none';},500);}
   } catch(err) {
-    setStatus('Error: '+err.message);
-    console.error(err);
-    document.getElementById('loadSteps').innerHTML='<div style="color:#ff8a65;font-size:12px;">'+esc(err.message)+'</div>';
+    var msg = err.message || String(err);
+    setStatus('Load failed');
+    console.error('P+P Inventory Manager boot error:', err);
+    document.getElementById('loadSteps').innerHTML =
+      '<div style="color:#ff8a65;font-size:13px;font-weight:600;margin-bottom:6px;">Error loading data:</div>' +
+      '<div style="color:#ffcdd2;font-size:12px;word-break:break-all;">' + esc(msg) + '</div>' +
+      '<div style="margin-top:12px;"><button onclick="refreshData()" style="padding:6px 16px;background:#fff;color:#0d47a1;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;">Retry</button></div>';
+    setBar(100);
+    document.getElementById('loadBar').style.background='#ef5350';
   }
 }
 
