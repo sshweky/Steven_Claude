@@ -140,10 +140,10 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script id="boot">
-// Code Page mode: data is split into chunks (QB Code Page size limit ~1MB).
-// First fetch manifest to learn chunk count, then fetch all chunks in parallel,
-// concatenate, base64-decode, gzip-decompress, JSON.parse.
-window.__MANIFEST_URL = "amazon-trend-manifest.json";
+// Code Page mode: data is split into chunks (QB Code Page size limit ~500KB).
+// QB dbpage URL pattern is "?a=dbpage&pagename=<name>" relative to current URL.
+window.__PAGE_URL = (name) => "?a=dbpage&pagename=" + name;
+window.__MANIFEST_NAME = "amazon-trend-manifest.json";
 window.__CHUNK_NAME_FMT = (i) => `amazon-trend-data-${String(i+1).padStart(3,'0')}.b64`;
 </script>
 
@@ -155,16 +155,16 @@ const {useState,useMemo,useEffect,useRef} = React;
 let PAYLOAD = null;
 
 const BUCKETS = [
-  {key:"strong_winner",     label:"🚀 Strong winner"},
-  {key:"accelerating",      label:"🔥 Accelerating"},
-  {key:"recovering",        label:"🔄 Recovering"},
-  {key:"cooling_winner",    label:"🧊 Cooling winner"},
-  {key:"surge_on_decline",  label:"⚠️ Surge on decline"},
-  {key:"stable",            label:"😴 Stable"},
-  {key:"soft",              label:"💤 Soft"},
-  {key:"lapping_softness",  label:"🔄 Lapping softness"},
-  {key:"new_decline",       label:"📉 New decline"},
-  {key:"sustained_decline", label:"💀 Sustained decline"},
+  {key:"strong_winner",     label:"▲ Strong winner"},
+  {key:"accelerating",      label:"↑ Accelerating"},
+  {key:"recovering",        label:"↻ Recovering"},
+  {key:"cooling_winner",    label:"▽ Cooling winner"},
+  {key:"surge_on_decline",  label:"⚠ Surge on decline"},
+  {key:"stable",            label:"● Stable"},
+  {key:"soft",              label:"○ Soft"},
+  {key:"lapping_softness",  label:"↻ Lapping softness"},
+  {key:"new_decline",       label:"↓ New decline"},
+  {key:"sustained_decline", label:"▼ Sustained decline"},
   {key:"no_data",           label:"— No data"},
 ];
 
@@ -284,8 +284,8 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
           <h3 style={{marginTop:4}}>{asin.description || "—"}</h3>
           <div style={{marginTop:8, display:"flex", gap:6, flexWrap:"wrap"}}>
             <Badge bucket={asin.bucket} label={asin.bucket_label} />
-            {asin.mixed_signal && <span className="flag">🔀 Mixed signal</span>}
-            {asin.volatile && <span className="flag vol">📊 Volatile</span>}
+            {asin.mixed_signal && <span className="flag">⇄ Mixed signal</span>}
+            {asin.volatile && <span className="flag vol">≈ Volatile</span>}
           </div>
         </div>
         <button className="x" onClick={onClose} aria-label="Close panel">✕</button>
@@ -502,8 +502,8 @@ function App(){
             </select>
             <span className="lbl" style={{marginLeft:12}}>Flag</span>
             <span className={`chip ${flagFilter==="all"?"active":""}`} onClick={()=>setFlagFilter("all")}>All</span>
-            <span className={`chip ${flagFilter==="mixed"?"active":""}`} onClick={()=>setFlagFilter("mixed")}>🔀 Mixed signal</span>
-            <span className={`chip ${flagFilter==="volatile"?"active":""}`} onClick={()=>setFlagFilter("volatile")}>📊 Volatile</span>
+            <span className={`chip ${flagFilter==="mixed"?"active":""}`} onClick={()=>setFlagFilter("mixed")}>⇄ Mixed signal</span>
+            <span className={`chip ${flagFilter==="volatile"?"active":""}`} onClick={()=>setFlagFilter("volatile")}>≈ Volatile</span>
             <input type="text" placeholder="Search ASIN, brand, description..."
                    value={search} onChange={e=>setSearch(e.target.value)}
                    style={{marginLeft:"auto", minWidth:240}} />
@@ -538,8 +538,8 @@ function App(){
                         onClick={()=>setSelected(a)}>
                       <td className="mono">{a.asin}</td>
                       <td>{a.brand}
-                        {a.mixed_signal && <span className="flag">🔀</span>}
-                        {a.volatile && <span className="flag vol">📊</span>}
+                        {a.mixed_signal && <span className="flag">⇄</span>}
+                        {a.volatile && <span className="flag vol">≈</span>}
                       </td>
                       <td className="desc" title={a.description || ""}>{a.description || "—"}</td>
                       <td><Badge bucket={a.bucket} label={a.bucket_label} /></td>
@@ -581,7 +581,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 const setStatus = (msg) => root.render(<div style={{padding:"40px",textAlign:"center",color:"var(--muted)",fontFamily:"system-ui"}}>{msg}</div>);
 setStatus("Loading manifest…");
 
-fetch(window.__MANIFEST_URL, {cache: "no-store"})
+fetch(window.__PAGE_URL(window.__MANIFEST_NAME), {cache: "no-store"})
   .then(r => {
     if (!r.ok) throw new Error("Manifest HTTP " + r.status);
     return r.json();
@@ -589,7 +589,7 @@ fetch(window.__MANIFEST_URL, {cache: "no-store"})
   .then(manifest => {
     const n = manifest.chunks;
     setStatus(`Loading data (${n} chunks)…`);
-    const urls = Array.from({length: n}, (_, i) => window.__CHUNK_NAME_FMT(i));
+    const urls = Array.from({length: n}, (_, i) => window.__PAGE_URL(window.__CHUNK_NAME_FMT(i)));
     return Promise.all(urls.map(url =>
       fetch(url, {cache: "no-store"}).then(r => {
         if (!r.ok) throw new Error("Chunk HTTP " + r.status + " loading " + url);
