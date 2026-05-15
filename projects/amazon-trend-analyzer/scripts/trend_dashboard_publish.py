@@ -50,12 +50,13 @@ HTML_PAGE_ID = os.environ.get("QB_HTML_PAGE_ID", "")
 
 # File locations relative to this script's parent (project root)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_PATH = PROJECT_ROOT / "qb_chunks" / "amazon-trend-data.b64"
-HTML_PATH = PROJECT_ROOT / "assets"    / "dashboard_template_codepage.html"
+DATA_DIR = PROJECT_ROOT / "qb_chunks"
+HTML_PATH = PROJECT_ROOT / "assets" / "dashboard_template_codepage.html"
 
 # Page names as they will appear in Quickbase
-DATA_PAGE_NAME = "amazon-trend-data.b64"
 HTML_PAGE_NAME = "amazon-trend-dashboard.html"
+MANIFEST_PAGE_NAME = "amazon-trend-manifest.json"
+# Data chunks: amazon-trend-data-001.b64, -002.b64, etc.
 
 
 # ─── QB API (JSON-RPC, like nielsen_dashboard_publish.py) ─────────────────
@@ -126,9 +127,9 @@ def main():
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--html-only", action="store_true",
-                    help="Publish only the HTML shell (skip the JSON data)")
+                    help="Publish only the HTML shell (skip the data chunks)")
     ap.add_argument("--json-only", action="store_true",
-                    help="Publish only the JSON data (skip the HTML shell)")
+                    help="Publish only the data chunks + manifest (skip the HTML)")
     args = ap.parse_args()
 
     # Validate config
@@ -138,40 +139,57 @@ def main():
         sys.exit("[ABORT] Set QB_APP_DBID env var (parent app DBID for the "
                   "Code Pages — e.g. bqkdiemav for Amazon_AdTrack)")
 
-    # Validate files exist
-    if not args.html_only and not DATA_PATH.exists():
-        sys.exit(f"[ABORT] JSON payload not found at {DATA_PATH}\n"
-                  f"        Run:  python scripts/build_dashboard_from_chunks.py "
-                  f"--emit-json {DATA_PATH}")
+    # Discover data chunks
+    chunks = sorted(DATA_DIR.glob("amazon-trend-data-*.b64"))
+    manifest_path = DATA_DIR / "amazon-trend-manifest.json"
+
+    if not args.html_only:
+        if not chunks:
+            sys.exit(f"[ABORT] No chunks found at {DATA_DIR}/amazon-trend-data-*.b64\n"
+                      f"        Run:  python scripts/build_dashboard_from_chunks.py "
+                      f"--emit-compressed {DATA_DIR}")
+        if not manifest_path.exists():
+            sys.exit(f"[ABORT] Manifest not found at {manifest_path}")
     if not args.json_only and not HTML_PATH.exists():
         sys.exit(f"[ABORT] HTML template not found at {HTML_PATH}")
-
-    data_size_mb = DATA_PATH.stat().st_size / (1024 * 1024) if DATA_PATH.exists() else 0
-    html_size_kb = HTML_PATH.stat().st_size / 1024 if HTML_PATH.exists() else 0
 
     print("─" * 60)
     print(f"realm:    {REALM}")
     print(f"app:      {APP_DBID}")
     if not args.html_only:
-        print(f"data:     {DATA_PATH.name}  ({data_size_mb:.1f} MB)")
+        total_kb = sum(c.stat().st_size for c in chunks) / 1024
+        print(f"chunks:   {len(chunks)} files, {total_kb:.0f} KB total")
     if not args.json_only:
+        html_size_kb = HTML_PATH.stat().st_size / 1024
         print(f"html:     {HTML_PATH.name}  ({html_size_kb:.1f} KB)")
     print("─" * 60)
 
-    data_pid = DATA_PAGE_ID
     html_pid = HTML_PAGE_ID
 
-    # 1. Publish data page (unless skipped)
+    # 1. Publish data chunks + manifest (unless skipped)
     if not args.html_only:
-        print(f"\nPublishing {DATA_PAGE_NAME} ...")
-        data_body = DATA_PATH.read_text(encoding="utf-8")
-        data_pid = api_add_replace_dbpage(
-            page_id=DATA_PAGE_ID or None,
-            page_name=DATA_PAGE_NAME,
-            page_body=data_body,
+        # Each chunk gets its own pageid. We don't bother pinning these
+        # since their count varies; QB will replace by pagename either way.
+        for chunk_path in chunks:
+            print(f"\nPublishing {chunk_path.name} ({chunk_path.stat().st_size // 1024} KB)...")
+            chunk_body = chunk_path.read_text(encoding="ascii")
+            pid = api_add_replace_dbpage(
+                page_id=None,   # let QB find by name and replace
+                page_name=chunk_path.name,
+                page_body=chunk_body,
+                page_type=1,
+            )
+            print(f"  ✓ pageid={pid}")
+
+        print(f"\nPublishing {MANIFEST_PAGE_NAME}...")
+        manifest_body = manifest_path.read_text(encoding="utf-8")
+        pid = api_add_replace_dbpage(
+            page_id=None,
+            page_name=MANIFEST_PAGE_NAME,
+            page_body=manifest_body,
             page_type=1,
         )
-        print(f"  ✓ pageid={data_pid}")
+        print(f"  ✓ pageid={pid}")
 
     # 2. Publish HTML page (unless skipped)
     if not args.json_only:
@@ -187,18 +205,12 @@ def main():
 
     # 3. Print URLs + setup notes
     dash_url = f"https://{REALM}/db/{APP_DBID}?a=dbpage&pagename={HTML_PAGE_NAME}"
-    data_url = f"https://{REALM}/db/{APP_DBID}?a=dbpage&pagename={DATA_PAGE_NAME}"
     print(f"\n{'='*60}")
     print(f"✅ Published. Dashboard URL:")
     print(f"   {dash_url}")
-    print(f"\nData page (for debugging):")
-    print(f"   {data_url}")
-
-    if data_pid and not DATA_PAGE_ID:
-        print(f"\n⚡ FIRST RUN — pin the data pageid in your environment:")
-        print(f"     export QB_DATA_PAGE_ID={data_pid}")
     if html_pid and not HTML_PAGE_ID:
-        print(f"     export QB_HTML_PAGE_ID={html_pid}")
+        print(f"\n⚡ FIRST RUN — pin the HTML pageid in your environment:")
+        print(f"   $env:QB_HTML_PAGE_ID = '{html_pid}'")
     print("="*60)
 
 

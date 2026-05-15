@@ -175,14 +175,41 @@ def main():
             print(f"\nEmitted raw JSON → {out_path}  ({size_mb:.1f} MB)")
 
         if args.emit_compressed:
-            out_path = Path(args.emit_compressed)
+            # gzip + base64 the whole payload
             gz = gzip.compress(raw_json.encode("utf-8"), compresslevel=9)
             b64 = base64.b64encode(gz).decode("ascii")
-            out_path.write_text(b64, encoding="ascii")
-            size_mb = out_path.stat().st_size / (1024 * 1024)
             raw_mb = len(raw_json) / (1024 * 1024)
-            print(f"\nEmitted gzip+base64 → {out_path}  "
-                  f"({raw_mb:.1f} MB raw → {size_mb:.2f} MB encoded)")
+            encoded_kb = len(b64) / 1024
+
+            # Split into N chunks of CHUNK_SIZE_BYTES each (QB Code Page limit)
+            # 500 KB per chunk gives us ample margin under the ~1 MB limit
+            CHUNK_SIZE_BYTES = 500_000
+            num_chunks = (len(b64) + CHUNK_SIZE_BYTES - 1) // CHUNK_SIZE_BYTES
+
+            base = Path(args.emit_compressed)
+            # The arg can be a path to a single file or a directory hint.
+            # We standardize the output names as amazon-trend-data-001.b64 etc.
+            out_dir = base.parent if base.suffix else base
+            out_dir.mkdir(parents=True, exist_ok=True)
+
+            print(f"\nCompressed payload: {raw_mb:.1f} MB raw → {encoded_kb:.0f} KB encoded")
+            print(f"Splitting into {num_chunks} chunks of {CHUNK_SIZE_BYTES // 1000} KB each:")
+
+            # Wipe any old chunks first
+            for old in out_dir.glob("amazon-trend-data-*.b64"):
+                old.unlink()
+
+            for i in range(num_chunks):
+                chunk_path = out_dir / f"amazon-trend-data-{i+1:03d}.b64"
+                chunk_data = b64[i * CHUNK_SIZE_BYTES : (i + 1) * CHUNK_SIZE_BYTES]
+                chunk_path.write_text(chunk_data, encoding="ascii")
+                print(f"  ✓ {chunk_path.name}  ({len(chunk_data) // 1000} KB)")
+
+            # Write a manifest so the publisher and the HTML know how many chunks
+            manifest = {"chunks": num_chunks, "encoding": "gzip-base64"}
+            manifest_path = out_dir / "amazon-trend-manifest.json"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            print(f"  ✓ {manifest_path.name}")
 
         print("Next: python scripts/trend_dashboard_publish.py")
         return
