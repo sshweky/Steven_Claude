@@ -1,0 +1,1308 @@
+993	!	rich-text
+242	Div	text
+981	Inventory Manager	user
+139	Product Category	text
+20	Mstyle	text
+319	Style #	text
+294	Item Status	text
+297	Sub Status	text-multiple-choice
+300	Brand	rich-text
+299	Description____	rich-text
+410	Qty OH	rich-text
+411	Open Cust POs	rich-text
+867	Hold Order Qty	numeric
+412	ATS Qty OH	rich-text
+309	ATS WOS OH	rich-text
+871	ATS Qty (not alloc'd)	numeric
+932	ATS Now	numeric
+414	I/T	rich-text
+415	I/W	rich-text
+413	ATS OH+ OO	rich-text
+312	ATS WOS OH +OO	rich-text
+428	Last Shp Date	date
+467	Shpd/ Wk L4	rich-text
+442	Shpd /Wk L13	rich-text
+934	+/- Prj L4w	rich-text
+133	Prj/ Wk	numeric
+1888	AMZ Prj%	percent
+423	# Prj	rich-text
+254	1st Out	rich-text
+1224	Shipment_Status_Summary_______	multitext
+702	Next Rcpt Date	date
+257	Inventory_Notes__	rich-text
+996	Last OOS/Priority Note	text
+968	Last Overstock Note	rich-text
+448	Over Committed Qty	numeric
+141	05_10 W1	rich-text
+148	05_17 W2	rich-text
+184	05_24 W3	rich-text
+185	05_31 W4	rich-text
+186	06_07 W5	rich-text
+187	06_14 W6	rich-text
+188	06_21 W7	rich-text
+189	06_28 W8	rich-text
+190	07_05 W9	rich-text
+191	07_12 W10	rich-text
+192	07_19 W11	rich-text
+193	07_26 W12	rich-text
+194	08_02 W13	rich-text
+195	08_09 W14	rich-text
+196	08_16 W15	rich-text
+197	08_23 W16	rich-text
+198	08_30 W17	rich-text
+199	09_06 W18	rich-text
+200	09_13 W19	rich-text
+201	09_20 W20	rich-text
+202	09_27 W21	rich-text
+203	10_04 W22	rich-text
+204	10_11 W23	rich-text
+205	10_18 W24	rich-text
+206	10_25 W25	rich-text
+207	11_01 W26	rich-text
+137	Opt WOS	numeric
+234	Opt OH	numeric
+446	LT+ Opt Weeks	numeric
+865	# Hold Orders	numeric
+781	# Pcs/Kit	numeric
+255	# Prj#	numeric
+1232	% Time In Stock (since 2/16/22)	percent
+963	+/- Prj L4w (all#)	percent
+959	+/- Prj L4w (Amazon)	percent
+958	+/- Prj L4w (AMZ)	rich-text
+1275	+/- Prj L4w (w/ multipk)	percent
+1372	0-90 Days % by Inv Manager_	percent
+1164	02-06 W1 - CRO	numeric
+1176	02-13 W2 - CRO	numeric
+1184	02-20 W3 - CRO	numeric
+1185	02-27 W4 - CRO	numeric
+1129	02_06 W1 - CRO	rich-text
+1130	02_13 W2 - CRO	rich-text
+1131	02_20 W3 - CRO	rich-text
+1132	02_27 W4 - CRO	rich-text
+1186	03-06 W5 - CRO	numeric
+1187	03-13 W6 - CRO	numeric
+1188	03-20 W7 - CRO	numeric
+1189	03-27 W8 - CRO	numeric
+1133	03_06 W5 - CRO	rich-text
+1134	03_13 W6 - CRO	rich-text
+1135	03_20 W7 - CRO	rich-text
+1076	03_27 W8 - CRO	rich-text
+1190	04-03 W9 - CRO	numeric
+1165	04-10 W10 - CRO	numeric
+1166	04-17 W11 - CRO	numeric
+1167	04-24 W12 - CRO	numeric
+1136	04_03 W9 - CRO	rich-text
+1137	04_10 W10 - CRO	rich-text
+1138	04_17 W11 - CRO	rich-text
+1139	04_24 W12 - CRO	rich-text
+1168	05-01 W13 - CRO	numeric
+1169	05-08 W14 - CRO	numeric
+1172	05-15 W15 - CRO	numeric
+1171	05-22 W16 - CRO	numeric
+1173	05-29 W17 - CRO	numeric
+1140	05_01 W13 - CRO	rich-text
+1141	05_08 W14 - CRO	rich-text
+1142	05_15 W15 - CRO	rich-text
+1143	05_22 W16 - CRO	rich-text
+1144	05_29 W17 - CRO	rich-text
+1174	06-05 W18 - CRO	numeric
+1175	06-12 W19 - CRO	numeric
+1177	06-19 W20 - CRO	numeric
+1178	06-26 W21 - CRO	numeric
+1145	06_05 W18 - CRO	rich-text
+1146	06_12 W19 - CRO	rich-text
+1147	06_19 W20 - CRO	rich-text
+1148	06_26 W21 - CRO	rich-text
+1179	07-03 W22 - CRO	numeric
+1180	07-10 W23 - CRO	numeric
+1181	07-17 W24 - CRO	numeric
+1182	07-24 W25 - CRO	numeric
+1183	07-31 W26 - CRO	numeric
+1149	07_03 W22 - CRO	rich-text
+1150	07_10 W23 - CRO	rich-text
+1151	07_17 W24 - CRO	rich-text
+1152	07_24 W25 - CRO	rich-text
+1153	07_31 W26 - CRO	rich-text
+1347	180-365 Days % by Inv Manager	rich-text
+1375	180-365 Days % by Inv Manager_	percent
+260	1st Out Date	date
+1513	1st Rcpt Qty	numeric
+1514	1st Rcpt Sellthru %	percent
+1426	2023 Cost $ Savings (I/T + OO)	currency
+1425	2023 Cost $ Savings (Rcpts)	currency
+1418	2023 Starting FOB Cost	currency
+1306	2023 Tot Cost $ Savings	currency
+1588	2024 Cost $ Savings (I/T + OO)	currency
+1589	2024 Cost $ Savings (Rcpts)	currency
+1579	2024 Starting FOB Cost	currency
+1590	2024 Tot Cost $ Savings	currency
+857	8 Wk Flow	rich-text
+858	8 Wk PRJ	rich-text
+863	8 Wk PRJ+ORD	rich-text
+859	8 Wk Rcpt	rich-text
+1346	91-180 Days % by Inv Manager	rich-text
+1374	91-180 Days % by Inv Manager_	percent
+1348	>365 Days % by Inv Manager	rich-text
+1376	>365 Days by Inv Manager_	percent
+175	@	rich-text
+752	A-Wk1	numeric
+747	Acct-Mstyle Pairs	dblink
+1251	Active Customers ( List Form)	rich-text
+927	Active Item?	checkbox
+928	Active Item? (no multi-pks)	checkbox
+1486	Active KL?	checkbox
+1223	Active Replen Customers	multitext
+1859	Latest Tariff Incr Notes	multitext
+1858	Active Replen Customers (MU% New Prodn)	multitext
+1860	Active Replen Customers (MU% Current)	multitext
+1808	Active Replen Customers(name)	multitext
+1273	Add Order	url
+697	Add PO	url
+178	Add Projection	url
+1522	Add Record	url
+251	Add Style	url
+1560	Add Style Inventory Level	url
+1326	Add Style2	url
+1779	Add Style3	url
+1392	Add-back W1	numeric
+1401	Add-back W10	numeric
+1402	Add-back W11	numeric
+1403	Add-back W12	numeric
+1404	Add-back W13	numeric
+1405	Add-back W14	numeric
+1406	Add-back W15	numeric
+1407	Add-back W16	numeric
+1408	Add-back W17	numeric
+1409	Add-back W18	numeric
+1410	Add-back W19	numeric
+1393	Add-back W2	numeric
+1411	Add-back W20	numeric
+1412	Add-back W21	numeric
+1413	Add-back W22	numeric
+1414	Add-back W23	numeric
+1415	Add-back W24	numeric
+1416	Add-back W25	numeric
+1417	Add-back W26	numeric
+1394	Add-back W3	numeric
+1395	Add-back W4	numeric
+1396	Add-back W5	numeric
+1397	Add-back W6	numeric
+1398	Add-back W7	numeric
+1399	Add-back W8	numeric
+1400	Add-back W9	numeric
+1308	Aged Inv 0-90 days	numeric
+1329	Aged Inv 0-90 Days by Inv Manager	numeric
+1316	Aged Inv 0-90 days TTL	numeric
+1341	Aged Inv 180-365 Days by Inv Manager	numeric
+1312	Aged Inv 181-365 days	numeric
+1333	Aged Inv 181-365 days TTL	numeric
+1310	Aged Inv 91-180 days	numeric
+1339	Aged Inv 91-180 Days by Inv Manager	numeric
+1317	Aged Inv 91-180 days TTL	numeric
+1343	Aged Inv >365 Days by Inv Manager	numeric
+1334	Aged Inv >365 days TTL	numeric
+1314	Aged Inv>365 days	numeric
+182	Alloc'd	numeric
+1682	Alt Supplier 1	rich-text
+1830	Supplier Info	rich-text
+1698	Alt Supplier 2	rich-text
+1699	Alt Supplier 3	rich-text
+938	Amazon Catalog	dblink
+1772	Amazon Max Qty (EC)	numeric
+982	Amazon Open PO Qty	numeric
+988	Amazon Ord Units Chg%	percent
+986	Amazon Ord Units LW	numeric
+987	Amazon Ord Units Prior Wk	numeric
+983	Amazon Sellable OH Units	numeric
+1504	Amazon Sold Units L60d	numeric
+957	Amazon_Sales/OH/OO/Shpd	rich-text
+1065	Amz % Ttl Prj	rich-text
+966	AMZ Last Order Date	date
+967	AMZ Last Shpd Date	date
+1740	AMZ Only?	text
+1746	AMZ Order Qty	numeric
+1503	Annualized Sales$ L12m	currency
+753	ARcv Wk1	numeric
+945	Arrived at Whse Date	date
+699	ASIN	text
+1193	ASIN - # Days OOS	numeric
+1291	ASIN Buyability Flag	text
+930	ASIN Status	text
+716	ATS 05_10 W1	numeric
+717	ATS 05_17 W2	numeric
+718	ATS 05_24 W3	numeric
+719	ATS 05_31 W4	numeric
+720	ATS 06_07 W5	numeric
+715	ATS 06_14 W6	numeric
+722	ATS 06_21 W7	numeric
+723	ATS 06_28 W8	numeric
+724	ATS 07_05 W9	numeric
+725	ATS 07_12 W10	numeric
+726	ATS 07_19 W11	numeric
+727	ATS 07_26 W12	numeric
+728	ATS 08_02 W13	numeric
+729	ATS 08_09 W14	numeric
+730	ATS 08_16 W15	numeric
+731	ATS 08_23 W16	numeric
+902	ATS 08_30 W17	numeric
+903	ATS 09_06 W18	numeric
+904	ATS 09_13 W19	numeric
+905	ATS 09_20 W20	numeric
+906	ATS 09_27 W21	numeric
+907	ATS 10_04 W22	numeric
+908	ATS 10_11 W23	numeric
+909	ATS 10_18 W24	numeric
+910	ATS 10_25 W25	numeric
+911	ATS 11_01 W26	numeric
+1552	ATS 12_17 W1 (Add-back ONLY)	numeric
+1200	ATS Now (Cfmd)	numeric
+1239	ATS now (Cmfd) > 3000?	checkbox
+1677	ATS Now (root w/o Amazon)	numeric
+1551	ATS Now (root)	numeric
+1649	ATS Now (w/o Amazon)	numeric
+1724	ATS Now (w/o Amazon) - UC	numeric
+1576	ATS Now for Whse	numeric
+933	ATS Now WOS	rich-text
+1212	ATS OH + I/T	numeric
+1216	ATS OH + I/T + Booked (not O/W)	numeric
+1218	ATS OH + I/T + Booked (not O/W) Out Dt	date
+1217	ATS OH + I/T + Booked (not O/W) WOS	numeric
+1214	ATS OH + I/T Out Dt	date
+1213	ATS OH + I/T WOS	numeric
+1491	ATS OH WOS (KL)	numeric
+1072	ATS OH#	numeric
+180	ATS OH+ OO#	numeric
+1546	ATS OH+OO (Root)	numeric
+1493	ATS OH+OO WOS (KL)	numeric
+1722	ATS OH+OO# (w/kits)	numeric
+1203	ATS Qty (not alloc'd) WOS	numeric
+179	ATS Qty OH#	numeric
+1547	ATS Qty OH# (root)	numeric
+208	ATS WOS OH#	numeric
+209	ATS WOS OH+ OO#	numeric
+1723	ATS WOS OH+ OO# (w/ kits)	numeric
+1911	ATS WOS OH+ OO# (w/o test/exclusions)	numeric
+1476	ATS?	text
+912	ATS_Summary__	rich-text
+1717	ATS_Summary__ For XL Docs	text
+1243	Aug Open Cust POs ($)	currency
+1242	Aug Open Cust POs (U)	numeric
+978	DEAD Valid for Search Term Results?	checkbox
+1238	Avg Hist LT (No Transit)	numeric
+1236	Avg Historical LT	numeric
+1519	Avg Units/Wk L13w (Amz)	numeric
+1520	Avg Units/Wk L26w (Amz)	numeric
+1529	Avg Units/Wk L4w (Amz)	numeric
+181	B/O Qty	numeric
+138	Brand Name	text
+457	Buy W1	numeric
+551	Buy W10	numeric
+552	Buy W11	numeric
+553	Buy W12	numeric
+554	Buy W13	numeric
+555	Buy W14	numeric
+556	Buy W15	numeric
+557	Buy W16	numeric
+558	Buy W17	numeric
+559	Buy W18	numeric
+560	Buy W19	numeric
+459	Buy W2	numeric
+561	Buy W20	numeric
+562	Buy W21	numeric
+563	Buy W22	numeric
+564	Buy W23	numeric
+565	Buy W24	numeric
+566	Buy W25	numeric
+567	Buy W26	numeric
+460	Buy W3	numeric
+461	Buy W4	numeric
+546	Buy W5	numeric
+547	Buy W6	numeric
+548	Buy W7	numeric
+549	Buy W8	numeric
+550	Buy W9	numeric
+1742	CA ATS  not alloc'd OH Out Dt  (w/amz)	date
+1761	CA ATS  not alloc'd OH Out Dt  (wo/amz)	date
+1457	CA ATS  OH + I/T + Booked (not O/W) WOS	rich-text
+1469	CA ATS  WOS OH	rich-text
+1451	CA ATS  WOS OH (not alloc'd)	rich-text
+1453	CA ATS  WOS OH+OO	rich-text
+1471	CA ATS OH	rich-text
+1257	CA ATS OH (not alloc'd)	numeric
+1447	CA ATS OH + I/T + Booked# (not O/W) WOS	numeric
+1465	CA ATS OH#	numeric
+1450	CA ATS OH+OO	rich-text
+1441	CA ATS OH+OO#	numeric
+1475	CA ATS Qty (not alloc'd)	numeric
+1745	CA ATS Qty unalloc'd+ I/T + Booked# (not O/W) WOS	numeric
+1729	CA ATS unalloc'd+ I/T Out Dt  (Prj/Wk (CA) w/AMZ)	date
+1467	CA ATS WOS OH#	numeric
+1432	CA ATS WOS OH# (not alloc'd)	numeric
+1443	CA ATS WOS OH+OO#	numeric
+1743	CA ATS WOS unalloc'd# (w/amz)	numeric
+1463	CA Qty OH	numeric
+1733	CA unalloc'd  + I/T WOS (w/amz)	numeric
+1731	CA unalloc'd + I/T	numeric
+1523	Cancelled $	currency
+318	Case Pk	numeric
+263	Close Window [Chrome]	rich-text
+972	Combined Text Cust SKU#	multitext
+1515	Commit Item?	checkbox
+1282	Completely Booked	text
+541	Component #	text
+1337	Copy of Inventory Manager	text
+443	Copy of Shpd /Wk L13 (backup to be deleted)	rich-text
+1304	Cost $ Diff  (+/-)	rich-text
+1541	Cost Neg Note Last Modified	date
+1423	Cost Saving $ (txt)	rich-text
+1016	Cost+Duty+Freight	currency
+223	Country	text
+429	CS-1	multitext
+438	CS-10	multitext
+439	CS-11	multitext
+440	CS-12	multitext
+441	CS-13	multitext
+430	CS-2	multitext
+431	CS-3	multitext
+432	CS-4	multitext
+433	CS-5	multitext
+434	CS-6	multitext
+435	CS-7	multitext
+436	CS-8	multitext
+437	CS-9	multitext
+267	CS1	multitext
+276	CS10	multitext
+277	CS11	multitext
+278	CS12	multitext
+279	CS13	multitext
+280	CS14	multitext
+281	CS15	multitext
+282	CS16	multitext
+283	CS17	multitext
+284	CS18	multitext
+285	CS19	multitext
+268	CS2	multitext
+286	CS20	multitext
+287	CS21	multitext
+288	CS22	multitext
+289	CS23	multitext
+290	CS24	multitext
+291	CS25	multitext
+292	CS26	multitext
+269	CS3	multitext
+270	CS4	multitext
+271	CS5	multitext
+272	CS6	multitext
+273	CS7	multitext
+274	CS8	multitext
+275	CS9	multitext
+466	Curr Wk Date	date
+1775	Current Duty Rate	percent
+220	Current FOB Cost	currency
+419	Current User	user
+591	Current User - Focus MStyle	text
+421	Current User - User Exists?	checkbox
+1497	Cust $L52w	multitext
+468	Cust - Shp L13	multitext
+704	Cust Prjns Wk1	multitext
+705	Cust Prjns Wk2	multitext
+706	Cust Prjns Wk3	multitext
+707	Cust Prjns Wk4	multitext
+708	Cust Prjns Wk5	multitext
+709	Cust Prjns Wk6	multitext
+1524	Cxl $ L12m	currency
+711	Date 1st Rcvd	date
+970	Date 1st Shpd (Last 12m)	date
+1	Date Created	timestamp
+2	Date Modified	timestamp
+1231	Days OOS L12m	numeric
+1009	Days OOS till Next Rcpt	numeric
+1010	Days OOS>10?	numeric
+40	Description	text
+1219	Destination Whs	text-multiple-choice
+923	Div (filter)	text
+303	Div-Brand	rich-text
+961	Dt Last Counted	date
+742	Dtl Wk1	rich-text
+743	Dtl Wk2	rich-text
+213	Due Date	date
+1014	Duty Rate	percent
+1025	Duty Rate2	percent
+1762	EC/Multipack In stock?	text
+1026	ELC LA	currency
+1028	ELC NJ	currency
+469	ETD W1	date
+572	ETD W10	date
+573	ETD W11	date
+574	ETD W12	date
+575	ETD W13	date
+576	ETD W14	date
+577	ETD W15	date
+578	ETD W16	date
+579	ETD W17	date
+580	ETD W18	date
+581	ETD W19	date
+470	ETD W2	date
+582	ETD W20	date
+583	ETD W21	date
+584	ETD W22	date
+585	ETD W23	date
+586	ETD W24	date
+587	ETD W25	date
+588	ETD W26	date
+471	ETD W3	date
+472	ETD W4	date
+473	ETD W5	date
+568	ETD W6	date
+569	ETD W7	date
+570	ETD W8	date
+571	ETD W9	date
+1540	FOB Cost Var % (Current/Prev)	percent
+1298	FOB Cost Var % (Current/Starting 2023)	percent
+1580	FOB Cost Var % (Current/Starting 2024)	percent
+1705	FOB Cost_ALT 1	currency
+1706	FOB Cost_ALT 2	currency
+1707	FOB Cost_ALT 3	currency
+1272	FOB Point	text
+589	Fragrance	text
+962	Frcst/wk N16w	numeric
+1031	Freight In LA	currency
+1015	Freight In NJ	currency
+1194	Has ADF?	checkbox
+1195	Has MPP?	checkbox
+1495	Historical ATS OH WOS (L13WK)	numeric
+1494	Historical ATS OH+OO WOS (L13WK)	numeric
+1438	I/T # (CA)	numeric
+1483	I/T # (KL)	numeric
+1437	I/T # (NJ)	numeric
+1548	I/T + I/W (root)	numeric
+454	I/T Summary	text
+453	I/T Summary (Combined text format)	multitext
+25	I/T#	numeric
+416	I/T+ I/W	rich-text
+218	I/T+ I/W#	numeric
+1439	I/W # (CA)	numeric
+1484	I/W # (KL)	numeric
+1436	I/W # (NJ)	numeric
+456	I/W Summary	text
+455	I/W Summary (Combined text format)	multitext
+26	I/W#	numeric
+1721	I/W+I/T w/Kits	numeric
+1501	In Prodn ST% (Active)	percent
+1023	Inner Pack	numeric
+1458	Inv _Whse_Issue_______________________	rich-text
+1380	Inv Age Basket	text
+1758	Inv Age Bsk	text
+1753	Inv Age Close to 180 Days	text
+1754	Inv Age Close to 365 Days	text
+256	Inv Dept Notes	text-multi-line
+322	Inv Flow Record Exists for Invtry	checkbox
+23	Inventory	dblink
+253	Inventory Flow Record Exists for MStyle?	checkbox
+1479	Inventory_Alert________	rich-text
+1269	Invtry Age (Days)	numeric
+783	isKitStyle?	checkbox
+1264	ISO ship date is before ist out date	text
+1573	Item Rank	text-multiple-choice
+924	Item Status (filter)	text
+1033	Jan 2022 Price (Max)	currency
+1241	July Open Cust POs ($)	currency
+1240	July Open Cust POs (U)	numeric
+1488	KHL Qty OH (non-ticketed)	numeric
+417	Kit Proj +16W	numeric
+1226	Kit Proj +26W	numeric
+1759	Kit Style?	checkbox
+427	Kits Last Shp Date	date
+327	Kits OpnWk0	numeric
+328	Kits OpnWk1	numeric
+342	Kits OpnWk10	numeric
+343	Kits OpnWk11	numeric
+344	Kits OpnWk12	numeric
+345	Kits OpnWk13	numeric
+346	Kits OpnWk14	numeric
+347	Kits OpnWk15	numeric
+348	Kits OpnWk16	numeric
+349	Kits OpnWk17	numeric
+350	Kits OpnWk18	numeric
+351	Kits OpnWk19	numeric
+329	Kits OpnWk2	numeric
+352	Kits OpnWk20	numeric
+353	Kits OpnWk21	numeric
+354	Kits OpnWk22	numeric
+355	Kits OpnWk23	numeric
+356	Kits OpnWk24	numeric
+357	Kits OpnWk25	numeric
+358	Kits OpnWk26	numeric
+330	Kits OpnWk3	numeric
+331	Kits OpnWk4	numeric
+337	Kits OpnWk5	numeric
+338	Kits OpnWk6	numeric
+339	Kits OpnWk7	numeric
+340	Kits OpnWk8	numeric
+341	Kits OpnWk9	numeric
+381	Kits Proj Wk1	numeric
+390	Kits Proj Wk10	numeric
+391	Kits Proj Wk11	numeric
+392	Kits Proj Wk12	numeric
+393	Kits Proj Wk13	numeric
+394	Kits Proj Wk14	numeric
+395	Kits Proj Wk15	numeric
+396	Kits Proj Wk16	numeric
+397	Kits Proj Wk17	numeric
+398	Kits Proj Wk18	numeric
+399	Kits Proj Wk19	numeric
+382	Kits Proj Wk2	numeric
+400	Kits Proj Wk20	numeric
+401	Kits Proj Wk21	numeric
+402	Kits Proj Wk22	numeric
+403	Kits Proj Wk23	numeric
+404	Kits Proj Wk24	numeric
+405	Kits Proj Wk25	numeric
+406	Kits Proj Wk26	numeric
+383	Kits Proj Wk3	numeric
+384	Kits Proj Wk4	numeric
+385	Kits Proj Wk5	numeric
+386	Kits Proj Wk6	numeric
+387	Kits Proj Wk7	numeric
+388	Kits Proj Wk8	numeric
+389	Kits Proj Wk9	numeric
+332	Kits RcvWk0	numeric
+333	Kits RcvWk1	numeric
+364	Kits RcvWk10	numeric
+365	Kits RcvWk11	numeric
+366	Kits RcvWk12	numeric
+367	Kits RcvWk13	numeric
+368	Kits RcvWk14	numeric
+369	Kits RcvWk15	numeric
+370	Kits RcvWk16	numeric
+371	Kits RcvWk17	numeric
+372	Kits RcvWk18	numeric
+373	Kits RcvWk19	numeric
+334	Kits RcvWk2	numeric
+374	Kits RcvWk20	numeric
+375	Kits RcvWk21	numeric
+376	Kits RcvWk22	numeric
+377	Kits RcvWk23	numeric
+378	Kits RcvWk24	numeric
+379	Kits RcvWk25	numeric
+380	Kits RcvWk26	numeric
+335	Kits RcvWk3	numeric
+336	Kits RcvWk4	numeric
+359	Kits RcvWk5	numeric
+360	Kits RcvWk6	numeric
+361	Kits RcvWk7	numeric
+362	Kits RcvWk8	numeric
+1074	Kits RcvWk8 Confirmed Only	numeric
+363	Kits RcvWk9	numeric
+425	Kits Shpd L13W	numeric
+1005	Kits Shpd L13W (scalar maintained by Pipeline import)	numeric
+426	Kits Shpd L4W	numeric
+1002	Kits Shpd L4W (scalar maintained by Pipeline import)	numeric
+1481	KL Qty OH	numeric
+1498	L13w $ by Cust	multitext
+1499	L13w Qty by Cust	multitext
+754	Label ATS WK1	text
+763	Label ATS WK10	text
+764	Label ATS WK11	text
+765	Label ATS WK12	text
+766	Label ATS WK13	text
+767	Label ATS WK14	text
+768	Label ATS WK15	text
+769	Label ATS WK16	text
+913	Label ATS WK17	text
+914	Label ATS WK18	text
+915	Label ATS WK19	text
+755	Label ATS WK2	text
+916	Label ATS WK20	text
+917	Label ATS WK21	text
+918	Label ATS WK22	text
+919	Label ATS WK23	text
+920	Label ATS WK24	text
+921	Label ATS WK25	text
+922	Label ATS WK26	text
+756	Label ATS WK3	text
+757	Label ATS WK4	text
+758	Label ATS WK5	text
+759	Label ATS WK6	text
+760	Label ATS WK7	text
+761	Label ATS WK8	text
+762	Label ATS WK9	text
+1013	Landed Cost	currency
+5	Last Modified By	user
+1233	Last OOS Date	date
+965	Last Ord Date	date
+305	Last Shp Date (raw)	date
+1199	Last Whs Rcvd Date	date
+770	Link to Admin Function 1	numeric
+973	Link to Search (=1)	numeric
+701	Lowest OH Next 16W	numeric
+409	LT (PT)	numeric
+1525	LT (Wks)	numeric
+225	LT+ Trans Days	numeric
+1711	LT_ALT 1	numeric
+1712	LT_ALT 2	numeric
+1713	LT_ALT 3	numeric
+929	Master Pack	numeric
+772	Minimum Record ID# (used by a Pipeline)	numeric
+1567	minOH	numeric
+226	MOQ	numeric
+695	MOQ (PT)	numeric
+686	MOQ (text)	text
+1708	MOQ_ALT 1	numeric
+1709	MOQ_ALT 2	numeric
+1710	MOQ_ALT 3	numeric
+1017	Move to USA Priority	text-multiple-choice
+1700	Mstyle (mirror)	text
+593	MStyle (Selling Unit) is in Focus for Display of Tub/Lid Resin BOMs (=1)	numeric
+1059	Mstyle - Avg Unit Cost	currency
+1505	MU% Shpd L12m (hist)	percent
+1575	MU%: LA	percent
+1574	MU%: NJ	percent
+1720	Multipack at Fty?	checkbox
+1021	Need By	date
+1020	Need Qty	numeric
+323	New ATS OH +OO	numeric
+1544	New ATS OH +OO (N4 Wk Ord)	numeric
+324	New ATS WOS OH +OO	numeric
+1545	New ATS WOS OH +OO (N4 Wk Ord)	numeric
+235	Next Avl Rcpt Dt	date
+1773	Next ETD Date	date
+1726	Next Rcpt Date (CA)	date
+1725	Next Rcpt Date (NJ)	date
+1258	NJ  ATS OH (not alloc'd)	numeric
+1730	NJ  unalloc'd + I/T	numeric
+1735	NJ ATS  not alloc'd OH Out Dt  (wo/amz)	date
+1456	NJ ATS  OH + I/T + Booked (not O/W) WOS	rich-text
+1468	NJ ATS  WOS OH	rich-text
+1449	NJ ATS  WOS OH (not alloc'd)	rich-text
+1452	NJ ATS  WOS OH+OO	rich-text
+1470	NJ ATS OH	rich-text
+1444	NJ ATS OH + I/T + Booked# (not O/W) WOS	numeric
+1464	NJ ATS OH#	numeric
+1448	NJ ATS OH+OO	rich-text
+1440	NJ ATS OH+OO#	numeric
+1473	NJ ATS Qty (not alloc'd)	numeric
+1744	NJ ATS Qty unalloc'd+ I/T + Booked# (not O/W) WOS	numeric
+1728	NJ ATS unalloc'd+ I/T Out Dt  (Prj/Wk (NJ) wo/AMZ)	date
+1466	NJ ATS WOS OH#	numeric
+1431	NJ ATS WOS OH# (not alloc'd)	numeric
+1442	NJ ATS WOS OH+OO#	numeric
+1738	NJ ATS WOS unalloc'd# (wo/amz)	numeric
+1462	NJ Qty OH	numeric
+1732	NJ unalloc'd + I/T WOS (wo/amz)	numeric
+1487	NVO	checkbox
+874	Nxt Avl Rcpt (for ATS)	date
+868	Nxt OOS Gap (Days)	numeric
+1767	Off Price Customer?	checkbox
+24	OH#	numeric
+1012	OH+OO#	numeric
+252	OOS Dates (MM-DD)	text
+262	OOS Dates (MM-DD-YY)	text
+1480	OOS Issue Nxt 16WK?	checkbox
+1234	OOS Now?	checkbox
+1752	OOS Risk N16 Wks?	checkbox
+985	OOS/Priority Notes	text-multi-line
+183	Open Cust PO Qty	numeric
+778	Open Cust PO Qtys Match?	checkbox
+840	Open Orders (all)	numeric
+947	Open Orders (Amazon)	numeric
+1459	Open Orders (CA)	numeric
+1500	Open Orders (customers)	multitext
+1485	Open Orders (KL)	numeric
+1461	Open Orders (NJ)	numeric
+1069	Open Orders (w/Kits ext'd)	numeric
+1237	Open POs ETD	multitext
+241	Open Supplier POs	multitext
+811	Opn w/Kits W0	numeric
+812	Opn w/Kits W1	numeric
+813	Opn w/Kits W2	numeric
+296	Opn Wk0	numeric
+1621	Opn Wk0 (w/o Amazon)	numeric
+30	Opn Wk1	numeric
+1620	Opn Wk1 (w/o Amazon)	numeric
+93	Opn Wk10	numeric
+1630	Opn Wk10 (w/o Amazon)	numeric
+94	Opn Wk11	numeric
+1631	Opn Wk11 (w/o Amazon)	numeric
+95	Opn Wk12	numeric
+1632	Opn Wk12 (w/o Amazon)	numeric
+96	Opn Wk13	numeric
+1633	Opn Wk13 (w/o Amazon)	numeric
+97	Opn Wk14	numeric
+1634	Opn Wk14 (w/o Amazon)	numeric
+98	Opn Wk15	numeric
+1635	Opn Wk15 (w/o Amazon)	numeric
+99	Opn Wk16	numeric
+1636	Opn Wk16 (w/o Amazon)	numeric
+100	Opn Wk17	numeric
+1637	Opn Wk17 (w/o Amazon)	numeric
+101	Opn Wk18	numeric
+1638	Opn Wk18 (w/o Amazon)	numeric
+143	Opn Wk19	numeric
+1639	Opn Wk19 (w/o Amazon)	numeric
+37	Opn Wk2	numeric
+1622	Opn Wk2 (w/o Amazon)	numeric
+103	Opn Wk20	numeric
+1640	Opn Wk20 (w/o Amazon)	numeric
+104	Opn Wk21	numeric
+1641	Opn Wk21 (w/o Amazon)	numeric
+105	Opn Wk22	numeric
+1642	Opn Wk22 (w/o Amazon)	numeric
+106	Opn Wk23	numeric
+1643	Opn Wk23 (w/o Amazon)	numeric
+107	Opn Wk24	numeric
+1644	Opn Wk24 (w/o Amazon)	numeric
+108	Opn Wk25	numeric
+1645	Opn Wk25 (w/o Amazon)	numeric
+109	Opn Wk26	numeric
+1646	Opn Wk26 (w/o Amazon)	numeric
+39	Opn Wk3	numeric
+1623	Opn Wk3 (w/o Amazon)	numeric
+38	Opn Wk4	numeric
+1624	Opn Wk4 (w/o Amazon)	numeric
+87	Opn Wk5	numeric
+1625	Opn Wk5 (w/o Amazon)	numeric
+89	Opn Wk6	numeric
+1626	Opn Wk6 (w/o Amazon)	numeric
+90	Opn Wk7	numeric
+1627	Opn Wk7 (w/o Amazon)	numeric
+91	Opn Wk8	numeric
+1628	Opn Wk8 (w/o Amazon)	numeric
+92	Opn Wk9	numeric
+1629	Opn Wk9 (w/o Amazon)	numeric
+212	Ord Qty	numeric
+1543	Ord Qty (N4 Wks)	numeric
+1202	Ord/Wk L13w	numeric
+937	Ord/Wk L4w	numeric
+951	Ord/Wk L4w (Amazon)	numeric
+1877	Ord/Wk L13w (Amazon)	numeric
+29	Orders	dblink
+264	Orders2	dblink
+696	Orders3	dblink
+797	Orders5	dblink
+798	Orders6	dblink
+307	Out Date OH	date
+311	Out Date OH+OO	date
+449	Overstock Notes	text-multi-line
+444	Ovr Comt WOS	numeric
+238	Pcs/ Ctn	numeric
+1714	Plate Ct	text
+259	PO #	multitext
+1271	Port of Origin for Supplier	text-multiple-choice
+1297	Previous FOB Cost	currency
+1281	Price Last Updated	date
+700	Priority	text-multiple-choice
+926	Priority (filter)	text
+1755	Prj OverUnder	percent
+146	Prj Wk1	numeric
+1593	Prj Wk1 (w/o Amazon)	numeric
+157	Prj Wk10	numeric
+1602	Prj Wk10 (w/o Amazon)	numeric
+158	Prj Wk11	numeric
+1603	Prj Wk11 (w/o Amazon)	numeric
+159	Prj Wk12	numeric
+1604	Prj Wk12 (w/o Amazon)	numeric
+160	Prj Wk13	numeric
+1605	Prj Wk13 (w/o Amazon)	numeric
+161	Prj Wk14	numeric
+1606	Prj Wk14 (w/o Amazon)	numeric
+162	Prj Wk15	numeric
+1607	Prj Wk15 (w/o Amazon)	numeric
+163	Prj Wk16	numeric
+1608	Prj Wk16 (w/o Amazon)	numeric
+164	Prj Wk17	numeric
+1609	Prj Wk17 (w/o Amazon)	numeric
+165	Prj Wk18	numeric
+1610	Prj Wk18 (w/o Amazon)	numeric
+166	Prj Wk19	numeric
+1611	Prj Wk19 (w/o Amazon)	numeric
+147	Prj Wk2	numeric
+1594	Prj Wk2 (w/o Amazon)	numeric
+167	Prj Wk20	numeric
+1612	Prj Wk20 (w/o Amazon)	numeric
+168	Prj Wk21	numeric
+1613	Prj Wk21 (w/o Amazon)	numeric
+169	Prj Wk22	numeric
+1614	Prj Wk22 (w/o Amazon)	numeric
+170	Prj Wk23	numeric
+1615	Prj Wk23 (w/o Amazon)	numeric
+171	Prj Wk24	numeric
+1616	Prj Wk24 (w/o Amazon)	numeric
+172	Prj Wk25	numeric
+1617	Prj Wk25 (w/o Amazon)	numeric
+173	Prj Wk26	numeric
+1618	Prj Wk26 (w/o Amazon)	numeric
+150	Prj Wk3	numeric
+1595	Prj Wk3 (w/o Amazon)	numeric
+151	Prj Wk4	numeric
+1596	Prj Wk4 (w/o Amazon)	numeric
+152	Prj Wk5	numeric
+1597	Prj Wk5 (w/o Amazon)	numeric
+153	Prj Wk6	numeric
+1598	Prj Wk6 (w/o Amazon)	numeric
+154	Prj Wk7	numeric
+1599	Prj Wk7 (w/o Amazon)	numeric
+155	Prj Wk8	numeric
+1600	Prj Wk8 (w/o Amazon)	numeric
+156	Prj Wk9	numeric
+1601	Prj Wk9 (w/o Amazon)	numeric
+149	Prj+16Wks	numeric
+1225	Prj+26Wks	numeric
+1555	Prj+26Wks (Add-back Only)	numeric
+1428	Prj/ Wk (Amz - CA)	numeric
+1736	Prj/ Wk (Amz - NJ)	numeric
+1537	Prj/ Wk (CA Pref)	numeric
+1478	Prj/ Wk (Either -CA Allocation)	numeric
+1477	Prj/ Wk (Either -NJ Allocation)	numeric
+1427	Prj/ Wk (Either Pref)	numeric
+1553	Prj/ Wk (excl Add-back)	numeric
+1482	Prj/ Wk (KL)	numeric
+1538	Prj/ Wk (Multipk)	numeric
+1366	Prj/ Wk (NJ Pref)	numeric
+1676	Prj/ Wk (w/o Amazon excl Add-back)	numeric
+1536	Prj/ Wk (WM MX Fetch- CA)	numeric
+1534	Prj/ Wk (WM MX Fetch- NJ)	numeric
+1535	Prj/ Wk (WM US Fetch- CA)	numeric
+1802	Prj/ Wk (WM US BB- CA)	numeric
+1533	Prj/ Wk (WM US Fetch- NJ)	numeric
+1803	Prj/ Wk (WM US BB- NJ)	numeric
+956	Prj/Wk (Amazon)	numeric
+1222	Prj/Wk (Amazon) + Kit	numeric
+1527	Prj/Wk (Costech)	numeric
+684	Prod Line	text-multiple-choice
+140	Product Subcategory	text
+534	Production Line of Component	text
+1191	Projection Alert	text
+1192	Projection Alert2	text
+177	Projections	dblink
+144	Projections2	dblink
+326	Purch Notes	rich-text
+230	Purchasing Notes	text
+710	Pvt Lbl/Excl	checkbox
+842	Qty Alloc'd (all)	numeric
+1474	Qty Alloc'd (CA)	numeric
+1472	Qty Alloc'd (NJ)	numeric
+843	Qty B/O'd (all)	numeric
+1420	QTY I/T $$ '23(at lower FOB)	currency
+1585	QTY I/T $$ '24(at lower FOB)	currency
+1300	QTY I/T '23(at lower FOB)	numeric
+1586	QTY I/T '24(at lower FOB)	numeric
+1549	Qty in Prodn (root)	numeric
+1550	Qty in Transit (root)	numeric
+780	Qty Mismatch Difference	numeric
+822	Qty OH (Kits Only Ext'd)	numeric
+823	Qty OH w/Kits (ext'd)	numeric
+543	Qty OH#	numeric
+1419	QTY Open $$ '23 (at lower FOB)	currency
+1583	QTY Open $$ '24 (at lower FOB)	currency
+1299	QTY Open '23 (at lower FOB)	numeric
+1584	QTY Open '24 (at lower FOB)	numeric
+779	Qty Shipped Today	numeric
+1421	Rcvd $$ '23 (at lower FOB)	currency
+1581	Rcvd $$ '24 (at lower FOB)	currency
+1302	Rcvd Qty'23 (at lower FOB)	numeric
+1582	Rcvd Qty'24 (at lower FOB)	numeric
+295	RcvWk0	numeric
+1078	RcvWk0 Confirmed Only	numeric
+623	RcvWk0 HP	numeric
+609	RcvWk0 HSL	numeric
+28	RcvWk1	numeric
+1079	RcvWk1 Confirmed Only	numeric
+624	RcvWk1 HP	numeric
+610	RcvWk1 HSL	numeric
+69	RcvWk10	numeric
+1087	RcvWk10 Confirmed Only	numeric
+633	RcvWk10 HP	numeric
+619	RcvWk10 HSL	numeric
+70	RcvWk11	numeric
+1088	RcvWk11 Confirmed Only	numeric
+634	RcvWk11 HP	numeric
+620	RcvWk11 HSL	numeric
+71	RcvWk12	numeric
+1089	RcvWk12 Confirmed Only	numeric
+635	RcvWk12 HP	numeric
+621	RcvWk12 HSL	numeric
+72	RcvWk13	numeric
+1090	RcvWk13 Confirmed Only	numeric
+636	RcvWk13 HP	numeric
+622	RcvWk13 HSL	numeric
+73	RcvWk14	numeric
+1091	RcvWk14 Confirmed Only	numeric
+74	RcvWk15	numeric
+1092	RcvWk15 Confirmed Only	numeric
+75	RcvWk16	numeric
+1093	RcvWk16 Confirmed Only	numeric
+76	RcvWk17	numeric
+1094	RcvWk17 Confirmed Only	numeric
+77	RcvWk18	numeric
+1095	RcvWk18 Confirmed Only	numeric
+78	RcvWk19	numeric
+1096	RcvWk19 Confirmed Only	numeric
+35	RcvWk2	numeric
+1080	RcvWk2 Confirmed Only	numeric
+625	RcvWk2 HP	numeric
+611	RcvWk2 HSL	numeric
+79	RcvWk20	numeric
+1097	RcvWk20 Confirmed Only	numeric
+80	RcvWk21	numeric
+1098	RcvWk21 Confirmed Only	numeric
+81	RcvWk22	numeric
+1099	RcvWk22 Confirmed Only	numeric
+82	RcvWk23	numeric
+1100	RcvWk23 Confirmed Only	numeric
+83	RcvWk24	numeric
+1101	RcvWk24 Confirmed Only	numeric
+84	RcvWk25	numeric
+1102	RcvWk25 Confirmed Only	numeric
+85	RcvWk26	numeric
+1103	RcvWk26 Confirmed Only	numeric
+36	RcvWk3	numeric
+1081	RcvWk3 Confirmed Only	numeric
+626	RcvWk3 HP	numeric
+612	RcvWk3 HSL	numeric
+50	RcvWk4	numeric
+1082	RcvWk4 Confirmed Only	numeric
+627	RcvWk4 HP	numeric
+613	RcvWk4 HSL	numeric
+51	RcvWk5	numeric
+1083	RcvWk5 Confirmed Only	numeric
+628	RcvWk5 HP	numeric
+614	RcvWk5 HSL	numeric
+65	RcvWk6	numeric
+1084	RcvWk6 Confirmed Only	numeric
+629	RcvWk6 HP	numeric
+615	RcvWk6 HSL	numeric
+66	RcvWk7	numeric
+1086	RcvWk7 Confirmed Only	numeric
+630	RcvWk7 HP	numeric
+616	RcvWk7 HSL	numeric
+67	RcvWk8	numeric
+1073	RcvWk8 Confirmed Only	numeric
+631	RcvWk8 HP	numeric
+617	RcvWk8 HSL	numeric
+68	RcvWk9	numeric
+1085	RcvWk9 Confirmed Only	numeric
+632	RcvWk9 HP	numeric
+618	RcvWk9 HSL	numeric
+1556	Reactivated to Replen?	checkbox
+946	Receiving Messages	multitext
+3	Record ID#	recordid
+773	Record ID# is the Minimum Record ID#	checkbox
+4	Record Owner	user
+1521	Record records	dblink
+1157	Related Acct-MStyle	text
+1284	Related ASIN	text
+1287	Related ASIN2	text
+1290	Related ASIN3	text
+1685	Related MStyle	text
+1259	Related Style	text
+1320	Related Style2	text
+1252	Related Supplier PO	text
+1204	Related Supplier PO#	numeric
+1592	Reorder Notes	text-multi-line
+792	Root Mstyle	text
+1578	Root Mstyle (New)	multitext
+1774	Safety Stock	numeric
+1566	scrap	numeric
+977	Search Terms	text
+1068	Season	text
+1024	Sell Ea: Latest Sell Price	currency
+1245	Sept Open Cust POs ($)	currency
+1244	Sept Open Cust POs (U)	numeric
+992	Set Opt Wks to Zero?	checkbox
+422	Set User Focus URL	url
+1496	Shipped Orders L52w	multitext
+1558	Shopify	checkbox
+314	Shp /Wk L13	numeric
+1841	Shp /Wk L4	numeric
+1507	Shp /Wk L8	numeric
+1295	Shp LW	rich-text
+1508	Shpd /Wk L8	rich-text
+1035	Shpd LW	numeric
+1036	Shpd LW -1	numeric
+1056	Shpd LW -10	numeric
+1057	Shpd LW -11	numeric
+1058	Shpd LW -12	numeric
+1048	Shpd LW -2	numeric
+1049	Shpd LW -3	numeric
+1050	Shpd LW -4	numeric
+1051	Shpd LW -5	numeric
+1052	Shpd LW -6	numeric
+1053	Shpd LW -7	numeric
+1054	Shpd LW -8	numeric
+1055	Shpd LW -9	numeric
+1034	Shpd W0	numeric
+1274	Shpd/ Wk L4 (w/ multipk)	numeric
+1528	Shpd/Wk L13 (w/kits)	numeric
+954	Shpd/Wk L13w (Amazon)	numeric
+313	Shpd/Wk L4 (w/kits)	numeric
+952	Shpd/Wk L4w (Amazon)	numeric
+533	Size/Ct	text
+1518	SKU $ Min	currency
+1517	Status Chg Notes	text
+703	STOCK Qty	numeric
+943	Stock_Summary______________	rich-text
+971	Style #- Mstyle - Customer Sku #	text
+1268	Style #- Mstyle - Customer Sku # - Mstyle	text
+1387	Style #2	text
+1776	Style #3	numeric
+994	Style Alert Message	text
+1229	Style inventory levels	dblink
+1778	Style records	dblink
+1782	Style records2	dblink
+1786	Style records3	dblink
+1032	Styles	dblink
+1292	Styles2	dblink
+1748	Sub Status Match	text
+236	Sugg Qty	numeric
+692	Sugg Qty is > 0?	text
+1000	Super Search Style #'s or MStyles	text
+751	Supp-Opn1	multitext
+231	Supplier (PT)	rich-text
+27	Supplier POs	dblink
+691	Supplier Ref #	text
+219	Supplier(PT)	text
+1702	Supplier_ALT 1	text
+1703	Supplier_ALT 2	text
+1704	Supplier_ALT 3	text
+1422	Tot $$ Rcvd + OO '23 (at lower FOB)	currency
+1587	Tot $$ Rcvd + OO '24 (at lower FOB)	currency
+1455	Tot CA Prj/Wk	rich-text
+1454	Tot NJ Prj/Wk	rich-text
+1647	Tot Opn 26 Wks (w/o Amazon)	numeric
+1201	Tot Ord L13w	numeric
+935	Tot Ord L4w	numeric
+948	Tot Ord L4w (Amazon)	numeric
+1876	Tot Ord L13w (Amazon)	numeric
+1557	Tot Ord LW	numeric
+1619	Tot Prj 26 Wks (w/o Amazon)	numeric
+1430	Tot Prj/Wk (CA)	numeric
+1741	Tot Prj/Wk (CA) w/AMZ	numeric
+1804	Tot Prj/Wk (NJ) w/AMZ	numeric
+1760	Tot Prj/Wk (CA) wo/AMZ	numeric
+1429	Tot Prj/Wk (NJ)	numeric
+1737	Tot Prj/Wk (NJ) wo/AMZ	numeric
+713	Tot Purchased LTD	numeric
+860	Tot Qty Marked for Allocation	numeric
+861	Tot Qty Marked for Cancellation	numeric
+862	Tot Qty Marked for Req Extension	numeric
+1502	Tot Shpd $ L12m	currency
+950	Tot Shpd L13 (Amazon)	numeric
+316	Tot Shpd L13w	numeric
+315	Tot Shpd L4	numeric
+949	Tot Shpd L4 (Amazon)	numeric
+1506	Tot Shpd L8w	numeric
+712	Tot Shpd LTD	numeric
+714	Tot Sold LTD	numeric
+1303	Tot Units Rcvd + OO '23 (at lower FOB)	numeric
+1591	Tot Units Rcvd + OO '24 (at lower FOB)	numeric
+1571	Tot Xfer Qty Open	numeric
+1530	Total Buy - N4 Wk FC	numeric
+1386	Total Cost	currency
+1389	Total OH$	currency
+1215	Total Qty Booked but not O/W	numeric
+1446	Total Qty Booked but not O/W (CA)	numeric
+1445	Total Qty Booked but not O/W (NJ)	numeric
+955	TotPrj (16w - Amazon)	numeric
+1227	TotPrj (26w - Amazon)	numeric
+1526	TotPrj (26w - Costech)	numeric
+1221	TotPrj Kit (16w - Amazon)	numeric
+1228	TotPrj Kit (26w - Amazon)	numeric
+1572	Transfer Qty Open?	checkbox
+1751	Transit Days	numeric
+1750	Transit Days(LA)	numeric
+1749	Transit Days(NY)	numeric
+1577	true	checkbox
+445	Try Cxl Qty	numeric
+1490	Ttl ATS OH (KL)	numeric
+1492	Ttl ATS OH+OO (KL)	numeric
+1489	Ttl Kohl OH	numeric
+1001	Valid for Style Search Results?	checkbox
+931	W0d	date
+885	W10d	date
+886	W11d	date
+887	W12d	date
+888	W13d	date
+889	W14d	date
+890	W15d	date
+891	W16d	date
+892	W17d	date
+893	W18d	date
+894	W19d	date
+876	W1d	date
+895	W20d	date
+896	W21d	date
+897	W22d	date
+898	W23d	date
+899	W24d	date
+879	W25d	date
+900	W26d	date
+877	W2d	date
+878	W3d	date
+901	W4d	date
+880	W5d	date
+881	W6d	date
+882	W7d	date
+883	W8d	date
+884	W9d	date
+134	Wk1	numeric
+1650	Wk1 (w/o Amazon)	numeric
+1104	Wk1 Confirmed Receipts Only	numeric
+115	Wk10	numeric
+1659	Wk10 (w/o Amazon)	numeric
+1112	Wk10 Confirmed Receipts Only	numeric
+116	Wk11	numeric
+1660	Wk11 (w/o Amazon)	numeric
+1113	Wk11 Confirmed Receipts Only	numeric
+117	Wk12	numeric
+1661	Wk12 (w/o Amazon)	numeric
+1114	Wk12 Confirmed Receipts Only	numeric
+118	Wk13	numeric
+1662	Wk13 (w/o Amazon)	numeric
+1115	Wk13 Confirmed Receipts Only	numeric
+128	Wk14	numeric
+1663	Wk14 (w/o Amazon)	numeric
+1116	Wk14 Confirmed Receipts Only	numeric
+129	Wk15	numeric
+1664	Wk15 (w/o Amazon)	numeric
+1117	Wk15 Confirmed Receipts Only	numeric
+130	Wk16	numeric
+1665	Wk16 (w/o Amazon)	numeric
+1118	Wk16 Confirmed Receipts Only	numeric
+131	Wk17	numeric
+1666	Wk17 (w/o Amazon)	numeric
+1119	Wk17 Confirmed Receipts Only	numeric
+120	Wk18	numeric
+1667	Wk18 (w/o Amazon)	numeric
+1120	Wk18 Confirmed Receipts Only	numeric
+121	Wk19	numeric
+1668	Wk19 (w/o Amazon)	numeric
+1121	Wk19 Confirmed Receipts Only	numeric
+8	Wk2	numeric
+1651	Wk2 (w/o Amazon)	numeric
+1105	Wk2 Confirmed Receipts Only	numeric
+122	Wk20	numeric
+1669	Wk20 (w/o Amazon)	numeric
+1122	Wk20 Confirmed Receipts Only	numeric
+123	Wk21	numeric
+1670	Wk21 (w/o Amazon)	numeric
+1123	Wk21 Confirmed Receipts Only	numeric
+124	Wk22	numeric
+1671	Wk22 (w/o Amazon)	numeric
+1124	Wk22 Confirmed Receipts Only	numeric
+125	Wk23	numeric
+1672	Wk23 (w/o Amazon)	numeric
+1125	Wk23 Confirmed Receipts Only	numeric
+126	Wk24	numeric
+1673	Wk24 (w/o Amazon)	numeric
+1126	Wk24 Confirmed Receipts only	numeric
+127	Wk25	numeric
+1674	Wk25 (w/o Amazon)	numeric
+1127	Wk25 Confirmed Receipts Only	numeric
+119	Wk26	numeric
+1675	Wk26 (w/o Amazon)	numeric
+1128	Wk26 Confirmed Receipts Only	numeric
+9	Wk3	numeric
+1652	Wk3 (w/o Amazon)	numeric
+1106	Wk3 Confirmed Receipts Only	numeric
+10	Wk4	numeric
+1906	Copy of Wk4	numeric
+1653	Wk4 (w/o Amazon)	numeric
+1107	Wk4 Confirmed Receipts Only	numeric
+110	Wk5	numeric
+1654	Wk5 (w/o Amazon)	numeric
+1108	Wk5 Confirmed Receipts Only	numeric
+111	Wk6	numeric
+1655	Wk6 (w/o Amazon)	numeric
+1109	Wk6 Confirmed Receipts Only	numeric
+112	Wk7	numeric
+1656	Wk7 (w/o Amazon)	numeric
+1110	Wk7 Confirmed Receipts Only	numeric
+113	Wk8	numeric
+1657	Wk8 (w/o Amazon)	numeric
+1077	Wk8 Confirmed Receipts only	numeric
+114	Wk9	numeric
+1658	Wk9 (w/o Amazon)	numeric
+1111	Wk9 Confirmed Receipts Only	numeric
+1793	# Customers (Active)	numeric
+1795	Prvte Lbl/ Excl	checkbox
+1796	Open Cust POs (Summary)	multitext
+1797	I/T Qty (Tariff)	numeric
+1800	I/T Qty (Tariff-NJ)	numeric
+1801	I/T Qty (Tariff-CA)	numeric
+1798	Related Style3	numeric
+1805	Acct-MStyle Pair records	dblink
+1806	Add Acct-MStyle Pair	url
+1807	Cust_$L52w (root)	multitext
+1809	MU%: NJ - LATEST PRICE	percent
+1810	MU%: LA - LATEST PRICE	percent
+1811	Sell Price - LATEST PRICE	currency
+1812	ATS Notes	text-multi-line
+1813	Landed Cost_ALT 1 LA	currency
+1814	Landed Cost_ALT 2 LA	currency
+1815	Landed Cost_ALT 3 LA	currency
+1816	Landed Cost_ALT 1 NJ	currency
+1817	Landed Cost_ALT 2 NJ	currency
+1818	Landed Cost_ALT 3 NJ	currency
+1819	MU%: NJ - LATEST PRICE 1	numeric
+1820	MU%: NJ - LATEST PRICE 2	percent
+1821	MU%: NJ - LATEST PRICE 3	percent
+1822	MU%: LA - LATEST PRICE 1	percent
+1823	MU%: LA - LATEST PRICE 2	percent
+1824	MU%: LA - LATEST PRICE 3	percent
+1826	Royalty %	percent
+1827	Avge Terms %	percent
+1828	Total Open Orders (Kits ONLY)	numeric
+1829	AMZ DO NOT SHIP	checkbox
+1831	Landed Cost LA	numeric
+1832	Total Qty Ordered	numeric
+1833	Qty Ordered by Supplier	numeric
+1835	Qty Ordered by Supplier 1	numeric
+1836	Qty Ordered by Supplier 2	numeric
+1837	Qty Ordered by Supplier 3	numeric
+1834	% Units Ord By Supplier	percent
+1838	% Units Ord By Supplier 1	percent
+1839	% Units Ord By Supplier 2	percent
+1840	% Units Ord By Supplier 3	percent
+1842	FD Keep As Is?	checkbox
+1843	FD Reactivate Notes	text-multi-line
+1845	Prj N26W Total	numeric
+1846	Ordered Qty N26W LY	numeric
+1847	N26W$	currency
+1848	Shpd Qty N26W LY	numeric
+1850	Ordered Qty L13WKS	numeric
+1851	Shpd Qty L13WKS	numeric
+1852	CBM/Case	numeric
+1853	Master Weight	numeric
+1854	Ord Qty CBM	numeric
+1855	Ord Qty Weight kg	numeric
+1856	Avg Sell Price	currency
+1862	Style # (mirror)	text
+1865	Aged Inv Summary	multitext
+1866	OH$	currency
+1867	Suggested Opt WOS	numeric
+1874	Trending Up?	text
+1884	Max Prj %	percent
+1870	Oversold?	checkbox
+1871	AMZ Suppression?	checkbox
+1878	AMZ Prj	numeric
+1882	# Pcs/Kit (USE)	numeric
+1883	Maximum Prj/ Wk	numeric
+1889	CNY Start	date
+1890	CNY End	date
+1891	CNY Weeks	numeric
+1892	1st Shpd Date	date
+1893	New Item - No Prj?	checkbox
+1894	Order Up To Date for CNY	date
+1895	Qty Needed Thru CNY	numeric
+1896	OPT WOS Override	numeric
+1897	OPT WOS Final	numeric
+1898	Suggested WOS= OPT WOS?	text
+1899	New OH+OO Runout Date	date
+1903	Mstyle (mirror)2	text
+1904	Amazon MU% OH	percent
+1907	Active Replen Customers w Multi-pack	rich-text
+1909	Test Order Qty	numeric
+1910	Exclude PO from WOS Qty	numeric
+1912	isMulti?	checkbox
+1913	MOQ (lookup)	numeric

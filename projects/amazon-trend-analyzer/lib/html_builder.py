@@ -119,6 +119,19 @@ def build_payload(results: Iterable[dict],
     return payload
 
 
+def _sanitize(obj):
+    """Recursively walk a dict/list tree and replace NaN/Inf floats with None.
+    JSON spec forbids NaN; this is a belt-and-suspenders pass before encoding."""
+    if isinstance(obj, dict):
+        return {k: _sanitize(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_sanitize(v) for v in obj]
+    if isinstance(obj, float):
+        if math.isnan(obj) or math.isinf(obj):
+            return None
+    return obj
+
+
 def render(results: Iterable[dict],
            weekly_long: pd.DataFrame,
            catalog: pd.DataFrame,
@@ -126,6 +139,7 @@ def render(results: Iterable[dict],
            baseline_mode: str = "exclusive") -> Path:
     """Render the dashboard HTML to disk and return the path."""
     payload = build_payload(results, weekly_long, catalog, baseline_mode=baseline_mode)
+    payload = _sanitize(payload)
     payload_json = json.dumps(payload, separators=(",", ":"), allow_nan=False)
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     html = template.replace("__PAYLOAD_JSON__", payload_json)

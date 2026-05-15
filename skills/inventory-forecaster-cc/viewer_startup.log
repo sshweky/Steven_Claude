@@ -58,3 +58,77 @@
   [InvMgmt] inv-flow batch 45/56 — 200 rows
   [InvMgmt] inv-flow batch 46/56 — 200 rows
   [InvMgmt] inv-flow batch 47/56 — 200 rows
+  [InvMgmt] inv-flow batch 48/56 — 200 rows
+  [InvMgmt] inv-flow batch 49/56 — 200 rows
+  [InvMgmt] inv-flow batch 50/56 — 200 rows
+  [retry 1/4] CData inv-flow 51/56: IncompleteRead(0 bytes read) — re-priming + retrying in 2s ...
+  [retry 2/4] CData inv-flow 51/56: IncompleteRead(0 bytes read) — re-priming + retrying in 4s ...
+  [InvMgmt] inv-flow batch 51/56 — 200 rows
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  [InvMgmt] inv-flow batch 52/56 — 200 rows
+  [InvMgmt] inv-flow batch 53/56 — 200 rows
+  [InvMgmt] inv-flow batch 54/56 — 200 rows
+  [InvMgmt] inv-flow batch 55/56 — 200 rows
+  [InvMgmt] inv-flow batch 56/56 — 179 rows
+  [warn] extended pull returned no data — detail pane will show defaults
+  [OK] 11178 mstyles loaded from Inventory Flow
+[InvMgmt] Pulling Projections rollup...
+[InvMgmt] Discovering current manual projection columns from QB...
+  [OK] 26 cols: 05_10_W1 -> 11_01_W26
+[InvMgmt]   batched projections metadata pull (12 batches × 1000 mstyles)...
+  [InvMgmt] proj-meta 10/12 — 4511 acct-mstyle rows accumulated
+  [InvMgmt] proj-meta 12/12 — 5058 acct-mstyle rows accumulated
+  [OK] 5058 acct-mstyle rows total
+  [InvMgmt] manual-demand batch 5/6 — 5000 acct-mstyles loaded
+  [InvMgmt] manual-demand batch 6/6 — 5058 acct-mstyles loaded
+  [OK] 2244 mstyles loaded from Projections
+
+  Mstyle          Country    Pri       Gaps  PipeExc  PipeWOS  POs  Recs
+  --------------- ---------- -------- ----- -------- -------- ---- -----
+  BB21642PCS12    Thailand   HIGH        22     -380      0.0    0     1
+  BB19110PCS6     Thailand   HIGH        21     -328      0.0    0     1
+  FF20209PCS6     China      HIGH        21     -240      0.0    0     1
+  FF20210PCS6     China      HIGH        21      -60      0.0    0     1
+  FF29833PX6      Cambodia   HIGH        21     -120      0.0    0     1
+  FF30879PX6      Cambodia   HIGH        21     -240      0.0    0     1
+  BB0151PCS12     Thailand   HIGH        20     -150      0.0    0     1
+  BB0152PCS12     Thailand   HIGH        20     -240      0.0    0     1
+  BB0217PCS6      China      HIGH        20     -553      0.0    0     1
+  BB16450PCS12    Thailand   HIGH        20     -300      0.0    0     1
+  BB16691PCS2                HIGH        20     -276      0.0    0     1
+  BB21643PCS12    Thailand   HIGH        20     -415      0.0    0     1
+  BB25518PCS6     Taiwan     HIGH        20     -150      0.0    0     1
+  BB29561PCS12    China      HIGH        20     -239      0.1    0     1
+  BB31553PCS3     China      HIGH        20   -2,175      1.4    0     1
+  BB31641PCS6     Taiwan     HIGH        20     -150      0.0    0     1
+  BB33249PCS2                HIGH        20     -276      0.0    0     1
+  BB35649PCS6     China      HIGH        20     -150      0.0    0     1
+  FF11926PX24     China      HIGH        20     -242     -0.2    0     1
+  FF33568PCS2                HIGH        20     -276      0.0    0     1
+  FF8831PCS12     China      HIGH        20     -240      0.0    0     1
+  FF31064PCS2                HIGH        19     -300      0.0    0     1
+  FF4775AU        USA        HIGH        19   -1,481      0.1    0     1
+  FF7266AU        USA        HIGH        19     -444      0.4    0     1
+  FF7267AU        USA        HIGH        19     -150      0.0    0     1
+  BB0231PCS6      China      HIGH        18     -150      0.0    0     1
+  BB14500CLR/9    China      HIGH        18  -22,191      8.3    1     1
+  BB21626PCS2     China      HIGH        18     -180      0.0    0     1
+  BB22025PCS2     China      HIGH        18     -300      0.0    0     1
+  BB22095PCS2     China      HIGH        18     -300      0.0    0     1
+  BB22272PCS2     China      HIGH        18     -304      0.0    0     1
+  BB33248PCS12    Taiwan     HIGH        18     -150      0.0    0     1
+  BB35639PCS6     India      HIGH        18     -150      0.0    0     1
+  BB35723PCS6     Taiwan     HIGH        18     -150      0.0    0     1
+  FF12279PX6      Thailand   HIGH        18     -242     -0.2    0     1
+  FF12283PCS6     Thailand   HIGH        18     -276      0.0    0     1
+  FF30879PCS2                HIGH        18     -386      0.0    0     1
+  FF31063AU       USA        HIGH        18   -1,839      0.0    0     1
+  FF31064PCS6     USA        HIGH        18     -240      0.0    0     1
+  FF31454         Cambodia   HIGH        18      604     34.6    2     1
+
+  11178 mstyles total · 825 with gaps · 917 overstocked · 965 with recommendations
+
+[InvMgmt] Pre-serializing 11178 records for the browser...
+  [OK] 1,478,374 bytes gzipped
+[InvMgmt] Cached 1,478,374 bytes to inv_mgmt_records.json.gz (TTL 4h)

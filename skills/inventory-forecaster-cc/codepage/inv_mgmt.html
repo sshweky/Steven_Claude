@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>P+P Inventory Manager</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, Arial, sans-serif; font-size: 13px; background: #f0f2f5; color: #222; }
+
+/* ── Loading overlay ────────────────────────────────────────────────── */
+#loading-overlay {
+  position: fixed; inset: 0; background: #263238; color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 9999; gap: 18px;
+}
+#loading-overlay h2 { font-size: 22px; font-weight: 600; letter-spacing: .5px; }
+#loading-status { font-size: 14px; color: #b0bec5; min-height: 20px; }
+#loading-bar-wrap { width: 360px; height: 8px; background: #37474f; border-radius: 4px; overflow: hidden; }
+#loading-bar { height: 100%; width: 0%; background: #4dd0e1; border-radius: 4px; transition: width .3s ease; }
+#loading-steps { font-size: 12px; color: #78909c; }
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+#header {
+  background: #263238; color: #fff; padding: 10px 18px;
+  display: flex; flex-direction: column; gap: 6px;
+  position: sticky; top: 0; z-index: 100;
+}
+#header-top { display: flex; align-items: center; gap: 12px; }
+#header h1 { font-size: 17px; font-weight: 700; flex: 1; }
+#data-ts { font-size: 11px; color: #90a4ae; }
+
+/* Stats bar */
+#stats-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 2px 0;
+}
+.pri-btn {
+  padding: 3px 11px; border-radius: 12px; font-size: 12px; font-weight: 700;
+  border: none; cursor: pointer; transition: opacity .15s, outline .1s;
+}
+.pri-btn:hover { opacity: .8; }
+.pri-btn.active { outline: 3px solid #fff; outline-offset: 2px; }
+.pri-all    { background: #eceff1; color: #37474f; }
+.pri-crit   { background: #b71c1c; color: #fff; }
+.pri-high   { background: #e65100; color: #fff; }
+.pri-med    { background: #f9a825; color: #222; }
+.pri-low    { background: #5d4037; color: #fff; }
+.stat-chip  { font-size: 11px; color: #cfd8dc; padding: 0 4px; }
+
+/* ── Filter bar ─────────────────────────────────────────────────────── */
+#filter-bar {
+  background: #fff; border-bottom: 1px solid #ddd; padding: 7px 14px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  position: sticky; top: 80px; z-index: 99;
+}
+#filter-bar input[type=text] {
+  font-size: 12px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;
+  width: 230px;
+}
+#filter-bar select {
+  font-size: 12px; padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px;
+  max-width: 140px;
+}
+.chk-wrap { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #555; cursor: pointer; }
+.chk-wrap input { cursor: pointer; }
+.filter-sep { width: 1px; height: 20px; background: #ddd; }
+
+/* ── Table ──────────────────────────────────────────────────────────── */
+#table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+thead th {
+  background: #37474f; color: #fff; padding: 8px 10px;
+  text-align: left; font-size: 12px; white-space: nowrap;
+  cursor: pointer; user-select: none; position: sticky; top: 0;
+}
+thead th:hover { background: #455a64; }
+thead th .sort-arrow { font-size: 10px; margin-left: 3px; opacity: .6; }
+tbody tr { border-bottom: 1px solid #e8ecef; }
+tbody tr:nth-child(even) { background: #f5f5f5; }
+tbody tr:hover { background: #e8f4f8; }
+tbody tr.gap-row { background: #ffebee; }
+tbody tr.gap-row:nth-child(even) { background: #ffd7d8; }
+tbody tr.gap-row:hover { background: #ffc9cb; }
+tbody tr.over-row { background: #e3f2fd; }
+tbody tr.over-row:nth-child(even) { background: #d4eafa; }
+tbody tr.over-row:hover { background: #c2dff7; }
+tbody tr.detail-open { background: #fff3e0 !important; }
+td { padding: 7px 10px; font-size: 12px; vertical-align: middle; }
+td.mstyle-cell { max-width: 160px; }
+td.mstyle-cell .ms { font-weight: 700; font-size: 12px; color: #1a237e; }
+td.mstyle-cell .desc { font-size: 10px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+
+/* Priority pill */
+.pill {
+  display: inline-block; padding: 2px 9px; border-radius: 10px;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+}
+.pill-CRITICAL { background: #b71c1c; color: #fff; }
+.pill-HIGH     { background: #e65100; color: #fff; }
+.pill-MEDIUM   { background: #f9a825; color: #222; }
+.pill-LOW      { background: #e0e0e0; color: #555; }
+
+/* Gap badge */
+.gap-badge {
+  background: #c62828; color: #fff; padding: 1px 7px; border-radius: 9px;
+  font-size: 11px; font-weight: 700;
+}
+
+/* Pipeline WOS coloring */
+.wos-red    { color: #b71c1c; font-weight: 700; }
+.wos-orange { color: #e65100; font-weight: 700; }
+.wos-blue   { color: #1565c0; font-weight: 700; }
+.wos-ok     { color: #2e7d32; }
+
+/* Action pill */
+.act-PULL_UP        { background: #1565c0; color: #fff; }
+.act-FASTER_VESSEL  { background: #6a1b9a; color: #fff; }
+.act-PUSH_OUT       { background: #4e342e; color: #fff; }
+.act-CANCEL         { background: #880e4f; color: #fff; }
+.act-SPLIT          { background: #e65100; color: #fff; }
+.act-NO_LEVER       { background: #757575; color: #fff; }
+.act-none           { color: #999; }
+
+/* ── Detail pane ────────────────────────────────────────────────────── */
+.detail-row td { padding: 0; background: #fafafa !important; }
+.detail-pane {
+  padding: 14px 18px; border-top: 3px solid #4dd0e1;
+  animation: slideDown .18s ease;
+}
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.dp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.dp-card {
+  background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
+  padding: 12px 14px;
+}
+.dp-card h3 { font-size: 12px; font-weight: 700; color: #37474f; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.dp-kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; }
+.dp-kv .k { font-size: 11px; color: #78909c; white-space: nowrap; }
+.dp-kv .v { font-size: 11px; color: #222; font-weight: 500; word-break: break-word; }
+.dp-kv .v.flag-on { color: #b71c1c; font-weight: 700; }
+.dp-kv .v.flag-off { color: #bbb; }
+.dp-kv2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; }
+.dp-kv2 .kv-pair { display: contents; }
+.dp-note { font-size: 11px; color: #444; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+/* 26-week horizon table */
+.hz-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.hz-table th { background: #455a64; color: #fff; padding: 4px 6px; text-align: center; white-space: nowrap; }
+.hz-table td { padding: 4px 6px; text-align: center; border-bottom: 1px solid #eee; }
+.hz-beg-ok   { background: #e8f5e9; }
+.hz-beg-warn { background: #fff9c4; }
+.hz-beg-gap  { background: #ffebee; font-weight: 700; color: #b71c1c; }
+/* PO table */
+.po-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.po-table th { background: #546e7a; color: #fff; padding: 4px 8px; text-align: left; }
+.po-table td { padding: 4px 8px; border-bottom: 1px solid #eee; }
+.po-status-MOVABLE           { color: #2e7d32; font-weight: 700; }
+.po-status-LOCKED            { color: #ef6c00; font-weight: 700; }
+.po-status-IN_TRANSIT        { color: #1565c0; font-weight: 700; }
+.po-status-FASTER_VESSEL_WINDOW { color: #6a1b9a; font-weight: 700; }
+.po-status-PULL_UP_NARROW    { color: #e65100; font-weight: 700; }
+.po-status-UNKNOWN           { color: #999; }
+/* Rec card */
+.rec-card {
+  background: #fff; border-left: 4px solid #999; border-radius: 4px;
+  padding: 10px 12px; margin-bottom: 8px; font-size: 11px;
+}
+.rec-PULL_UP       { border-color: #1565c0; }
+.rec-FASTER_VESSEL { border-color: #6a1b9a; }
+.rec-PUSH_OUT      { border-color: #4e342e; }
+.rec-CANCEL        { border-color: #880e4f; }
+.rec-SPLIT         { border-color: #e65100; }
+.rec-NO_LEVER      { border-color: #757575; }
+.rec-card .rc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.rec-card .rc-reason { color: #555; line-height: 1.5; }
+.rec-card .rc-dates  { color: #37474f; margin-top: 4px; }
+
+/* ── Misc ────────────────────────────────────────────────────────────── */
+.no-results { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+.error-box { background: #ffebee; border: 1px solid #ef9a9a; color: #b71c1c; padding: 14px 18px; margin: 20px; border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading-overlay">
+  <h2>&#127981; P+P Inventory Manager</h2>
+  <div id="loading-status">Initializing...</div>
+  <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+  <div id="loading-steps"></div>
+</div>
+
+<!-- Main content (hidden until ready) -->
+<div id="app" style="display:none">
+  <!-- Header -->
+  <div id="header">
+    <div id="header-top">
+      <h1>&#127981; P+P Inventory Manager</h1>
+      <span id="data-ts"></span>
+    </div>
+    <div id="stats-bar">
+      <button class="pri-btn pri-all active" data-pri="ALL" onclick="setPriFilter('ALL')">All <span id="cnt-all">0</span></button>
+      <button class="pri-btn pri-crit" data-pri="CRITICAL" onclick="setPriFilter('CRITICAL')">&#128308; Critical <span id="cnt-crit">0</span></button>
+      <button class="pri-btn pri-high" data-pri="HIGH" onclick="setPriFilter('HIGH')">&#128992; High <span id="cnt-high">0</span></button>
+      <button class="pri-btn pri-med" data-pri="MEDIUM" onclick="setPriFilter('MEDIUM')">&#128993; Medium <span id="cnt-med">0</span></button>
+      <button class="pri-btn pri-low" data-pri="LOW" onclick="setPriFilter('LOW')">&#9898; Low <span id="cnt-low">0</span></button>
+      <span class="stat-chip">&#183;</span>
+      <span class="stat-chip" id="stat-gaps">0 with gaps</span>
+      <span class="stat-chip">&#183;</span>
+      <span class="stat-chip" id="stat-over">0 overstocked</span>
+      <span class="stat-chip">&#183;</span>
+      <span class="stat-chip" id="stat-shown">0 shown</span>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div id="filter-bar">
+    <input type="text" id="search" placeholder="Search mstyle / desc / brand..." oninput="applyFilters()">
+    <select id="f-action" onchange="applyFilters()"><option value="">Action (all)</option></select>
+    <select id="f-country" onchange="applyFilters()"><option value="">Country (all)</option></select>
+    <select id="f-brand" onchange="applyFilters()"><option value="">Brand (all)</option></select>
+    <select id="f-mgr" onchange="applyFilters()"><option value="">Inv Mgr (all)</option></select>
+    <div class="filter-sep"></div>
+    <label class="chk-wrap"><input type="checkbox" id="chk-replen" onchange="applyFilters()"> Replen only</label>
+    <label class="chk-wrap"><input type="checkbox" id="chk-gaps" onchange="applyFilters()"> Gaps only</label>
+    <label class="chk-wrap"><input type="checkbox" id="chk-over" onchange="applyFilters()"> Overstock only</label>
+    <label class="chk-wrap"><input type="checkbox" id="chk-nomulti" onchange="applyFilters()"> Hide Multi-Pk</label>
+  </div>
+
+  <!-- Table container -->
+  <div id="table-wrap">
+    <table id="main-table">
+      <thead>
+        <tr>
+          <th onclick="sortBy('mstyle')">Mstyle <span class="sort-arrow" id="sa-mstyle"></span></th>
+          <th onclick="sortBy('country')">Country <span class="sort-arrow" id="sa-country"></span></th>
+          <th onclick="sortBy('priority')">Priority <span class="sort-arrow" id="sa-priority"></span></th>
+          <th onclick="sortBy('gaps')">Gaps <span class="sort-arrow" id="sa-gaps"></span></th>
+          <th onclick="sortBy('pipeline_wos')">Pipeline WOS <span class="sort-arrow" id="sa-pipeline_wos"></span></th>
+          <th onclick="sortBy('prj_wk')">Prj/Wk <span class="sort-arrow" id="sa-prj_wk"></span></th>
+          <th onclick="sortBy('qty_oh')">Qty OH <span class="sort-arrow" id="sa-qty_oh"></span></th>
+          <th onclick="sortBy('it_iw')">I/T + I/W <span class="sort-arrow" id="sa-it_iw"></span></th>
+          <th onclick="sortBy('action')">Action <span class="sort-arrow" id="sa-action"></span></th>
+          <th onclick="sortBy('inv_manager')">Inv Mgr <span class="sort-arrow" id="sa-inv_manager"></span></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div id="no-results" class="no-results" style="display:none">No records match your filters.</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── Constants ──────────────────────────────────────────────────────────────────
+const REALM     = 'pim.quickbase.com';
+const APP_DBID  = 'bpd24h9wy';
+const APP_TOKEN = 'b39re4_mkf7_0_bt2bnypb4qq99bcfxcst6bu5sb68';
+const INVF_TID  = 'bpsaju5pm';
+const PROJ_TID  = 'bpd237tvm';
+const CACHE_KEY = 'pp_inv_mgmt_v1';
+const CACHE_TTL = 4 * 60 * 60 * 1000;  // 4 hours
+
+const OPT_WOS_DEFAULT     = 4.0;
+const OVERSTOCK_EXCESS_TH = 2500;
+const OVERSTOCK_WOS_TH    = 33;
+const MIN_RESOLVED_GAP_DEFICIT = 1.0;
+const ETD_LOCK_DAYS       = 7;
+const FASTER_VESSEL_HI    = 15;
+const CANCEL_HORIZON_DAYS = 60;
+const WAREHOUSE_LAG       = 10;
+const USA_WAREHOUSE_LAG   = 3;
+const FAST_VESSEL_TRANSIT = 18;
+const MIN_PULLUP_DAYS     = 7;
+const PARTIAL_MIN_PCS     = 2500;
+
+// Field IDs — Inventory Flow
+const INVF = {
+  mstyle: 20, country: 223, season: 1068, item_rank: 1573,
+  item_status: 294, sub_status: 297, nvo: 1487, new_item_no_prj: 1893,
+  opt_wos: 137, opt_wos_final: 1897, opt_oh: 234,
+  next_avl_rcpt_dt: 235, lt_trans_days: 225, transit_days: 1751,
+  lt_wks: 1525, cny_weeks: 1891, lt_opt_weeks: 446,
+  open_supplier_pos: 241, moq: 226,
+  kit_style: 1759, pcs_kit_use: 1882, root_mstyle: 792,
+  ats_qty_oh_root: 1547, it_iw_root: 1548, ats_oh_oo_root: 1546,
+  qty_oh: 24, ats_qty_oh: 179, ats_now: 932,
+  ats_oh_oo: 180, ats_oh_oo_w_kits: 1722,
+  ats_qty_not_alloc: 871, nj_ats_oh: 1462, ca_ats_oh: 1463,
+  hold_order_qty: 867, it: 25, iw: 26, it_iw: 218, it_iw_kits: 1721,
+  open_cust_po_qty: 183, test_order_qty: 1909, exclude_po_wos_qty: 1910,
+  ats_wos_oh: 208, ats_wos_oh_oo: 209, ats_wos_oh_oo_w_kits: 1723,
+  ats_wos_oh_oo_wo_test: 1911, ats_oh_it_booked_wos: 1217,
+  days_oos_next_rcpt: 1009, days_oos_l12m: 1231, last_oos_date: 1233,
+  prj_wk: 133, max_prj_wk: 1883, prj_l4w_all: 963, prj_26wks: 1225,
+  shp_wk_l4: 1841, shp_wk_l13: 314,
+  tot_shpd_l13w: 316, tot_shpd_l4: 315, tot_shpd_ltd: 712,
+  last_shp_date: 305,
+  date_1st_rcvd: 711, last_whs_rcvd: 1199, first_shpd_date: 1892, first_out_date: 260,
+  active_kl: 1486, amz_do_not_ship: 1829, amz_suppression: 1871, transfer_qty_open: 1572,
+  shipment_status_summary: 1224, ats_summary: 912,
+  inventory_notes: 257, style_alert: 994,
+  oos_priority_notes: 985, active_replen_customers: 1223,
+  inventory_manager: 981,
+  size_ct: 533, fragrance: 589, pvt_lbl_excl: 1795, commit_item: 1515,
+  inner_pack: 1023, master_pack: 929, oos_dates: 262,
+  over_committed_qty: 448, ovr_comt_wos: 444, invtry_age_days: 1269,
+  aged_inv_0_90: 1308, aged_inv_91_180: 1310,
+  aged_inv_181_365: 1312, aged_inv_365plus: 1314, pct_time_in_stock: 1232,
+};
+
+const BEG_IDS = [134,8,9,10,110,111,112,113,114,115,116,117,118,128,129,130,131,120,121,122,123,124,125,126,127,119];
+const RCV_IDS = [28,35,36,50,51,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85];
+const PRJ_IDS = [146,147,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173];
+const ATS_IDS = [716,717,718,719,720,715,722,723,724,725,726,727,728,729,730,731,902,903,904,905,906,907,908,909,910,911];
+
+// Field IDs — Projections
+const PROJ = {
+  mstyle: 196, cust_name: 376, status_cust: 10, pt_item_status: 374,
+  brand: 398, description: 399, acct_mstyle_key: 292,
+};
+const MANUAL_W_IDS = [22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97];
+const MANUAL_W_LABELS = ['W1 05/10','W2 05/17','W3 05/24','W4 05/31','W5 06/07','W6 06/14',
+  'W7 06/21','W8 06/28','W9 07/05','W10 07/12','W11 07/19','W12 07/26',
+  'W13 08/02','W14 08/09','W15 08/16','W16 08/23','W17 08/30','W18 09/06',
+  'W19 09/13','W20 09/20','W21 09/27','W22 10/04','W23 10/11','W24 10/18',
+  'W25 10/25','W26 11/01'];
+
+// All INVF select fields for QB query
+const INVF_SELECT_IDS = [
+  ...Object.values(INVF),
+  ...BEG_IDS, ...RCV_IDS, ...PRJ_IDS
+].filter((v,i,a)=>a.indexOf(v)===i);
+
+const PROJ_SELECT_IDS = [
+  PROJ.mstyle, PROJ.cust_name, PROJ.status_cust, PROJ.pt_item_status,
+  PROJ.brand, PROJ.description, PROJ.acct_mstyle_key,
+  ...MANUAL_W_IDS
+];
+
+// ── App State ─────────────────────────────────────────────────────────────────
+let tempToken = null;
+let tokenExpiry = 0;
+let allRecords = [];   // processed MStyleRecord-like objects
+let filtered = [];
+let sortCol = 'priority';
+let sortAsc = true;
+let activePri = 'ALL';
+let openDetailMstyle = null;
+let today = new Date();
+today.setHours(0,0,0,0);
+
+// ── QB API helpers ────────────────────────────────────────────────────────────
+async function getTempToken() {
+  const r = await fetch(`https://api.quickbase.com/v1/auth/temporary/${APP_DBID}`, {
+    method: 'POST',
+    headers: { 'QB-Realm-Hostname': REALM, 'QB-App-Token': APP_TOKEN, 'Content-Type': 'application/json' }
+  });
+  if (!r.ok) throw new Error(`Auth failed: ${r.status} ${await r.text()}`);
+  const j = await r.json();
+  tempToken = j.temporaryAuthorization;
+  tokenExpiry = Date.now() + 4 * 60 * 1000;  // refresh every 4 min
+  return tempToken;
+}
+
+async function ensureToken() {
+  if (!tempToken || Date.now() > tokenExpiry) await getTempToken();
+  return tempToken;
+}
+
+setInterval(async () => {
+  if (tempToken) { try { await getTempToken(); } catch(e) { console.warn('Token refresh failed', e); } }
+}, 4 * 60 * 1000);
+
+function qbHeaders() {
+  return {
+    'QB-Realm-Hostname': REALM,
+    'Authorization': `QB-TEMP-TOKEN ${tempToken}`,
+    'Content-Type': 'application/json'
+  };
+}
+
+async function qbQuery(tableId, selectIds, where, skip=0, top=1000) {
+  await ensureToken();
+  const body = { from: tableId, select: selectIds, options: { top, skip } };
+  if (where) body.where = where;
+  const r = await fetch('https://api.quickbase.com/v1/records/query', {
+    method: 'POST', headers: qbHeaders(), body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const txt = await r.text();
+    throw new Error(`QB query failed [${tableId}]: ${r.status} — ${txt}`);
+  }
+  return r.json();
+}
+
+function fv(record, fid, def='') {
+  const cell = record[fid];
+  if (cell === undefined || cell === null) return def;
+  const v = cell.value;
+  if (v === undefined || v === null) return def;
+  return v;
+}
+
+function fvNum(record, fid, def=0) {
+  const v = fv(record, fid, null);
+  if (v === null || v === '') return def;
+  if (typeof v === 'number') return v;
+  const n = parseFloat(String(v).replace(/,/g,''));
+  return isNaN(n) ? def : n;
+}
+
+function fvBool(record, fid) {
+  const v = fv(record, fid, false);
+  if (typeof v === 'boolean') return v;
+  if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
+  return !!v;
+}
+
+function fvStr(record, fid) {
+  const v = fv(record, fid, '');
+  if (typeof v === 'object' && v !== null) return v.name || v.email || '';
+  return String(v);
+}
+
+function fvDate(record, fid) {
+  const v = fv(record, fid, null);
+  if (!v) return null;
+  const s = typeof v === 'string' ? v.substring(0, 10) : String(v).substring(0, 10);
+  const d = new Date(s + 'T00:00:00');
+  return isNaN(d) ? null : d;
+}
+
+function stripHtml(s) {
+  if (!s) return '';
+  return s.replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').trim();
+}
+
+// ── Progress helpers ──────────────────────────────────────────────────────────
+function setProgress(pct, msg, detail='') {
+  document.getElementById('loading-bar').style.width = pct + '%';
+  document.getElementById('loading-status').textContent = msg;
+  document.getElementById('loading-steps').textContent = detail;
+}
+
+// ── PO Parser ─────────────────────────────────────────────────────────────────
+const PO_RE = /^\s*([A-Z0-9\-]+)\s*-\s*(.+?)\s*-\s*I\/T:\s*([\d,]+)\s*pcs\s*\/\s*I\/W:\s*([\d,]+)\s*pcs\s*-\s*ETD:\s*(\d{2}-\d{2}-\d{4})\s*-\s*ETA:\s*(\d{2}-\d{2}-\d{4})/i;
+
+function parseDate(s) {
+  if (!s) return null;
+  const m = s.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (!m) return null;
+  const d = new Date(parseInt(m[3]), parseInt(m[1])-1, parseInt(m[2]));
+  return isNaN(d) ? null : d;
+}
+
+function parseOpenPOs(raw) {
+  if (!raw) return [];
+  const out = [];
+  const chunks = raw.split(/[;\r\n]+/);
+  for (const chunk of chunks) {
+    const c = chunk.trim();
+    if (!c) continue;
+    const m = PO_RE.exec(c);
+    if (!m) continue;
+    const it = parseInt(m[3].replace(/,/g,'')) || 0;
+    const iw = parseInt(m[4].replace(/,/g,'')) || 0;
+    const etd = parseDate(m[5]);
+    const eta = parseDate(m[6]);
+    out.push({ po_number: m[1].trim(), supplier: m[2].trim(), it_qty: it, iw_qty: iw, etd, eta, qty: it + iw });
+  }
+  return out;
+}
+
+function poTransitDays(po) {
+  if (!po.etd || !po.eta) return null;
+  return Math.round((po.eta - po.etd) / 86400000);
+}
+
+function poStatus(po, todayD, country) {
+  if (po.it_qty > 0) return 'IN_TRANSIT';
+  if (!po.etd) return 'UNKNOWN';
+  const dtd = Math.round((po.etd - todayD) / 86400000);
+  if (dtd < ETD_LOCK_DAYS) return 'LOCKED';
+  if (dtd >= 8 && dtd <= FASTER_VESSEL_HI) {
+    return country.toUpperCase().includes('USA') ? 'PULL_UP_NARROW' : 'FASTER_VESSEL_WINDOW';
+  }
+  return 'MOVABLE';
+}
+
+// ── Week helpers ──────────────────────────────────────────────────────────────
+function wkDate(todayD, wi) {
+  // Sunday of week wi (0-indexed). Week 0 = current week.
+  const d = new Date(todayD);
+  const dayOfWeek = d.getDay(); // 0=Sun
+  d.setDate(d.getDate() - dayOfWeek + wi * 7);
+  return d;
+}
+
+function wkIdxForDate(todayD, targetD) {
+  const w1 = wkDate(todayD, 0);
+  return Math.floor((targetD - w1) / (7 * 86400000));
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${m}/${day}/${d.getFullYear()}`;
+}
+
+// ── Rec Engine ────────────────────────────────────────────────────────────────
+function computeDerived(rec) {
+  const todayD = today;
+  const beg = rec.beg;
+  const prj = rec.prj;
+  const open_pos = rec.open_pos;
+
+  rec.pipeline_total = (beg[0] || 0) + open_pos.reduce((s,p)=>s+p.qty,0);
+  rec.demand_26w = prj.reduce((s,v)=>s+v,0);
+
+  if (rec.demand_26w > 0) {
+    const safety = rec.opt_wos * (rec.demand_26w / 26.0);
+    rec.pipeline_excess = rec.pipeline_total - rec.demand_26w - Math.round(safety);
+    rec.pipeline_wos = rec.pipeline_total * 26.0 / rec.demand_26w;
+  } else {
+    rec.pipeline_excess = rec.pipeline_total;
+    rec.pipeline_wos = rec.pipeline_total > 0 ? Infinity : 0;
+  }
+  rec.overstocked = (rec.pipeline_excess > OVERSTOCK_EXCESS_TH) ||
+                    (rec.demand_26w > 0 && rec.pipeline_wos > OVERSTOCK_WOS_TH);
+
+  // Gap detection
+  rec.gap_weeks = [];
+  if (rec.is_replen && rec.opt_wos > 0) {
+    let nr_idx = rec.next_rcpt_dt ? wkIdxForDate(todayD, rec.next_rcpt_dt) : 25;
+    if (nr_idx < 0) nr_idx = -1;
+    const check_until = Math.min(25, nr_idx);
+    for (let i = 0; i <= check_until; i++) {
+      const bv = beg[i] || 0;
+      const pv = prj[i] || 0;
+      if (pv > 0 && (bv / pv) < rec.opt_wos) {
+        rec.gap_weeks.push({
+          wi: i + 1,
+          date: wkDate(todayD, i),
+          beg: bv, prj: pv,
+          wos: Math.round(10 * bv / pv) / 10,
+          deficit: Math.round(10 * (rec.opt_wos - bv / pv)) / 10
+        });
+      }
+    }
+  }
+
+  // Recommendations
+  rec.recommendations = [];
+  const actionable_gaps = rec.gap_weeks.filter(g => g.deficit >= MIN_RESOLVED_GAP_DEFICIT);
+  const isUSA = rec.country.toUpperCase().includes('USA') || rec.country.toUpperCase().includes('UNITED STATES');
+  const wh_lag = isUSA ? USA_WAREHOUSE_LAG : WAREHOUSE_LAG;
+  const movable = open_pos.filter(p => {
+    const s = poStatus(p, todayD, rec.country);
+    return s === 'MOVABLE' || s === 'PULL_UP_NARROW' || s === 'FASTER_VESSEL_WINDOW';
+  });
+
+  const raw_proposals = [];
+  for (const gap of actionable_gaps) {
+    if (!movable.length) continue;
+    const gap_week_start = wkDate(todayD, gap.wi - 1);
+    const target_eta = new Date(gap_week_start - wh_lag * 86400000);
+    const candidates = [...movable].sort((a,b)=> (a.etd||new Date(9e15)) - (b.etd||new Date(9e15)));
+    for (const po of candidates) {
+      if (!po.etd) continue;
+      const transit = poTransitDays(po) || rec.transit_days || 26;
+      const min_etd = new Date(todayD.getTime() + ETD_LOCK_DAYS * 86400000);
+      const dtd = Math.round((po.etd - todayD) / 86400000);
+      const in_fast_window = dtd >= 8 && dtd <= FASTER_VESSEL_HI;
+      if (in_fast_window && !isUSA) {
+        const proposed_eta = new Date(po.etd.getTime() + FAST_VESSEL_TRANSIT * 86400000);
+        if (proposed_eta <= new Date(target_eta.getTime() + 3 * 86400000)) {
+          raw_proposals.push({ po, new_etd: po.etd, gap_wks: [gap.wi], action: 'FASTER_VESSEL' });
+          break;
+        }
+      }
+      const new_etd_ts = Math.max(min_etd.getTime(), target_eta.getTime() - transit * 86400000);
+      const new_etd = new Date(new_etd_ts);
+      if (new_etd >= po.etd) continue;
+      const pullup_days = Math.round((po.etd - new_etd) / 86400000);
+      if (pullup_days < MIN_PULLUP_DAYS) continue;
+      raw_proposals.push({ po, new_etd, gap_wks: [gap.wi], action: 'PULL_UP' });
+      break;
+    }
+  }
+
+  // Deduplicate
+  const grouped = {};
+  for (const { po, new_etd, gap_wks, action } of raw_proposals) {
+    const key = action + '|' + po.po_number;
+    if (!grouped[key]) { grouped[key] = { po, new_etd, gap_wks: [...gap_wks] }; }
+    else {
+      if (new_etd < grouped[key].new_etd) grouped[key].new_etd = new_etd;
+      grouped[key].gap_wks.push(...gap_wks);
+    }
+  }
+
+  for (const [key, { po, new_etd, gap_wks }] of Object.entries(grouped)) {
+    const action = key.split('|')[0];
+    const wks = [...new Set(gap_wks)].sort((a,b)=>a-b);
+    const wkStr = wks.length <= 4 ? wks.map(w=>`W${w}`).join(', ') :
+      `W${wks[0]}-W${wks[wks.length-1]} (${wks.length} weeks)`;
+    const transit = poTransitDays(po) || rec.transit_days || 26;
+    const new_eta = new Date(new_etd.getTime() + transit * 86400000);
+    if (action === 'FASTER_VESSEL') {
+      const prop_eta = new Date(po.etd.getTime() + FAST_VESSEL_TRANSIT * 86400000);
+      rec.recommendations.push({
+        action: 'FASTER_VESSEL', po_number: po.po_number, supplier: po.supplier,
+        qty_affected: po.qty, orig_etd: po.etd, proposed_etd: po.etd,
+        orig_eta: po.eta, proposed_eta: prop_eta, delta_days: 0, delta_qty: 0,
+        priority: 'HIGH', reason: `Request faster vessel — covers gaps in ${wkStr}`,
+        gap_weeks_fixed: wks, in_transit_qty: po.it_qty, in_work_qty: po.iw_qty, po_total_qty: po.qty
+      });
+    } else {
+      rec.recommendations.push({
+        action: 'PULL_UP', po_number: po.po_number, supplier: po.supplier,
+        qty_affected: po.qty, orig_etd: po.etd, proposed_etd: new_etd,
+        orig_eta: po.eta, proposed_eta: new_eta,
+        delta_days: Math.round((new_etd - po.etd) / 86400000), delta_qty: 0,
+        priority: 'HIGH', reason: `Pull-up — covers gaps in ${wkStr}`,
+        gap_weeks_fixed: wks, in_transit_qty: po.it_qty, in_work_qty: po.iw_qty, po_total_qty: po.qty
+      });
+    }
+  }
+
+  if (actionable_gaps.length && !rec.recommendations.length) {
+    rec.recommendations.push({
+      action: 'NO_LEVER', po_number: '', supplier: '', qty_affected: 0,
+      orig_etd: null, proposed_etd: null, orig_eta: null, proposed_eta: null,
+      delta_days: 0, delta_qty: 0, priority: 'HIGH',
+      reason: `${actionable_gaps.length} actionable gap weeks but no movable PO can land in time. Live with the gap or escalate.`,
+      gap_weeks_fixed: [], in_transit_qty: 0, in_work_qty: 0, po_total_qty: 0
+    });
+  }
+
+  // Overstock
+  if (rec.overstocked && open_pos.length) {
+    const partial_min = Math.max(rec.moq > 0 ? Math.floor(rec.moq / 2) : PARTIAL_MIN_PCS, 1);
+    const furthest = open_pos.reduce((a,b)=> (a.etd||new Date(0)) >= (b.etd||new Date(0)) ? a : b);
+    const excess = Math.max(0, rec.pipeline_excess);
+    if (furthest.etd && Math.round((furthest.etd - todayD) / 86400000) > CANCEL_HORIZON_DAYS) {
+      const cancel_qty = Math.min(excess, furthest.qty);
+      if (cancel_qty >= partial_min) {
+        rec.recommendations.push({
+          action: 'CANCEL', po_number: furthest.po_number, supplier: furthest.supplier,
+          qty_affected: cancel_qty, orig_etd: furthest.etd, proposed_etd: furthest.etd,
+          orig_eta: furthest.eta, proposed_eta: furthest.eta, delta_days: 0, delta_qty: -cancel_qty,
+          priority: 'MEDIUM',
+          reason: `Pipeline excess ${excess.toLocaleString()} pcs · ${furthest.po_number} ETD ${fmtDate(furthest.etd)} is >60d out → cancel ${cancel_qty.toLocaleString()} pcs (partial floor MOQ/2 = ${partial_min.toLocaleString()})`,
+          gap_weeks_fixed: [], in_transit_qty: furthest.it_qty, in_work_qty: furthest.iw_qty, po_total_qty: furthest.qty,
+          keep_qty: 0, push_qty: 0
+        });
+      }
+    } else {
+      const push_qty = Math.min(excess, furthest.qty);
+      if (push_qty >= partial_min) {
+        const transit = poTransitDays(furthest) || rec.transit_days || 26;
+        const new_etd = furthest.etd ? new Date(furthest.etd.getTime() + 8*7*86400000) : null;
+        const new_eta = new_etd ? new Date(new_etd.getTime() + transit*86400000) : null;
+        const keep_qty = furthest.qty - push_qty;
+        if (keep_qty >= partial_min) {
+          rec.recommendations.push({
+            action: 'SPLIT', po_number: furthest.po_number, supplier: furthest.supplier,
+            qty_affected: push_qty, orig_etd: furthest.etd, proposed_etd: new_etd,
+            orig_eta: furthest.eta, proposed_eta: new_eta,
+            delta_days: (new_etd && furthest.etd) ? Math.round((new_etd-furthest.etd)/86400000) : 0, delta_qty: 0,
+            priority: 'MEDIUM',
+            reason: `Split shipment — keep ${keep_qty.toLocaleString()} at original ETD, push ${push_qty.toLocaleString()} to free up early-window inventory`,
+            gap_weeks_fixed: [], in_transit_qty: furthest.it_qty, in_work_qty: furthest.iw_qty, po_total_qty: furthest.qty,
+            keep_qty, push_qty
+          });
+        } else {
+          rec.recommendations.push({
+            action: 'PUSH_OUT', po_number: furthest.po_number, supplier: furthest.supplier,
+            qty_affected: furthest.qty, orig_etd: furthest.etd, proposed_etd: new_etd,
+            orig_eta: furthest.eta, proposed_eta: new_eta,
+            delta_days: (new_etd && furthest.etd) ? Math.round((new_etd-furthest.etd)/86400000) : 0, delta_qty: 0,
+            priority: 'MEDIUM',
+            reason: `Push entire PO out ~8 weeks — splitting would leave a partial below MOQ/2 = ${partial_min.toLocaleString()}`,
+            gap_weeks_fixed: [], in_transit_qty: furthest.it_qty, in_work_qty: furthest.iw_qty, po_total_qty: furthest.qty,
+            keep_qty: 0, push_qty: furthest.qty
+          });
+        }
+      }
+    }
+  }
+
+  // Priority roll-up
+  if (rec.recommendations.some(r => r.priority === 'CRITICAL')) rec.priority = 'CRITICAL';
+  else if (rec.gap_weeks.some(g => g.deficit >= 2.0)) rec.priority = 'HIGH';
+  else if (rec.gap_weeks.length || rec.overstocked) rec.priority = 'MEDIUM';
+  else rec.priority = 'LOW';
+}
+
+// ── Priority sort order ───────────────────────────────────────────────────────
+const PRI_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+
+// ── Data loading ──────────────────────────────────────────────────────────────
+async function fetchAllPages(tableId, selectIds, where) {
+  let skip = 0;
+  const top = 1000;
+  let all = [];
+  let page = 1;
+  // Fetch first page
+  const first = await qbQuery(tableId, selectIds, where, 0, top);
+  all = all.concat(first.data || []);
+  const total = first.metadata?.totalRecords || all.length;
+  const numPages = Math.ceil(total / top);
+  setProgress(null, `Loading table (page 1/${numPages})...`);
+  if (numPages > 1) {
+    // Fetch remaining pages in series (rate-limit friendly)
+    for (let p = 2; p <= numPages; p++) {
+      const res = await qbQuery(tableId, selectIds, where, (p-1)*top, top);
+      all = all.concat(res.data || []);
+    }
+  }
+  return all;
+}
+
+async function fetchInvFlow(onProgress) {
+  onProgress(0, 'Loading Inventory Flow (page 1/?)...');
+  let skip = 0, top = 1000, all = [], page = 1;
+  const first = await qbQuery(INVF_TID, INVF_SELECT_IDS, null, 0, top);
+  all = all.concat(first.data || []);
+  const total = first.metadata?.totalRecords || all.length;
+  const numPages = Math.ceil(total / top);
+  for (let p = 2; p <= numPages; p++) {
+    onProgress(Math.round((p-1)/numPages*40), `Loading Inventory Flow (page ${p}/${numPages})...`);
+    const res = await qbQuery(INVF_TID, INVF_SELECT_IDS, null, (p-1)*top, top);
+    all = all.concat(res.data || []);
+  }
+  onProgress(40, `Inventory Flow loaded: ${all.length} records`);
+  return all;
+}
+
+async function fetchProjections(onProgress) {
+  onProgress(40, 'Loading Projections (page 1/?)...');
+  const where = `{${PROJ.status_cust}.SW.A} OR {${PROJ.status_cust}.SW.FD}`;
+  let all = [], top = 1000;
+  const first = await qbQuery(PROJ_TID, PROJ_SELECT_IDS, where, 0, top);
+  all = all.concat(first.data || []);
+  const total = first.metadata?.totalRecords || all.length;
+  const numPages = Math.ceil(total / top);
+  for (let p = 2; p <= numPages; p++) {
+    onProgress(40 + Math.round((p-1)/numPages*35), `Loading Projections (page ${p}/${numPages})...`);
+    const res = await qbQuery(PROJ_TID, PROJ_SELECT_IDS, where, (p-1)*top, top);
+    all = all.concat(res.data || []);
+  }
+  onProgress(75, `Projections loaded: ${all.length} rows`);
+  return all;
+}
+
+function buildRecords(invFlowRows, projRows, onProgress) {
+  onProgress(75, 'Merging data...');
+  // Process InvFlow
+  const invMap = {};
+  for (const r of invFlowRows) {
+    const ms = fvStr(r, INVF.mstyle);
+    if (!ms) continue;
+    const optWosFinal = fvNum(r, INVF.opt_wos_final, 0);
+    const optWosBase  = fvNum(r, INVF.opt_wos, 0);
+    const opt_wos = optWosFinal || optWosBase || OPT_WOS_DEFAULT;
+    invMap[ms] = {
+      mstyle: ms,
+      country: fvStr(r, INVF.country),
+      season: fvStr(r, INVF.season),
+      item_rank: fvStr(r, INVF.item_rank),
+      item_status_flow: fvStr(r, INVF.item_status),
+      sub_status: fvStr(r, INVF.sub_status),
+      nvo: fvBool(r, INVF.nvo),
+      new_item_no_prj: fvBool(r, INVF.new_item_no_prj),
+      opt_wos,
+      opt_oh: fvNum(r, INVF.opt_oh),
+      next_rcpt_dt: fvDate(r, INVF.next_avl_rcpt_dt),
+      lt_trans_days: fvNum(r, INVF.lt_trans_days),
+      transit_days: fvNum(r, INVF.transit_days),
+      lt_wks: fvNum(r, INVF.lt_wks),
+      cny_weeks: fvNum(r, INVF.cny_weeks),
+      lt_opt_weeks: fvNum(r, INVF.lt_opt_weeks),
+      moq: fvNum(r, INVF.moq),
+      open_pos_raw: fvStr(r, INVF.open_supplier_pos),
+      is_multi: fvBool(r, INVF.kit_style),
+      pcs_per_kit: Math.max(1, fvNum(r, INVF.pcs_kit_use, 1)),
+      root_mstyle: fvStr(r, INVF.root_mstyle),
+      qty_oh_root: fvNum(r, INVF.ats_qty_oh_root),
+      it_iw_root: fvNum(r, INVF.it_iw_root),
+      ats_oh_oo_root: fvNum(r, INVF.ats_oh_oo_root),
+      qty_oh: fvNum(r, INVF.qty_oh),
+      ats_qty_oh: fvNum(r, INVF.ats_qty_oh),
+      ats_now: fvNum(r, INVF.ats_now),
+      ats_oh_oo: fvNum(r, INVF.ats_oh_oo),
+      ats_oh_oo_w_kits: fvNum(r, INVF.ats_oh_oo_w_kits),
+      ats_qty_not_alloc: fvNum(r, INVF.ats_qty_not_alloc),
+      nj_ats_oh: fvNum(r, INVF.nj_ats_oh),
+      ca_ats_oh: fvNum(r, INVF.ca_ats_oh),
+      hold_qty: fvNum(r, INVF.hold_order_qty),
+      it_qty: fvNum(r, INVF.it),
+      iw_qty: fvNum(r, INVF.iw),
+      it_iw: fvNum(r, INVF.it_iw),
+      it_iw_kits: fvNum(r, INVF.it_iw_kits),
+      open_cust_po_qty: fvNum(r, INVF.open_cust_po_qty),
+      test_order_qty: fvNum(r, INVF.test_order_qty),
+      exclude_po_wos: fvNum(r, INVF.exclude_po_wos_qty),
+      ats_wos_oh: fvNum(r, INVF.ats_wos_oh),
+      ats_wos_oh_oo: fvNum(r, INVF.ats_wos_oh_oo),
+      ats_wos_oh_oo_w_kits: fvNum(r, INVF.ats_wos_oh_oo_w_kits),
+      ats_wos_oh_oo_wo_test: fvNum(r, INVF.ats_wos_oh_oo_wo_test),
+      ats_oh_it_booked_wos: fvNum(r, INVF.ats_oh_it_booked_wos),
+      days_oos_next_rcpt: fvNum(r, INVF.days_oos_next_rcpt),
+      days_oos_l12m: fvNum(r, INVF.days_oos_l12m),
+      last_oos_date: fvDate(r, INVF.last_oos_date),
+      prj_wk: fvNum(r, INVF.prj_wk),
+      max_prj_wk: fvNum(r, INVF.max_prj_wk),
+      prj_l4w_all: fvNum(r, INVF.prj_l4w_all),
+      prj_26wks: fvNum(r, INVF.prj_26wks),
+      shp_wk_l4: fvNum(r, INVF.shp_wk_l4),
+      shp_wk_l13: fvNum(r, INVF.shp_wk_l13),
+      tot_shpd_l13w: fvNum(r, INVF.tot_shpd_l13w),
+      tot_shpd_l4: fvNum(r, INVF.tot_shpd_l4),
+      tot_shpd_ltd: fvNum(r, INVF.tot_shpd_ltd),
+      last_shp_date: fvDate(r, INVF.last_shp_date),
+      date_1st_rcvd: fvDate(r, INVF.date_1st_rcvd),
+      last_whs_rcvd: fvDate(r, INVF.last_whs_rcvd),
+      first_shpd_date: fvDate(r, INVF.first_shpd_date),
+      first_out_date: fvDate(r, INVF.first_out_date),
+      active_kl: fvBool(r, INVF.active_kl),
+      amz_do_not_ship: fvBool(r, INVF.amz_do_not_ship),
+      amz_suppression: fvBool(r, INVF.amz_suppression),
+      transfer_qty_open: fvBool(r, INVF.transfer_qty_open),
+      shipment_status_summary: stripHtml(fvStr(r, INVF.shipment_status_summary)),
+      ats_summary: stripHtml(fvStr(r, INVF.ats_summary)),
+      inventory_notes: stripHtml(fvStr(r, INVF.inventory_notes)),
+      style_alert: stripHtml(fvStr(r, INVF.style_alert)),
+      oos_priority_notes: stripHtml(fvStr(r, INVF.oos_priority_notes)),
+      active_replen_customers: stripHtml(fvStr(r, INVF.active_replen_customers)),
+      size_ct: fvStr(r, INVF.size_ct),
+      fragrance: fvStr(r, INVF.fragrance),
+      pvt_lbl_excl: fvBool(r, INVF.pvt_lbl_excl),
+      commit_item: fvBool(r, INVF.commit_item),
+      inner_pack: fvNum(r, INVF.inner_pack),
+      master_pack: fvNum(r, INVF.master_pack),
+      oos_dates: fvStr(r, INVF.oos_dates),
+      over_committed_qty: fvNum(r, INVF.over_committed_qty),
+      ovr_comt_wos: fvNum(r, INVF.ovr_comt_wos),
+      invtry_age_days: fvNum(r, INVF.invtry_age_days),
+      aged_inv_0_90: fvNum(r, INVF.aged_inv_0_90),
+      aged_inv_91_180: fvNum(r, INVF.aged_inv_91_180),
+      aged_inv_181_365: fvNum(r, INVF.aged_inv_181_365),
+      aged_inv_365plus: fvNum(r, INVF.aged_inv_365plus),
+      pct_time_in_stock: fvNum(r, INVF.pct_time_in_stock),
+      inv_manager_raw: fv(r, INVF.inventory_manager, null),
+      beg: BEG_IDS.map(id => fvNum(r, id)),
+      rcv: RCV_IDS.map(id => fvNum(r, id)),
+      prj: PRJ_IDS.map(id => fvNum(r, id)),
+    };
+  }
+
+  // Process Projections
+  const projMap = {};  // mstyle -> {description, brand, inv_managers, item_statuses, customer_count, manual_demand_26w}
+  for (const r of projRows) {
+    const ms = fvStr(r, PROJ.mstyle);
+    if (!ms) continue;
+    if (!projMap[ms]) {
+      projMap[ms] = {
+        description: stripHtml(fvStr(r, PROJ.description)),
+        brand: fvStr(r, PROJ.brand),
+        inv_managers: new Set(),
+        item_statuses: [],
+        customer_count: 0,
+        manual_demand_26w: 0,
+      };
+    }
+    const d = projMap[ms];
+    const status = fvStr(r, PROJ.status_cust);
+    const pt_status = fvStr(r, PROJ.pt_item_status);
+    if (pt_status) d.item_statuses.push(pt_status);
+    d.customer_count++;
+    const weeklyDemand = MANUAL_W_IDS.reduce((s,id)=>s+fvNum(r,id),0);
+    d.manual_demand_26w += weeklyDemand;
+  }
+
+  onProgress(85, 'Computing recommendations...');
+
+  // Build final records
+  const records = [];
+  for (const [ms, ivf] of Object.entries(invMap)) {
+    const pr = projMap[ms] || {};
+    // Most common item_status
+    let item_status = '';
+    if (pr.item_statuses && pr.item_statuses.length) {
+      const counts = {};
+      for (const s of pr.item_statuses) counts[s] = (counts[s]||0)+1;
+      item_status = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+    }
+    const is_replen = item_status.toLowerCase().includes('replen');
+
+    // Inv manager name
+    let inv_manager = '';
+    if (ivf.inv_manager_raw) {
+      const v = ivf.inv_manager_raw;
+      if (typeof v === 'object' && v !== null) inv_manager = v.name || v.email || '';
+      else inv_manager = String(v);
+    }
+
+    const rec = {
+      ...ivf,
+      description: pr.description || '',
+      brand: pr.brand || '',
+      inv_manager,
+      item_status,
+      is_replen,
+      customer_count: pr.customer_count || 0,
+      manual_demand_26w: pr.manual_demand_26w || 0,
+      open_pos: parseOpenPOs(ivf.open_pos_raw),
+      // Derived (filled by computeDerived)
+      pipeline_total: 0, demand_26w: 0, pipeline_excess: 0, pipeline_wos: 0,
+      overstocked: false, gap_weeks: [], recommendations: [], priority: 'LOW',
+    };
+    computeDerived(rec);
+    records.push(rec);
+  }
+
+  onProgress(95, 'Sorting...');
+  records.sort((a,b)=>{
+    const pd = PRI_ORDER[a.priority] - PRI_ORDER[b.priority];
+    if (pd !== 0) return pd;
+    const gd = b.gap_weeks.length - a.gap_weeks.length;
+    if (gd !== 0) return gd;
+    return a.mstyle.localeCompare(b.mstyle);
+  });
+
+  return records;
+}
+
+// ── Cache helpers ─────────────────────────────────────────────────────────────
+function saveCache(records) {
+  try {
+    // Serialize dates to ISO strings
+    const serial = JSON.stringify({ ts: Date.now(), records }, (key, val) => {
+      if (val instanceof Date) return { __date__: val.toISOString() };
+      return val;
+    });
+    localStorage.setItem(CACHE_KEY, serial);
+  } catch(e) { console.warn('Cache save failed', e); }
+}
+
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw, (key, val) => {
+      if (val && typeof val === 'object' && val.__date__) return new Date(val.__date__);
+      return val;
+    });
+    if (Date.now() - parsed.ts > CACHE_TTL) return null;
+    return parsed;
+  } catch(e) { return null; }
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function n(v, dec=0) {
+  if (v === null || v === undefined || v === '') return '—';
+  if (typeof v === 'number' && !isFinite(v)) return '∞';
+  const num = typeof v === 'number' ? v : parseFloat(v);
+  if (isNaN(num)) return '—';
+  return num.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function flag(v, label) {
+  return `<span class="${v ? 'flag-on' : 'flag-off'}">${v ? label : label}</span>`;
+}
+
+function pillHtml(pri) {
+  return `<span class="pill pill-${pri}">${pri}</span>`;
+}
+
+function actionPill(action) {
+  if (!action) return '<span class="act-none">—</span>';
+  return `<span class="pill act-${action}" style="font-size:10px">${action.replace(/_/g,' ')}</span>`;
+}
+
+function wosClass(wos, opt_wos) {
+  if (!isFinite(wos) || wos === 0) return '';
+  if (wos < opt_wos) return 'wos-red';
+  if (wos < opt_wos * 1.5) return 'wos-orange';
+  if (wos > OVERSTOCK_WOS_TH) return 'wos-blue';
+  return 'wos-ok';
+}
+
+// ── Build dropdown options ────────────────────────────────────────────────────
+function buildDropdowns() {
+  const actions = new Set(), countries = new Set(), brands = new Set(), mgrs = new Set();
+  for (const r of allRecords) {
+    const act = r.recommendations[0]?.action;
+    if (act) actions.add(act);
+    if (r.country) countries.add(r.country);
+    if (r.brand) brands.add(r.brand);
+    if (r.inv_manager) mgrs.add(r.inv_manager);
+  }
+  const fill = (id, vals) => {
+    const el = document.getElementById(id);
+    const cur = el.value;
+    el.innerHTML = el.options[0].outerHTML;
+    [...vals].sort().forEach(v => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = v;
+      el.appendChild(o);
+    });
+    if (cur) el.value = cur;
+  };
+  fill('f-action', actions);
+  fill('f-country', countries);
+  fill('f-brand', brands);
+  fill('f-mgr', mgrs);
+}
+
+// ── Stats update ──────────────────────────────────────────────────────────────
+function updateStats() {
+  const cnt = { ALL: allRecords.length, CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
+  let gaps = 0, over = 0;
+  for (const r of allRecords) {
+    cnt[r.priority] = (cnt[r.priority]||0) + 1;
+    if (r.gap_weeks.length) gaps++;
+    if (r.overstocked) over++;
+  }
+  document.getElementById('cnt-all').textContent = cnt.ALL;
+  document.getElementById('cnt-crit').textContent = cnt.CRITICAL;
+  document.getElementById('cnt-high').textContent = cnt.HIGH;
+  document.getElementById('cnt-med').textContent = cnt.MEDIUM;
+  document.getElementById('cnt-low').textContent = cnt.LOW;
+  document.getElementById('stat-gaps').textContent = `${gaps} with gaps`;
+  document.getElementById('stat-over').textContent = `${over} overstocked`;
+}
+
+// ── Filter + Sort + Render ────────────────────────────────────────────────────
+function applyFilters() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const fAction = document.getElementById('f-action').value;
+  const fCountry = document.getElementById('f-country').value;
+  const fBrand = document.getElementById('f-brand').value;
+  const fMgr = document.getElementById('f-mgr').value;
+  const chkReplen = document.getElementById('chk-replen').checked;
+  const chkGaps = document.getElementById('chk-gaps').checked;
+  const chkOver = document.getElementById('chk-over').checked;
+  const chkNoMulti = document.getElementById('chk-nomulti').checked;
+
+  filtered = allRecords.filter(r => {
+    if (activePri !== 'ALL' && r.priority !== activePri) return false;
+    if (search && !r.mstyle.toLowerCase().includes(search) &&
+        !r.description.toLowerCase().includes(search) &&
+        !r.brand.toLowerCase().includes(search)) return false;
+    if (fAction && r.recommendations[0]?.action !== fAction) return false;
+    if (fCountry && r.country !== fCountry) return false;
+    if (fBrand && r.brand !== fBrand) return false;
+    if (fMgr && r.inv_manager !== fMgr) return false;
+    if (chkReplen && !r.is_replen) return false;
+    if (chkGaps && !r.gap_weeks.length) return false;
+    if (chkOver && !r.overstocked) return false;
+    if (chkNoMulti && r.is_multi) return false;
+    return true;
+  });
+
+  // Sort
+  filtered.sort((a,b)=>{
+    let av = a[sortCol], bv = b[sortCol];
+    if (sortCol === 'priority') { av = PRI_ORDER[a.priority]; bv = PRI_ORDER[b.priority]; }
+    if (sortCol === 'gaps') { av = a.gap_weeks.length; bv = b.gap_weeks.length; }
+    if (sortCol === 'action') { av = a.recommendations[0]?.action||''; bv = b.recommendations[0]?.action||''; }
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av === bv) return 0;
+    const cmp = av < bv ? -1 : 1;
+    return sortAsc ? cmp : -cmp;
+  });
+
+  document.getElementById('stat-shown').textContent = `${filtered.length} shown`;
+  renderTable();
+}
+
+function setPriFilter(pri) {
+  activePri = pri;
+  document.querySelectorAll('.pri-btn').forEach(b => b.classList.toggle('active', b.dataset.pri === pri));
+  applyFilters();
+}
+
+let sortDir = {};
+function sortBy(col) {
+  if (sortCol === col) { sortAsc = !sortAsc; }
+  else { sortCol = col; sortAsc = col === 'priority' || col === 'mstyle'; }
+  // Update arrows
+  document.querySelectorAll('.sort-arrow').forEach(el => el.textContent = '');
+  const arrow = document.getElementById(`sa-${col}`);
+  if (arrow) arrow.textContent = sortAsc ? '▲' : '▼';
+  applyFilters();
+}
+
+// ── Table rendering ───────────────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  const nr = document.getElementById('no-results');
+  if (!filtered.length) { nr.style.display = ''; return; }
+  nr.style.display = 'none';
+
+  for (const rec of filtered) {
+    const tr = document.createElement('tr');
+    if (rec.gap_weeks.length) tr.classList.add('gap-row');
+    else if (rec.overstocked) tr.classList.add('over-row');
+    if (rec.mstyle === openDetailMstyle) tr.classList.add('detail-open');
+    tr.dataset.mstyle = rec.mstyle;
+    tr.style.cursor = 'pointer';
+    tr.addEventListener('click', () => toggleDetail(rec, tr));
+
+    const wos = rec.pipeline_wos;
+    const wc = wosClass(wos, rec.opt_wos);
+    const wosStr = isFinite(wos) && wos > 0 ? n(wos, 1) : (wos === Infinity ? '∞' : '0.0');
+    const act = rec.recommendations[0]?.action || null;
+
+    tr.innerHTML = `
+      <td class="mstyle-cell">
+        <div class="ms">${esc(rec.mstyle)}</div>
+        <div class="desc" title="${esc(rec.description)}">${esc(rec.description)}</div>
+      </td>
+      <td>${esc(rec.country)}</td>
+      <td>${pillHtml(rec.priority)}</td>
+      <td>${rec.gap_weeks.length ? `<span class="gap-badge">${rec.gap_weeks.length}</span>` : '<span style="color:#bbb">0</span>'}</td>
+      <td><span class="${wc}">${wosStr}</span></td>
+      <td>${n(rec.prj_wk, 0)}</td>
+      <td>${n(rec.qty_oh)}</td>
+      <td>${n(rec.it_iw)}</td>
+      <td>${actionPill(act)}</td>
+      <td style="white-space:nowrap;font-size:11px">${esc(rec.inv_manager||'—')}</td>
+    `;
+    tbody.appendChild(tr);
+
+    if (rec.mstyle === openDetailMstyle) {
+      tbody.appendChild(buildDetailRow(rec));
+    }
+  }
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Detail pane ───────────────────────────────────────────────────────────────
+function toggleDetail(rec, tr) {
+  if (openDetailMstyle === rec.mstyle) {
+    openDetailMstyle = null;
+  } else {
+    openDetailMstyle = rec.mstyle;
+  }
+  renderTable();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && openDetailMstyle) {
+    openDetailMstyle = null;
+    renderTable();
+  }
+});
+
+function buildDetailRow(rec) {
+  const detailTr = document.createElement('tr');
+  detailTr.className = 'detail-row';
+  const td = document.createElement('td');
+  td.colSpan = 10;
+  td.innerHTML = buildDetailHtml(rec);
+  detailTr.appendChild(td);
+  return detailTr;
+}
+
+function kv(label, val) {
+  return `<div class="k">${label}</div><div class="v">${val}</div>`;
+}
+
+function flagKV(label, val) {
+  const cls = val ? 'flag-on' : 'flag-off';
+  return `<div class="k">${label}</div><div class="v ${cls}">${val ? 'YES' : 'No'}</div>`;
+}
+
+function buildDetailHtml(rec) {
+  const html = [];
+  html.push('<div class="detail-pane">');
+  html.push('<div class="dp-grid">');
+
+  // Card 1: Identity
+  html.push(`<div class="dp-card"><h3>Identity</h3><div class="dp-kv">`);
+  html.push(kv('Mstyle', `<strong>${esc(rec.mstyle)}</strong>`));
+  html.push(kv('Description', esc(rec.description)||'—'));
+  html.push(kv('Brand', esc(rec.brand)||'—'));
+  html.push(kv('Country', esc(rec.country)||'—'));
+  html.push(kv('Season', esc(rec.season)||'—'));
+  html.push(kv('Item Rank', esc(rec.item_rank)||'—'));
+  html.push(kv('Status (Proj)', esc(rec.item_status)||'—'));
+  html.push(kv('Status (Flow)', esc(rec.item_status_flow)||'—'));
+  html.push(kv('Sub Status', esc(rec.sub_status)||'—'));
+  html.push(kv('Inv Manager', esc(rec.inv_manager)||'—'));
+  html.push(kv('Customers', rec.customer_count));
+  html.push(kv('Multi-Pack', rec.is_multi ? `Yes (${rec.pcs_per_kit} pcs/kit from ${esc(rec.root_mstyle)})` : 'No'));
+  html.push(`</div><div class="dp-kv" style="margin-top:8px">`);
+  html.push(flagKV('NVO', rec.nvo));
+  html.push(flagKV('Pvt Lbl Excl', rec.pvt_lbl_excl));
+  html.push(flagKV('Commit Item', rec.commit_item));
+  html.push(flagKV('AMZ Do Not Ship', rec.amz_do_not_ship));
+  html.push(flagKV('AMZ Suppression', rec.amz_suppression));
+  html.push(flagKV('Active KL', rec.active_kl));
+  html.push(flagKV('Transfer Open', rec.transfer_qty_open));
+  html.push(flagKV('New Item No Prj', rec.new_item_no_prj));
+  html.push('</div></div>');
+
+  // Card 2: Item Data
+  html.push(`<div class="dp-card"><h3>Item Data</h3><div class="dp-kv">`);
+  html.push(kv('Inner Pack', n(rec.inner_pack)));
+  html.push(kv('Master Pack', n(rec.master_pack)));
+  html.push(kv('MOQ', n(rec.moq)));
+  html.push(kv('Opt OH', n(rec.opt_oh)));
+  html.push(kv('Opt WOS', n(rec.opt_wos, 1)));
+  html.push(kv('LT (Wks)', n(rec.lt_wks, 1)));
+  html.push(kv('LT + Opt Wks', n(rec.lt_opt_weeks, 1)));
+  html.push(kv('CNY Weeks', n(rec.cny_weeks, 1)));
+  html.push(kv('LT Trans Days', n(rec.lt_trans_days)));
+  html.push(kv('Transit Days', n(rec.transit_days)));
+  html.push(kv('Size Ct', esc(rec.size_ct)||'—'));
+  html.push(kv('Fragrance', esc(rec.fragrance)||'—'));
+  html.push(kv('OOS Dates', esc(rec.oos_dates)||'—'));
+  html.push('</div></div>');
+
+  // Card 3: Inventory
+  html.push(`<div class="dp-card"><h3>Inventory</h3><div class="dp-kv">`);
+  html.push(kv('Qty OH', n(rec.qty_oh)));
+  html.push(kv('ATS OH', n(rec.ats_qty_oh)));
+  html.push(kv('ATS Now', n(rec.ats_now)));
+  html.push(kv('ATS OH+OO', n(rec.ats_oh_oo)));
+  html.push(kv('ATS OH+OO (Kits)', n(rec.ats_oh_oo_w_kits)));
+  html.push(kv('NJ ATS OH', n(rec.nj_ats_oh)));
+  html.push(kv('CA ATS OH', n(rec.ca_ats_oh)));
+  html.push(kv('Hold Qty', n(rec.hold_qty)));
+  html.push(kv('Open Cust POs', n(rec.open_cust_po_qty)));
+  html.push(kv('Test Order Qty', n(rec.test_order_qty)));
+  html.push(kv('ATS WOS OH', n(rec.ats_wos_oh, 1)));
+  html.push(kv('ATS WOS OH+OO', n(rec.ats_wos_oh_oo, 1)));
+  html.push(kv('Pipeline WOS', n(rec.pipeline_wos, 1)));
+  html.push(kv('Opt WOS', n(rec.opt_wos, 1)));
+  html.push(kv('Pipeline Total', n(rec.pipeline_total)));
+  html.push(kv('Pipeline Excess', n(rec.pipeline_excess)));
+  if (rec.is_multi) {
+    html.push(kv('Root OH', n(rec.qty_oh_root)));
+    html.push(kv('Root IT+IW', n(rec.it_iw_root)));
+    html.push(kv('Root ATS OH+OO', n(rec.ats_oh_oo_root)));
+  }
+  html.push('</div></div>');
+
+  // Card 4: Demand / Shipments
+  html.push(`<div class="dp-card"><h3>Demand / Shipments</h3><div class="dp-kv">`);
+  html.push(kv('Prj/Wk', n(rec.prj_wk, 0)));
+  html.push(kv('Max Prj/Wk', n(rec.max_prj_wk, 0)));
+  html.push(kv('Prj 26W', n(rec.prj_26wks)));
+  html.push(kv('Manual Demand 26W', n(rec.manual_demand_26w)));
+  html.push(kv('Demand 26W (engine)', n(rec.demand_26w)));
+  html.push(kv('Shp/Wk L4', n(rec.shp_wk_l4, 0)));
+  html.push(kv('Shp/Wk L13', n(rec.shp_wk_l13, 0)));
+  html.push(kv('Tot Shpd L13W', n(rec.tot_shpd_l13w)));
+  html.push(kv('Tot Shpd LTD', n(rec.tot_shpd_ltd)));
+  html.push(kv('Last Shp Date', fmtDate(rec.last_shp_date)));
+  html.push(kv('Next Rcpt Date', fmtDate(rec.next_rcpt_dt)));
+  html.push(kv('Days OOS to Next Rcpt', n(rec.days_oos_next_rcpt)));
+  html.push(kv('Days OOS L12M', n(rec.days_oos_l12m)));
+  html.push(kv('Last OOS Date', fmtDate(rec.last_oos_date)));
+  html.push(kv('Date 1st Rcvd', fmtDate(rec.date_1st_rcvd)));
+  html.push(kv('Last WHS Rcvd', fmtDate(rec.last_whs_rcvd)));
+  html.push('</div></div>');
+
+  html.push('</div>'); // end dp-grid row 1
+
+  // Card 5: Open POs
+  if (rec.open_pos.length) {
+    html.push('<div style="margin-bottom:12px">');
+    html.push('<div class="dp-card"><h3>Open POs</h3>');
+    html.push('<table class="po-table"><thead><tr><th>PO #</th><th>Supplier</th><th>I/T</th><th>I/W</th><th>Total</th><th>ETD</th><th>ETA</th><th>Status</th></tr></thead><tbody>');
+    for (const po of rec.open_pos) {
+      const st = poStatus(po, today, rec.country);
+      html.push(`<tr>
+        <td>${esc(po.po_number)}</td>
+        <td>${esc(po.supplier)}</td>
+        <td>${n(po.it_qty)}</td>
+        <td>${n(po.iw_qty)}</td>
+        <td>${n(po.qty)}</td>
+        <td>${fmtDate(po.etd)}</td>
+        <td>${fmtDate(po.eta)}</td>
+        <td class="po-status-${st}">${st}</td>
+      </tr>`);
+    }
+    html.push('</tbody></table></div></div>');
+  }
+
+  // Second row: recs + overstock + horizon + notes
+  html.push('<div class="dp-grid">');
+
+  // Card 6: Recommendations
+  if (rec.recommendations.length) {
+    html.push('<div class="dp-card"><h3>Recommendations</h3>');
+    for (const r of rec.recommendations) {
+      html.push(`<div class="rec-card rec-${r.action}">`);
+      html.push(`<div class="rc-head">${actionPill(r.action)} <strong>${esc(r.po_number||'')}</strong> ${r.supplier ? `<span style="color:#666;font-size:10px">${esc(r.supplier)}</span>` : ''}</div>`);
+      html.push(`<div class="rc-reason">${esc(r.reason)}</div>`);
+      if (r.orig_etd && r.proposed_etd) {
+        html.push(`<div class="rc-dates">ETD: ${fmtDate(r.orig_etd)} → ${fmtDate(r.proposed_etd)}</div>`);
+      }
+      if (r.orig_eta && r.proposed_eta) {
+        html.push(`<div class="rc-dates">ETA: ${fmtDate(r.orig_eta)} → ${fmtDate(r.proposed_eta)}</div>`);
+      }
+      if (r.action === 'CANCEL') html.push(`<div class="rc-dates">Cancel qty: ${n(r.qty_affected)}</div>`);
+      if (r.action === 'SPLIT') html.push(`<div class="rc-dates">Keep ${n(r.keep_qty)} at orig ETD, push ${n(r.push_qty)}</div>`);
+      html.push('</div>');
+    }
+    html.push('</div>');
+  }
+
+  // Card 7: Overstock
+  if (rec.overstocked) {
+    html.push('<div class="dp-card"><h3>Overstock</h3><div class="dp-kv">');
+    html.push(kv('Pipeline Excess', `<span style="color:#b71c1c;font-weight:700">${n(rec.pipeline_excess)}</span>`));
+    html.push(kv('Pipeline WOS', n(rec.pipeline_wos, 1)));
+    html.push(kv('Over Committed Qty', n(rec.over_committed_qty)));
+    html.push(kv('Ovr Comt WOS', n(rec.ovr_comt_wos, 1)));
+    html.push(kv('Aged 0-90d', n(rec.aged_inv_0_90)));
+    html.push(kv('Aged 91-180d', n(rec.aged_inv_91_180)));
+    html.push(kv('Aged 181-365d', n(rec.aged_inv_181_365)));
+    html.push(kv('Aged 365d+', n(rec.aged_inv_365plus)));
+    html.push(kv('% Time In Stock', n(rec.pct_time_in_stock, 1) + '%'));
+    html.push('</div></div>');
+  }
+
+  // Card 8: 26-Week Horizon
+  html.push('<div class="dp-card" style="grid-column:1/-1"><h3>26-Week Horizon</h3>');
+  html.push('<div style="overflow-x:auto">');
+  html.push('<table class="hz-table"><thead><tr><th>Wk</th><th>Date</th><th>Beg OH</th><th>Rcv</th><th>Prj Demand</th><th>WOS</th></tr></thead><tbody>');
+  const gapWiSet = new Set(rec.gap_weeks.map(g=>g.wi));
+  for (let i = 0; i < 26; i++) {
+    const bv = rec.beg[i] || 0;
+    const rv = rec.rcv[i] || 0;
+    const pv = rec.prj[i] || 0;
+    const wos = pv > 0 ? Math.round(10 * bv / pv) / 10 : null;
+    const isGap = gapWiSet.has(i+1);
+    const begCls = isGap ? 'hz-beg-gap' : (pv > 0 && bv / pv < rec.opt_wos * 1.5 ? 'hz-beg-warn' : 'hz-beg-ok');
+    const wkLabel = MANUAL_W_LABELS[i] || `W${i+1}`;
+    const dt = fmtDate(wkDate(today, i));
+    html.push(`<tr>
+      <td>${wkLabel.split(' ')[0]}</td>
+      <td>${dt}</td>
+      <td class="${begCls}">${n(bv)}</td>
+      <td>${rv > 0 ? `<span style="color:#1565c0;font-weight:700">${n(rv)}</span>` : '—'}</td>
+      <td>${pv > 0 ? n(pv) : '—'}</td>
+      <td>${wos !== null ? n(wos, 1) : '—'}</td>
+    </tr>`);
+  }
+  html.push('</tbody></table></div></div>');
+
+  // Card 9: Notes
+  const hasNotes = rec.shipment_status_summary || rec.ats_summary || rec.inventory_notes || rec.style_alert || rec.oos_priority_notes || rec.active_replen_customers;
+  if (hasNotes) {
+    html.push('<div class="dp-card" style="grid-column:1/-1"><h3>Notes</h3>');
+    const noteField = (label, val) => {
+      if (!val) return '';
+      return `<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#37474f;margin-bottom:4px">${label}</div><div class="dp-note">${esc(val)}</div></div>`;
+    };
+    html.push(noteField('Shipment Status Summary', rec.shipment_status_summary));
+    html.push(noteField('ATS Summary', rec.ats_summary));
+    html.push(noteField('Inventory Notes', rec.inventory_notes));
+    html.push(noteField('Style Alert', rec.style_alert));
+    html.push(noteField('OOS Priority Notes', rec.oos_priority_notes));
+    html.push(noteField('Active Replen Customers', rec.active_replen_customers));
+    html.push('</div>');
+  }
+
+  html.push('</div>'); // end dp-grid row 2
+  html.push('</div>'); // end detail-pane
+  return html.join('');
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+async function main() {
+  try {
+    setProgress(2, 'Checking cache...');
+    const cached = loadCache();
+    let records;
+
+    if (cached) {
+      setProgress(80, 'Using cached data...', `Cached ${new Date(cached.ts).toLocaleString()}`);
+      records = cached.records;
+      // Re-run computeDerived since dates were deserialized
+      today = new Date();
+      today.setHours(0,0,0,0);
+    } else {
+      // Step 1: Auth
+      setProgress(3, 'Getting auth token...');
+      await getTempToken();
+      setProgress(5, 'Auth OK');
+
+      // Step 2: Inventory Flow
+      const invFlowRows = await fetchInvFlow((pct, msg) => setProgress(5 + pct*0.35, msg));
+
+      // Step 3: Projections
+      const projRows = await fetchProjections((pct, msg) => setProgress(40 + pct*0.35, msg));
+
+      // Step 4: Build
+      setProgress(75, 'Building records...');
+      records = buildRecords(invFlowRows, projRows, (pct, msg) => setProgress(pct, msg));
+
+      // Cache
+      saveCache(records);
+    }
+
+    allRecords = records;
+    filtered = [...allRecords];
+
+    // Update UI
+    updateStats();
+    buildDropdowns();
+    sortBy('priority');
+
+    // Data timestamp
+    const ts = cached ? new Date(cached.ts) : new Date();
+    document.getElementById('data-ts').textContent = `Data as of ${ts.toLocaleString()}`;
+
+    setProgress(100, 'Ready!');
+    await new Promise(r => setTimeout(r, 400));
+
+    document.getElementById('loading-overlay').style.display = 'none';
+    document.getElementById('app').style.display = '';
+
+  } catch(err) {
+    document.getElementById('loading-overlay').style.display = 'none';
+    document.getElementById('app').style.display = '';
+    const wrap = document.getElementById('table-wrap');
+    wrap.innerHTML = `<div class="error-box"><strong>Error loading data:</strong><br>${esc(String(err))}<br><br>
+      <small>Make sure you are logged in to QuickBase (pim.quickbase.com) in this browser. If you recently logged in, try refreshing the page.</small>
+      <br><br><button onclick="localStorage.removeItem('${CACHE_KEY}');location.reload()">Clear Cache &amp; Retry</button></div>`;
+  }
+}
+
+main();
+</script>
+</body>
+</html>
