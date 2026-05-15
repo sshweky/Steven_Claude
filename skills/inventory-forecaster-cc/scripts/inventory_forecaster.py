@@ -5002,21 +5002,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # they now flow through the standard classification path below like any
     # other Amazon record.
 
-    # F60 — EC-transition annotation (2026-05-15).
-    # History was already inherited in the main-loop pre-pass.  Here we only
-    # add the driver narrative so the alert clearly explains why the forecast
-    # looks like an established item rather than a sparse new one.
-    if row.get("_ec_transition"):
-        _f60_parent  = row.get("_ec_parent_mstyle", "?")
-        _f60_par_l13 = row.get("_ec_parent_l13", 0)
-        _f60_orig_l13 = row.get("_ec_orig_l13", 0)
-        if isinstance(meta, dict):
-            meta.setdefault("drivers", []).append(
-                f"F60 EC-transition: inherited 52w order+ship history from parent "
-                f"{_f60_parent} (parent L13W={_f60_par_l13:.0f}, "
-                f"EC own L13W={_f60_orig_l13:.0f} — {_f60_orig_l13/_f60_par_l13*100:.0f}% "
-                f"of parent); forecast reflects parent demand signal"
-            )
+    # F60 — EC-transition flag (2026-05-15).
+    # History was already inherited from the parent mstyle in the main-loop
+    # pre-pass.  Flag here so _fire() tags rule_fires; driver narrative is
+    # added in the F59/post-model block below where `meta` is available.
+    _f60_is_ec_transition = bool(row.get("_ec_transition"))
+    if _f60_is_ec_transition:
         _fire("F60")
 
     # F34 — Pre-launch-zeros detection (2026-05-05).
