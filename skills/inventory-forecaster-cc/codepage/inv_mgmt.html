@@ -236,9 +236,12 @@ async function qbQuery(tableId, fieldIds, where, skip, top) {
   return r.json();
 }
 
-async function qbQueryAll(tableId, fieldIds, where) {
+async function qbQueryAll(tableId, fieldIds, where, label) {
   var skip = 0, top = 1000, all = [];
+  var page = 0;
   while (true) {
+    page++;
+    if (label) setStatus((label) + ' (page ' + page + ', ' + all.length + ' records)...');
     var data = await qbQuery(tableId, fieldIds, where, skip, top);
     var rows = data.data || [];
     all = all.concat(rows);
