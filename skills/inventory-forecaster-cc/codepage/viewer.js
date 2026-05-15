@@ -2108,19 +2108,18 @@ async function _loadAmzDcInv(r, safeId) {
   const fmt    = n => Math.round(n).toLocaleString('en-US');
   const fmtWos = n => n.toFixed(1);
   let wosHtml;
-  if      (wos < 3)  wosHtml = `<span style="color:#c62828;font-weight:600">WOS ${fmtWos(wos)}wks ⚠</span>`;
-  else if (wos < 8)  wosHtml = `<span style="color:#e65100">WOS ${fmtWos(wos)}wks</span>`;
-  else if (wos < 16) wosHtml = `WOS ${fmtWos(wos)}wks`;
-  else               wosHtml = `<span style="color:#f57f17">WOS ${fmtWos(wos)}wks (overstocked)</span>`;
+  if      (wos < 3)  wosHtml = `<b>WOS</b> <span style="color:#c62828;font-weight:600">${fmtWos(wos)} wks &#9888;</span>`;
+  else if (wos < 8)  wosHtml = `<b>WOS</b> <span style="color:#e65100">${fmtWos(wos)} wks</span>`;
+  else if (wos < 16) wosHtml = `<b>WOS</b> ${fmtWos(wos)} wks`;
+  else               wosHtml = `<b>WOS</b> <span style="color:#f57f17">${fmtWos(wos)} wks (overstocked)</span>`;
 
   // Always show all three fields — display 0 when null/missing.
-  const parts = [
-    `Amazon OH ${fmt(soh)}u`,
-    `Open PO ${fmt(opo)}u`,
-    wosHtml,
-  ];
-
-  const bullet = `<b>Amazon DC inventory:</b> ${parts.join(' · ')}.`;
+  // Use HTML entity separator (no special Unicode chars that can mangle in QB).
+  const sep = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
+  const bullet = '<b>Amazon DC inventory:</b> ' +
+    `<b>Amazon OH</b> ${fmt(soh)} u` + sep +
+    `<b>Open PO</b> ${fmt(opo)} u` + sep +
+    wosHtml;
 
   // Find the AI Analysis <ul> (id stamped during panel render above)
   const ul = document.getElementById('ai-bullets-' + safeId);
