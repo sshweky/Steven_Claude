@@ -2064,6 +2064,81 @@ function toggleDetail(key) {
   el.dataset.loaded = '1';
   // Pull the 30-day comment history from QB and populate the right pane
   loadCommentHistory(r.key);
+  // Live Amazon DC inventory health  -  fetches fresh SOH/OPO/WOS from the
+  // Amazon Catalog table and injects/refreshes the bullet in AI Analysis.
+  // Runs after innerHTML is set so the target <ul> already exists in the DOM.
+  if (isAmazonRec && CFG.AMZ_CATALOG_TID) _loadAmzDcInv(r, safeId);
+}
+
+// -- Amazon DC Inventory Health live fetch ------------------------------------
+// Called every time an Amazon detail panel opens.  Queries bqp8vz625 by Mstyle
+// and injects/replaces the "Amazon DC inventory" bullet in the AI Analysis <ul>.
+// If the stored ai_analysis already has a DC inventory bullet from a previous
+// forecast run, this replaces it with a fresh live read so data never goes stale.
+async function _loadAmzDcInv(r, safeId) {
+  if (!CFG.AMZ_CATALOG_TID) return;
+  const AF      = CFG.AMZ_CATALOG_FID;
+  const mstyle  = (r.mstyle || '').trim();
+  if (!mstyle) return;
+
+  let soh = 0, opo = 0, wos = 0;
+  try {
+    const resp = await qb('/records/query', {
+      from:    CFG.AMZ_CATALOG_TID,
+      select:  [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH],
+      where:   `{${AF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}`,
+      options: { top: 1 },
+    });
+    const rows = resp.data || [];
+    if (!rows.length) return;   // no Amazon Catalog row for this mstyle
+    const row = rows[0];
+    soh = parseFloat((row[AF.SOH]    && row[AF.SOH].value)    || 0) || 0;
+    opo = parseFloat((row[AF.OPO]    && row[AF.OPO].value)    || 0) || 0;
+    wos = parseFloat((row[AF.WOS_OH] && row[AF.WOS_OH].value) || 0) || 0;
+  } catch (e) {
+    console.warn('[DC Inv] fetch failed for mstyle', mstyle, e);
+    return;
+  }
+
+  if (!soh && !opo && !wos) return;   // empty row — nothing to display
+
+  // WOS colour thresholds match Python build_ai_analysis:
+  //   < 3 wks  → red    (OOS risk)
+  //   3–7 wks  → amber  (watch)
+  //   8–15 wks → normal (healthy)
+  //  ≥ 16 wks  → orange (overstocked)
+  const fmt    = n => Math.round(n).toLocaleString('en-US');
+  const fmtWos = n => n.toFixed(1);
+  let wosHtml;
+  if      (wos < 3)  wosHtml = `<span style="color:#c62828;font-weight:600">WOS ${fmtWos(wos)}wks ⚠</span>`;
+  else if (wos < 8)  wosHtml = `<span style="color:#e65100">WOS ${fmtWos(wos)}wks</span>`;
+  else if (wos < 16) wosHtml = `WOS ${fmtWos(wos)}wks`;
+  else               wosHtml = `<span style="color:#f57f17">WOS ${fmtWos(wos)}wks (overstocked)</span>`;
+
+  const parts = [];
+  if (soh > 0) parts.push(`SOH ${fmt(soh)}u`);
+  if (opo > 0) parts.push(`Open PO ${fmt(opo)}u`);
+  if (wos > 0) parts.push(wosHtml);
+  if (!parts.length) return;
+
+  const bullet = `<b>Amazon DC inventory:</b> ${parts.join(' · ')}.`;
+
+  // Find the AI Analysis <ul> (id stamped during panel render above)
+  const ul = document.getElementById('ai-bullets-' + safeId);
+  if (!ul) return;
+
+  // Remove any stale DC inventory <li> already in the list (e.g. from the
+  // last forecast run's ai_analysis text).  Prevents duplicate bullets.
+  Array.from(ul.querySelectorAll('li')).forEach(li => {
+    if (/amazon dc inventory/i.test(li.textContent)) li.remove();
+  });
+
+  // Append a fresh live-data bullet at the end of the AI Analysis list
+  const li = document.createElement('li');
+  li.style.marginBottom = '4px';
+  li.setAttribute('data-amz-dc-inv', '1');
+  li.innerHTML = bullet;
+  ul.appendChild(li);
 }
 
 // -- Comment history loader --------------------------------------------------
