@@ -1498,8 +1498,6 @@ def _rec_to_json(r: MStyleRecord) -> dict:
         "first_shpd_date":    _d(r.first_shpd_date),
         "first_out_date":     _d(r.first_out_date),
         # Text summaries (detail pane)
-        "shipment_status_summary": r.shipment_status_summary,
-        "ats_summary":        r.ats_summary,
         "inventory_notes":    r.inventory_notes,
         "style_alert":        r.style_alert,
         "oos_priority_notes": r.oos_priority_notes,
