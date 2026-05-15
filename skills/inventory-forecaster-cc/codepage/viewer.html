@@ -147,6 +147,18 @@ window.QB_CONFIG = {
     IGNORED:      9,    // checkbox  -  x Ignore button flips to true
   },
 
+  // -- Amazon Catalog / DC Inventory Health (bqp8vz625) -----------------------
+  // Per-mstyle Amazon DC inventory.  Queried live when an Amazon detail panel
+  // opens so the planner always sees fresh data (independent of forecast run).
+  // Join key: Mstyle (FID 34).  Data sourced from Amazon Inventory Health feed.
+  AMZ_CATALOG_TID: "bqp8vz625",
+  AMZ_CATALOG_FID: {
+    MSTYLE: 34,   // Mstyle  -  text join key
+    SOH:    126,  // Sellable On Hand Units
+    OPO:    137,  // Amazon Open PO Quantity
+    WOS_OH: 151,  // Amazon WOS OH (weeks of supply onhand)
+  },
+
   // The 26 manual projection fids are date-stamped and rotate weekly
   // (W1's label is "MM DD W1" where MM/DD = the most recent Sunday).
   // viewer.js will discover these at startup by querying the table's
