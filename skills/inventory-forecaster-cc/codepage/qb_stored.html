@@ -1,0 +1,1183 @@
+﻿<?xml version="1.0" ?>
+<qdbapi>
+	<action>API_GetDBPage</action>
+	<errcode>0</errcode>
+	<errtext>No error</errtext>
+	<pagebody>
+&lt;!doctype html&gt;<BR/>
+&lt;html&gt;&lt;head&gt;<BR/>
+&lt;meta charset=&quot;utf-8&quot;&gt;<BR/>
+&lt;title&gt;P+P Inventory Manager&lt;/title&gt;<BR/>
+&lt;style&gt;<BR/>
+  *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }<BR/>
+  body { font-family:&quot;Segoe UI&quot;,Arial,sans-serif; font-size:13px; background:#f0f2f5; color:#222; }<BR/>
+<BR/>
+  /* -- Loading screen -- */<BR/>
+  #loadingScreen {<BR/>
+    position:fixed; inset:0; background:#0d47a1; z-index:9999;<BR/>
+    display:flex; flex-direction:column; align-items:center; justify-content:center;<BR/>
+    color:#fff; transition:opacity 0.4s ease;<BR/>
+  }<BR/>
+  #loadingScreen.hidden { opacity:0; pointer-events:none; }<BR/>
+  #loadIcon  { font-size:52px; margin-bottom:16px; }<BR/>
+  #loadTitle { font-size:22px; font-weight:700; margin-bottom:4px; }<BR/>
+  #loadSub   { font-size:13px; color:rgba(255,255,255,0.6); margin-bottom:36px; }<BR/>
+  #loadBarWrap { width:340px; height:5px; background:rgba(255,255,255,0.2); border-radius:3px; overflow:hidden; margin-bottom:20px; }<BR/>
+  #loadBar   { height:100%; background:#fff; width:0%; transition:width 0.6s ease; border-radius:3px; }<BR/>
+  #loadStatus { font-size:13px; color:rgba(255,255,255,0.9); margin-bottom:28px; min-height:18px; }<BR/>
+  #loadSteps { font-size:12px; color:rgba(255,255,255,0.5); line-height:2; min-width:240px; }<BR/>
+  #loadSteps .done  { color:rgba(255,255,255,0.9); }<BR/>
+  #loadSteps .done::before { content:&quot;\2713\00a0&quot;; }<BR/>
+  #loadSteps .active { color:#fff; font-weight:600; }<BR/>
+  #loadSteps .active::before { content:&quot;\25b6\00a0&quot;; }<BR/>
+  #loadSteps .pending::before { content:&quot;\25cb\00a0&quot;; }<BR/>
+  .topbar { background:#0d47a1; color:#fff; padding:10px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }<BR/>
+  .topbar h1 { font-size:18px; font-weight:600; }<BR/>
+  .stats { display:flex; gap:8px; font-size:12px; align-items:center; flex-wrap:wrap; }<BR/>
+  .stats .stat { background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:4px; }<BR/>
+  .stats .stat b { font-size:14px; }<BR/>
+  .pri-btn {<BR/>
+    font-size:12px; padding:5px 12px; border-radius:18px; cursor:pointer;<BR/>
+    font-family:inherit; font-weight:600;<BR/>
+    transition: transform 0.1s, box-shadow 0.1s;<BR/>
+  }<BR/>
+  .pri-btn:hover { transform: translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.2); }<BR/>
+  .pri-btn.active { box-shadow:0 0 0 2px rgba(255,255,255,0.4); }<BR/>
+  .pri-btn b { font-weight:700; }<BR/>
+  .toolbar { padding:10px 18px; background:#fff; border-bottom:1px solid #d8dce3; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }<BR/>
+  .toolbar input, .toolbar select { font-size:12px; padding:4px 8px; border:1px solid #ccc; border-radius:3px; font-family:inherit; }<BR/>
+  .toolbar input[type=text] { width:240px; }<BR/>
+  table.main { width:100%; background:#fff; border-collapse:collapse; font-size:12px; }<BR/>
+  table.main th { background:#eceff1; padding:6px 8px; text-align:left; border-bottom:2px solid #cfd8dc; white-space:nowrap; cursor:pointer; user-select:none; position:sticky; top:0; }<BR/>
+  table.main td { padding:5px 8px; border-bottom:1px solid #eceff1; vertical-align:top; }<BR/>
+  table.main tr.row { cursor:pointer; }<BR/>
+  table.main tr.row:hover { background:#f5fafd; }<BR/>
+  .pri-CRITICAL { color:#b71c1c; font-weight:700; }<BR/>
+  .pri-HIGH     { color:#e65100; font-weight:600; }<BR/>
+  .pri-MEDIUM   { color:#5d4037; }<BR/>
+  .pri-LOW      { color:#555; }<BR/>
+  .badge { display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:8px; }<BR/>
+  .badge-red    { background:#ffebee; color:#b71c1c; }<BR/>
+  .badge-amber  { background:#fff3e0; color:#e65100; }<BR/>
+  .badge-purple { background:#f3e5f5; color:#4a148c; }<BR/>
+  .badge-green  { background:#e8f5e9; color:#1b5e20; }<BR/>
+  .badge-gray   { background:#eeeeee; color:#666; }<BR/>
+  .detail-pane { background:#fafafa; }<BR/>
+  .detail-pane td { padding:0; }<BR/>
+  .detail-pane .dwrap { padding:14px 18px; }<BR/>
+  .section { background:#fff; border:1px solid #e0e0e0; border-radius:5px; padding:10px 14px; margin-bottom:10px; }<BR/>
+  .section h3 { font-size:13px; font-weight:600; color:#0d47a1; margin-bottom:8px; }<BR/>
+  table.subtbl { width:100%; border-collapse:collapse; font-size:11px; }<BR/>
+  table.subtbl th { background:#f5f5f5; padding:3px 6px; text-align:left; border-bottom:1px solid #ddd; font-weight:600; }<BR/>
+  table.subtbl td { padding:3px 6px; border-bottom:1px solid #f3f3f3; }<BR/>
+  table.subtbl td.right { text-align:right; }<BR/>
+  .rec-box { padding:10px 14px; border-left:3px solid #1565c0; background:#f0f7ff; margin-bottom:8px; font-size:12px; border-radius:0 4px 4px 0; }<BR/>
+  .rec-box.priority-HIGH { border-color:#e65100; background:#fff8e1; }<BR/>
+  .rec-box.priority-CRITICAL { border-color:#b71c1c; background:#ffebee; }<BR/>
+  .rec-box.action-NO_LEVER { border-color:#888; background:#f5f5f5; color:#666; }<BR/>
+  .rec-action { font-weight:700; font-size:11px; letter-spacing:0.5px; padding:2px 8px; border-radius:3px; background:rgba(255,255,255,0.6); }<BR/>
+  .rec-action.NO_LEVER       { color:#888; background:#eeeeee; }<BR/>
+  .rec-action.PULL_UP        { color:#fff; background:#1565c0; }<BR/>
+  .rec-action.FASTER_VESSEL  { color:#fff; background:#5e35b1; }<BR/>
+  .rec-action.PUSH_OUT       { color:#fff; background:#e65100; }<BR/>
+  .rec-action.SPLIT          { color:#fff; background:#bf360c; }<BR/>
+  .rec-action.CANCEL         { color:#fff; background:#b71c1c; }<BR/>
+  .rec-body { margin-top:6px; padding-left:4px; }<BR/>
+  .rec-row { padding:2px 0; font-size:11px; color:#333; }<BR/>
+  .rec-row .rec-lbl { display:inline-block; min-width:80px; color:#666; font-weight:600; font-size:10px; text-transform:uppercase; letter-spacing:0.3px; }<BR/>
+  .rec-reason { margin-top:5px; padding:4px 8px; background:rgba(255,255,255,0.5); border-radius:3px; font-size:11px; color:#444; }<BR/>
+  .grid26 { font-size:10px; }<BR/>
+  .grid26 th, .grid26 td { padding:2px 5px; text-align:right; white-space:nowrap; }<BR/>
+  .grid26 th { font-size:9px; }<BR/>
+  .grid26 .lbl { text-align:left; font-weight:600; background:#fafafa; }<BR/>
+  .grid26 .gap { background:#ffebee; color:#b71c1c; font-weight:600; }<BR/>
+  .grid26 .ok { color:#555; }<BR/>
+  .grid26 .neg { color:#b71c1c; }<BR/>
+  .stat-text { font-size:11px; color:#555; }<BR/>
+  .stat-text b { color:#222; }<BR/>
+  .kv-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:6px 18px; font-size:11px; }<BR/>
+  .kv-grid div { padding:2px 0; }<BR/>
+  .kpi-strip { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; padding:8px; background:#fafbfc; border:1px solid #e0e3e8; border-radius:5px; }<BR/>
+  .kpi { flex:0 0 auto; min-width:100px; padding:5px 10px; background:#fff; border:1px solid #e8ecf0; border-radius:4px; cursor:help; }<BR/>
+  .kpi-lbl { font-size:10px; color:#888; text-transform:uppercase; letter-spacing:0.3px; }<BR/>
+  .kpi-val { font-size:14px; font-weight:700; color:#0d47a1; margin-top:1px; }<BR/>
+  .grid26 td[title] { position:relative; }<BR/>
+  table.main td, table.main th { font-size:11px; padding:4px 6px; }<BR/>
+  table.main th.right, table.main td.right { text-align:right; }<BR/>
+  table.main thead tr:first-child th { cursor:pointer; user-select:none; }<BR/>
+  table.main thead tr:first-child th:hover { background:#dde2e6; }<BR/>
+  table.main thead tr.filter-row { background:#f5f7fa; position:sticky; top:24px; }<BR/>
+  table.main thead tr.filter-row th { padding:2px 4px; font-weight:400; }<BR/>
+  table.main thead tr.filter-row input { width:100%; box-sizing:border-box; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:2px; font-family:inherit; background:#fff; }<BR/>
+  table.main thead tr.filter-row input:focus { outline:1px solid #0d47a1; border-color:#0d47a1; }<BR/>
+  table.main thead tr:first-child th { position:sticky; top:0; }<BR/>
+  .sort-arrow { display:inline-block; margin-left:3px; color:#0d47a1; font-size:10px; }<BR/>
+&lt;/style&gt;<BR/>
+&lt;/head&gt;&lt;body&gt;<BR/>
+<BR/>
+&lt;div id=&quot;loadingScreen&quot;&gt;<BR/>
+  &lt;div id=&quot;loadIcon&quot;&gt;&amp;#127981;&lt;/div&gt;<BR/>
+  &lt;div id=&quot;loadTitle&quot;&gt;P+P Inventory Manager&lt;/div&gt;<BR/>
+  &lt;div id=&quot;loadSub&quot;&gt;Pets + People&lt;/div&gt;<BR/>
+  &lt;div id=&quot;loadBarWrap&quot;&gt;&lt;div id=&quot;loadBar&quot;&gt;&lt;/div&gt;&lt;/div&gt;<BR/>
+  &lt;div id=&quot;loadStatus&quot;&gt;Initializing&amp;#8230;&lt;/div&gt;<BR/>
+  &lt;div id=&quot;loadSteps&quot;&gt;<BR/>
+    &lt;div id=&quot;ls1&quot; class=&quot;pending&quot;&gt;Check cache&lt;/div&gt;<BR/>
+    &lt;div id=&quot;ls2&quot; class=&quot;pending&quot;&gt;Load Inventory Flow&lt;/div&gt;<BR/>
+    &lt;div id=&quot;ls3&quot; class=&quot;pending&quot;&gt;Load Projections&lt;/div&gt;<BR/>
+    &lt;div id=&quot;ls4&quot; class=&quot;pending&quot;&gt;Build view&lt;/div&gt;<BR/>
+  &lt;/div&gt;<BR/>
+&lt;/div&gt;<BR/>
+<BR/>
+&lt;div class=&quot;topbar&quot;&gt;<BR/>
+  &lt;img src=&quot;p+p_Logo.png&quot; alt=&quot;Pets+People&quot; style=&quot;height:36px;width:auto;object-fit:contain;flex-shrink:0;&quot; onerror=&quot;this.style.display=&#039;none&#039;&quot;&gt;<BR/>
+  &lt;h1&gt;&amp;#127981; P+P Inventory Manager&lt;/h1&gt;<BR/>
+  &lt;div style=&quot;display:flex;flex-direction:column;gap:2px;&quot;&gt;<BR/>
+    &lt;div class=&quot;stats&quot; id=&quot;statsBar&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;div id=&quot;dataAsOf&quot; style=&quot;font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:0.2px;&quot;&gt;&lt;/div&gt;<BR/>
+  &lt;/div&gt;<BR/>
+  &lt;button onclick=&quot;generateRecoSheet()&quot; style=&quot;margin-left:auto;padding:6px 14px;background:#fff;color:#0d47a1;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;&quot;&gt;<BR/>
+    &amp;#128203; Generate Reco Spreadsheet<BR/>
+    &lt;span id=&quot;recoBadge&quot; style=&quot;background:#e65100;color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;display:none;&quot;&gt;0&lt;/span&gt;<BR/>
+  &lt;/button&gt;<BR/>
+&lt;/div&gt;<BR/>
+<BR/>
+&lt;div class=&quot;toolbar&quot;&gt;<BR/>
+  &lt;input type=&quot;text&quot; id=&quot;searchInput&quot; placeholder=&quot;Search mstyle / description / brand&quot;&gt;<BR/>
+  &lt;select id=&quot;actionFilter&quot;&gt;<BR/>
+    &lt;option value=&quot;&quot;&gt;All actions&lt;/option&gt;<BR/>
+    &lt;option value=&quot;PULL_UP&quot;&gt;PULL_UP&lt;/option&gt;<BR/>
+    &lt;option value=&quot;FASTER_VESSEL&quot;&gt;FASTER_VESSEL&lt;/option&gt;<BR/>
+    &lt;option value=&quot;PUSH_OUT&quot;&gt;PUSH_OUT&lt;/option&gt;<BR/>
+    &lt;option value=&quot;SPLIT&quot;&gt;SPLIT&lt;/option&gt;<BR/>
+    &lt;option value=&quot;CANCEL&quot;&gt;CANCEL&lt;/option&gt;<BR/>
+    &lt;option value=&quot;NO_LEVER&quot;&gt;NO_LEVER&lt;/option&gt;<BR/>
+    &lt;option value=&quot;__NONE__&quot;&gt;No recs (clean)&lt;/option&gt;<BR/>
+  &lt;/select&gt;<BR/>
+  &lt;select id=&quot;countryFilter&quot;&gt;&lt;option value=&quot;&quot;&gt;All countries&lt;/option&gt;&lt;/select&gt;<BR/>
+  &lt;select id=&quot;brandFilter&quot;&gt;&lt;option value=&quot;&quot;&gt;All brands&lt;/option&gt;&lt;/select&gt;<BR/>
+  &lt;select id=&quot;invMgrFilter&quot;&gt;&lt;option value=&quot;&quot;&gt;All inv mgrs&lt;/option&gt;&lt;/select&gt;<BR/>
+  &lt;label style=&quot;font-size:11px;&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;replenOnly&quot; checked&gt; Replen only&lt;/label&gt;<BR/>
+  &lt;label style=&quot;font-size:11px;&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;gapsOnly&quot;&gt; OOS Risk&lt;/label&gt;<BR/>
+  &lt;label style=&quot;font-size:11px;&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;overstockOnly&quot;&gt; Overstock&lt;/label&gt;<BR/>
+  &lt;label style=&quot;font-size:11px;&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;hideMulti&quot; checked&gt; Hide multi-packs&lt;/label&gt;<BR/>
+  &lt;button id=&quot;clearBtn&quot; style=&quot;padding:4px 10px;background:#fff;border:1px solid #999;border-radius:3px;cursor:pointer;font-size:11px;&quot;&gt;Clear filters&lt;/button&gt;<BR/>
+  &lt;button onclick=&quot;refreshData()&quot; style=&quot;padding:4px 10px;background:#fff;border:1px solid #1565c0;border-radius:3px;cursor:pointer;font-size:11px;color:#1565c0;&quot;&gt;&amp;#128260; Refresh&lt;/button&gt;<BR/>
+&lt;/div&gt;<BR/>
+<BR/>
+&lt;div style=&quot;overflow:auto;max-height:calc(100vh - 120px);&quot;&gt;<BR/>
+&lt;table class=&quot;main&quot; id=&quot;mainTable&quot;&gt;<BR/>
+  &lt;thead id=&quot;theadMain&quot;&gt;&lt;/thead&gt;<BR/>
+  &lt;tbody id=&quot;tbody&quot;&gt;&lt;/tbody&gt;<BR/>
+&lt;/table&gt;<BR/>
+&lt;/div&gt;<BR/>
+<BR/>
+&lt;script&gt;<BR/>
+// Immediate diagnostic &#151; if this runs, JS is executing<BR/>
+(function(){<BR/>
+  var el = document.getElementById(&#039;loadStatus&#039;);<BR/>
+  if (el) el.textContent = &#039;Script executing...&#039;;<BR/>
+})();<BR/>
+<BR/>
+window.onerror = function(msg, src, line, col, err) {<BR/>
+  var el = document.getElementById(&#039;loadStatus&#039;);<BR/>
+  if (el) el.textContent = &#039;JS Error (line &#039; + line + &#039;): &#039; + msg;<BR/>
+  var steps = document.getElementById(&#039;loadSteps&#039;);<BR/>
+  if (steps) steps.innerHTML = &#039;&lt;div style=&quot;color:#ff8a65;font-size:11px;word-break:break-all;&quot;&gt;&#039; + msg + &#039;&lt;br&gt;Line: &#039; + line + &#039;&lt;/div&gt;&#039;;<BR/>
+  return true;<BR/>
+};<BR/>
+<BR/>
+// -- Constants -----------------------------------------------------------------<BR/>
+var QB_REALM  = &#039;pim.quickbase.com&#039;;<BR/>
+var QB_TOKEN  = &#039;QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s&#039;;<BR/>
+var INVF_TID  = &#039;bpsaju5pm&#039;;<BR/>
+var PROJ_TID  = &#039;bpd237tvm&#039;;<BR/>
+var CACHE_KEY = &#039;pp_inv_mgmt_codepage_v1&#039;;<BR/>
+var CACHE_TTL = 6 * 60 * 60 * 1000;<BR/>
+<BR/>
+var OPT_WOS_DEFAULT       = 4.0;<BR/>
+var WAREHOUSE_LAG_DAYS    = 10;<BR/>
+var USA_WAREHOUSE_LAG     = 3;<BR/>
+var FAST_VESSEL_TRANSIT   = 18;<BR/>
+var PARTIAL_MIN_PCS       = 2500;<BR/>
+var ETD_LOCK_DAYS         = 7;<BR/>
+var FASTER_VESSEL_HI      = 15;<BR/>
+var CANCEL_HORIZON_DAYS   = 60;<BR/>
+var OVERSTOCK_EXCESS_TH   = 2500;<BR/>
+var OVERSTOCK_WOS_TH      = 33;<BR/>
+var MIN_PULLUP_DAYS       = 7;<BR/>
+var MIN_RESOLVED_GAP_DEF  = 1.0;<BR/>
+<BR/>
+// -- Field ID maps -------------------------------------------------------------<BR/>
+var IF_F = {<BR/>
+  Mstyle:20, Country:223, ItemStatus:294, SubStatus:297, Season:1068, ItemRank:1573,<BR/>
+  NVO:1487, NewItemNoPrj:1893, KitStyle:1759, PcsKitUse:1882, RootMstyle:792,<BR/>
+  OptWOS:137, OptWOSFinal:1897, OptOH:234, NextAvlRcptDt:235,<BR/>
+  LTTransDays:225, TransitDays:1751, LTWks:1525, CNYWeeks:1891, LTOptWeeks:446,<BR/>
+  OpenSupplierPOs:241, MOQ:226, InvManager:981,<BR/>
+  QtyOH:24, ATSQtyOH:179, ATSNow:932, ATSOHplusOO:180, ATSOHOOwKits:1722,<BR/>
+  ATSQtyNotAlloc:871, NJATSOH:1462, CAATSOH:1463, HoldOrderQty:867,<BR/>
+  IT:25, IW:26, ITplusIW:218, ITIWwKits:1721, OpenCustPOQty:183,<BR/>
+  TestOrderQty:1909, ExcludePOWOSQty:1910, ATSOHITBookedWOS:1217,<BR/>
+  ATSWOSOH:208, ATSWOSOHplusOO:209, ATSWOSOHOOwKits:1723, ATSWOSOHOOwotestexcl:1911,<BR/>
+  DaysOOSNextRcpt:1009, DaysOOSL12m:1231, LastOOSDate:1233,<BR/>
+  PrjWk:133, MaxPrjWk:1883, PrjL4wAll:963, Prj26Wks:1225,<BR/>
+  ShpWkL4:1841, ShpWkL13:314, TotShpdL13w:316, TotShpdL4:315, TotShpdLTD:712, LastShpDate:305,<BR/>
+  Date1stRcvd:711, LastWhsRcvd:1199, FirstShpdDate:1892, FirstOutDate:260,<BR/>
+  ActiveKL:1486, AMZDoNotShip:1829, AMZSuppression:1871, TransferQtyOpen:1572,<BR/>
+  ShipmentStatusSummary:1224, ATSSummary:912, InventoryNotes:257, StyleAlert:994,<BR/>
+  OOSPriorityNotes:985, ActiveReplCusts:1223,<BR/>
+  SizeCt:533, Fragrance:589, PvtLblExcl:1795, CommitItem:1515, InnerPack:1023, MasterPack:929,<BR/>
+  OOSDates:262, OverCommittedQty:448, OvrComtWOS:444, InvtryAgeDays:1269,<BR/>
+  AgedInv090:1308, AgedInv91180:1310, AgedInv181365:1312, AgedInv365plus:1314, PctTimeInStock:1232<BR/>
+};<BR/>
+var IF_BEG = [134,8,9,10,110,111,112,113,114,115,116,117,118,128,129,130,131,120,121,122,123,124,125,126,127,119];<BR/>
+var IF_RCV = [28,35,36,50,51,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85];<BR/>
+var IF_PRJ = [146,147,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173];<BR/>
+var IF_ATS = [716,717,718,719,720,715,722,723,724,725,726,727,728,729,730,731,902,903,904,905,906,907,908,909,910,911];<BR/>
+<BR/>
+var PRJ_F = { Mstyle:196, CustName:376, StatusCust:10, PTItemStatus:374, Brand:398, Description:399, AcctMStyleKey:292 };<BR/>
+var PRJ_MANUAL = [22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97];<BR/>
+<BR/>
+// -- QB API --------------------------------------------------------------------<BR/>
+async function qbQuery(tableId, fieldIds, where, skip, top) {<BR/>
+  skip = skip || 0; top = top || 1000;<BR/>
+  var body = { from: tableId, select: fieldIds, where: where || &#039;&#039;, options: { skip: skip, top: top } };<BR/>
+  var r = await fetch(&#039;https://api.quickbase.com/v1/records/query&#039;, {<BR/>
+    method: &#039;POST&#039;,<BR/>
+    headers: {<BR/>
+      &#039;QB-Realm-Hostname&#039;: QB_REALM,<BR/>
+      &#039;Authorization&#039;: QB_TOKEN,<BR/>
+      &#039;Content-Type&#039;: &#039;application/json&#039;<BR/>
+    },<BR/>
+    body: JSON.stringify(body)<BR/>
+  });<BR/>
+  if (!r.ok) throw new Error(&#039;QB API &#039; + r.status + &#039;: &#039; + await r.text());<BR/>
+  return r.json();<BR/>
+}<BR/>
+<BR/>
+async function qbQueryAll(tableId, fieldIds, where, label) {<BR/>
+  var skip = 0, top = 1000, all = [];<BR/>
+  var page = 0;<BR/>
+  while (true) {<BR/>
+    page++;<BR/>
+    if (label) setStatus((label) + &#039; (page &#039; + page + &#039;, &#039; + all.length + &#039; records)...&#039;);<BR/>
+    var data = await qbQuery(tableId, fieldIds, where, skip, top);<BR/>
+    var rows = data.data || [];<BR/>
+    all = all.concat(rows);<BR/>
+    if (rows.length &lt; top) break;<BR/>
+    skip += top;<BR/>
+  }<BR/>
+  return all;<BR/>
+}<BR/>
+<BR/>
+// -- Cache ---------------------------------------------------------------------<BR/>
+function saveCache(data) {<BR/>
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}<BR/>
+}<BR/>
+function loadCache() {<BR/>
+  try {<BR/>
+    var raw = localStorage.getItem(CACHE_KEY);<BR/>
+    if (!raw) return null;<BR/>
+    var obj = JSON.parse(raw);<BR/>
+    if (Date.now() - obj.ts &gt; CACHE_TTL) return null;<BR/>
+    return obj;<BR/>
+  } catch(e) { return null; }<BR/>
+}<BR/>
+function fmtTimestamp(ts) {<BR/>
+  var d = new Date(ts);<BR/>
+  var h = d.getHours(), m = d.getMinutes();<BR/>
+  var ampm = h &lt; 12 ? &#039;AM&#039; : &#039;PM&#039;;<BR/>
+  var h12 = h % 12 || 12;<BR/>
+  return (d.getMonth()+1) + &#039;/&#039; + d.getDate() + &#039;/&#039; + d.getFullYear() + &#039; &#039; + h12 + &#039;:&#039; + String(m).padStart(2,&#039;0&#039;) + &#039; &#039; + ampm;<BR/>
+}<BR/>
+<BR/>
+// -- PO parser -----------------------------------------------------------------<BR/>
+// Format: &quot;FC607491 - SUPPLIER NAME - I/T: 0 pcs / I/W: 1200 pcs - ETD: 05-17-2026 - ETA: 06-04-2026&quot;<BR/>
+var PO_RE = /^\s*([A-Z0-9\-]+)\s*-\s*(.+?)\s*-\s*I\/T:\s*([\d,]+)\s*pcs\s*\/\s*I\/W:\s*([\d,]+)\s*pcs\s*-\s*ETD:\s*(\d{2}-\d{2}-\d{4})\s*-\s*ETA:\s*(\d{2}-\d{2}-\d{4})/i;<BR/>
+<BR/>
+function parseMMDDYYYY(s) {<BR/>
+  if (!s) return null;<BR/>
+  var m = s.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);<BR/>
+  if (!m) return null;<BR/>
+  return new Date(parseInt(m[3]), parseInt(m[1])-1, parseInt(m[2]));<BR/>
+}<BR/>
+<BR/>
+function parsePOs(text) {<BR/>
+  if (!text) return [];<BR/>
+  var out = [];<BR/>
+  var chunks = text.split(/[;\r\n]+/);<BR/>
+  for (var i = 0; i &lt; chunks.length; i++) {<BR/>
+    var c = chunks[i].trim();<BR/>
+    if (!c) continue;<BR/>
+    var m = PO_RE.exec(c);<BR/>
+    if (!m) continue;<BR/>
+    var it = parseInt(m[3].replace(/,/g,&#039;&#039;));<BR/>
+    var iw = parseInt(m[4].replace(/,/g,&#039;&#039;));<BR/>
+    var etd = parseMMDDYYYY(m[5]);<BR/>
+    var eta = parseMMDDYYYY(m[6]);<BR/>
+    var td = (etd &amp;&amp; eta) ? Math.round((eta - etd) / 86400000) : null;<BR/>
+    out.push({<BR/>
+      po_number: m[1].trim(), supplier: m[2].trim(),<BR/>
+      in_transit_qty: it, in_work_qty: iw, qty: it+iw,<BR/>
+      etd: etd, eta: eta, transit_days: td,<BR/>
+      is_in_transit: it &gt; 0,<BR/>
+      etd_iso: etd ? fmtISO(etd) : null,<BR/>
+      eta_iso: eta ? fmtISO(eta) : null<BR/>
+    });<BR/>
+  }<BR/>
+  return out;<BR/>
+}<BR/>
+<BR/>
+function poStatus(po, today, country) {<BR/>
+  if (po.is_in_transit) return &#039;IN_TRANSIT&#039;;<BR/>
+  if (!po.etd) return &#039;UNKNOWN&#039;;<BR/>
+  var dtd = Math.round((po.etd - today) / 86400000);<BR/>
+  if (dtd &lt; ETD_LOCK_DAYS) return &#039;LOCKED&#039;;<BR/>
+  var isUSA = /^(usa|united states)$/i.test(country || &#039;&#039;);<BR/>
+  if (dtd &gt;= 8 &amp;&amp; dtd &lt;= FASTER_VESSEL_HI) return isUSA ? &#039;PULL_UP_NARROW&#039; : &#039;FASTER_VESSEL_WINDOW&#039;;<BR/>
+  return &#039;MOVABLE&#039;;<BR/>
+}<BR/>
+<BR/>
+// -- Utilities -----------------------------------------------------------------<BR/>
+function fmt(n) { if (n == null) return &#039;&#039;; return Number(n).toLocaleString(&#039;en-US&#039;, {maximumFractionDigits:1}); }<BR/>
+function esc(s) { return String(s == null ? &#039;&#039; : s).replace(/[&lt;&gt;&amp;&quot;&#039;]/g, function(c){return {&#039;&lt;&#039;:&#039;&amp;lt;&#039;,&#039;&gt;&#039;:&#039;&amp;gt;&#039;,&#039;&amp;&#039;:&#039;&amp;amp;&#039;,&#039;&quot;&#039;:&#039;&amp;quot;&#039;,&quot;&#039;&quot;:&#039;&amp;#39;&#039;}[c];}); }<BR/>
+function fmtDate(d) {<BR/>
+  if (!d) return &#039;&amp;#8212;&#039;;<BR/>
+  try { var dt = (typeof d === &#039;string&#039;) ? new Date(d) : d; if (!dt || isNaN(dt)) return &#039;&amp;#8212;&#039;; return dt.toLocaleDateString(&#039;en-US&#039;, {month:&#039;short&#039;, day:&#039;numeric&#039;}); }<BR/>
+  catch(e) { return String(d); }<BR/>
+}<BR/>
+function fmtISO(d) { if (!d) return null; var dt = (typeof d === &#039;string&#039;) ? new Date(d) : d; if (!dt || isNaN(dt)) return null; return dt.toISOString().slice(0,10); }<BR/>
+function toNum(v) { if (v == null || v === &#039;&#039;) return 0; return parseFloat(v) || 0; }<BR/>
+function toBool(v) { if (v == null) return false; if (typeof v === &#039;boolean&#039;) return v; if (typeof v === &#039;number&#039;) return v !== 0; return /^(true|1|yes)$/i.test(String(v)); }<BR/>
+function addDays(d, n) { var r = new Date(d); r.setDate(r.getDate()+n); return r; }<BR/>
+function addWeeks(d, n) { return addDays(d, n*7); }<BR/>
+function wkSunday(today, idx) {<BR/>
+  var w1 = new Date(today); w1.setDate(today.getDate() - today.getDay());<BR/>
+  return addWeeks(w1, idx);<BR/>
+}<BR/>
+function wkIdxForDate(today, dt) {<BR/>
+  if (!dt) return 25;<BR/>
+  var dtObj = (typeof dt === &#039;string&#039;) ? new Date(dt) : dt;<BR/>
+  var w1 = new Date(today); w1.setDate(today.getDate() - today.getDay());<BR/>
+  return Math.floor((dtObj - w1) / (7 * 86400000));<BR/>
+}<BR/>
+<BR/>
+// -- State ---------------------------------------------------------------------<BR/>
+var ALL = [], FILTERED = [];<BR/>
+var currentSort = { id: null, dir: 1 };<BR/>
+var DEFAULT_SORT_CHAIN = [&#039;inv_manager&#039;,&#039;brand&#039;,&#039;mstyle&#039;];<BR/>
+var colFilters = {};<BR/>
+var priorityFilter = &#039;&#039;;<BR/>
+var recoSheet = [];<BR/>
+<BR/>
+function setBar(pct) { var b=document.getElementById(&#039;loadBar&#039;); if(b) b.style.width=pct+&#039;%&#039;; }<BR/>
+function setStatus(msg) { var s=document.getElementById(&#039;loadStatus&#039;); if(s) s.textContent=msg; }<BR/>
+function setStep(n, state) {<BR/>
+  for (var i=1;i&lt;=4;i++) { var el=document.getElementById(&#039;ls&#039;+i); if(!el) continue; el.className=i&lt;n?&#039;done&#039;:i===n?state:&#039;pending&#039;; }<BR/>
+}<BR/>
+<BR/>
+// -- Data loading --------------------------------------------------------------<BR/>
+async function loadData() {<BR/>
+  var today = new Date(); today.setHours(0,0,0,0);<BR/>
+<BR/>
+  setStep(2,&#039;active&#039;); setBar(10);<BR/>
+  var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);<BR/>
+  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, &#039;&#039;, &#039;Loading Inventory Flow&#039;);<BR/>
+<BR/>
+  setStep(3,&#039;active&#039;); setBar(55); setStatus(&#039;Loading Projections...&#039;);<BR/>
+  var prjFieldIds = Object.values(PRJ_F).concat(PRJ_MANUAL);<BR/>
+  var prjRows = await qbQueryAll(PROJ_TID, prjFieldIds, &quot;{10}.CT.&#039;A&#039;&quot;, &#039;Loading Projections&#039;);<BR/>
+<BR/>
+  setBar(70); setStatus(&#039;Processing data...&#039;);<BR/>
+<BR/>
+  // Build projections lookup by mstyle<BR/>
+  var prjByMs = {};<BR/>
+  for (var i=0; i&lt;prjRows.length; i++) {<BR/>
+    var row = prjRows[i];<BR/>
+    var ms   = String((row[PRJ_F.Mstyle]||{}).value||&#039;&#039;).trim();<BR/>
+    var cust = String((row[PRJ_F.CustName]||{}).value||&#039;&#039;).trim();<BR/>
+    var desc = String((row[PRJ_F.Description]||{}).value||&#039;&#039;).trim();<BR/>
+    var brand= String((row[PRJ_F.Brand]||{}).value||&#039;&#039;).trim();<BR/>
+    if (!ms) continue;<BR/>
+    var weekly = PRJ_MANUAL.map(function(fid){return toNum((row[fid]||{}).value);});<BR/>
+    var total  = weekly.reduce(function(a,b){return a+b;},0);<BR/>
+    if (!prjByMs[ms]) prjByMs[ms] = { custs:[], desc:desc, brand:brand };<BR/>
+    else { if(desc &amp;&amp; !prjByMs[ms].desc) prjByMs[ms].desc=desc; if(brand &amp;&amp; !prjByMs[ms].brand) prjByMs[ms].brand=brand; }<BR/>
+    prjByMs[ms].custs.push({ customer:cust, weekly:weekly, total:total });<BR/>
+  }<BR/>
+<BR/>
+  // Build records from Inventory Flow<BR/>
+  var records = [];<BR/>
+  for (var i=0; i&lt;ifRows.length; i++) {<BR/>
+    var row = ifRows[i];<BR/>
+    var g = function(fid) { return (row[fid]||{}).value; };<BR/>
+<BR/>
+    var mstyle  = String(g(IF_F.Mstyle)||&#039;&#039;).trim();<BR/>
+    if (!mstyle) continue;<BR/>
+    var country = String(g(IF_F.Country)||&#039;&#039;).trim();<BR/>
+    var isMulti = toBool(g(IF_F.KitStyle));<BR/>
+    var pcsKit  = toNum(g(IF_F.PcsKitUse)) || 1;<BR/>
+    var rootMs  = String(g(IF_F.RootMstyle)||&#039;&#039;).trim();<BR/>
+<BR/>
+    var pi = prjByMs[mstyle] || { custs:[], desc:&#039;&#039;, brand:&#039;&#039; };<BR/>
+<BR/>
+    var optWOS = toNum(g(IF_F.OptWOSFinal)) || toNum(g(IF_F.OptWOS)) || OPT_WOS_DEFAULT;<BR/>
+    var beg_inv = IF_BEG.map(function(fid){return Math.round(toNum(g(fid)));});<BR/>
+    var rcv     = IF_RCV.map(function(fid){return Math.round(toNum(g(fid)));});<BR/>
+    var prj     = IF_PRJ.map(function(fid){return Math.round(toNum(g(fid)));});<BR/>
+<BR/>
+    var custDemand = (pi.custs||[]).sort(function(a,b){return b.total-a.total;});<BR/>
+    var manDem26w  = custDemand.reduce(function(s,c){return s+c.total;},0);<BR/>
+<BR/>
+    var openPosRaw = String(g(IF_F.OpenSupplierPOs)||&#039;&#039;);<BR/>
+    var rawPOs = parsePOs(openPosRaw);<BR/>
+    var openPos = rawPOs.map(function(p){<BR/>
+      return Object.assign({}, p, {<BR/>
+        status: poStatus(p, today, country),<BR/>
+        etd: p.etd_iso, eta: p.eta_iso,<BR/>
+        etd_obj: p.etd, eta_obj: p.eta<BR/>
+      });<BR/>
+    });<BR/>
+<BR/>
+    var nrRaw = g(IF_F.NextAvlRcptDt);<BR/>
+    var nextRcptDt = nrRaw ? new Date(nrRaw) : null;<BR/>
+<BR/>
+    var itemStatusFlow = String(g(IF_F.ItemStatus)||&#039;&#039;).trim();<BR/>
+    var isReplen = /^(replen|active|r)/i.test(itemStatusFlow) || toNum(g(IF_F.OptWOS)) &gt; 0;<BR/>
+<BR/>
+    var shpL4  = toNum(g(IF_F.ShpWkL4));<BR/>
+    var shpL13 = toNum(g(IF_F.ShpWkL13));<BR/>
+    var prjL4wChange = 0;<BR/>
+    if (shpL4 !== 0 &amp;&amp; shpL13 !== 0) prjL4wChange = Math.round(((shpL4-shpL13)/shpL13)*100);<BR/>
+<BR/>
+    var rec = {<BR/>
+      mstyle:mstyle, country:country,<BR/>
+      brand: pi.brand||&#039;&#039;, description: pi.desc||&#039;&#039;,<BR/>
+      inv_manager: String(g(IF_F.InvManager)||&#039;&#039;).trim(),<BR/>
+      item_status: itemStatusFlow, item_status_flow:itemStatusFlow,<BR/>
+      sub_status: String(g(IF_F.SubStatus)||&#039;&#039;).trim(),<BR/>
+      season: String(g(IF_F.Season)||&#039;&#039;).trim(),<BR/>
+      item_rank: String(g(IF_F.ItemRank)||&#039;&#039;).trim(),<BR/>
+      customer_count: custDemand.length,<BR/>
+      is_replen: isReplen,<BR/>
+      beg_inv:beg_inv, rcv:rcv, prj:prj,<BR/>
+      opt_wos:optWOS, opt_oh:toNum(g(IF_F.OptOH)),<BR/>
+      next_rcpt_dt:nextRcptDt,<BR/>
+      lt_trans_days:toNum(g(IF_F.LTTransDays)), transit_days:toNum(g(IF_F.TransitDays)),<BR/>
+      lt_wks:toNum(g(IF_F.LTWks)), cny_weeks:toNum(g(IF_F.CNYWeeks)), lt_opt_weeks:toNum(g(IF_F.LTOptWeeks)),<BR/>
+      moq:toNum(g(IF_F.MOQ)),<BR/>
+      qty_oh:toNum(g(IF_F.QtyOH)), ats_qty_oh:toNum(g(IF_F.ATSQtyOH)),<BR/>
+      ats_now:toNum(g(IF_F.ATSNow)), ats_oh_oo:toNum(g(IF_F.ATSOHplusOO)),<BR/>
+      ats_oh_oo_w_kits:toNum(g(IF_F.ATSOHOOwKits)), ats_qty_not_alloc:toNum(g(IF_F.ATSQtyNotAlloc)),<BR/>
+      nj_ats_oh:toNum(g(IF_F.NJATSOH)), ca_ats_oh:toNum(g(IF_F.CAATSOH)),<BR/>
+      hold_qty:toNum(g(IF_F.HoldOrderQty)),<BR/>
+      it_qty:toNum(g(IF_F.IT)), iw_qty:toNum(g(IF_F.IW)), it_iw:toNum(g(IF_F.ITplusIW)),<BR/>
+      it_iw_kits:toNum(g(IF_F.ITIWwKits)), open_cust_po_qty:toNum(g(IF_F.OpenCustPOQty)),<BR/>
+      test_order_qty:toNum(g(IF_F.TestOrderQty)), exclude_po_wos:toNum(g(IF_F.ExcludePOWOSQty)),<BR/>
+      ats_wos_oh:toNum(g(IF_F.ATSWOSOH)), ats_wos_oh_oo:toNum(g(IF_F.ATSWOSOHplusOO)),<BR/>
+      ats_wos_oh_oo_w_kits:toNum(g(IF_F.ATSWOSOHOOwKits)), ats_wos_oh_oo_wo_test:toNum(g(IF_F.ATSWOSOHOOwotestexcl)),<BR/>
+      ats_oh_it_booked_wos:toNum(g(IF_F.ATSOHITBookedWOS)),<BR/>
+      days_oos_next_rcpt:toNum(g(IF_F.DaysOOSNextRcpt)), days_oos_l12m:toNum(g(IF_F.DaysOOSL12m)),<BR/>
+      last_oos_date: g(IF_F.LastOOSDate)||null,<BR/>
+      prj_wk:toNum(g(IF_F.PrjWk)), max_prj_wk:toNum(g(IF_F.MaxPrjWk)),<BR/>
+      prj_l4w_change:prjL4wChange, prj_26wks:toNum(g(IF_F.Prj26Wks)),<BR/>
+      shp_wk_l4:shpL4, shp_wk_l13:shpL13,<BR/>
+      tot_shpd_l13w:toNum(g(IF_F.TotShpdL13w)), tot_shpd_l4:toNum(g(IF_F.TotShpdL4)),<BR/>
+      tot_shpd_ltd:toNum(g(IF_F.TotShpdLTD)), last_shp_date:g(IF_F.LastShpDate)||null,<BR/>
+      date_1st_rcvd:g(IF_F.Date1stRcvd)||null, last_whs_rcvd:g(IF_F.LastWhsRcvd)||null,<BR/>
+      first_shpd_date:g(IF_F.FirstShpdDate)||null, first_out_date:g(IF_F.FirstOutDate)||null,<BR/>
+      nvo:toBool(g(IF_F.NVO)), new_item_no_prj:toBool(g(IF_F.NewItemNoPrj)),<BR/>
+      active_kl:toBool(g(IF_F.ActiveKL)), amz_do_not_ship:toBool(g(IF_F.AMZDoNotShip)),<BR/>
+      amz_suppression:toBool(g(IF_F.AMZSuppression)),<BR/>
+      transfer_qty_open:toNum(g(IF_F.TransferQtyOpen))&gt;0,<BR/>
+      pvt_lbl_excl:toBool(g(IF_F.PvtLblExcl)), commit_item:toBool(g(IF_F.CommitItem)),<BR/>
+      shipment_status_summary:String(g(IF_F.ShipmentStatusSummary)||&#039;&#039;),<BR/>
+      ats_summary:String(g(IF_F.ATSSummary)||&#039;&#039;),<BR/>
+      inventory_notes:String(g(IF_F.InventoryNotes)||&#039;&#039;),<BR/>
+      style_alert:String(g(IF_F.StyleAlert)||&#039;&#039;),<BR/>
+      oos_priority_notes:String(g(IF_F.OOSPriorityNotes)||&#039;&#039;),<BR/>
+      active_replen_customers:String(g(IF_F.ActiveReplCusts)||&#039;&#039;),<BR/>
+      size_ct:String(g(IF_F.SizeCt)||&#039;&#039;), fragrance:String(g(IF_F.Fragrance)||&#039;&#039;),<BR/>
+      inner_pack:String(g(IF_F.InnerPack)||&#039;&#039;), master_pack:String(g(IF_F.MasterPack)||&#039;&#039;),<BR/>
+      oos_dates:String(g(IF_F.OOSDates)||&#039;&#039;),<BR/>
+      over_committed_qty:toNum(g(IF_F.OverCommittedQty)), ovr_comt_wos:toNum(g(IF_F.OvrComtWOS)),<BR/>
+      invtry_age_days:toNum(g(IF_F.InvtryAgeDays)),<BR/>
+      aged_inv_0_90:toNum(g(IF_F.AgedInv090)), aged_inv_91_180:toNum(g(IF_F.AgedInv91180)),<BR/>
+      aged_inv_181_365:toNum(g(IF_F.AgedInv181365)), aged_inv_365plus:toNum(g(IF_F.AgedInv365plus)),<BR/>
+      pct_time_in_stock:toNum(g(IF_F.PctTimeInStock)),<BR/>
+      is_multi:isMulti, pcs_per_kit:pcsKit, root_mstyle:rootMs,<BR/>
+      qty_oh_root:0, it_iw_root:0, ats_oh_oo_root:0, assembleable_kits:0,<BR/>
+      open_pos:openPos,<BR/>
+      manual_demand_26w:manDem26w, customer_demand:custDemand, demand_26w:0,<BR/>
+      pipeline_total:0, pipeline_excess:0, pipeline_wos:0,<BR/>
+      gap_weeks:[], overstocked:false, recommendations:[], priority:&#039;LOW&#039;, flag:&#039;&#039;<BR/>
+    };<BR/>
+<BR/>
+    computeDerived(rec, today);<BR/>
+    records.push(rec);<BR/>
+  }<BR/>
+  return records;<BR/>
+}<BR/>
+<BR/>
+// -- computeDerived ------------------------------------------------------------<BR/>
+function computeDerived(rec, today) {<BR/>
+  var openPOTotal = rec.open_pos.reduce(function(s,p){return s+(p.qty||0);},0);<BR/>
+  rec.pipeline_total = (rec.beg_inv[0]||0) + openPOTotal;<BR/>
+  rec.demand_26w     = rec.prj.reduce(function(s,v){return s+v;},0);<BR/>
+  rec.assembleable_kits = (rec.is_multi &amp;&amp; rec.pcs_per_kit&gt;0) ? Math.floor(rec.qty_oh_root/rec.pcs_per_kit) : 0;<BR/>
+<BR/>
+  if (rec.demand_26w &gt; 0) {<BR/>
+    var safety = rec.opt_wos * (rec.demand_26w / 26.0);<BR/>
+    rec.pipeline_excess = Math.round(rec.pipeline_total - rec.demand_26w - safety);<BR/>
+    rec.pipeline_wos    = parseFloat((rec.pipeline_total * 26.0 / rec.demand_26w).toFixed(1));<BR/>
+  } else {<BR/>
+    rec.pipeline_excess = rec.pipeline_total;<BR/>
+    rec.pipeline_wos    = rec.pipeline_total &gt; 0 ? null : 0;<BR/>
+  }<BR/>
+  rec.overstocked = (rec.pipeline_excess &gt; OVERSTOCK_EXCESS_TH)<BR/>
+    || (rec.demand_26w &gt; 0 &amp;&amp; rec.pipeline_wos != null &amp;&amp; rec.pipeline_wos &gt; OVERSTOCK_WOS_TH);<BR/>
+<BR/>
+  // Gap detection<BR/>
+  rec.gap_weeks = [];<BR/>
+  if (rec.is_replen &amp;&amp; rec.opt_wos &gt; 0) {<BR/>
+    var nrIdx = rec.next_rcpt_dt ? wkIdxForDate(today, rec.next_rcpt_dt) : 25;<BR/>
+    var checkUntil = (nrIdx &gt;= 0) ? Math.min(25, nrIdx) : -1;<BR/>
+    for (var i=0; i&lt;=checkUntil; i++) {<BR/>
+      var bv=rec.beg_inv[i]||0, pv=rec.prj[i]||0;<BR/>
+      if (pv&gt;0 &amp;&amp; (bv/pv)&lt;rec.opt_wos) {<BR/>
+        var wkd = wkSunday(today, i);<BR/>
+        rec.gap_weeks.push({ wi:i+1, date:fmtISO(wkd), beg:bv, prj:pv,<BR/>
+          wos:parseFloat((bv/pv).toFixed(1)), deficit:parseFloat((rec.opt_wos-bv/pv).toFixed(1)) });<BR/>
+      }<BR/>
+    }<BR/>
+  }<BR/>
+<BR/>
+  // Recommendations<BR/>
+  var actionableGaps = rec.gap_weeks.filter(function(g){return g.deficit&gt;=MIN_RESOLVED_GAP_DEF;});<BR/>
+  var isUSA = /^(usa|united states)$/i.test(rec.country||&#039;&#039;);<BR/>
+  var whLag = isUSA ? USA_WAREHOUSE_LAG : WAREHOUSE_LAG_DAYS;<BR/>
+  var movable = rec.open_pos.filter(function(p){<BR/>
+    return [&#039;MOVABLE&#039;,&#039;PULL_UP_NARROW&#039;,&#039;FASTER_VESSEL_WINDOW&#039;].indexOf(p.status)&gt;=0;<BR/>
+  });<BR/>
+<BR/>
+  var rawProposals = [];<BR/>
+  for (var gi=0; gi&lt;actionableGaps.length; gi++) {<BR/>
+    var gap = actionableGaps[gi];<BR/>
+    if (!movable.length) continue;<BR/>
+    var gapWkStart = wkSunday(today, gap.wi-1);<BR/>
+    var targetETA  = addDays(gapWkStart, -whLag);<BR/>
+    var candidates = movable.slice().sort(function(a,b){<BR/>
+      var da=a.etd_obj?a.etd_obj:new Date(&#039;9999-12-31&#039;);<BR/>
+      var db=b.etd_obj?b.etd_obj:new Date(&#039;9999-12-31&#039;);<BR/>
+      return da-db;<BR/>
+    });<BR/>
+    var found=false;<BR/>
+    for (var ci=0; ci&lt;candidates.length &amp;&amp; !found; ci++) {<BR/>
+      var po = candidates[ci];<BR/>
+      if (!po.etd_obj) continue;<BR/>
+      var transit = po.transit_days || rec.transit_days || 26;<BR/>
+      var minEtd = addDays(today, ETD_LOCK_DAYS);<BR/>
+      var dtd = Math.round((po.etd_obj - today) / 86400000);<BR/>
+      var inFast = dtd&gt;=8 &amp;&amp; dtd&lt;=FASTER_VESSEL_HI;<BR/>
+      if (inFast &amp;&amp; !isUSA) {<BR/>
+        var propETA = addDays(po.etd_obj, FAST_VESSEL_TRANSIT);<BR/>
+        if (propETA &lt;= addDays(targetETA, 3)) {<BR/>
+          rawProposals.push({ po:po, newEtd:po.etd_obj, gapWks:[gap.wi], action:&#039;FASTER_VESSEL&#039; });<BR/>
+          found=true; break;<BR/>
+        }<BR/>
+      }<BR/>
+      var rawNewEtd = addDays(targetETA, -transit);<BR/>
+      var newEtd = rawNewEtd &gt; minEtd ? rawNewEtd : minEtd;<BR/>
+      if (newEtd &gt;= po.etd_obj) continue;<BR/>
+      var pullupDays = Math.round((po.etd_obj - newEtd) / 86400000);<BR/>
+      if (pullupDays &lt; MIN_PULLUP_DAYS) continue;<BR/>
+      rawProposals.push({ po:po, newEtd:newEtd, gapWks:[gap.wi], action:&#039;PULL_UP&#039; });<BR/>
+      found=true;<BR/>
+    }<BR/>
+  }<BR/>
+<BR/>
+  // Deduplicate by (action, po_number)<BR/>
+  var grouped = {};<BR/>
+  for (var pi=0; pi&lt;rawProposals.length; pi++) {<BR/>
+    var rp = rawProposals[pi];<BR/>
+    var key = rp.action+&#039;|&#039;+rp.po.po_number;<BR/>
+    if (!grouped[key]) grouped[key]={ po:rp.po, newEtd:rp.newEtd, gapWks:rp.gapWks.slice(), action:rp.action };<BR/>
+    else {<BR/>
+      if (rp.newEtd &lt; grouped[key].newEtd) grouped[key].newEtd=rp.newEtd;<BR/>
+      grouped[key].gapWks = grouped[key].gapWks.concat(rp.gapWks);<BR/>
+    }<BR/>
+  }<BR/>
+<BR/>
+  rec.recommendations = [];<BR/>
+  var keys = Object.keys(grouped);<BR/>
+  for (var ki=0; ki&lt;keys.length; ki++) {<BR/>
+    var g2 = grouped[keys[ki]];<BR/>
+    var wks = g2.gapWks.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(function(a,b){return a-b;});<BR/>
+    var wkStr = wks.length&lt;=4 ? wks.map(function(w){return &#039;W&#039;+w;}).join(&#039;, &#039;) : &#039;W&#039;+wks[0]+&#039;-W&#039;+wks[wks.length-1];<BR/>
+    var transit2 = g2.po.transit_days || rec.transit_days || 26;<BR/>
+    var po2 = g2.po;<BR/>
+    if (g2.action===&#039;FASTER_VESSEL&#039;) {<BR/>
+      rec.recommendations.push({<BR/>
+        action:&#039;FASTER_VESSEL&#039;, po_number:po2.po_number, supplier:po2.supplier,<BR/>
+        qty_affected:po2.qty, orig_etd:po2.etd, proposed_etd:po2.etd,<BR/>
+        orig_eta:po2.eta, proposed_eta:fmtISO(addDays(po2.etd_obj, FAST_VESSEL_TRANSIT)),<BR/>
+        delta_days:0, delta_qty:0, priority:&#039;HIGH&#039;,<BR/>
+        reason:&#039;Request faster vessel &#151; covers gaps in &#039;+wkStr,<BR/>
+        in_transit_qty:po2.in_transit_qty, in_work_qty:po2.in_work_qty, po_total_qty:po2.qty,<BR/>
+        keep_qty:0, push_qty:0, gap_weeks_fixed:wks<BR/>
+      });<BR/>
+    } else {<BR/>
+      var newEta2 = addDays(g2.newEtd, transit2);<BR/>
+      rec.recommendations.push({<BR/>
+        action:&#039;PULL_UP&#039;, po_number:po2.po_number, supplier:po2.supplier,<BR/>
+        qty_affected:po2.qty, orig_etd:po2.etd, proposed_etd:fmtISO(g2.newEtd),<BR/>
+        orig_eta:po2.eta, proposed_eta:fmtISO(newEta2),<BR/>
+        delta_days:Math.round((g2.newEtd-po2.etd_obj)/86400000), delta_qty:0, priority:&#039;HIGH&#039;,<BR/>
+        reason:&#039;Pull-up &#151; covers gaps in &#039;+wkStr,<BR/>
+        in_transit_qty:po2.in_transit_qty, in_work_qty:po2.in_work_qty, po_total_qty:po2.qty,<BR/>
+        keep_qty:0, push_qty:0, gap_weeks_fixed:wks<BR/>
+      });<BR/>
+    }<BR/>
+  }<BR/>
+<BR/>
+  if (actionableGaps.length&gt;0 &amp;&amp; rec.recommendations.length===0) {<BR/>
+    rec.recommendations.push({<BR/>
+      action:&#039;NO_LEVER&#039;, po_number:&#039;&#039;, supplier:&#039;&#039;, qty_affected:0,<BR/>
+      orig_etd:null, proposed_etd:null, orig_eta:null, proposed_eta:null,<BR/>
+      delta_days:0, delta_qty:0, priority:&#039;HIGH&#039;,<BR/>
+      reason:actionableGaps.length+&#039; actionable gap weeks but no movable PO can land in time.&#039;,<BR/>
+      in_transit_qty:0, in_work_qty:0, po_total_qty:0, keep_qty:0, push_qty:0, gap_weeks_fixed:[]<BR/>
+    });<BR/>
+  }<BR/>
+<BR/>
+  // Overstock recs<BR/>
+  var partMin = Math.max(rec.moq&gt;0 ? Math.floor(rec.moq/2) : PARTIAL_MIN_PCS, 1);<BR/>
+  if (rec.overstocked &amp;&amp; rec.open_pos.length&gt;0) {<BR/>
+    var furthest = rec.open_pos.reduce(function(best,p){<BR/>
+      var bd=best.etd_obj||new Date(0), pd=p.etd_obj||new Date(0);<BR/>
+      return pd&gt;bd?p:best;<BR/>
+    }, rec.open_pos[0]);<BR/>
+    var excess = Math.max(0, rec.pipeline_excess);<BR/>
+    var fEtd = furthest.etd_obj||null;<BR/>
+    var horizDays = fEtd ? Math.round((fEtd-today)/86400000) : 0;<BR/>
+    var transit3 = furthest.transit_days||rec.transit_days||26;<BR/>
+    if (fEtd &amp;&amp; horizDays&gt;CANCEL_HORIZON_DAYS) {<BR/>
+      var cancelQ = Math.min(excess, furthest.qty);<BR/>
+      if (cancelQ&gt;=partMin) {<BR/>
+        rec.recommendations.push({<BR/>
+          action:&#039;CANCEL&#039;, po_number:furthest.po_number, supplier:furthest.supplier,<BR/>
+          qty_affected:cancelQ, orig_etd:furthest.etd, proposed_etd:furthest.etd,<BR/>
+          orig_eta:furthest.eta, proposed_eta:furthest.eta,<BR/>
+          delta_days:0, delta_qty:-cancelQ, priority:&#039;MEDIUM&#039;,<BR/>
+          reason:&#039;Pipeline excess &#039;+excess.toLocaleString()+&#039; pcs &#183; &#039;+furthest.po_number+&#039; ETD is &gt;60d out ? cancel &#039;+cancelQ.toLocaleString()+&#039; pcs&#039;,<BR/>
+          in_transit_qty:furthest.in_transit_qty, in_work_qty:furthest.in_work_qty, po_total_qty:furthest.qty,<BR/>
+          keep_qty:0, push_qty:0, gap_weeks_fixed:[]<BR/>
+        });<BR/>
+      }<BR/>
+    } else if (fEtd) {<BR/>
+      var pushQ = Math.min(excess, furthest.qty);<BR/>
+      var newEtd3 = addWeeks(fEtd, 8);<BR/>
+      var newEta3 = addDays(newEtd3, transit3);<BR/>
+      var ddelta = Math.round((newEtd3-fEtd)/86400000);<BR/>
+      if (pushQ&gt;=partMin) {<BR/>
+        var keepQ = furthest.qty-pushQ;<BR/>
+        if (keepQ&gt;=partMin) {<BR/>
+          rec.recommendations.push({<BR/>
+            action:&#039;SPLIT&#039;, po_number:furthest.po_number, supplier:furthest.supplier,<BR/>
+            qty_affected:pushQ, orig_etd:furthest.etd, proposed_etd:fmtISO(newEtd3),<BR/>
+            orig_eta:furthest.eta, proposed_eta:fmtISO(newEta3),<BR/>
+            delta_days:ddelta, delta_qty:0, priority:&#039;MEDIUM&#039;,<BR/>
+            reason:&#039;Split shipment &#151; keep &#039;+keepQ.toLocaleString()+&#039; at original ETD, push &#039;+pushQ.toLocaleString()+&#039; to free up early-window inventory&#039;,<BR/>
+            in_transit_qty:furthest.in_transit_qty, in_work_qty:furthest.in_work_qty, po_total_qty:furthest.qty,<BR/>
+            keep_qty:keepQ, push_qty:pushQ, gap_weeks_fixed:[]<BR/>
+          });<BR/>
+        } else {<BR/>
+          rec.recommendations.push({<BR/>
+            action:&#039;PUSH_OUT&#039;, po_number:furthest.po_number, supplier:furthest.supplier,<BR/>
+            qty_affected:furthest.qty, orig_etd:furthest.etd, proposed_etd:fmtISO(newEtd3),<BR/>
+            orig_eta:furthest.eta, proposed_eta:fmtISO(newEta3),<BR/>
+            delta_days:ddelta, delta_qty:0, priority:&#039;MEDIUM&#039;,<BR/>
+            reason:&#039;Push entire PO out ~8 weeks &#151; splitting would leave partial below MOQ/2 = &#039;+partMin.toLocaleString(),<BR/>
+            in_transit_qty:furthest.in_transit_qty, in_work_qty:furthest.in_work_qty, po_total_qty:furthest.qty,<BR/>
+            keep_qty:0, push_qty:furthest.qty, gap_weeks_fixed:[]<BR/>
+          });<BR/>
+        }<BR/>
+      }<BR/>
+    }<BR/>
+  }<BR/>
+<BR/>
+  // Priority rollup<BR/>
+  if (rec.recommendations.some(function(r){return r.priority===&#039;CRITICAL&#039;;})) rec.priority=&#039;CRITICAL&#039;;<BR/>
+  else if (rec.gap_weeks.some(function(g){return g.deficit&gt;=2.0;})) rec.priority=&#039;HIGH&#039;;<BR/>
+  else if (rec.gap_weeks.length&gt;0||rec.overstocked) rec.priority=&#039;MEDIUM&#039;;<BR/>
+  else rec.priority=&#039;LOW&#039;;<BR/>
+}<BR/>
+<BR/>
+// -- Columns -------------------------------------------------------------------<BR/>
+var COLS = [<BR/>
+  { id:&#039;priority&#039;, label:&#039;Pri&#039;, align:&#039;left&#039;, numeric:true,<BR/>
+    get:function(r){return {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3}[r.priority]!=null?{CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3}[r.priority]:9;},<BR/>
+    filterValue:function(r){return r.priority;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;pri-&#039;+r.priority+&#039;&quot;&gt;&#039;+r.priority+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;mstyle&#039;, label:&#039;Mstyle&#039;, align:&#039;left&#039;,<BR/>
+    get:function(r){return r.mstyle;},<BR/>
+    render:function(r){return &#039;&lt;td&gt;&lt;b&gt;&#039;+esc(r.mstyle)+&#039;&lt;/b&gt;&#039;+(r.is_multi?&#039; &lt;span class=&quot;badge badge-purple&quot; title=&quot;Multi-pack (kit)&quot;&gt;KIT&lt;/span&gt;&#039;:&#039;&#039;)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;description&#039;, label:&#039;Description&#039;, align:&#039;left&#039;,<BR/>
+    get:function(r){return r.description;},<BR/>
+    render:function(r){return &#039;&lt;td style=&quot;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;&quot; title=&quot;&#039;+esc(r.description)+&#039;&quot;&gt;&#039;+esc(r.description)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;brand&#039;, label:&#039;Brand&#039;, align:&#039;left&#039;, get:function(r){return r.brand;}, render:function(r){return &#039;&lt;td&gt;&#039;+esc(r.brand)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;country&#039;, label:&#039;Country&#039;, align:&#039;left&#039;, get:function(r){return r.country;}, render:function(r){return &#039;&lt;td&gt;&#039;+esc(r.country)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;inv_manager&#039;, label:&#039;Inv Mgr&#039;, align:&#039;left&#039;, get:function(r){return r.inv_manager;}, render:function(r){return &#039;&lt;td&gt;&#039;+esc(r.inv_manager)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;status_sub&#039;, label:&#039;Status / Sub&#039;, align:&#039;left&#039;,<BR/>
+    get:function(r){return r.item_status_flow||r.item_status||&#039;&#039;;},<BR/>
+    filterValue:function(r){return (r.item_status_flow||r.item_status||&#039;&#039;)+&#039; &#039;+(r.sub_status||&#039;&#039;);},<BR/>
+    render:function(r){return &#039;&lt;td&gt;&#039;+esc(r.item_status_flow||r.item_status||&#039;&#039;)+(r.sub_status?&#039;&lt;br&gt;&lt;span style=&quot;color:#888;font-size:10px;&quot;&gt;&#039;+esc(r.sub_status)+&#039;&lt;/span&gt;&#039;:&#039;&#039;)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;item_rank&#039;, label:&#039;Rank&#039;, align:&#039;left&#039;, get:function(r){return r.item_rank;}, render:function(r){return &#039;&lt;td&gt;&#039;+esc(r.item_rank)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;customer_count&#039;, label:&#039;Cust&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.customer_count;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+r.customer_count+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;qty_oh&#039;, label:&#039;Qty OH&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.qty_oh;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right &#039;+(r.qty_oh&lt;0?&#039;neg&#039;:&#039;&#039;)+&#039;&quot;&gt;&#039;+fmt(r.qty_oh)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;ats_now&#039;, label:&#039;ATS Now&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.ats_now;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right &#039;+(r.ats_now&lt;0?&#039;neg&#039;:&#039;&#039;)+&#039;&quot;&gt;&#039;+fmt(r.ats_now)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;qty_oh_root&#039;, label:&#039;Pcs OH (root)&#039;, align:&#039;right&#039;, numeric:true,<BR/>
+    get:function(r){return r.is_multi?r.qty_oh_root:-1;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+(r.is_multi?&#039;&lt;b&gt;&#039;+fmt(r.qty_oh_root)+&#039;&lt;/b&gt; &lt;span style=&quot;color:#888;font-size:10px;&quot;&gt;(+&#039;+fmt(r.assembleable_kits)+&#039;)&lt;/span&gt;&#039;:&#039;&lt;span style=&quot;color:#bbb;&quot;&gt;&amp;#8212;&lt;/span&gt;&#039;)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;it_qty&#039;, label:&#039;I/T&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.it_qty;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.it_qty)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;iw_qty&#039;, label:&#039;I/W&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.iw_qty;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.iw_qty)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;hold_qty&#039;, label:&#039;Hold&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.hold_qty;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right &#039;+(r.hold_qty&gt;0?&#039;pri-MEDIUM&#039;:&#039;&#039;)+&#039;&quot;&gt;&#039;+fmt(r.hold_qty)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;open_cust_po_qty&#039;, label:&#039;Open Cust PO&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.open_cust_po_qty;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.open_cust_po_qty)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;shp_wk_l4&#039;, label:&#039;Shpd/Wk L4&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.shp_wk_l4;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.shp_wk_l4)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;shp_wk_l13&#039;, label:&#039;Shpd/Wk L13&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.shp_wk_l13;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.shp_wk_l13)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;prj_wk&#039;, label:&#039;Prj/Wk&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.prj_wk;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.prj_wk)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;prj_l4w_change&#039;, label:&#039;+/- L4w&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.prj_l4w_change;},<BR/>
+    render:function(r){var l4w=r.prj_l4w_change;var arr=l4w&gt;5?&#039;&lt;span style=&quot;color:#2e7d32;font-weight:700;&quot;&gt;&amp;#9650;&lt;/span&gt;&#039;:l4w&lt;-5?&#039;&lt;span style=&quot;color:#c62828;font-weight:700;&quot;&gt;&amp;#9660;&lt;/span&gt;&#039;:&#039;&#039;;return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+arr+&#039; &#039;+fmt(l4w)+&#039;%&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;opt_wos&#039;, label:&#039;Opt WOS&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.opt_wos;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.opt_wos)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;ats_wos_oh&#039;, label:&#039;ATS WOS&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.ats_wos_oh;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right &#039;+(r.ats_wos_oh&gt;0&amp;&amp;r.ats_wos_oh&lt;r.opt_wos?&#039;pri-HIGH&#039;:&#039;&#039;)+&#039;&quot;&gt;&#039;+fmt(r.ats_wos_oh)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;opt_oh&#039;, label:&#039;Opt OH&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.opt_oh;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.opt_oh)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;lt_wks&#039;, label:&#039;LT Wks&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.lt_wks;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.lt_wks)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;cny_weeks&#039;, label:&#039;CNY&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.cny_weeks;}, render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.cny_weeks)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;days_oos_next_rcpt&#039;, label:&#039;Days OOS&amp;#8594;Rcpt&#039;, align:&#039;right&#039;, numeric:true, get:function(r){return r.days_oos_next_rcpt;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right &#039;+(r.days_oos_next_rcpt&gt;0?&#039;pri-CRITICAL&#039;:&#039;&#039;)+&#039;&quot;&gt;&#039;+fmt(r.days_oos_next_rcpt)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;next_rcpt_dt&#039;, label:&#039;Next Rcpt&#039;, align:&#039;left&#039;,<BR/>
+    get:function(r){return r.next_rcpt_dt?r.next_rcpt_dt.toISOString():&#039;zzzz&#039;;},<BR/>
+    render:function(r){return &#039;&lt;td&gt;&#039;+fmtDate(r.next_rcpt_dt)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;gap_weeks_n&#039;, label:&#039;OOS Wks&#039;, align:&#039;right&#039;, numeric:true,<BR/>
+    get:function(r){return r.gap_weeks.length;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right &#039;+(r.gap_weeks.length&gt;0?&#039;pri-CRITICAL&#039;:&#039;&#039;)+&#039;&quot;&gt;&#039;+r.gap_weeks.length+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;pipeline_excess&#039;, label:&#039;OH+OO Excess&#039;, align:&#039;right&#039;, numeric:true,<BR/>
+    get:function(r){return r.pipeline_excess;},<BR/>
+    tooltip:&#039;OH+OO Excess = (Week 1 OH + all open PO qty) - 26w projected demand - safety stock\nPositive = overstock. &gt; 2,500 triggers Overstock flag.&#039;,<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right &#039;+(r.pipeline_excess&gt;2500?&#039;pri-HIGH&#039;:&#039;&#039;)+&#039;&quot;&gt;&#039;+fmt(r.pipeline_excess)+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;pipeline_wos&#039;, label:&#039;OH+OO WOS&#039;, align:&#039;right&#039;, numeric:true,<BR/>
+    get:function(r){return r.pipeline_wos==null?1e9:r.pipeline_wos;},<BR/>
+    render:function(r){return &#039;&lt;td class=&quot;right&quot;&gt;&#039;+(r.pipeline_wos==null?&#039;&amp;#8734;&#039;:fmt(r.pipeline_wos))+&#039;&lt;/td&gt;&#039;;} },<BR/>
+  { id:&#039;action&#039;, label:&#039;Action&#039;, align:&#039;left&#039;,<BR/>
+    get:function(r){if(!r.recommendations.length)return&#039;CLEAN&#039;;var c={};r.recommendations.forEach(function(rc){c[rc.action]=(c[rc.action]||0)+1;});return Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0];},<BR/>
+    render:function(r){return &#039;&lt;td&gt;&#039;+actionTag(r)+&#039;&lt;/td&gt;&#039;;} }<BR/>
+];<BR/>
+<BR/>
+function actionTag(r) {<BR/>
+  if (!r.recommendations.length) return &#039;&lt;span class=&quot;badge badge-green&quot;&gt;CLEAN&lt;/span&gt;&#039;;<BR/>
+  var counts={};<BR/>
+  r.recommendations.forEach(function(rc){counts[rc.action]=(counts[rc.action]||0)+1;});<BR/>
+  var top=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];})[0];<BR/>
+  var cls={PULL_UP:&#039;badge-amber&#039;,FASTER_VESSEL:&#039;badge-purple&#039;,PUSH_OUT:&#039;badge-amber&#039;,SPLIT:&#039;badge-amber&#039;,CANCEL:&#039;badge-red&#039;,NO_LEVER:&#039;badge-gray&#039;}[top]||&#039;badge-gray&#039;;<BR/>
+  return &#039;&lt;span class=&quot;badge &#039;+cls+&#039;&quot;&gt;&#039;+top+&#039;&lt;/span&gt;&#039;+(r.recommendations.length&gt;1?&#039; &lt;span style=&quot;color:#888;font-size:10px;&quot;&gt;+&#039;+( r.recommendations.length-1)+&#039;&lt;/span&gt;&#039;:&#039;&#039;);<BR/>
+}<BR/>
+<BR/>
+function visibleCols() {<BR/>
+  var hideMulti=(document.getElementById(&#039;hideMulti&#039;)||{}).checked;<BR/>
+  return COLS.filter(function(c){return !(hideMulti&amp;&amp;c.id===&#039;qty_oh_root&#039;);});<BR/>
+}<BR/>
+<BR/>
+// -- Table rendering -----------------------------------------------------------<BR/>
+function buildTableHead() {<BR/>
+  var head=document.getElementById(&#039;theadMain&#039;);<BR/>
+  var cols=visibleCols();<BR/>
+  var h1=&#039;&lt;tr&gt;&#039;;<BR/>
+  cols.forEach(function(c){<BR/>
+    var a=c.align===&#039;right&#039;?&#039; class=&quot;right&quot;&#039;:&#039;&#039;;<BR/>
+    var arrow=(currentSort.id===c.id)?&#039;&lt;span class=&quot;sort-arrow&quot;&gt;&#039;+(currentSort.dir&gt;0?&#039;&amp;#9650;&#039;:&#039;&amp;#9660;&#039;)+&#039;&lt;/span&gt;&#039;:&#039;&#039;;<BR/>
+    var tip=c.tooltip?&#039; title=&quot;&#039;+c.tooltip.replace(/&quot;/g,&#039;&amp;quot;&#039;)+&#039;&quot; style=&quot;cursor:help;&quot;&#039;:&#039;&#039;;<BR/>
+    h1+=&#039;&lt;th&#039;+a+tip+&#039; data-col=&quot;&#039;+c.id+&#039;&quot;&gt;&#039;+c.label+arrow+&#039;&lt;/th&gt;&#039;;<BR/>
+  });<BR/>
+  h1+=&#039;&lt;/tr&gt;&#039;;<BR/>
+  var h2=&#039;&lt;tr class=&quot;filter-row&quot;&gt;&#039;;<BR/>
+  cols.forEach(function(c){<BR/>
+    var a=c.align===&#039;right&#039;?&#039; class=&quot;right&quot;&#039;:&#039;&#039;;<BR/>
+    var v=colFilters[c.id]||&#039;&#039;;<BR/>
+    h2+=&#039;&lt;th&#039;+a+&#039;&gt;&lt;input data-filter=&quot;&#039;+c.id+&#039;&quot; type=&quot;text&quot; placeholder=&quot;filter&#133;&quot; value=&quot;&#039;+esc(v)+&#039;&quot;&gt;&lt;/th&gt;&#039;;<BR/>
+  });<BR/>
+  h2+=&#039;&lt;/tr&gt;&#039;;<BR/>
+  head.innerHTML=h1+h2;<BR/>
+  head.querySelectorAll(&#039;th[data-col]&#039;).forEach(function(th){<BR/>
+    th.onclick=function(){<BR/>
+      var id=th.dataset.col;<BR/>
+      if(currentSort.id===id)currentSort.dir=-currentSort.dir;<BR/>
+      else{currentSort.id=id;currentSort.dir=1;}<BR/>
+      buildTableHead();applyFilters();<BR/>
+    };<BR/>
+  });<BR/>
+  head.querySelectorAll(&#039;input[data-filter]&#039;).forEach(function(inp){<BR/>
+    inp.oninput=function(){var id=inp.dataset.filter,v=inp.value.trim();if(v)colFilters[id]=v;else delete colFilters[id];applyFilters();};<BR/>
+    inp.onclick=function(e){e.stopPropagation();};<BR/>
+  });<BR/>
+}<BR/>
+<BR/>
+function buildFilterDropdowns() {<BR/>
+  var countries=new Set(),brands=new Set(),mgrs=new Set();<BR/>
+  ALL.forEach(function(r){if(r.country)countries.add(r.country);if(r.brand)brands.add(r.brand);if(r.inv_manager)mgrs.add(r.inv_manager);});<BR/>
+  function fill(id,vals){var el=document.getElementById(id);[...vals].sort().forEach(function(v){var o=document.createElement(&#039;option&#039;);o.value=v;o.textContent=v;el.appendChild(o);});}<BR/>
+  fill(&#039;countryFilter&#039;,countries);fill(&#039;brandFilter&#039;,brands);fill(&#039;invMgrFilter&#039;,mgrs);<BR/>
+}<BR/>
+<BR/>
+function _filterRecords(skipPri) {<BR/>
+  var q=document.getElementById(&#039;searchInput&#039;).value.toLowerCase().trim();<BR/>
+  var af=document.getElementById(&#039;actionFilter&#039;).value;<BR/>
+  var cf=document.getElementById(&#039;countryFilter&#039;).value;<BR/>
+  var bf=document.getElementById(&#039;brandFilter&#039;).value;<BR/>
+  var mf=document.getElementById(&#039;invMgrFilter&#039;).value;<BR/>
+  var replen=document.getElementById(&#039;replenOnly&#039;).checked;<BR/>
+  var gaps=document.getElementById(&#039;gapsOnly&#039;).checked;<BR/>
+  var over=document.getElementById(&#039;overstockOnly&#039;).checked;<BR/>
+  var hideMulti=document.getElementById(&#039;hideMulti&#039;).checked;<BR/>
+  var activeCols=[];<BR/>
+  Object.keys(colFilters).forEach(function(cid){var c=COLS.find(function(x){return x.id===cid;});if(c)activeCols.push({c:c,needle:colFilters[cid].toLowerCase()});});<BR/>
+  return ALL.filter(function(r){<BR/>
+    if(q){var hay=(r.mstyle+&#039; &#039;+r.description+&#039; &#039;+r.brand).toLowerCase();if(hay.indexOf(q)&lt;0)return false;}<BR/>
+    if(cf&amp;&amp;r.country!==cf)return false;<BR/>
+    if(bf&amp;&amp;r.brand!==bf)return false;<BR/>
+    if(mf&amp;&amp;r.inv_manager!==mf)return false;<BR/>
+    if(replen&amp;&amp;!r.is_replen)return false;<BR/>
+    if(gaps&amp;&amp;r.gap_weeks.length===0)return false;<BR/>
+    if(over&amp;&amp;!r.overstocked)return false;<BR/>
+    if(hideMulti&amp;&amp;r.is_multi)return false;<BR/>
+    if(af===&#039;__NONE__&#039;){if(r.recommendations.length!==0)return false;}<BR/>
+    else if(af){if(!r.recommendations.some(function(rc){return rc.action===af;}))return false;}<BR/>
+    if(!skipPri&amp;&amp;priorityFilter&amp;&amp;r.priority!==priorityFilter)return false;<BR/>
+    for(var i=0;i&lt;activeCols.length;i++){var ac=activeCols[i];var val=ac.c.filterValue?ac.c.filterValue(r):ac.c.get(r);if(val==null)return false;if(String(val).toLowerCase().indexOf(ac.needle)&lt;0)return false;}<BR/>
+    return true;<BR/>
+  });<BR/>
+}<BR/>
+<BR/>
+function applyFilters() {<BR/>
+  FILTERED=_filterRecords(false);<BR/>
+  var cmpCol=function(c,a,b,dir){var va=c.get(a),vb=c.get(b);if(c.numeric)return(Number(va)-Number(vb))*dir;var sa=String(va==null?&#039;&#039;:va).toLowerCase(),sb=String(vb==null?&#039;&#039;:vb).toLowerCase();return sa&lt;sb?-dir:sa&gt;sb?dir:0;};<BR/>
+  if(currentSort.id){<BR/>
+    var sc=COLS.find(function(c){return c.id===currentSort.id;});<BR/>
+    if(sc){var dir=currentSort.dir;FILTERED.sort(function(a,b){return cmpCol(sc,a,b,dir);});}<BR/>
+  } else {<BR/>
+    var chain=DEFAULT_SORT_CHAIN.map(function(id){return COLS.find(function(c){return c.id===id;});}).filter(Boolean);<BR/>
+    FILTERED.sort(function(a,b){for(var i=0;i&lt;chain.length;i++){var r2=cmpCol(chain[i],a,b,1);if(r2!==0)return r2;}return 0;});<BR/>
+  }<BR/>
+  renderStats();renderTable();<BR/>
+}<BR/>
+<BR/>
+function renderStats() {<BR/>
+  var npf=_filterRecords(true);<BR/>
+  var inScope=FILTERED.length,gapsN=FILTERED.filter(function(r){return r.gap_weeks.length&gt;0;}).length;<BR/>
+  var overN=FILTERED.filter(function(r){return r.overstocked;}).length;<BR/>
+  var pri={CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0};<BR/>
+  npf.forEach(function(r){pri[r.priority]=(pri[r.priority]||0)+1;});<BR/>
+  var total=npf.length;<BR/>
+  var PRI_TIPS={CRITICAL:&#039;CRITICAL: most severe stockout situations.&#039;,HIGH:&#039;HIGH: gap week deficit = 2.0 weeks below Opt WOS.&#039;,MEDIUM:&#039;MEDIUM: has any gap week, or pipeline excess &gt; 2,500 units.&#039;,LOW:&#039;LOW: no gap weeks and not overstocked.&#039;};<BR/>
+  function btn(key,label,color){var active=priorityFilter===key;return &#039;&lt;button class=&quot;pri-btn &#039;+(active?&#039;active&#039;:&#039;&#039;)+&#039;&quot; data-pri=&quot;&#039;+key+&#039;&quot; title=&quot;&#039;+PRI_TIPS[key]+&#039;&quot; style=&quot;background:&#039;+(active?color:&#039;#ffffff&#039;)+&#039;;color:&#039;+(active?&#039;#fff&#039;:color)+&#039;;border:1.5px solid &#039;+color+&#039;;&quot;&gt;&#039;+label+&#039; &lt;b style=&quot;margin-left:4px;&quot;&gt;&#039;+(pri[key]||0).toLocaleString()+&#039;&lt;/b&gt;&lt;/button&gt;&#039;;}<BR/>
+  var allBtn=&#039;&lt;button class=&quot;pri-btn &#039;+(priorityFilter===&#039;&#039;?&#039;active&#039;:&#039;&#039;)+&#039;&quot; data-pri=&quot;&quot; title=&quot;All priorities&quot; style=&quot;background:&#039;+(priorityFilter===&#039;&#039;?&#039;#37474f&#039;:&#039;#ffffff&#039;)+&#039;;color:&#039;+(priorityFilter===&#039;&#039;?&#039;#fff&#039;:&#039;#37474f&#039;)+&#039;;border:1.5px solid #37474f;&quot;&gt;All &lt;b style=&quot;margin-left:4px;&quot;&gt;&#039;+total.toLocaleString()+&#039;&lt;/b&gt;&lt;/button&gt;&#039;;<BR/>
+  document.getElementById(&#039;statsBar&#039;).innerHTML=allBtn+btn(&#039;CRITICAL&#039;,&#039;&amp;#128308; Critical&#039;,&#039;#b71c1c&#039;)+btn(&#039;HIGH&#039;,&#039;&amp;#128992; High&#039;,&#039;#e65100&#039;)+btn(&#039;MEDIUM&#039;,&#039;&amp;#129001; Medium&#039;,&#039;#f9a825&#039;)+btn(&#039;LOW&#039;,&#039;&amp;#9898; Low&#039;,&#039;#5d4037&#039;)+&#039;&lt;div class=&quot;stat&quot; style=&quot;margin-left:14px;&quot;&gt;&lt;b&gt;&#039;+gapsN+&#039;&lt;/b&gt; with gaps&lt;/div&gt;&lt;div class=&quot;stat&quot;&gt;&lt;b&gt;&#039;+overN+&#039;&lt;/b&gt; overstocked&lt;/div&gt;&lt;div class=&quot;stat&quot;&gt;&lt;b&gt;&#039;+inScope.toLocaleString()+&#039;&lt;/b&gt; shown&lt;/div&gt;&#039;;<BR/>
+  document.getElementById(&#039;statsBar&#039;).querySelectorAll(&#039;.pri-btn&#039;).forEach(function(b){b.onclick=function(){var key=b.dataset.pri;priorityFilter=(priorityFilter===key)?&#039;&#039;:key;applyFilters();};});<BR/>
+}<BR/>
+<BR/>
+function renderTable() {<BR/>
+  var tb=document.getElementById(&#039;tbody&#039;);<BR/>
+  var cols=visibleCols();var nCols=cols.length;<BR/>
+  var html=&#039;&#039;;<BR/>
+  FILTERED.forEach(function(r){<BR/>
+    var safeMs=r.mstyle.replace(/[^a-zA-Z0-9]/g,&#039;_&#039;);<BR/>
+    html+=&#039;&lt;tr class=&quot;row&quot; data-ms=&quot;&#039;+esc(r.mstyle)+&#039;&quot; onclick=&quot;toggleDetail(this.dataset.ms)&quot;&gt;&#039;;<BR/>
+    cols.forEach(function(c){html+=c.render(r);});<BR/>
+    html+=&#039;&lt;/tr&gt;&#039;;<BR/>
+    html+=&#039;&lt;tr class=&quot;detail-pane&quot; id=&quot;detail-&#039;+safeMs+&#039;&quot; style=&quot;display:none&quot;&gt;&lt;td colspan=&quot;&#039;+nCols+&#039;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&#039;;<BR/>
+  });<BR/>
+  tb.innerHTML=html;<BR/>
+}<BR/>
+<BR/>
+function toggleDetail(mstyle) {<BR/>
+  var id=&#039;detail-&#039;+mstyle.replace(/[^a-zA-Z0-9]/g,&#039;_&#039;);<BR/>
+  var dtr=document.getElementById(id);<BR/>
+  if(!dtr)return;<BR/>
+  if(dtr.style.display===&#039;table-row&#039;){dtr.style.display=&#039;none&#039;;return;}<BR/>
+  dtr.style.display=&#039;table-row&#039;;<BR/>
+  if(dtr.dataset.loaded===&#039;1&#039;)return;<BR/>
+  var r=ALL.find(function(x){return x.mstyle===mstyle;});<BR/>
+  if(!r)return;<BR/>
+  dtr.querySelector(&#039;td&#039;).innerHTML=renderDetail(r);<BR/>
+  dtr.dataset.loaded=&#039;1&#039;;<BR/>
+}<BR/>
+<BR/>
+// -- renderDetail --------------------------------------------------------------<BR/>
+function renderDetail(r) {<BR/>
+  var today=new Date();today.setHours(0,0,0,0);<BR/>
+  var isUSA=/^(usa|united states)$/i.test(r.country||&#039;&#039;);<BR/>
+  var lag=isUSA?USA_WAREHOUSE_LAG:WAREHOUSE_LAG_DAYS;<BR/>
+  var w1sun=new Date(today);w1sun.setDate(today.getDate()-today.getDay());<BR/>
+<BR/>
+  // Map POs to forecast weeks via ETA + warehouse lag<BR/>
+  var poByWeek={};<BR/>
+  (r.open_pos||[]).forEach(function(p){<BR/>
+    if(!p.eta_obj&amp;&amp;!p.eta)return;<BR/>
+    var etaDt=p.eta_obj||(p.eta?new Date(p.eta):null);<BR/>
+    if(!etaDt)return;<BR/>
+    var wh=addDays(etaDt,lag);<BR/>
+    var wi=Math.floor((wh-w1sun)/86400000/7);<BR/>
+    if(wi&lt;0||wi&gt;25)return;<BR/>
+    if(!poByWeek[wi])poByWeek[wi]=[];<BR/>
+    poByWeek[wi].push(p);<BR/>
+  });<BR/>
+<BR/>
+  function fmtPoHover(wi){<BR/>
+    var pos=poByWeek[wi]||[];if(!pos.length)return&#039;&#039;;<BR/>
+    var wkDate=(new Date(w1sun.getTime()+wi*7*86400000)).toLocaleDateString(&#039;en-US&#039;,{month:&#039;short&#039;,day:&#039;numeric&#039;});<BR/>
+    var h=&#039;Week of &#039;+wkDate+&#039;  (wh-avail = ETA + &#039;+lag+&#039;d)\n&#039;+&#039;-&#039;.repeat(38)+&#039;\n&#039;;<BR/>
+    pos.forEach(function(p){h+=&#039;PO #: &#039;+p.po_number+&#039;\nSupplier: &#039;+(p.supplier||&#039;&#151;&#039;)+&#039;\nOpen (I/W): &#039;+fmt(p.in_work_qty||0)+&#039;  &#183;  In Transit (I/T): &#039;+fmt(p.in_transit_qty||0)+&#039;\nETD: &#039;+(p.etd||&#039;&#151;&#039;)+&#039;  &#183;  ETA: &#039;+(p.eta||&#039;&#151;&#039;)+&#039;\n&#039;;});<BR/>
+    return h;<BR/>
+  }<BR/>
+  function fmtPrjHover(wi){<BR/>
+    var cd=r.customer_demand||[];<BR/>
+    var wk=(new Date(w1sun.getTime()+wi*7*86400000)).toLocaleDateString(&#039;en-US&#039;,{month:&#039;short&#039;,day:&#039;numeric&#039;});<BR/>
+    var h=&#039;Prj Demand &#151; W&#039;+(wi+1)+&#039; (week of &#039;+wk+&#039;)\nPer-customer rollup from QB Projections:\n\n&#039;;<BR/>
+    var sorted=cd.map(function(c){return{customer:c.customer,qty:(c.weekly&amp;&amp;c.weekly[wi])||0};}).filter(function(c){return c.qty!==0;}).sort(function(a,b){return b.qty-a.qty;});<BR/>
+    if(!sorted.length)h+=&#039;(no per-customer projection for this week)&#039;;<BR/>
+    sorted.forEach(function(c){h+=&#039;&#149; &#039;+(c.customer||&#039;(unknown)&#039;)+&#039;: &#039;+fmt(c.qty)+&#039;\n&#039;;});<BR/>
+    return h;<BR/>
+  }<BR/>
+<BR/>
+  // Rec action by PO for rcv row highlighting<BR/>
+  var recByPo={};<BR/>
+  (r.recommendations||[]).forEach(function(rc){if(rc.action===&#039;PUSH_OUT&#039;||rc.action===&#039;PULL_UP&#039;)recByPo[rc.po_number]=rc.action;});<BR/>
+  var weekAction={};<BR/>
+  Object.keys(poByWeek).forEach(function(wi){poByWeek[wi].forEach(function(p){var action=recByPo[p.po_number];if(action&amp;&amp;(!weekAction[wi]||action===&#039;PULL_UP&#039;))weekAction[wi]=action;});});<BR/>
+  function rcvHL(wi){var a=weekAction[wi];if(a===&#039;PUSH_OUT&#039;)return&#039;background:#fff3e0;color:#e65100;font-weight:600;&#039;;if(a===&#039;PULL_UP&#039;)return&#039;background:#e3f2fd;color:#1565c0;font-weight:600;&#039;;return null;}<BR/>
+<BR/>
+  // 26-week grid<BR/>
+  var invFlow=&#039;&lt;table class=&quot;subtbl grid26&quot;&gt;&lt;tr&gt;&lt;th class=&quot;lbl&quot;&gt;&lt;/th&gt;&#039;;<BR/>
+  for(var i=1;i&lt;=26;i++){var s=new Date(w1sun.getTime()+(i-1)*7*86400000);var lbl=(s.getMonth()+1)+&#039;/&#039;+s.getDate();invFlow+=&#039;&lt;th title=&quot;W&#039;+i+&#039; &#151; week of &#039;+s.toLocaleDateString(&#039;en-US&#039;,{month:&#039;short&#039;,day:&#039;numeric&#039;,year:&#039;numeric&#039;})+&#039;&quot;&gt;&#039;+lbl+&#039;&lt;/th&gt;&#039;;}<BR/>
+  invFlow+=&#039;&lt;th&gt;Total&lt;/th&gt;&lt;/tr&gt;&#039;;<BR/>
+<BR/>
+  function renderRow(label,arr,hoverFn,hlFn){<BR/>
+    var html=&#039;&lt;tr&gt;&lt;td class=&quot;lbl&quot;&gt;&#039;+label+&#039;&lt;/td&gt;&#039;;var tot=0;<BR/>
+    for(var i=0;i&lt;26;i++){<BR/>
+      var v=arr[i]||0;tot+=v;var c=v&lt;0?&#039;neg&#039;:&#039;ok&#039;;<BR/>
+      var styleStr=&#039;&#039;,extra=&#039;&#039;;<BR/>
+      if(hoverFn){var tip=hoverFn(i);if(tip){extra+=&#039; title=&quot;&#039;+tip.replace(/&quot;/g,&#039;&amp;quot;&#039;)+&#039;&quot;&#039;;styleStr+=&#039;cursor:help;&#039;;}}<BR/>
+      if(hlFn){var hl=hlFn(i);if(hl)styleStr+=hl;}<BR/>
+      var sa=styleStr?&#039; style=&quot;&#039;+styleStr+&#039;&quot;&#039;:&#039;&#039;;<BR/>
+      html+=&#039;&lt;td class=&quot;&#039;+c+&#039;&quot;&#039;+extra+sa+&#039;&gt;&#039;+(v===0?&#039;&#151;&#039;:fmt(v))+&#039;&lt;/td&gt;&#039;;<BR/>
+    }<BR/>
+    html+=&#039;&lt;td&gt;&lt;b&gt;&#039;+fmt(tot)+&#039;&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&#039;;return html;<BR/>
+  }<BR/>
+  invFlow+=renderRow(&#039;Beg Inv&#039;,r.beg_inv,null,null);<BR/>
+  invFlow+=renderRow(&#039;Expected Receipts&#039;,r.rcv,fmtPoHover,rcvHL);<BR/>
+  invFlow+=renderRow(&#039;Prj Demand&#039;,r.prj,fmtPrjHover,null);<BR/>
+  var wosRow=&#039;&lt;tr&gt;&lt;td class=&quot;lbl&quot;&gt;WOS OH&lt;/td&gt;&#039;;<BR/>
+  for(var i=0;i&lt;26;i++){var b=r.beg_inv[i]||0,p=r.prj[i]||0;var v=&#039;&#151;&#039;,cls=&#039;ok&#039;;if(p&gt;0){var w=b/p;v=w.toFixed(1);if(w&lt;r.opt_wos)cls=&#039;gap&#039;;if(w&lt;0)cls=&#039;neg&#039;;}else if(b&gt;0){v=&#039;8&#039;;}wosRow+=&#039;&lt;td class=&quot;&#039;+cls+&#039;&quot;&gt;&#039;+v+&#039;&lt;/td&gt;&#039;;}<BR/>
+  wosRow+=&#039;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&#039;;<BR/>
+  invFlow+=wosRow+&#039;&lt;/table&gt;&#039;;<BR/>
+<BR/>
+  // Open POs<BR/>
+  var pos=&#039;&lt;table class=&quot;subtbl&quot;&gt;&lt;tr&gt;&lt;th&gt;PO #&lt;/th&gt;&lt;th&gt;Supplier&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;I/T&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;I/W&lt;/th&gt;&lt;th&gt;ETD&lt;/th&gt;&lt;th&gt;ETA&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Transit&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;&#039;;<BR/>
+  r.open_pos.forEach(function(p){<BR/>
+    var sc={LOCKED:&#039;badge-gray&#039;,IN_TRANSIT:&#039;badge-purple&#039;,MOVABLE:&#039;badge-green&#039;,FASTER_VESSEL_WINDOW:&#039;badge-amber&#039;,PULL_UP_NARROW:&#039;badge-amber&#039;}[p.status]||&#039;badge-gray&#039;;<BR/>
+    pos+=&#039;&lt;tr&gt;&lt;td&gt;&lt;b&gt;&#039;+esc(p.po_number)+&#039;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&#039;+esc(p.supplier)+&#039;&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(p.in_transit_qty)+&#039;&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(p.in_work_qty)+&#039;&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(p.etd)+&#039;&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(p.eta)+&#039;&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+(p.transit_days||&#039;&#151;&#039;)+&#039;d&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;badge &#039;+sc+&#039;&quot;&gt;&#039;+p.status+&#039;&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&#039;;<BR/>
+  });<BR/>
+  if(!r.open_pos.length)pos+=&#039;&lt;tr&gt;&lt;td colspan=&quot;8&quot; style=&quot;color:#888;font-style:italic;&quot;&gt;No open POs.&lt;/td&gt;&lt;/tr&gt;&#039;;<BR/>
+  pos+=&#039;&lt;/table&gt;&#039;;<BR/>
+<BR/>
+  // Recommendations<BR/>
+  var recs=&#039;&#039;;<BR/>
+  if(!r.recommendations.length){recs=&#039;&lt;div style=&quot;color:#1b5e20;font-style:italic;&quot;&gt;&amp;#10003; No actions recommended.&lt;/div&gt;&#039;;}<BR/>
+  else {<BR/>
+    var arrow=&#039;&lt;span style=&quot;color:#888;margin:0 4px;&quot;&gt;?&lt;/span&gt;&#039;;<BR/>
+    function beforeAfter(before,after,isDate){var a=isDate?fmtDate(before):fmt(before);var b=isDate?fmtDate(after):fmt(after);if(before===after)return&#039;&lt;span&gt;&#039;+a+&#039;&lt;/span&gt;&#039;;return&#039;&lt;span style=&quot;color:#888;text-decoration:line-through;&quot;&gt;&#039;+a+&#039;&lt;/span&gt;&#039;+arrow+&#039;&lt;span style=&quot;color:#0d47a1;font-weight:600;&quot;&gt;&#039;+b+&#039;&lt;/span&gt;&#039;;}<BR/>
+    r.recommendations.forEach(function(rc){<BR/>
+      var cls=&#039;priority-&#039;+rc.priority+&#039; action-&#039;+rc.action;<BR/>
+      var header=&#039;&lt;div style=&quot;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;&quot;&gt;&lt;span class=&quot;rec-action &#039;+rc.action+&#039;&quot;&gt;&#039;+rc.action+&#039;&lt;/span&gt;&lt;b style=&quot;font-size:13px;&quot;&gt;&#039;+esc(rc.po_number||&#039;&#151;&#039;)+&#039;&lt;/b&gt;&#039;+(rc.supplier?&#039;&lt;span style=&quot;color:#555;font-size:11px;&quot;&gt;&#183; &#039;+esc(rc.supplier)+&#039;&lt;/span&gt;&#039;:&#039;&#039;)+&#039;&lt;/div&gt;&#039;;<BR/>
+      var body=&#039;&#039;;<BR/>
+      if(rc.action===&#039;PULL_UP&#039;||rc.action===&#039;FASTER_VESSEL&#039;){<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;Current qty:&lt;/span&gt; &lt;b&gt;&#039;+fmt(rc.po_total_qty)+&#039;&lt;/b&gt; pcs &lt;span style=&quot;color:#888;&quot;&gt;(I/T &#039;+fmt(rc.in_transit_qty)+&#039;, I/W &#039;+fmt(rc.in_work_qty)+&#039;)&lt;/span&gt;&lt;/div&gt;&#039;;<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;ETD:&lt;/span&gt; &#039;+beforeAfter(rc.orig_etd,rc.proposed_etd,true)+&#039;&lt;/div&gt;&#039;;<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;ETA:&lt;/span&gt; &#039;+beforeAfter(rc.orig_eta,rc.proposed_eta,true)+(rc.delta_days?&#039;&lt;span style=&quot;color:#888;margin-left:8px;&quot;&gt;(&#039;+( rc.delta_days&gt;0?&#039;+&#039;:&#039;&#039;)+rc.delta_days+&#039; days)&lt;/span&gt;&#039;:&#039;&#039;)+&#039;&lt;/div&gt;&#039;;<BR/>
+        if(rc.action===&#039;FASTER_VESSEL&#039;)body+=&#039;&lt;div class=&quot;rec-row&quot; style=&quot;color:#5e35b1;font-style:italic;font-size:11px;&quot;&gt;Same ETD &#151; request faster vessel only (transit ~18 days vs ~26)&lt;/div&gt;&#039;;<BR/>
+      } else if(rc.action===&#039;SPLIT&#039;){<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;Original PO:&lt;/span&gt; &lt;b&gt;&#039;+fmt(rc.po_total_qty)+&#039;&lt;/b&gt; pcs &#183; ETD &#039;+fmtDate(rc.orig_etd)+&#039; ? ETA &#039;+fmtDate(rc.orig_eta)+&#039; &lt;span style=&quot;color:#888;&quot;&gt;(I/T &#039;+fmt(rc.in_transit_qty)+&#039;, I/W &#039;+fmt(rc.in_work_qty)+&#039;)&lt;/span&gt;&lt;/div&gt;&#039;;<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;Keep:&lt;/span&gt; &lt;b style=&quot;color:#1b5e20;&quot;&gt;&#039;+fmt(rc.keep_qty)+&#039;&lt;/b&gt; pcs at original ETD &#039;+fmtDate(rc.orig_etd)+&#039; ? ETA &#039;+fmtDate(rc.orig_eta)+&#039;&lt;/div&gt;&#039;;<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;Push:&lt;/span&gt; &lt;b style=&quot;color:#e65100;&quot;&gt;&#039;+fmt(rc.push_qty)+&#039;&lt;/b&gt; pcs to new ETD &#039;+fmtDate(rc.proposed_etd)+&#039; ? ETA &#039;+fmtDate(rc.proposed_eta)+&#039; &lt;span style=&quot;color:#888;margin-left:6px;&quot;&gt;(+&#039;+rc.delta_days+&#039; days)&lt;/span&gt;&lt;/div&gt;&#039;;<BR/>
+      } else if(rc.action===&#039;PUSH_OUT&#039;){<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;Current qty:&lt;/span&gt; &lt;b&gt;&#039;+fmt(rc.po_total_qty)+&#039;&lt;/b&gt; pcs &lt;span style=&quot;color:#888;&quot;&gt;(I/T &#039;+fmt(rc.in_transit_qty)+&#039;, I/W &#039;+fmt(rc.in_work_qty)+&#039;)&lt;/span&gt;&lt;/div&gt;&#039;;<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;ETD:&lt;/span&gt; &#039;+beforeAfter(rc.orig_etd,rc.proposed_etd,true)+&#039;&lt;/div&gt;&#039;;<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;ETA:&lt;/span&gt; &#039;+beforeAfter(rc.orig_eta,rc.proposed_eta,true)+(rc.delta_days?&#039;&lt;span style=&quot;color:#888;margin-left:8px;&quot;&gt;(+&#039;+rc.delta_days+&#039; days)&lt;/span&gt;&#039;:&#039;&#039;)+&#039;&lt;/div&gt;&#039;;<BR/>
+      } else if(rc.action===&#039;CANCEL&#039;){<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;Original PO:&lt;/span&gt; &lt;b&gt;&#039;+fmt(rc.po_total_qty)+&#039;&lt;/b&gt; pcs &#183; ETD &#039;+fmtDate(rc.orig_etd)+&#039; ? ETA &#039;+fmtDate(rc.orig_eta)+&#039;&lt;/div&gt;&#039;;<BR/>
+        body+=&#039;&lt;div class=&quot;rec-row&quot;&gt;&lt;span class=&quot;rec-lbl&quot;&gt;Cancel:&lt;/span&gt; &lt;b style=&quot;color:#c62828;&quot;&gt;&#039;+fmt(rc.qty_affected)+&#039;&lt;/b&gt; pcs &lt;span style=&quot;color:#888;&quot;&gt;(remaining: &#039;+fmt(rc.po_total_qty-rc.qty_affected)+&#039;)&lt;/span&gt;&lt;/div&gt;&#039;;<BR/>
+      }<BR/>
+      var wks=rc.gap_weeks_fixed||[];<BR/>
+      var gapChip=wks.length?(wks.length&lt;=4?&#039;Covers gaps in &lt;b&gt;&#039;+wks.map(function(w){return &#039;W&#039;+w;}).join(&#039;, &#039;)+&#039;&lt;/b&gt;&#039;:&#039;Covers &lt;b&gt;&#039;+wks.length+&#039;&lt;/b&gt; gap weeks (W&#039;+wks[0]+&#039;&#150;W&#039;+wks[wks.length-1]+&#039;)&#039;):&#039;&#039;;<BR/>
+      var reasonRow=(rc.reason&amp;&amp;!gapChip)?&#039;&lt;div class=&quot;rec-reason&quot;&gt;&#039;+esc(rc.reason)+&#039;&lt;/div&gt;&#039;:gapChip?&#039;&lt;div class=&quot;rec-reason&quot;&gt;&#039;+gapChip+&#039;&lt;/div&gt;&#039;:&#039;&#039;;<BR/>
+      var addBtn=rc.po_number?&#039;&lt;div style=&quot;margin-top:8px;text-align:right;&quot;&gt;&lt;button class=&quot;add-excel-btn&quot; data-mstyle=&quot;&#039;+esc(r.mstyle)+&#039;&quot; data-action=&quot;&#039;+rc.action+&#039;&quot; data-po=&quot;&#039;+esc(rc.po_number||&#039;&#039;)+&#039;&quot; data-supplier=&quot;&#039;+esc(rc.supplier||&#039;&#039;)+&#039;&quot; data-qty=&quot;&#039;+(rc.po_total_qty||0)+&#039;&quot; data-curr-etd=&quot;&#039;+(rc.orig_etd||&#039;&#039;)+&#039;&quot; data-curr-eta=&quot;&#039;+(rc.orig_eta||&#039;&#039;)+&#039;&quot; data-req-etd=&quot;&#039;+(rc.proposed_etd||&#039;&#039;)+&#039;&quot; data-req-eta=&quot;&#039;+(rc.proposed_eta||&#039;&#039;)+&#039;&quot; onclick=&quot;addToRecoSheet(this)&quot; style=&quot;font-size:11px;padding:3px 10px;background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;border-radius:3px;cursor:pointer;font-family:inherit;&quot;&gt;&amp;#10133; Add to Excel&lt;/button&gt;&lt;/div&gt;&#039;:&#039;&#039;;<BR/>
+      recs+=&#039;&lt;div class=&quot;rec-box &#039;+cls+&#039;&quot;&gt;&#039;+header+&#039;&lt;div class=&quot;rec-body&quot;&gt;&#039;+body+&#039;&lt;/div&gt;&#039;+reasonRow+addBtn+&#039;&lt;/div&gt;&#039;;<BR/>
+    });<BR/>
+  }<BR/>
+<BR/>
+  // Gap detail<BR/>
+  var gapDetail=&#039;&#039;;<BR/>
+  if(r.gap_weeks.length){<BR/>
+    gapDetail=&#039;&lt;table class=&quot;subtbl&quot;&gt;&lt;tr&gt;&lt;th&gt;Wk&lt;/th&gt;&lt;th&gt;Date&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Beg&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Prj&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;WOS&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Deficit&lt;/th&gt;&lt;/tr&gt;&#039;;<BR/>
+    r.gap_weeks.forEach(function(g){gapDetail+=&#039;&lt;tr&gt;&lt;td&gt;W&#039;+g.wi+&#039;&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(g.date)+&#039;&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(g.beg)+&#039;&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(g.prj)+&#039;&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+g.wos+&#039;&lt;/td&gt;&lt;td class=&quot;right pri-CRITICAL&quot;&gt;&#039;+g.deficit+&#039;&lt;/td&gt;&lt;/tr&gt;&#039;;});<BR/>
+    gapDetail+=&#039;&lt;/table&gt;&#039;;<BR/>
+  } else { gapDetail=&#039;&lt;div style=&quot;color:#1b5e20;font-style:italic;&quot;&gt;&amp;#10003; No gap weeks before next receipt.&lt;/div&gt;&#039;; }<BR/>
+<BR/>
+  // Badges<BR/>
+  var flagBadges=[];<BR/>
+  if(r.active_kl)flagBadges.push(&#039;&lt;span class=&quot;badge badge-green&quot;&gt;Active KL&lt;/span&gt;&#039;);<BR/>
+  if(r.nvo)flagBadges.push(&#039;&lt;span class=&quot;badge badge-purple&quot;&gt;NVO&lt;/span&gt;&#039;);<BR/>
+  if(r.new_item_no_prj)flagBadges.push(&#039;&lt;span class=&quot;badge badge-amber&quot;&gt;New Item &#183; No Prj&lt;/span&gt;&#039;);<BR/>
+  if(r.amz_do_not_ship)flagBadges.push(&#039;&lt;span class=&quot;badge badge-red&quot;&gt;AMZ DO NOT SHIP&lt;/span&gt;&#039;);<BR/>
+  if(r.amz_suppression)flagBadges.push(&#039;&lt;span class=&quot;badge badge-red&quot;&gt;AMZ Suppression&lt;/span&gt;&#039;);<BR/>
+  if(r.transfer_qty_open)flagBadges.push(&#039;&lt;span class=&quot;badge badge-amber&quot;&gt;Transfer Qty Open&lt;/span&gt;&#039;);<BR/>
+  if(r.pvt_lbl_excl)flagBadges.push(&#039;&lt;span class=&quot;badge badge-amber&quot;&gt;Pvt Lbl / Excl&lt;/span&gt;&#039;);<BR/>
+  if(r.commit_item)flagBadges.push(&#039;&lt;span class=&quot;badge badge-green&quot;&gt;Commit Item&lt;/span&gt;&#039;);<BR/>
+  if(r.is_multi)flagBadges.push(&#039;&lt;span class=&quot;badge badge-purple&quot;&gt;Multi-Pack (Kit)&lt;/span&gt;&#039;);<BR/>
+<BR/>
+  function kvRow(lbl,val){return &#039;&lt;div style=&quot;display:flex;gap:6px;padding:1px 0;font-size:11px;line-height:1.45;&quot;&gt;&lt;span style=&quot;color:#666;min-width:90px;flex-shrink:0;&quot;&gt;&#039;+lbl+&#039;&lt;/span&gt;&lt;span style=&quot;font-weight:500;color:#222;&quot;&gt;&#039;+val+&#039;&lt;/span&gt;&lt;/div&gt;&#039;;}<BR/>
+  function kvBox(lbl,rows){return &#039;&lt;div style=&quot;flex:1;min-width:160px;background:#f8f9fa;border:1px solid #e4e7eb;border-radius:4px;padding:8px 10px;&quot;&gt;&#039;+(lbl?&#039;&lt;div style=&quot;font-size:10px;font-weight:700;color:#9e9e9e;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;&quot;&gt;&#039;+lbl+&#039;&lt;/div&gt;&#039;:&#039;&#039;)+rows+&#039;&lt;/div&gt;&#039;;}<BR/>
+<BR/>
+  var identityBox=kvBox(&#039;Identity&#039;,kvRow(&#039;Mstyle&#039;,&#039;&lt;b&gt;&#039;+esc(r.mstyle)+&#039;&lt;/b&gt;&#039;)+kvRow(&#039;Rank&#039;,esc(r.item_rank)||&#039;&#151;&#039;)+kvRow(&#039;Status&#039;,esc(r.item_status_flow)||&#039;&#151;&#039;)+kvRow(&#039;Sub Stat&#039;,esc(r.sub_status)||&#039;&#151;&#039;)+(r.season?kvRow(&#039;Season&#039;,esc(r.season)):&#039;&#039;)+( r.size_ct?kvRow(&#039;Size/Ct&#039;,esc(r.size_ct)):&#039;&#039;)+( r.fragrance?kvRow(&#039;Fragrance&#039;,esc(r.fragrance)):&#039;&#039;)+( flagBadges.length?&#039;&lt;div style=&quot;margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;&quot;&gt;&#039;+flagBadges.join(&#039;&#039;)+&#039;&lt;/div&gt;&#039;:&#039;&#039;));<BR/>
+  var itemDataBox=kvBox(&#039;Item Data&#039;,&#039;&lt;div style=&quot;display:grid;grid-template-columns:1fr 1fr;gap:0 14px;&quot;&gt;&lt;div&gt;&#039;+kvRow(&#039;Inner Pack&#039;,r.inner_pack||&#039;&#151;&#039;)+kvRow(&#039;Master Pack&#039;,r.master_pack||&#039;&#151;&#039;)+kvRow(&#039;MOQ&#039;,r.moq?fmt(r.moq):&#039;&#151;&#039;)+kvRow(&#039;Opt OH&#039;,fmt(r.opt_oh))+&#039;&lt;/div&gt;&lt;div&gt;&#039;+kvRow(&#039;Opt WOS&#039;,fmt(r.opt_wos))+kvRow(&#039;LT (Wks)&#039;,fmt(r.lt_wks))+kvRow(&#039;LT + Opt Wks&#039;,fmt(r.lt_opt_weeks))+(r.oos_dates?kvRow(&#039;OOS Dates&#039;,esc(r.oos_dates)):&#039;&#039; )+&#039;&lt;/div&gt;&lt;/div&gt;&#039;);<BR/>
+  var overstockBox=kvBox(&#039;Overstock&#039;,kvRow(&#039;Over Cmtd Qty&#039;,&#039;&lt;span style=&quot;color:&#039;+(r.over_committed_qty&gt;0?&#039;#c62828&#039;:&#039;inherit&#039;)+&#039;&quot;&gt;&#039;+fmt(r.over_committed_qty)+&#039;&lt;/span&gt;&#039;)+kvRow(&#039;Ovr Comt WOS&#039;,&#039;&lt;span style=&quot;color:&#039;+(r.ovr_comt_wos&gt;0?&#039;#c62828&#039;:&#039;inherit&#039;)+&#039;&quot;&gt;&#039;+fmt(r.ovr_comt_wos)+&#039;&lt;/span&gt;&#039;));<BR/>
+<BR/>
+  var atsHtml=&#039;&lt;table class=&quot;subtbl&quot;&gt;&lt;tr&gt;&lt;th&gt;Position&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Qty&lt;/th&gt;&lt;th&gt;Position&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Qty&lt;/th&gt;&lt;th&gt;WOS Metric&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Value&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Qty OH (total)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&lt;b&gt;&#039;+fmt(r.qty_oh)+&#039;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;I/T (in transit)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.it_qty)+&#039;&lt;/td&gt;&lt;td&gt;ATS WOS OH&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_wos_oh)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;ATS Qty OH&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_qty_oh)+&#039;&lt;/td&gt;&lt;td&gt;I/W (in work)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.iw_qty)+&#039;&lt;/td&gt;&lt;td&gt;ATS WOS OH+OO&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_wos_oh_oo)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;ATS Now&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&lt;b&gt;&#039;+fmt(r.ats_now)+&#039;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;I/T + I/W&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.it_iw)+&#039;&lt;/td&gt;&lt;td&gt;ATS WOS OH+OO (w/ kits)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_wos_oh_oo_w_kits)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;ATS OH + OO&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_oh_oo)+&#039;&lt;/td&gt;&lt;td&gt;I/W + I/T w/ Kits&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.it_iw_kits)+&#039;&lt;/td&gt;&lt;td&gt;ATS WOS (w/o test/excl)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_wos_oh_oo_wo_test)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;ATS OH + OO (w/ kits)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_oh_oo_w_kits)+&#039;&lt;/td&gt;&lt;td&gt;Open Cust PO Qty&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.open_cust_po_qty)+&#039;&lt;/td&gt;&lt;td&gt;ATS OH + I/T Booked WOS&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_oh_it_booked_wos)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;ATS Qty (not alloc\&#039;d)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ats_qty_not_alloc)+&#039;&lt;/td&gt;&lt;td&gt;Hold Order Qty&lt;/td&gt;&lt;td class=&quot;right &#039;+(r.hold_qty&gt;0?&#039;pri-MEDIUM&#039;:&#039;&#039;)+&#039;&quot;&gt;&#039;+fmt(r.hold_qty)+&#039;&lt;/td&gt;&lt;td&gt;Opt WOS&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&lt;b&gt;&#039;+fmt(r.opt_wos)+&#039;&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;NJ ATS OH&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.nj_ats_oh)+&#039;&lt;/td&gt;&lt;td&gt;Test Order Qty&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.test_order_qty)+&#039;&lt;/td&gt;&lt;td&gt;Opt OH&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.opt_oh)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;CA ATS OH&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.ca_ats_oh)+&#039;&lt;/td&gt;&lt;td&gt;Exclude PO from WOS&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.exclude_po_wos)+&#039;&lt;/td&gt;&lt;td&gt;LT (Wks) &#183; CNY &#183; LT+Opt&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.lt_wks)+&#039; &#183; &#039;+fmt(r.cny_weeks)+&#039; &#183; &#039;+fmt(r.lt_opt_weeks)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&#039;;<BR/>
+<BR/>
+  var demandHtml=&#039;&lt;table class=&quot;subtbl&quot;&gt;&lt;tr&gt;&lt;th&gt;Demand&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Qty&lt;/th&gt;&lt;th&gt;Shipments&lt;/th&gt;&lt;th class=&quot;right&quot;&gt;Qty&lt;/th&gt;&lt;th&gt;Date&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Prj / Wk&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&lt;b&gt;&#039;+fmt(r.prj_wk)+&#039;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Shpd / Wk L4&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&lt;b&gt;&#039;+fmt(r.shp_wk_l4)+&#039;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Last Shp Date&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(r.last_shp_date)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Max Prj / Wk&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.max_prj_wk)+&#039;&lt;/td&gt;&lt;td&gt;Shpd / Wk L13&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&lt;b&gt;&#039;+fmt(r.shp_wk_l13)+&#039;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;1st Shpd Date&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(r.first_shpd_date)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;+/- Prj L4w&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.prj_l4w_change)+&#039;%&lt;/td&gt;&lt;td&gt;Total Shpd L4&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.tot_shpd_l4)+&#039;&lt;/td&gt;&lt;td&gt;Date 1st Rcvd&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(r.date_1st_rcvd)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Prj 26 Wks&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.prj_26wks)+&#039;&lt;/td&gt;&lt;td&gt;Total Shpd L13w&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.tot_shpd_l13w)+&#039;&lt;/td&gt;&lt;td&gt;Last Whs Rcvd&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(r.last_whs_rcvd)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Manual demand (rollup)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.manual_demand_26w)+&#039;&lt;/td&gt;&lt;td&gt;Total Shpd LTD&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.tot_shpd_ltd)+&#039;&lt;/td&gt;&lt;td&gt;1st Out Date&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(r.first_out_date)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Demand (Inv Flow 26w S)&lt;/td&gt;&lt;td class=&quot;right&quot;&gt;&#039;+fmt(r.demand_26w)+&#039;&lt;/td&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;/td&gt;&lt;td&gt;Last OOS Date&lt;/td&gt;&lt;td&gt;&#039;+fmtDate(r.last_oos_date)+&#039;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;div class=&quot;stat-text&quot; style=&quot;margin-top:4px;&quot;&gt;&lt;b&gt;Days OOS till Next Rcpt:&lt;/b&gt; &#039;+fmt(r.days_oos_next_rcpt)+&#039; &#183; &lt;b&gt;Days OOS L12m:&lt;/b&gt; &#039;+fmt(r.days_oos_l12m)+&#039;&lt;/div&gt;&#039;;<BR/>
+<BR/>
+  function kpi(label,value,hint,color){return &#039;&lt;div class=&quot;kpi&quot;&#039;+(hint?&#039; title=&quot;&#039;+esc(hint)+&#039;&quot;&#039;:&#039;&#039;)+&#039;&gt;  &lt;div class=&quot;kpi-lbl&quot;&gt;&#039;+label+&#039;&lt;/div&gt;&lt;div class=&quot;kpi-val&quot; style=&quot;&#039;+(color?&#039;color:&#039;+color+&#039;;&#039;)+&#039;&quot;&gt;&#039;+value+&#039;&lt;/div&gt;&lt;/div&gt;&#039;;}<BR/>
+  function wosColor(w){if(w==null||w===0)return&#039;#888&#039;;if(w&lt;r.opt_wos)return&#039;#c62828&#039;;if(w&gt;26)return&#039;#1b5e20&#039;;return&#039;#0d47a1&#039;;}<BR/>
+  function excessColor(e){return e&gt;2500?&#039;#c62828&#039;:(e&lt;-2500?&#039;#e65100&#039;:&#039;#1b5e20&#039;);}<BR/>
+  function oosColor(d){return d&gt;14?&#039;#c62828&#039;:(d&gt;0?&#039;#e65100&#039;:&#039;#1b5e20&#039;);}<BR/>
+  var kpiStrip=&#039;&lt;div class=&quot;kpi-strip&quot;&gt;&#039;+kpi(&#039;ATS Now&#039;,fmt(r.ats_now),&#039;Available to sell &#151; after holds / allocations&#039;,r.ats_now&lt;0?&#039;#c62828&#039;:&#039;&#039;)+kpi(&#039;ATS WOS OH&#039;,fmt(r.ats_wos_oh),&#039;Weeks of supply on hand (per QB)&#039;,wosColor(r.ats_wos_oh))+kpi(&#039;Open Cust PO&#039;,fmt(r.open_cust_po_qty),&#039;Outstanding customer PO qty awaiting shipment&#039;,&#039;&#039;)+kpi(&#039;Hold Qty&#039;,fmt(r.hold_qty),&#039;Hold Order Qty &#151; orders parked, not shipping&#039;,r.hold_qty&gt;0?&#039;#e65100&#039;:&#039;&#039;)+kpi(&#039;Days?Next Rcpt&#039;,fmt(r.days_oos_next_rcpt),&#039;Days OOS until next supplier receipt arrives&#039;,oosColor(r.days_oos_next_rcpt))+kpi(&#039;Pipe Excess&#039;,fmt(r.pipeline_excess),&#039;Total pipeline - 26w demand - safety stock. Positive = overstock&#039;,excessColor(r.pipeline_excess))+kpi(&#039;PipeWOS&#039;,(r.pipeline_wos==null?&#039;8&#039;:fmt(r.pipeline_wos)),&#039;Pipeline weeks of supply (all I/T + I/W + OH &#247; 26w demand)&#039;,&#039;&#039;)+kpi(&#039;LT + CNY&#039;,fmt(r.lt_wks)+&#039; + &#039;+fmt(r.cny_weeks),&#039;Lead time (weeks) + Chinese New Year shutdown weeks&#039;,&#039;&#039;)+kpi(&#039;Days OOS L12m&#039;,fmt(r.days_oos_l12m),&#039;Days out-of-stock in trailing 12 months&#039;,r.days_oos_l12m&gt;30?&#039;#c62828&#039;:&#039;&#039;)+kpi(&#039;Customers&#039;,fmt(r.customer_count),&#039;Active Acct-MStyles rolled up into this mstyle&#039;,&#039;&#039;)+kpi(&#039;Manual Demand&#039;,fmt(r.manual_demand_26w),&#039;26-week sum of customer manual projections (rolled up)&#039;,&#039;&#039;)+&#039;&lt;/div&gt;&#039;+(r.is_multi?&#039;&lt;div style=&quot;margin-top:8px;padding:6px 10px;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;font-size:11px;color:#5d4037;&quot;&gt;&amp;#127873; &lt;b&gt;Multi-pack:&lt;/b&gt; Each unit = &#039;+r.pcs_per_kit+&#039; pcs of root &lt;b&gt;&#039;+esc(r.root_mstyle)+&#039;&lt;/b&gt;. Root OH: &lt;b&gt;&#039;+fmt(r.qty_oh_root)+&#039;&lt;/b&gt; pcs ? can assemble &lt;b&gt;&#039;+fmt(r.assembleable_kits)+&#039;&lt;/b&gt; more kits.&lt;/div&gt;&#039;:&#039;&#039;);<BR/>
+<BR/>
+  var totalAged=(r.aged_inv_0_90||0)+(r.aged_inv_91_180||0)+(r.aged_inv_181_365||0)+(r.aged_inv_365plus||0);<BR/>
+  function agePct(n){return totalAged&gt;0?&#039; (&#039;+Math.round(n/totalAged*100)+&#039;%)&#039;:&#039;&#039;;}<BR/>
+  function ageColor(days){return days&gt;180?&#039;#c62828&#039;:days&gt;90?&#039;#e65100&#039;:&#039;inherit&#039;;}<BR/>
+  var agedInvHtml=&#039;&lt;div class=&quot;kv-grid&quot;&gt;&lt;div&gt;&lt;b&gt;Inv Age (Days):&lt;/b&gt; &lt;span style=&quot;color:&#039;+ageColor(r.invtry_age_days)+&#039;&quot;&gt;&#039;+fmt(r.invtry_age_days)+&#039;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;% Time In Stock:&lt;/b&gt; &#039;+(r.pct_time_in_stock&gt;0?fmt(r.pct_time_in_stock)+&#039;%&#039;:&#039;&#151;&#039;)+&#039;&lt;/div&gt;&lt;div&gt;&lt;b&gt;0&#150;90 Days:&lt;/b&gt; &#039;+fmt(r.aged_inv_0_90)+agePct(r.aged_inv_0_90)+&#039;&lt;/div&gt;&lt;div&gt;&lt;b&gt;91&#150;180 Days:&lt;/b&gt; &lt;span style=&quot;color:&#039;+(r.aged_inv_91_180&gt;0?&#039;#e65100&#039;:&#039;inherit&#039;)+&#039;&quot;&gt;&#039;+fmt(r.aged_inv_91_180)+agePct(r.aged_inv_91_180)+&#039;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;181&#150;365 Days:&lt;/b&gt; &lt;span style=&quot;color:&#039;+(r.aged_inv_181_365&gt;0?&#039;#c62828&#039;:&#039;inherit&#039;)+&#039;&quot;&gt;&#039;+fmt(r.aged_inv_181_365)+agePct(r.aged_inv_181_365)+&#039;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&amp;gt;365 Days:&lt;/b&gt; &lt;span style=&quot;color:&#039;+(r.aged_inv_365plus&gt;0?&#039;#c62828&#039;:&#039;inherit&#039;)+&#039;;font-weight:&#039;+(r.aged_inv_365plus&gt;0?&#039;700&#039;:&#039;400&#039;)+&#039;&quot;&gt;&#039;+fmt(r.aged_inv_365plus)+agePct(r.aged_inv_365plus)+&#039;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&#039;;<BR/>
+<BR/>
+  return &#039;&lt;div class=&quot;dwrap&quot;&gt;&lt;div class=&quot;section&quot; style=&quot;padding:10px 14px;&quot;&gt;&lt;div style=&quot;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;&quot;&gt;&#039;+identityBox+itemDataBox+overstockBox+&#039;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;section&quot;&gt;&lt;h3&gt;&amp;#128230; Inventory Flow &lt;span style=&quot;font-size:10px;font-weight:400;color:#888;&quot;&gt;&#151; hover Expected Receipts cells for PO detail &#183; hover Prj Demand cells for customer breakdown&lt;/span&gt;&lt;/h3&gt;&lt;div style=&quot;overflow-x:auto&quot;&gt;&#039;+invFlow+&#039;&lt;/div&gt;&#039;+kpiStrip+&#039;&lt;/div&gt;&lt;div class=&quot;section&quot;&gt;&lt;h3&gt;&amp;#128202; Inventory Positions &amp;amp; WOS&lt;/h3&gt;&#039;+atsHtml+&#039;&lt;/div&gt;&lt;div class=&quot;section&quot;&gt;&lt;h3&gt;&amp;#128200; Demand &amp;amp; Shipments&lt;/h3&gt;&#039;+demandHtml+&#039;&lt;/div&gt;&lt;div class=&quot;section&quot;&gt;&lt;h3&gt;&amp;#128197; Aged Inventory&lt;/h3&gt;&#039;+agedInvHtml+&#039;&lt;/div&gt;&lt;div class=&quot;section&quot;&gt;&lt;h3&gt;&amp;#128680; OOS Gap Detail&lt;/h3&gt;&#039;+gapDetail+&#039;&lt;/div&gt;&lt;div class=&quot;section&quot;&gt;&lt;h3&gt;&amp;#127919; Recommended Actions&lt;/h3&gt;&#039;+recs+&#039;&lt;/div&gt;&lt;/div&gt;&#039;;<BR/>
+}<BR/>
+<BR/>
+// -- Reco spreadsheet ----------------------------------------------------------<BR/>
+function addToRecoSheet(btn) {<BR/>
+  var d=btn.dataset;<BR/>
+  recoSheet.push({mstyle:d.mstyle,action:d.action,po_number:d.po,supplier:d.supplier,qty_open:d.qty,curr_etd:d.currEtd,curr_eta:d.currEta,req_etd:d.reqEtd,req_eta:d.reqEta});<BR/>
+  btn.textContent=&#039;? Added&#039;;btn.disabled=true;btn.style.background=&#039;#e8f5e9&#039;;btn.style.color=&#039;#2e7d32&#039;;btn.style.borderColor=&#039;#a5d6a7&#039;;<BR/>
+  var badge=document.getElementById(&#039;recoBadge&#039;);if(badge){badge.textContent=recoSheet.length;badge.style.display=&#039;inline&#039;;}<BR/>
+}<BR/>
+function generateRecoSheet() {<BR/>
+  if(!recoSheet.length){alert(&#039;No recommendations added yet.\nOpen a record and click &quot;Add to Excel&quot; on any recommendation card.&#039;);return;}<BR/>
+  var headers=[&#039;Mstyle&#039;,&#039;Action&#039;,&#039;PO #&#039;,&#039;Supplier&#039;,&#039;Qty Open&#039;,&#039;Current ETD&#039;,&#039;Current ETA&#039;,&#039;Requested ETD&#039;,&#039;Requested ETA&#039;];<BR/>
+  var rows=recoSheet.map(function(r){return[r.mstyle,r.action,r.po_number,r.supplier,r.qty_open,r.curr_etd,r.curr_eta,r.req_etd,r.req_eta];});<BR/>
+  var csv=[headers].concat(rows).map(function(row){return row.map(function(v){return&#039;&quot;&#039;+String(v!=null?v:&#039;&#039;).replace(/&quot;/g,&#039;&quot;&quot;&#039;)+&#039;&quot;&#039;;}).join(&#039;,&#039;);}).join(&#039;\n&#039;);<BR/>
+  var blob=new Blob([&#039;?&#039;+csv],{type:&#039;text/csv;charset=utf-8;&#039;});<BR/>
+  var a=document.createElement(&#039;a&#039;);a.href=URL.createObjectURL(blob);a.download=&#039;PO_Recommendations_&#039;+new Date().toISOString().slice(0,10)+&#039;.csv&#039;;a.click();<BR/>
+}<BR/>
+<BR/>
+// -- Boot ----------------------------------------------------------------------<BR/>
+async function boot() {<BR/>
+  var scr=document.getElementById(&#039;loadingScreen&#039;);<BR/>
+  setStep(1,&#039;active&#039;);setBar(5);setStatus(&#039;Checking cache&#133;&#039;);<BR/>
+<BR/>
+  var cached=loadCache();<BR/>
+  if(cached){<BR/>
+    setBar(80);setStatus(&#039;Loading from cache&#133;&#039;);<BR/>
+    ALL=cached.data;<BR/>
+    var asOf=document.getElementById(&#039;dataAsOf&#039;);<BR/>
+    if(asOf)asOf.textContent=&#039;Data as of &#039;+fmtTimestamp(cached.ts)+&#039; (cached)&#039;;<BR/>
+    setBar(90);setStatus(&#039;Building view&#133;&#039;);<BR/>
+    setStep(4,&#039;active&#039;);<BR/>
+    buildFilterDropdowns();buildTableHead();applyFilters();<BR/>
+    setBar(100);setStep(4,&#039;done&#039;);<BR/>
+    await new Promise(function(r){setTimeout(r,350);});<BR/>
+    if(scr){scr.classList.add(&#039;hidden&#039;);setTimeout(function(){scr.style.display=&#039;none&#039;;},500);}<BR/>
+    return;<BR/>
+  }<BR/>
+<BR/>
+  try {<BR/>
+    var records=await loadData();<BR/>
+    ALL=records;<BR/>
+    saveCache(records);<BR/>
+    setStep(4,&#039;active&#039;);setBar(85);setStatus(&#039;Building view&#133;&#039;);<BR/>
+    await new Promise(function(r){setTimeout(r,50);});<BR/>
+    buildFilterDropdowns();buildTableHead();applyFilters();<BR/>
+    var ts=Date.now();<BR/>
+    var asOf=document.getElementById(&#039;dataAsOf&#039;);<BR/>
+    if(asOf)asOf.textContent=&#039;Data as of &#039;+fmtTimestamp(ts);<BR/>
+    setBar(100);setStep(4,&#039;done&#039;);setStatus(&#039;Ready!&#039;);<BR/>
+    await new Promise(function(r){setTimeout(r,350);});<BR/>
+    if(scr){scr.classList.add(&#039;hidden&#039;);setTimeout(function(){scr.style.display=&#039;none&#039;;},500);}<BR/>
+  } catch(err) {<BR/>
+    var msg = err.message || String(err);<BR/>
+    setStatus(&#039;Load failed&#039;);<BR/>
+    console.error(&#039;P+P Inventory Manager boot error:&#039;, err);<BR/>
+    document.getElementById(&#039;loadSteps&#039;).innerHTML =<BR/>
+      &#039;&lt;div style=&quot;color:#ff8a65;font-size:13px;font-weight:600;margin-bottom:6px;&quot;&gt;Error loading data:&lt;/div&gt;&#039; +<BR/>
+      &#039;&lt;div style=&quot;color:#ffcdd2;font-size:12px;word-break:break-all;&quot;&gt;&#039; + esc(msg) + &#039;&lt;/div&gt;&#039; +<BR/>
+      &#039;&lt;div style=&quot;margin-top:12px;&quot;&gt;&lt;button onclick=&quot;refreshData()&quot; style=&quot;padding:6px 16px;background:#fff;color:#0d47a1;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;&quot;&gt;Retry&lt;/button&gt;&lt;/div&gt;&#039;;<BR/>
+    setBar(100);<BR/>
+    document.getElementById(&#039;loadBar&#039;).style.background=&#039;#ef5350&#039;;<BR/>
+  }<BR/>
+}<BR/>
+<BR/>
+async function refreshData() {<BR/>
+  localStorage.removeItem(CACHE_KEY);<BR/>
+  ALL=[];FILTERED=[];<BR/>
+  document.getElementById(&#039;tbody&#039;).innerHTML=&#039;&#039;;<BR/>
+  document.getElementById(&#039;statsBar&#039;).innerHTML=&#039;&#039;;<BR/>
+  var scr=document.getElementById(&#039;loadingScreen&#039;);<BR/>
+  if(scr){scr.style.display=&#039;flex&#039;;scr.classList.remove(&#039;hidden&#039;);}<BR/>
+  document.getElementById(&#039;loadBar&#039;).style.width=&#039;0%&#039;;<BR/>
+  document.getElementById(&#039;loadSteps&#039;).innerHTML=&#039;&lt;div id=&quot;ls1&quot; class=&quot;pending&quot;&gt;Check cache&lt;/div&gt;&lt;div id=&quot;ls2&quot; class=&quot;pending&quot;&gt;Load Inventory Flow&lt;/div&gt;&lt;div id=&quot;ls3&quot; class=&quot;pending&quot;&gt;Load Projections&lt;/div&gt;&lt;div id=&quot;ls4&quot; class=&quot;pending&quot;&gt;Build view&lt;/div&gt;&#039;;<BR/>
+  await boot();<BR/>
+}<BR/>
+<BR/>
+// -- Wire up controls ----------------------------------------------------------<BR/>
+document.getElementById(&#039;searchInput&#039;).oninput=applyFilters;<BR/>
+document.getElementById(&#039;actionFilter&#039;).onchange=applyFilters;<BR/>
+document.getElementById(&#039;countryFilter&#039;).onchange=applyFilters;<BR/>
+document.getElementById(&#039;brandFilter&#039;).onchange=applyFilters;<BR/>
+document.getElementById(&#039;invMgrFilter&#039;).onchange=applyFilters;<BR/>
+document.getElementById(&#039;replenOnly&#039;).onchange=applyFilters;<BR/>
+document.getElementById(&#039;gapsOnly&#039;).onchange=applyFilters;<BR/>
+document.getElementById(&#039;overstockOnly&#039;).onchange=applyFilters;<BR/>
+document.getElementById(&#039;hideMulti&#039;).onchange=function(){buildTableHead();applyFilters();};<BR/>
+document.getElementById(&#039;clearBtn&#039;).onclick=function(){<BR/>
+  document.getElementById(&#039;searchInput&#039;).value=&#039;&#039;;<BR/>
+  document.getElementById(&#039;actionFilter&#039;).value=&#039;&#039;;<BR/>
+  document.getElementById(&#039;countryFilter&#039;).value=&#039;&#039;;<BR/>
+  document.getElementById(&#039;brandFilter&#039;).value=&#039;&#039;;<BR/>
+  document.getElementById(&#039;invMgrFilter&#039;).value=&#039;&#039;;<BR/>
+  document.getElementById(&#039;replenOnly&#039;).checked=false;<BR/>
+  document.getElementById(&#039;gapsOnly&#039;).checked=false;<BR/>
+  document.getElementById(&#039;overstockOnly&#039;).checked=false;<BR/>
+  document.getElementById(&#039;hideMulti&#039;).checked=true;<BR/>
+  Object.keys(colFilters).forEach(function(k){delete colFilters[k];});<BR/>
+  priorityFilter=&#039;&#039;;<BR/>
+  currentSort={id:null,dir:1};<BR/>
+  buildTableHead();applyFilters();<BR/>
+};<BR/>
+<BR/>
+boot();<BR/>
+&lt;/script&gt;<BR/>
+&lt;/body&gt;&lt;/html&gt;<BR/>
+
+	</pagebody>
+</qdbapi>
+
