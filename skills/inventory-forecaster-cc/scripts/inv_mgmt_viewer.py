@@ -1296,8 +1296,6 @@ def build_records(mstyle_filter: Optional[list[str]] = None,
             first_shpd_date=ivf.get("first_shpd_date"),
             first_out_date=ivf.get("first_out_date"),
             # Text summaries
-            shipment_status_summary=ivf.get("shipment_status_summary", ""),
-            ats_summary=ivf.get("ats_summary", ""),
             inventory_notes=ivf.get("inventory_notes", ""),
             style_alert=ivf.get("style_alert", ""),
             oos_priority_notes=ivf.get("oos_priority_notes", ""),
