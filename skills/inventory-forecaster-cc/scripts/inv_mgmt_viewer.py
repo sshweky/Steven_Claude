@@ -2786,7 +2786,7 @@ def main():
             except Exception:
                 _count = "?"
             print(f"[InvMgmt] Serving {_count} cached records — to refresh from QB, restart with --refresh", flush=True)
-            serve(port=args.port, open_browser=not args.no_browser)
+            serve(port=args.port, open_browser=not args.no_browser, host=args.host)
             return
 
     # ── Start server immediately so browser can connect (returns 503 until data ready) ──
