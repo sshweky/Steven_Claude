@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html><head>
 <meta charset="utf-8">
 <title>P+P Inventory Manager</title>
@@ -107,8 +107,7 @@
   table.main thead tr:first-child th { position:sticky; top:0; }
   .sort-arrow { display:inline-block; margin-left:3px; color:#0d47a1; font-size:10px; }
 </style>
-<script src="/db/bpd24h9wy?a=dbpage&pageID=56"></script>
-</head><body onload="(function(){var s=document.createElement('script');s.src='/db/bpd24h9wy?a=dbpage&pageID=56';document.head.appendChild(s);})()">
+</head><body>
 
 <div id="loadingScreen">
   <div id="loadIcon">&#127981;</div>
@@ -167,5 +166,6 @@
 </table>
 </div>
 
-
+<!-- Script MUST be at end of body so DOM is fully parsed before JS runs -->
+<script src="/db/bpd24h9wy?a=dbpage&pageID=56"></script>
 </body></html>
