@@ -178,7 +178,7 @@ const clsPct = (n) => n==null||Math.abs(n)<0.005?"neutral":n>0?"pos":"neg";
 
 // -------------- Sparkline (mini SVG) --------------
 function Spark({data, color="#0c447c"}){
-  if(!data || data.length<2) return <span className="hint">\u2014</span>;
+  if(!data || data.length<2) return <span className="hint">&mdash;</span>;
   const w=80,h=24,pad=2;
   const min = Math.min(...data), max=Math.max(...data);
   const range = max-min || 1;
@@ -295,15 +295,15 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
     <div className="panel">
       <div className="panel-hdr">
         <div>
-          <div className="mono" style={{fontSize:12,color:"var(--muted)"}}>{asin.asin} \u00B7 {asin.brand}</div>
+          <div className="mono" style={{fontSize:12,color:"var(--muted)"}}>{asin.asin} &middot; {asin.brand}</div>
           <h3 style={{marginTop:4}}>{asin.description || "\u2014"}</h3>
           <div style={{marginTop:8, display:"flex", gap:6, flexWrap:"wrap"}}>
             <Badge bucket={asin.bucket} label={asin.bucket_label} />
-            {asin.mixed_signal && <span className="flag">\u21C4 Mixed signal</span>}
-            {asin.volatile && <span className="flag vol">\u2248 Volatile</span>}
+            {asin.mixed_signal && <span className="flag">&#8644; Mixed signal</span>}
+            {asin.volatile && <span className="flag vol">&#8776; Volatile</span>}
           </div>
         </div>
-        <button className="x" onClick={onClose} aria-label="Close panel">\u2715</button>
+        <button className="x" onClick={onClose} aria-label="Close panel">&times;</button>
       </div>
 
       {/* Three trend windows */}
@@ -311,17 +311,17 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
         <div className="tile">
           <div className="lbl">L4W vs L13W</div>
           <div className={`val ${cls(comp13)}`}>{fmtIdx(comp13)}</div>
-          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l13"+suffix])} \u00B7 Rev {fmtIdx(ri["l4_vs_l13"+suffix])}</div>
+          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l13"+suffix])} &middot; Rev {fmtIdx(ri["l4_vs_l13"+suffix])}</div>
         </div>
         <div className="tile">
           <div className="lbl">L4W vs L26W</div>
           <div className={`val ${cls(comp26)}`}>{fmtIdx(comp26)}</div>
-          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l26"+suffix])} \u00B7 Rev {fmtIdx(ri["l4_vs_l26"+suffix])}</div>
+          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l26"+suffix])} &middot; Rev {fmtIdx(ri["l4_vs_l26"+suffix])}</div>
         </div>
         <div className="tile">
           <div className="lbl">L4W vs L52W</div>
           <div className={`val ${cls(comp52)}`}>{fmtIdx(comp52)}</div>
-          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l52"+suffix])} \u00B7 Rev {fmtIdx(ri["l4_vs_l52"+suffix])}</div>
+          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l52"+suffix])} &middot; Rev {fmtIdx(ri["l4_vs_l52"+suffix])}</div>
         </div>
       </div>
 
@@ -342,7 +342,7 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
         ))}
       </div>
       <div className="chart-header">
-        <div className="chart-title">Weekly trend \u00B7 last 52 weeks</div>
+        <div className="chart-title">Weekly trend &middot; last 52 weeks</div>
         <div className="chart-legend">
           <span className="lk"><span className="sw" style={{background:"#378ADD"}}></span>Ordered units</span>
           <span className="lk"><span className="sw" style={{background:"#BA7517"}}></span>L4W window</span>
@@ -362,7 +362,7 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
       <div className="narr">{asin.drivers_narrative}</div>
 
       {/* Drivers ranked */}
-      <h4 style={{marginTop:18,marginBottom:8}}>Drivers \u00B7 L4W vs L13W</h4>
+      <h4 style={{marginTop:18,marginBottom:8}}>Drivers &middot; L4W vs L13W</h4>
       {(asin.drivers_ranked||[]).length===0 && <div className="empty" style={{padding:0}}>No driver changes large enough to flag.</div>}
       {(asin.drivers_ranked||[]).map((d,i)=>(
         <div className="driver-row" key={i}>
@@ -462,7 +462,7 @@ function App(){
       <div className="hdr">
         <div className="ttl">
           <h1>Amazon Trend Analyzer</h1>
-          <span className="sub">{PAYLOAD.asin_count.toLocaleString()} ASINs \u00B7 baseline mode: {baselineMode}</span>
+          <span className="sub">{PAYLOAD.asin_count.toLocaleString()} ASINs &middot; baseline mode: {baselineMode}</span>
         </div>
         <div className="meta">
           <span>Generated {new Date(PAYLOAD.generated_at).toLocaleString()}</span>
@@ -517,8 +517,8 @@ function App(){
             </select>
             <span className="lbl" style={{marginLeft:12}}>Flag</span>
             <span className={`chip ${flagFilter==="all"?"active":""}`} onClick={()=>setFlagFilter("all")}>All</span>
-            <span className={`chip ${flagFilter==="mixed"?"active":""}`} onClick={()=>setFlagFilter("mixed")}>\u21C4 Mixed signal</span>
-            <span className={`chip ${flagFilter==="volatile"?"active":""}`} onClick={()=>setFlagFilter("volatile")}>\u2248 Volatile</span>
+            <span className={`chip ${flagFilter==="mixed"?"active":""}`} onClick={()=>setFlagFilter("mixed")}>&#8644; Mixed signal</span>
+            <span className={`chip ${flagFilter==="volatile"?"active":""}`} onClick={()=>setFlagFilter("volatile")}>&#8776; Volatile</span>
             <input type="text" placeholder="Search ASIN, brand, description..."
                    value={search} onChange={e=>setSearch(e.target.value)}
                    style={{marginLeft:"auto", minWidth:240}} />
@@ -553,8 +553,8 @@ function App(){
                         onClick={()=>setSelected(a)}>
                       <td className="mono">{a.asin}</td>
                       <td>{a.brand}
-                        {a.mixed_signal && <span className="flag">\u21C4</span>}
-                        {a.volatile && <span className="flag vol">\u2248</span>}
+                        {a.mixed_signal && <span className="flag">&#8644;</span>}
+                        {a.volatile && <span className="flag vol">&#8776;</span>}
                       </td>
                       <td className="desc" title={a.description || ""}>{a.description || "\u2014"}</td>
                       <td><Badge bucket={a.bucket} label={a.bucket_label} /></td>
@@ -571,13 +571,13 @@ function App(){
               </tbody>
             </table>
             <div className="pagination">
-              <span>Showing {page*ROWS_PER_PAGE+1}\u2013{Math.min((page+1)*ROWS_PER_PAGE, filtered.length)} of {filtered.length}</span>
+              <span>Showing {page*ROWS_PER_PAGE+1}&ndash;{Math.min((page+1)*ROWS_PER_PAGE, filtered.length)} of {filtered.length}</span>
               <span style={{display:"flex",gap:6}}>
-                <button onClick={()=>setPage(0)} disabled={page===0}>\u00AB First</button>
-                <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0}>\u2039 Prev</button>
+                <button onClick={()=>setPage(0)} disabled={page===0}>&laquo; First</button>
+                <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0}>&lsaquo; Prev</button>
                 <span style={{padding:"4px 8px"}}>Page {page+1} of {totalPages}</span>
-                <button onClick={()=>setPage(Math.min(totalPages-1,page+1))} disabled={page>=totalPages-1}>Next \u203A</button>
-                <button onClick={()=>setPage(totalPages-1)} disabled={page>=totalPages-1}>Last \u00BB</button>
+                <button onClick={()=>setPage(Math.min(totalPages-1,page+1))} disabled={page>=totalPages-1}>Next &rsaquo;</button>
+                <button onClick={()=>setPage(totalPages-1)} disabled={page>=totalPages-1}>Last &raquo; </button>
               </span>
             </div>
             </>
