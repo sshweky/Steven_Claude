@@ -41,42 +41,42 @@ VOLATILE_CV = 0.30
 
 BUCKETS = {
     # All three positive → strongest growth story
-    ( 1,  1,  1): ("strong_winner",   "▲ Strong Winner"),
+    ( 1,  1,  1): ("strong_winner",   "Strong Winner"),
 
     # Recent up, longer-term up, lapping flat/soft year
-    ( 1,  1,  0): ("accelerating",    "↑ Accelerating"),
-    ( 1,  1, -1): ("accelerating",    "↑ Accelerating"),
+    ( 1,  1,  0): ("accelerating",    "Accelerating"),
+    ( 1,  1, -1): ("accelerating",    "Accelerating"),
 
     # Recent up, mid-term flat, long-term up
-    ( 1,  0,  1): ("recovering",      "↻ Recovering"),
-    ( 1,  0,  0): ("recovering",      "↻ Recovering"),
-    ( 1, -1,  1): ("recovering",      "↻ Recovering"),
+    ( 1,  0,  1): ("recovering",      "Recovering"),
+    ( 1,  0,  0): ("recovering",      "Recovering"),
+    ( 1, -1,  1): ("recovering",      "Recovering"),
 
     # Recent up but trend still down at every other horizon
-    ( 1,  0, -1): ("surge_on_decline","⚠ Surge on Decline"),
-    ( 1, -1, -1): ("surge_on_decline","⚠ Surge on Decline"),
-    ( 1, -1,  0): ("surge_on_decline","⚠ Surge on Decline"),
+    ( 1,  0, -1): ("surge_on_decline","Surge on Decline"),
+    ( 1, -1, -1): ("surge_on_decline","Surge on Decline"),
+    ( 1, -1,  0): ("surge_on_decline","Surge on Decline"),
 
     # Recent flat / mild dip with healthy long-term — watch list
-    ( 0,  1,  1): ("cooling_winner",  "▽ Cooling Winner"),
-    ( 0,  0,  1): ("cooling_winner",  "▽ Cooling Winner"),
-    ( 0,  1,  0): ("stable",          "● Stable"),
-    ( 0,  0,  0): ("stable",          "● Stable"),
-    ( 0, -1,  0): ("soft",            "○ Soft"),
-    ( 0,  0, -1): ("soft",            "○ Soft"),
+    ( 0,  1,  1): ("cooling_winner",  "Cooling Winner"),
+    ( 0,  0,  1): ("cooling_winner",  "Cooling Winner"),
+    ( 0,  1,  0): ("stable",          "Stable"),
+    ( 0,  0,  0): ("stable",          "Stable"),
+    ( 0, -1,  0): ("soft",            "Soft"),
+    ( 0,  0, -1): ("soft",            "Soft"),
 
     # Recent down, mixed
-    (-1,  1,  1): ("cooling_winner",  "▽ Cooling Winner"),
-    (-1,  0,  1): ("new_decline",     "↓ New Decline"),
-    (-1, -1,  1): ("new_decline",     "↓ New Decline"),
-    (-1,  1,  0): ("cooling_winner",  "▽ Cooling Winner"),
-    (-1,  1, -1): ("lapping_softness","↻ Lapping Softness"),
-    (-1, -1,  0): ("sustained_decline","▼ Sustained Decline"),
+    (-1,  1,  1): ("cooling_winner",  "Cooling Winner"),
+    (-1,  0,  1): ("new_decline",     "New Decline"),
+    (-1, -1,  1): ("new_decline",     "New Decline"),
+    (-1,  1,  0): ("cooling_winner",  "Cooling Winner"),
+    (-1,  1, -1): ("lapping_softness","Lapping Softness"),
+    (-1, -1,  0): ("sustained_decline","Sustained Decline"),
 
     # All three negative → sustained decline
-    (-1, -1, -1): ("sustained_decline","▼ Sustained Decline"),
-    (-1,  0,  0): ("soft",            "○ Soft"),
-    (-1,  0, -1): ("sustained_decline","▼ Sustained Decline"),
+    (-1, -1, -1): ("sustained_decline","Sustained Decline"),
+    (-1,  0,  0): ("soft",            "Soft"),
+    (-1,  0, -1): ("sustained_decline","Sustained Decline"),
 }
 
 
@@ -93,7 +93,7 @@ def _sign(idx: float, threshold: float = SIGN_THRESHOLD) -> int:
 
 def bucket_from_pattern(s13: int, s26: int, s52: int) -> tuple[str, str]:
     """Return (bucket_key, bucket_label) for a 3-sign pattern."""
-    return BUCKETS.get((s13, s26, s52), ("stable", "● Stable"))
+    return BUCKETS.get((s13, s26, s52), ("stable", "Stable"))
 
 
 # -----------------------------------------------------------------------------

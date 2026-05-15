@@ -153,6 +153,44 @@ Format a markdown response with:
 
 ---
 
+## Phase 5 — Publish to Quickbase as a Code Page (production)
+
+For always-on access in QB, use the **two-Code-Page architecture**:
+
+| Page | Contents | Refresh cadence |
+|---|---|---|
+| `amazon-trend-data.json` | The data payload (~14MB) | Nightly |
+| `amazon-trend-dashboard.html` | React/Chart.js shell (~50KB) | Only when UI changes |
+
+The HTML page fetches the JSON page on load. Same pattern as the Nielsen
+dashboard.
+
+### Build the data-only JSON
+```bash
+python scripts/build_dashboard_from_chunks.py \
+    --emit-json ./qb_chunks/amazon-trend-data.json
+```
+
+### Publish both pages
+```bash
+export QB_REALM="petspeople.quickbase.com"   # operational realm
+export QB_USER_TOKEN="b9xxx_xxxx_xxxx"
+export QB_APP_DBID="bqkdiemav"               # parent app for the Code Pages
+python scripts/trend_dashboard_publish.py
+```
+
+First run prints two pageids. Pin them so future runs replace in place:
+```bash
+export QB_DATA_PAGE_ID=12
+export QB_HTML_PAGE_ID=13
+```
+
+See `scripts/CODEPAGE_PUBLISH_README.md` for full details, scheduling, and
+the differences between `pim.quickbase.com` (where Daily_Metrics lives) and
+`petspeople.quickbase.com` (where the Code Pages live).
+
+---
+
 ## Defensive rules (do not skip)
 
 1. **Always call getInstructions first** — every session, no exceptions.

@@ -151,34 +151,34 @@ window.__CHUNK_NAME_FMT = (i) => `amazon-trend-data-${String(i+1).padStart(3,'0'
 const {useState,useMemo,useEffect,useRef} = React;
 
 // -------------- Data load --------------
-// PAYLOAD is loaded async — see fetch chain below
+// PAYLOAD is loaded async \u2014 see fetch chain below
 let PAYLOAD = null;
 
 const BUCKETS = [
-  {key:"strong_winner",     label:"▲ Strong winner"},
-  {key:"accelerating",      label:"↑ Accelerating"},
-  {key:"recovering",        label:"↻ Recovering"},
-  {key:"cooling_winner",    label:"▽ Cooling winner"},
-  {key:"surge_on_decline",  label:"⚠ Surge on decline"},
-  {key:"stable",            label:"● Stable"},
-  {key:"soft",              label:"○ Soft"},
-  {key:"lapping_softness",  label:"↻ Lapping softness"},
-  {key:"new_decline",       label:"↓ New decline"},
-  {key:"sustained_decline", label:"▼ Sustained decline"},
-  {key:"no_data",           label:"— No data"},
+  {key:"strong_winner",     label:"\u25B2 Strong winner"},
+  {key:"accelerating",      label:"\u2191 Accelerating"},
+  {key:"recovering",        label:"\u21BB Recovering"},
+  {key:"cooling_winner",    label:"\u25BD Cooling winner"},
+  {key:"surge_on_decline",  label:"\u26A0 Surge on decline"},
+  {key:"stable",            label:"\u25CF Stable"},
+  {key:"soft",              label:"\u25CB Soft"},
+  {key:"lapping_softness",  label:"\u21BB Lapping softness"},
+  {key:"new_decline",       label:"\u2193 New decline"},
+  {key:"sustained_decline", label:"\u25BC Sustained decline"},
+  {key:"no_data",           label:"\u2014 No data"},
 ];
 
-const fmt$  = (n) => n==null?"—":"$"+Math.round(n).toLocaleString();
-const fmtK  = (n) => n==null?"—":n>=1000?"$"+(n/1000).toFixed(1)+"k":fmt$(n);
-const fmtN  = (n) => n==null?"—":Math.round(n).toLocaleString();
-const fmtPct = (n) => n==null?"—":((n>=0?"+":"")+(n*100).toFixed(1)+"%");
-const fmtIdx = (n) => n==null?"—":((n-1>=0?"+":"")+((n-1)*100).toFixed(1)+"%");
+const fmt$  = (n) => n==null?"$0":"$"+Math.round(n).toLocaleString();
+const fmtK  = (n) => n==null?"$0":n>=1000?"$"+(n/1000).toFixed(1)+"k":fmt$(n);
+const fmtN  = (n) => n==null?"0":Math.round(n).toLocaleString();
+const fmtPct = (n) => n==null?"0.0%":((n>=0?"+":"")+(n*100).toFixed(1)+"%");
+const fmtIdx = (n) => n==null?"0.0%":((n-1>=0?"+":"")+((n-1)*100).toFixed(1)+"%");
 const cls = (n) => n==null||Math.abs(n-1)<0.005?"neutral":n>1?"pos":"neg";
 const clsPct = (n) => n==null||Math.abs(n)<0.005?"neutral":n>0?"pos":"neg";
 
 // -------------- Sparkline (mini SVG) --------------
 function Spark({data, color="#0c447c"}){
-  if(!data || data.length<2) return <span className="hint">—</span>;
+  if(!data || data.length<2) return <span className="hint">\u2014</span>;
   const w=80,h=24,pad=2;
   const min = Math.min(...data), max=Math.max(...data);
   const range = max-min || 1;
@@ -195,8 +195,23 @@ function Spark({data, color="#0c447c"}){
 }
 
 // -------------- Bucket badge --------------
+// Icons come from this local JS map (not from the data) so they never travel
+// through QB's API where multi-byte chars get mangled to "?".
+const BUCKET_ICON = {
+  strong_winner:     "\u25B2",  // up triangle
+  accelerating:      "\u2191",  // up arrow
+  recovering:        "\u21BB",  // circular arrow
+  cooling_winner:    "\u25BD",  // white down triangle
+  surge_on_decline:  "\u26A0",  // warning sign
+  stable:            "\u25CF",  // filled circle
+  soft:              "\u25CB",  // empty circle
+  new_decline:       "\u2193",  // down arrow
+  sustained_decline: "\u25BC",  // filled down triangle
+  lapping_softness:  "\u21BB",  // circular arrow
+};
 function Badge({bucket, label}){
-  return <span className={`badge b-${bucket||"no_data"}`}>{label}</span>;
+  const icon = BUCKET_ICON[bucket] || "";
+  return <span className={`badge b-${bucket||"no_data"}`}>{icon} {label}</span>;
 }
 
 // -------------- Trend chart in drill-down --------------
@@ -280,15 +295,15 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
     <div className="panel">
       <div className="panel-hdr">
         <div>
-          <div className="mono" style={{fontSize:12,color:"var(--muted)"}}>{asin.asin} · {asin.brand}</div>
-          <h3 style={{marginTop:4}}>{asin.description || "—"}</h3>
+          <div className="mono" style={{fontSize:12,color:"var(--muted)"}}>{asin.asin} \u00B7 {asin.brand}</div>
+          <h3 style={{marginTop:4}}>{asin.description || "\u2014"}</h3>
           <div style={{marginTop:8, display:"flex", gap:6, flexWrap:"wrap"}}>
             <Badge bucket={asin.bucket} label={asin.bucket_label} />
-            {asin.mixed_signal && <span className="flag">⇄ Mixed signal</span>}
-            {asin.volatile && <span className="flag vol">≈ Volatile</span>}
+            {asin.mixed_signal && <span className="flag">\u21C4 Mixed signal</span>}
+            {asin.volatile && <span className="flag vol">\u2248 Volatile</span>}
           </div>
         </div>
-        <button className="x" onClick={onClose} aria-label="Close panel">✕</button>
+        <button className="x" onClick={onClose} aria-label="Close panel">\u2715</button>
       </div>
 
       {/* Three trend windows */}
@@ -296,17 +311,17 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
         <div className="tile">
           <div className="lbl">L4W vs L13W</div>
           <div className={`val ${cls(comp13)}`}>{fmtIdx(comp13)}</div>
-          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l13"+suffix])} · Rev {fmtIdx(ri["l4_vs_l13"+suffix])}</div>
+          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l13"+suffix])} \u00B7 Rev {fmtIdx(ri["l4_vs_l13"+suffix])}</div>
         </div>
         <div className="tile">
           <div className="lbl">L4W vs L26W</div>
           <div className={`val ${cls(comp26)}`}>{fmtIdx(comp26)}</div>
-          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l26"+suffix])} · Rev {fmtIdx(ri["l4_vs_l26"+suffix])}</div>
+          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l26"+suffix])} \u00B7 Rev {fmtIdx(ri["l4_vs_l26"+suffix])}</div>
         </div>
         <div className="tile">
           <div className="lbl">L4W vs L52W</div>
           <div className={`val ${cls(comp52)}`}>{fmtIdx(comp52)}</div>
-          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l52"+suffix])} · Rev {fmtIdx(ri["l4_vs_l52"+suffix])}</div>
+          <div className="delta mono">Units {fmtIdx(ui["l4_vs_l52"+suffix])} \u00B7 Rev {fmtIdx(ri["l4_vs_l52"+suffix])}</div>
         </div>
       </div>
 
@@ -327,7 +342,7 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
         ))}
       </div>
       <div className="chart-header">
-        <div className="chart-title">Weekly trend · last 52 weeks</div>
+        <div className="chart-title">Weekly trend \u00B7 last 52 weeks</div>
         <div className="chart-legend">
           <span className="lk"><span className="sw" style={{background:"#378ADD"}}></span>Ordered units</span>
           <span className="lk"><span className="sw" style={{background:"#BA7517"}}></span>L4W window</span>
@@ -347,7 +362,7 @@ function Panel({asin, onClose, baselineMode, setBaselineMode}){
       <div className="narr">{asin.drivers_narrative}</div>
 
       {/* Drivers ranked */}
-      <h4 style={{marginTop:18,marginBottom:8}}>Drivers · L4W vs L13W</h4>
+      <h4 style={{marginTop:18,marginBottom:8}}>Drivers \u00B7 L4W vs L13W</h4>
       {(asin.drivers_ranked||[]).length===0 && <div className="empty" style={{padding:0}}>No driver changes large enough to flag.</div>}
       {(asin.drivers_ranked||[]).map((d,i)=>(
         <div className="driver-row" key={i}>
@@ -439,7 +454,7 @@ function App(){
     else { setSortBy(col); setSortDir("desc"); }
   }
 
-  const arrow = (col) => sortBy===col ? (sortDir==="asc"?" ↑":" ↓") : "";
+  const arrow = (col) => sortBy===col ? (sortDir==="asc"?" \u2191":" \u2193") : "";
 
   return (
     <div className="app">
@@ -447,7 +462,7 @@ function App(){
       <div className="hdr">
         <div className="ttl">
           <h1>Amazon Trend Analyzer</h1>
-          <span className="sub">{PAYLOAD.asin_count.toLocaleString()} ASINs · baseline mode: {baselineMode}</span>
+          <span className="sub">{PAYLOAD.asin_count.toLocaleString()} ASINs \u00B7 baseline mode: {baselineMode}</span>
         </div>
         <div className="meta">
           <span>Generated {new Date(PAYLOAD.generated_at).toLocaleString()}</span>
@@ -502,8 +517,8 @@ function App(){
             </select>
             <span className="lbl" style={{marginLeft:12}}>Flag</span>
             <span className={`chip ${flagFilter==="all"?"active":""}`} onClick={()=>setFlagFilter("all")}>All</span>
-            <span className={`chip ${flagFilter==="mixed"?"active":""}`} onClick={()=>setFlagFilter("mixed")}>⇄ Mixed signal</span>
-            <span className={`chip ${flagFilter==="volatile"?"active":""}`} onClick={()=>setFlagFilter("volatile")}>≈ Volatile</span>
+            <span className={`chip ${flagFilter==="mixed"?"active":""}`} onClick={()=>setFlagFilter("mixed")}>\u21C4 Mixed signal</span>
+            <span className={`chip ${flagFilter==="volatile"?"active":""}`} onClick={()=>setFlagFilter("volatile")}>\u2248 Volatile</span>
             <input type="text" placeholder="Search ASIN, brand, description..."
                    value={search} onChange={e=>setSearch(e.target.value)}
                    style={{marginLeft:"auto", minWidth:240}} />
@@ -538,10 +553,10 @@ function App(){
                         onClick={()=>setSelected(a)}>
                       <td className="mono">{a.asin}</td>
                       <td>{a.brand}
-                        {a.mixed_signal && <span className="flag">⇄</span>}
-                        {a.volatile && <span className="flag vol">≈</span>}
+                        {a.mixed_signal && <span className="flag">\u21C4</span>}
+                        {a.volatile && <span className="flag vol">\u2248</span>}
                       </td>
-                      <td className="desc" title={a.description || ""}>{a.description || "—"}</td>
+                      <td className="desc" title={a.description || ""}>{a.description || "\u2014"}</td>
                       <td><Badge bucket={a.bucket} label={a.bucket_label} /></td>
                       <td><Spark data={sparkData} color={
                         c13 > 1.05 ? "#0f6e56" : c13 < 0.95 ? "#791f1f" : "#6b6a64"} /></td>
@@ -556,13 +571,13 @@ function App(){
               </tbody>
             </table>
             <div className="pagination">
-              <span>Showing {page*ROWS_PER_PAGE+1}–{Math.min((page+1)*ROWS_PER_PAGE, filtered.length)} of {filtered.length}</span>
+              <span>Showing {page*ROWS_PER_PAGE+1}\u2013{Math.min((page+1)*ROWS_PER_PAGE, filtered.length)} of {filtered.length}</span>
               <span style={{display:"flex",gap:6}}>
-                <button onClick={()=>setPage(0)} disabled={page===0}>« First</button>
-                <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0}>‹ Prev</button>
+                <button onClick={()=>setPage(0)} disabled={page===0}>\u00AB First</button>
+                <button onClick={()=>setPage(Math.max(0,page-1))} disabled={page===0}>\u2039 Prev</button>
                 <span style={{padding:"4px 8px"}}>Page {page+1} of {totalPages}</span>
-                <button onClick={()=>setPage(Math.min(totalPages-1,page+1))} disabled={page>=totalPages-1}>Next ›</button>
-                <button onClick={()=>setPage(totalPages-1)} disabled={page>=totalPages-1}>Last »</button>
+                <button onClick={()=>setPage(Math.min(totalPages-1,page+1))} disabled={page>=totalPages-1}>Next \u203A</button>
+                <button onClick={()=>setPage(totalPages-1)} disabled={page>=totalPages-1}>Last \u00BB</button>
               </span>
             </div>
             </>
@@ -579,7 +594,7 @@ function App(){
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const setStatus = (msg) => root.render(<div style={{padding:"40px",textAlign:"center",color:"var(--muted)",fontFamily:"system-ui"}}>{msg}</div>);
-setStatus("Loading manifest…");
+setStatus("Loading manifest\u2026");
 
 fetch(window.__PAGE_URL(window.__MANIFEST_NAME), {cache: "no-store"})
   .then(r => {
@@ -588,7 +603,7 @@ fetch(window.__PAGE_URL(window.__MANIFEST_NAME), {cache: "no-store"})
   })
   .then(manifest => {
     const n = manifest.chunks;
-    setStatus(`Loading data (${n} chunks)…`);
+    setStatus(`Loading data (${n} chunks)\u2026`);
     const urls = Array.from({length: n}, (_, i) => window.__PAGE_URL(window.__CHUNK_NAME_FMT(i)));
     return Promise.all(urls.map(url =>
       fetch(url, {cache: "no-store"}).then(r => {
@@ -598,7 +613,7 @@ fetch(window.__PAGE_URL(window.__MANIFEST_NAME), {cache: "no-store"})
     ));
   })
   .then(chunkTexts => {
-    setStatus("Decompressing…");
+    setStatus("Decompressing\u2026");
     const b64 = chunkTexts.join("").replace(/\s/g, "");
     const binary = atob(b64);
     const bytes = new Uint8Array(binary.length);
