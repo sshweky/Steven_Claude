@@ -275,7 +275,7 @@ async function fetchAllRecords() {
   let skip = 0;
   const all = [];
   while (true) {
-    _setDetail(`Fetched ${all.length.toLocaleString()} of ~5,100 records...`);
+    _setDetail(`Fetched ${all.length.toLocaleString()} records...`);
     const resp = await qb('/records/query', {
       from: CFG.PROJECTIONS_TID,
       select: sel,
