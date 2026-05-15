@@ -1573,6 +1573,8 @@ function toggleDetail(key) {
   // dataset attributes (key may contain hyphens that are fine in attrs but
   // make CSS-style id selectors awkward).
   const safeIdForTotal = r.key.replace(/[^a-zA-Z0-9]/g, '_');
+  // Detect Amazon record so we can fetch DC inventory health live.
+  const isAmazonRec = /amazon/i.test(r.cust || '');
   let liveProjTotal = 0;
   for (let i = 0; i < wks.length; i++) {
     const w = wks[i];
