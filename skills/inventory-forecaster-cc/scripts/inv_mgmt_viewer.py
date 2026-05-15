@@ -261,8 +261,6 @@ class MStyleRecord:
     first_out_date:        Optional[date] = None
 
     # Text summaries (detail pane)
-    shipment_status_summary: str = ""
-    ats_summary:           str = ""
     inventory_notes:       str = ""
     style_alert:           str = ""
     oos_priority_notes:    str = ""
