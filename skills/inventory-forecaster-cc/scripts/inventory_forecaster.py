@@ -6701,6 +6701,61 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"(OOS asymmetric risk on high-velocity items)"
                 )
 
+        # ── F59h — Amazon DC inventory health balancing ──────────────────────
+        # Uses Sellable On-Hand (SOH), Open PO Quantity (OPO), and Weeks-of-
+        # Supply On-Hand (WOS) from Amazon_Invtry_Health to sanity-check
+        # near-term forecasts against Amazon's actual DC position.
+        #
+        # Overstock suppression (WOS ≥ 16):
+        #   Amazon has 4+ months on hand — they won't be ordering aggressively
+        #   in the near term.  Trim W1-W8 proportionally to the excess above a
+        #   12-week target, capped at 25%.  This avoids projecting heavy orders
+        #   into a period where Amazon is burning down existing stock.
+        #
+        # Low-stock protection (WOS < 3, no OPO):
+        #   Amazon is near OOS with nothing inbound.  Flag it but do NOT apply
+        #   any further suppression — the reorder risk is already the bigger
+        #   concern.  Planners should prioritise this item.
+        #
+        # OPO awareness: large open POs mean supply is already on the way.
+        #   If OPO alone covers > 8 weeks of forward demand, note it in
+        #   the narrative so planners know the near-term gap is pre-covered.
+        #
+        # Placement: after F59g (high-vol buffer) but before F58 (AI comment
+        # replay), so planners can override via AI comments if needed.
+        _f59h_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
+        _f59h_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
+        _f59h_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
+
+        if is_amazon and amz_catalog and _f59h_wos > 0:
+            _f59h_vel = _f59_l13w_avg if _f59_l13w_avg > 0 else max(sum(fcst) / 26, 1)
+            _f59h_opo_wos = _f59h_opo / max(_f59h_vel, 1)  # weeks of forward coverage from OPO
+
+            if _f59h_wos >= 16:
+                # Overstock: trim W1-W8.  Each week above the 12-wk target = ~2% trim, cap 25%.
+                _f59h_trim = min(0.25, (_f59h_wos - 12) * 0.02)
+                for i in range(min(8, len(fcst))):
+                    fcst[i] = snap(max(0, fcst[i] * (1 - _f59h_trim)), mp)
+                _fire("F59h")
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F59h DC overstock: WOS={_f59h_wos:.1f}wks OH ({_f59h_soh:,.0f}u), "
+                        f"OPO={_f59h_opo:,.0f}u — W1-W8 -{_f59h_trim*100:.0f}% near-term trim"
+                    )
+            elif _f59h_wos < 3 and _f59h_opo == 0:
+                _fire("F59h")
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F59h DC low-stock alert: WOS={_f59h_wos:.1f}wks, OPO=0 — "
+                        f"reorder risk; projections NOT suppressed"
+                    )
+            elif _f59h_opo_wos >= 8 and isinstance(meta, dict):
+                # Large open PO covers near-term demand — note it without adjusting
+                meta.setdefault("drivers", []).append(
+                    f"F59h OPO coverage: {_f59h_opo:,.0f}u open PO ≈ {_f59h_opo_wos:.1f}wks "
+                    f"forward supply — near-term gap pre-covered"
+                )
+
         # ── F60 — EC-transition narrative ────────────────────────────────────
         # History was inherited from parent mstyle in the pre-pass.  Log the
         # driver text now that `meta` is available.
