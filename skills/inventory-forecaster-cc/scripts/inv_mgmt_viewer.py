@@ -672,11 +672,9 @@ def pull_inv_flow(mstyle_filter: Optional[list[str]] = None) -> dict[str, dict]:
             "active_replen_customers": _as_str(get("Active_Replen_Customers")),
 
             # Text summaries — deferred to pull_inv_flow_extended(); defaults here
-            "shipment_status_summary": "",
-            "ats_summary":             "",
-            "inventory_notes":         "",
-            "style_alert":             "",
-            "oos_priority_notes":      "",
+            "inventory_notes":    "",
+            "style_alert":        "",
+            "oos_priority_notes": "",
 
             # Extended detail-pane fields — populated by pull_inv_flow_extended()
             "size_ct": "", "fragrance": "", "pvt_lbl_excl": False, "commit_item": False,
