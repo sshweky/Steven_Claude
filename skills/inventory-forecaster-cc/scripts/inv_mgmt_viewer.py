@@ -439,7 +439,7 @@ _INV_FLOW_META = [
 # Deferred columns: pulled in a second parallel batched pass after the main pull.
 # These are either large text blobs or 26-week arrays only needed for the detail pane.
 _INV_FLOW_DEFERRED_TEXT = [
-    "Shipment_Status_Summary_", "ATS_Summary_", "Inventory_Notes_",
+    "Inventory_Notes_",
     "Style_Alert_Message", "OOS_Priority_Notes",
 ]
 
