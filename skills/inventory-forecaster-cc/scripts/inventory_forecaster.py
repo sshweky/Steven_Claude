@@ -4786,6 +4786,22 @@ def _f58_parse_comment(text, current_forecast):
         for i in range(a, b + 1): out[i] = 0
         return True, [int(v) for v in out], f"Zero W{a+1}{f'-W{b+1}' if b!=a else ''}"
 
+    # Layer 1b-2: "zero/reduce-to-zero + starting/from Wn" → zero W[n]–W26
+    # Catches comments like "Transitioning to EC suffix starting W13 — reduce orders to zero"
+    # where the zero keyword comes *after* the week reference.
+    _HAS_ZERO_SIG = _re_f58.search(
+        r'zero|no[\s-]*orders?|reduce[^\n]{0,40}?zero|set[^\n]{0,40}?zero', lo)
+    if _HAS_ZERO_SIG:
+        m = _re_f58.search(
+            r'(?:starting|from|after|beginning)\s+w?(?:k|eek)?\s*(\d{1,2})', lo)
+        if not m:
+            m = _re_f58.search(
+                r'w(?:k|eek)?\s*(\d{1,2})\s*(?:and\s+)?(?:beyond|forward|onward)', lo)
+        if m:
+            a = _clamp(int(m.group(1)))
+            for i in range(a, 26): out[i] = 0
+            return True, [int(v) for v in out], f"Zero W{a+1}-W26 (starting W{a+1})"
+
     # Layer 1c: set N/wk for Wa[-Wb]
     m = _re_f58.search(r'(?:set|baseline|target|hold[\s]+at|run\s*rate)[^\d]*([\d,]+)\s*(?:u(?:nits?)?\s*\/?\s*wk|\/\s*wk|per\s*wk|per\s*week|units|u)?(?:[^\d]*w?(\d{1,2}))?(?:\s*[-–]\s*w?(\d{1,2}))?', lo)
     if m:
