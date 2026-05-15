@@ -6586,13 +6586,26 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"60%×L4W+40%×L13W={_f59b_target:.0f}/wk"
                 )
 
-        # ── F59d — Zero-week suppression for high-velocity items ──────────────
-        # Amazon items with L13W non-zero avg ≥ 300/wk should never produce
-        # week-level zero forecasts.  A zero tells the replenishment engine to
-        # stop ordering — at 300+/wk velocity that triggers OOS within days.
-        # Floor = L13W_nz_avg × 0.50 (conservative half-rate as the minimum).
-        if _f59_l13w_avg >= 300:
-            _f59d_floor = _f59_l13w_avg * 0.50
+        # ── F59d — Zero-week suppression, velocity-tiered ────────────────────
+        # Amazon items with meaningful weekly velocity should never produce
+        # week-level zero forecasts — a zero tells the replenishment engine to
+        # stop ordering, which triggers OOS within days on fast-movers.
+        # Floor multiplier is tiered per planner's high-vol aggression request:
+        #   HIGH vol (L13W_nz ≥ 500):  floor = L13W_nz × 0.65
+        #   MED  vol (L13W_nz 200-499): floor = L13W_nz × 0.55
+        #   LOW  vol (L13W_nz 75-199):  floor = L13W_nz × 0.50
+        #   Below 75/wk: no zero-suppression (intermittent demand is expected)
+        if _f59_l13w_avg >= 500:
+            _f59d_mult, _f59d_tier, _f59d_thresh = 0.65, "HIGH", 500
+        elif _f59_l13w_avg >= 200:
+            _f59d_mult, _f59d_tier, _f59d_thresh = 0.55, "MED",  200
+        elif _f59_l13w_avg >= 75:
+            _f59d_mult, _f59d_tier, _f59d_thresh = 0.50, "LOW",  75
+        else:
+            _f59d_mult = 0.0  # no zero suppression below 75/wk
+
+        if _f59d_mult > 0:
+            _f59d_floor = _f59_l13w_avg * _f59d_mult
             _f59d_fired = 0
             for _i in range(len(fcst)):
                 if fcst[_i] == 0:
@@ -6600,9 +6613,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     _f59d_fired += 1
             if _f59d_fired > 0 and isinstance(meta, dict):
                 meta.setdefault("drivers", []).append(
-                    f"F59d Zero-suppression (high-vol): {_f59d_fired}w raised "
-                    f"0→L13W_nz×0.50={_f59d_floor:.0f}/wk "
-                    f"(L13W_nz={_f59_l13w_avg:.0f} ≥ 300)"
+                    f"F59d Zero-suppression ({_f59d_tier}-vol): {_f59d_fired}w raised "
+                    f"0→L13W_nz×{_f59d_mult:.2f}={_f59d_floor:.0f}/wk "
+                    f"(L13W_nz={_f59_l13w_avg:.0f} ≥ {_f59d_thresh})"
                 )
 
         # ── F59e — Buy-box price-movement velocity buffer ─────────────────────
