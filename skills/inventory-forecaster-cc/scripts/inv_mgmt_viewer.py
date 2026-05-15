@@ -426,11 +426,21 @@ _INV_FLOW_META = [
     # Flags
     "Active_KL_", "AMZ_DO_NOT_SHIP", "AMZ_Suppression_", "Transfer_Qty_Open_",
 
-    # Summary text (detail pane)
-    "Shipment_Status_Summary_", "ATS_Summary_", "Inventory_Notes_",
-    "Style_Alert_Message", "OOS_Priority_Notes",
+    # Active replen customers (used for display only — kept here because it's short)
     "Active_Replen_Customers",
 
+    # NOTE: large text blobs (Shipment_Status_Summary_, ATS_Summary_,
+    # Inventory_Notes_, Style_Alert_Message, OOS_Priority_Notes) have been
+    # moved to _INV_FLOW_DEFERRED to reduce per-row payload in the batched pull.
+    # NOTE: RcvWk1-26 (_INV_FLOW_RCV) has also been moved to _INV_FLOW_DEFERRED
+    # because they are only needed for the detail pane 26-week grid.
+]
+
+# Deferred columns: pulled in a second parallel batched pass after the main pull.
+# These are either large text blobs or 26-week arrays only needed for the detail pane.
+_INV_FLOW_DEFERRED_TEXT = [
+    "Shipment_Status_Summary_", "ATS_Summary_", "Inventory_Notes_",
+    "Style_Alert_Message", "OOS_Priority_Notes",
 ]
 
 # Extended detail-pane fields pulled separately (so a bad name here never
