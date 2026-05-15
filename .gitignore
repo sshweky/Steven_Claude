@@ -1,5 +1,7 @@
 # --- Sensitive / credentials ---
 settings.json
+.credentials.json
+.last-cleanup
 mcp-needs-auth-cache.json
 remote-settings.json
 policy-limits.json
