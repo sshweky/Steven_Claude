@@ -6532,16 +6532,27 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"L4W×1.15={_f59f_cap:.0f}/wk"
                     )
 
-        # ── F59a — L4W floor (momentum-gated) ────────────────────────────────
-        # Prevents non-zero forecast weeks from falling below 85% of in-stock
+        # ── F59a — L4W floor, velocity-tiered (momentum-gated) ───────────────
+        # Prevents non-zero forecast weeks from falling below a % of in-stock
         # L4W velocity when momentum is holding (L4W ≥ 85% of L8W).
-        # Amazon asymmetric risk: OOS → ranking loss > cost of slight overstock.
-        # Does NOT fill zero weeks (that is F59d's job for high-velocity items).
+        # Tiered by L13W non-zero avg to be more aggressive on high-vol items
+        # per planner feedback: "much more risk in under projecting than over
+        # projecting" on high-vol items.
+        #   HIGH vol (L13W_nz ≥ 500):  floor = L4W × 0.95
+        #   MED  vol (L13W_nz 150-499): floor = L4W × 0.90
+        #   LOW  vol (L13W_nz < 150):   floor = L4W × 0.85
+        if _f59_l13w_avg >= 500:
+            _f59a_mult, _f59a_tier = 0.95, "HIGH"
+        elif _f59_l13w_avg >= 150:
+            _f59a_mult, _f59a_tier = 0.90, "MED"
+        else:
+            _f59a_mult, _f59a_tier = 0.85, "LOW"
+
         _f59a_momentum = (
             _f59_l8w_avg == 0
             or _f59_l4w_avg >= _f59_l8w_avg * 0.85
         )
-        _f59a_floor = _f59_l4w_avg * 0.85
+        _f59a_floor = _f59_l4w_avg * _f59a_mult
         if _f59_l4w_avg > 0 and _f59a_momentum and _f59a_floor > 0:
             _f59a_fired = 0
             for _i in range(len(fcst)):
@@ -6550,9 +6561,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     _f59a_fired += 1
             if _f59a_fired > 0 and isinstance(meta, dict):
                 meta.setdefault("drivers", []).append(
-                    f"F59a Amazon L4W floor: {_f59a_fired}w raised to "
-                    f"L4W×0.85={_f59a_floor:.0f}/wk "
-                    f"(in-stock L4W={_f59_l4w_avg:.0f}, L8W={_f59_l8w_avg:.0f})"
+                    f"F59a Amazon L4W floor ({_f59a_tier}-vol): {_f59a_fired}w raised to "
+                    f"L4W×{_f59a_mult:.2f}={_f59a_floor:.0f}/wk "
+                    f"(in-stock L4W={_f59_l4w_avg:.0f}, L13W_nz={_f59_l13w_avg:.0f})"
                 )
 
         # ── F59b — Recency upweight when L4W >> L13W ─────────────────────────
