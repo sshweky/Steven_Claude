@@ -2757,6 +2757,7 @@ def main():
     p.add_argument("--dry-run", action="store_true", help="Build data, print summary, exit (no server)")
     p.add_argument("--port", type=int, default=VIEWER_PORT_DEFAULT, help=f"HTTP port (default {VIEWER_PORT_DEFAULT})")
     p.add_argument("--no-browser", action="store_true", help="Don't auto-open the browser")
+    p.add_argument("--host", default="0.0.0.0", help="Host/IP to bind (default 0.0.0.0 = all interfaces)")
     p.add_argument("--refresh", action="store_true", help="Force a fresh pull from QB (ignore disk cache)")
     p.add_argument("--cache-ttl", type=float, default=CACHE_TTL_HOURS, help=f"Disk cache TTL in hours (default {CACHE_TTL_HOURS})")
     args = p.parse_args()
