@@ -8027,7 +8027,7 @@ def _is_generic_alert(s: str) -> bool:
     return any(ph.lower() in sl for ph in _GENERIC_ALERT_PHRASES)
 
 
-def build_ai_analysis(rec, row, ec_superseded=False, pos=None):
+def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None):
     """Build the AI Analysis narrative as rich-text HTML.
 
     rec: forecast record (forecast[26], manual[26], model, alert, pct_diff, ...)
@@ -8036,6 +8036,8 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None):
     pos: POS dict for any customer (Amazon Catalog today; Walmart/Petsmart/Petco
          coming).  Keys: 'l4w','l13w','l26w','l52w','ordered_lw','ordered_prior_wk'
          or upstream-formatted 'Avg_Units_Wk_*' / 'Ordered_Units_*'.
+    amz_catalog: Amazon Catalog US + Invtry Health merged dict for this mstyle.
+         Keys used here: 'Inv_SOH', 'Inv_OPO', 'Inv_WOS'.
     """
     from html import escape as _e
     MAX_BULLETS = 4
