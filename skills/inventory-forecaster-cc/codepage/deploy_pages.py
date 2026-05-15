@@ -49,8 +49,8 @@ def upload_page(filename: str):
     )
 
     xml_bytes = body.encode("utf-8")
-    print(f"{filename}: {len(content):,} chars  →  XML {len(xml_bytes):,}B  "
-          f"(U+FFFF→FFFD: {n_replaced})")
+    print(f"{filename}: {len(content):,} chars  ->  XML {len(xml_bytes):,}B  "
+          f"(U+FFFF->FFFD: {n_replaced})")
 
     req = urllib.request.Request(
         f"{URL}?a=API_AddReplaceDBPage",
