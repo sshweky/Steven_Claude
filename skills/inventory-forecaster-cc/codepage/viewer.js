@@ -1229,7 +1229,7 @@ function populateFilters() {
 
 function _sortKey(v) {
   const s = (v == null ? '' : String(v)).trim();
-  return s === '' ? '￿' : s.toLowerCase();  // ￿ = U+FFFF sort-last sentinel (XML-safe escape)
+  return s === '' ? '￿' : s.toLowerCase();  // '￿' = sort-last sentinel (U+FFFF encoded to keep file XML-upload-safe)
 }
 
 // -- Header badge counts -----------------------------------------------------
