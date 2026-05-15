@@ -63,7 +63,7 @@ INVF_CACHE = CACHE_DIR / "inv_mgmt_invflow.json"
 # launch when fresh (< CACHE_TTL_HOURS); subsequent launches skip the entire
 # CData pipeline and serve instantly.
 RECORDS_CACHE_PATH = CACHE_DIR / "inv_mgmt_records.json.gz"
-CACHE_TTL_HOURS    = 4
+CACHE_TTL_HOURS    = 6
 
 
 # ─── CData helpers (reuse pattern from viewer.py) ─────────────────────────────
