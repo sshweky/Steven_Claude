@@ -973,30 +973,35 @@ async function refreshData() {
   await boot();
 }
 
-// ── Wire up controls ──────────────────────────────────────────────────────────
-document.getElementById('searchInput').oninput=applyFilters;
-document.getElementById('actionFilter').onchange=applyFilters;
-document.getElementById('countryFilter').onchange=applyFilters;
-document.getElementById('brandFilter').onchange=applyFilters;
-document.getElementById('invMgrFilter').onchange=applyFilters;
-document.getElementById('replenOnly').onchange=applyFilters;
-document.getElementById('gapsOnly').onchange=applyFilters;
-document.getElementById('overstockOnly').onchange=applyFilters;
-document.getElementById('hideMulti').onchange=function(){buildTableHead();applyFilters();};
-document.getElementById('clearBtn').onclick=function(){
-  document.getElementById('searchInput').value='';
-  document.getElementById('actionFilter').value='';
-  document.getElementById('countryFilter').value='';
-  document.getElementById('brandFilter').value='';
-  document.getElementById('invMgrFilter').value='';
-  document.getElementById('replenOnly').checked=false;
-  document.getElementById('gapsOnly').checked=false;
-  document.getElementById('overstockOnly').checked=false;
-  document.getElementById('hideMulti').checked=true;
-  Object.keys(colFilters).forEach(function(k){delete colFilters[k];});
-  priorityFilter='';
-  currentSort={id:null,dir:1};
-  buildTableHead();applyFilters();
-};
+// ── Wire up controls + boot ────────────────────────────────────────────────────
+// IMPORTANT: wrapped in DOMContentLoaded so DOM elements exist before we
+// reference them.  The <script> tag in the HTML should be at the END of <body>
+// (not in <head>) — but this guard handles both placements safely.
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('searchInput').oninput=applyFilters;
+  document.getElementById('actionFilter').onchange=applyFilters;
+  document.getElementById('countryFilter').onchange=applyFilters;
+  document.getElementById('brandFilter').onchange=applyFilters;
+  document.getElementById('invMgrFilter').onchange=applyFilters;
+  document.getElementById('replenOnly').onchange=applyFilters;
+  document.getElementById('gapsOnly').onchange=applyFilters;
+  document.getElementById('overstockOnly').onchange=applyFilters;
+  document.getElementById('hideMulti').onchange=function(){buildTableHead();applyFilters();};
+  document.getElementById('clearBtn').onclick=function(){
+    document.getElementById('searchInput').value='';
+    document.getElementById('actionFilter').value='';
+    document.getElementById('countryFilter').value='';
+    document.getElementById('brandFilter').value='';
+    document.getElementById('invMgrFilter').value='';
+    document.getElementById('replenOnly').checked=false;
+    document.getElementById('gapsOnly').checked=false;
+    document.getElementById('overstockOnly').checked=false;
+    document.getElementById('hideMulti').checked=true;
+    Object.keys(colFilters).forEach(function(k){delete colFilters[k];});
+    priorityFilter='';
+    currentSort={id:null,dir:1};
+    buildTableHead();applyFilters();
+  };
 
-boot();
+  boot();
+});
