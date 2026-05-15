@@ -6662,6 +6662,37 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"→ +15% velocity buffer applied"
                     )
 
+        # ── F59g — High-volume forward buffer ────────────────────────────────
+        # For items with L13W non-zero avg ≥ 500/wk (high-vol), apply an 8%
+        # upward buffer across all non-zero forecast weeks.  These items have
+        # disproportionate OOS risk (lost ranking, lost page share) that is
+        # far more costly than carrying a few extra weeks of safety stock.
+        # Planner feedback: "much more risk in under projecting than over
+        # projecting" on high-volume items.
+        if _f59_l13w_avg >= 500:
+            fcst = [snap(v * 1.08, mp) if v > 0 else 0 for v in fcst]
+            if isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F59g High-vol forward buffer: L13W_nz={_f59_l13w_avg:.0f} ≥ 500 "
+                    f"→ +8% applied across all non-zero weeks "
+                    f"(OOS asymmetric risk on high-velocity items)"
+                )
+
+        # ── F60 — EC-transition narrative ────────────────────────────────────
+        # History was inherited from parent mstyle in the pre-pass.  Log the
+        # driver text now that `meta` is available.
+        if _f60_is_ec_transition and isinstance(meta, dict):
+            _f60_parent   = row.get("_ec_parent_mstyle", "?")
+            _f60_par_l13  = row.get("_ec_parent_l13",   0)
+            _f60_orig_l13 = row.get("_ec_orig_l13",     0)
+            meta.setdefault("drivers", []).append(
+                f"F60 EC-transition: inherited 52w order+ship history from parent "
+                f"{_f60_parent} (parent L13W={_f60_par_l13:.0f}, "
+                f"EC own L13W={_f60_orig_l13:.0f} — "
+                f"{_f60_orig_l13 / max(_f60_par_l13, 1) * 100:.0f}% of parent); "
+                f"forecast reflects parent demand signal"
+            )
+
     # F58 — Tell-AI comment replay (2026-05-08 → option B).
     # Apply the planner's most-recent "AI Adjusted" comment from QB Projection
     # Comments table as an override on top of the model's forecast.  Same
