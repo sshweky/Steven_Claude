@@ -8571,6 +8571,55 @@ def main():
             if _ms.endswith("EC") and _ms[:-2] in _mss:
                 ec_parents.add(f"{_acct}-{_ms[:-2]}")
 
+    # F60 — EC-transition history inheritance (2026-05-15).
+    # When an EC variant ({mstyle}EC) exists for the same account as the
+    # original parent mstyle, the EC item is the same product prepped for
+    # ecommerce fulfillment — consumer demand is identical.  If the EC
+    # variant has sparse order history (<25% of parent L13W), it will
+    # misclassify as Inactive or New/Sparse and receive a near-zero forecast.
+    # Fix: copy the parent's order + shipment history columns directly into
+    # the EC row so the forecaster sees the real demand signal, then tag
+    # the row so the alert narrative explains why.
+    #
+    # Threshold: EC L13W total < 25% of parent L13W total (EC is new/sparse)
+    # AND parent L13W total > 0 (parent has meaningful history to inherit).
+    # Safe: row mutation is done before any parallel/thread work begins.
+    print(f"\n[2.9] F60 — EC transition history inheritance ...", flush=True)
+    row_by_key = {_r.get("Acct_MStyle_Key_", ""): _r for _r in rows}
+    _f60_count = 0
+    for _row in rows:
+        _k   = _row.get("Acct_MStyle_Key_", "")
+        _ms  = _row.get("Mstyle", "")
+        if not _ms.endswith("EC") or "-" not in _k:
+            continue
+        _parent_ms  = _ms[:-2]
+        _acct_pfx   = _k.split("-", 1)[0]
+        _parent_key = f"{_acct_pfx}-{_parent_ms}"
+        _parent_row = row_by_key.get(_parent_key)
+        if _parent_row is None:
+            continue
+        # Compare L13W totals to decide whether inheritance is warranted
+        _ec_l13     = sum(float(_row.get(c) or 0)      for c in ORD_COLS[-13:])
+        _par_l13    = sum(float(_parent_row.get(c) or 0) for c in ORD_COLS[-13:])
+        if _par_l13 <= 0 or _ec_l13 >= _par_l13 * 0.25:
+            # EC variant already has meaningful history — no inheritance needed
+            continue
+        # Copy full 52w order + shipment history from parent into EC row.
+        # This lets get_history() / get_ship_history() see the real demand
+        # signal without any changes to those functions.
+        for _c in ORD_COLS:
+            _row[_c] = _parent_row.get(_c, 0)
+        for _c in SHP_COLS:
+            _row[_c] = _parent_row.get(_c, 0)
+        # Tag for alert/driver annotation in forecast_record()
+        _row["_ec_transition"]   = True
+        _row["_ec_parent_mstyle"] = _parent_ms
+        _row["_ec_parent_key"]    = _parent_key
+        _row["_ec_parent_l13"]    = _par_l13
+        _row["_ec_orig_l13"]      = _ec_l13
+        _f60_count += 1
+    print(f"      {_f60_count} EC variants inherited parent history", flush=True)
+
     # F58 — Pull active "AI Adjusted" comments once (lookback 60 days).
     # Bucketed by acct-mstyle key.  Most-recent comment per key wins.
     ai_comments = _f58_fetch_active_comments(lookback_days=60)
