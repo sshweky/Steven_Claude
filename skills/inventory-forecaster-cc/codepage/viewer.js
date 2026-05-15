@@ -1916,13 +1916,26 @@ function toggleDetail(key) {
   const _narParts = (r.narrative || '')
     .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n')
     .split('\n').filter(s => s.trim());
+  // _narUlId: stable element id used by _loadAmzDcInv to inject/replace the
+  // live DC inventory bullet after the panel renders.
+  const _narUlId = 'ai-bullets-' + safeIdForTotal;
+  const _narWrapId = 'ai-narr-wrap-' + safeIdForTotal;
+  const _narDivStyle = 'padding:8px 12px;background:#f5f5f5;border-top:1px solid #ddd;font-size:12px;line-height:1.5;color:#333;';
+  const _narHdrHtml  = '<div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:5px;">AI Analysis</div>';
   const narrativeHtml = _narParts.length
-    ? '<div style="padding:8px 12px;background:#f5f5f5;border-top:1px solid #ddd;font-size:12px;line-height:1.5;color:#333;">' +
-      '<div style="font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:5px;">AI Analysis</div>' +
-      '<ul style="margin:2px 0;padding-left:16px;">' +
+    ? '<div id="' + _narWrapId + '" style="' + _narDivStyle + '">' +
+      _narHdrHtml +
+      '<ul id="' + _narUlId + '" style="margin:2px 0;padding-left:16px;">' +
       _narParts.map(p => '<li style="margin-bottom:4px;">' + p + '</li>').join('') +
       '</ul></div>'
-    : '';
+    // Amazon records with no narrative yet: render an empty AI Analysis shell
+    // so _loadAmzDcInv has a ul to inject the live DC inventory bullet into.
+    : (isAmazonRec
+        ? '<div id="' + _narWrapId + '" style="' + _narDivStyle + '">' +
+          _narHdrHtml +
+          '<ul id="' + _narUlId + '" style="margin:2px 0;padding-left:16px;"></ul>' +
+          '</div>'
+        : '');
 
   const safeKey = r.key.replace(/'/g, "&#39;");
   const safeId   = r.key.replace(/[^a-zA-Z0-9]/g, '_');
