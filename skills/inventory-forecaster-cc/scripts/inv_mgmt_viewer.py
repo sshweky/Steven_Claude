@@ -761,11 +761,9 @@ def pull_inv_flow_extended(out: dict) -> None:
                 if ms not in out:
                     continue
                 out[ms].update({
-                    "shipment_status_summary": _as_str(_get_col(r, "Shipment_Status_Summary_")),
-                    "ats_summary":             _as_str(_get_col(r, "ATS_Summary_")),
-                    "inventory_notes":         _as_str(_get_col(r, "Inventory_Notes_")),
-                    "style_alert":             _as_str(_get_col(r, "Style_Alert_Message")),
-                    "oos_priority_notes":      _as_str(_get_col(r, "OOS_Priority_Notes")),
+                    "inventory_notes":    _as_str(_get_col(r, "Inventory_Notes_")),
+                    "style_alert":        _as_str(_get_col(r, "Style_Alert_Message")),
+                    "oos_priority_notes": _as_str(_get_col(r, "OOS_Priority_Notes")),
                     "rcv": [_to_num(_get_col(r, c)) for c in _INV_FLOW_RCV],
                 })
                 merged_a += 1
