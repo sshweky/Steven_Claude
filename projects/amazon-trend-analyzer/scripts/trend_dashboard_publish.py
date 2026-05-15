@@ -114,7 +114,7 @@ def api_add_replace_dbpage(page_id: str | int | None,
         sys.exit(f"[ABORT] QB API error code {err.group(1)}: "
                   f"{detail.group(1) if detail else body[:500]}")
 
-    pageid_match = re.search(r"<pageid>(\d+)</pageid>", body)
+    pageid_match = re.search(r"<pageID>(\d+)</pageID>", body, re.IGNORECASE)
     if not pageid_match:
         sys.exit(f"[ABORT] No pageid in response: {body[:500]}")
     return pageid_match.group(1)
