@@ -2701,10 +2701,13 @@ class _ThreadedServer(socketserver.ThreadingTCPServer):
     allow_reuse_address = True   # avoids WinError 10048 on quick restart
 
 
-def serve(port: int = VIEWER_PORT_DEFAULT, open_browser: bool = True) -> None:
+def serve(port: int = VIEWER_PORT_DEFAULT, open_browser: bool = True, host: str = "0.0.0.0") -> None:
+    import socket
     handler = Handler
-    httpd = _ThreadedServer(("127.0.0.1", port), handler)
-    print(f"\n[InvMgmt] Serving at http://127.0.0.1:{port}")
+    httpd = _ThreadedServer((host, port), handler)
+    local_ip = socket.gethostbyname(socket.gethostname())
+    print(f"\n[InvMgmt] Serving at http://127.0.0.1:{port}  (local)")
+    print(f"[InvMgmt] Team access:  http://{local_ip}:{port}")
     if open_browser:
         threading.Timer(0.5, lambda: webbrowser.open(f"http://127.0.0.1:{port}")).start()
     try:
