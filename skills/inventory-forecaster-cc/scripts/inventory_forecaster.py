@@ -8165,6 +8165,41 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             if _smart_ord:
                 specific.append(_smart_ord)
 
+    # ── Specific: Amazon DC inventory health ─────────────────────────────────
+    # Surface SOH, Open PO, and WOS so planners can see Amazon's actual DC
+    # position alongside the forecast.  Colour-coded WOS for quick triage:
+    #   < 3 wks  → red   (risk of OOS)
+    #   3–7 wks  → amber (watch)
+    #   8–15 wks → normal (no colour)
+    #   ≥ 16 wks → orange (overstocked)
+    if amz_catalog:
+        _ih_soh = float(amz_catalog.get("Inv_SOH") or 0)
+        _ih_opo = float(amz_catalog.get("Inv_OPO") or 0)
+        _ih_wos = float(amz_catalog.get("Inv_WOS") or 0)
+        if _ih_soh > 0 or _ih_opo > 0 or _ih_wos > 0:
+            _ih_parts = []
+            if _ih_soh > 0:
+                _ih_parts.append(f"SOH {int(_ih_soh):,}u")
+            if _ih_opo > 0:
+                _ih_parts.append(f"Open PO {int(_ih_opo):,}u")
+            if _ih_wos > 0:
+                if _ih_wos < 3:
+                    _wos_str = (f"<span style='color:#c62828'><b>WOS "
+                                f"{_ih_wos:.1f}wks ⚠</b></span>")
+                elif _ih_wos < 8:
+                    _wos_str = (f"<span style='color:#e65100'>WOS "
+                                f"{_ih_wos:.1f}wks</span>")
+                elif _ih_wos >= 16:
+                    _wos_str = (f"<span style='color:#f57f17'>WOS "
+                                f"{_ih_wos:.1f}wks (overstocked)</span>")
+                else:
+                    _wos_str = f"WOS {_ih_wos:.1f}wks"
+                _ih_parts.append(_wos_str)
+            if _ih_parts:
+                specific.append(
+                    f"<b>Amazon DC inventory:</b> " + " · ".join(_ih_parts) + "."
+                )
+
     # ── Gap pill: Plan vs AI summary ──────────────────────────────────────────
     # Only surfaced when the gap is ≥ 15% (enough to warrant a review) or when
     # there is no manual plan at all. It's the lowest-priority bullet because
