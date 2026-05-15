@@ -50,11 +50,11 @@ HTML_PAGE_ID = os.environ.get("QB_HTML_PAGE_ID", "")
 
 # File locations relative to this script's parent (project root)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-JSON_PATH = PROJECT_ROOT / "qb_chunks" / "amazon-trend-data.json"
+DATA_PATH = PROJECT_ROOT / "qb_chunks" / "amazon-trend-data.b64"
 HTML_PATH = PROJECT_ROOT / "assets"    / "dashboard_template_codepage.html"
 
 # Page names as they will appear in Quickbase
-DATA_PAGE_NAME = "amazon-trend-data.json"
+DATA_PAGE_NAME = "amazon-trend-data.b64"
 HTML_PAGE_NAME = "amazon-trend-dashboard.html"
 
 
@@ -139,21 +139,21 @@ def main():
                   "Code Pages — e.g. bqkdiemav for Amazon_AdTrack)")
 
     # Validate files exist
-    if not args.html_only and not JSON_PATH.exists():
-        sys.exit(f"[ABORT] JSON payload not found at {JSON_PATH}\n"
+    if not args.html_only and not DATA_PATH.exists():
+        sys.exit(f"[ABORT] JSON payload not found at {DATA_PATH}\n"
                   f"        Run:  python scripts/build_dashboard_from_chunks.py "
-                  f"--emit-json {JSON_PATH}")
+                  f"--emit-json {DATA_PATH}")
     if not args.json_only and not HTML_PATH.exists():
         sys.exit(f"[ABORT] HTML template not found at {HTML_PATH}")
 
-    json_size_mb = JSON_PATH.stat().st_size / (1024 * 1024) if JSON_PATH.exists() else 0
+    data_size_mb = DATA_PATH.stat().st_size / (1024 * 1024) if DATA_PATH.exists() else 0
     html_size_kb = HTML_PATH.stat().st_size / 1024 if HTML_PATH.exists() else 0
 
     print("─" * 60)
     print(f"realm:    {REALM}")
     print(f"app:      {APP_DBID}")
     if not args.html_only:
-        print(f"data:     {JSON_PATH.name}  ({json_size_mb:.1f} MB)")
+        print(f"data:     {DATA_PATH.name}  ({data_size_mb:.1f} MB)")
     if not args.json_only:
         print(f"html:     {HTML_PATH.name}  ({html_size_kb:.1f} KB)")
     print("─" * 60)
@@ -164,11 +164,11 @@ def main():
     # 1. Publish data page (unless skipped)
     if not args.html_only:
         print(f"\nPublishing {DATA_PAGE_NAME} ...")
-        json_body = JSON_PATH.read_text(encoding="utf-8")
+        data_body = DATA_PATH.read_text(encoding="utf-8")
         data_pid = api_add_replace_dbpage(
             page_id=DATA_PAGE_ID or None,
             page_name=DATA_PAGE_NAME,
-            page_body=json_body,
+            page_body=data_body,
             page_type=1,
         )
         print(f"  ✓ pageid={data_pid}")

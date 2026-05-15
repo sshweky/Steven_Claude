@@ -121,12 +121,17 @@ def load_chunks(chunks_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--chunks-dir", default="./qb_chunks",
-                    help="Directory containing chunk_*.csv from qb_rest_pull.py")
+                    help="Directory containing the pulled CSV files")
     ap.add_argument("--out", default="./amazon_trend_dashboard.html",
-                    help="Output HTML file path")
+                    help="Output HTML file path (ignored when --emit-json is set)")
     ap.add_argument("--baseline", default="exclusive",
                     choices=["exclusive", "inclusive"],
                     help="Bucket assignment uses this baseline mode")
+    ap.add_argument("--emit-json", default=None,
+                    help="If set, write JSON payload to this path (raw, uncompressed)")
+    ap.add_argument("--emit-compressed", default=None,
+                    help="If set, write gzip+base64 encoded payload to this path. "
+                         "Use this for QB Code Page upload to fit under size limit.")
     args = ap.parse_args()
 
     chunks_dir = Path(args.chunks_dir)
@@ -155,6 +160,34 @@ def main():
     if not summary.empty:
         print(summary.to_string(index=False))
 
+    if args.emit_json or args.emit_compressed:
+        # JSON-only mode: produce the payload for the Code Page architecture
+        import json, gzip, base64
+        payload = hb.build_payload(results, weekly, catalog,
+                                    baseline_mode=args.baseline)
+        payload = hb._sanitize(payload)
+        raw_json = json.dumps(payload, separators=(",", ":"), allow_nan=False)
+
+        if args.emit_json:
+            out_path = Path(args.emit_json)
+            out_path.write_text(raw_json, encoding="utf-8")
+            size_mb = out_path.stat().st_size / (1024 * 1024)
+            print(f"\nEmitted raw JSON → {out_path}  ({size_mb:.1f} MB)")
+
+        if args.emit_compressed:
+            out_path = Path(args.emit_compressed)
+            gz = gzip.compress(raw_json.encode("utf-8"), compresslevel=9)
+            b64 = base64.b64encode(gz).decode("ascii")
+            out_path.write_text(b64, encoding="ascii")
+            size_mb = out_path.stat().st_size / (1024 * 1024)
+            raw_mb = len(raw_json) / (1024 * 1024)
+            print(f"\nEmitted gzip+base64 → {out_path}  "
+                  f"({raw_mb:.1f} MB raw → {size_mb:.2f} MB encoded)")
+
+        print("Next: python scripts/trend_dashboard_publish.py")
+        return
+
+    # Default: render the standalone HTML
     print(f"\nRendering dashboard → {args.out}")
     out = hb.render(results, weekly, catalog,
                     out_path=args.out, baseline_mode=args.baseline)
