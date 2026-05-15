@@ -538,11 +538,8 @@ def pull_inv_flow(mstyle_filter: Optional[list[str]] = None) -> dict[str, dict]:
         all_mstyles = [m for m in all_mstyles if m]
         print(f"  [InvMgmt] {len(all_mstyles)} mstyles found — batching full pull...", flush=True)
 
-    # Step 1 — batch-pull all columns in chunks of 200 mstyles.
-    # Larger batches (500, 1000) cause the IN-clause SQL to exceed CData's
-    # query-string limit and hang indefinitely.  200 gives ~56 fast batches
-    # (~2-3s each = ~2 min cold pull), then cached for 4h.
-    BATCH = 200
+    # Step 1 — batch-pull all columns in chunks of mstyles.
+    BATCH = 1000
     n_batches = max(1, (len(all_mstyles) + BATCH - 1) // BATCH)
     out: dict[str, dict] = {}
 
