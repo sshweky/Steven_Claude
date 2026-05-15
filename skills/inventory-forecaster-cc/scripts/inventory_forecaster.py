@@ -8874,11 +8874,16 @@ def main():
         _cust_name = (row.get("Customr_Name") or r.get("cust") or "")
         _is_amazon_rec = AMAZON_CUST_SUBSTR in _cust_name.upper()
         _pos_for_rec = (amazon_pos or {}).get(r.get("mstyle", "")) if _is_amazon_rec else None
+        _amz_cat_for_rec = (
+            (amazon_catalog_us or {}).get(r.get("mstyle", ""))
+            if _is_amazon_rec else None
+        )
         try:
             r["ai_analysis"] = build_ai_analysis(
                 r, row,
                 ec_superseded=(key in ec_parents),
                 pos=_pos_for_rec,
+                amz_catalog=_amz_cat_for_rec,
             )
         except Exception as _e:
             # Don't let narrative bugs block the forecast — just leave it blank.
