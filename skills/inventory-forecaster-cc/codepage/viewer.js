@@ -2100,8 +2100,6 @@ async function _loadAmzDcInv(r, safeId) {
     return;
   }
 
-  if (!soh && !opo && !wos) return;   // empty row — nothing to display
-
   // WOS colour thresholds match Python build_ai_analysis:
   //   < 3 wks  → red    (OOS risk)
   //   3–7 wks  → amber  (watch)
@@ -2115,11 +2113,12 @@ async function _loadAmzDcInv(r, safeId) {
   else if (wos < 16) wosHtml = `WOS ${fmtWos(wos)}wks`;
   else               wosHtml = `<span style="color:#f57f17">WOS ${fmtWos(wos)}wks (overstocked)</span>`;
 
-  const parts = [];
-  if (soh > 0) parts.push(`SOH ${fmt(soh)}u`);
-  if (opo > 0) parts.push(`Open PO ${fmt(opo)}u`);
-  if (wos > 0) parts.push(wosHtml);
-  if (!parts.length) return;
+  // Always show all three fields — display 0 when null/missing.
+  const parts = [
+    `Amazon OH ${fmt(soh)}u`,
+    `Open PO ${fmt(opo)}u`,
+    wosHtml,
+  ];
 
   const bullet = `<b>Amazon DC inventory:</b> ${parts.join(' · ')}.`;
 

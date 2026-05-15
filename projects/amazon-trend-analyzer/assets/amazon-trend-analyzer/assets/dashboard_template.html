@@ -138,20 +138,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-<script id="boot">
-// Code Page mode: data lives in a sibling Code Page (amazon-trend-data.b64)
-// served from the same QB app. URL is relative so it works in any realm/app.
-// Format: base64-encoded gzip-compressed JSON (fits under QB's Code Page size limit).
-window.__PAYLOAD_URL = "amazon-trend-data.b64";
-</script>
+<script id="payload" type="application/json">__PAYLOAD_JSON__</script>
 
 <script type="text/babel" data-presets="react">
 const {useState,useMemo,useEffect,useRef} = React;
 
 // -------------- Data load --------------
-// PAYLOAD is loaded async — see fetch below
-let PAYLOAD = null;
+const PAYLOAD = JSON.parse(document.getElementById("payload").textContent);
+window.__PAYLOAD = PAYLOAD; // debug hook
 
 const BUCKETS = [
   {key:"strong_winner",     label:"🚀 Strong winner"},
@@ -576,36 +570,7 @@ function App(){
   );
 }
 
-// Show a loading state while we fetch the data payload
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<div style={{padding:"40px",textAlign:"center",color:"var(--muted)",fontFamily:"system-ui"}}>Loading trend data…</div>);
-
-fetch(window.__PAYLOAD_URL, {cache: "no-store"})
-  .then(r => {
-    if (!r.ok) throw new Error("HTTP " + r.status + " loading " + window.__PAYLOAD_URL);
-    return r.text();
-  })
-  .then(b64 => {
-    // Decode base64 → ungzip → JSON.parse
-    const binary = atob(b64.trim());
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    const jsonStr = pako.ungzip(bytes, {to: "string"});
-    const data = JSON.parse(jsonStr);
-    PAYLOAD = data;
-    window.__PAYLOAD = data;
-    root.render(<App />);
-  })
-  .catch(err => {
-    root.render(
-      <div style={{padding:"40px",fontFamily:"system-ui",color:"#791f1f"}}>
-        <h2 style={{marginTop:0}}>Could not load trend data</h2>
-        <p>Tried: <code>{window.__PAYLOAD_URL}</code></p>
-        <pre style={{background:"#fcebeb",padding:"10px",borderRadius:"6px",fontSize:"12px",whiteSpace:"pre-wrap"}}>{String(err)}</pre>
-        <p>The data Code Page may not have been published yet.</p>
-      </div>
-    );
-  });
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
