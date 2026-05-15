@@ -6447,20 +6447,24 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"4-week taper applied; total {_f52_pre_total:,} → {_f52_post_total:,}"
             )
 
-    # ── F59 — Amazon demand-signal corrections (2026-05-15) ────────────────────
-    # Synthesized from planner review of 13 account-1864 items: 10/13 were
-    # under-projected, 1 was over.  Six targeted sub-rules address the root
-    # causes identified:
-    #   F59a — L4W floor (model regressing to historical mean too aggressively)
+    # ── F59/F60 — Amazon demand-signal corrections (2026-05-15) ───────────────
+    # F59: Synthesized from planner review of 13 account-1864 items (10/13
+    #      under-projected, 1 over).  Sub-rules:
+    #   F59a — L4W floor, velocity-tiered (high-vol more aggressive per planner)
     #   F59b — Recency upweight when L4W >> L13W (structural acceleration)
     #   F59c — OOS-week exclusion from velocity baselines (annotation)
-    #   F59d — Zero-week suppression on high-velocity items (≥300/wk L13W)
+    #   F59d — Zero-week suppression, velocity-tiered floor multiplier
     #   F59e — Buy-box price-movement velocity buffer
-    #   F59f — Deceleration cap (prevents Holt-Winters over-extrapolation)
+    #   F59f — Deceleration cap (prevents HW trend over-extrapolation)
+    #   F59g — High-volume forward buffer (≥500/wk: +8% across full window)
+    # F60: EC-transition narrative (history inherited in pre-pass above).
     #
-    # Placement: BEFORE F58 so explicit Tell-AI comment replays (planner intent)
-    # always supersede these automatic model corrections.
-    # Only fires for Amazon accounts; skips Inactive/OTB paths.
+    # Velocity tiers (all based on L13W non-zero avg, Amazon only):
+    #   HIGH:  L13W_nz ≥ 500/wk  → more aggressive floors + F59g buffer
+    #   MED:   L13W_nz 150–499   → moderately aggressive
+    #   LOW:   L13W_nz < 150     → standard (original) settings
+    #
+    # Placement: BEFORE F58 so explicit Tell-AI comment replays supersede.
     if is_amazon and not model.startswith("Inactive") and not model.startswith("OTB"):
 
         # ── Velocity baselines with OOS-week exclusion (F59c) ────────────────
