@@ -6439,6 +6439,193 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"4-week taper applied; total {_f52_pre_total:,} → {_f52_post_total:,}"
             )
 
+    # ── F59 — Amazon demand-signal corrections (2026-05-15) ────────────────────
+    # Synthesized from planner review of 13 account-1864 items: 10/13 were
+    # under-projected, 1 was over.  Six targeted sub-rules address the root
+    # causes identified:
+    #   F59a — L4W floor (model regressing to historical mean too aggressively)
+    #   F59b — Recency upweight when L4W >> L13W (structural acceleration)
+    #   F59c — OOS-week exclusion from velocity baselines (annotation)
+    #   F59d — Zero-week suppression on high-velocity items (≥300/wk L13W)
+    #   F59e — Buy-box price-movement velocity buffer
+    #   F59f — Deceleration cap (prevents Holt-Winters over-extrapolation)
+    #
+    # Placement: BEFORE F58 so explicit Tell-AI comment replays (planner intent)
+    # always supersede these automatic model corrections.
+    # Only fires for Amazon accounts; skips Inactive/OTB paths.
+    if is_amazon and not model.startswith("Inactive") and not model.startswith("OTB"):
+
+        # ── Velocity baselines with OOS-week exclusion (F59c) ────────────────
+        # When Days_Amazon_OOS_L30d ≥ 7, the item has had material OOS recently.
+        # Those weeks show as order zeros and depress all-weeks averages.
+        # Use non-zero averages (in-stock velocity) so floors are grounded in
+        # real demand, not demand + stockout weeks blended together.
+        _f59_oos_days   = float((amz_catalog or {}).get("Days_Amazon_OOS_L30d_") or 0)
+        _f59_oos_active = _f59_oos_days >= 7
+
+        _f59_l4w_raw    = hist[-4:]  if len(hist) >= 4  else list(hist)
+        _f59_l4w_nz     = [v for v in _f59_l4w_raw  if v > 0]
+        _f59_l4w_avg    = (
+            sum(_f59_l4w_nz) / len(_f59_l4w_nz)
+            if (_f59_oos_active and _f59_l4w_nz)
+            else sum(_f59_l4w_raw) / max(len(_f59_l4w_raw), 1)
+        )
+
+        _f59_l8w_raw    = hist[-8:]  if len(hist) >= 8  else list(hist)
+        _f59_l8w_nz     = [v for v in _f59_l8w_raw  if v > 0]
+        _f59_l8w_avg    = (
+            sum(_f59_l8w_nz) / len(_f59_l8w_nz)
+            if (_f59_oos_active and _f59_l8w_nz)
+            else sum(_f59_l8w_raw) / max(len(_f59_l8w_raw), 1)
+        )
+
+        _f59_l13w_raw   = hist[-13:] if len(hist) >= 13 else list(hist)
+        _f59_l13w_nz    = [v for v in _f59_l13w_raw if v > 0]
+        _f59_l13w_avg   = (
+            sum(_f59_l13w_nz) / len(_f59_l13w_nz) if _f59_l13w_nz else 0.0
+        )
+
+        # Annotate when OOS exclusion materially changed the L4W baseline
+        if _f59_oos_active and _f59_l4w_nz and len(_f59_l4w_nz) < 4:
+            _f59c_all_avg = sum(_f59_l4w_raw) / max(len(_f59_l4w_raw), 1)
+            if isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F59c OOS velocity exclusion: {4 - len(_f59_l4w_nz)}/4 L4W "
+                    f"weeks excluded ({_f59_oos_days:.0f} OOS days/L30d); "
+                    f"in-stock L4W={_f59_l4w_avg:.0f} vs all-weeks={_f59c_all_avg:.0f}"
+                )
+
+        # ── F59f — Deceleration cap (runs BEFORE floor rules) ────────────────
+        # When L4W < L8W < L13W (consistent decline across all three windows)
+        # and the model projects above L4W, cap each week at L4W×1.15.
+        # Prevents Holt-Winters from carrying a downtrend into the projection.
+        # Runs first so the floor rules below see a corrected basis.
+        _f59f_decel = (
+            _f59_l4w_avg  > 0 and _f59_l8w_avg > 0 and _f59_l13w_avg > 0
+            and _f59_l4w_avg  < _f59_l8w_avg  * 0.90  # 4w clearly below 8w
+            and _f59_l8w_avg  < _f59_l13w_avg * 0.90  # 8w clearly below 13w
+            and _f59_l4w_avg  < _f59_l13w_avg * 0.80  # sustained overall decline
+        )
+        if _f59f_decel:
+            _f59f_cap   = _f59_l4w_avg * 1.15
+            _f59f_snapped = snap(_f59f_cap, mp)
+            _f59f_weeks = sum(1 for v in fcst if v > _f59f_cap)
+            if _f59f_weeks > 0:
+                fcst = [_f59f_snapped if v > _f59f_cap else v for v in fcst]
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F59f Deceleration cap: L4W {_f59_l4w_avg:.0f} < "
+                        f"L8W {_f59_l8w_avg:.0f} < L13W {_f59_l13w_avg:.0f} "
+                        f"(consistent decline) → {_f59f_weeks}w capped at "
+                        f"L4W×1.15={_f59f_cap:.0f}/wk"
+                    )
+
+        # ── F59a — L4W floor (momentum-gated) ────────────────────────────────
+        # Prevents non-zero forecast weeks from falling below 85% of in-stock
+        # L4W velocity when momentum is holding (L4W ≥ 85% of L8W).
+        # Amazon asymmetric risk: OOS → ranking loss > cost of slight overstock.
+        # Does NOT fill zero weeks (that is F59d's job for high-velocity items).
+        _f59a_momentum = (
+            _f59_l8w_avg == 0
+            or _f59_l4w_avg >= _f59_l8w_avg * 0.85
+        )
+        _f59a_floor = _f59_l4w_avg * 0.85
+        if _f59_l4w_avg > 0 and _f59a_momentum and _f59a_floor > 0:
+            _f59a_fired = 0
+            for _i in range(len(fcst)):
+                if fcst[_i] > 0 and fcst[_i] < _f59a_floor:
+                    fcst[_i] = snap(_f59a_floor, mp)
+                    _f59a_fired += 1
+            if _f59a_fired > 0 and isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F59a Amazon L4W floor: {_f59a_fired}w raised to "
+                    f"L4W×0.85={_f59a_floor:.0f}/wk "
+                    f"(in-stock L4W={_f59_l4w_avg:.0f}, L8W={_f59_l8w_avg:.0f})"
+                )
+
+        # ── F59b — Recency upweight when L4W >> L13W ─────────────────────────
+        # When L4W is ≥1.4× L13W non-zero avg, the item has structurally
+        # accelerated recently (keyword gain, buy-box win, distribution add).
+        # Model is discounting this as noise; re-blend non-zero weeks toward
+        # a 60% L4W / 40% L13W target to preserve the recent signal.
+        if (_f59_l4w_avg > 0 and _f59_l13w_avg > 0
+                and _f59_l4w_avg >= _f59_l13w_avg * 1.40):
+            _f59b_target = _f59_l4w_avg * 0.60 + _f59_l13w_avg * 0.40
+            _f59b_fired  = 0
+            for _i in range(len(fcst)):
+                if fcst[_i] > 0 and fcst[_i] < _f59b_target:
+                    fcst[_i] = snap(_f59b_target, mp)
+                    _f59b_fired += 1
+            if _f59b_fired > 0 and isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F59b Recency upweight: L4W {_f59_l4w_avg:.0f} ≥ 1.4× "
+                    f"L13W {_f59_l13w_avg:.0f} → {_f59b_fired}w raised to "
+                    f"60%×L4W+40%×L13W={_f59b_target:.0f}/wk"
+                )
+
+        # ── F59d — Zero-week suppression for high-velocity items ──────────────
+        # Amazon items with L13W non-zero avg ≥ 300/wk should never produce
+        # week-level zero forecasts.  A zero tells the replenishment engine to
+        # stop ordering — at 300+/wk velocity that triggers OOS within days.
+        # Floor = L13W_nz_avg × 0.50 (conservative half-rate as the minimum).
+        if _f59_l13w_avg >= 300:
+            _f59d_floor = _f59_l13w_avg * 0.50
+            _f59d_fired = 0
+            for _i in range(len(fcst)):
+                if fcst[_i] == 0:
+                    fcst[_i] = snap(_f59d_floor, mp)
+                    _f59d_fired += 1
+            if _f59d_fired > 0 and isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F59d Zero-suppression (high-vol): {_f59d_fired}w raised "
+                    f"0→L13W_nz×0.50={_f59d_floor:.0f}/wk "
+                    f"(L13W_nz={_f59_l13w_avg:.0f} ≥ 300)"
+                )
+
+        # ── F59e — Buy-box price-movement velocity buffer ─────────────────────
+        # Two triggers:
+        #   (1) Recent price drop: L4W avg unit revenue > current buybox × 1.10
+        #       The avg L4W revenue was 10%+ above the current listed price,
+        #       meaning the price dropped during this window.  The resulting
+        #       sales lift should be treated as the new structural baseline,
+        #       not noise around a prior higher-price mean.
+        #   (2) Below-MAP pricing: buybox < MAP × 0.85
+        #       Active buy-box competition is driving velocity above what the
+        #       model captures from smooth order-history averages.
+        # Response: apply +15% lift on all non-zero forecast weeks.
+        if amz_catalog:
+            _f59e_bb     = float(amz_catalog.get("Amazon_Buybox") or 0)
+            _f59e_aur_l4 = float(amz_catalog.get("AUR_L4w")       or 0)
+            _f59e_map    = float(amz_catalog.get("MAP_Price")      or 0)
+
+            _f59e_price_drop = (
+                _f59e_bb > 0 and _f59e_aur_l4 > 0
+                and _f59e_aur_l4 > _f59e_bb * 1.10
+            )
+            _f59e_below_map = (
+                _f59e_bb > 0 and _f59e_map > 0
+                and _f59e_bb < _f59e_map * 0.85
+            )
+
+            if _f59e_price_drop or _f59e_below_map:
+                fcst = [snap(v * 1.15, mp) if v > 0 else 0 for v in fcst]
+                _f59e_reasons = []
+                if _f59e_price_drop:
+                    _f59e_reasons.append(
+                        f"AUR_L4w ${_f59e_aur_l4:.2f} > BB ${_f59e_bb:.2f} "
+                        f"(+{(_f59e_aur_l4 / _f59e_bb - 1) * 100:.0f}% — recent drop)"
+                    )
+                if _f59e_below_map:
+                    _f59e_reasons.append(
+                        f"BB ${_f59e_bb:.2f} < MAP ${_f59e_map:.2f} "
+                        f"(−{(1 - _f59e_bb / _f59e_map) * 100:.0f}% below MAP)"
+                    )
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F59e Buy-box price signal: {'; '.join(_f59e_reasons)} "
+                        f"→ +15% velocity buffer applied"
+                    )
+
     # F58 — Tell-AI comment replay (2026-05-08 → option B).
     # Apply the planner's most-recent "AI Adjusted" comment from QB Projection
     # Comments table as an override on top of the model's forecast.  Same
