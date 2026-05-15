@@ -4779,10 +4779,17 @@ def _f58_parse_comment(text, current_forecast):
         return True, [int(v) for v in out], f"EOL by W{tgt+1} (4-week taper, zero after)"
 
     # Layer 1b: zero / PO covers Wa[-Wb]
+    # If an explicit range is given (W13-W26) use it; if "starting/from" precedes
+    # the week number and no range end is given, auto-extend to W26.
     m = _re_f58.search(r'(?:zero|no\s*orders?|po\s*covers?|covered\s*by\s*po)[^\d]*w?(\d{1,2})(?:\s*[-–]\s*w?(\d{1,2}))?', lo)
     if m:
         a = _clamp(int(m.group(1)))
         b = _clamp(int(m.group(2))) if m.group(2) else a
+        # "zero starting W13" / "no orders from W13" → extend to W26
+        if not m.group(2):
+            _ctx = lo[:m.start(1)]
+            if _re_f58.search(r'starting|from\s+w|beginning', _ctx):
+                b = 25
         for i in range(a, b + 1): out[i] = 0
         return True, [int(v) for v in out], f"Zero W{a+1}{f'-W{b+1}' if b!=a else ''}"
 
