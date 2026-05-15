@@ -529,13 +529,21 @@ def _as_str(v) -> str:
 def pull_inv_flow(mstyle_filter: Optional[list[str]] = None) -> dict[str, dict]:
     """Pull Inventory Flow rows (one per mstyle).  Returns {mstyle: row_dict}.
 
-    Full-table pull is batched by mstyle (500/batch) because the unfiltered
-    141-column × 11k-row SELECT exceeds CData's response-size limit.
+    Two-phase pull:
+      Phase 1 — parallel batched SELECT of META + BEG + PRJ (the columns needed
+        for compute_derived and the main table).  RCV and large text blobs are
+        intentionally excluded to keep per-row payload small.
+        Workers=3 cuts wall time ~3x vs sequential.
+      Phase 2 — pull_inv_flow_extended() fetches RCV, text blobs, and product
+        attrs in a separate batched pass and merges them in.
+
     Step 0 fetches just [Mstyle] to bootstrap the batch list (1 tiny call).
     If mstyle_filter is given, step 0 is skipped.
     Side effect: populates module-level _INV_FLOW_MSTYLES for downstream rollup."""
     global _INV_FLOW_MSTYLES
-    cols = "[" + "], [".join(_INV_FLOW_META + _INV_FLOW_BEG + _INV_FLOW_RCV + _INV_FLOW_PRJ) + "]"
+
+    # META + BEG + PRJ only — RCV (26 cols) and text blobs deferred to Phase 2
+    cols = "[" + "], [".join(_INV_FLOW_META + _INV_FLOW_BEG + _INV_FLOW_PRJ) + "]"
 
     # Step 0 — get mstyle list (1-column query, tiny response)
     if mstyle_filter:
@@ -547,47 +555,39 @@ def pull_inv_flow(mstyle_filter: Optional[list[str]] = None) -> dict[str, dict]:
         all_mstyles = [_as_str(r.get("Mstyle") or r.get("mstyle", ""))
                        for r in (list_rows or [])]
         all_mstyles = [m for m in all_mstyles if m]
-        print(f"  [InvMgmt] {len(all_mstyles)} mstyles found — batching full pull...", flush=True)
+        print(f"  [InvMgmt] {len(all_mstyles)} mstyles found — parallel batched pull...", flush=True)
 
-    # Step 1 — batch-pull all columns in chunks of mstyles.
-    BATCH = 1000
+    # Step 1 — parallel batch-pull, 3 concurrent workers
+    BATCH   = 1000
+    WORKERS = 3
     n_batches = max(1, (len(all_mstyles) + BATCH - 1) // BATCH)
-    out: dict[str, dict] = {}
+    batches   = [all_mstyles[bi:bi + BATCH] for bi in range(0, len(all_mstyles), BATCH)]
 
     def _b(v):
         return v is True or v == 1 or (isinstance(v, str) and v.lower() in ("true", "1", "yes"))
 
-    for bi in range(0, len(all_mstyles), BATCH):
-        batch = all_mstyles[bi:bi + BATCH]
-        in_clause = ", ".join("'" + m.replace("'", "''") + "'" for m in batch)
-        sql = (f"SELECT {cols} FROM [Quickbase1].[InventoryTrack].[Inventory_Flow] "
-               f"WHERE [Mstyle] IN ({in_clause})")
-        rows = cdata_query(sql, description=f"inv-flow {bi // BATCH + 1}/{n_batches}")
-        print(f"  [InvMgmt] inv-flow batch {bi // BATCH + 1}/{n_batches} — {len(rows or [])} rows", flush=True)
-        for r in rows or []:
-            # Tolerate either CData-sanitized or original QB label form
-            def get(col, _r=r):
-                if col in _r: return _r[col]
-                alt1 = col.replace("_", " ")
-                if alt1 in _r: return _r[alt1]
-                alt2 = col.replace(" ", "_")
-                if alt2 in _r: return _r[alt2]
-                return None
-            ms = _as_str(get("Mstyle"))
-            if not ms:
-                continue
-            # Multi-pack / Kit detection: Kit_Style_ is the boolean.  When True,
-            # this mstyle is built from _Pcs_Kit_USE_ pcs of Root_Mstyle.
-            _kit_flag = get("Kit_Style_")
-            is_multi = (_kit_flag is True or _kit_flag == 1 or
-                        (isinstance(_kit_flag, str) and _kit_flag.lower() in ("true","1","yes")))
-            pcs_per_kit = max(1, _to_num(get("_Pcs_Kit_USE_"), default=1))
-            out[ms] = {
+    def _process_row(r: dict) -> tuple[str, dict]:
+        """Parse one raw CData row → (mstyle, row_dict).  Thread-safe (no shared state)."""
+        def get(col):
+            if col in r: return r[col]
+            alt1 = col.replace("_", " ")
+            if alt1 in r: return r[alt1]
+            alt2 = col.replace(" ", "_")
+            if alt2 in r: return r[alt2]
+            return None
+        ms = _as_str(get("Mstyle"))
+        if not ms:
+            return ("", {})
+        _kit_flag = get("Kit_Style_")
+        is_multi = (_kit_flag is True or _kit_flag == 1 or
+                    (isinstance(_kit_flag, str) and _kit_flag.lower() in ("true","1","yes")))
+        pcs_per_kit = max(1, _to_num(get("_Pcs_Kit_USE_"), default=1))
+        return (ms, {
             "country":      _as_str(get("Country")),
             "style_":       _as_str(get("Style_")),
             "season":       _as_str(get("Season")),
             "item_rank":    _as_str(get("Item_Rank")),
-            "item_status_flow": _as_str(get("Item_Status")),  # Inv-Flow's own item status
+            "item_status_flow": _as_str(get("Item_Status")),
             "sub_status":   _as_str(get("Sub_Status")),
             "nvo":          _b(get("NVO")),
             "new_item_no_prj": _b(get("New_Item_No_Prj_")),
@@ -668,13 +668,15 @@ def pull_inv_flow(mstyle_filter: Optional[list[str]] = None) -> dict[str, dict]:
             "amz_suppression": _b(get("AMZ_Suppression_")),
             "transfer_qty_open": _b(get("Transfer_Qty_Open_")),
 
-            # Text summaries (detail pane)
-            "shipment_status_summary": _as_str(get("Shipment_Status_Summary_")),
-            "ats_summary":     _as_str(get("ATS_Summary_")),
-            "inventory_notes": _as_str(get("Inventory_Notes_")),
-            "style_alert":     _as_str(get("Style_Alert_Message")),
-            "oos_priority_notes": _as_str(get("OOS_Priority_Notes")),
+            # Active replen customers
             "active_replen_customers": _as_str(get("Active_Replen_Customers")),
+
+            # Text summaries — deferred to pull_inv_flow_extended(); defaults here
+            "shipment_status_summary": "",
+            "ats_summary":             "",
+            "inventory_notes":         "",
+            "style_alert":             "",
+            "oos_priority_notes":      "",
 
             # Extended detail-pane fields — populated by pull_inv_flow_extended()
             "size_ct": "", "fragrance": "", "pvt_lbl_excl": False, "commit_item": False,
@@ -684,9 +686,30 @@ def pull_inv_flow(mstyle_filter: Optional[list[str]] = None) -> dict[str, dict]:
             "aged_inv_181_365": 0, "aged_inv_365plus": 0, "pct_time_in_stock": 0.0,
 
             "beg": [_to_num(get(c)) for c in _INV_FLOW_BEG],
-            "rcv": [_to_num(get(c)) for c in _INV_FLOW_RCV],
+            "rcv": [0] * 26,   # populated by pull_inv_flow_extended()
             "prj": [_to_num(get(c)) for c in _INV_FLOW_PRJ],
+        })
+
+    def _fetch_batch(batch_num: int, batch: list[str]) -> list[tuple[str, dict]]:
+        """Fetch one batch and return list of (mstyle, row_dict) pairs."""
+        in_clause = ", ".join("'" + m.replace("'", "''") + "'" for m in batch)
+        sql = (f"SELECT {cols} FROM [Quickbase1].[InventoryTrack].[Inventory_Flow] "
+               f"WHERE [Mstyle] IN ({in_clause})")
+        rows = cdata_query(sql, description=f"inv-flow {batch_num}/{n_batches}")
+        print(f"  [InvMgmt] inv-flow batch {batch_num}/{n_batches} — {len(rows or [])} rows", flush=True)
+        return [_process_row(r) for r in (rows or [])]
+
+    out: dict[str, dict] = {}
+    with ThreadPoolExecutor(max_workers=WORKERS) as executor:
+        futures = {
+            executor.submit(_fetch_batch, i + 1, batch): i
+            for i, batch in enumerate(batches)
         }
+        for future in as_completed(futures):
+            for ms, row_dict in future.result():
+                if ms:
+                    out[ms] = row_dict
+
     _INV_FLOW_MSTYLES = list(out.keys())
     pull_inv_flow_extended(out)
     return out
