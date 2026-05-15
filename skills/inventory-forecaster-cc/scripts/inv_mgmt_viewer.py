@@ -716,53 +716,101 @@ def pull_inv_flow(mstyle_filter: Optional[list[str]] = None) -> dict[str, dict]:
 
 
 def pull_inv_flow_extended(out: dict) -> None:
-    """Pull extended detail-pane fields in a single unfiltered SELECT — same
-    approach as pull_inv_flow(), so it's one CData call, not 56.
-    Any bad column name here fails gracefully without affecting the main pull."""
+    """Pull deferred detail-pane fields (RCV weeks, text blobs, product attrs)
+    using the same batched IN-clause approach as the main pull.
+
+    Columns fetched here were intentionally excluded from pull_inv_flow() to
+    reduce per-row payload in the parallel batched pass.  Any failure here is
+    non-fatal — the main table still loads; only the detail pane loses these
+    fields and shows blanks/zeros.
+
+    Two column groups:
+      A) _INV_FLOW_DEFERRED_TEXT — large text blobs + RcvWk1-26
+      B) _INV_FLOW_META_EXT      — product attrs (size, fragrance, age, etc.)
+    Both are pulled in batches of 500 mstyles (smaller than main to account for
+    the extra column width of text blobs)."""
     if not out:
         return
-    cols = "[Mstyle], " + ", ".join("[" + c + "]" for c in _INV_FLOW_META_EXT)
-    sql = f"SELECT {cols} FROM [Quickbase1].[InventoryTrack].[Inventory_Flow]"
+
+    all_mstyles = list(out.keys())
+    EXT_BATCH = 500
+    ext_n = max(1, (len(all_mstyles) + EXT_BATCH - 1) // EXT_BATCH)
+
+    def _bx(v):
+        return v is True or v == 1 or (isinstance(v, str) and v.lower() in ("true", "1", "yes"))
+
+    def _get_col(r: dict, col: str):
+        if col in r: return r[col]
+        alt = col.replace("_", " ")
+        if alt in r: return r[alt]
+        return None
+
+    # ── Group A: deferred text blobs + RcvWk1-26 ────────────────────────────
+    a_cols = "[Mstyle], " + ", ".join(
+        "[" + c + "]" for c in (_INV_FLOW_DEFERRED_TEXT + _INV_FLOW_RCV)
+    )
     try:
-        rows = cdata_query(sql, description="inv-flow-ext pull")
-        merged = 0
-        for r in (rows or []):
-            def _get(col, _r=r):
-                if col in _r:
-                    return _r[col]
-                alt = col.replace("_", " ")
-                if alt in _r:
-                    return _r[alt]
-                return None
-            def _bx(v):
-                return v is True or v == 1 or (isinstance(v, str) and v.lower() in ("true", "1", "yes"))
-            ms = _as_str(_get("Mstyle"))
-            if ms not in out:
-                continue
-            out[ms].update({
-                "size_ct":            _as_str(_get("Size_Ct")),
-                "fragrance":          _as_str(_get("Fragrance")),
-                "pvt_lbl_excl":       _bx(_get("Prvte_Lbl_Excl_")),
-                "commit_item":        _bx(_get("Commit_Item_")),
-                "inner_pack":         _to_num(_get("Inner_Pack")),
-                "master_pack":        _to_num(_get("Master_Pack")),
-                "oos_dates":          _as_str(_get("OOS_Dates_MM_DD_YY_")),
-                "over_committed_qty": _to_num(_get("Over_Committed_Qty")),
-                "ovr_comt_wos":       float(_to_num(_get("Ovr_Comt_WOS"))),
-                "invtry_age_days":    _to_num(_get("Invtry_Age_Days_")),
-                "aged_inv_0_90":      _to_num(_get("Aged_Inv_0_90_days")),
-                "aged_inv_91_180":    _to_num(_get("Aged_Inv_91_180_days")),
-                "aged_inv_181_365":   _to_num(_get("Aged_Inv_181_365_days")),
-                "aged_inv_365plus":   _to_num(_get("Aged_Inv_365_days")),
-                "pct_time_in_stock":  float(_to_num(_get("_Time_In_Stock_since_2_16_22_"))),
-            })
-            merged += 1
-        if merged:
-            print(f"  [OK] extended fields: {merged} mstyles enriched", flush=True)
-        else:
-            print("  [warn] extended pull returned no data — detail pane will show defaults", flush=True)
+        merged_a = 0
+        for bi in range(0, len(all_mstyles), EXT_BATCH):
+            batch = all_mstyles[bi:bi + EXT_BATCH]
+            bn    = bi // EXT_BATCH + 1
+            in_cl = ", ".join("'" + m.replace("'", "''") + "'" for m in batch)
+            sql   = (f"SELECT {a_cols} FROM [Quickbase1].[InventoryTrack].[Inventory_Flow] "
+                     f"WHERE [Mstyle] IN ({in_cl})")
+            rows  = cdata_query(sql, description=f"inv-flow-ext-A {bn}/{ext_n}")
+            for r in (rows or []):
+                ms = _as_str(_get_col(r, "Mstyle"))
+                if ms not in out:
+                    continue
+                out[ms].update({
+                    "shipment_status_summary": _as_str(_get_col(r, "Shipment_Status_Summary_")),
+                    "ats_summary":             _as_str(_get_col(r, "ATS_Summary_")),
+                    "inventory_notes":         _as_str(_get_col(r, "Inventory_Notes_")),
+                    "style_alert":             _as_str(_get_col(r, "Style_Alert_Message")),
+                    "oos_priority_notes":      _as_str(_get_col(r, "OOS_Priority_Notes")),
+                    "rcv": [_to_num(_get_col(r, c)) for c in _INV_FLOW_RCV],
+                })
+                merged_a += 1
+        print(f"  [OK] ext-A (text+RCV): {merged_a} mstyles enriched", flush=True)
     except Exception as e:
-        print(f"  [warn] inv-flow-ext failed: {e} — detail pane will show defaults", flush=True)
+        print(f"  [warn] inv-flow-ext-A failed: {e} — text summaries/RCV will be blank", flush=True)
+
+    # ── Group B: product attrs (unchanged from original extended pull) ────────
+    b_cols = "[Mstyle], " + ", ".join("[" + c + "]" for c in _INV_FLOW_META_EXT)
+    try:
+        merged_b = 0
+        for bi in range(0, len(all_mstyles), EXT_BATCH):
+            batch = all_mstyles[bi:bi + EXT_BATCH]
+            bn    = bi // EXT_BATCH + 1
+            in_cl = ", ".join("'" + m.replace("'", "''") + "'" for m in batch)
+            sql   = (f"SELECT {b_cols} FROM [Quickbase1].[InventoryTrack].[Inventory_Flow] "
+                     f"WHERE [Mstyle] IN ({in_cl})")
+            rows  = cdata_query(sql, description=f"inv-flow-ext-B {bn}/{ext_n}")
+            for r in (rows or []):
+                ms = _as_str(_get_col(r, "Mstyle"))
+                if ms not in out:
+                    continue
+                out[ms].update({
+                    "size_ct":            _as_str(_get_col(r, "Size_Ct")),
+                    "fragrance":          _as_str(_get_col(r, "Fragrance")),
+                    "pvt_lbl_excl":       _bx(_get_col(r, "Prvte_Lbl_Excl_")),
+                    "commit_item":        _bx(_get_col(r, "Commit_Item_")),
+                    "inner_pack":         _to_num(_get_col(r, "Inner_Pack")),
+                    "master_pack":        _to_num(_get_col(r, "Master_Pack")),
+                    "oos_dates":          _as_str(_get_col(r, "OOS_Dates_MM_DD_YY_")),
+                    "over_committed_qty": _to_num(_get_col(r, "Over_Committed_Qty")),
+                    "ovr_comt_wos":       float(_to_num(_get_col(r, "Ovr_Comt_WOS"))),
+                    "invtry_age_days":    _to_num(_get_col(r, "Invtry_Age_Days_")),
+                    "aged_inv_0_90":      _to_num(_get_col(r, "Aged_Inv_0_90_days")),
+                    "aged_inv_91_180":    _to_num(_get_col(r, "Aged_Inv_91_180_days")),
+                    "aged_inv_181_365":   _to_num(_get_col(r, "Aged_Inv_181_365_days")),
+                    "aged_inv_365plus":   _to_num(_get_col(r, "Aged_Inv_365_days")),
+                    "pct_time_in_stock":  float(_to_num(_get_col(r, "_Time_In_Stock_since_2_16_22_"))),
+                })
+                merged_b += 1
+        print(f"  [OK] ext-B (product attrs): {merged_b} mstyles enriched", flush=True)
+    except Exception as e:
+        print(f"  [warn] inv-flow-ext-B failed: {e} — product attrs will show defaults", flush=True)
 
 
 # Populated once at startup by build_records — the 26 rolling manual prj labels
