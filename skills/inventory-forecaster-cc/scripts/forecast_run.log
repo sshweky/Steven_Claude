@@ -47,7 +47,7 @@
 
 [2.9] VP-ATS: fetching ATS L26W history for 2247 mstyles ...
       [vp-ats] fetching ATS L26W history from bv2sxg2ji (2247 mstyles) ...
- 266 mstyles with ATS history loaded  (734 filtered out)
+      [vp-ats] 266 mstyles with ATS history loaded  (734 filtered out)
       266 mstyles loaded, 182 with at least one non-zero ATS week
 
 [3/4] Running forecasts ...
@@ -57,15 +57,14 @@
 [2.9] F60 — EC transition history inheritance ...
       6 EC variants inherited parent history
   [F58] Loaded 2 active AI adjustments (last 60 days)
-      5061 forecasts complete in 12.7s
+      5061 forecasts complete in 9.6s
       Croston's: 1211  Heuristic: 165  Inactive: 542  Inactive (zero order history): 353  Inactive+Floor: 8  Inactive+Floor (R3): 2  Inactive+S6 (off-price): 18  OTB (zero): 312  Pre-launch NEW (manual passthrough): 53  Reactivating: 47  Seasonal Baseline: 837  Sparse Intermittent: 1513  Bi-weekly enforced: 0  Alerts (>5%): 3885
-  [watchdog] still running � 1s since last output | last:       Croston's: 1211  Heuristic: 165  Inactive: 542  Inactive (zero order histo
       Saved → forecast_results.json
       Open viewer: python scripts/viewer.py --results forecast_results.json
 
 [4/4] Writing 5061 records to Quickbase ...
       5061 records  |  bulk REST → pim.quickbase.com/v1/records, batch=500
-      Bulk upsert: 5,061 OK · 0 failed · 20.2s (250 rec/s)
+      Bulk upsert: 5,061 OK · 0 failed · 17.1s (296 rec/s)
 
 ==================================================================
   COMPLETE  |  5061 records  |  Total 26w demand: 17,791,488
@@ -19148,6 +19147,11 @@
   AI  BB36058                     0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man BB36058                     0    0    0    0 3000    0    0  540  540  540  540  540  540  540  540  540  540  540  540  540  540  540  540  540  540  540     510
   -------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+  [watchdog] Forecaster completed successfully.
+----------------------------------------------------------------------
 
 
 
