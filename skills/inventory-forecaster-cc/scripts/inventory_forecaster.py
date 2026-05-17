@@ -2272,6 +2272,10 @@ def normalize_ats_oos_weeks(hist, ats_l26):
     for i in range(26, min(52, n)):
         ats_idx = i - 26
         ats_val = float(ats_l26[ats_idx] or 0)
+        # Negative ATS = returns/adjustments created a paper over-allocation;
+        # this is a data quality artifact, not an actual stockout.  Skip.
+        if ats_val < 0:
+            continue
 
         # L13 nz-avg from ORIGINAL history prior to this week
         prior_lo = max(0, i - 13)
