@@ -5088,7 +5088,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # via _prep_record_signals().
     _sig = _prep_record_signals(row, master_pack, oos_entry=oos_entry,
                                 amazon_pos=amazon_pos, season_map=season_map,
-                                amazon_catalog_us=amazon_catalog_us)
+                                amazon_catalog_us=amazon_catalog_us,
+                                ats_hist_l26=ats_hist)
     mp               = _sig["mp"]
     hist             = _sig["hist"]
     cust_name        = _sig["cust_name"]
