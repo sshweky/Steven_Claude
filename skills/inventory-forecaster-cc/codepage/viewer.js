@@ -2728,7 +2728,7 @@ async function saveRecordEdits(key) {
     updateSaveAllBadge();
     if (saveStatus) {
       saveStatus.style.color = '#2e7d32';
-      saveStatus.textContent = `✓ Saved ${key}`;
+      saveStatus.textContent = '✓ Saved ' + key;
       setTimeout(() => { if ((saveStatus.textContent || '').includes(key)) saveStatus.textContent = ''; }, 4000);
     }
   } catch (e) {
