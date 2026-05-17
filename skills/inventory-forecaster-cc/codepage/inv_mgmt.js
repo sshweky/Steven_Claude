@@ -184,6 +184,20 @@ function poStatus(po, today, country) {
 // -- Utilities -----------------------------------------------------------------
 function fmt(n) { if (n == null || n === '' || n === undefined) return '0'; var num=Number(n); if (isNaN(num)) return String(n); return num.toLocaleString('en-US', {maximumFractionDigits:1}); }
 function esc(s) { return String(s == null ? '' : s).replace(/[<>&"']/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];}); }
+// Strip HTML tags and common entities from QB-returned rich-text fields
+function stripHtml(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/<[^>]*>/g, '')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').replace(/&#\d+;/g,'').replace(/&[a-z]+;/gi,'')
+    .replace(/\s+/g,' ').trim();
+}
+// Extract plain string from QB user-type fields (returned as {id,name,email} objects)
+function qbUser(v) {
+  if (!v) return '';
+  if (typeof v === 'object') return String(v.name || v.email || v.id || '');
+  return String(v);
+}
 function fmtDate(d) {
   if (!d) return '&#8212;';
   try { var dt = (typeof d === 'string') ? new Date(d) : d; if (!dt || isNaN(dt)) return '&#8212;'; return dt.toLocaleDateString('en-US', {month:'short', day:'numeric'}); }
