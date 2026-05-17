@@ -79,6 +79,14 @@ FALL_DEAL_WEEKS    = {23, 24, 25}   # early-Sep pre-order
 EVENT_WEEKS        = PRIME_DAY_WEEKS | FALL_DEAL_WEEKS
 PRIME_DAY_LIFT     = 1.25            # legacy constant (still used for insertion/messaging)
 FALL_DEAL_LIFT     = 1.12
+# F64 — Trade fall calendar events (2026-05-17).  Based on manual-vs-AI analysis:
+# W17-W18 = early September fall replenishment (most common planner spike week);
+# W21-W22 = early October holiday pre-order wave (2nd most common spike week).
+# Applied to non-Amazon items only (Amazon has its own Prime Day / Fall Deal lifts).
+TRADE_FALL_REPLEN_WEEKS  = {17, 18}
+TRADE_FALL_SEASON2_WEEKS = {21, 22}
+TRADE_FALL_REPLEN_LIFT   = 1.10
+TRADE_FALL_SEASON2_LIFT  = 1.08
 AMAZON_CUST_SUBSTR = "AMAZON"      # substring match on Customr_Name (case-insensitive)
 # R4 (Amazon Private Label skip) was removed 2026-05-05 — APL items ARE shipped,
 # so they should go through normal classification like any other Amazon record.
