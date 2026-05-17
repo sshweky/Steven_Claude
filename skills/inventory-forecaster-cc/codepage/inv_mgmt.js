@@ -333,9 +333,10 @@ async function loadData() {
     var nextRcptDt = nrRaw ? new Date(nrRaw) : null;
 
     var itemStatusFlow = String(g(IF_F.ItemStatus)||'').trim();
-    // Skip non-actionable statuses — never show in viewer
+    // Skip non-actionable statuses (and blank status — no proj data)
+    if (!itemStatusFlow) continue;
     if (/^(restricted|ready to sell|ready to quote|discontinued|dropped|in develop)/i.test(itemStatusFlow)) continue;
-    if (/component/i.test(itemStatusFlow)) continue; // contains-match: catches Sub-Component, Kit/Component, etc.
+    if (/component/i.test(itemStatusFlow)) continue;
     var isReplen = /^(replen|active|r)/i.test(itemStatusFlow) || toNum(g(IF_F.OptWOS)) > 0;
 
     var shpL4  = toNum(g(IF_F.ShpWkL4));
