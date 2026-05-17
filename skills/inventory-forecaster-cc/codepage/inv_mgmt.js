@@ -285,8 +285,9 @@ async function loadData() {
 
   setStep(2,'active'); setBar(10);
   var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);
-  // Filter to active/replen records only using field 927 (Active Item? checkbox)
-  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, "{927}.EX.'true'", 'Loading Inventory Flow');
+  // Filter to active/replen records only using field 927 (boolean checkbox — no quotes around true)
+  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, "{927}.EX.true", 'Loading Inventory Flow');
+  setStatus('IF loaded: ' + ifRows.length + ' records');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
   // Active projections only (StatusCust starts with 'A') — provides demand + brand/description
