@@ -306,7 +306,7 @@ async function loadData() {
     var country = String(g(IF_F.Country)||'').trim();
     var isMulti = toBool(g(IF_F.KitStyle));
     var pcsKit  = toNum(g(IF_F.PcsKitUse)) || 1;
-    if (isMulti && pcsKit !== 1) continue; // hide true multi-packs (PcsKitUse > 1); show kit-style items with PcsKitUse=1
+    if (pcsKit > 1) continue; // hide any record with PcsKitUse > 1, regardless of KitStyle
     var rootMs  = String(g(IF_F.RootMstyle)||'').trim();
 
     var pi = prjByMs[mstyle] || { custs:[], desc:'', brand:'' };
