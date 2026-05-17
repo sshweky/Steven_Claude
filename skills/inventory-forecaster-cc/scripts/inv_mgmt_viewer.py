@@ -2728,6 +2728,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 with open(logo_path, "rb") as f:
                     data = f.read()
                 self.send_response(200)
+                self._cors()
                 self.send_header("Content-Type", "image/png")
                 self.send_header("Content-Length", str(len(data)))
                 self.send_header("Cache-Control", "max-age=3600")
