@@ -275,7 +275,9 @@ async function loadData() {
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
   var prjFieldIds = Object.values(PRJ_F).concat(PRJ_MANUAL);
-  var prjRows = await qbQueryAll(PROJ_TID, prjFieldIds, "{10}.CT.'A'", 'Loading Projections');
+  // No filter — load all projections so every mstyle gets brand/description metadata.
+  // Demand (custs[]) is restricted to active-status rows in the loop below.
+  var prjRows = await qbQueryAll(PROJ_TID, prjFieldIds, '', 'Loading Projections');
 
   setBar(70); setStatus('Processing data...');
 
@@ -287,12 +289,17 @@ async function loadData() {
     var cust = String((row[PRJ_F.CustName]||{}).value||'').trim();
     var desc = String((row[PRJ_F.Description]||{}).value||'').trim();
     var brand= String((row[PRJ_F.Brand]||{}).value||'').trim();
+    var sc   = String((row[PRJ_F.StatusCust]||{}).value||'').trim();
     if (!ms) continue;
-    var weekly = PRJ_MANUAL.map(function(fid){return toNum((row[fid]||{}).value);});
-    var total  = weekly.reduce(function(a,b){return a+b;},0);
+    // Always capture brand/description regardless of customer status
     if (!prjByMs[ms]) prjByMs[ms] = { custs:[], desc:desc, brand:brand };
     else { if(desc && !prjByMs[ms].desc) prjByMs[ms].desc=desc; if(brand && !prjByMs[ms].brand) prjByMs[ms].brand=brand; }
-    prjByMs[ms].custs.push({ customer:cust, weekly:weekly, total:total });
+    // Only include active-status customer demand (StatusCust starts with 'A')
+    if (/^A/i.test(sc)) {
+      var weekly = PRJ_MANUAL.map(function(fid){return toNum((row[fid]||{}).value);});
+      var total  = weekly.reduce(function(a,b){return a+b;},0);
+      prjByMs[ms].custs.push({ customer:cust, weekly:weekly, total:total });
+    }
   }
 
   // Build records from Inventory Flow
