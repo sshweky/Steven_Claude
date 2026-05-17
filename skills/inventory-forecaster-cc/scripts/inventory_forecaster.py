@@ -4520,6 +4520,10 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     # post-stockout catch-up weeks so the rest of the pipeline sees real
     # demand intent, not "base + accumulated owe".
     hist, f35_corrections = normalize_stockout_recovery(hist)
+    # VP-ATS — ATS-confirmed OOS zero-week fill.  Runs AFTER F35 (so F35
+    # can first normalize any post-gap catch-up spike) and BEFORE F47/F41
+    # (so those normalizations see ATS-corrected demand intent).
+    hist, f_ats_corrections = normalize_ats_oos_weeks(hist, ats_hist_l26)
     # F41 — Shipment-confirmed phantom-order dedupe.  Pull per-week ship
     # history and cross-check: if order N wasn't fulfilled within the 1-wk
     # lag window, a similar-qty order in N+1 / N+2 is a phantom reorder.
