@@ -5737,6 +5737,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                                        is_offprice=_is_offprice_s1)
         model    = "Sparse Intermittent"
         biweekly = False   # sparse items never get biweekly enforcement
+        _cadence_gap_si = detect_biweekly(hist_for_model)
+        biweekly = bool(_cadence_gap_si)
+        fcst = apply_ordering_pattern(fcst, hist_for_model, mp)
 
     elif not is_dense:
         # Intermittent buyer (25–50% non-zero = every 2–5 weeks).
@@ -5754,6 +5757,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                    is_international=is_international)
         model    = "Croston's"
         biweekly = False
+        _cadence_gap_c = detect_biweekly(hist_for_model)
+        biweekly = bool(_cadence_gap_c)
+        fcst = apply_ordering_pattern(fcst, hist_for_model, mp)
 
     else:
         # Dense buyer (≥ 50% non-zero): seasonal baseline + ordering pattern shape.
