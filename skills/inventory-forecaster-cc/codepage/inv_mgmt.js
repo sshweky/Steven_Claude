@@ -746,14 +746,16 @@ function buildTableHead() {
   var tbl=document.getElementById('mainTable');
   var cg=tbl.querySelector('colgroup');
   if(!cg){cg=document.createElement('colgroup');tbl.insertBefore(cg,tbl.firstChild);}
+  var totalW=cols.reduce(function(s,c){return s+(COL_WIDTHS[c.id]||62);},0);
   cg.innerHTML=cols.map(function(c){return '<col style="width:'+(COL_WIDTHS[c.id]||62)+'px">';}).join('');
+  tbl.style.width=totalW+'px';
 
   var h1='<tr class="sort-row">';
   cols.forEach(function(c){
     var a=c.align==='right'?' class="right"':'';
     var arrow=(currentSort.id===c.id)?'<span class="sort-arrow">'+(currentSort.dir>0?'&#9650;':'&#9660;')+'</span>':'';
     var tip=c.tooltip?' title="'+c.tooltip.replace(/"/g,'&quot;')+'"':'';
-    h1+='<th'+a+tip+' data-col="'+c.id+'">'+c.label+arrow+'</th>';
+    h1+='<th'+a+tip+' data-col="'+c.id+'"><span class="col-label">'+c.label+'</span>'+arrow+'</th>';
   });
   h1+='</tr>';
   var h2='<tr class="filter-row">';
