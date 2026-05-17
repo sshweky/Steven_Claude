@@ -7317,6 +7317,37 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"forecast reflects total product demand (warehouse + factory-direct)"
             )
 
+        # ── F69 cadence-pause dampener ────────────────────────────────────────
+        # Amazon orders DI on the 10th monthly with 65-day lead time.
+        # If we have NOT received expected DI POs (silence ≥ 6 weeks with prior
+        # history), Amazon has intentionally paused ordering — likely because DC
+        # is overstocked.  The warehouse channel won't compensate; dampen
+        # near-term forecast for the duration of the expected pause window.
+        #
+        # Scale: each missed monthly window reduces the near-term fcst further.
+        #   1 missed  → ×0.70   (cautious — one skip could be a timing anomaly)
+        #   2 missed  → ×0.50
+        #   3 missed  → ×0.35
+        #   4+ missed → ×0.25   (floor — clear channel pause)
+        # Applied to W1 through (missed_windows × 4 + 4) weeks, capped at W16.
+        if (row.get("_di_pause") and is_amazon
+                and isinstance(fcst, list) and len(fcst) >= 26
+                and model not in ("Inactive",)):
+            _fire("F69-pause")
+            _di_missed = row.get("_di_missed_windows", 1)
+            _di_pw     = row.get("_di_pause_weeks", 6)
+            _di_scale  = max(0.25, 1.0 - (_di_missed * 0.25))
+            _di_horizon = min(16, _di_missed * 4 + 4)
+            for _wi in range(_di_horizon):
+                if fcst[_wi] > 0:
+                    fcst[_wi] = snap(fcst[_wi] * _di_scale, mp)
+            meta.setdefault("drivers", []).append(
+                f"F69 DI cadence pause: last DI order {_di_pw}w ago "
+                f"({_di_missed} expected monthly window(s) missed) — "
+                f"W1-W{_di_horizon} scaled ×{_di_scale:.2f} "
+                f"(Amazon DC overstocked; DI + warehouse ordering paused)"
+            )
+
     # F58 — Tell-AI comment replay (2026-05-08 → option B).
     # Apply the planner's most-recent "AI Adjusted" comment from QB Projection
     # Comments table as an override on top of the model's forecast.  Same
