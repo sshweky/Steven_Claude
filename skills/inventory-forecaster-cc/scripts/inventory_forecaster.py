@@ -4661,7 +4661,8 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
         "f41_corrections":  f41_corrections,
         "f43_corrections":  f43_corrections,
         "f47_corrections":  f47_corrections,
-        "f_ats_corrections": f_ats_corrections,
+        "f_ats_corrections":       f_ats_corrections,
+        "f_ats_catch_corrections": f_ats_catch_corrections,
     }
 
 
