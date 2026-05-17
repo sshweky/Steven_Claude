@@ -782,6 +782,12 @@ function buildTableHead() {
     inp.oninput=function(){var id=inp.dataset.filter,v=inp.value.trim();if(v)colFilters[id]=v;else delete colFilters[id];applyFilters();};
     inp.onclick=function(e){e.stopPropagation();};
   });
+  // Fix sort-row sticky offset: measure filter-row actual height so sort row sits precisely below it
+  setTimeout(function(){
+    var filterTh=head.querySelector('tr.filter-row th');
+    var filterH=filterTh?filterTh.offsetHeight:22;
+    head.querySelectorAll('tr.sort-row th').forEach(function(th){th.style.top=filterH+'px';});
+  },0);
 }
 
 function buildFilterDropdowns() {
