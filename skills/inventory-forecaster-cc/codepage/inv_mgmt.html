@@ -8,25 +8,27 @@
 
   /* ── Loading screen ── */
   #loadingScreen {
-    position:fixed; inset:0; background:#0d47a1; z-index:9999;
+    position:fixed; inset:0; background:rgba(15,15,30,0.95); z-index:9999;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     color:#fff; transition:opacity 0.4s ease;
   }
   #loadingScreen.hidden { opacity:0; pointer-events:none; }
   #loadIcon  { font-size:52px; margin-bottom:16px; }
   #loadTitle { font-size:22px; font-weight:700; margin-bottom:4px; }
-  #loadSub   { font-size:13px; color:rgba(255,255,255,0.6); margin-bottom:36px; }
-  #loadBarWrap { width:340px; height:5px; background:rgba(255,255,255,0.2); border-radius:3px; overflow:hidden; margin-bottom:20px; }
-  #loadBar   { height:100%; background:#fff; width:0%; transition:width 0.6s ease; border-radius:3px; }
-  #loadStatus { font-size:13px; color:rgba(255,255,255,0.9); margin-bottom:28px; min-height:18px; }
-  #loadSteps { font-size:12px; color:rgba(255,255,255,0.5); line-height:2; min-width:240px; }
-  #loadSteps .done  { color:rgba(255,255,255,0.9); }
+  #loadSub   { font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:36px; }
+  #loadBarWrap { width:340px; height:4px; background:rgba(255,255,255,0.15); border-radius:3px; overflow:hidden; margin-bottom:20px; }
+  #loadBar   { height:100%; background:#f9a825; width:0%; transition:width 0.6s ease; border-radius:3px; }
+  #loadStatus { font-size:13px; color:rgba(255,255,255,0.8); margin-bottom:28px; min-height:18px; }
+  #loadSteps { font-size:12px; color:rgba(255,255,255,0.4); line-height:2; min-width:240px; }
+  #loadSteps .done  { color:rgba(255,255,255,0.8); }
   #loadSteps .done::before { content:"\2713\00a0"; }
-  #loadSteps .active { color:#fff; font-weight:600; }
+  #loadSteps .active { color:#f9a825; font-weight:600; }
   #loadSteps .active::before { content:"\25b6\00a0"; }
   #loadSteps .pending::before { content:"\25cb\00a0"; }
-  .topbar { background:#0d47a1; color:#fff; padding:10px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-  .topbar h1 { font-size:18px; font-weight:600; }
+
+  /* ── Top bar ── */
+  .topbar { background:#4a148c; color:#fff; padding:10px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .topbar h1 { font-size:16px; font-weight:600; }
   .stats { display:flex; gap:8px; font-size:12px; align-items:center; flex-wrap:wrap; }
   .stats .stat { background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:4px; }
   .stats .stat b { font-size:14px; }
@@ -35,37 +37,53 @@
     font-family:inherit; font-weight:600;
     transition: transform 0.1s, box-shadow 0.1s;
   }
-  .pri-btn:hover { transform: translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+  .pri-btn:hover { transform: translateY(-1px); box-shadow:0 2px 6px rgba(0,0,0,0.3); }
   .pri-btn.active { box-shadow:0 0 0 2px rgba(255,255,255,0.4); }
   .pri-btn b { font-weight:700; }
-  .toolbar { padding:10px 18px; background:#fff; border-bottom:1px solid #d8dce3; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  .toolbar input, .toolbar select { font-size:12px; padding:4px 8px; border:1px solid #ccc; border-radius:3px; font-family:inherit; }
-  .toolbar input[type=text] { width:240px; }
-  table.main { width:100%; background:#fff; border-collapse:collapse; font-size:12px; }
-  table.main th { background:#eceff1; padding:6px 8px; text-align:left; border-bottom:2px solid #cfd8dc; white-space:nowrap; }
-  table.main td { padding:5px 8px; border-bottom:1px solid #eceff1; vertical-align:top; }
+
+  /* ── Toolbar ── */
+  .toolbar { padding:8px 18px; background:#fff; border-bottom:1px solid #d8dce3; display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; }
+  .toolbar input, .toolbar select { font-size:11px; padding:3px 6px; border:1px solid #ccc; border-radius:4px; font-family:inherit; }
+  .toolbar input[type=text] { width:220px; }
+  .ms-wrap { display:inline-flex; flex-direction:column; gap:2px; }
+  .ms-label { font-size:9px; color:#6a6a6a; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; line-height:1; padding:0 2px; }
+
+  /* ── Main table ── */
+  /* border-collapse:separate required for position:sticky on thead to work reliably */
+  table.main { width:100%; background:#fff; border-collapse:separate; border-spacing:0; }
+  table.main th { background:#f8f9fa; padding:6px 8px; text-align:left; white-space:nowrap; font-size:11px; padding:4px 6px; }
+  table.main td { padding:4px 6px; border-bottom:1px solid #eee; vertical-align:top; font-size:12px; }
   table.main tr.row { cursor:pointer; }
-  table.main tr.row:hover { background:#f5fafd; }
+  table.main tr.row:hover { background:#eef4ff; }
+  table.main th.right, table.main td.right { text-align:right; }
+
+  /* Priority text */
   .pri-CRITICAL { color:#b71c1c; font-weight:700; }
   .pri-HIGH     { color:#e65100; font-weight:600; }
   .pri-MEDIUM   { color:#5d4037; }
   .pri-LOW      { color:#555; }
+
+  /* Badges */
   .badge { display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:8px; }
   .badge-red    { background:#ffebee; color:#b71c1c; }
   .badge-amber  { background:#fff3e0; color:#e65100; }
   .badge-purple { background:#f3e5f5; color:#4a148c; }
   .badge-green  { background:#e8f5e9; color:#1b5e20; }
   .badge-gray   { background:#eeeeee; color:#666; }
+
+  /* ── Detail pane ── */
   .detail-pane { background:#fafafa; }
-  .detail-pane td { padding:0; }
+  .detail-pane td { padding:0; border-bottom:none; }
   .detail-pane .dwrap { padding:14px 18px; }
   .section { background:#fff; border:1px solid #e0e0e0; border-radius:5px; padding:10px 14px; margin-bottom:10px; }
-  .section h3 { font-size:13px; font-weight:600; color:#0d47a1; margin-bottom:8px; }
+  .section h3 { font-size:13px; font-weight:600; color:#4a148c; margin-bottom:8px; }
   table.subtbl { width:100%; border-collapse:collapse; font-size:11px; }
   table.subtbl th { background:#f5f5f5; padding:3px 6px; text-align:left; border-bottom:1px solid #ddd; font-weight:600; }
   table.subtbl td { padding:3px 6px; border-bottom:1px solid #f3f3f3; }
   table.subtbl td.right { text-align:right; }
-  .rec-box { padding:10px 14px; border-left:3px solid #1565c0; background:#f0f7ff; margin-bottom:8px; font-size:12px; border-radius:0 4px 4px 0; }
+
+  /* Rec cards */
+  .rec-box { padding:10px 14px; border-left:3px solid #6a1b9a; background:#f3e5f5; margin-bottom:8px; font-size:12px; border-radius:0 4px 4px 0; }
   .rec-box.priority-HIGH { border-color:#e65100; background:#fff8e1; }
   .rec-box.priority-CRITICAL { border-color:#b71c1c; background:#ffebee; }
   .rec-box.action-NO_LEVER { border-color:#888; background:#f5f5f5; color:#666; }
@@ -80,6 +98,8 @@
   .rec-row { padding:2px 0; font-size:11px; color:#333; }
   .rec-row .rec-lbl { display:inline-block; min-width:80px; color:#666; font-weight:600; font-size:10px; text-transform:uppercase; letter-spacing:0.3px; }
   .rec-reason { margin-top:5px; padding:4px 8px; background:rgba(255,255,255,0.5); border-radius:3px; font-size:11px; color:#444; }
+
+  /* Inventory Flow grid */
   .grid26 { font-size:10px; }
   .grid26 th, .grid26 td { padding:2px 5px; text-align:right; white-space:nowrap; }
   .grid26 th { font-size:9px; }
@@ -91,23 +111,27 @@
   .stat-text b { color:#222; }
   .kv-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:6px 18px; font-size:11px; }
   .kv-grid div { padding:2px 0; }
+  .grid26 td[title] { position:relative; }
+
+  /* KPI strip */
   .kpi-strip { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; padding:8px; background:#fafbfc; border:1px solid #e0e3e8; border-radius:5px; }
   .kpi { flex:0 0 auto; min-width:100px; padding:5px 10px; background:#fff; border:1px solid #e8ecf0; border-radius:4px; cursor:help; }
   .kpi-lbl { font-size:10px; color:#888; text-transform:uppercase; letter-spacing:0.3px; }
-  .kpi-val { font-size:14px; font-weight:700; color:#0d47a1; margin-top:1px; }
-  .grid26 td[title] { position:relative; }
-  table.main td, table.main th { font-size:11px; padding:4px 6px; }
-  table.main th.right, table.main td.right { text-align:right; }
-  /* Filter row sits on TOP (above column labels) */
-  table.main thead tr.filter-row { background:#e8edf2; position:sticky; top:0; z-index:3; }
-  table.main thead tr.filter-row th { padding:2px 4px; font-weight:400; cursor:default; border-bottom:1px solid #cfd8dc; }
-  table.main thead tr.filter-row input { width:100%; box-sizing:border-box; font-size:10px; padding:2px 4px; border:1px solid #b0bec5; border-radius:2px; font-family:inherit; background:#fff; }
-  table.main thead tr.filter-row input:focus { outline:1px solid #0d47a1; border-color:#0d47a1; }
-  /* Sort row sits BELOW filter row, clickable */
-  table.main thead tr.sort-row th { position:sticky; top:22px; z-index:2; cursor:pointer; user-select:none; background:#eceff1; border-bottom:2px solid #cfd8dc; }
-  table.main thead tr.sort-row th:hover { background:#dde2e6; }
-  .sort-arrow { display:inline-block; margin-left:3px; color:#0d47a1; font-size:10px; }
-  /* Priority row coloring */
+  .kpi-val { font-size:14px; font-weight:700; color:#4a148c; margin-top:1px; }
+
+  /* ── Sticky header rows ── */
+  /* Filter row — TOP (inputs above column labels) */
+  table.main thead tr.filter-row { background:#fafbfc; position:sticky; top:0; z-index:3; }
+  table.main thead tr.filter-row th { padding:2px 4px; font-weight:400; cursor:default; box-shadow:inset 0 -1px 0 #e0e0e0; }
+  table.main thead tr.filter-row input { width:100%; box-sizing:border-box; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:3px; font-family:inherit; background:#fff; color:#333; }
+  table.main thead tr.filter-row input::placeholder { color:#aaa; font-style:italic; }
+  table.main thead tr.filter-row input:focus { outline:none; border-color:#4a148c; box-shadow:0 0 0 2px rgba(74,20,140,0.12); }
+  /* Sort/label row — below filter row, clickable */
+  table.main thead tr.sort-row th { position:sticky; top:22px; z-index:2; cursor:pointer; user-select:none; background:#f8f9fa; box-shadow:inset 0 -2px 0 #ddd; }
+  table.main thead tr.sort-row th:hover { background:#eef4ff; }
+  .sort-arrow { display:inline-block; margin-left:3px; color:#4a148c; font-size:10px; }
+
+  /* ── Priority row coloring ── */
   table.main tr.row-CRITICAL { background:#fff5f5; }
   table.main tr.row-CRITICAL td:first-child { box-shadow:inset 3px 0 0 #b71c1c; }
   table.main tr.row-HIGH { background:#fff8f3; }
@@ -115,9 +139,10 @@
   table.main tr.row-MEDIUM { background:#fffef0; }
   table.main tr.row-MEDIUM td:first-child { box-shadow:inset 3px 0 0 #f9a825; }
   table.main tr.row-CRITICAL:hover { background:#ffe9e9; }
-  table.main tr.row-HIGH:hover { background:#fff3ea; }
+  table.main tr.row-HIGH:hover { background:#fff0e6; }
   table.main tr.row-MEDIUM:hover { background:#fffde5; }
-  /* Recommended Actions — 25% wide cards */
+
+  /* ── Recommended Actions — 25% wide cards ── */
   .recs-wrap { display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start; }
   .recs-wrap .rec-box { width:calc(25% - 6px); min-width:220px; margin-bottom:0; }
 </style>
@@ -142,35 +167,37 @@
   <h1>&#127981; P+P Inventory Manager</h1>
   <div style="display:flex;flex-direction:column;gap:2px;">
     <div class="stats" id="statsBar"></div>
-    <div id="dataAsOf" style="font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:0.2px;"></div>
+    <div id="dataAsOf" style="font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.2px;"></div>
   </div>
-  <button onclick="generateRecoSheet()" style="margin-left:auto;padding:6px 14px;background:#fff;color:#0d47a1;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;">
+  <button onclick="generateRecoSheet()" style="margin-left:auto;padding:6px 14px;background:#fff;color:#4a148c;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;font-family:inherit;">
     &#128203; Generate Reco Spreadsheet
     <span id="recoBadge" style="background:#e65100;color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;display:none;">0</span>
   </button>
 </div>
 
 <div class="toolbar">
-  <input type="text" id="searchInput" placeholder="Search mstyle / description / brand">
-  <select id="actionFilter">
-    <option value="">All actions</option>
-    <option value="PULL_UP">PULL_UP</option>
-    <option value="FASTER_VESSEL">FASTER_VESSEL</option>
-    <option value="PUSH_OUT">PUSH_OUT</option>
-    <option value="SPLIT">SPLIT</option>
-    <option value="CANCEL">CANCEL</option>
-    <option value="NO_LEVER">NO_LEVER</option>
-    <option value="__NONE__">No recs (clean)</option>
-  </select>
-  <select id="countryFilter"><option value="">All countries</option></select>
-  <select id="brandFilter"><option value="">All brands</option></select>
-  <select id="invMgrFilter"><option value="">All inv mgrs</option></select>
+  <div class="ms-wrap"><span class="ms-label">Search</span><input type="text" id="searchInput" placeholder="mstyle / description / brand"></div>
+  <div class="ms-wrap"><span class="ms-label">Action</span>
+    <select id="actionFilter">
+      <option value="">All actions</option>
+      <option value="PULL_UP">PULL_UP</option>
+      <option value="FASTER_VESSEL">FASTER_VESSEL</option>
+      <option value="PUSH_OUT">PUSH_OUT</option>
+      <option value="SPLIT">SPLIT</option>
+      <option value="CANCEL">CANCEL</option>
+      <option value="NO_LEVER">NO_LEVER</option>
+      <option value="__NONE__">No recs (clean)</option>
+    </select>
+  </div>
+  <div class="ms-wrap"><span class="ms-label">Country</span><select id="countryFilter"><option value="">All countries</option></select></div>
+  <div class="ms-wrap"><span class="ms-label">Brand</span><select id="brandFilter"><option value="">All brands</option></select></div>
+  <div class="ms-wrap"><span class="ms-label">Inv Mgr</span><select id="invMgrFilter"><option value="">All inv mgrs</option></select></div>
   <label style="font-size:11px;"><input type="checkbox" id="replenOnly" checked> Replen only</label>
   <label style="font-size:11px;"><input type="checkbox" id="gapsOnly"> OOS Risk</label>
   <label style="font-size:11px;"><input type="checkbox" id="overstockOnly"> Overstock</label>
   <label style="font-size:11px;"><input type="checkbox" id="hideMulti" checked> Hide multi-packs</label>
-  <button id="clearBtn" style="padding:4px 10px;background:#fff;border:1px solid #999;border-radius:3px;cursor:pointer;font-size:11px;">Clear filters</button>
-  <button onclick="refreshData()" style="padding:4px 10px;background:#fff;border:1px solid #1565c0;border-radius:3px;cursor:pointer;font-size:11px;color:#1565c0;">&#128260; Refresh</button>
+  <button id="clearBtn" style="padding:4px 10px;background:#fff;border:1px solid #999;border-radius:4px;cursor:pointer;font-size:11px;font-family:inherit;">Clear filters</button>
+  <button onclick="refreshData()" style="padding:4px 10px;background:#fff;border:1px solid #4a148c;border-radius:4px;cursor:pointer;font-size:11px;color:#4a148c;font-family:inherit;">&#128260; Refresh</button>
 </div>
 
 <div style="overflow:auto;max-height:calc(100vh - 120px);">
