@@ -1774,6 +1774,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
 
         # Trigger A — spike-and-cooldown
         # idx 0 = W-13, idx 12 = W-1.  Spike in W-12..W-5 means idx in [1..8].
+        # Cooldown uses L8_avg (stored in _f48_l4_avg) vs L13 nz-avg.
         _f48_spike   = (_f48_l13_med > 0 and _f48_l13_max >= _f48_l13_med * 2.5
                         and 1 <= _f48_l13_max_idx <= 8)
         _f48_cooled  = (_f48_l13_nz_avg > 0 and _f48_l4_avg > 0
@@ -2503,7 +2504,7 @@ def normalize_oos_rebuild_ramp(hist, ships):
     when we cannot ship — they are rebuilding their on-hand position the
     moment shipments resume.  In that case:
         • ord_history shows continuous order activity (no zero run)
-        • ship_history shows ≥3 consecutive zero ship weeks with ord>0
+        • ship_history shows ≥2 consecutive zero ship weeks with ord>0
         • The 3-5 weeks AFTER ship resumes are inflated 1.5-3.5× normal
           because the customer is rebuilding safety stock
 
@@ -2562,7 +2563,7 @@ def normalize_oos_rebuild_ramp(hist, ships):
                 run_end = i  # first non-OOS index after the run
                 run_len = run_end - run_start
 
-                if run_len >= 3 and run_end < n:
+                if run_len >= 2 and run_end < n:
                     # (2) Establish the pre-OOS pace from the prior shipping window.
                     pre_window_start = max(0, run_start - 13)
                     pre_ships = [s[k] for k in range(pre_window_start, run_start) if s[k] > 0]
