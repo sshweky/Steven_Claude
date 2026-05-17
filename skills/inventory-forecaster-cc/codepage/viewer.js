@@ -972,8 +972,9 @@ function adaptRow(row) {
 
   const ai_total     = forecast.reduce((a,b) => a+b, 0);
   const manual_total = manual.reduce((a,b) => a+b, 0);
-  const ai_per_wk    = ai_total / 26;
-  const proj_per_wk  = manual_total / 26;
+  const opn_total    = opn.reduce((a,b) => a+b, 0);   // open PO units (zeroed-out wks counted here)
+  const ai_per_wk    = (ai_total + opn_total) / 26;   // effective rate including open POs
+  const proj_per_wk  = (manual_total + opn_total) / 26;
   // Ord/Wk L13W: numeric formula field "Ord /Wk L13w #" (fid 1593).  The
   // older fid 313 is a rich-text version of the same metric  -  don't use
   // that one, it can't be parsed back into a number reliably.
