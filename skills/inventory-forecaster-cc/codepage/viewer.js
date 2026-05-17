@@ -2300,6 +2300,7 @@ function toggleDetail(key) {
               <option value="In Progress">In Progress</option>
               <option value="Resolved">Resolved</option>
               <option value="Dismissed">Dismissed</option>
+              <option value="Planner Response" style="color:#00695c;font-weight:600;">💬 Planner Response</option>
             </select>
           </label>
           <button id="cmt-btn-${safeKey}" onclick="addComment('${safeKey}')" style="padding:5px 14px;background:#8b2252;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:11px;">Save</button>
