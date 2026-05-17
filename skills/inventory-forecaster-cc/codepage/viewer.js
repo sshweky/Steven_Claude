@@ -1629,11 +1629,33 @@ function toggleDetail(key) {
   el.style.display = 'table-row';
   if (el.dataset.loaded === '1') return;
 
+  // Wrap everything from here in a try-catch so a JS error never leaves the
+  // panel silently blank.  On failure we at minimum show the error in the pane
+  // and log it to the console so the planner can report it.
+  try {
+
   const r      = ALL_RECORDS.find(x => x.key === key) || {};
   const wks    = r.weeks_slim || [];
   const aiFcst = r.ai_fcst    || [];
   const aiMdl  = r.ai_model   || '';
   const sug    = r.suggested  || [];
+
+  // Safety valve: if the record wasn't found in ALL_RECORDS (e.g. key mismatch
+  // between the onclick and the cached records), show a diagnostic card instead
+  // of a blank panel.  Also logs to the console for easier support.
+  if (!r.key) {
+    console.warn('[toggleDetail] record not found in ALL_RECORDS for key:', JSON.stringify(key),
+                 '| ALL_RECORDS.length:', ALL_RECORDS.length,
+                 '| sample keys:', ALL_RECORDS.slice(0,3).map(x => x.key));
+    el.innerHTML = `<td colspan="21" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
+      <b style="color:#e65100">&#x26A0; Detail panel could not load for this record.</b><br>
+      <span style="font-size:11px;color:#555;">Key: <code>${key || '(empty)'}</code> was not found in the loaded record set (${ALL_RECORDS.length} records loaded).
+      Try refreshing with <a href="?nocache=1" style="color:#1565c0">?nocache=1</a> to force a fresh pull from Quickbase.
+      If this is an FD (Future Delete) item, it may have a missing or blank Key field in QB.</span>
+    </td>`;
+    el.dataset.loaded = '1';
+    return;
+  }
 
   let hdrCells  = '<th class="row-label"></th>';
   let projCells = '<td class="row-label">Projection</td>';
