@@ -334,7 +334,8 @@ async function loadData() {
 
     var itemStatusFlow = String(g(IF_F.ItemStatus)||'').trim();
     // Skip non-actionable statuses — never show in viewer
-    if (/^(restricted|ready to sell|ready to quote|component|discontinued|dropped|in develop)/i.test(itemStatusFlow)) continue;
+    if (/^(restricted|ready to sell|ready to quote|discontinued|dropped|in develop)/i.test(itemStatusFlow)) continue;
+    if (/component/i.test(itemStatusFlow)) continue; // contains-match: catches Sub-Component, Kit/Component, etc.
     var isReplen = /^(replen|active|r)/i.test(itemStatusFlow) || toNum(g(IF_F.OptWOS)) > 0;
 
     var shpL4  = toNum(g(IF_F.ShpWkL4));
