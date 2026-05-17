@@ -1,4 +1,4 @@
-﻿// Immediate diagnostic — if this runs, JS is executing
+// Immediate diagnostic - if this runs, JS is executing
 (function(){
   var el = document.getElementById('loadStatus');
   if (el) el.textContent = 'Script executing...';
@@ -12,7 +12,7 @@ window.onerror = function(msg, src, line, col, err) {
   return true;
 };
 
-// ── Constants ─────────────────────────────────────────────────────────────────
+// -- Constants -----------------------------------------------------------------
 var QB_REALM  = 'pim.quickbase.com';
 var QB_TOKEN  = 'QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s';
 var INVF_TID  = 'bpsaju5pm';
@@ -33,7 +33,7 @@ var OVERSTOCK_WOS_TH      = 33;
 var MIN_PULLUP_DAYS       = 7;
 var MIN_RESOLVED_GAP_DEF  = 1.0;
 
-// ── Field ID maps ─────────────────────────────────────────────────────────────
+// -- Field ID maps -------------------------------------------------------------
 var IF_F = {
   Mstyle:20, Country:223, ItemStatus:294, SubStatus:297, Season:1068, ItemRank:1573,
   NVO:1487, NewItemNoPrj:1893, KitStyle:1759, PcsKitUse:1882, RootMstyle:792,
@@ -64,7 +64,7 @@ var IF_ATS = [716,717,718,719,720,715,722,723,724,725,726,727,728,729,730,731,90
 var PRJ_F = { Mstyle:196, CustName:376, StatusCust:10, PTItemStatus:374, Brand:398, Description:399, AcctMStyleKey:292 };
 var PRJ_MANUAL = [22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97];
 
-// ── QB API ────────────────────────────────────────────────────────────────────
+// -- QB API --------------------------------------------------------------------
 async function qbQuery(tableId, fieldIds, where, skip, top) {
   skip = skip || 0; top = top || 1000;
   var body = { from: tableId, select: fieldIds, where: where || '', options: { skip: skip, top: top } };
@@ -96,7 +96,7 @@ async function qbQueryAll(tableId, fieldIds, where, label) {
   return all;
 }
 
-// ── Cache ─────────────────────────────────────────────────────────────────────
+// -- Cache ---------------------------------------------------------------------
 function saveCache(data) {
   try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
 }
@@ -117,7 +117,7 @@ function fmtTimestamp(ts) {
   return (d.getMonth()+1) + '/' + d.getDate() + '/' + d.getFullYear() + ' ' + h12 + ':' + String(m).padStart(2,'0') + ' ' + ampm;
 }
 
-// ── PO parser ─────────────────────────────────────────────────────────────────
+// -- PO parser -----------------------------------------------------------------
 // Format: "FC607491 - SUPPLIER NAME - I/T: 0 pcs / I/W: 1200 pcs - ETD: 05-17-2026 - ETA: 06-04-2026"
 var PO_RE = /^\s*([A-Z0-9\-]+)\s*-\s*(.+?)\s*-\s*I\/T:\s*([\d,]+)\s*pcs\s*\/\s*I\/W:\s*([\d,]+)\s*pcs\s*-\s*ETD:\s*(\d{2}-\d{2}-\d{4})\s*-\s*ETA:\s*(\d{2}-\d{2}-\d{4})/i;
 
@@ -164,7 +164,7 @@ function poStatus(po, today, country) {
   return 'MOVABLE';
 }
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
+// -- Utilities -----------------------------------------------------------------
 function fmt(n) { if (n == null) return ''; return Number(n).toLocaleString('en-US', {maximumFractionDigits:1}); }
 function esc(s) { return String(s == null ? '' : s).replace(/[<>&"']/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];}); }
 function fmtDate(d) {
@@ -188,7 +188,7 @@ function wkIdxForDate(today, dt) {
   return Math.floor((dtObj - w1) / (7 * 86400000));
 }
 
-// ── State ─────────────────────────────────────────────────────────────────────
+// -- State ---------------------------------------------------------------------
 var ALL = [], FILTERED = [];
 var currentSort = { id: null, dir: 1 };
 var DEFAULT_SORT_CHAIN = ['inv_manager','brand','mstyle'];
@@ -202,7 +202,7 @@ function setStep(n, state) {
   for (var i=1;i<=4;i++) { var el=document.getElementById('ls'+i); if(!el) continue; el.className=i<n?'done':i===n?state:'pending'; }
 }
 
-// ── Data loading ──────────────────────────────────────────────────────────────
+// -- Data loading --------------------------------------------------------------
 async function loadData() {
   var today = new Date(); today.setHours(0,0,0,0);
 
@@ -345,7 +345,7 @@ async function loadData() {
   return records;
 }
 
-// ── computeDerived ────────────────────────────────────────────────────────────
+// -- computeDerived ------------------------------------------------------------
 function computeDerived(rec, today) {
   var openPOTotal = rec.open_pos.reduce(function(s,p){return s+(p.qty||0);},0);
   rec.pipeline_total = (rec.beg_inv[0]||0) + openPOTotal;
@@ -448,7 +448,7 @@ function computeDerived(rec, today) {
         qty_affected:po2.qty, orig_etd:po2.etd, proposed_etd:po2.etd,
         orig_eta:po2.eta, proposed_eta:fmtISO(addDays(po2.etd_obj, FAST_VESSEL_TRANSIT)),
         delta_days:0, delta_qty:0, priority:'HIGH',
-        reason:'Request faster vessel — covers gaps in '+wkStr,
+        reason:'Request faster vessel - covers gaps in '+wkStr,
         in_transit_qty:po2.in_transit_qty, in_work_qty:po2.in_work_qty, po_total_qty:po2.qty,
         keep_qty:0, push_qty:0, gap_weeks_fixed:wks
       });
@@ -459,7 +459,7 @@ function computeDerived(rec, today) {
         qty_affected:po2.qty, orig_etd:po2.etd, proposed_etd:fmtISO(g2.newEtd),
         orig_eta:po2.eta, proposed_eta:fmtISO(newEta2),
         delta_days:Math.round((g2.newEtd-po2.etd_obj)/86400000), delta_qty:0, priority:'HIGH',
-        reason:'Pull-up — covers gaps in '+wkStr,
+        reason:'Pull-up - covers gaps in '+wkStr,
         in_transit_qty:po2.in_transit_qty, in_work_qty:po2.in_work_qty, po_total_qty:po2.qty,
         keep_qty:0, push_qty:0, gap_weeks_fixed:wks
       });
@@ -495,7 +495,7 @@ function computeDerived(rec, today) {
           qty_affected:cancelQ, orig_etd:furthest.etd, proposed_etd:furthest.etd,
           orig_eta:furthest.eta, proposed_eta:furthest.eta,
           delta_days:0, delta_qty:-cancelQ, priority:'MEDIUM',
-          reason:'Pipeline excess '+excess.toLocaleString()+' pcs · '+furthest.po_number+' ETD is >60d out → cancel '+cancelQ.toLocaleString()+' pcs',
+          reason:'Pipeline excess '+excess.toLocaleString()+' pcs / '+furthest.po_number+' ETD is >60d out -> cancel '+cancelQ.toLocaleString()+' pcs',
           in_transit_qty:furthest.in_transit_qty, in_work_qty:furthest.in_work_qty, po_total_qty:furthest.qty,
           keep_qty:0, push_qty:0, gap_weeks_fixed:[]
         });
@@ -513,7 +513,7 @@ function computeDerived(rec, today) {
             qty_affected:pushQ, orig_etd:furthest.etd, proposed_etd:fmtISO(newEtd3),
             orig_eta:furthest.eta, proposed_eta:fmtISO(newEta3),
             delta_days:ddelta, delta_qty:0, priority:'MEDIUM',
-            reason:'Split shipment — keep '+keepQ.toLocaleString()+' at original ETD, push '+pushQ.toLocaleString()+' to free up early-window inventory',
+            reason:'Split shipment - keep '+keepQ.toLocaleString()+' at original ETD, push '+pushQ.toLocaleString()+' to free up early-window inventory',
             in_transit_qty:furthest.in_transit_qty, in_work_qty:furthest.in_work_qty, po_total_qty:furthest.qty,
             keep_qty:keepQ, push_qty:pushQ, gap_weeks_fixed:[]
           });
@@ -523,7 +523,7 @@ function computeDerived(rec, today) {
             qty_affected:furthest.qty, orig_etd:furthest.etd, proposed_etd:fmtISO(newEtd3),
             orig_eta:furthest.eta, proposed_eta:fmtISO(newEta3),
             delta_days:ddelta, delta_qty:0, priority:'MEDIUM',
-            reason:'Push entire PO out ~8 weeks — splitting would leave partial below MOQ/2 = '+partMin.toLocaleString(),
+            reason:'Push entire PO out ~8 weeks - splitting would leave partial below MOQ/2 = '+partMin.toLocaleString(),
             in_transit_qty:furthest.in_transit_qty, in_work_qty:furthest.in_work_qty, po_total_qty:furthest.qty,
             keep_qty:0, push_qty:furthest.qty, gap_weeks_fixed:[]
           });
@@ -539,7 +539,7 @@ function computeDerived(rec, today) {
   else rec.priority='LOW';
 }
 
-// ── Columns ───────────────────────────────────────────────────────────────────
+// -- Columns -------------------------------------------------------------------
 var COLS = [
   { id:'priority', label:'Pri', align:'left', numeric:true,
     get:function(r){return {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3}[r.priority]!=null?{CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3}[r.priority]:9;},
@@ -617,7 +617,7 @@ function visibleCols() {
   return COLS.filter(function(c){return !(hideMulti&&c.id==='qty_oh_root');});
 }
 
-// ── Table rendering ───────────────────────────────────────────────────────────
+// -- Table rendering -----------------------------------------------------------
 function buildTableHead() {
   var head=document.getElementById('theadMain');
   var cols=visibleCols();
@@ -633,7 +633,7 @@ function buildTableHead() {
   cols.forEach(function(c){
     var a=c.align==='right'?' class="right"':'';
     var v=colFilters[c.id]||'';
-    h2+='<th'+a+'><input data-filter="'+c.id+'" type="text" placeholder="filter…" value="'+esc(v)+'"></th>';
+    h2+='<th'+a+'><input data-filter="'+c.id+'" type="text" placeholder="filter..." value="'+esc(v)+'"></th>';
   });
   h2+='</tr>';
   head.innerHTML=h1+h2;
@@ -707,7 +707,7 @@ function renderStats() {
   var pri={CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0};
   npf.forEach(function(r){pri[r.priority]=(pri[r.priority]||0)+1;});
   var total=npf.length;
-  var PRI_TIPS={CRITICAL:'CRITICAL: most severe stockout situations.',HIGH:'HIGH: gap week deficit ≥ 2.0 weeks below Opt WOS.',MEDIUM:'MEDIUM: has any gap week, or pipeline excess > 2,500 units.',LOW:'LOW: no gap weeks and not overstocked.'};
+  var PRI_TIPS={CRITICAL:'CRITICAL: most severe stockout situations.',HIGH:'HIGH: gap week deficit >= 2.0 weeks below Opt WOS.',MEDIUM:'MEDIUM: has any gap week, or pipeline excess > 2,500 units.',LOW:'LOW: no gap weeks and not overstocked.'};
   function btn(key,label,color){var active=priorityFilter===key;return '<button class="pri-btn '+(active?'active':'')+'" data-pri="'+key+'" title="'+PRI_TIPS[key]+'" style="background:'+(active?color:'#ffffff')+';color:'+(active?'#fff':color)+';border:1.5px solid '+color+';">'+label+' <b style="margin-left:4px;">'+(pri[key]||0).toLocaleString()+'</b></button>';}
   var allBtn='<button class="pri-btn '+(priorityFilter===''?'active':'')+'" data-pri="" title="All priorities" style="background:'+(priorityFilter===''?'#37474f':'#ffffff')+';color:'+(priorityFilter===''?'#fff':'#37474f')+';border:1.5px solid #37474f;">All <b style="margin-left:4px;">'+total.toLocaleString()+'</b></button>';
   document.getElementById('statsBar').innerHTML=allBtn+btn('CRITICAL','&#128308; Critical','#b71c1c')+btn('HIGH','&#128992; High','#e65100')+btn('MEDIUM','&#129001; Medium','#f9a825')+btn('LOW','&#9898; Low','#5d4037')+'<div class="stat" style="margin-left:14px;"><b>'+gapsN+'</b> with gaps</div><div class="stat"><b>'+overN+'</b> overstocked</div><div class="stat"><b>'+inScope.toLocaleString()+'</b> shown</div>';
@@ -741,7 +741,7 @@ function toggleDetail(mstyle) {
   dtr.dataset.loaded='1';
 }
 
-// ── renderDetail ──────────────────────────────────────────────────────────────
+// -- renderDetail --------------------------------------------------------------
 function renderDetail(r) {
   var today=new Date();today.setHours(0,0,0,0);
   var isUSA=/^(usa|united states)$/i.test(r.country||'');
@@ -764,17 +764,17 @@ function renderDetail(r) {
   function fmtPoHover(wi){
     var pos=poByWeek[wi]||[];if(!pos.length)return'';
     var wkDate=(new Date(w1sun.getTime()+wi*7*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    var h='Week of '+wkDate+'  (wh-avail = ETA + '+lag+'d)\n'+'─'.repeat(38)+'\n';
-    pos.forEach(function(p){h+='PO #: '+p.po_number+'\nSupplier: '+(p.supplier||'—')+'\nOpen (I/W): '+fmt(p.in_work_qty||0)+'  ·  In Transit (I/T): '+fmt(p.in_transit_qty||0)+'\nETD: '+(p.etd||'—')+'  ·  ETA: '+(p.eta||'—')+'\n';});
+    var h='Week of '+wkDate+'  (wh-avail = ETA + '+lag+'d)\n'+'-'.repeat(38)+'\n';
+    pos.forEach(function(p){h+='PO #: '+p.po_number+'\nSupplier: '+(p.supplier||'&#8212;')+'\nOpen (I/W): '+fmt(p.in_work_qty||0)+'  /  In Transit (I/T): '+fmt(p.in_transit_qty||0)+'\nETD: '+(p.etd||'&#8212;')+'  /  ETA: '+(p.eta||'&#8212;')+'\n';});
     return h;
   }
   function fmtPrjHover(wi){
     var cd=r.customer_demand||[];
     var wk=(new Date(w1sun.getTime()+wi*7*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    var h='Prj Demand — W'+(wi+1)+' (week of '+wk+')\nPer-customer rollup from QB Projections:\n\n';
+    var h='Prj Demand - W'+(wi+1)+' (week of '+wk+')\nPer-customer rollup from QB Projections:\n\n';
     var sorted=cd.map(function(c){return{customer:c.customer,qty:(c.weekly&&c.weekly[wi])||0};}).filter(function(c){return c.qty!==0;}).sort(function(a,b){return b.qty-a.qty;});
     if(!sorted.length)h+='(no per-customer projection for this week)';
-    sorted.forEach(function(c){h+='• '+(c.customer||'(unknown)')+': '+fmt(c.qty)+'\n';});
+    sorted.forEach(function(c){h+='- '+(c.customer||'(unknown)')+': '+fmt(c.qty)+'\n';});
     return h;
   }
 
@@ -787,7 +787,7 @@ function renderDetail(r) {
 
   // 26-week grid
   var invFlow='<table class="subtbl grid26"><tr><th class="lbl"></th>';
-  for(var i=1;i<=26;i++){var s=new Date(w1sun.getTime()+(i-1)*7*86400000);var lbl=(s.getMonth()+1)+'/'+s.getDate();invFlow+='<th title="W'+i+' — week of '+s.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'">'+lbl+'</th>';}
+  for(var i=1;i<=26;i++){var s=new Date(w1sun.getTime()+(i-1)*7*86400000);var lbl=(s.getMonth()+1)+'/'+s.getDate();invFlow+='<th title="W'+i+' - week of '+s.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'">'+lbl+'</th>';}
   invFlow+='<th>Total</th></tr>';
 
   function renderRow(label,arr,hoverFn,hlFn){
@@ -798,7 +798,7 @@ function renderDetail(r) {
       if(hoverFn){var tip=hoverFn(i);if(tip){extra+=' title="'+tip.replace(/"/g,'&quot;')+'"';styleStr+='cursor:help;';}}
       if(hlFn){var hl=hlFn(i);if(hl)styleStr+=hl;}
       var sa=styleStr?' style="'+styleStr+'"':'';
-      html+='<td class="'+c+'"'+extra+sa+'>'+(v===0?'—':fmt(v))+'</td>';
+      html+='<td class="'+c+'"'+extra+sa+'>'+(v===0?'&#8212;':fmt(v))+'</td>';
     }
     html+='<td><b>'+fmt(tot)+'</b></td></tr>';return html;
   }
@@ -806,7 +806,7 @@ function renderDetail(r) {
   invFlow+=renderRow('Expected Receipts',r.rcv,fmtPoHover,rcvHL);
   invFlow+=renderRow('Prj Demand',r.prj,fmtPrjHover,null);
   var wosRow='<tr><td class="lbl">WOS OH</td>';
-  for(var i=0;i<26;i++){var b=r.beg_inv[i]||0,p=r.prj[i]||0;var v='—',cls='ok';if(p>0){var w=b/p;v=w.toFixed(1);if(w<r.opt_wos)cls='gap';if(w<0)cls='neg';}else if(b>0){v='∞';}wosRow+='<td class="'+cls+'">'+v+'</td>';}
+  for(var i=0;i<26;i++){var b=r.beg_inv[i]||0,p=r.prj[i]||0;var v='&#8212;',cls='ok';if(p>0){var w=b/p;v=w.toFixed(1);if(w<r.opt_wos)cls='gap';if(w<0)cls='neg';}else if(b>0){v='&#8734;';}wosRow+='<td class="'+cls+'">'+v+'</td>';}
   wosRow+='<td></td></tr>';
   invFlow+=wosRow+'</table>';
 
@@ -814,7 +814,7 @@ function renderDetail(r) {
   var pos='<table class="subtbl"><tr><th>PO #</th><th>Supplier</th><th class="right">I/T</th><th class="right">I/W</th><th>ETD</th><th>ETA</th><th class="right">Transit</th><th>Status</th></tr>';
   r.open_pos.forEach(function(p){
     var sc={LOCKED:'badge-gray',IN_TRANSIT:'badge-purple',MOVABLE:'badge-green',FASTER_VESSEL_WINDOW:'badge-amber',PULL_UP_NARROW:'badge-amber'}[p.status]||'badge-gray';
-    pos+='<tr><td><b>'+esc(p.po_number)+'</b></td><td>'+esc(p.supplier)+'</td><td class="right">'+fmt(p.in_transit_qty)+'</td><td class="right">'+fmt(p.in_work_qty)+'</td><td>'+fmtDate(p.etd)+'</td><td>'+fmtDate(p.eta)+'</td><td class="right">'+(p.transit_days||'—')+'d</td><td><span class="badge '+sc+'">'+p.status+'</span></td></tr>';
+    pos+='<tr><td><b>'+esc(p.po_number)+'</b></td><td>'+esc(p.supplier)+'</td><td class="right">'+fmt(p.in_transit_qty)+'</td><td class="right">'+fmt(p.in_work_qty)+'</td><td>'+fmtDate(p.etd)+'</td><td>'+fmtDate(p.eta)+'</td><td class="right">'+(p.transit_days||'&#8212;')+'d</td><td><span class="badge '+sc+'">'+p.status+'</span></td></tr>';
   });
   if(!r.open_pos.length)pos+='<tr><td colspan="8" style="color:#888;font-style:italic;">No open POs.</td></tr>';
   pos+='</table>';
@@ -823,31 +823,31 @@ function renderDetail(r) {
   var recs='';
   if(!r.recommendations.length){recs='<div style="color:#1b5e20;font-style:italic;">&#10003; No actions recommended.</div>';}
   else {
-    var arrow='<span style="color:#888;margin:0 4px;">→</span>';
+    var arrow='<span style="color:#888;margin:0 4px;">&#8594;</span>';
     function beforeAfter(before,after,isDate){var a=isDate?fmtDate(before):fmt(before);var b=isDate?fmtDate(after):fmt(after);if(before===after)return'<span>'+a+'</span>';return'<span style="color:#888;text-decoration:line-through;">'+a+'</span>'+arrow+'<span style="color:#0d47a1;font-weight:600;">'+b+'</span>';}
     r.recommendations.forEach(function(rc){
       var cls='priority-'+rc.priority+' action-'+rc.action;
-      var header='<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;"><span class="rec-action '+rc.action+'">'+rc.action+'</span><b style="font-size:13px;">'+esc(rc.po_number||'—')+'</b>'+(rc.supplier?'<span style="color:#555;font-size:11px;">· '+esc(rc.supplier)+'</span>':'')+'</div>';
+      var header='<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;"><span class="rec-action '+rc.action+'">'+rc.action+'</span><b style="font-size:13px;">'+esc(rc.po_number||'&#8212;')+'</b>'+(rc.supplier?'<span style="color:#555;font-size:11px;">/ '+esc(rc.supplier)+'</span>':'')+'</div>';
       var body='';
       if(rc.action==='PULL_UP'||rc.action==='FASTER_VESSEL'){
         body+='<div class="rec-row"><span class="rec-lbl">Current qty:</span> <b>'+fmt(rc.po_total_qty)+'</b> pcs <span style="color:#888;">(I/T '+fmt(rc.in_transit_qty)+', I/W '+fmt(rc.in_work_qty)+')</span></div>';
         body+='<div class="rec-row"><span class="rec-lbl">ETD:</span> '+beforeAfter(rc.orig_etd,rc.proposed_etd,true)+'</div>';
         body+='<div class="rec-row"><span class="rec-lbl">ETA:</span> '+beforeAfter(rc.orig_eta,rc.proposed_eta,true)+(rc.delta_days?'<span style="color:#888;margin-left:8px;">('+( rc.delta_days>0?'+':'')+rc.delta_days+' days)</span>':'')+'</div>';
-        if(rc.action==='FASTER_VESSEL')body+='<div class="rec-row" style="color:#5e35b1;font-style:italic;font-size:11px;">Same ETD — request faster vessel only (transit ~18 days vs ~26)</div>';
+        if(rc.action==='FASTER_VESSEL')body+='<div class="rec-row" style="color:#5e35b1;font-style:italic;font-size:11px;">Same ETD - request faster vessel only (transit ~18 days vs ~26)</div>';
       } else if(rc.action==='SPLIT'){
-        body+='<div class="rec-row"><span class="rec-lbl">Original PO:</span> <b>'+fmt(rc.po_total_qty)+'</b> pcs · ETD '+fmtDate(rc.orig_etd)+' → ETA '+fmtDate(rc.orig_eta)+' <span style="color:#888;">(I/T '+fmt(rc.in_transit_qty)+', I/W '+fmt(rc.in_work_qty)+')</span></div>';
-        body+='<div class="rec-row"><span class="rec-lbl">Keep:</span> <b style="color:#1b5e20;">'+fmt(rc.keep_qty)+'</b> pcs at original ETD '+fmtDate(rc.orig_etd)+' → ETA '+fmtDate(rc.orig_eta)+'</div>';
-        body+='<div class="rec-row"><span class="rec-lbl">Push:</span> <b style="color:#e65100;">'+fmt(rc.push_qty)+'</b> pcs to new ETD '+fmtDate(rc.proposed_etd)+' → ETA '+fmtDate(rc.proposed_eta)+' <span style="color:#888;margin-left:6px;">(+'+rc.delta_days+' days)</span></div>';
+        body+='<div class="rec-row"><span class="rec-lbl">Original PO:</span> <b>'+fmt(rc.po_total_qty)+'</b> pcs / ETD '+fmtDate(rc.orig_etd)+' &#8594; ETA '+fmtDate(rc.orig_eta)+' <span style="color:#888;">(I/T '+fmt(rc.in_transit_qty)+', I/W '+fmt(rc.in_work_qty)+')</span></div>';
+        body+='<div class="rec-row"><span class="rec-lbl">Keep:</span> <b style="color:#1b5e20;">'+fmt(rc.keep_qty)+'</b> pcs at original ETD '+fmtDate(rc.orig_etd)+' &#8594; ETA '+fmtDate(rc.orig_eta)+'</div>';
+        body+='<div class="rec-row"><span class="rec-lbl">Push:</span> <b style="color:#e65100;">'+fmt(rc.push_qty)+'</b> pcs to new ETD '+fmtDate(rc.proposed_etd)+' &#8594; ETA '+fmtDate(rc.proposed_eta)+' <span style="color:#888;margin-left:6px;">(+'+rc.delta_days+' days)</span></div>';
       } else if(rc.action==='PUSH_OUT'){
         body+='<div class="rec-row"><span class="rec-lbl">Current qty:</span> <b>'+fmt(rc.po_total_qty)+'</b> pcs <span style="color:#888;">(I/T '+fmt(rc.in_transit_qty)+', I/W '+fmt(rc.in_work_qty)+')</span></div>';
         body+='<div class="rec-row"><span class="rec-lbl">ETD:</span> '+beforeAfter(rc.orig_etd,rc.proposed_etd,true)+'</div>';
         body+='<div class="rec-row"><span class="rec-lbl">ETA:</span> '+beforeAfter(rc.orig_eta,rc.proposed_eta,true)+(rc.delta_days?'<span style="color:#888;margin-left:8px;">(+'+rc.delta_days+' days)</span>':'')+'</div>';
       } else if(rc.action==='CANCEL'){
-        body+='<div class="rec-row"><span class="rec-lbl">Original PO:</span> <b>'+fmt(rc.po_total_qty)+'</b> pcs · ETD '+fmtDate(rc.orig_etd)+' → ETA '+fmtDate(rc.orig_eta)+'</div>';
+        body+='<div class="rec-row"><span class="rec-lbl">Original PO:</span> <b>'+fmt(rc.po_total_qty)+'</b> pcs / ETD '+fmtDate(rc.orig_etd)+' &#8594; ETA '+fmtDate(rc.orig_eta)+'</div>';
         body+='<div class="rec-row"><span class="rec-lbl">Cancel:</span> <b style="color:#c62828;">'+fmt(rc.qty_affected)+'</b> pcs <span style="color:#888;">(remaining: '+fmt(rc.po_total_qty-rc.qty_affected)+')</span></div>';
       }
       var wks=rc.gap_weeks_fixed||[];
-      var gapChip=wks.length?(wks.length<=4?'Covers gaps in <b>'+wks.map(function(w){return 'W'+w;}).join(', ')+'</b>':'Covers <b>'+wks.length+'</b> gap weeks (W'+wks[0]+'–W'+wks[wks.length-1]+')'):'';
+      var gapChip=wks.length?(wks.length<=4?'Covers gaps in <b>'+wks.map(function(w){return 'W'+w;}).join(', ')+'</b>':'Covers <b>'+wks.length+'</b> gap weeks (W'+wks[0]+'-W'+wks[wks.length-1]+')'):'';
       var reasonRow=(rc.reason&&!gapChip)?'<div class="rec-reason">'+esc(rc.reason)+'</div>':gapChip?'<div class="rec-reason">'+gapChip+'</div>':'';
       var addBtn=rc.po_number?'<div style="margin-top:8px;text-align:right;"><button class="add-excel-btn" data-mstyle="'+esc(r.mstyle)+'" data-action="'+rc.action+'" data-po="'+esc(rc.po_number||'')+'" data-supplier="'+esc(rc.supplier||'')+'" data-qty="'+(rc.po_total_qty||0)+'" data-curr-etd="'+(rc.orig_etd||'')+'" data-curr-eta="'+(rc.orig_eta||'')+'" data-req-etd="'+(rc.proposed_etd||'')+'" data-req-eta="'+(rc.proposed_eta||'')+'" onclick="addToRecoSheet(this)" style="font-size:11px;padding:3px 10px;background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;border-radius:3px;cursor:pointer;font-family:inherit;">&#10133; Add to Excel</button></div>':'';
       recs+='<div class="rec-box '+cls+'">'+header+'<div class="rec-body">'+body+'</div>'+reasonRow+addBtn+'</div>';
@@ -866,7 +866,7 @@ function renderDetail(r) {
   var flagBadges=[];
   if(r.active_kl)flagBadges.push('<span class="badge badge-green">Active KL</span>');
   if(r.nvo)flagBadges.push('<span class="badge badge-purple">NVO</span>');
-  if(r.new_item_no_prj)flagBadges.push('<span class="badge badge-amber">New Item · No Prj</span>');
+  if(r.new_item_no_prj)flagBadges.push('<span class="badge badge-amber">New Item / No Prj</span>');
   if(r.amz_do_not_ship)flagBadges.push('<span class="badge badge-red">AMZ DO NOT SHIP</span>');
   if(r.amz_suppression)flagBadges.push('<span class="badge badge-red">AMZ Suppression</span>');
   if(r.transfer_qty_open)flagBadges.push('<span class="badge badge-amber">Transfer Qty Open</span>');
@@ -877,33 +877,33 @@ function renderDetail(r) {
   function kvRow(lbl,val){return '<div style="display:flex;gap:6px;padding:1px 0;font-size:11px;line-height:1.45;"><span style="color:#666;min-width:90px;flex-shrink:0;">'+lbl+'</span><span style="font-weight:500;color:#222;">'+val+'</span></div>';}
   function kvBox(lbl,rows){return '<div style="flex:1;min-width:160px;background:#f8f9fa;border:1px solid #e4e7eb;border-radius:4px;padding:8px 10px;">'+(lbl?'<div style="font-size:10px;font-weight:700;color:#9e9e9e;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;">'+lbl+'</div>':'')+rows+'</div>';}
 
-  var identityBox=kvBox('Identity',kvRow('Mstyle','<b>'+esc(r.mstyle)+'</b>')+kvRow('Rank',esc(r.item_rank)||'—')+kvRow('Status',esc(r.item_status_flow)||'—')+kvRow('Sub Stat',esc(r.sub_status)||'—')+(r.season?kvRow('Season',esc(r.season)):'')+( r.size_ct?kvRow('Size/Ct',esc(r.size_ct)):'')+( r.fragrance?kvRow('Fragrance',esc(r.fragrance)):'')+( flagBadges.length?'<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">'+flagBadges.join('')+'</div>':''));
-  var itemDataBox=kvBox('Item Data','<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px;"><div>'+kvRow('Inner Pack',r.inner_pack||'—')+kvRow('Master Pack',r.master_pack||'—')+kvRow('MOQ',r.moq?fmt(r.moq):'—')+kvRow('Opt OH',fmt(r.opt_oh))+'</div><div>'+kvRow('Opt WOS',fmt(r.opt_wos))+kvRow('LT (Wks)',fmt(r.lt_wks))+kvRow('LT + Opt Wks',fmt(r.lt_opt_weeks))+(r.oos_dates?kvRow('OOS Dates',esc(r.oos_dates)):'' )+'</div></div>');
+  var identityBox=kvBox('Identity',kvRow('Mstyle','<b>'+esc(r.mstyle)+'</b>')+kvRow('Rank',esc(r.item_rank)||'&#8212;')+kvRow('Status',esc(r.item_status_flow)||'&#8212;')+kvRow('Sub Stat',esc(r.sub_status)||'&#8212;')+(r.season?kvRow('Season',esc(r.season)):'')+( r.size_ct?kvRow('Size/Ct',esc(r.size_ct)):'')+( r.fragrance?kvRow('Fragrance',esc(r.fragrance)):'')+( flagBadges.length?'<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">'+flagBadges.join('')+'</div>':''));
+  var itemDataBox=kvBox('Item Data','<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px;"><div>'+kvRow('Inner Pack',r.inner_pack||'&#8212;')+kvRow('Master Pack',r.master_pack||'&#8212;')+kvRow('MOQ',r.moq?fmt(r.moq):'-')+kvRow('Opt OH',fmt(r.opt_oh))+'</div><div>'+kvRow('Opt WOS',fmt(r.opt_wos))+kvRow('LT (Wks)',fmt(r.lt_wks))+kvRow('LT + Opt Wks',fmt(r.lt_opt_weeks))+(r.oos_dates?kvRow('OOS Dates',esc(r.oos_dates)):'' )+'</div></div>');
   var overstockBox=kvBox('Overstock',kvRow('Over Cmtd Qty','<span style="color:'+(r.over_committed_qty>0?'#c62828':'inherit')+'">'+fmt(r.over_committed_qty)+'</span>')+kvRow('Ovr Comt WOS','<span style="color:'+(r.ovr_comt_wos>0?'#c62828':'inherit')+'">'+fmt(r.ovr_comt_wos)+'</span>'));
 
-  var atsHtml='<table class="subtbl"><tr><th>Position</th><th class="right">Qty</th><th>Position</th><th class="right">Qty</th><th>WOS Metric</th><th class="right">Value</th></tr><tr><td>Qty OH (total)</td><td class="right"><b>'+fmt(r.qty_oh)+'</b></td><td>I/T (in transit)</td><td class="right">'+fmt(r.it_qty)+'</td><td>ATS WOS OH</td><td class="right">'+fmt(r.ats_wos_oh)+'</td></tr><tr><td>ATS Qty OH</td><td class="right">'+fmt(r.ats_qty_oh)+'</td><td>I/W (in work)</td><td class="right">'+fmt(r.iw_qty)+'</td><td>ATS WOS OH+OO</td><td class="right">'+fmt(r.ats_wos_oh_oo)+'</td></tr><tr><td>ATS Now</td><td class="right"><b>'+fmt(r.ats_now)+'</b></td><td>I/T + I/W</td><td class="right">'+fmt(r.it_iw)+'</td><td>ATS WOS OH+OO (w/ kits)</td><td class="right">'+fmt(r.ats_wos_oh_oo_w_kits)+'</td></tr><tr><td>ATS OH + OO</td><td class="right">'+fmt(r.ats_oh_oo)+'</td><td>I/W + I/T w/ Kits</td><td class="right">'+fmt(r.it_iw_kits)+'</td><td>ATS WOS (w/o test/excl)</td><td class="right">'+fmt(r.ats_wos_oh_oo_wo_test)+'</td></tr><tr><td>ATS OH + OO (w/ kits)</td><td class="right">'+fmt(r.ats_oh_oo_w_kits)+'</td><td>Open Cust PO Qty</td><td class="right">'+fmt(r.open_cust_po_qty)+'</td><td>ATS OH + I/T Booked WOS</td><td class="right">'+fmt(r.ats_oh_it_booked_wos)+'</td></tr><tr><td>ATS Qty (not alloc\'d)</td><td class="right">'+fmt(r.ats_qty_not_alloc)+'</td><td>Hold Order Qty</td><td class="right '+(r.hold_qty>0?'pri-MEDIUM':'')+'">'+fmt(r.hold_qty)+'</td><td>Opt WOS</td><td class="right"><b>'+fmt(r.opt_wos)+'</b></td></tr><tr><td>NJ ATS OH</td><td class="right">'+fmt(r.nj_ats_oh)+'</td><td>Test Order Qty</td><td class="right">'+fmt(r.test_order_qty)+'</td><td>Opt OH</td><td class="right">'+fmt(r.opt_oh)+'</td></tr><tr><td>CA ATS OH</td><td class="right">'+fmt(r.ca_ats_oh)+'</td><td>Exclude PO from WOS</td><td class="right">'+fmt(r.exclude_po_wos)+'</td><td>LT (Wks) · CNY · LT+Opt</td><td class="right">'+fmt(r.lt_wks)+' · '+fmt(r.cny_weeks)+' · '+fmt(r.lt_opt_weeks)+'</td></tr></table>';
+  var atsHtml='<table class="subtbl"><tr><th>Position</th><th class="right">Qty</th><th>Position</th><th class="right">Qty</th><th>WOS Metric</th><th class="right">Value</th></tr><tr><td>Qty OH (total)</td><td class="right"><b>'+fmt(r.qty_oh)+'</b></td><td>I/T (in transit)</td><td class="right">'+fmt(r.it_qty)+'</td><td>ATS WOS OH</td><td class="right">'+fmt(r.ats_wos_oh)+'</td></tr><tr><td>ATS Qty OH</td><td class="right">'+fmt(r.ats_qty_oh)+'</td><td>I/W (in work)</td><td class="right">'+fmt(r.iw_qty)+'</td><td>ATS WOS OH+OO</td><td class="right">'+fmt(r.ats_wos_oh_oo)+'</td></tr><tr><td>ATS Now</td><td class="right"><b>'+fmt(r.ats_now)+'</b></td><td>I/T + I/W</td><td class="right">'+fmt(r.it_iw)+'</td><td>ATS WOS OH+OO (w/ kits)</td><td class="right">'+fmt(r.ats_wos_oh_oo_w_kits)+'</td></tr><tr><td>ATS OH + OO</td><td class="right">'+fmt(r.ats_oh_oo)+'</td><td>I/W + I/T w/ Kits</td><td class="right">'+fmt(r.it_iw_kits)+'</td><td>ATS WOS (w/o test/excl)</td><td class="right">'+fmt(r.ats_wos_oh_oo_wo_test)+'</td></tr><tr><td>ATS OH + OO (w/ kits)</td><td class="right">'+fmt(r.ats_oh_oo_w_kits)+'</td><td>Open Cust PO Qty</td><td class="right">'+fmt(r.open_cust_po_qty)+'</td><td>ATS OH + I/T Booked WOS</td><td class="right">'+fmt(r.ats_oh_it_booked_wos)+'</td></tr><tr><td>ATS Qty (not alloc\'d)</td><td class="right">'+fmt(r.ats_qty_not_alloc)+'</td><td>Hold Order Qty</td><td class="right '+(r.hold_qty>0?'pri-MEDIUM':'')+'">'+fmt(r.hold_qty)+'</td><td>Opt WOS</td><td class="right"><b>'+fmt(r.opt_wos)+'</b></td></tr><tr><td>NJ ATS OH</td><td class="right">'+fmt(r.nj_ats_oh)+'</td><td>Test Order Qty</td><td class="right">'+fmt(r.test_order_qty)+'</td><td>Opt OH</td><td class="right">'+fmt(r.opt_oh)+'</td></tr><tr><td>CA ATS OH</td><td class="right">'+fmt(r.ca_ats_oh)+'</td><td>Exclude PO from WOS</td><td class="right">'+fmt(r.exclude_po_wos)+'</td><td>LT (Wks) / CNY / LT+Opt</td><td class="right">'+fmt(r.lt_wks)+' / '+fmt(r.cny_weeks)+' / '+fmt(r.lt_opt_weeks)+'</td></tr></table>';
 
-  var demandHtml='<table class="subtbl"><tr><th>Demand</th><th class="right">Qty</th><th>Shipments</th><th class="right">Qty</th><th>Date</th><th>Value</th></tr><tr><td>Prj / Wk</td><td class="right"><b>'+fmt(r.prj_wk)+'</b></td><td>Shpd / Wk L4</td><td class="right"><b>'+fmt(r.shp_wk_l4)+'</b></td><td>Last Shp Date</td><td>'+fmtDate(r.last_shp_date)+'</td></tr><tr><td>Max Prj / Wk</td><td class="right">'+fmt(r.max_prj_wk)+'</td><td>Shpd / Wk L13</td><td class="right"><b>'+fmt(r.shp_wk_l13)+'</b></td><td>1st Shpd Date</td><td>'+fmtDate(r.first_shpd_date)+'</td></tr><tr><td>+/- Prj L4w</td><td class="right">'+fmt(r.prj_l4w_change)+'%</td><td>Total Shpd L4</td><td class="right">'+fmt(r.tot_shpd_l4)+'</td><td>Date 1st Rcvd</td><td>'+fmtDate(r.date_1st_rcvd)+'</td></tr><tr><td>Prj 26 Wks</td><td class="right">'+fmt(r.prj_26wks)+'</td><td>Total Shpd L13w</td><td class="right">'+fmt(r.tot_shpd_l13w)+'</td><td>Last Whs Rcvd</td><td>'+fmtDate(r.last_whs_rcvd)+'</td></tr><tr><td>Manual demand (rollup)</td><td class="right">'+fmt(r.manual_demand_26w)+'</td><td>Total Shpd LTD</td><td class="right">'+fmt(r.tot_shpd_ltd)+'</td><td>1st Out Date</td><td>'+fmtDate(r.first_out_date)+'</td></tr><tr><td>Demand (Inv Flow 26w Σ)</td><td class="right">'+fmt(r.demand_26w)+'</td><td colspan="2"></td><td>Last OOS Date</td><td>'+fmtDate(r.last_oos_date)+'</td></tr></table><div class="stat-text" style="margin-top:4px;"><b>Days OOS till Next Rcpt:</b> '+fmt(r.days_oos_next_rcpt)+' · <b>Days OOS L12m:</b> '+fmt(r.days_oos_l12m)+'</div>';
+  var demandHtml='<table class="subtbl"><tr><th>Demand</th><th class="right">Qty</th><th>Shipments</th><th class="right">Qty</th><th>Date</th><th>Value</th></tr><tr><td>Prj / Wk</td><td class="right"><b>'+fmt(r.prj_wk)+'</b></td><td>Shpd / Wk L4</td><td class="right"><b>'+fmt(r.shp_wk_l4)+'</b></td><td>Last Shp Date</td><td>'+fmtDate(r.last_shp_date)+'</td></tr><tr><td>Max Prj / Wk</td><td class="right">'+fmt(r.max_prj_wk)+'</td><td>Shpd / Wk L13</td><td class="right"><b>'+fmt(r.shp_wk_l13)+'</b></td><td>1st Shpd Date</td><td>'+fmtDate(r.first_shpd_date)+'</td></tr><tr><td>+/- Prj L4w</td><td class="right">'+fmt(r.prj_l4w_change)+'%</td><td>Total Shpd L4</td><td class="right">'+fmt(r.tot_shpd_l4)+'</td><td>Date 1st Rcvd</td><td>'+fmtDate(r.date_1st_rcvd)+'</td></tr><tr><td>Prj 26 Wks</td><td class="right">'+fmt(r.prj_26wks)+'</td><td>Total Shpd L13w</td><td class="right">'+fmt(r.tot_shpd_l13w)+'</td><td>Last Whs Rcvd</td><td>'+fmtDate(r.last_whs_rcvd)+'</td></tr><tr><td>Manual demand (rollup)</td><td class="right">'+fmt(r.manual_demand_26w)+'</td><td>Total Shpd LTD</td><td class="right">'+fmt(r.tot_shpd_ltd)+'</td><td>1st Out Date</td><td>'+fmtDate(r.first_out_date)+'</td></tr><tr><td>Demand (Inv Flow 26w Sum)</td><td class="right">'+fmt(r.demand_26w)+'</td><td colspan="2"></td><td>Last OOS Date</td><td>'+fmtDate(r.last_oos_date)+'</td></tr></table><div class="stat-text" style="margin-top:4px;"><b>Days OOS till Next Rcpt:</b> '+fmt(r.days_oos_next_rcpt)+' / <b>Days OOS L12m:</b> '+fmt(r.days_oos_l12m)+'</div>';
 
   function kpi(label,value,hint,color){return '<div class="kpi"'+(hint?' title="'+esc(hint)+'"':'')+'>  <div class="kpi-lbl">'+label+'</div><div class="kpi-val" style="'+(color?'color:'+color+';':'')+'">'+value+'</div></div>';}
   function wosColor(w){if(w==null||w===0)return'#888';if(w<r.opt_wos)return'#c62828';if(w>26)return'#1b5e20';return'#0d47a1';}
   function excessColor(e){return e>2500?'#c62828':(e<-2500?'#e65100':'#1b5e20');}
   function oosColor(d){return d>14?'#c62828':(d>0?'#e65100':'#1b5e20');}
-  var kpiStrip='<div class="kpi-strip">'+kpi('ATS Now',fmt(r.ats_now),'Available to sell — after holds / allocations',r.ats_now<0?'#c62828':'')+kpi('ATS WOS OH',fmt(r.ats_wos_oh),'Weeks of supply on hand (per QB)',wosColor(r.ats_wos_oh))+kpi('Open Cust PO',fmt(r.open_cust_po_qty),'Outstanding customer PO qty awaiting shipment','')+kpi('Hold Qty',fmt(r.hold_qty),'Hold Order Qty — orders parked, not shipping',r.hold_qty>0?'#e65100':'')+kpi('Days→Next Rcpt',fmt(r.days_oos_next_rcpt),'Days OOS until next supplier receipt arrives',oosColor(r.days_oos_next_rcpt))+kpi('Pipe Excess',fmt(r.pipeline_excess),'Total pipeline - 26w demand - safety stock. Positive = overstock',excessColor(r.pipeline_excess))+kpi('PipeWOS',(r.pipeline_wos==null?'∞':fmt(r.pipeline_wos)),'Pipeline weeks of supply (all I/T + I/W + OH ÷ 26w demand)','')+kpi('LT + CNY',fmt(r.lt_wks)+' + '+fmt(r.cny_weeks),'Lead time (weeks) + Chinese New Year shutdown weeks','')+kpi('Days OOS L12m',fmt(r.days_oos_l12m),'Days out-of-stock in trailing 12 months',r.days_oos_l12m>30?'#c62828':'')+kpi('Customers',fmt(r.customer_count),'Active Acct-MStyles rolled up into this mstyle','')+kpi('Manual Demand',fmt(r.manual_demand_26w),'26-week sum of customer manual projections (rolled up)','')+'</div>'+(r.is_multi?'<div style="margin-top:8px;padding:6px 10px;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;font-size:11px;color:#5d4037;">&#127873; <b>Multi-pack:</b> Each unit = '+r.pcs_per_kit+' pcs of root <b>'+esc(r.root_mstyle)+'</b>. Root OH: <b>'+fmt(r.qty_oh_root)+'</b> pcs → can assemble <b>'+fmt(r.assembleable_kits)+'</b> more kits. Total effective kit availability: '+fmt((r.beg_inv&&r.beg_inv[0])||0)+' on-hand + '+fmt(r.assembleable_kits)+' buildable = <b>'+fmt(((r.beg_inv&&r.beg_inv[0])||0)+r.assembleable_kits)+'</b> kits.</div>':'');
+  var kpiStrip='<div class="kpi-strip">'+kpi('ATS Now',fmt(r.ats_now),'Available to sell - after holds / allocations',r.ats_now<0?'#c62828':'')+kpi('ATS WOS OH',fmt(r.ats_wos_oh),'Weeks of supply on hand (per QB)',wosColor(r.ats_wos_oh))+kpi('Open Cust PO',fmt(r.open_cust_po_qty),'Outstanding customer PO qty awaiting shipment','')+kpi('Hold Qty',fmt(r.hold_qty),'Hold Order Qty - orders parked, not shipping',r.hold_qty>0?'#e65100':'')+kpi('Days->Next Rcpt',fmt(r.days_oos_next_rcpt),'Days OOS until next supplier receipt arrives',oosColor(r.days_oos_next_rcpt))+kpi('Pipe Excess',fmt(r.pipeline_excess),'Total pipeline - 26w demand - safety stock. Positive = overstock',excessColor(r.pipeline_excess))+kpi('PipeWOS',(r.pipeline_wos==null?'&#8734;':fmt(r.pipeline_wos)),'Pipeline weeks of supply (all I/T + I/W + OH / 26w demand)','')+kpi('LT + CNY',fmt(r.lt_wks)+' + '+fmt(r.cny_weeks),'Lead time (weeks) + Chinese New Year shutdown weeks','')+kpi('Days OOS L12m',fmt(r.days_oos_l12m),'Days out-of-stock in trailing 12 months',r.days_oos_l12m>30?'#c62828':'')+kpi('Customers',fmt(r.customer_count),'Active Acct-MStyles rolled up into this mstyle','')+kpi('Manual Demand',fmt(r.manual_demand_26w),'26-week sum of customer manual projections (rolled up)','')+'</div>'+(r.is_multi?'<div style="margin-top:8px;padding:6px 10px;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;font-size:11px;color:#5d4037;">&#127873; <b>Multi-pack:</b> Each unit = '+r.pcs_per_kit+' pcs of root <b>'+esc(r.root_mstyle)+'</b>. Root OH: <b>'+fmt(r.qty_oh_root)+'</b> pcs -> can assemble <b>'+fmt(r.assembleable_kits)+'</b> more kits. Total effective kit availability: '+fmt((r.beg_inv&&r.beg_inv[0])||0)+' on-hand + '+fmt(r.assembleable_kits)+' buildable = <b>'+fmt(((r.beg_inv&&r.beg_inv[0])||0)+r.assembleable_kits)+'</b> kits.</div>':'');
 
   var totalAged=(r.aged_inv_0_90||0)+(r.aged_inv_91_180||0)+(r.aged_inv_181_365||0)+(r.aged_inv_365plus||0);
   function agePct(n){return totalAged>0?' ('+Math.round(n/totalAged*100)+'%)':'';}
   function ageColor(days){return days>180?'#c62828':days>90?'#e65100':'inherit';}
-  var agedInvHtml='<div class="kv-grid"><div><b>Inv Age (Days):</b> <span style="color:'+ageColor(r.invtry_age_days)+'">'+fmt(r.invtry_age_days)+'</span></div><div><b>% Time In Stock:</b> '+(r.pct_time_in_stock>0?fmt(r.pct_time_in_stock)+'%':'—')+'</div><div><b>0–90 Days:</b> '+fmt(r.aged_inv_0_90)+agePct(r.aged_inv_0_90)+'</div><div><b>91–180 Days:</b> <span style="color:'+(r.aged_inv_91_180>0?'#e65100':'inherit')+'">'+fmt(r.aged_inv_91_180)+agePct(r.aged_inv_91_180)+'</span></div><div><b>181–365 Days:</b> <span style="color:'+(r.aged_inv_181_365>0?'#c62828':'inherit')+'">'+fmt(r.aged_inv_181_365)+agePct(r.aged_inv_181_365)+'</span></div><div><b>&gt;365 Days:</b> <span style="color:'+(r.aged_inv_365plus>0?'#c62828':'inherit')+';font-weight:'+(r.aged_inv_365plus>0?'700':'400')+'">'+fmt(r.aged_inv_365plus)+agePct(r.aged_inv_365plus)+'</span></div></div>';
+  var agedInvHtml='<div class="kv-grid"><div><b>Inv Age (Days):</b> <span style="color:'+ageColor(r.invtry_age_days)+'">'+fmt(r.invtry_age_days)+'</span></div><div><b>% Time In Stock:</b> '+(r.pct_time_in_stock>0?fmt(r.pct_time_in_stock)+'%':'-')+'</div><div><b>0-90 Days:</b> '+fmt(r.aged_inv_0_90)+agePct(r.aged_inv_0_90)+'</div><div><b>91-180 Days:</b> <span style="color:'+(r.aged_inv_91_180>0?'#e65100':'inherit')+'">'+fmt(r.aged_inv_91_180)+agePct(r.aged_inv_91_180)+'</span></div><div><b>181-365 Days:</b> <span style="color:'+(r.aged_inv_181_365>0?'#c62828':'inherit')+'">'+fmt(r.aged_inv_181_365)+agePct(r.aged_inv_181_365)+'</span></div><div><b>&gt;365 Days:</b> <span style="color:'+(r.aged_inv_365plus>0?'#c62828':'inherit')+';font-weight:'+(r.aged_inv_365plus>0?'700':'400')+'">'+fmt(r.aged_inv_365plus)+agePct(r.aged_inv_365plus)+'</span></div></div>';
 
-  return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+overstockBox+'</div></div><div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">— hover Expected Receipts cells for PO detail · hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div><div class="section"><h3>&#127919; Recommended Actions</h3>'+recs+'</div></div>';
+  return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+overstockBox+'</div></div><div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">- hover Expected Receipts cells for PO detail / hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div><div class="section"><h3>&#127919; Recommended Actions</h3>'+recs+'</div></div>';
 }
 
-// ── Reco spreadsheet ──────────────────────────────────────────────────────────
+// -- Reco spreadsheet ----------------------------------------------------------
 function addToRecoSheet(btn) {
   var d=btn.dataset;
   recoSheet.push({mstyle:d.mstyle,action:d.action,po_number:d.po,supplier:d.supplier,qty_open:d.qty,curr_etd:d.currEtd,curr_eta:d.currEta,req_etd:d.reqEtd,req_eta:d.reqEta});
-  btn.textContent='✓ Added';btn.disabled=true;btn.style.background='#e8f5e9';btn.style.color='#2e7d32';btn.style.borderColor='#a5d6a7';
+  btn.textContent='+ Added';btn.disabled=true;btn.style.background='#e8f5e9';btn.style.color='#2e7d32';btn.style.borderColor='#a5d6a7';
   var badge=document.getElementById('recoBadge');if(badge){badge.textContent=recoSheet.length;badge.style.display='inline';}
 }
 function generateRecoSheet() {
@@ -911,22 +911,22 @@ function generateRecoSheet() {
   var headers=['Mstyle','Action','PO #','Supplier','Qty Open','Current ETD','Current ETA','Requested ETD','Requested ETA'];
   var rows=recoSheet.map(function(r){return[r.mstyle,r.action,r.po_number,r.supplier,r.qty_open,r.curr_etd,r.curr_eta,r.req_etd,r.req_eta];});
   var csv=[headers].concat(rows).map(function(row){return row.map(function(v){return'"'+String(v!=null?v:'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  var blob=new Blob([''+csv],{type:'text/csv;charset=utf-8;'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PO_Recommendations_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
+// -- Boot ----------------------------------------------------------------------
 async function boot() {
   var scr=document.getElementById('loadingScreen');
-  setStep(1,'active');setBar(5);setStatus('Checking cache…');
+  setStep(1,'active');setBar(5);setStatus('Checking cache...');
 
   var cached=loadCache();
   if(cached){
-    setBar(80);setStatus('Loading from cache…');
+    setBar(80);setStatus('Loading from cache...');
     ALL=cached.data;
     var asOf=document.getElementById('dataAsOf');
     if(asOf)asOf.textContent='Data as of '+fmtTimestamp(cached.ts)+' (cached)';
-    setBar(90);setStatus('Building view…');
+    setBar(90);setStatus('Building view...');
     setStep(4,'active');
     buildFilterDropdowns();buildTableHead();applyFilters();
     setBar(100);setStep(4,'done');
@@ -939,7 +939,7 @@ async function boot() {
     var records=await loadData();
     ALL=records;
     saveCache(records);
-    setStep(4,'active');setBar(85);setStatus('Building view…');
+    setStep(4,'active');setBar(85);setStatus('Building view...');
     await new Promise(function(r){setTimeout(r,50);});
     buildFilterDropdowns();buildTableHead();applyFilters();
     var ts=Date.now();
@@ -973,10 +973,10 @@ async function refreshData() {
   await boot();
 }
 
-// ── Wire up controls + boot ────────────────────────────────────────────────────
+// -- Wire up controls + boot ----------------------------------------------------
 // IMPORTANT: wrapped in DOMContentLoaded so DOM elements exist before we
 // reference them.  The <script> tag in the HTML should be at the END of <body>
-// (not in <head>) — but this guard handles both placements safely.
+// (not in <head>) - but this guard handles both placements safely.
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('searchInput').oninput=applyFilters;
   document.getElementById('actionFilter').onchange=applyFilters;

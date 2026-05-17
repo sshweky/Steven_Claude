@@ -2157,7 +2157,7 @@ function toggleDetail(key) {
   const isFDRecord = (r.asin_status || '').trim().toUpperCase().startsWith('FD');
   const fdStatusHtml = isFDRecord ? `
     <div style="margin:8px 12px 0 12px;padding:10px 12px;background:#fff3f3;border:1px solid #ffcdd2;border-radius:6px;font-size:12px;color:#4a1010;">
-      <div style="font-weight:700;font-size:12px;color:#c62828;margin-bottom:6px;">&#x26A0; Future Delete — Status @ Cust: <span style="font-weight:400">${(r.asin_status||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</span></div>
+      <div style="font-weight:700;font-size:12px;color:#c62828;margin-bottom:6px;">&#x26A0; Future Delete - Status @ Cust: <span style="font-weight:400">${(r.asin_status||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</span></div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px 16px;font-size:11px;">
         <div><b>Customer:</b> ${(r.cust||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
         <div><b>Mstyle:</b> ${(r.mstyle||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
