@@ -1960,7 +1960,7 @@ function toggleDetail(key) {
           <span> Inventory Flow</span>
           ${_hasInvFlow && _optWos > 0 ? `<span style="font-weight:400;font-size:10px;color:#555;">Opt WOS: <b>${_invFmt1(_optWos)}</b></span>` : ''}
           ${_hasInvFlow && _gap.nextRcptDate ? `<span style="font-weight:400;font-size:10px;color:#555;">Next avl receipt date: <b>${_gap.nextRcptDate.toLocaleDateString('en-US', { month:'short', day:'numeric' })}</b></span>` : ''}
-          ${_hasInvFlow && _ltWks > 0 ? `<span style="font-weight:400;font-size:10px;color:#555;">LT: <b>${_ltWks} wks</b></span>` : ''}
+          ${_hasInvFlow && _ltWks > 0 ? `<span style="font-weight:400;font-size:10px;color:#555;">LT: <b>${Math.round(_ltWks)} wks</b></span>` : ''}
           ${_hasInvFlow && _moq > 0 ? `<span style="font-weight:400;font-size:10px;color:#555;">MOQ: <b>${_moq.toLocaleString()}</b></span>` : ''}
           ${_hasInvFlow ? '' : (_invFlowPromise ? '<span style="font-weight:400;font-size:10px;color:#888;">Loading inventory balances...</span>' : '<span style="font-weight:400;font-size:10px;color:#888;">(no QB Inventory Flow row for this mstyle)</span>')}
         </div>
