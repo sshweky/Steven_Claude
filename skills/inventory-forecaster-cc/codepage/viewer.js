@@ -363,7 +363,7 @@ async function attachInvFlow(records) {
   if (!records.length) return {};
 
   // -- Cache fast-path ----------------------------------------------------
-  // If localStorage has a fresh map (<4h old), attach from there and skip
+  // If localStorage has a fresh map (<6h old), attach from there and skip
   // the entire bulk QB pull.  Saves ~12 paginated /records/query calls per
   // page load, per user, per 4-hour window.
   if (!_invFlowCacheBypassed()) {
