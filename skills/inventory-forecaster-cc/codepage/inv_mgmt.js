@@ -285,8 +285,14 @@ async function loadData() {
 
   setStep(2,'active'); setBar(10);
   var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);
-  // Filter to active/replen records only using field 927 (boolean checkbox — no quotes around true)
-  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, "{927}.EX.true", 'Loading Inventory Flow');
+  // Filter on Item Status (fid 294) — field 927 is a formula field QB can't filter on directly.
+  // Include all statuses where the field-927 formula returns true:
+  var IF_STATUS_FILTER = [
+    "Active: Promo","Active: Promo Commt","Active: Replen","Active: Replen Commt",
+    "Active: Multi-Pk Replen","Future Delete",
+    "In Prodn: Promo","In Prodn: Promo Commt","In Prodn: Replen"
+  ].map(function(s){return "{294}.EX.'"+s+"'";}).join(' OR ');
+  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, IF_STATUS_FILTER, 'Loading Inventory Flow');
   setStatus('IF loaded: ' + ifRows.length + ' records');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
