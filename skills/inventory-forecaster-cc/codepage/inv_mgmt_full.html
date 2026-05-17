@@ -72,25 +72,28 @@
   .col-label { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word; line-height:1.25; }
   table.main thead tr.sort-row th { vertical-align:bottom; }
   table.main thead tr.filter-row th input { white-space:nowrap; }
-  table.main td { padding:3px 4px; border-bottom:1px solid #eee; vertical-align:top; font-size:11px; overflow:hidden; }
+  table.main td { padding:3px 4px; border-bottom:1px solid #eee; vertical-align:top; font-size:11px; overflow:hidden; color:#111; }
   table.main tr.row { cursor:pointer; }
   table.main tr.row:hover { background:#eef4ff; }
   table.main th.right, table.main td.right { text-align:right; }
+  /* 2-line clamp for text-heavy cells (applied on inner div) */
+  .cell-clamp2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word; line-height:1.4; }
+  .neg { color:#c62828; }
 
-  /* Priority text */
-  .pri-CRITICAL { color:#b71c1c; font-weight:700; }
-  .pri-HIGH     { color:#e65100; font-weight:600; }
-  .pri-MEDIUM   { color:#5d4037; }
-  .pri-LOW      { color:#555; }
-  .pri-NO_OOS   { color:#bbb; }
+  /* Priority text — vivid, easy to scan */
+  .pri-CRITICAL { color:#cc0000; font-weight:700; }
+  .pri-HIGH     { color:#e53c00; font-weight:600; }
+  .pri-MEDIUM   { color:#e07800; }
+  .pri-LOW      { color:#444; }
+  .pri-NO_OOS   { color:#999; }
 
-  /* Badges */
-  .badge { display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:8px; }
-  .badge-red    { background:#ffebee; color:#b71c1c; }
-  .badge-amber  { background:#fff3e0; color:#e65100; }
-  .badge-purple { background:#f3e5f5; color:#6a1b9a; }
-  .badge-green  { background:#e8f5e9; color:#1b5e20; }
-  .badge-gray   { background:#eeeeee; color:#666; }
+  /* Badges — vivid */
+  .badge { display:inline-block; font-size:10px; font-weight:600; padding:1px 7px; border-radius:8px; white-space:nowrap; }
+  .badge-red    { background:#ffcdd2; color:#b71c1c; }
+  .badge-amber  { background:#ffe0b2; color:#bf360c; }
+  .badge-purple { background:#e8eaf6; color:#4527a0; }
+  .badge-green  { background:#c8e6c9; color:#1b5e20; }
+  .badge-gray   { background:#e0e0e0; color:#444; }
 
   /* ── Detail pane ── */
   .detail-pane { background:#fafafa; }
