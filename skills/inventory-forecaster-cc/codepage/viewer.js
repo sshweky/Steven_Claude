@@ -357,7 +357,7 @@ function _fmtCacheAge(ms) {
 // still runs every time (one fast metadata call) because week labels rotate
 // every Sunday.  Cache is keyed by version string; bump it any time the shape
 // of adaptRow() output changes to force-invalidate all clients.
-const PRJ_CACHE_KEY    = 'pp_prj_v1';
+const PRJ_CACHE_KEY    = 'pp_prj_v2';
 const PRJ_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 
 function _prjCacheBypassed() {

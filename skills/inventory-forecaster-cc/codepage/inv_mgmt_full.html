@@ -166,7 +166,7 @@
 </table>
 </div>
 
-<!-- All JS inline — no external page dependency -->
+<!-- Script MUST be at end of body so DOM is fully parsed before JS runs -->
 <script>
 // Immediate diagnostic — if this runs, JS is executing
 (function(){
@@ -1055,7 +1055,7 @@ function renderDetail(r) {
 
   var demandHtml='<table class="subtbl"><tr><th>Demand</th><th class="right">Qty</th><th>Shipments</th><th class="right">Qty</th><th>Date</th><th>Value</th></tr><tr><td>Prj / Wk</td><td class="right"><b>'+fmt(r.prj_wk)+'</b></td><td>Shpd / Wk L4</td><td class="right"><b>'+fmt(r.shp_wk_l4)+'</b></td><td>Last Shp Date</td><td>'+fmtDate(r.last_shp_date)+'</td></tr><tr><td>Max Prj / Wk</td><td class="right">'+fmt(r.max_prj_wk)+'</td><td>Shpd / Wk L13</td><td class="right"><b>'+fmt(r.shp_wk_l13)+'</b></td><td>1st Shpd Date</td><td>'+fmtDate(r.first_shpd_date)+'</td></tr><tr><td>+/- Prj L4w</td><td class="right">'+fmt(r.prj_l4w_change)+'%</td><td>Total Shpd L4</td><td class="right">'+fmt(r.tot_shpd_l4)+'</td><td>Date 1st Rcvd</td><td>'+fmtDate(r.date_1st_rcvd)+'</td></tr><tr><td>Prj 26 Wks</td><td class="right">'+fmt(r.prj_26wks)+'</td><td>Total Shpd L13w</td><td class="right">'+fmt(r.tot_shpd_l13w)+'</td><td>Last Whs Rcvd</td><td>'+fmtDate(r.last_whs_rcvd)+'</td></tr><tr><td>Manual demand (rollup)</td><td class="right">'+fmt(r.manual_demand_26w)+'</td><td>Total Shpd LTD</td><td class="right">'+fmt(r.tot_shpd_ltd)+'</td><td>1st Out Date</td><td>'+fmtDate(r.first_out_date)+'</td></tr><tr><td>Demand (Inv Flow 26w Σ)</td><td class="right">'+fmt(r.demand_26w)+'</td><td colspan="2"></td><td>Last OOS Date</td><td>'+fmtDate(r.last_oos_date)+'</td></tr></table><div class="stat-text" style="margin-top:4px;"><b>Days OOS till Next Rcpt:</b> '+fmt(r.days_oos_next_rcpt)+' · <b>Days OOS L12m:</b> '+fmt(r.days_oos_l12m)+'</div>';
 
-  function kpi(label,value,hint,color){return '<div class="kpi"'+(hint?' title="'+esc(hint)+'"':'')+'>  <div class="kpi-lbl">'+label+'</div><div class="kpi-val" style="'+(color?'color:'+color+';')+'">'+value+'</div></div>';}
+  function kpi(label,value,hint,color){return '<div class="kpi"'+(hint?' title="'+esc(hint)+'"':'')+'>  <div class="kpi-lbl">'+label+'</div><div class="kpi-val" style="'+(color?'color:'+color+';':'')+'">'+value+'</div></div>';}
   function wosColor(w){if(w==null||w===0)return'#888';if(w<r.opt_wos)return'#c62828';if(w>26)return'#1b5e20';return'#0d47a1';}
   function excessColor(e){return e>2500?'#c62828':(e<-2500?'#e65100':'#1b5e20');}
   function oosColor(d){return d>14?'#c62828':(d>0?'#e65100':'#1b5e20');}
