@@ -2074,9 +2074,11 @@ function toggleDetail(key) {
       ordCells += `<td style="${ov === 0 ? 'color:#bbb' : 'color:#e65100;font-weight:600'}">${fmtN(ov)}</td>`;
       shpTot += sv;  ordTot += ov;
     }
-    histHdrCells += '<th>Total</th>';
+    histHdrCells += '<th>Total</th><th style="color:#888;font-weight:600">Avg/Wk</th>';
     shpCells     += `<td style="font-weight:700;color:#6a1b9a">${fmtN(shpTot)}</td>`;
+    shpCells     += `<td style="font-weight:700;color:#6a1b9a">${fmtN(Math.round(shpTot / 26))}</td>`;
     ordCells     += `<td style="font-weight:700;color:#e65100">${fmtN(ordTot)}</td>`;
+    ordCells     += `<td style="font-weight:700;color:#e65100">${fmtN(Math.round(ordTot / 26))}</td>`;
     histHtml = `
     <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:2px solid #ede7f6;">
       <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">L26W History</div>
