@@ -713,10 +713,6 @@ function buildFilterDropdowns() {
 
 function _filterRecords(skipPri) {
   var q=document.getElementById('searchInput').value.toLowerCase().trim();
-  var af=document.getElementById('actionFilter').value;
-  var cf=document.getElementById('countryFilter').value;
-  var bf=document.getElementById('brandFilter').value;
-  var mf=document.getElementById('invMgrFilter').value;
   var replen=document.getElementById('replenOnly').checked;
   var gaps=document.getElementById('gapsOnly').checked;
   var over=document.getElementById('overstockOnly').checked;
@@ -725,16 +721,18 @@ function _filterRecords(skipPri) {
   Object.keys(colFilters).forEach(function(cid){var c=COLS.find(function(x){return x.id===cid;});if(c)activeCols.push({c:c,needle:colFilters[cid].toLowerCase()});});
   return ALL.filter(function(r){
     if(q){var hay=(r.mstyle+' '+r.description+' '+r.brand).toLowerCase();if(hay.indexOf(q)<0)return false;}
-    if(cf&&r.country!==cf)return false;
-    if(bf&&r.brand!==bf)return false;
-    if(mf&&r.inv_manager!==mf)return false;
+    if(selCountries.size>0&&!selCountries.has(r.country))return false;
+    if(selBrands.size>0&&!selBrands.has(r.brand))return false;
+    if(selMgrs.size>0&&!selMgrs.has(r.inv_manager))return false;
     if(replen&&!r.is_replen)return false;
     if(gaps&&r.gap_weeks.length===0)return false;
     if(over&&!r.overstocked)return false;
     if(hideMulti&&r.is_multi)return false;
-    if(af==='__NONE__'){if(r.recommendations.length!==0)return false;}
-    else if(af){if(!r.recommendations.some(function(rc){return rc.action===af;}))return false;}
-    if(!skipPri&&priorityFilter&&r.priority!==priorityFilter)return false;
+    if(selActions.size>0){
+      if(selActions.has('__NONE__')){if(r.recommendations.length!==0)return false;}
+      else{if(!r.recommendations.some(function(rc){return selActions.has(rc.action);}))return false;}
+    }
+    if(!skipPri&&selPriorities.size>0&&!selPriorities.has(r.priority))return false;
     for(var i=0;i<activeCols.length;i++){var ac=activeCols[i];var val=ac.c.filterValue?ac.c.filterValue(r):ac.c.get(r);if(val==null)return false;if(String(val).toLowerCase().indexOf(ac.needle)<0)return false;}
     return true;
   });
