@@ -316,8 +316,8 @@ async function loadData() {
     var row = prjRows[i];
     var ms   = String((row[PRJ_F.Mstyle]||{}).value||'').trim();
     var cust = String((row[PRJ_F.CustName]||{}).value||'').trim();
-    var desc = String((row[PRJ_F.Description]||{}).value||'').trim();
-    var brand= String((row[PRJ_F.Brand]||{}).value||'').trim();
+    var desc = stripHtml((row[PRJ_F.Description]||{}).value);
+    var brand= stripHtml((row[PRJ_F.Brand]||{}).value);
     if (!ms) continue;
     var weekly = PRJ_MANUAL.map(function(fid){return toNum((row[fid]||{}).value);});
     var total  = weekly.reduce(function(a,b){return a+b;},0);
