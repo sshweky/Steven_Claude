@@ -2638,35 +2638,52 @@ async function loadCommentHistory(key, force) {
 
 // -- Add comment > INSERT into Projection Comments table --------------------
 async function addComment(key) {
-  const txt  = document.getElementById('cmt-text-' + key).value.trim();
-  const flag = document.getElementById('cmt-flag-' + key).value;
-  const btn  = document.getElementById('cmt-btn-' + key);
-  const msg  = document.getElementById('cmt-msg-' + key);
+  const txt    = document.getElementById('cmt-text-'   + key).value.trim();
+  const flag   = document.getElementById('cmt-flag-'   + key).value;
+  const author = (document.getElementById('cmt-author-' + key) || {}).value || '';
+  const btn    = document.getElementById('cmt-btn-'    + key);
+  const msg    = document.getElementById('cmt-msg-'    + key);
   if (!txt) { msg.textContent = 'Comment cannot be empty.'; msg.style.color = '#c62828'; return; }
   btn.disabled = true; btn.textContent = 'Saving...'; msg.textContent = '';
+
+  // Persist author name for next time
+  if (author) try { localStorage.setItem('viewerAuthorName', author); } catch(_) {}
+
   try {
     const today = new Date();
     const daysToSat = (6 - today.getDay() + 7) % 7;
     const dow = new Date(today); dow.setDate(today.getDate() + daysToSat);
     const dowStr = dow.toISOString().slice(0, 10);
-
-    // NOTE: DATE_OF_WEEK (fid 17) is a QB snapshot/derived field  -  QB computes
-    // it itself and rejects any attempt to set it via the API
-    // ("Can not change the value of the snapshot field with ID '17'.").
-    // Do NOT include it in the insert payload.  `dowStr` is computed above only
-    // because it may be useful for future client-side grouping.
-    void dowStr;
+    void dowStr;  // QB computes DATE_OF_WEEK itself \u2014 do not include in payload
 
     const fields = {};
-    fields[CFG.COMMENT_FID.NOTE]         = { value: txt };
-    fields[CFG.COMMENT_FID.ACCT_MSTYLE]  = { value: key };
-    if (flag) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
+    fields[CFG.COMMENT_FID.NOTE]        = { value: txt };
+    fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
+    if (flag)   fields[CFG.COMMENT_FID.FLAG]   = { value: flag };
+    if (author) fields[CFG.COMMENT_FID.AUTHOR] = { value: author };
 
-    // _qbFetch() now centrally validates the QB response  -  if the row was
-    // silently rejected (lineErrors, or zero records affected) it will throw,
-    // and the catch block below shows a red error message.
-    const resp = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
+    const resp  = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
     const recId = (resp && resp.metadata && resp.metadata.createdRecordIds && resp.metadata.createdRecordIds[0]) || '';
+
+    // If this is a planner response, flip Planner_Reply_Pending on the Projections record
+    if (flag === 'Planner Response') {
+      const pf = {};
+      pf[CFG.FID.KEY]                   = { value: key };
+      pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: true };
+      await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
+      // Optimistic UI
+      const rec = ALL_RECORDS.find(x => x.key === key);
+      if (rec) rec.planner_reply_pending = true;
+      const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+      const badgeCell = document.getElementById('row-badges-' + safeId);
+      if (badgeCell && !badgeCell.querySelector('.reply-badge')) {
+        badgeCell.insertAdjacentHTML('beforeend', '<span class="reply-badge" title="Planner reply awaiting director review">\ud83d\udcac</span>');
+      }
+      const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
+      if (tr) tr.classList.add('row-reply-pending');
+      updateReplyCount();
+    }
+
     msg.textContent = recId ? `\u2713 Saved (rec #${recId})` : '\u2713 Saved';
     msg.style.color = '#2e7d32';
     document.getElementById('cmt-text-' + key).value = '';
@@ -2675,12 +2692,11 @@ async function addComment(key) {
     if (rec) {
       const stamp = new Date().toISOString().slice(0,16).replace('T',' ');
       const flagTag = flag ? ' ['+flag+']' : '';
-      rec.last_comment = `${stamp} - you${flagTag}: ${txt.slice(0,200)}`;
+      const authorTag = author ? ` (${author})` : '';
+      rec.last_comment = `${stamp}${authorTag}${flagTag}: ${txt.slice(0,200)}`;
       rec.last_comment_date = new Date().toISOString();
     }
     btn.textContent = 'Save'; btn.disabled = false;
-    // Refresh the 30-day history pane in place so the new comment shows up
-    // without requiring a panel collapse + re-expand
     if (typeof loadCommentHistory === 'function') loadCommentHistory(key, true);
   } catch (e) {
     msg.textContent = 'Failed: ' + e.message; msg.style.color = '#c62828';
