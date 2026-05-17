@@ -656,8 +656,8 @@ Some mstyles carry a suffix that signals a non-standard fulfillment mode. These 
 
 | Suffix | Name | Meaning |
 |---|---|---|
-| `MPP` | Direct Import (DI) | Amazon orders direct from P+P's overseas factory. ~10 week transit to Amazon DC. Amazon writes POs 35–65 days before shipment. P+P does not project; F69 blends history into base. |
-| `ADF` | Direct Import (DI) | Same as MPP — alternate DI suffix. Same F69 treatment. |
+| `MPP` | Direct Import (DI) | Amazon orders direct from P+P's overseas factory. ~10 week transit to Amazon DC. Amazon writes POs 35–65 days before shipment. P+P does not project; F69 blends history into base. DI orders appear in Order History under **acct 61865** (not the warehouse Amazon acct). |
+| `ADF` | Direct Import (DI) | Same as MPP — alternate DI suffix, same F69 treatment, same acct 61865. |
 | `COS` | Cost / Direct Ship | Ships direct from factory to retailer/Amazon, bypassing P+P warehouse. Longer lead times. No warehouse inventory signal. (No forecaster logic yet.) |
 | `EC` | eCommerce / Drop-Ship | eComm/FBA fulfillment variant. F60 inherits parent history when EC is sparse. |
 
