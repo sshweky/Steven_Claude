@@ -148,7 +148,7 @@ def _take_rule_fires():
 
 import re as _re_for_rule_fires
 _RULE_TAG_RE = _re_for_rule_fires.compile(
-    r"\b(VP-Q[1-4]|VP-FL|R[1-9]|F\d+[a-z]?|T4|S6|M1)\b"
+    r"\b(VP-Q[1-4]|VP-FL|VP-ATS|R[1-9]|F\d+[a-z]?|T4|S6|M1)\b"
 )
 
 def _scan_rule_fires(meta=None, alert="", baseline_mode="", model="",
