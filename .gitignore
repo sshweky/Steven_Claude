@@ -23,6 +23,8 @@ plans/
 # --- Large data caches (files exceed GitHub 100 MB limit) ---
 cache/
 **/cache/
+# QB chunk exports (can be > 100 MB)
+projects/amazon-trend-analyzer/qb_chunks/
 
 # --- Python ---
 __pycache__/
