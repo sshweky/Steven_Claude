@@ -1814,7 +1814,7 @@ function renderPage(page) {
       <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.desc||'').replace(/"/g,'&quot;')}">${r.desc||''}</td>
       ${_renderStatusCell(r.asin_status, r.key)}
       <td style="font-size:11px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.item_status||'').replace(/"/g,'&quot;')}">${r.item_status||''}</td>
-      <td>${priLabel(r.priority)}</td>
+      <td style="white-space:nowrap">${_priCell(r)}</td>
       <td style="font-size:11px;color:#888;white-space:nowrap">${r.last_ord_date || ' -'}</td>
       <td>${fmtN(Math.round(r.ord_wk_l4 || 0))}</td>
       <td style="color:#6a1b9a">${fmtN(Math.round(r.shpd_wk_l4 || 0))}</td>
