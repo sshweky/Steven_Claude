@@ -67,9 +67,10 @@
   .age-card-pct { font-size:12px; color:#888; margin-top:3px; }
 
   /* ── Main table ── */
-  table.main { width:100%; background:#fff; border-collapse:separate; border-spacing:0; }
-  table.main th { background:#f8f9fa; padding:4px 6px; text-align:left; font-size:11px; color:#000; font-weight:600; word-wrap:break-word; overflow-wrap:break-word; }
-  table.main thead tr.sort-row th { line-height:1.25; vertical-align:bottom; }
+  table.main { background:#fff; border-collapse:separate; border-spacing:0; table-layout:fixed; }
+  table.main th { background:#f8f9fa; padding:3px 4px; text-align:left; font-size:10px; color:#000; font-weight:600; overflow:hidden; }
+  .col-label { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word; line-height:1.25; }
+  table.main thead tr.sort-row th { vertical-align:bottom; }
   table.main thead tr.filter-row th input { white-space:nowrap; }
   table.main td { padding:4px 6px; border-bottom:1px solid #eee; vertical-align:top; font-size:12px; }
   table.main tr.row { cursor:pointer; }
