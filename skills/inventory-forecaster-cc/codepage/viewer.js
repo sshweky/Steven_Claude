@@ -659,6 +659,59 @@ async function attachInvFlow(records) {
   return map;
 }
 
+// -- ATS (Available to Sell) L26W history from Inventory History - Weekly ----
+let _atsHistPromise = null;
+async function attachAtsHistory(records) {
+  if (!records.length) return {};
+  if (!_invFlowCacheBypassed()) {
+    const cached = _loadAtsHistCache();
+    if (cached && cached.map) {
+      let n = 0;
+      for (const r of records) { if (r.mstyle && cached.map[r.mstyle]) { r.ats_hist = cached.map[r.mstyle]; n++; } }
+      const ageStr = _fmtCacheAge(cached.ageMs);
+      console.info(`[AtsHist] loaded from cache (age ${ageStr}) - ${n} records attached`);
+      return cached.map;
+    }
+  }
+  const FK   = CFG.ATS_HIST_FK_MSTYLE;
+  const FIDS = CFG.ATS_HIST_FIDS;
+  const sel  = [FK, ...FIDS];
+  const TOP  = 1000;
+  const map  = {};
+  let totalFetched = 0;
+  const numCell = (row, fid) => {
+    const cell = row[String(fid)];
+    if (!cell || cell.value == null || cell.value === '') return 0;
+    const n = Number(cell.value);
+    return Number.isFinite(n) ? n : 0;
+  };
+  let skip = 0;
+  while (true) {
+    const resp = await qb('/records/query', {
+      from: CFG.ATS_HIST_TID,
+      select: sel,
+      options: { top: TOP, skip: skip },
+    });
+    const rows = resp.data || [];
+    if (!rows.length) break;
+    for (const row of rows) {
+      const m = (row[String(FK)] && row[String(FK)].value) || '';
+      if (!m) continue;
+      map[m] = FIDS.map(fid => numCell(row, fid));  // oldest->newest
+    }
+    totalFetched += rows.length;
+    if (rows.length < TOP) break;
+    skip += TOP;
+  }
+  let nMatched = 0;
+  for (const r of records) {
+    if (r.mstyle && map[r.mstyle]) { r.ats_hist = map[r.mstyle]; nMatched++; }
+  }
+  console.info(`[AtsHist] ${Object.keys(map).length} mstyles fetched, ${nMatched} records attached`);
+  if (Object.keys(map).length > 0) _saveAtsHistCache(map);
+  return map;
+}
+
 // -- Convert a raw QB row into the record shape the UI expects --------------
 function v(row, fid) {
   const cell = row[String(fid)];
