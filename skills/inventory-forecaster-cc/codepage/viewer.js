@@ -4081,7 +4081,8 @@ function applyFilters() {
 
   FILTERED_RECORDS = ALL_RECORDS.filter(r => {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
-    if (FLAGGED_ONLY && !r.flagged) return false;
+    if (FLAGGED_ONLY     && !r.flagged)               return false;
+    if (SHOW_REPLY_ONLY  && !r.planner_reply_pending) return false;
     if (search) {
       const txt = (r.key + ' ' + r.cust + ' ' + r.mstyle + ' ' + (r.desc||'') + ' ' + (r.brand||'') + ' ' + (r.inv_manager||'')).toLowerCase();
       if (!txt.includes(search)) return false;
