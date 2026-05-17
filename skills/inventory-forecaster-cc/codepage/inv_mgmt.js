@@ -1067,7 +1067,7 @@ function renderDetail(r) {
       +'</div>';
   }
   var ageHeader='<div style="display:flex;align-items:center;gap:18px;margin-bottom:10px;">'
-    +'<div><span style="font-size:11px;color:#666;">Avg Inv Age</span><div style="font-size:22px;font-weight:700;color:'+(r.invtry_age_days>180?'#c62828':r.invtry_age_days>90?'#e65100':'#1565c0')+'">'+fmt(r.invtry_age_days)+' <span style="font-size:13px;font-weight:400;color:#888;">days</span></div></div>'
+    +'<div><span style="font-size:11px;color:#666;">Avg Inv Age</span><div style="font-size:22px;font-weight:700;color:'+(r.invtry_age_days>180?'#c62828':r.invtry_age_days>90?'#e65100':'#1565c0')+'">'+Math.round(r.invtry_age_days||0)+' <span style="font-size:13px;font-weight:400;color:#888;">days</span></div></div>'
     +'<div><span style="font-size:11px;color:#666;">Total Aged Inv</span><div style="font-size:22px;font-weight:700;color:#333;">'+fmt(totalAged)+' <span style="font-size:13px;font-weight:400;color:#888;">units</span></div></div>'
     +'</div>';
   var agedInvHtml=ageHeader+'<div class="age-cards">'
