@@ -2,8 +2,8 @@
 name: Quickbase API Connection
 description: Credentials, headers, endpoints, and table indexes for Quickbase apps at pim.quickbase.com (Amazon AdTrack + InventoryTrack)
 type: reference
+originSessionId: 7fd250e7-4824-4617-8d21-edaa141aab96
 ---
-
 ## Connection Details
 
 - **Realm**: pim.quickbase.com
@@ -214,6 +214,7 @@ Content-Type: application/json
 | br3afzd2h | Metric Trends (sync) |
 | br5fajrrx | MStyle Mirror Pipelines Test |
 | br6dcnv35 | Inventory History |
+| bv2sxg2ji | Inventory History - Weekly |
 | bsa9dpz87 | Current Stock Errors |
 | bsa9dz864 | PO Data Errors |
 | bsa9d3gp9 | Suggested PO ETAs |
