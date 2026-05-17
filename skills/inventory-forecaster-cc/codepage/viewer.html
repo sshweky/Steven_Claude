@@ -159,6 +159,17 @@ window.QB_CONFIG = {
     WOS_OH: 151,  // Amazon WOS OH (weeks of supply onhand)
   },
 
+  // -- Field IDs on Inventory History - Weekly (bv2sxg2ji) ------------------
+  // ATS = Available to Sell.  L26W history (oldest->newest: LW-25 to LW).
+  // fid 65 does not exist (deleted), so LW-1 = fid 66.
+  ATS_HIST_TID:       "bv2sxg2ji",
+  ATS_HIST_FK_MSTYLE: 6,
+  // Ordered oldest->newest: LW-25=90, LW-24=89, ..., LW-2=67, LW-1=66, LW=64
+  ATS_HIST_FIDS: [
+    90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76,
+    75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 64,
+  ],
+
   // The 26 manual projection fids are date-stamped and rotate weekly
   // (W1's label is "MM DD W1" where MM/DD = the most recent Sunday).
   // viewer.js will discover these at startup by querying the table's
