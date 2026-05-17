@@ -494,7 +494,7 @@ async function attachInvFlow(records) {
   console.info(`[InvFlow] ${Object.keys(map).length} unique mstyles fetched fresh from QB, attached to ${nMatched} records`);
 
   // Persist to localStorage so subsequent loads (this browser, this user)
-  // within the next 4 hours short-circuit the bulk pull.
+  // within the next 6 hours short-circuit the bulk pull.
   if (Object.keys(map).length > 0) {
     _saveInvFlowCache(map);
     console.info(`[InvFlow] saved ${Object.keys(map).length} mstyles to localStorage cache`);
