@@ -5259,6 +5259,37 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     if _f60_is_ec_transition:
         _fire("F60")
 
+    # F69 — DI direct-import variant: Amazon-managed PO, no AI projection.
+    # History was already blended into the base mstyle record in the pre-pass.
+    # Return a zero forecast so we don't overwrite QB with a model value that
+    # neither P+P nor Amazon uses for these records.
+    if row.get("_di_skip"):
+        _fire("F69")
+        _manual = [float(row.get(c) or 0) for c in ORIG_PRJ_COLS]
+        return {
+            "key":         row.get("Acct_MStyle_Key_", ""),
+            "mstyle":      row.get("Mstyle", ""),
+            "cust":        cust_name,
+            "mp":          mp,
+            "model":       "DI Direct Import (F69)",
+            "biweekly":    False,
+            "iso":         False,
+            "iso_settle":  False,
+            "forecast":    [0] * 26,
+            "manual":      _manual,
+            "cap_base":    0,
+            "new_total":   0,
+            "prior_total": sum(_manual),
+            "pct_diff":    100.0 if sum(_manual) > 0 else 0.0,
+            "alert":       (
+                f"F69 DI Direct Import ({row.get('Mstyle','')}): Amazon orders "
+                f"direct from factory — P+P does not project. "
+                f"Order history blended into base record {row.get('_di_base_key','')}."
+            ),
+            "drivers":     ["F69"],
+            "rule_fires":  _stop_rule_fires(),
+        }
+
     # F34 — Pre-launch-zeros detection (2026-05-05).
     #
     # When weeks 27-51 ago are essentially empty (sum < 1% of L26 sum) but
