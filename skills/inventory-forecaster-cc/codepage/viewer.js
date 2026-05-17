@@ -383,6 +383,30 @@ function _saveInvFlowCache(map) {
   }
 }
 
+function _loadAtsHistCache() {
+  try {
+    const raw = sessionStorage.getItem(ATS_HIST_CACHE_KEY);
+    if (raw) { const obj = JSON.parse(raw); if (obj && typeof obj.ts === 'number' && obj.map) return { map: obj.map, ageMs: Date.now() - obj.ts }; }
+  } catch (e) { /* ignore */ }
+  try {
+    const raw = localStorage.getItem(ATS_HIST_CACHE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || typeof obj.ts !== 'number' || !obj.map) return null;
+    if (Date.now() - obj.ts > ATS_HIST_CACHE_TTL_MS) return null;
+    return { map: obj.map, ageMs: Date.now() - obj.ts };
+  } catch (e) { return null; }
+}
+function _saveAtsHistCache(map) {
+  const payload = JSON.stringify({ ts: Date.now(), map });
+  try { sessionStorage.setItem(ATS_HIST_CACHE_KEY, payload); } catch (e) { /* ignore */ }
+  try {
+    localStorage.setItem(ATS_HIST_CACHE_KEY, payload);
+  } catch (e) {
+    try { localStorage.removeItem(ATS_HIST_CACHE_KEY); localStorage.setItem(ATS_HIST_CACHE_KEY, payload); } catch (e2) { /* ignore */ }
+  }
+}
+
 // Clear every local cache (both stores, both keys) and reload fresh from QB
 function clearAllCaches() {
   [INV_FLOW_CACHE_KEY, PRJ_CACHE_KEY, FID_SESS_KEY].forEach(k => {
