@@ -8646,9 +8646,28 @@ def main():
     if not getattr(args, "no_po_zero", False):
         from oos_history import fetch_open_pos_forward
         keys = [r.get("Acct_MStyle_Key_") for r in rows if r.get("Acct_MStyle_Key_")]
+        # Decode W1_DATE from ORIG_PRJ_COLS[0] (e.g. "05_10_W1" -> 2026-05-10).
+        # Passing this to fetch_open_pos_forward fixes VP-Q4's bucketing alignment:
+        # cancel dates must be bucketed relative to the forecast grid's Sunday
+        # anchor, not relative to today, otherwise a 1-week shift zeroes the
+        # wrong forecast weeks when the run date != W1_DATE.
+        _prj_w1_date = None
+        if ORIG_PRJ_COLS:
+            try:
+                _col0 = ORIG_PRJ_COLS[0]            # "MM_DD_W1"
+                _wm, _wd = int(_col0[0:2]), int(_col0[3:5])
+                _prj_w1_date = date(date.today().year, _wm, _wd)
+                # If the decoded date is more than 6 months in the past, it
+                # likely wraps to the next calendar year (rare edge case).
+                if (date.today() - _prj_w1_date).days > 180:
+                    _prj_w1_date = date(date.today().year + 1, _wm, _wd)
+            except Exception as _e:
+                print(f"      [2.8] Warning: could not decode W1_DATE from "
+                      f"'{ORIG_PRJ_COLS[0]}': {_e} — using today-relative bucketing")
         print(f"\n[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs "
-              f"in forward 26w window for {len(keys)} keys ...", flush=True)
-        open_pos_data = fetch_open_pos_forward(keys)
+              f"in forward 26w window for {len(keys)} keys "
+              f"(w1_date={_prj_w1_date}) ...", flush=True)
+        open_pos_data = fetch_open_pos_forward(keys, w1_date=_prj_w1_date)
         total_open_qty = sum(sum(v) for v in open_pos_data.values())
         n_with_any_po = sum(1 for v in open_pos_data.values() if any(q > 0 for q in v))
         print(f"      {n_with_any_po} keys have confirmed forward POs "
