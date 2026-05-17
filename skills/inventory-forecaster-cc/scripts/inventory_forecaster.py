@@ -8145,7 +8145,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                 _pos_parts.append(f"L52W {l52:.0f}/wk")
             if _pos_parts:
                 specific.append(
-                    f"<b>Consumer demand (POS):</b> "
+                    f"<b>Amazon POS Sales:</b> "
                     + ", ".join(_pos_parts)
                     + f" ({_trend_lbl})."
                 )
