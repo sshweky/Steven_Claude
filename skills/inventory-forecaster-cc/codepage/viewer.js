@@ -2225,7 +2225,7 @@ function toggleDetail(key) {
           </table>
         </div>
         ${gapBannerHtml}
-        <div id="inv-cards-${safeIdForTotal}" style="margin-top:6px;" data-next-rcpt="${_gap.nextRcptDate ? _gap.nextRcptDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''}"></div>
+        <div id="inv-cards-${safeIdForTotal}" style="margin-top:6px;" data-next-rcpt="${r.next_rcpt_dt ? new Date(r.next_rcpt_dt + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''}"></div>
       </div>`;
   }
 
