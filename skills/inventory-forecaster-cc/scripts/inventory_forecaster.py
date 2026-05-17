@@ -5563,7 +5563,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #   (B) Non-Amazon path — last non-zero order in hist within 26
         #       weeks (item ordered recently enough to be considered
         #       paused-not-dead).  Velocity cap = L52 order total ÷ 2.
-        if CONSERVATIVE_INACTIVE:
+        if CONSERVATIVE_INACTIVE and not _zero_velocity:
             _manual_tmp   = [float(row.get(c) or 0) for c in ORIG_PRJ_COLS]
             _manual_total = sum(_manual_tmp)
             # Path A — Amazon POS liveness
