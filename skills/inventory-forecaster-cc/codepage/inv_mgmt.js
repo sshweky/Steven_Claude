@@ -285,11 +285,10 @@ async function loadData() {
 
   setStep(2,'active'); setBar(10);
   var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);
-  // Pre-filter at QB level: only load Active, Replen, and Future Delete records.
-  // Excluded: Restricted, Ready to Sell, Ready to Quote, Discontinued, Dropped,
-  //           In Development, and any Component variants.
-  var ifWhere = "({294}.CT.'Active') OR ({294}.CT.'Replen') OR ({294}.CT.'Future Delete')";
-  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, ifWhere, 'Loading Inventory Flow');
+  // No QB-level status filter — ItemStatus is a formula/lookup field and CT filters on it
+  // are unreliable. Status exclusion (Restricted, Ready to Sell, Discontinued, etc.)
+  // is handled in the JS build loop below.
+  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, '', 'Loading Inventory Flow');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
   // Active projections only (StatusCust starts with 'A') — provides demand + brand/description
