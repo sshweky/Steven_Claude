@@ -292,29 +292,13 @@ async function loadData() {
   var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, ifWhere, 'Loading Inventory Flow');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
-  // Query 1: active projections only (StatusCust starts with 'A') — full field set for demand
+  // Active projections only (StatusCust starts with 'A') — provides demand + brand/description
   var prjFieldIds = Object.values(PRJ_F).concat(PRJ_MANUAL);
   var prjRows = await qbQueryAll(PROJ_TID, prjFieldIds, "{10}.CT.'A'", 'Loading Projections');
 
-  // Query 2: metadata only (Mstyle + Brand + Description, 3 fields) with no filter
-  // Fills brand/description for any mstyle that has zero active-customer rows
-  var prjMetaRows = await qbQueryAll(PROJ_TID, [PRJ_F.Mstyle, PRJ_F.Brand, PRJ_F.Description], '', 'Loading item metadata');
-
   setBar(70); setStatus('Processing data...');
 
-  // Build metadata lookup first so active-row pass can override if it has richer data
-  var prjMeta = {};
-  for (var i=0; i<prjMetaRows.length; i++) {
-    var mrow = prjMetaRows[i];
-    var mms  = String((mrow[PRJ_F.Mstyle]||{}).value||'').trim();
-    if (!mms) continue;
-    var mdesc  = stripHtml((mrow[PRJ_F.Description]||{}).value);
-    var mbrand = stripHtml((mrow[PRJ_F.Brand]||{}).value);
-    if (!prjMeta[mms]) prjMeta[mms] = { desc:mdesc, brand:mbrand };
-    else { if(mdesc && !prjMeta[mms].desc) prjMeta[mms].desc=mdesc; if(mbrand && !prjMeta[mms].brand) prjMeta[mms].brand=mbrand; }
-  }
-
-  // Build projections lookup by mstyle — active rows provide demand + preferred metadata
+  // Build projections lookup by mstyle
   var prjByMs = {};
   for (var i=0; i<prjRows.length; i++) {
     var row = prjRows[i];
@@ -329,11 +313,6 @@ async function loadData() {
     else { if(desc && !prjByMs[ms].desc) prjByMs[ms].desc=desc; if(brand && !prjByMs[ms].brand) prjByMs[ms].brand=brand; }
     prjByMs[ms].custs.push({ customer:cust, weekly:weekly, total:total });
   }
-  // Merge metadata for any mstyle not covered by the active query
-  Object.keys(prjMeta).forEach(function(ms) {
-    if (!prjByMs[ms]) prjByMs[ms] = { custs:[], desc:prjMeta[ms].desc, brand:prjMeta[ms].brand };
-    else { if(!prjByMs[ms].desc && prjMeta[ms].desc) prjByMs[ms].desc=prjMeta[ms].desc; if(!prjByMs[ms].brand && prjMeta[ms].brand) prjByMs[ms].brand=prjMeta[ms].brand; }
-  });
 
   // Build records from Inventory Flow
   var records = [];
