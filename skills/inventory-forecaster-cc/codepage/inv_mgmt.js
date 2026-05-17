@@ -825,11 +825,17 @@ function renderDetail(r) {
     poByWeek[wi].push(p);
   });
 
+  var allOpenPos = r.open_pos||[];
   function fmtPoHover(wi){
-    var pos=poByWeek[wi]||[];if(!pos.length)return'';
+    var wkVal=r.rcv[wi]||0;if(wkVal===0&&allOpenPos.length===0)return'';
     var wkDate=(new Date(w1sun.getTime()+wi*7*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    var h='Week of '+wkDate+'  (wh-avail = ETA + '+lag+'d)\n'+'-'.repeat(38)+'\n';
-    pos.forEach(function(p){h+='PO #: '+p.po_number+'\nSupplier: '+(p.supplier||'&#8212;')+'\nOpen (I/W): '+fmt(p.in_work_qty||0)+'  /  In Transit (I/T): '+fmt(p.in_transit_qty||0)+'\nETD: '+(p.etd||'&#8212;')+'  /  ETA: '+(p.eta||'&#8212;')+'\n';});
+    var h='Week of '+wkDate+' | Expected: '+fmt(wkVal)+' units\n'+('-').repeat(40)+'\n';
+    if(!allOpenPos.length){h+='(no open POs)';return h;}
+    allOpenPos.forEach(function(p){
+      h+='PO: '+p.po_number+' | Supplier: '+(p.supplier||'--')+'\n';
+      h+='  I/W: '+fmt(p.in_work_qty||0)+' | I/T: '+fmt(p.in_transit_qty||0);
+      h+=' | ETD: '+(p.etd||'--')+' | ETA: '+(p.eta||'--')+'\n';
+    });
     return h;
   }
   function fmtPrjHover(wi){
