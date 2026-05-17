@@ -303,8 +303,19 @@ window.QB_CONFIG = {
   .border-ok   { border-left: 4px solid #e0e0e0; }
   /* Light-red wash for any record whose Flagged checkbox is true in QB.
      Specificity beats `tbody tr:hover` so the tint persists on hover. */
-  tbody tr.row-flagged          { background:#ffebee; }
-  tbody tr.row-flagged:hover    { background:#ffcdd2; }
+  tbody tr.row-flagged                    { background:#ffebee; }
+  tbody tr.row-flagged:hover              { background:#ffcdd2; }
+  tbody tr.row-reply-pending              { background:#e0f2f1; }
+  tbody tr.row-reply-pending:hover        { background:#b2dfdb; }
+  tbody tr.row-flagged.row-reply-pending  { background:#f3e5f5; }
+  tbody tr.row-flagged.row-reply-pending:hover { background:#e1bee7; }
+  .reply-badge { display:inline-block;font-size:13px;line-height:1;cursor:default;
+                 margin-left:3px;vertical-align:middle;title-attr:"Planner reply awaiting review"; }
+  #replyBanner { display:none;background:#e65100;color:#fff;font-size:13px;font-weight:600;
+                 padding:8px 16px;border-radius:6px;margin:8px 0 4px 0;
+                 display:flex;align-items:center;gap:12px;flex-wrap:wrap; }
+  #replyBanner button { font-size:12px;padding:3px 12px;background:#fff;color:#e65100;
+                        border:none;border-radius:4px;cursor:pointer;font-weight:700; }
   .pct-up   { color:#2e7d32; font-weight:600; }
   .pct-down { color:#c62828; font-weight:600; }
   .pct-flat { color:#888; }
