@@ -97,18 +97,34 @@ async function qbQueryAll(tableId, fieldIds, where, label) {
   return all;
 }
 
-// -- Cache ---------------------------------------------------------------------
+// -- Cache (localStorage with sessionStorage fallback for large datasets) ------
 function saveCache(data) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+  var payload = JSON.stringify({ ts: Date.now(), data: data });
+  // Try localStorage first (persists across browser refreshes for up to CACHE_TTL)
+  try {
+    localStorage.setItem(CACHE_KEY, payload);
+    sessionStorage.removeItem(CACHE_KEY); // clear session copy if ls succeeded
+    return;
+  } catch(e) {}
+  // localStorage full (QuotaExceededError) -- fall back to sessionStorage
+  // sessionStorage survives Ctrl+R but clears when the tab closes
+  try { sessionStorage.setItem(CACHE_KEY, payload); } catch(e) {}
 }
 function loadCache() {
+  // Prefer localStorage (cross-refresh), fall back to sessionStorage
+  var raw = null;
+  try { raw = localStorage.getItem(CACHE_KEY); } catch(e) {}
+  if (!raw) { try { raw = sessionStorage.getItem(CACHE_KEY); } catch(e) {} }
+  if (!raw) return null;
   try {
-    var raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
     var obj = JSON.parse(raw);
     if (Date.now() - obj.ts > CACHE_TTL) return null;
     return obj;
   } catch(e) { return null; }
+}
+function clearCache() {
+  try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
+  try { sessionStorage.removeItem(CACHE_KEY); } catch(e) {}
 }
 function fmtTimestamp(ts) {
   var d = new Date(ts);
