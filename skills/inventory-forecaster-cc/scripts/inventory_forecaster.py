@@ -7030,7 +7030,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
 def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
                     low_mult=VALID_LOW_MULT, spike_mult=VALID_SPIKE_MULT,
-                    oos_entry=None, open_po_wk=None):
+                    oos_entry=None, open_po_wk=None, ats_hist=None):
     """
     Compare manual projections against historical order patterns.
     Flags weeks where the projection looks anomalous relative to what
