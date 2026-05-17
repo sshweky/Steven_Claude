@@ -2597,6 +2597,8 @@ async function _loadAmzDcInv(r, safeId) {
       <div style="font-size:18px;font-weight:700;color:${color};white-space:nowrap;">${value}</div>
     </div>`;
 
+  const nextRcpt = cardsEl.dataset.nextRcpt || '';
+
   const groupGap = `<div style="width:20px;flex:none;"></div>`;
   const divider  = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
 
@@ -2605,6 +2607,7 @@ async function _loadAmzDcInv(r, safeId) {
       ${card('Qty OH',        fmt(qtyOh),          '#37474f')}
       ${card('Qty I/W',       fmt(qtyIw),          '#37474f', 'Qty in Production / In-Work')}
       ${card('Qty I/T',       fmt(qtyIt),          '#37474f', 'Qty in Transit (inbound to warehouse)')}
+      ${card('Next Rcpt',     nextRcpt || '0',     nextRcpt ? '#c62828' : '#bbb', 'Next scheduled receipt date')}
       ${divider}
       ${card('OH WOS',        wosText(ohWos),       wosColor(ohWos),   'Weeks of supply: Qty OH / Prj/Wk')}
       ${card('OH+OO WOS',     wosText(ohOoWos),     wosColor(ohOoWos), 'Weeks of supply: (Qty OH + Cust Open Orders) / Prj/Wk')}
