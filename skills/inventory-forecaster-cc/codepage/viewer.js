@@ -4277,6 +4277,12 @@ async function bootstrap() {
       if (el) el.textContent = 'unavailable';
     });
 
+    _atsHistPromise = attachAtsHistory(ALL_RECORDS).then(() => {
+      _setFreshness('atshist-loaded-at', Date.now());
+    }).catch(e => {
+      console.warn('ATS History load failed (non-fatal):', e);
+    });
+
     _setBoot('Sorting projections...');
     _setDetail(`Ordering ${ALL_RECORDS.length.toLocaleString()} records by Inv Mgr > Brand > Customer > Mstyle`);
     await new Promise(r => setTimeout(r, 16));
