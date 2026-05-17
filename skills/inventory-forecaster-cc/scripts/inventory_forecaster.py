@@ -7039,7 +7039,8 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
     # Shared prep with forecast_record() — see _prep_record_signals().
     # Includes F35 stockout-backlog normalization so validation flags are
     # computed against true demand intent, not pile-up artifacts.
-    _sig                = _prep_record_signals(row, master_pack, oos_entry=oos_entry)
+    _sig                = _prep_record_signals(row, master_pack, oos_entry=oos_entry,
+                                               ats_hist_l26=ats_hist)
     mp                  = _sig["mp"]
     hist                = _sig["hist"]
     is_amazon           = _sig["is_amazon"]
