@@ -7374,16 +7374,15 @@ def _build_record_narrative(r):
         if _trunc_len >= 6 and _trunc_ai_vol > 0:
             _trunc_wk1 = _trunc_start_idx + 1  # 1-indexed week label
             parts.insert(0,
-                f"The plan goes to zero starting W{_trunc_wk1} and stays flat "
-                f"through W26 — but Status @ Cust is Active and there's no POG "
-                f"End Date on file. Based on this account's buying history, the AI "
-                f"would forecast {_trunc_ai_vol:,} units across those {_trunc_len} "
-                f"weeks. You clearly know something that isn't captured here: a POG "
-                f"ending, a listing drop, a distribution change, or a seasonal "
-                f"exit. Please document it — enter a POG End Date, update the item "
-                f"status, or add a comment so the plan makes sense to anyone "
-                f"reviewing it. Without context, this looks like missing demand "
-                f"that will create an inventory blind spot."
+                f"<b>Critical AI Flag:</b> The plan goes to zero at W{_trunc_wk1} "
+                f"and stays flat through W26, but Status @ Cust is Active with no "
+                f"POG End Date on file. The AI would forecast {_trunc_ai_vol:,} "
+                f"units across those {_trunc_len} weeks based on buying history. "
+                f"If there is an event driving this - POG ending, listing drop, "
+                f"distribution cut, or seasonal exit - please document it: enter a "
+                f"POG End Date, update the item status, or add a comment. Without "
+                f"context this looks like missing demand and creates an inventory "
+                f"blind spot."
             )
 
     if not parts:
