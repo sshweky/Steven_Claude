@@ -9516,62 +9516,76 @@ def main():
         _f60_count += 1
     print(f"      {_f60_count} EC variants inherited parent history", flush=True)
 
-    # ── Phase 2.9b: F69 — DI direct-import sibling history blending ──────────
-    # Amazon sometimes orders product direct from P+P's overseas factory
-    # instead of through the warehouse.  These "Direct Import" (DI) variants
-    # carry a suffix of MPP or ADF on the same base mstyle (e.g. FF8654MPP).
-    # Amazon writes its own POs 35-65 days before factory shipment (~10 weeks
-    # transit to Amazon DC); P+P does not project for these lines.
-    # However, their L52W order history IS real product demand.  Blending it
-    # into the base record gives the forecaster a true total-demand signal.
+    # ── Phase 2.9b: F69 — DI direct-import sibling history pull ─────────────
+    # Amazon (and sometimes other customers) order product direct from P+P's
+    # overseas factory — "Direct Import" (DI).  These variants share the base
+    # mstyle but carry MPP or ADF suffix (e.g. 1864-FF8654MPP alongside
+    # 1864-FF8654).  Amazon writes its own POs 35-65 days before factory
+    # shipment (~10 weeks transit); P+P does not project for these.
     #
-    # Steps:
-    #   1. Scan rows for any mstyle ending in MPP or ADF.
-    #   2. Map each to its base key (same acct, strip suffix).
-    #   3. If the base record exists in rows, ADD the sibling's weekly ORD_COLS
-    #      to the base row in-place (safe: pre-pass, single-threaded).
-    #   4. Tag base row with _di_blend metadata for driver annotation.
-    #   5. Tag DI rows with _di_skip so forecast_record() returns zero forecast.
+    # Because MPP/ADF have no Projections record, their orders only exist in
+    # the Order History table.  They can be concurrent with warehouse orders —
+    # in any given week Amazon may order via warehouse, DI, or both.
+    #
+    # Strategy: generate candidate sibling keys for every base row, query
+    # Order History via fetch_clean_demand(), then accumulate raw_ord weekly
+    # arrays into the base row's ORD_COLS in-place.  raw_ord[i] aligns 1:1
+    # with ORD_COLS[i] (both oldest→newest, 52 slots).  The forecaster then
+    # sees total demand (warehouse + factory-direct) without any changes to
+    # model logic.
     _DI_SUFFIXES = ("MPP", "ADF")
-    print(f"\n[2.9b] F69 — DI direct-import sibling history blending ...", flush=True)
-    di_siblings = {}
-    for _row in rows:
-        _ms = (_row.get("Mstyle") or "").strip()
-        _k  = _row.get("Acct_MStyle_Key_", "")
-        if "-" not in _k:
-            continue
-        for _sfx in _DI_SUFFIXES:
-            if _ms.upper().endswith(_sfx):
-                _base_ms  = _ms[:-len(_sfx)]
-                _acct_pfx = _k.split("-", 1)[0]
-                _base_key = f"{_acct_pfx}-{_base_ms}"
-                di_siblings.setdefault(_base_key, []).append(_row)
-                _row["_di_skip"]     = True
-                _row["_di_base_key"] = _base_key
-                break
+    print(f"\n[2.9b] F69 — DI direct-import sibling history pull ...", flush=True)
 
-    _f69_count = 0
-    for _base_key, _sibs in di_siblings.items():
-        _base_row = row_by_key.get(_base_key)
+    # Build candidate sibling keys for every base record
+    _di_candidate_keys  = []
+    _di_sib_to_base_row = {}   # sibling_key -> base row dict
+    for _row in rows:
+        _base_key = _row.get("Acct_MStyle_Key_", "")
+        _ms       = (_row.get("Mstyle") or "").strip()
+        if "-" not in _base_key or not _ms:
+            continue
+        _acct_pfx = _base_key.split("-", 1)[0]
+        for _sfx in _DI_SUFFIXES:
+            _sib_key = f"{_acct_pfx}-{_ms}{_sfx}"
+            _di_candidate_keys.append(_sib_key)
+            _di_sib_to_base_row[_sib_key] = _row
+
+    # Query Order History for all candidate sibling keys in one batched pull
+    _di_oh = {}
+    try:
+        from oos_history import fetch_clean_demand as _fetch_clean_demand
+        _di_oh = _fetch_clean_demand(_di_candidate_keys, verbose=False)
+    except Exception as _e:
+        print(f"      [WARN] F69 DI fetch failed: {_e} — DI blending disabled",
+              flush=True)
+
+    # Blend each found sibling's raw_ord into its base row's ORD_COLS
+    _f69_blend_count  = 0
+    _f69_base_touched = set()
+    for _sib_key, _oh in _di_oh.items():
+        _base_row = _di_sib_to_base_row.get(_sib_key)
         if _base_row is None:
             continue
-        _sib_labels    = []
-        _sib_l13_total = 0.0
-        for _sib in _sibs:
-            _sib_ms  = (_sib.get("Mstyle") or "").strip()
-            _sib_l13 = sum(float(_sib.get(c) or 0) for c in ORD_COLS[-13:])
-            for _c in ORD_COLS:
-                _base_row[_c] = float(_base_row.get(_c) or 0) + float(_sib.get(_c) or 0)
-            _sib_l13_total += _sib_l13
-            _sib_labels.append(f"{_sib_ms}(+{_sib_l13:.0f} L13)")
+        _raw_ord = _oh.get("raw_ord", [0.0] * 52)   # 52 floats oldest→newest
+        _sib_ms  = _sib_key.split("-", 1)[1] if "-" in _sib_key else _sib_key
+        _sib_l13 = sum(_raw_ord[-13:])
+        # ORD_COLS[i] aligns with raw_ord[i]: index 0 = oldest, 51 = newest
+        for _ci, _c in enumerate(ORD_COLS):
+            _base_row[_c] = float(_base_row.get(_c) or 0) + _raw_ord[_ci]
+        # Accumulate metadata for driver annotation
         _base_row["_di_blend"]    = True
-        _base_row["_di_siblings"] = [s.get("Mstyle", "") for s in _sibs]
-        _base_row["_di_label"]    = ", ".join(_sib_labels)
-        _base_row["_di_l13_add"]  = _sib_l13_total
-        _f69_count += 1
-    _di_sib_total = sum(len(v) for v in di_siblings.values())
-    print(f"      {_f69_count} base record(s) blended with DI sibling demand "
-          f"({_di_sib_total} sibling variant(s) → zero AI projection)", flush=True)
+        _base_row["_di_l13_add"]  = float(_base_row.get("_di_l13_add", 0)) + _sib_l13
+        _base_row.setdefault("_di_sib_labels", []).append(f"{_sib_ms}(+{_sib_l13:.0f} L13)")
+        _f69_blend_count += 1
+        _f69_base_touched.add(_base_row.get("Acct_MStyle_Key_", ""))
+
+    # Consolidate label list → single string for driver text
+    for _row in rows:
+        if _row.get("_di_blend"):
+            _row["_di_label"] = ", ".join(_row.get("_di_sib_labels", []))
+
+    print(f"      {_f69_blend_count} DI sibling variant(s) blended into "
+          f"{len(_f69_base_touched)} base record(s)", flush=True)
 
     # F58 — Pull active "AI Adjusted" comments once (lookback 60 days).
     # Bucketed by acct-mstyle key.  Most-recent comment per key wins.
