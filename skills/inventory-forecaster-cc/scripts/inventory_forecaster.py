@@ -7480,11 +7480,13 @@ def _build_record_narrative(r):
 
 
 def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
-                   oos_data=None, open_pos_data=None, amazon_catalog_us=None):
+                   oos_data=None, open_pos_data=None, amazon_catalog_us=None,
+                   ats_data=None):
     """Run projection validation + AI forecast for each record."""
     high = getattr(args, "threshold", VALID_HIGH_MULT)
-    oos_data = oos_data or {}
+    oos_data      = oos_data      or {}
     open_pos_data = open_pos_data or {}
+    ats_data      = ats_data      or {}
 
     # Pre-compute account cadences so sparse items are anchored to their
     # customer's known ordering rhythm, not just their own thin history.
@@ -7495,15 +7497,18 @@ def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
         key      = row.get("Acct_MStyle_Key_", "")
         oos_ent  = oos_data.get(key)
         po_wk    = open_pos_data.get(key)
+        ats_hist = ats_data.get(row.get("Mstyle", ""))
         r = validate_record(row, master_pack, high_mult=high,
-                            oos_entry=oos_ent, open_po_wk=po_wk)
+                            oos_entry=oos_ent, open_po_wk=po_wk,
+                            ats_hist=ats_hist)
         # Also run the AI forecast so we can show it in the viewer
         prefix = key.split("-")[0] if "-" in key else key
         acct_iv = acct_cadences.get(prefix)
         fr = forecast_record(row, master_pack, account_interval=acct_iv,
                              amazon_pos=amazon_pos, season_map=season_map,
                              oos_entry=oos_ent, open_po_wk=po_wk,
-                             amazon_catalog_us=amazon_catalog_us)
+                             amazon_catalog_us=amazon_catalog_us,
+                             ats_hist=ats_hist)
         r["ai_forecast"] = fr["forecast"]
         r["ai_model"]    = fr["model"]
         r["ai_total"]    = fr["new_total"]
