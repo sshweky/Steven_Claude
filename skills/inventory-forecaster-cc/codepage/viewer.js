@@ -4420,6 +4420,7 @@ async function bootstrap() {
       console.info(`[Prj] saved ${ALL_RECORDS.length.toLocaleString()} records to localStorage cache`);
     }
     _setFreshness('prj-loaded-at', Date.now());
+    _initSnoozeFlags();   // stamp r._snoozed from localStorage before first render
 
     // -- Pull Inventory Flow in the background (non-blocking) ---------------
     // inv_flow_* fields are only used in the detail panel, never in the main
