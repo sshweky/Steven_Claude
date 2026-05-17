@@ -2558,56 +2558,56 @@ def normalize_oos_rebuild_ramp(hist, ships):
                 run_end = i  # first non-OOS index after the run
                 run_len = run_end - run_start
 
-            if run_len >= 3 and run_end < n:
-                # (2) Establish the pre-OOS pace from the prior shipping window.
-                pre_window_start = max(0, run_start - 13)
-                pre_ships = [s[k] for k in range(pre_window_start, run_start) if s[k] > 0]
-                if len(pre_ships) >= 4:
-                    pre_sorted = sorted(pre_ships)
-                    pre_median = pre_sorted[len(pre_sorted) // 2]
-                    pre_avg    = sum(pre_ships) / len(pre_ships)
-                    # Less aggressive of the two — avoid over-capping.
-                    baseline = max(pre_median, pre_avg * 0.8)
-                    # VP-tuned cap: 1.3× pre-OOS pace (gives ~30% organic-
-                    # growth headroom while still stripping clear rebuild
-                    # ramp.  Originally capped at exact baseline → too
-                    # aggressive on FF12660-style cases.)
-                    cap_level = baseline * 1.3
-                    cap_int   = int(round(cap_level))
+                if run_len >= 3 and run_end < n:
+                    # (2) Establish the pre-OOS pace from the prior shipping window.
+                    pre_window_start = max(0, run_start - 13)
+                    pre_ships = [s[k] for k in range(pre_window_start, run_start) if s[k] > 0]
+                    if len(pre_ships) >= 4:
+                        pre_sorted = sorted(pre_ships)
+                        pre_median = pre_sorted[len(pre_sorted) // 2]
+                        pre_avg    = sum(pre_ships) / len(pre_ships)
+                        # Less aggressive of the two — avoid over-capping.
+                        baseline = max(pre_median, pre_avg * 0.8)
+                        # VP-tuned cap: 1.3× pre-OOS pace (gives ~30% organic-
+                        # growth headroom while still stripping clear rebuild
+                        # ramp.  Originally capped at exact baseline → too
+                        # aggressive on FF12660-style cases.)
+                        cap_level = baseline * 1.3
+                        cap_int   = int(round(cap_level))
 
-                    removed_total   = 0
-                    weeks_capped    = 0
-                    capped_indices  = []  # indices F47 touched — F39/F41 skip these
+                        removed_total   = 0
+                        weeks_capped    = 0
+                        capped_indices  = []  # indices F47 touched — F39/F41 skip these
 
-                    # Cap orders DURING the OOS gap (this is where the
-                    # compounded rebuild happens — customer escalates weekly).
-                    for idx in range(run_start, run_end):
-                        if out[idx] > cap_level:
-                            excess = out[idx] - cap_int
-                            out[idx] = cap_int
+                        # Cap orders DURING the OOS gap (this is where the
+                        # compounded rebuild happens — customer escalates weekly).
+                        for idx in range(run_start, run_end):
+                            if out[idx] > cap_level:
+                                excess = out[idx] - cap_int
+                                out[idx] = cap_int
+                                removed_total += excess
+                                weeks_capped  += 1
+                                capped_indices.append(idx)
+
+                        # Cap the first post-gap week IF it's still in catch-up
+                        # mode (final rebuild burst when shipping resumes).
+                        if run_end < n and out[run_end] > baseline * 1.5:
+                            excess = out[run_end] - cap_int
+                            out[run_end] = cap_int
                             removed_total += excess
                             weeks_capped  += 1
-                            capped_indices.append(idx)
+                            capped_indices.append(run_end)
 
-                    # Cap the first post-gap week IF it's still in catch-up
-                    # mode (final rebuild burst when shipping resumes).
-                    if run_end < n and out[run_end] > baseline * 1.5:
-                        excess = out[run_end] - cap_int
-                        out[run_end] = cap_int
-                        removed_total += excess
-                        weeks_capped  += 1
-                        capped_indices.append(run_end)
-
-                    if removed_total > 0:
-                        corrections.append({
-                            "gap_start":      run_start,
-                            "gap_len":        run_len,
-                            "baseline":       round(baseline, 1),
-                            "removed_total":  removed_total,
-                            "weeks_capped":   weeks_capped,
-                            "capped_indices": capped_indices,
-                        })
-            continue
+                        if removed_total > 0:
+                            corrections.append({
+                                "gap_start":      run_start,
+                                "gap_len":        run_len,
+                                "baseline":       round(baseline, 1),
+                                "removed_total":  removed_total,
+                                "weeks_capped":   weeks_capped,
+                                "capped_indices": capped_indices,
+                            })
+                continue
         i += 1
 
     return out, corrections
