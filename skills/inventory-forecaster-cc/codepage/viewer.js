@@ -1505,6 +1505,42 @@ function priLabel(p) {
   if (p === 'MEDIUM')   return '<span class="pri-med">MEDIUM</span>';
   return '<span class="pri-low">LOW</span>';
 }
+
+// -- Snooze helpers (localStorage, 48-hr expiry) ----------------------------
+function _getSnoozes() {
+  try {
+    const s = JSON.parse(localStorage.getItem('viewerSnoozes') || '{}');
+    const now = Date.now();
+    let pruned = false;
+    Object.keys(s).forEach(k => { if (s[k] <= now) { delete s[k]; pruned = true; } });
+    if (pruned) localStorage.setItem('viewerSnoozes', JSON.stringify(s));
+    return s;
+  } catch(_) { return {}; }
+}
+function _isSnooze(key) { const s = _getSnoozes(); return !!(s[key] && s[key] > Date.now()); }
+function _initSnoozeFlags() {
+  const s = _getSnoozes();
+  const now = Date.now();
+  ALL_RECORDS.forEach(r => { r._snoozed = !!(s[r.key] && s[r.key] > now); });
+}
+function snooze48(key) {
+  const s = _getSnoozes();
+  s[key] = Date.now() + 48 * 60 * 60 * 1000;
+  try { localStorage.setItem('viewerSnoozes', JSON.stringify(s)); } catch(_) {}
+  const rec = ALL_RECORDS.find(r => r.key === key);
+  if (rec) rec._snoozed = true;
+  applyFilters();
+}
+function _priCell(r) {
+  if (r._snoozed) {
+    const expMs  = (_getSnoozes()[r.key] || 0) - Date.now();
+    const hrsRem = Math.max(0, expMs / 3600000).toFixed(1);
+    return `<span class="pri-snoozed" title="Snoozed — ${hrsRem}h remaining">SNOOZED</span>`;
+  }
+  const safeKey = r.key.replace(/'/g, "\\'");
+  return `${priLabel(r.priority)}<button class="snooze-btn" onclick="snooze48('${safeKey}')" title="Ignore priority for 48 hours">Snooze 48 hrs</button>`;
+}
+
 function borderClass(s) {
   if (s === 'CRITICAL') return 'border-crit';
   if (s === 'WARNING')  return 'border-warn';
