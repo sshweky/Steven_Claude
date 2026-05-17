@@ -2513,8 +2513,9 @@ def normalize_oos_rebuild_ramp(hist, ships):
     manual 40k for 26w (+27%).
 
     Detection (both required):
-      (1) Ship-zero gap: ≥3 consecutive weeks of ship=0 with ord>0
-          (customer ordered, P+P could not ship)
+      (1) Ship-zero gap: ≥3 consecutive weeks where ships[i]+ships[i+1] < 30%
+          of the order (1-week lag window; rules out normal Amazon/Walmart
+          1-week order-to-ship lag as a false OOS signal)
       (2) Pre-OOS pace established: ≥4 active ship weeks in the prior 13
           (we know what "normal" looked like)
 
