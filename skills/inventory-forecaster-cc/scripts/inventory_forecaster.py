@@ -8931,6 +8931,26 @@ def main():
                 "to skip VP-Q4 intentionally."
             )
 
+    # ── Phase 2.9: VP-ATS ATS inventory history ─────────────────────
+    # Fetch Available-to-Sell (ATS) L26W data so the engine can distinguish
+    # weeks where zero/short orders were inventory-constrained vs. genuine
+    # demand absence.  Keyed by Mstyle (not acct-mstyle) since ATS is a
+    # warehouse-level signal shared across all customers.  Non-fatal: a
+    # failed fetch emits a warning and the pipeline runs without ATS.
+    ats_data = {}
+    _ats_mstyles = list({r.get("Mstyle") for r in rows if r.get("Mstyle")})
+    print(f"\n[2.9] VP-ATS: fetching ATS L26W history for "
+          f"{len(_ats_mstyles)} mstyles ...", flush=True)
+    try:
+        from oos_history import fetch_ats_history
+        ats_data = fetch_ats_history(mstyle_set=_ats_mstyles)
+        _n_ats_nz = sum(1 for v in ats_data.values() if any(x > 0 for x in v))
+        print(f"      {len(ats_data)} mstyles loaded, "
+              f"{_n_ats_nz} with at least one non-zero ATS week")
+    except Exception as _e:
+        print(f"      [WARN] ATS fetch failed: {_e} — VP-ATS disabled this run",
+              flush=True)
+
     # ── Validate Projections (if requested) ─────────────────────────
     if args.validate:
         print(f"\n[3/3] Validating manual projections for {len(rows)} records ...", flush=True)
