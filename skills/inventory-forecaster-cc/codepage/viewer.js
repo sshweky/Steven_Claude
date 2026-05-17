@@ -2704,6 +2704,44 @@ async function addComment(key) {
   }
 }
 
+// -- Mark Reviewed > clear Planner_Reply_Pending + FLAGGED on Projections ----
+//
+// Called from the "Mark Reviewed" button on a Planner Response comment bubble.
+// Two QB field clears on the Projections record:
+//   - Planner_Reply_Pending → false  (removes the 💬 badge)
+//   - FLAGGED               → false  (removes the flag tint; closes the loop)
+async function markReviewed(key, btnEl) {
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '...'; }
+  try {
+    const pf = {};
+    pf[CFG.FID.KEY]                   = { value: key };
+    pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: false };
+    pf[CFG.FID.FLAGGED]               = { value: false };
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
+
+    // Optimistic UI
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    if (rec) { rec.planner_reply_pending = false; rec.flagged = false; rec._auto_flagged = false; }
+    const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+    const badgeCell = document.getElementById('row-badges-' + safeId);
+    if (badgeCell) {
+      const rb = badgeCell.querySelector('.reply-badge');
+      if (rb) rb.remove();
+      badgeCell.innerHTML = '';   // clear flag indicator too
+    }
+    const flagBtn = document.getElementById('flg-' + safeId);
+    if (flagBtn) flagBtn.className = 'flag-btn';
+    const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
+    if (tr) { tr.classList.remove('row-reply-pending', 'row-flagged'); }
+    updateFlagCount();
+    updateReplyCount();
+    if (btnEl) { btnEl.textContent = '✓ Reviewed'; btnEl.style.background = '#e8f5e9'; btnEl.style.color = '#2e7d32'; }
+  } catch(e) {
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Mark Reviewed'; }
+    alert('Failed to mark reviewed: ' + e.message);
+  }
+}
+
 // -- Use AI / Use Suggested > upsert manual prj cols ------------------------
 async function copyToMan(key, source, btn) {
   const label = source === 'ai' ? 'AI PRJ' : 'Suggested';
