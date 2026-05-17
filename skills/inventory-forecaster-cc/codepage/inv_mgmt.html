@@ -98,14 +98,28 @@
   .grid26 td[title] { position:relative; }
   table.main td, table.main th { font-size:11px; padding:4px 6px; }
   table.main th.right, table.main td.right { text-align:right; }
-  table.main thead tr:first-child th { cursor:pointer; user-select:none; }
-  table.main thead tr:first-child th:hover { background:#dde2e6; }
-  table.main thead tr.filter-row { background:#f5f7fa; position:sticky; top:24px; }
-  table.main thead tr.filter-row th { padding:2px 4px; font-weight:400; }
-  table.main thead tr.filter-row input { width:100%; box-sizing:border-box; font-size:10px; padding:2px 4px; border:1px solid #ccc; border-radius:2px; font-family:inherit; background:#fff; }
+  /* Filter row sits on TOP (above column labels) */
+  table.main thead tr.filter-row { background:#e8edf2; position:sticky; top:0; z-index:3; }
+  table.main thead tr.filter-row th { padding:2px 4px; font-weight:400; cursor:default; border-bottom:1px solid #cfd8dc; }
+  table.main thead tr.filter-row input { width:100%; box-sizing:border-box; font-size:10px; padding:2px 4px; border:1px solid #b0bec5; border-radius:2px; font-family:inherit; background:#fff; }
   table.main thead tr.filter-row input:focus { outline:1px solid #0d47a1; border-color:#0d47a1; }
-  table.main thead tr:first-child th { position:sticky; top:0; }
+  /* Sort row sits BELOW filter row, clickable */
+  table.main thead tr.sort-row th { position:sticky; top:22px; z-index:2; cursor:pointer; user-select:none; background:#eceff1; border-bottom:2px solid #cfd8dc; }
+  table.main thead tr.sort-row th:hover { background:#dde2e6; }
   .sort-arrow { display:inline-block; margin-left:3px; color:#0d47a1; font-size:10px; }
+  /* Priority row coloring */
+  table.main tr.row-CRITICAL { background:#fff5f5; }
+  table.main tr.row-CRITICAL td:first-child { box-shadow:inset 3px 0 0 #b71c1c; }
+  table.main tr.row-HIGH { background:#fff8f3; }
+  table.main tr.row-HIGH td:first-child { box-shadow:inset 3px 0 0 #e65100; }
+  table.main tr.row-MEDIUM { background:#fffef0; }
+  table.main tr.row-MEDIUM td:first-child { box-shadow:inset 3px 0 0 #f9a825; }
+  table.main tr.row-CRITICAL:hover { background:#ffe9e9; }
+  table.main tr.row-HIGH:hover { background:#fff3ea; }
+  table.main tr.row-MEDIUM:hover { background:#fffde5; }
+  /* Recommended Actions — 25% wide cards */
+  .recs-wrap { display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start; }
+  .recs-wrap .rec-box { width:calc(25% - 6px); min-width:220px; margin-bottom:0; }
 </style>
 </head><body>
 

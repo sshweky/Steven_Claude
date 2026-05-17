@@ -2684,7 +2684,7 @@ async function saveAllManEdits() {
 
 // Save edits for a single record key only. Writes just the dirty cells for
 // this one record to QB; any other records' unsaved edits are left untouched.
-// Called by the per-row "Save ✓" button in the editToolbar.
+// Called by the per-row Save button in the editToolbar.
 async function saveRecordEdits(key) {
   const myEdits = [...DIRTY_EDITS.values()].filter(e => e.key === key);
   if (myEdits.length === 0) {
@@ -2728,7 +2728,7 @@ async function saveRecordEdits(key) {
     updateSaveAllBadge();
     if (saveStatus) {
       saveStatus.style.color = '#2e7d32';
-      saveStatus.textContent = '✓ Saved ' + key;
+      saveStatus.textContent = '\u2713 Saved ' + key;
       setTimeout(() => { if ((saveStatus.textContent || '').includes(key)) saveStatus.textContent = ''; }, 4000);
     }
   } catch (e) {
