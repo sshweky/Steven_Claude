@@ -2655,7 +2655,7 @@ async function saveAllManEdits() {
       }
       if (rec && rec.weeks_slim) {
         rec.proj_total = rec.weeks_slim.reduce((a, w) => a + (w.projection || 0), 0);
-        rec.proj_wk    = Math.round((rec.proj_total / 26) * 10) / 10;
+        rec.proj_wk    = Math.round(((rec.proj_total + (rec.opn_total || 0)) / 26) * 10) / 10;
       }
     }
     // Refresh the visible inputs: cells that just saved lose `.dirty` and
