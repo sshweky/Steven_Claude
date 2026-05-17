@@ -5621,7 +5621,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #   F5  = PT_Item_Status EOL gate (skip the branch entirely if EOL)
         #   F8  = Shipment corroboration (use Shp as fallback when Ord silent
         #         but Shp active — captures stockout-suppressed demand)
-        if model == "Inactive" and not _is_eol(row):
+        if model == "Inactive" and not _is_eol(row) and not _zero_velocity:
             _fx_family_rate, _fx_n_sib = _family_rate_for(row)
             _fx_cust_rate,   _fx_n_cust = _cust_rate_for(row)
 
