@@ -2190,7 +2190,7 @@ function toggleDetail(key) {
     ordCells += `<td style="font-weight:700;color:#e65100">${fmtN(Math.round(ordTot / 26))}</td>`;
     shpCells += `<td style="font-weight:700;color:#6a1b9a">${fmtN(shpTot)}</td>`;
     shpCells += `<td style="font-weight:700;color:#6a1b9a">${fmtN(Math.round(shpTot / 26))}</td>`;
-    atsCells += `<td style="font-weight:700;color:#00695c">${fmtN(atsTot)}</td>`;
+    atsCells += `<td style="color:#bbb"> - </td>`;
     atsCells += `<td style="font-weight:700;color:#00695c">${fmtN(Math.round(atsTot / 26))}</td>`;
     histHtml = `
     <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:2px solid #ede7f6;">
