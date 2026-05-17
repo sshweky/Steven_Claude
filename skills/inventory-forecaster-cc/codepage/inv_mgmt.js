@@ -271,7 +271,7 @@ async function loadData() {
 
   setStep(2,'active'); setBar(10);
   var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);
-  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, "{1759}.EX.'false'", 'Loading Inventory Flow');
+  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, '', 'Loading Inventory Flow');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
   var prjFieldIds = Object.values(PRJ_F).concat(PRJ_MANUAL);
