@@ -428,17 +428,18 @@ function computeDerived(rec, today) {
   rec.overstocked = (rec.pipeline_excess > OVERSTOCK_EXCESS_TH)
     || (rec.demand_26w > 0 && rec.pipeline_wos != null && rec.pipeline_wos > OVERSTOCK_WOS_TH);
 
-  // Gap detection
+  // Gap detection — true OOS weeks (beg_inv=0) before next available receipt
   rec.gap_weeks = [];
-  if (rec.is_replen && rec.opt_wos > 0) {
+  if (rec.is_replen) {
     var nrIdx = rec.next_rcpt_dt ? wkIdxForDate(today, rec.next_rcpt_dt) : 25;
-    var checkUntil = (nrIdx >= 0) ? Math.min(25, nrIdx) : -1;
+    // check strictly before receipt week (nrIdx-1); if no receipt, check all 25 weeks
+    var checkUntil = Math.min(24, nrIdx - 1);
     for (var i=0; i<=checkUntil; i++) {
       var bv=rec.beg_inv[i]||0, pv=rec.prj[i]||0;
-      if (pv>0 && (bv/pv)<rec.opt_wos) {
+      if (pv>0 && bv<=0) {
         var wkd = wkSunday(today, i);
         rec.gap_weeks.push({ wi:i+1, date:fmtISO(wkd), beg:bv, prj:pv,
-          wos:parseFloat((bv/pv).toFixed(1)), deficit:parseFloat((rec.opt_wos-bv/pv).toFixed(1)) });
+          wos:0, deficit:parseFloat(rec.opt_wos.toFixed(1)) });
       }
     }
   }
