@@ -2574,21 +2574,21 @@ async function _loadAmzDcInv(r, safeId) {
   const cardsEl = document.getElementById('inv-cards-' + safeId);
   if (!cardsEl) return;
 
-  // WOS helper: compute weeks of supply; returns null when rate is 0
-  const calcWos = (qty, rate) => (rate > 0 ? qty / rate : null);
+  // WOS: 0 when rate is zero (never use special chars — show 0)
+  const calcWos = (qty, rate) => (rate > 0 ? qty / rate : 0);
   const wosColor = w => {
-    if (w === null)  return '#bbb';
-    if (w < 3)       return '#c62828';
-    if (w < 8)       return '#e65100';
-    if (w < 16)      return '#1b5e20';
-    return '#f57f17';                    // overstocked
+    if (w === 0)   return '#bbb';
+    if (w < 3)     return '#c62828';
+    if (w < 8)     return '#e65100';
+    if (w < 16)    return '#1b5e20';
+    return '#f57f17';
   };
-  const wosText = w => w === null ? '—' : w.toFixed(1) + ' wks';
+  const wosText = w => w === 0 ? '0' : w.toFixed(1) + ' wks';
 
-  const ohWos     = calcWos(qtyOh,              prjWk);
-  const ohOoWos   = calcWos(qtyOh + custOo,     prjWk);
-  const atsOhWos  = calcWos(atsOh,              prjWk);
-  const atsOoWos  = calcWos(atsOo,              prjWk);
+  const ohWos     = calcWos(qtyOh,          prjWk);
+  const ohOoWos   = calcWos(qtyOh + custOo, prjWk);
+  const atsOhWos  = calcWos(atsOh,          prjWk);
+  const atsOoWos  = calcWos(atsOo,          prjWk);
 
   // card(label, value, valueColor, title)
   const card = (label, value, color = '#222', title = '') =>
@@ -2597,33 +2597,24 @@ async function _loadAmzDcInv(r, safeId) {
       <div style="font-size:18px;font-weight:700;color:${color};white-space:nowrap;">${value}</div>
     </div>`;
 
-  const divider = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
-
-  const invGroup = `
-    <div style="display:flex;gap:6px;flex-wrap:nowrap;align-items:stretch;">
-      ${card('Qty OH',      fmt(qtyOh),               '#37474f')}
-      ${card('Qty I/W',     fmt(qtyIw),               '#37474f', 'Qty in Production / In-Work')}
-      ${card('Qty I/T',     fmt(qtyIt),               '#37474f', 'Qty in Transit (inbound to warehouse)')}
-      ${divider}
-      ${card('OH WOS',      wosText(ohWos),            wosColor(ohWos),   'Weeks of supply: Qty OH ÷ Prj/Wk')}
-      ${card('OH+OO WOS',   wosText(ohOoWos),          wosColor(ohOoWos), 'Weeks of supply: (Qty OH + Cust Open Orders) ÷ Prj/Wk')}
-    </div>`;
-
-  const atsGroup = `
-    <div style="display:flex;gap:6px;flex-wrap:nowrap;align-items:stretch;">
-      ${card('ATS Now',     fmt(atsNow),              '#1565c0', 'ATS available to ship today')}
-      ${card('ATS OH',      fmt(atsOh),               '#1565c0', 'ATS Qty OH — available from on-hand')}
-      ${card('ATS OH+OO',   fmt(atsOo),               '#1565c0', 'ATS OH + open supplier orders')}
-      ${divider}
-      ${card('ATS OH WOS',    wosText(atsOhWos),      wosColor(atsOhWos),  'ATS OH ÷ Prj/Wk')}
-      ${card('ATS OH+OO WOS', wosText(atsOoWos),      wosColor(atsOoWos), 'ATS OH+OO ÷ Prj/Wk')}
-    </div>`;
+  const groupGap = `<div style="width:20px;flex:none;"></div>`;
+  const divider  = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
 
   cardsEl.innerHTML = `
-    <div style="border-top:1px solid #e0e0e0;padding-top:8px;">
-      ${invGroup}
-      <div style="margin-top:14px;"></div>
-      ${atsGroup}
+    <div style="border-top:1px solid #e0e0e0;padding-top:8px;display:flex;gap:6px;flex-wrap:nowrap;align-items:stretch;">
+      ${card('Qty OH',        fmt(qtyOh),          '#37474f')}
+      ${card('Qty I/W',       fmt(qtyIw),          '#37474f', 'Qty in Production / In-Work')}
+      ${card('Qty I/T',       fmt(qtyIt),          '#37474f', 'Qty in Transit (inbound to warehouse)')}
+      ${divider}
+      ${card('OH WOS',        wosText(ohWos),       wosColor(ohWos),   'Weeks of supply: Qty OH / Prj/Wk')}
+      ${card('OH+OO WOS',     wosText(ohOoWos),     wosColor(ohOoWos), 'Weeks of supply: (Qty OH + Cust Open Orders) / Prj/Wk')}
+      ${groupGap}
+      ${card('ATS Now',       fmt(atsNow),          '#1565c0', 'ATS available to ship today')}
+      ${card('ATS OH',        fmt(atsOh),           '#1565c0', 'ATS Qty OH - available from on-hand')}
+      ${card('ATS OH+OO',     fmt(atsOo),           '#1565c0', 'ATS OH + open supplier orders')}
+      ${divider}
+      ${card('ATS OH WOS',    wosText(atsOhWos),    wosColor(atsOhWos), 'ATS OH / Prj/Wk')}
+      ${card('ATS OH+OO WOS', wosText(atsOoWos),    wosColor(atsOoWos), 'ATS OH+OO / Prj/Wk')}
     </div>`;
 }
 
