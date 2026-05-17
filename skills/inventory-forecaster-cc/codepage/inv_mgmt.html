@@ -142,23 +142,22 @@
   .kpi-lbl { font-size:10px; color:#888; text-transform:uppercase; letter-spacing:0.3px; }
   .kpi-val { font-size:14px; font-weight:700; color:#1565c0; margin-top:1px; }
 
-  /* ── Sticky header rows ── */
-  table.main thead tr.filter-row { background:#fafbfc; position:sticky; top:0; z-index:3; }
-  table.main thead tr.filter-row th { padding:2px 3px; font-weight:400; cursor:default; box-shadow:inset 0 -1px 0 #e0e0e0; }
+  /* ── Sticky header rows — sticky on TH not TR ── */
+  table.main thead tr.filter-row th { position:sticky; top:0; z-index:4; background:#fafbfc; padding:2px 3px; font-weight:400; cursor:default; box-shadow:inset 0 -1px 0 #e0e0e0; }
   table.main thead tr.filter-row input { width:100%; box-sizing:border-box; font-size:9px; padding:1px 3px; border:1px solid #ccc; border-radius:3px; font-family:inherit; background:#fff; color:#333; }
   table.main thead tr.filter-row input::placeholder { color:#aaa; font-style:italic; }
   table.main thead tr.filter-row input:focus { outline:none; border-color:#1565c0; box-shadow:0 0 0 2px rgba(21,101,192,0.15); }
-  table.main thead tr.sort-row th { position:sticky; top:26px; z-index:2; cursor:pointer; user-select:none; background:#f8f9fa; box-shadow:inset 0 -2px 0 #ddd; }
+  table.main thead tr.sort-row th { position:sticky; z-index:3; cursor:pointer; user-select:none; background:#f8f9fa; box-shadow:inset 0 -2px 0 #ddd; vertical-align:bottom; }
   table.main thead tr.sort-row th:hover { background:#eef4ff; }
   .sort-arrow { display:inline-block; margin-left:3px; color:#1565c0; font-size:10px; }
 
   /* ── Priority row coloring ── */
   table.main tr.row-CRITICAL { background:#fff5f5; }
-  table.main tr.row-CRITICAL td:first-child { box-shadow:inset 3px 0 0 #b71c1c; }
+  table.main tr.row-CRITICAL td:first-child { box-shadow:inset 3px 0 0 #cc0000; }
   table.main tr.row-HIGH { background:#fff8f3; }
-  table.main tr.row-HIGH td:first-child { box-shadow:inset 3px 0 0 #e65100; }
+  table.main tr.row-HIGH td:first-child { box-shadow:inset 3px 0 0 #e53c00; }
   table.main tr.row-MEDIUM { background:#fffef0; }
-  table.main tr.row-MEDIUM td:first-child { box-shadow:inset 3px 0 0 #f9a825; }
+  table.main tr.row-MEDIUM td:first-child { box-shadow:inset 3px 0 0 #e07800; }
   table.main tr.row-NO_OOS { opacity:0.55; }
   table.main tr.row-CRITICAL:hover { background:#ffe9e9; }
   table.main tr.row-HIGH:hover { background:#fff0e6; }
