@@ -722,14 +722,14 @@ function actionTag(r) {
 }
 
 var COL_WIDTHS = {
-  priority:52, mstyle:78, description:155, brand:82, country:52, inv_manager:78,
-  status_sub:88, item_rank:42, customer_count:38,
-  qty_oh:62, ats_now:62, qty_oh_root:72,
-  it_qty:52, iw_qty:52, hold_qty:52, open_cust_po_qty:72,
-  shp_wk_l4:58, shp_wk_l13:62, prj_wk:52, prj_l4w_change:52,
-  opt_wos:52, ats_wos_oh:58, opt_oh:58, lt_wks:48, cny_weeks:38,
-  days_oos_next_rcpt:68, next_rcpt_dt:68, gap_weeks_n:52,
-  pipeline_excess:72, pipeline_wos:62, action:72
+  priority:44, mstyle:62, description:120, brand:68, country:44, inv_manager:68,
+  status_sub:62, item_rank:34, customer_count:32,
+  qty_oh:48, ats_now:48, qty_oh_root:56,
+  it_qty:38, iw_qty:38, hold_qty:38, open_cust_po_qty:52,
+  shp_wk_l4:44, shp_wk_l13:46, prj_wk:40, prj_l4w_change:44,
+  opt_wos:40, ats_wos_oh:44, opt_oh:44, lt_wks:38, cny_weeks:32,
+  days_oos_next_rcpt:46, next_rcpt_dt:54, gap_weeks_n:38,
+  pipeline_excess:54, pipeline_wos:48, action:60
 };
 
 function visibleCols() {
