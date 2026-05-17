@@ -9547,6 +9547,63 @@ def main():
         _f60_count += 1
     print(f"      {_f60_count} EC variants inherited parent history", flush=True)
 
+    # ── Phase 2.9b: F69 — DI direct-import sibling history blending ──────────
+    # Amazon sometimes orders product direct from P+P's overseas factory
+    # instead of through the warehouse.  These "Direct Import" (DI) variants
+    # carry a suffix of MPP or ADF on the same base mstyle (e.g. FF8654MPP).
+    # Amazon writes its own POs 35-65 days before factory shipment (~10 weeks
+    # transit to Amazon DC); P+P does not project for these lines.
+    # However, their L52W order history IS real product demand.  Blending it
+    # into the base record gives the forecaster a true total-demand signal.
+    #
+    # Steps:
+    #   1. Scan rows for any mstyle ending in MPP or ADF.
+    #   2. Map each to its base key (same acct, strip suffix).
+    #   3. If the base record exists in rows, ADD the sibling's weekly ORD_COLS
+    #      to the base row in-place (safe: pre-pass, single-threaded).
+    #   4. Tag base row with _di_blend metadata for driver annotation.
+    #   5. Tag DI rows with _di_skip so forecast_record() returns zero forecast.
+    _DI_SUFFIXES = ("MPP", "ADF")
+    print(f"\n[2.9b] F69 — DI direct-import sibling history blending ...", flush=True)
+    di_siblings = {}
+    for _row in rows:
+        _ms = (_row.get("Mstyle") or "").strip()
+        _k  = _row.get("Acct_MStyle_Key_", "")
+        if "-" not in _k:
+            continue
+        for _sfx in _DI_SUFFIXES:
+            if _ms.upper().endswith(_sfx):
+                _base_ms  = _ms[:-len(_sfx)]
+                _acct_pfx = _k.split("-", 1)[0]
+                _base_key = f"{_acct_pfx}-{_base_ms}"
+                di_siblings.setdefault(_base_key, []).append(_row)
+                _row["_di_skip"]     = True
+                _row["_di_base_key"] = _base_key
+                break
+
+    _f69_count = 0
+    for _base_key, _sibs in di_siblings.items():
+        _base_row = row_by_key.get(_base_key)
+        if _base_row is None:
+            continue
+        _sib_labels    = []
+        _sib_l13_total = 0.0
+        for _sib in _sibs:
+            _sib_ms  = (_sib.get("Mstyle") or "").strip()
+            _sib_l13 = sum(float(_sib.get(c) or 0) for c in ORD_COLS[-13:])
+            for _c in ORD_COLS:
+                _base_row[_c] = float(_base_row.get(_c) or 0) + float(_sib.get(_c) or 0)
+            _sib_l13_total += _sib_l13
+            _sib_labels.append(f"{_sib_ms}(+{_sib_l13:.0f} L13)")
+        _base_row["_di_blend"]    = True
+        _base_row["_di_siblings"] = [s.get("Mstyle", "") for s in _sibs]
+        _base_row["_di_label"]    = ", ".join(_sib_labels)
+        _base_row["_di_l13_add"]  = _sib_l13_total
+        _f69_count += 1
+    _di_sib_total = sum(len(v) for v in di_siblings.values())
+    print(f"      {_f69_count} base record(s) blended with DI sibling demand "
+          f"({_di_sib_total} sibling variant(s) → zero AI projection)", flush=True)
+
     # F58 — Pull active "AI Adjusted" comments once (lookback 60 days).
     # Bucketed by acct-mstyle key.  Most-recent comment per key wins.
     ai_comments = _f58_fetch_active_comments(lookback_days=60)
