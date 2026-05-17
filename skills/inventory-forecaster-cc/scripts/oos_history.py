@@ -31,6 +31,82 @@ from inventory_forecaster import (   # noqa: E402
     qb_run_report, QB_OPEN_POS_TABLE, QB_OPEN_POS_REPORT, QB_OPEN_POS_CACHE_HOURS,
 )
 
+# ─── VP-ATS: ATS Inventory History fetch ──────────────────────────────────────
+
+ATS_HIST_TID     = "bv2sxg2ji"   # Inventory History - Weekly (parent table)
+ATS_HIST_FID_KEY = 6              # Mstyle (primary key, text)
+# FIDs ordered OLDEST → NEWEST (LW-25=fid90 … LW=fid64); fid 65 was deleted.
+# ats_l26[k] aligns with the 52-week hist array at hist[26+k]:
+#   k=0 → fid90 = ATS 25 weeks ago → hist[26]
+#   k=25 → fid64 = ATS last week   → hist[51]
+ATS_HIST_FIDS = [90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76,
+                 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 64]   # 26 values
+
+
+def fetch_ats_history(mstyle_set=None, verbose=True):
+    """Fetch Available-to-Sell (ATS) L26W history from InventoryTrack via QB REST.
+
+    Table: bv2sxg2ji (Inventory History - Weekly), one record per Mstyle.
+    ATS summary fields: fid 64 (ATS last week / newest) through fid 90
+    (ATS 25 weeks ago / oldest), with fid 65 deleted.
+
+    Returns {mstyle: [26 floats, oldest→newest]} where:
+        result[mstyle][0]  = ATS 25 weeks ago  (aligns with hist[26])
+        result[mstyle][25] = ATS last week     (aligns with hist[51])
+
+    mstyle_set: optional iterable to filter the return set.  None → all mstyles.
+    """
+    from inventory_forecaster import _qb_request   # lazy import — avoids circular
+
+    if verbose:
+        scope = f"({len(list(mstyle_set))} mstyles)" if mstyle_set is not None else "(all)"
+        print(f"      [vp-ats] fetching ATS L26W history from {ATS_HIST_TID} {scope} ...",
+              flush=True)
+
+    select_fids = [ATS_HIST_FID_KEY] + ATS_HIST_FIDS   # 27 fids total
+    body = {
+        "from":    ATS_HIST_TID,
+        "select":  select_fids,
+        "options": {"top": 50000, "skip": 0},
+    }
+    try:
+        resp = _qb_request("POST", "/records/query", body=body, timeout=120)
+    except Exception as _e:
+        if verbose:
+            print(f"      [vp-ats] WARN: QB REST fetch failed: {_e}", flush=True)
+        return {}
+
+    data_rows     = resp.get("data", [])
+    mstyle_filter = set(mstyle_set) if mstyle_set is not None else None
+    out           = {}
+    n_skipped     = 0
+
+    for r in data_rows:
+        key_cell = r.get(str(ATS_HIST_FID_KEY)) or {}
+        mstyle   = str((key_cell.get("value") if isinstance(key_cell, dict)
+                        else key_cell) or "").strip()
+        if not mstyle:
+            continue
+        if mstyle_filter is not None and mstyle not in mstyle_filter:
+            n_skipped += 1
+            continue
+
+        ats = []
+        for fid in ATS_HIST_FIDS:
+            cell = r.get(str(fid)) or {}
+            val  = cell.get("value") if isinstance(cell, dict) else cell
+            try:
+                ats.append(float(val or 0))
+            except (TypeError, ValueError):
+                ats.append(0.0)
+        out[mstyle] = ats
+
+    if verbose:
+        print(f"      [vp-ats] {len(out)} mstyles with ATS history loaded"
+              f"{f'  ({n_skipped} filtered out)' if n_skipped else ''}",
+              flush=True)
+    return out
+
 # ─── Reason-code classification ───────────────────────────────────────────────
 # Compared case-insensitively. Sub-reason "Low Margin" overrides parent → Bucket B.
 
