@@ -1014,6 +1014,7 @@ function adaptRow(row) {
   // narrative doesn't already contain POS or Recent orders info).
   // Idempotent  -  skipped if the line is already in AI_ANALYSIS.
   if (narrative.indexOf('POS run rate') === -1 &&
+      narrative.indexOf('Amazon POS Sales') === -1 &&
       narrative.indexOf('Consumer demand (POS)') === -1 &&
       narrative.indexOf('ordered units:') === -1 &&
       narrative.indexOf('Recent orders:') === -1 &&
