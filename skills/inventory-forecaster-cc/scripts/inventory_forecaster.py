@@ -9533,20 +9533,24 @@ def main():
     # with ORD_COLS[i] (both oldest→newest, 52 slots).  The forecaster then
     # sees total demand (warehouse + factory-direct) without any changes to
     # model logic.
-    _DI_SUFFIXES = ("MPP", "ADF")
+    _DI_SUFFIXES    = ("MPP", "ADF")
+    _DI_IMPORT_ACCT = "61865"   # Amazon's DI (direct-import) account in Order History
     print(f"\n[2.9b] F69 — DI direct-import sibling history pull ...", flush=True)
 
-    # Build candidate sibling keys for every base record
+    # Build candidate sibling keys for Amazon records only.
+    # DI orders land under acct 61865 regardless of which Amazon acct placed them.
     _di_candidate_keys  = []
     _di_sib_to_base_row = {}   # sibling_key -> base row dict
     for _row in rows:
         _base_key = _row.get("Acct_MStyle_Key_", "")
         _ms       = (_row.get("Mstyle") or "").strip()
+        _cust     = (_row.get("Customr_Name") or "").upper()
         if "-" not in _base_key or not _ms:
             continue
-        _acct_pfx = _base_key.split("-", 1)[0]
+        if AMAZON_CUST_SUBSTR not in _cust:
+            continue   # DI only applies to Amazon
         for _sfx in _DI_SUFFIXES:
-            _sib_key = f"{_acct_pfx}-{_ms}{_sfx}"
+            _sib_key = f"{_DI_IMPORT_ACCT}-{_ms}{_sfx}"
             _di_candidate_keys.append(_sib_key)
             _di_sib_to_base_row[_sib_key] = _row
 
