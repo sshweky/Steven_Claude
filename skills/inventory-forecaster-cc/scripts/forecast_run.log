@@ -116,3 +116,10 @@
 
 [2.9] F60 — EC transition history inheritance ...
       6 EC variants inherited parent history
+  [F58] Loaded 2 active AI adjustments (last 60 days)
+      5061 forecasts complete in 6.0s
+      Croston's: 1234  Heuristic: 168  Inactive: 537  Inactive (zero order history): 342  Inactive+Floor: 9  Inactive+Floor (R3): 8  Inactive+S6 (off-price): 22  OTB (zero): 335  Pre-launch NEW (manual passthrough): 49  Reactivating: 48  Seasonal Baseline: 821  Sparse Intermittent: 1488  Bi-weekly enforced: 0  Alerts (>5%): 3894
+      Saved → forecast_results.json
+      Open viewer: python scripts/viewer.py --results forecast_results.json
+
+[4/4] Writing 5061 records to Quickbase ...
