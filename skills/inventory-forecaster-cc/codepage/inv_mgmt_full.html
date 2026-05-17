@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html><head>
 <meta charset="utf-8">
 <title>P+P Inventory Manager</title>
@@ -166,8 +166,22 @@
 </table>
 </div>
 
-
+<!-- All JS inline — no external page dependency -->
 <script>
+﻿// Immediate diagnostic — if this runs, JS is executing
+(function(){
+  var el = document.getElementById('loadStatus');
+  if (el) el.textContent = 'Script executing...';
+})();
+
+window.onerror = function(msg, src, line, col, err) {
+  var el = document.getElementById('loadStatus');
+  if (el) el.textContent = 'JS Error (line ' + line + '): ' + msg;
+  var steps = document.getElementById('loadSteps');
+  if (steps) steps.innerHTML = '<div style="color:#ff8a65;font-size:11px;word-break:break-all;">' + msg + '<br>Line: ' + line + '</div>';
+  return true;
+};
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 var QB_REALM  = 'pim.quickbase.com';
 var QB_TOKEN  = 'QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s';
@@ -1129,34 +1143,38 @@ async function refreshData() {
   await boot();
 }
 
-// ── Wire up controls ──────────────────────────────────────────────────────────
-document.getElementById('searchInput').oninput=applyFilters;
-document.getElementById('actionFilter').onchange=applyFilters;
-document.getElementById('countryFilter').onchange=applyFilters;
-document.getElementById('brandFilter').onchange=applyFilters;
-document.getElementById('invMgrFilter').onchange=applyFilters;
-document.getElementById('replenOnly').onchange=applyFilters;
-document.getElementById('gapsOnly').onchange=applyFilters;
-document.getElementById('overstockOnly').onchange=applyFilters;
-document.getElementById('hideMulti').onchange=function(){buildTableHead();applyFilters();};
-document.getElementById('clearBtn').onclick=function(){
-  document.getElementById('searchInput').value='';
-  document.getElementById('actionFilter').value='';
-  document.getElementById('countryFilter').value='';
-  document.getElementById('brandFilter').value='';
-  document.getElementById('invMgrFilter').value='';
-  document.getElementById('replenOnly').checked=false;
-  document.getElementById('gapsOnly').checked=false;
-  document.getElementById('overstockOnly').checked=false;
-  document.getElementById('hideMulti').checked=true;
-  Object.keys(colFilters).forEach(function(k){delete colFilters[k];});
-  priorityFilter='';
-  currentSort={id:null,dir:1};
-  buildTableHead();applyFilters();
-};
+// ── Wire up controls + boot ────────────────────────────────────────────────────
+// IMPORTANT: wrapped in DOMContentLoaded so DOM elements exist before we
+// reference them.  The <script> tag in the HTML should be at the END of <body>
+// (not in <head>) — but this guard handles both placements safely.
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('searchInput').oninput=applyFilters;
+  document.getElementById('actionFilter').onchange=applyFilters;
+  document.getElementById('countryFilter').onchange=applyFilters;
+  document.getElementById('brandFilter').onchange=applyFilters;
+  document.getElementById('invMgrFilter').onchange=applyFilters;
+  document.getElementById('replenOnly').onchange=applyFilters;
+  document.getElementById('gapsOnly').onchange=applyFilters;
+  document.getElementById('overstockOnly').onchange=applyFilters;
+  document.getElementById('hideMulti').onchange=function(){buildTableHead();applyFilters();};
+  document.getElementById('clearBtn').onclick=function(){
+    document.getElementById('searchInput').value='';
+    document.getElementById('actionFilter').value='';
+    document.getElementById('countryFilter').value='';
+    document.getElementById('brandFilter').value='';
+    document.getElementById('invMgrFilter').value='';
+    document.getElementById('replenOnly').checked=false;
+    document.getElementById('gapsOnly').checked=false;
+    document.getElementById('overstockOnly').checked=false;
+    document.getElementById('hideMulti').checked=true;
+    Object.keys(colFilters).forEach(function(k){delete colFilters[k];});
+    priorityFilter='';
+    currentSort={id:null,dir:1};
+    buildTableHead();applyFilters();
+  };
 
-boot();
+  boot();
+});
 
 </script>
 </body></html>
-

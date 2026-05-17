@@ -291,11 +291,11 @@ async function fetchAllRecords() {
   return all;
 }
 
-// -- Inventory Flow cache (localStorage, 4h TTL) ----------------------------
+// -- Inventory Flow cache (localStorage, 6h TTL) ----------------------------
 // Each browser caches the per-mstyle inv-flow map locally so we don't bulk-
 // re-query QB on every codepage open.  ~80 users x every page load was
 // hammering /records/query; with this cache each user pays one cold pull
-// per 4-hour window instead.  Quota: ~600 KB for ~1,500 mstyles, well
+// per 6-hour window instead.  Quota: ~600 KB for ~1,500 mstyles, well
 // under the ~5 MB localStorage budget per origin.
 //
 // Cache version is in the key.  Bump it (_v1 -> _v2) on any schema change
