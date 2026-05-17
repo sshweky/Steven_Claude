@@ -326,6 +326,7 @@ async function loadData() {
       active_replen_customers:String(g(IF_F.ActiveReplCusts)||''),
       size_ct:String(g(IF_F.SizeCt)||''), fragrance:String(g(IF_F.Fragrance)||''),
       inner_pack:String(g(IF_F.InnerPack)||''), master_pack:String(g(IF_F.MasterPack)||''),
+      upc:String(g(IF_F.UPC)||''), gtin:String(g(IF_F.GTIN)||''),
       oos_dates:String(g(IF_F.OOSDates)||''),
       over_committed_qty:toNum(g(IF_F.OverCommittedQty)), ovr_comt_wos:toNum(g(IF_F.OvrComtWOS)),
       invtry_age_days:toNum(g(IF_F.InvtryAgeDays)),
