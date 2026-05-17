@@ -6575,6 +6575,31 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"decay); W6+ resumes normal cadence"
                     )
 
+    # F67 — Amazon buy-box = $0 near-term dampener (2026-05-17).
+    # Distinct from F38f (formal "Not Buyable"/"ASIN Suppressed" flag):
+    # when Amazon_Buybox == 0 but the item isn't formally suppressed, the
+    # listing is live but has no active buy-box price — often a temporary
+    # pricing hold, 3P competition flush-out, or compliance review.
+    # Pattern: usually resolves within 4 weeks.  Cut W1-W4 by 70%, leave
+    # W5-W26 unchanged; flag so planners can see the signal.
+    if (is_amazon and amz_catalog and model not in ("Inactive",)
+            and isinstance(fcst, list) and len(fcst) >= 26):
+        _f67_bb = float(amz_catalog.get("Amazon_Buybox") or 0)
+        _f67_flag = (amz_catalog.get("ASIN_Buyability_Flag") or "").strip()
+        # Only fire when buybox is 0 AND the item isn't already handled by F38f.
+        if _f67_bb == 0 and _f67_flag not in ("Not Buyable", "ASIN Suppressed"):
+            _f67_weeks_cut = 0
+            for _wi in range(4):          # W1-W4 only
+                if fcst[_wi] > 0:
+                    fcst[_wi] = snap(fcst[_wi] * 0.30, mp)
+                    _f67_weeks_cut += 1
+            if _f67_weeks_cut > 0 and isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F67 Buy-box $0 dampener: W1-W4 cut 70% ({_f67_weeks_cut}w "
+                    f"affected) — listing active but no buy-box price; "
+                    f"W5-W26 unchanged (expect restoration within 4 weeks)"
+                )
+
     # F37 — Forward inventory-shortfall adjustment (2026-05-05).
     # Reads anticipated on-hand for the next 26 weeks (Inv_Wk1..Inv_Wk26)
     # which already have the current AI projection deducted.  When a week
