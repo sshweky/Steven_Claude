@@ -484,7 +484,7 @@ window.QB_CONFIG = {
 <div id="replyBanner" style="display:none;">
   <span>💬 <span id="replyBannerCount">0</span> planner replies awaiting your review</span>
   <button onclick="toggleReplyOnly()">View Replies</button>
-  <button onclick="document.getElementById('replyBanner').style.display='none'" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);">Dismiss</button>
+  <button onclick="const b=document.getElementById('replyBanner');b.style.display='none';b.dataset.dismissed='1';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);">Dismiss</button>
 </div>
 
 <table>
