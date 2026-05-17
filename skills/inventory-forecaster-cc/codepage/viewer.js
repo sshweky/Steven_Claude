@@ -1575,8 +1575,11 @@ function renderPage(page) {
       ${_renderStatusCell(r.asin_status, r.key)}
       <td style="font-size:11px;white-space:nowrap">${r.item_status||''}</td>
       <td>${priLabel(r.priority)}</td>
+      <td style="font-size:11px;color:#888;white-space:nowrap">${r.last_ord_date || ' -'}</td>
       <td>${fmtN(Math.round(r.ord_wk_l4 || 0))}</td>
+      <td style="color:#6a1b9a">${fmtN(Math.round(r.shpd_wk_l4 || 0))}</td>
       <td>${fmtN(Math.round(r.shp_wk))}</td>
+      <td style="color:#6a1b9a">${fmtN(Math.round(r.shpd_wk_l13 || 0))}</td>
       <td>${fmtN(Math.round(r.proj_wk))}</td>
       <td style="color:#1565c0;font-weight:600">${fmtN(Math.round(r.ai_wk))}</td>
       <td style="color:#555" title="Average of Suggested W1..W26">${fmtN(Math.round(r.sugg_wk))}</td>
