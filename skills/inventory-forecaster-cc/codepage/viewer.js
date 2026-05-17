@@ -2631,6 +2631,61 @@ async function saveAllManEdits() {
   }
 }
 
+// Save edits for a single record key only. Writes just the dirty cells for
+// this one record to QB; any other records' unsaved edits are left untouched.
+// Called by the per-row "Save ✓" button in the editToolbar.
+async function saveRecordEdits(key) {
+  const myEdits = [...DIRTY_EDITS.values()].filter(e => e.key === key);
+  if (myEdits.length === 0) {
+    alert('No unsaved edits for this record.');
+    return;
+  }
+  const msg = `Save ${myEdits.length} edit(s) for ${key} to Quickbase?\n\nThis writes the new MAN projection values immediately and cannot be undone from this screen.`;
+  if (!confirm(msg)) return;
+
+  const fields = {};
+  fields[CFG.FID.KEY] = { value: key };
+  for (const { weekIdx, newVal } of myEdits) {
+    fields[MAN_PRJ_FIDS[weekIdx]] = { value: Math.round(newVal) };
+  }
+  const saveStatus = document.getElementById('saveStatus');
+  if (saveStatus) { saveStatus.style.color = '#1565c0'; saveStatus.textContent = `Saving ${key}...`; }
+  try {
+    await qb('/records', {
+      to: CFG.PROJECTIONS_TID,
+      data: [fields],
+      mergeFieldId: CFG.FID.KEY,
+    });
+    // On success — clear dirty state and refresh in-memory record
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    for (const e of myEdits) {
+      DIRTY_EDITS.delete(`${e.key}|${e.weekIdx}`);
+      if (rec && rec.weeks_slim && rec.weeks_slim[e.weekIdx]) {
+        rec.weeks_slim[e.weekIdx].projection = e.newVal;
+      }
+    }
+    if (rec && rec.weeks_slim) {
+      rec.proj_total = rec.weeks_slim.reduce((a, w) => a + (w.projection || 0), 0);
+      rec.proj_wk    = Math.round((rec.proj_total / 26) * 10) / 10;
+    }
+    // Remove dirty highlight from inputs belonging to this record
+    const safeKeyAttr = key.replace(/"/g, '&quot;');
+    document.querySelectorAll(`.man-edit[data-key="${safeKeyAttr}"]`).forEach(el => {
+      el.dataset.orig = el.value;
+      el.classList.remove('dirty');
+    });
+    updateSaveAllBadge();
+    if (saveStatus) {
+      saveStatus.style.color = '#2e7d32';
+      saveStatus.textContent = `✓ Saved ${key}`;
+      setTimeout(() => { if ((saveStatus.textContent || '').includes(key)) saveStatus.textContent = ''; }, 4000);
+    }
+  } catch (e) {
+    if (saveStatus) { saveStatus.style.color = '#c62828'; saveStatus.textContent = `Error saving ${key}: ${e.message || e}`; }
+    console.error('saveRecordEdits failed:', key, e);
+  }
+}
+
 // Discard every unsaved edit. No QB call  -  just resets state and visuals.
 function discardAllManEdits() {
   const n = DIRTY_EDITS.size;
