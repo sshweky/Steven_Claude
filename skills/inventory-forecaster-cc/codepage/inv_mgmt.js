@@ -702,8 +702,13 @@ function buildTableHead() {
 function buildFilterDropdowns() {
   var countries=new Set(),brands=new Set(),mgrs=new Set();
   ALL.forEach(function(r){if(r.country)countries.add(r.country);if(r.brand)brands.add(r.brand);if(r.inv_manager)mgrs.add(r.inv_manager);});
-  function fill(id,vals){var el=document.getElementById(id);[...vals].sort().forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});}
-  fill('countryFilter',countries);fill('brandFilter',brands);fill('invMgrFilter',mgrs);
+  function toItems(set){return Array.from(set).sort().map(function(v){return{v:v};});}
+  buildDdPanel('dd-country', toItems(countries), 'All Countries', function(s){selCountries=s;});
+  buildDdPanel('dd-brand',   toItems(brands),    'All Brands',    function(s){selBrands=s;});
+  buildDdPanel('dd-mgr',     toItems(mgrs),      'All Inv Mgrs',  function(s){selMgrs=s;});
+  updateDdBtn('dd-country','All Countries');
+  updateDdBtn('dd-brand',  'All Brands');
+  updateDdBtn('dd-mgr',    'All Inv Mgrs');
 }
 
 function _filterRecords(skipPri) {
