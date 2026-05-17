@@ -2144,7 +2144,7 @@ function toggleDetail(key) {
         <div><b>Last Ord:</b> ${r.last_ord_date||' -'}</div>
       </div>
       <div style="max-width:600px;font-size:11px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(r.desc||'').replace(/"/g,'&quot;')}"><b>Description:</b> ${(r.desc||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
-      <div style="margin-top:6px;font-size:10px;color:#a0845c;font-style:italic;">FD items may have zero projections if a forecast hasn't been run for them yet. Use the Edit MAN toolbar below to enter initial projections manually.</div>
+      <div style="margin-top:6px;font-size:10px;color:#c62828;font-style:italic;">&#x26A0; This item is scheduled for deletion. Orders typically stop ~4 weeks before the POG End Date. Review projections carefully — zero out weeks after the last expected order date.</div>
     </div>` : '';
 
   el.innerHTML = `<td colspan="21" style="padding:0">
