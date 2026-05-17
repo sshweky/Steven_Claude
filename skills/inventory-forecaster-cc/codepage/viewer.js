@@ -2224,7 +2224,7 @@ function toggleDetail(key) {
           </table>
         </div>
         ${gapBannerHtml}
-        <div id="inv-cards-${safeId}" style="margin-top:6px;"></div>
+        <div id="inv-cards-${safeIdForTotal}" style="margin-top:6px;"></div>
       </div>`;
   }
 
