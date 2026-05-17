@@ -7337,6 +7337,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"forecast reflects parent demand signal"
             )
 
+        # ── F69 — DI direct-import blend narrative ───────────────────────────
+        # Sibling (MPP/ADF) order history was added to this base record's
+        # ORD_COLS in the pre-pass.  Log the additive contribution.
+        if row.get("_di_blend") and isinstance(meta, dict):
+            _fire("F69")
+            meta.setdefault("drivers", []).append(
+                f"F69 DI blend: {row.get('_di_label','?')} direct-import history "
+                f"added to base demand signal (+{row.get('_di_l13_add', 0):.0f} units L13W); "
+                f"forecast reflects total product demand (warehouse + factory-direct)"
+            )
+
     # F58 — Tell-AI comment replay (2026-05-08 → option B).
     # Apply the planner's most-recent "AI Adjusted" comment from QB Projection
     # Comments table as an override on top of the model's forecast.  Same
