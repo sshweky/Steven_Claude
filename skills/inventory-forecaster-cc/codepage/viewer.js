@@ -2282,6 +2282,15 @@ function toggleDetail(key) {
       <!-- LEFT: Add a Comment (25%)  -  for planner <-> mgr dialogue -->
       <div style="flex:0 0 25%;min-width:0;">
         <div style="font-weight:600;color:#8b2252;margin-bottom:6px;font-size:12px;">Add a Comment <span style="font-weight:400;color:#999;font-size:10px;"> -  for inv mgr</span></div>
+        <div style="margin-bottom:5px;">
+          <label style="font-size:11px;color:#555;display:flex;align-items:center;gap:6px;">
+            Your Name:
+            <input id="cmt-author-${safeKey}" type="text" placeholder="e.g. Amy Rodriguez"
+              value="${((()=>{try{return localStorage.getItem('viewerAuthorName')||'';}catch(_){return '';}})())}"
+              oninput="try{localStorage.setItem('viewerAuthorName',this.value);}catch(_){}"
+              style="flex:1;font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;font-family:inherit;">
+          </label>
+        </div>
         <textarea id="cmt-text-${safeKey}" oninput="autoFlagOnComment('${safeKey}')" placeholder="Write a comment for the mgr review..." style="width:100%;min-height:80px;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
         <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
           <label style="font-size:11px;color:#555;">Status:
