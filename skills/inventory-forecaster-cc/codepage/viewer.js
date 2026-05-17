@@ -1531,11 +1531,21 @@ function snooze48(key) {
   if (rec) rec._snoozed = true;
   applyFilters();
 }
+function unsnooze(key) {
+  const s = _getSnoozes();
+  delete s[key];
+  try { localStorage.setItem('viewerSnoozes', JSON.stringify(s)); } catch(_) {}
+  const rec = ALL_RECORDS.find(r => r.key === key);
+  if (rec) rec._snoozed = false;
+  applyFilters();
+}
 function _priCell(r) {
   if (r._snoozed) {
     const expMs  = (_getSnoozes()[r.key] || 0) - Date.now();
     const hrsRem = Math.max(0, expMs / 3600000).toFixed(1);
-    return `<span class="pri-snoozed" title="Snoozed — ${hrsRem}h remaining">SNOOZED</span>`;
+    const safeKey = r.key.replace(/'/g, "\\'");
+    return `<span class="pri-snoozed" title="Snoozed — ${hrsRem}h remaining">SNOOZED</span>`
+         + `<button class="snooze-btn" onclick="unsnooze('${safeKey}')" title="Remove snooze and restore original priority immediately" style="color:#1565c0;border-color:#1565c0;">UnSnooze</button>`;
   }
   const safeKey = r.key.replace(/'/g, "\\'");
   return `${priLabel(r.priority)}<button class="snooze-btn" onclick="snooze48('${safeKey}')" title="Snooze this item for 48 hours — priority will be ignored and badge will show as SNOOZED until the period expires">Snooze</button>`;
