@@ -2796,8 +2796,7 @@ async function addComment(key) {
     if (rec) {
       const stamp = new Date().toISOString().slice(0,16).replace('T',' ');
       const flagTag = flag ? ' ['+flag+']' : '';
-      const authorTag = author ? ` (${author})` : '';
-      rec.last_comment = `${stamp}${authorTag}${flagTag}: ${txt.slice(0,200)}`;
+      rec.last_comment = `${stamp}${flagTag}: ${txt.slice(0,200)}`;
       rec.last_comment_date = new Date().toISOString();
     }
     btn.textContent = 'Save'; btn.disabled = false;
