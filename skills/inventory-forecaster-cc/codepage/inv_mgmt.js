@@ -610,8 +610,8 @@ function computeDerived(rec, today) {
 
 // -- Columns -------------------------------------------------------------------
 var COLS = [
-  { id:'priority', label:'Pri', align:'left', numeric:true,
-    get:function(r){return {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3}[r.priority]!=null?{CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3}[r.priority]:9;},
+  { id:'priority', label:'OOS Pri', align:'left', numeric:true,
+    get:function(r){return {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,NO_OOS:4}[r.priority]!=null?{CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,NO_OOS:4}[r.priority]:9;},
     filterValue:function(r){return r.priority;},
     render:function(r){return '<td class="pri-'+r.priority+'">'+r.priority+'</td>';} },
   { id:'mstyle', label:'Mstyle', align:'left',
