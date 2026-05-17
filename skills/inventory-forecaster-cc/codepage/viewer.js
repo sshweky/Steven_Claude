@@ -1264,6 +1264,7 @@ function adaptRow(row) {
     inv_flow_next_rcpt:  '',          // ISO date  -  when next supplier receipt arrives
     inv_flow_lt_wks:     0,           // numeric  -  lead time in weeks
     inv_flow_moq:        0,           // numeric  -  minimum order quantity
+    ats_hist:            null,        // [26] ATS inv history oldest->newest (LW-25..LW)
   };
 }
 
