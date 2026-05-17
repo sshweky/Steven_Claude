@@ -193,28 +193,49 @@
 
 <div class="toolbar">
   <div class="ms-wrap"><span class="ms-label">Search</span><input type="text" id="searchInput" placeholder="mstyle / description / brand"></div>
+
   <div class="ms-wrap"><span class="ms-label">Action</span>
-    <select id="actionFilter">
-      <option value="">All actions</option>
-      <option value="PULL_UP">PULL_UP</option>
-      <option value="FASTER_VESSEL">FASTER_VESSEL</option>
-      <option value="PUSH_OUT">PUSH_OUT</option>
-      <option value="SPLIT">SPLIT</option>
-      <option value="CANCEL">CANCEL</option>
-      <option value="NO_LEVER">NO_LEVER</option>
-      <option value="__NONE__">No recs (clean)</option>
-    </select>
+    <div class="ms-dd" id="dd-action">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-action')">All Actions</button>
+      <div class="ms-dd-panel"></div>
+    </div>
   </div>
-  <div class="ms-wrap"><span class="ms-label">Country</span><select id="countryFilter"><option value="">All countries</option></select></div>
-  <div class="ms-wrap"><span class="ms-label">Brand</span><select id="brandFilter"><option value="">All brands</option></select></div>
-  <div class="ms-wrap"><span class="ms-label">Inv Mgr</span><select id="invMgrFilter"><option value="">All inv mgrs</option></select></div>
+
+  <div class="ms-wrap"><span class="ms-label">Priority</span>
+    <div class="ms-dd" id="dd-priority">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-priority')">All Priorities</button>
+      <div class="ms-dd-panel"></div>
+    </div>
+  </div>
+
+  <div class="ms-wrap"><span class="ms-label">Country</span>
+    <div class="ms-dd" id="dd-country">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-country')">All Countries</button>
+      <div class="ms-dd-panel"></div>
+    </div>
+  </div>
+
+  <div class="ms-wrap"><span class="ms-label">Brand</span>
+    <div class="ms-dd" id="dd-brand">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-brand')">All Brands</button>
+      <div class="ms-dd-panel"></div>
+    </div>
+  </div>
+
+  <div class="ms-wrap"><span class="ms-label">Inv Mgr</span>
+    <div class="ms-dd" id="dd-mgr">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-mgr')">All Inv Mgrs</button>
+      <div class="ms-dd-panel"></div>
+    </div>
+  </div>
+
   <label style="font-size:11px;"><input type="checkbox" id="replenOnly" checked> Replen only</label>
   <label style="font-size:11px;"><input type="checkbox" id="gapsOnly"> OOS Risk</label>
   <label style="font-size:11px;"><input type="checkbox" id="overstockOnly"> Overstock</label>
   <label style="font-size:11px;"><input type="checkbox" id="hideMulti" checked> Hide multi-packs</label>
   <button id="clearBtn" style="padding:4px 10px;background:#fff;border:1px solid #999;border-radius:4px;cursor:pointer;font-size:11px;font-family:inherit;">Clear filters</button>
-  <button onclick="refreshData()" title="Uses cached data if less than 6 hours old" style="padding:4px 10px;background:#fff;border:1px solid #1565c0;border-radius:4px;cursor:pointer;font-size:11px;color:#1565c0;font-family:inherit;">&#128260; Refresh</button>
-  <button onclick="forceRefresh()" title="Clear cache and reload from Quickbase" style="padding:4px 10px;background:#fff;border:1px solid #999;border-radius:4px;cursor:pointer;font-size:11px;color:#555;font-family:inherit;">&#128472; Force</button>
+  <button onclick="refreshData()" title="Uses cached data if less than 6 hours old" style="padding:4px 10px;background:#fff;border:1px solid #1565c0;border-radius:4px;cursor:pointer;font-size:11px;color:#1565c0;font-family:inherit;">&#128260; Refresh Data</button>
+  <button onclick="forceRefresh()" title="Clear cache and reload from Quickbase" style="padding:4px 10px;background:#fff;border:1px solid #999;border-radius:4px;cursor:pointer;font-size:11px;color:#555;font-family:inherit;">&#128472; Force Reload</button>
 </div>
 
 <div style="overflow:auto;max-height:calc(100vh - 120px);">
