@@ -1718,6 +1718,35 @@ function updateFlagCount() {
   if (el) el.textContent = n + ' flagged for manager';
 }
 
+function updateReplyCount() {
+  const n = ALL_RECORDS.filter(r => r.planner_reply_pending).length;
+  const el  = document.getElementById('replyCount');
+  const btn = document.getElementById('replyOnlyBtn');
+  if (el) { el.textContent = n + ' repl' + (n === 1 ? 'y' : 'ies') + ' pending'; el.style.display = n ? 'inline' : 'none'; }
+  if (btn) btn.style.fontWeight = (SHOW_REPLY_ONLY ? '800' : '600');
+  // Notification banner — shown at top when there are pending replies
+  const banner = document.getElementById('replyBanner');
+  const bannerCount = document.getElementById('replyBannerCount');
+  if (banner && bannerCount) {
+    bannerCount.textContent = n;
+    // Show banner when data has loaded and replies exist; don't re-show if user dismissed
+    if (n > 0 && banner.dataset.dismissed !== '1') banner.style.display = 'flex';
+    else if (n === 0) banner.style.display = 'none';
+  }
+}
+
+let SHOW_REPLY_ONLY = false;
+function toggleReplyOnly() {
+  SHOW_REPLY_ONLY = !SHOW_REPLY_ONLY;
+  const btn = document.getElementById('replyOnlyBtn');
+  if (btn) {
+    btn.style.background    = SHOW_REPLY_ONLY ? '#00695c' : '#fff';
+    btn.style.color         = SHOW_REPLY_ONLY ? '#fff'    : '#00695c';
+    btn.style.fontWeight    = '800';
+  }
+  applyFilters();
+}
+
 // -- Render: pagination -----------------------------------------------------
 function renderPage(page) {
   currentPage = page;
