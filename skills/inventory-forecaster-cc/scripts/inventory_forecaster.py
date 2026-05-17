@@ -7317,36 +7317,54 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"forecast reflects total product demand (warehouse + factory-direct)"
             )
 
-        # ── F69 cadence-pause dampener ────────────────────────────────────────
-        # Amazon orders DI on the 10th monthly with 65-day lead time.
-        # If we have NOT received expected DI POs (silence ≥ 6 weeks with prior
-        # history), Amazon has intentionally paused ordering — likely because DC
-        # is overstocked.  The warehouse channel won't compensate; dampen
-        # near-term forecast for the duration of the expected pause window.
+        # ── F69 DI WOS-excess correction ─────────────────────────────────────
+        # For DI-blended Amazon records the combined warehouse + factory-direct
+        # order history reflects total replenishment demand, which tracks the
+        # underlying consumer POS rate.  The model's order-history baseline can
+        # understate demand when DI orders are large and infrequent (lumpy
+        # cadence), so we anchor the full 26-week forecast to POS L13W and apply
+        # a WOS-excess reduction for any inventory Amazon holds above its ~12wk
+        # target ceiling.
         #
-        # Scale: each missed monthly window reduces the near-term fcst further.
-        #   1 missed  → ×0.70   (cautious — one skip could be a timing anomaly)
-        #   2 missed  → ×0.50
-        #   3 missed  → ×0.35
-        #   4+ missed → ×0.25   (floor — clear channel pause)
-        # Applied to W1 through (missed_windows × 4 + 4) weeks, capped at W16.
-        if (row.get("_di_pause") and is_amazon
+        # Adjustment:
+        #   excess_wos = max(0, current_wos − 12)   [12wk = Amazon's target max]
+        #   wos_scale  = max(0.70, 1 − excess_wos/26)
+        #   target/wk  = pos_l13w × wos_scale
+        #
+        # The model's seasonal shape is preserved by proportional rescaling;
+        # this correction covers the full 26-week horizon (superseding F59h's
+        # 8-week soft taper for DI-blended records where POS is the cleaner
+        # demand signal).
+        if (row.get("_di_blend") and is_amazon
                 and isinstance(fcst, list) and len(fcst) >= 26
                 and model not in ("Inactive",)):
-            _fire("F69-pause")
-            _di_missed = row.get("_di_missed_windows", 1)
-            _di_pw     = row.get("_di_pause_weeks", 6)
-            _di_scale  = max(0.25, 1.0 - (_di_missed * 0.25))
-            _di_horizon = min(16, _di_missed * 4 + 4)
-            for _wi in range(_di_horizon):
-                if fcst[_wi] > 0:
-                    fcst[_wi] = snap(fcst[_wi] * _di_scale, mp)
-            meta.setdefault("drivers", []).append(
-                f"F69 DI cadence pause: last DI order {_di_pw}w ago "
-                f"({_di_missed} expected monthly window(s) missed) — "
-                f"W1-W{_di_horizon} scaled ×{_di_scale:.2f} "
-                f"(Amazon DC overstocked; DI + warehouse ordering paused)"
-            )
+            _f69w_pos_l13 = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+            if _f69w_pos_l13 > 0:
+                _fire("F69-wos")
+                _f69w_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
+                if _f69w_wos <= 0:
+                    _f69w_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
+                    _f69w_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
+                    _f69w_wos = (_f69w_soh + _f69w_opo) / _f69w_pos_l13
+                _f69w_excess = max(0.0, _f69w_wos - 12.0)
+                _f69w_scale  = max(0.70, 1.0 - _f69w_excess / 26.0)
+                _f69w_target = _f69w_pos_l13 * _f69w_scale
+                # Proportional rescale — preserve the model's seasonal shape
+                _f69w_cur_avg = sum(fcst) / max(len(fcst), 1)
+                if _f69w_cur_avg > 0:
+                    _f69w_anchor = _f69w_target / _f69w_cur_avg
+                    for _wi in range(len(fcst)):
+                        fcst[_wi] = snap(fcst[_wi] * _f69w_anchor, mp)
+                else:
+                    for _wi in range(len(fcst)):
+                        fcst[_wi] = snap(_f69w_target, mp)
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F69-WOS: DI-blended forecast anchored to consumer POS "
+                        f"({_f69w_pos_l13:,.0f}/wk L13W); DC WOS={_f69w_wos:.1f}wks "
+                        f"(excess {_f69w_excess:.1f}wks → ×{_f69w_scale:.2f}) → "
+                        f"target {_f69w_target:,.0f}/wk (warehouse + DI combined demand)"
+                    )
 
     # F58 — Tell-AI comment replay (2026-05-08 → option B).
     # Apply the planner's most-recent "AI Adjusted" comment from QB Projection
