@@ -826,7 +826,7 @@ function renderDetail(r) {
   if(!r.recommendations.length){recs='<div style="color:#1b5e20;font-style:italic;">&#10003; No actions recommended.</div>';}
   else {
     var arrow='<span style="color:#888;margin:0 4px;">&#8594;</span>';
-    function beforeAfter(before,after,isDate){var a=isDate?fmtDate(before):fmt(before);var b=isDate?fmtDate(after):fmt(after);if(before===after)return'<span>'+a+'</span>';return'<span style="color:#888;text-decoration:line-through;">'+a+'</span>'+arrow+'<span style="color:#0d47a1;font-weight:600;">'+b+'</span>';}
+    function beforeAfter(before,after,isDate){var a=isDate?fmtDate(before):fmt(before);var b=isDate?fmtDate(after):fmt(after);if(before===after)return'<span>'+a+'</span>';return'<span style="color:#888;text-decoration:line-through;">'+a+'</span>'+arrow+'<span style="color:#1565c0;font-weight:600;">'+b+'</span>';}
     r.recommendations.forEach(function(rc){
       var cls='priority-'+rc.priority+' action-'+rc.action;
       var header='<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;"><span class="rec-action '+rc.action+'">'+rc.action+'</span><b style="font-size:13px;">'+esc(rc.po_number||'&#8212;')+'</b>'+(rc.supplier?'<span style="color:#555;font-size:11px;">/ '+esc(rc.supplier)+'</span>':'')+'</div>';
