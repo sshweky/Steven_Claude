@@ -1590,7 +1590,7 @@ function renderPage(page) {
     dtr.className = 'detail-pane';
     dtr.id = 'detail-' + r.key;
     dtr.dataset.loaded = '0';
-    dtr.innerHTML = `<td colspan="20"></td>`;
+    dtr.innerHTML = `<td colspan="23"></td>`;
     tb.appendChild(dtr);
   });
   updatePageNav();
