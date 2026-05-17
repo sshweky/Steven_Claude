@@ -2769,6 +2769,12 @@ async function addComment(key) {
     const resp  = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
     const recId = (resp && resp.metadata && resp.metadata.createdRecordIds && resp.metadata.createdRecordIds[0]) || '';
 
+    // If status is Resolved, auto-clear the flag on the Projections record
+    if (flag === 'Resolved') {
+      const recRes = ALL_RECORDS.find(x => x.key === key);
+      if (recRes && recRes.flagged) await toggleFlag(key);
+    }
+
     // If this is a planner response, flip Planner_Reply_Pending on the Projections record
     if (flag === 'Planner Response') {
       const pf = {};
