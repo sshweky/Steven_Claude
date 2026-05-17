@@ -1,0 +1,11 @@
+  [auto-throttle] --all detected → workers=2, rate_limit_ms=150, bulk_writeback=on, lean_pull=off
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_10_W1 → 11_01_W26
+
+[1/4] Pulling projections from Quickbase ...

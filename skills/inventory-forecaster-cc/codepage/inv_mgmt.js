@@ -1100,18 +1100,10 @@ document.addEventListener('DOMContentLoaded', function() {
   ],'All Actions',function(s){selActions=s;});
 
   // Wire up static Priority dropdown panel checkboxes
+  // setState only updates selPriorities; renderStats() (called by applyFilters) redraws stats bar
   buildDdPanel('dd-priority',[
-    {v:'CRITICAL',label:'&#128308; Critical'},{v:'HIGH',label:'&#128992; High'},{v:'MEDIUM',label:'&#129001; Medium'},{v:'LOW',label:'&#9898; Low'}
-  ],'All Priorities',function(s){selPriorities=s;syncPriorityDd=function(){};applyFilters();});
-  // Override the priority buildDdPanel callback to also sync stats bar
-  var ddPriPanel=document.querySelector('#dd-priority .ms-dd-panel');
-  if(ddPriPanel)ddPriPanel.querySelectorAll('input').forEach(function(cb){
-    cb.addEventListener('change',function(){
-      selPriorities=new Set(getDdValues('dd-priority'));
-      updateDdBtn('dd-priority','All Priorities');
-      applyFilters();
-    });
-  });
+    {v:'CRITICAL',label:'Critical'},{v:'HIGH',label:'High'},{v:'MEDIUM',label:'Medium'},{v:'LOW',label:'Low'}
+  ],'All Priorities',function(s){selPriorities=s;});
 
   document.getElementById('clearBtn').onclick=function(){
     document.getElementById('searchInput').value='';
