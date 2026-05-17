@@ -8958,7 +8958,8 @@ def main():
         val_results = run_validation(rows, master_pack, args, amazon_pos=amazon_pos,
                                      amazon_catalog_us=amazon_catalog_us,
                                      season_map=season_map, oos_data=oos_data,
-                                     open_pos_data=open_pos_data)
+                                     open_pos_data=open_pos_data,
+                                     ats_data=ats_data)
         elapsed_val = time.time() - t_val
         print(f"      Validation complete in {elapsed_val:.1f}s")
 
@@ -9140,13 +9141,14 @@ def main():
         key     = row.get("Acct_MStyle_Key_", "")
         prefix  = key.split("-")[0] if "-" in key else key
         acct_iv = acct_cadences.get(prefix)
-        oos_ent = oos_data.get(key) if oos_data else None
-        po_wk   = open_pos_data.get(key) if open_pos_data else None
+        oos_ent  = oos_data.get(key) if oos_data else None
+        po_wk    = open_pos_data.get(key) if open_pos_data else None
+        ats_hist = ats_data.get(row.get("Mstyle", "")) if ats_data else None
         r = forecast_record(row, master_pack, account_interval=acct_iv,
                             amazon_pos=amazon_pos, season_map=season_map,
                             oos_entry=oos_ent, open_po_wk=po_wk,
                             amazon_catalog_us=amazon_catalog_us,
-                            ai_comments=ai_comments)
+                            ai_comments=ai_comments, ats_hist=ats_hist)
         # Build AI Analysis narrative — stored as a rich-text HTML string so
         # the QB codepage viewer can display it without re-deriving on the
         # client.  Mirrors the same logic the local viewer's
@@ -9438,10 +9440,4 @@ def _print_summary(results, elapsed_wb, failed):
             print(f"  {r['key']:<32} {r['pct_diff']:>+7.1f}%  "
                   f"{r['model']:<14} {bw}  {r['new_total']:>10,}  {r['prior_total']:>10,}")
 
-    # Always print week-by-week detail
-    _print_week_detail(results)
-    print()
-
-
-if __name__ == "__main__":
-    main()
+    # Always print week-b
