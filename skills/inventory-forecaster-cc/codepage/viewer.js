@@ -2185,7 +2185,7 @@ function toggleDetail(key) {
       atsCells += `<td style="${av === 0 ? 'color:#bbb' : 'color:#00695c'}">${fmtN(av)}</td>`;
       shpTot += sv;  ordTot += ov;  atsTot += av;
     }
-    histHdrCells += '<th>Total</th><th style="color:#888;font-weight:600">Avg/Wk</th>';
+    histHdrCells += '<th style="min-width:0;padding:2px 3px;width:1%">Total</th><th style="color:#888;font-weight:600;min-width:0;padding:2px 3px;width:1%">Avg/Wk</th>';
     ordCells += `<td style="font-weight:700;color:#e65100">${fmtN(ordTot)}</td>`;
     ordCells += `<td style="font-weight:700;color:#e65100">${fmtN(Math.round(ordTot / 26))}</td>`;
     shpCells += `<td style="font-weight:700;color:#6a1b9a">${fmtN(shpTot)}</td>`;
