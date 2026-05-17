@@ -287,10 +287,16 @@ def _open_pos_cache_path():
     return cache_dir / "open_pos_report.json"
 
 
-def _bucket_open_pos_into_weeks(rows, in_scope_keys, today, verbose=True):
+def _bucket_open_pos_into_weeks(rows, in_scope_keys, today, verbose=True, w1_date=None):
     """Take raw report rows ({label: value}) and bucket into forward 26-week
     qty-open totals keyed by Acct_MStyle (constructed from `Acct #` + `Mstyle`).
-    Returns: {acct_mstyle: [w1, w2, ..., w26]}."""
+    Returns: {acct_mstyle: [w1, w2, ..., w26]}.
+
+    w1_date: the Sunday that starts forecast week 1 (ORIG_PRJ_COLS[0] decoded).
+    When provided, cancel dates are bucketed relative to w1_date so that the
+    resulting open_po_wk[i] aligns exactly with forecast[i].  Without it,
+    bucketing is relative to today, which causes a 1-week shift whenever the
+    run date != W1_DATE (e.g. running on Monday with a Sunday W1)."""
     in_scope_set = set(in_scope_keys) if in_scope_keys else None
     out = {}
     n_kept_in_scope = 0
@@ -330,11 +336,22 @@ def _bucket_open_pos_into_weeks(rows, in_scope_keys, today, verbose=True):
         except Exception:
             n_skipped_no_date += 1
             continue
-        days_forward = (bucket_date - today).days
-        if days_forward <= 0 or days_forward > 26 * 7:
-            n_skipped_outside_window += 1
-            continue
-        n = (days_forward - 1) // 7
+        # Bucket relative to W1_DATE when available so open_po_wk[i] aligns
+        # with forecast[i].  Falling back to today-relative bucketing causes
+        # a shift equal to (today - W1_DATE) that incorrectly zeroes adjacent
+        # weeks (VP-Q4 bug, 2026-05-17).
+        if w1_date is not None:
+            days_from_w1 = (bucket_date - w1_date).days
+            if days_from_w1 < 0 or days_from_w1 >= 26 * 7:
+                n_skipped_outside_window += 1
+                continue
+            n = days_from_w1 // 7
+        else:
+            days_forward = (bucket_date - today).days
+            if days_forward <= 0 or days_forward > 26 * 7:
+                n_skipped_outside_window += 1
+                continue
+            n = (days_forward - 1) // 7
         if not (0 <= n <= 25):
             continue
         if key not in out:
