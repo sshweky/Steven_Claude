@@ -1242,9 +1242,10 @@ function adaptRow(row) {
     hist_ord:          histOrd,
     ly_ord:            lyOrd,
     ly_shp:            lyShp,
-    last_comment:      str(row, F.LAST_COMMENT),
-    last_comment_date: str(row, F.LAST_COMMENT_DATE),
-    flagged:           bool(row, F.FLAGGED),
+    last_comment:          str(row, F.LAST_COMMENT),
+    last_comment_date:     str(row, F.LAST_COMMENT_DATE),
+    flagged:               bool(row, F.FLAGGED),
+    planner_reply_pending: bool(row, F.PLANNER_REPLY_PENDING),
     master_pack:       num(row, F.MASTER_PACK) || 1,
     // POG / ISO context (added 2026-05-10)  -  used by the Inventory Plan
     // block in the detail panel.  inv_flow_wk attached separately after
@@ -1727,7 +1728,9 @@ function renderPage(page) {
   tb.innerHTML = '';
   pageRecs.forEach(r => {
     const tr = document.createElement('tr');
-    tr.className = borderClass(r.max_sev) + (r.flagged ? ' row-flagged' : '');
+    tr.className = borderClass(r.max_sev)
+      + (r.flagged               ? ' row-flagged'        : '')
+      + (r.planner_reply_pending ? ' row-reply-pending'  : '');
     tr.dataset.key = r.key;
 
     const aiVsProj = r.proj_total > 0 ? ((r.ai_total - r.proj_total) / r.proj_total * 100) : 0;
@@ -1735,8 +1738,9 @@ function renderPage(page) {
     const manVsL13 = (r.man_vs_l13 == null ? 0 : r.man_vs_l13);
     const l13Avail = r.shp_wk > 0;
 
+    const _safeId2 = r.key.replace(/[^a-zA-Z0-9]/g,'_');
     tr.innerHTML = `
-      <td></td>
+      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.flagged ? '<span title="Flagged for manager review" style="color:#c62828;font-size:13px;">⚑</span>' : ''}${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">💬</span>' : ''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.key}</td>
       <td style="font-size:11px;white-space:nowrap">${r.inv_manager||''}</td>
       <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.brand||'').replace(/"/g,'&quot;')}">${r.brand||''}</td>

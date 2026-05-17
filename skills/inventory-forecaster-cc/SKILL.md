@@ -686,6 +686,14 @@ Top 104 high-volume acct 1864 records: AI total **2.73M units** vs manual **3.73
 
 ---
 
+## Model Fixes (applied 2026-05-17 — ATS catch-up spike cap)
+
+| Fix | Description |
+|---|---|
+| **VP-ATS-Catch** | Companion to VP-ATS. After ATS restores from an OOS period (≥2 prior weeks near-zero ATS), caps orders in the 1–3 weeks following restoration to the pre-OOS baseline when they exceed 1.5× that baseline. Prevents duplicate / pent-up catch-up orders from inflating the L13W nz-avg and over-projecting. Per planner feedback: 1864-FF9297/24, weeks 2/15 & 2/22. |
+
+---
+
 ## Model Fixes (applied 2026-04-22/23 — cadence & over-projection control)
 
 These supplement the `Fix 1`–`Fix 5` table above. All live in
