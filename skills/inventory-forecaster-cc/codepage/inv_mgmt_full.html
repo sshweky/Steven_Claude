@@ -68,7 +68,9 @@
 
   /* ── Main table ── */
   table.main { width:100%; background:#fff; border-collapse:separate; border-spacing:0; }
-  table.main th { background:#f8f9fa; padding:4px 6px; text-align:left; white-space:nowrap; font-size:11px; }
+  table.main th { background:#f8f9fa; padding:4px 6px; text-align:left; font-size:11px; word-wrap:break-word; overflow-wrap:break-word; }
+  table.main thead tr.sort-row th { line-height:1.25; vertical-align:bottom; }
+  table.main thead tr.filter-row th input { white-space:nowrap; }
   table.main td { padding:4px 6px; border-bottom:1px solid #eee; vertical-align:top; font-size:12px; }
   table.main tr.row { cursor:pointer; }
   table.main tr.row:hover { background:#eef4ff; }
