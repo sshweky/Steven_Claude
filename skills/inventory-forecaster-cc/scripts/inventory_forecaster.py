@@ -9440,4 +9440,10 @@ def _print_summary(results, elapsed_wb, failed):
             print(f"  {r['key']:<32} {r['pct_diff']:>+7.1f}%  "
                   f"{r['model']:<14} {bw}  {r['new_total']:>10,}  {r['prior_total']:>10,}")
 
-    # Always print week-b
+    # Always print week-by-week detail
+    _print_week_detail(results)
+    print()
+
+
+if __name__ == "__main__":
+    main()
