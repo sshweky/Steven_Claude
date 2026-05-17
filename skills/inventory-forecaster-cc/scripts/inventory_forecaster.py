@@ -7344,6 +7344,46 @@ def _build_record_narrative(r):
             f"rushed replenishment orders."
         )
 
+    # ── 6) Unexplained planner truncation ─────────────────────────────────────
+    # When the planner has zeroed out a consecutive tail of weeks (W-N through
+    # W26) but the item is still Active at the customer with no POG End Date,
+    # something is missing.  The planner knows something the AI doesn't — a
+    # POG ending, a listing drop, a distribution cut, a seasonal exit — and
+    # that context needs to be documented so the AI can plan properly.
+    # Threshold: >= 6 trailing zero weeks (anything less could be natural
+    # intermittent cadence).
+    _sc_raw   = (r.get("status_cust") or "").upper().strip()
+    _it_raw   = (r.get("item_status") or "").upper().strip()
+    _pog_end  = (r.get("pog_end") or "").strip()
+    _is_fd    = _sc_raw.startswith("FD")
+    _is_active_cust = _sc_raw.startswith("A") and not _is_fd
+    _is_eol_item    = any(tok in _it_raw for tok in ("DISC", "PHASE", "EOL", "DELETE"))
+    if _is_active_cust and not _pog_end and not _is_eol_item:
+        # Find where the trailing zero block starts (scan backward from W26)
+        _trunc_start_idx = None   # 0-based index of first trailing zero
+        for _w in range(25, -1, -1):
+            if manual[_w] > 0:
+                _trunc_start_idx = _w + 1   # zero block begins at index _w+1
+                break
+        if _trunc_start_idx is None:
+            _trunc_start_idx = 0            # all weeks are zero
+        _trunc_len   = 26 - _trunc_start_idx
+        _trunc_ai_vol = sum(ai[_trunc_start_idx:])
+        if _trunc_len >= 6 and _trunc_ai_vol > 0:
+            _trunc_wk1 = _trunc_start_idx + 1  # 1-indexed week label
+            parts.insert(0,
+                f"The plan goes to zero starting W{_trunc_wk1} and stays flat "
+                f"through W26 — but Status @ Cust is Active and there's no POG "
+                f"End Date on file. Based on this account's buying history, the AI "
+                f"would forecast {_trunc_ai_vol:,} units across those {_trunc_len} "
+                f"weeks. You clearly know something that isn't captured here: a POG "
+                f"ending, a listing drop, a distribution change, or a seasonal "
+                f"exit. Please document it — enter a POG End Date, update the item "
+                f"status, or add a comment so the plan makes sense to anyone "
+                f"reviewing it. Without context, this looks like missing demand "
+                f"that will create an inventory blind spot."
+            )
+
     if not parts:
         return ""
 
