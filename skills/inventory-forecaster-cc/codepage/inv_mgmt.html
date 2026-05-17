@@ -154,6 +154,7 @@
   table.main tr.row-HIGH td:first-child { box-shadow:inset 3px 0 0 #e65100; }
   table.main tr.row-MEDIUM { background:#fffef0; }
   table.main tr.row-MEDIUM td:first-child { box-shadow:inset 3px 0 0 #f9a825; }
+  table.main tr.row-NO_OOS { opacity:0.55; }
   table.main tr.row-CRITICAL:hover { background:#ffe9e9; }
   table.main tr.row-HIGH:hover { background:#fff0e6; }
   table.main tr.row-MEDIUM:hover { background:#fffde5; }
@@ -202,9 +203,9 @@
     </div>
   </div>
 
-  <div class="ms-wrap"><span class="ms-label">Priority</span>
+  <div class="ms-wrap"><span class="ms-label">OOS Priority</span>
     <div class="ms-dd" id="dd-priority">
-      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-priority')">All Priorities</button>
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-priority')">All OOS Pri</button>
       <div class="ms-dd-panel"></div>
     </div>
   </div>
