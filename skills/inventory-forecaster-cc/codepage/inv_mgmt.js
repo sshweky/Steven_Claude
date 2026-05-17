@@ -194,8 +194,54 @@ var ALL = [], FILTERED = [];
 var currentSort = { id: null, dir: 1 };
 var DEFAULT_SORT_CHAIN = ['inv_manager','brand','mstyle'];
 var colFilters = {};
-var priorityFilter = '';
+var selActions    = new Set();
+var selCountries  = new Set();
+var selBrands     = new Set();
+var selMgrs       = new Set();
+var selPriorities = new Set();
 var recoSheet = [];
+
+// -- Multi-select dropdown helpers ---------------------------------------------
+function toggleDd(evt, ddId) {
+  evt.stopPropagation();
+  var panel = document.getElementById(ddId).querySelector('.ms-dd-panel');
+  var isOpen = panel.classList.contains('open');
+  document.querySelectorAll('.ms-dd-panel.open').forEach(function(p){p.classList.remove('open');});
+  if (!isOpen) panel.classList.add('open');
+}
+document.addEventListener('click', function(){
+  document.querySelectorAll('.ms-dd-panel.open').forEach(function(p){p.classList.remove('open');});
+});
+function getDdValues(ddId) {
+  return Array.from(document.querySelectorAll('#'+ddId+' input[type=checkbox]:checked')).map(function(c){return c.value;});
+}
+function updateDdBtn(ddId, allLabel) {
+  var vals = getDdValues(ddId);
+  var btn = document.querySelector('#'+ddId+' .ms-dd-btn');
+  if (!btn) return;
+  btn.textContent = vals.length===0 ? allLabel : vals.length+' selected';
+  btn.classList.toggle('has-sel', vals.length>0);
+}
+function buildDdPanel(ddId, items, allLabel, setState) {
+  var panel = document.querySelector('#'+ddId+' .ms-dd-panel');
+  if (!panel) return;
+  panel.innerHTML = '';
+  items.forEach(function(item) {
+    var lbl = document.createElement('label');
+    lbl.className = 'ms-item';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = item.v;
+    cb.addEventListener('change', function() {
+      var vals = getDdValues(ddId);
+      setState(new Set(vals));
+      updateDdBtn(ddId, allLabel);
+      applyFilters();
+    });
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(item.label || item.v));
+    panel.appendChild(lbl);
+  });
+}
 
 function setBar(pct) { var b=document.getElementById('loadBar'); if(b) b.style.width=pct+'%'; }
 function setStatus(msg) { var s=document.getElementById('loadStatus'); if(s) s.textContent=msg; }
