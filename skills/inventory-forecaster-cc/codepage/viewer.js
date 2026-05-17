@@ -3904,13 +3904,22 @@ async function bootstrap() {
     await new Promise(r => setTimeout(r, 16));
 
     _setBoot('Loading projections...');
-    _setDetail('Querying Quickbase for active records');
-    const rawRows = await fetchAllRecords();
-
-    _setBoot('Parsing projection data...');
-    _setDetail(`${rawRows.length.toLocaleString()} records received | adapting to UI shape`);
-    await new Promise(r => setTimeout(r, 16));
-    ALL_RECORDS = rawRows.map(adaptRow);
+    const _prjCached = !_prjCacheBypassed() && _loadPrjCache();
+    if (_prjCached) {
+      ALL_RECORDS = _prjCached.records;
+      const ageStr = _fmtCacheAge(_prjCached.ageMs);
+      _setDetail(`Projections: served from local cache (${ageStr} old)  -  append ?nocache=1 to URL for fresh pull`);
+      console.info(`[Prj] loaded ${ALL_RECORDS.length.toLocaleString()} records from localStorage cache (age ${ageStr})`);
+    } else {
+      _setDetail('Querying Quickbase for active records');
+      const rawRows = await fetchAllRecords();
+      _setBoot('Parsing projection data...');
+      _setDetail(`${rawRows.length.toLocaleString()} records received | adapting to UI shape`);
+      await new Promise(r => setTimeout(r, 16));
+      ALL_RECORDS = rawRows.map(adaptRow);
+      _savePrjCache(ALL_RECORDS);
+      console.info(`[Prj] saved ${ALL_RECORDS.length.toLocaleString()} records to localStorage cache`);
+    }
     _setFreshness('prj-loaded-at', Date.now());
 
     // -- Pull Inventory Flow in the background (non-blocking) ---------------
