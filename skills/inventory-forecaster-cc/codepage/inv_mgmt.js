@@ -1118,7 +1118,7 @@ document.addEventListener('DOMContentLoaded', function() {
       el.querySelectorAll('input[type=checkbox]').forEach(function(cb){cb.checked=false;});
       var labels={
         'dd-action':'All Actions','dd-country':'All Countries','dd-brand':'All Brands',
-        'dd-mgr':'All Inv Mgrs','dd-priority':'All Priorities'
+        'dd-mgr':'All Inv Mgrs','dd-priority':'All OOS Pri'
       };
       updateDdBtn(id,labels[id]);
     });
