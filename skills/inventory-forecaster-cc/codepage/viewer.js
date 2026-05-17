@@ -2748,14 +2748,10 @@ async function loadCommentHistory(key, force) {
 async function addComment(key) {
   const txt    = document.getElementById('cmt-text-'   + key).value.trim();
   const flag   = document.getElementById('cmt-flag-'   + key).value;
-  const author = (document.getElementById('cmt-author-' + key) || {}).value || '';
   const btn    = document.getElementById('cmt-btn-'    + key);
   const msg    = document.getElementById('cmt-msg-'    + key);
   if (!txt) { msg.textContent = 'Comment cannot be empty.'; msg.style.color = '#c62828'; return; }
   btn.disabled = true; btn.textContent = 'Saving...'; msg.textContent = '';
-
-  // Persist author name for next time
-  if (author) try { localStorage.setItem('viewerAuthorName', author); } catch(_) {}
 
   try {
     const today = new Date();
