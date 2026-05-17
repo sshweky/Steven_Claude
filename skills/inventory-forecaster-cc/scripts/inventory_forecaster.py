@@ -6112,6 +6112,135 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"M2 EOL-dampen ({_m2_reason}): cut forecast to max(AI×30%, manual)"
             )
 
+    # F66 — Per-customer bias correction (2026-05-17).
+    # For customers where planners systematically override AI >75% of the time
+    # in the same direction, apply a calibration multiplier derived from the
+    # trailing planner-vs-AI bias analysis.  Multiplier > 1.0 = AI under-projects.
+    # Only applies to non-zero, non-Inactive forecasts.
+    if model != "Inactive" and sum(fcst) > 0:
+        _f66_mult = 1.0
+        _cu_upper = cust_name.upper()
+        for _bias_cust, _bias_mult in CUSTOMER_BIAS_CORRECTIONS.items():
+            if _bias_cust in _cu_upper:
+                _f66_mult = _bias_mult
+                break
+        if _f66_mult != 1.0:
+            fcst = [snap(v * _f66_mult, mp) if v > 0 else 0 for v in fcst]
+            meta.setdefault("drivers", []).append(
+                f"F66 Customer bias correction ({_bias_cust}): ×{_f66_mult:.2f} "
+                f"(AI systematically {'under' if _f66_mult > 1 else 'over'}-projects "
+                f"this account based on planner override history)"
+            )
+
+    # F62 — Soft L4W/L13W trend blend (2026-05-17).
+    # Fills the gap between F26's hard 0.85× (L4W/L13W < 0.70) and no-action.
+    # When L4W is moderately below L13W (ratio 0.70–0.88), apply a proportional
+    # blend that smoothly damps the forecast toward recent trend.
+    # For mild acceleration (ratio 1.10–1.28), apply a proportional lift.
+    # Skip for Amazon (has its own POS blend), new launches, and Inactive.
+    if model != "Inactive" and sum(fcst) > 0 and not is_amazon and not _f34_is_new_launch:
+        _f62_l4_nz  = [float(v) for v in hist[-4:]  if float(v or 0) > 0]
+        _f62_l13_nz = [float(v) for v in hist[-13:] if float(v or 0) > 0]
+        if len(_f62_l4_nz) >= 2 and len(_f62_l13_nz) >= 3:
+            _f62_l4_avg  = sum(_f62_l4_nz) / len(_f62_l4_nz)
+            _f62_l13_avg = sum(_f62_l13_nz) / len(_f62_l13_nz)
+            _f62_ratio   = _f62_l4_avg / _f62_l13_avg if _f62_l13_avg > 0 else 1.0
+            # Mild decline: 0.70 ≤ ratio < 0.88 (F6/F26 already cover < 0.70)
+            if 0.70 <= _f62_ratio < 0.88:
+                # Blend scale: at ratio=0.70 → ×0.82, at ratio=0.88 → ×0.93
+                _f62_scale = 0.6 * _f62_ratio + 0.4
+                fcst = [snap(v * _f62_scale, mp) if v > 0 else 0 for v in fcst]
+                meta.setdefault("drivers", []).append(
+                    f"F62 Soft trend blend: L4W nz avg {_f62_l4_avg:.0f} vs L13W nz "
+                    f"{_f62_l13_avg:.0f} (ratio {_f62_ratio:.2f}) → ×{_f62_scale:.2f} "
+                    f"(mild decline; fills F26 gap)"
+                )
+            # Mild acceleration: 1.12 ≤ ratio < 1.30 (F27 already covers 1.30+)
+            elif 1.12 <= _f62_ratio < 1.30:
+                _f62_scale = 0.6 * _f62_ratio + 0.4
+                fcst = [snap(v * _f62_scale, mp) if v > 0 else 0 for v in fcst]
+                meta.setdefault("drivers", []).append(
+                    f"F62 Soft trend blend: L4W nz avg {_f62_l4_avg:.0f} vs L13W nz "
+                    f"{_f62_l13_avg:.0f} (ratio {_f62_ratio:.2f}) → ×{_f62_scale:.2f} "
+                    f"(mild acceleration lift)"
+                )
+
+    # F63 — Multi-pack baseline floor (2026-05-17).
+    # Multi-Pk Replen items have sparse L13W order history (they order less
+    # frequently per SKU) but the AI under-projects by 743% avg delta.
+    # When L13W is very sparse and L26W shows a higher non-zero rate, lift
+    # the forecast to at least 40% of the L26W nz average × 26w.
+    # Skips: Inactive, new launches, Amazon (POS blend handles it).
+    _f63_item_status = (row.get("PT_Item_Status") or "").upper()
+    if ("MULTI-PK" in _f63_item_status or "MULTI PK" in _f63_item_status) and \
+            model != "Inactive" and sum(fcst) > 0 and not _f34_is_new_launch:
+        _f63_l13_nz = [float(v) for v in hist[-13:] if float(v or 0) > 0]
+        _f63_l26_nz = [float(v) for v in hist[-26:] if float(v or 0) > 0]
+        _f63_l13_avg = sum(_f63_l13_nz) / len(_f63_l13_nz) if _f63_l13_nz else 0
+        _f63_l26_avg = sum(_f63_l26_nz) / len(_f63_l26_nz) if _f63_l26_nz else 0
+        # If L26W nz avg is materially higher than L13W nz avg (≥ 1.5×),
+        # the item has more history we should be anchoring to.
+        if _f63_l26_avg > _f63_l13_avg * 1.5 and _f63_l26_avg > 0:
+            _f63_floor_total = _f63_l26_avg * 26 * 0.40
+            if sum(fcst) < _f63_floor_total:
+                _f63_scale = _f63_floor_total / sum(fcst)
+                fcst = [snap(v * _f63_scale, mp) if v > 0 else 0 for v in fcst]
+                meta.setdefault("drivers", []).append(
+                    f"F63 Multi-pack floor: L26W nz avg {_f63_l26_avg:.0f} >> "
+                    f"L13W nz avg {_f63_l13_avg:.0f} (ratio "
+                    f"{_f63_l26_avg/max(_f63_l13_avg,1):.1f}×); "
+                    f"lifted forecast to 40% of L26W nz rate × 26w"
+                )
+
+    # F64 — Trade calendar fall events (2026-05-17).
+    # Apply modest lifts to W17-W18 (fall replenishment) and W21-W22 (holiday
+    # pre-order) for non-Amazon active items.  These are the two most common
+    # planner spike weeks from the manual-vs-AI analysis.  Amazon-only
+    # items get Prime Day / Fall Deal lifts instead.
+    if not is_amazon and model != "Inactive" and sum(fcst) > 0:
+        _f64_applied = []
+        for _wk in range(1, 27):
+            if _wk in TRADE_FALL_REPLEN_WEEKS and fcst[_wk - 1] > 0:
+                fcst[_wk - 1] = snap(fcst[_wk - 1] * TRADE_FALL_REPLEN_LIFT, mp)
+                _f64_applied.append(f"W{_wk}×{TRADE_FALL_REPLEN_LIFT:.2f}")
+            elif _wk in TRADE_FALL_SEASON2_WEEKS and fcst[_wk - 1] > 0:
+                fcst[_wk - 1] = snap(fcst[_wk - 1] * TRADE_FALL_SEASON2_LIFT, mp)
+                _f64_applied.append(f"W{_wk}×{TRADE_FALL_SEASON2_LIFT:.2f}")
+        if _f64_applied and isinstance(meta, dict):
+            meta.setdefault("drivers", []).append(
+                f"F64 Trade calendar lift: {', '.join(_f64_applied)} "
+                f"(fall replenishment W17-18 +10%, holiday pre-order W21-22 +8%)"
+            )
+
+    # F61 — Horizon confidence decay (2026-05-17).
+    # Planners systematically cut the AI back-half forecast (W9-W26) more
+    # aggressively than the near-term.  For items without strong seasonal
+    # signals (non-Amazon, no season tag, non-new-launch), apply a gentle
+    # decay to W9-W26 to better match observed planner behavior.
+    # Decay: W9-W26 × 0.88.  Skips: Amazon, seasonal items, new launches, Inactive.
+    _f61_seasonal_tags = {"Halloween", "Christmas", "Holiday", "July 4th",
+                          "Valentines Day", "Easter", "Back to School",
+                          "Prime Day", "Fall Deal"}
+    _f61_is_seasonal   = bool(season and any(t.lower() in (season or "").lower()
+                                              for t in _f61_seasonal_tags))
+    _f61_has_cat_prof  = isinstance(meta, dict) and any(
+        "category profile" in str(d).lower() or "F64" in str(d)
+        for d in meta.get("drivers", [])
+    )
+    if (not is_amazon and not _f34_is_new_launch and not _f61_is_seasonal
+            and model != "Inactive" and sum(fcst) > 0):
+        _f61_fired = 0
+        for _wi in range(8, 26):       # W9-W26 (0-indexed: 8-25)
+            if fcst[_wi] > 0:
+                fcst[_wi] = snap(fcst[_wi] * 0.88, mp)
+                _f61_fired += 1
+        if _f61_fired > 0 and isinstance(meta, dict):
+            meta.setdefault("drivers", []).append(
+                f"F61 Horizon decay: W9-W26 ({_f61_fired} non-zero wks) × 0.88 "
+                f"(planners systematically trim back-half AI forecast; "
+                f"preserves near-term W1-W8 signal)"
+            )
+
     # F29 (2026-04-26, loosened, deferral-gated 2026-05-06) — New-item floor.
     # First version required ≥2 L4 active weeks, but new items often have only
     # 1 active week in L4 because they just shipped.  Loosened to use the
