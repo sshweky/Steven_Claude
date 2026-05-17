@@ -4494,7 +4494,7 @@ def _detect_otb(history, is_amazon=False):
 
 def _prep_record_signals(row, master_pack, oos_entry=None,
                          amazon_pos=None, season_map=None,
-                         amazon_catalog_us=None):
+                         amazon_catalog_us=None, ats_hist_l26=None):
     """
     Shared initial prep used by both forecast_record() and validate_record()
     (extracted 2026-05-06 to eliminate near-duplicate code between the two
