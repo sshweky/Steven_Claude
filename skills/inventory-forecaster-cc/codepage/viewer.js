@@ -2515,9 +2515,10 @@ function onManEdit(inputEl) {
 }
 
 // Updates the Save All / Discard button labels + enabled state based on the
-// current size of DIRTY_EDITS. Cheap; called on every keystroke.
+// current size of DIRTY_EDITS. Counts unique record keys (not individual cells)
+// so the badge reads "3 records to save" rather than "9 cells".
 function updateSaveAllBadge() {
-  const n = DIRTY_EDITS.size;
+  const n = new Set([...DIRTY_EDITS.values()].map(e => e.key)).size;
   const saveBtn = document.getElementById('saveAllBtn');
   const discBtn = document.getElementById('discardAllBtn');
   if (saveBtn) {
