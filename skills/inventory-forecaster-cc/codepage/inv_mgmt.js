@@ -333,8 +333,7 @@ async function loadData() {
     var nextRcptDt = nrRaw ? new Date(nrRaw) : null;
 
     var itemStatusFlow = String(g(IF_F.ItemStatus)||'').trim();
-    // Skip non-actionable statuses (and blank status — no proj data)
-    if (!itemStatusFlow) continue;
+    // Skip non-actionable statuses
     if (/^(restricted|ready to sell|ready to quote|discontinued|dropped|in develop)/i.test(itemStatusFlow)) continue;
     if (/component/i.test(itemStatusFlow)) continue;
     var isReplen = /^(replen|active|r)/i.test(itemStatusFlow) || toNum(g(IF_F.OptWOS)) > 0;
