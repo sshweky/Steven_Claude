@@ -285,10 +285,8 @@ async function loadData() {
 
   setStep(2,'active'); setBar(10);
   var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);
-  // No QB-level status filter — ItemStatus is a formula/lookup field and CT filters on it
-  // are unreliable. Status exclusion (Restricted, Ready to Sell, Discontinued, etc.)
-  // is handled in the JS build loop below.
-  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, '', 'Loading Inventory Flow');
+  // Filter to active/replen records only using field 927 (Active Item? checkbox)
+  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, "{927}.EX.'true'", 'Loading Inventory Flow');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
   // Active projections only (StatusCust starts with 'A') — provides demand + brand/description
