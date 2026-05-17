@@ -1710,7 +1710,9 @@ function toggleDetail(key) {
     lyShpCells += `<td style="${sv === 0 ? 'color:#bbb' : 'color:#1565c0'};font-size:10px">${fmtN(sv)}</td>`;
   }
   lyOrdCells += `<td style="font-weight:700;color:#2e7d32">${fmtN(lyOrdTot)}</td>`;
+  lyOrdCells += `<td style="font-weight:700;color:#2e7d32;font-size:10px">${fmtN(Math.round(lyOrdTot / 26 * 10) / 10)}</td>`;
   lyShpCells += `<td style="font-weight:700;color:#1565c0">${fmtN(lyShpTot)}</td>`;
+  lyShpCells += `<td style="font-weight:700;color:#1565c0;font-size:10px">${fmtN(Math.round(lyShpTot / 26 * 10) / 10)}</td>`;
 
   // -- Inventory Flow section ----------------------------------------------
   // Three rows from QB Inventory Flow table, keyed by mstyle:
