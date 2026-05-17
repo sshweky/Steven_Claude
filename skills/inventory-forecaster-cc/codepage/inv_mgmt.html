@@ -251,4 +251,24 @@
 
 <!-- Script MUST be at end of body so DOM is fully parsed before JS runs -->
 <script src="/db/bpd24h9wy?a=dbpage&pageID=56&v=20260521"></script>
+<script>
+// Pre-filter to a specific mstyle when linked from another codepage.
+// Usage: inv_mgmt.html?mstyle=FF15592
+(function () {
+  const ms = new URLSearchParams(window.location.search).get('mstyle');
+  if (!ms) return;
+  // Wait for the QB script to populate the table, then set + trigger the filter.
+  const tbody = document.getElementById('tbody');
+  const input = document.getElementById('searchInput');
+  if (!tbody || !input) return;
+  const observer = new MutationObserver(function (_, obs) {
+    if (tbody.children.length > 0) {
+      obs.disconnect();
+      input.value = ms;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+  observer.observe(tbody, { childList: true });
+})();
+</script>
 </body></html>
