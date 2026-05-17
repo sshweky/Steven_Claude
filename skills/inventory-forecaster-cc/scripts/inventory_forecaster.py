@@ -5499,7 +5499,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _r3_gate_l52_nz = 5
             _r3_floor_mult  = 0.3
             _r3_tag         = ""
-        if (not _r3_skip and _r3_l26_avg > 0 and
+        if (not _zero_velocity and not _r3_skip and _r3_l26_avg > 0 and
                 _r3_l26_nz >= _r3_gate_l26_nz and _r3_l52_nz >= _r3_gate_l52_nz):
             _r3_floor = _r3_l26_avg * _r3_floor_mult
             _r3_snapped = snap(_r3_floor, mp)
