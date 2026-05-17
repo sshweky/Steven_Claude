@@ -1800,7 +1800,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                     _f48_trig_b = True
 
         if _f48_trig_a or _f48_trig_b:
-            # Anchor on the lower-bound stable signals: L4 (current pace) and
+            # Anchor on the lower-bound stable signals: L8 (current pace) and
             # L26 (medium-term avg).  LY is intentionally EXCLUDED — declining
             # items can have an inflated LY that would loosen the cap.
             # Multiplier 1.20 (was 1.30) — tight enough to actually bind for
@@ -1808,11 +1808,11 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             # but still above true pace.
             if is_amazon and _f48_pos_blend > 0:
                 _f48_anchor = max(_f48_l4_avg, _f48_pos_blend)
-                _f48_src    = (f"max(L4 {_f48_l4_avg:.0f}, "
+                _f48_src    = (f"max(L8 {_f48_l4_avg:.0f}, "
                                f"POS_blend {_f48_pos_blend:.0f})")
             else:
                 _f48_anchor = max(_f48_l4_avg, _f48_l26_avg)
-                _f48_src    = (f"max(L4 {_f48_l4_avg:.0f}, "
+                _f48_src    = (f"max(L8 {_f48_l4_avg:.0f}, "
                                f"L26 {_f48_l26_avg:.0f})")
             _f48_ceiling = _f48_anchor * 1.20
             if _f48_anchor > 0 and baseline > _f48_ceiling:
@@ -1820,11 +1820,11 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                 _f48_driver = (
                     f"F48 post-OOS recovery anchor (Trigger {_which}): "
                     f"baseline {_f48_pre_baseline:.0f} → {_f48_ceiling:.0f} "
-                    f"(anchor = {_f48_src} × 1.30; "
+                    f"(anchor = {_f48_src} × 1.20; "
                     f"L13 spike {_f48_l13_max:.0f} vs median "
                     f"{_f48_l13_med:.0f} = "
                     f"{(_f48_l13_max / _f48_l13_med if _f48_l13_med else 0):.1f}×, "
-                    f"L4/L13_nz = "
+                    f"L8/L13_nz = "
                     f"{(_f48_l4_avg / _f48_l13_nz_avg if _f48_l13_nz_avg else 0):.2f})"
                 )
                 baseline = _f48_ceiling
@@ -2514,9 +2514,11 @@ def normalize_oos_rebuild_ramp(hist, ships):
     manual 40k for 26w (+27%).
 
     Detection (both required):
-      (1) Ship-zero gap: ≥3 consecutive weeks where ships[i]+ships[i+1] < 30%
+      (1) Ship-zero gap: ≥2 consecutive weeks where ships[i]+ships[i+1] < 30%
           of the order (1-week lag window; rules out normal Amazon/Walmart
-          1-week order-to-ship lag as a false OOS signal)
+          1-week order-to-ship lag as a false OOS signal; reduced from 3 to 2
+          per planner feedback — FF15592 Walmart had exactly 2 zero-ship weeks
+          and is the canonical case this rule was built for)
       (2) Pre-OOS pace established: ≥4 active ship weeks in the prior 13
           (we know what "normal" looked like)
 
