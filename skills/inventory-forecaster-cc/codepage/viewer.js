@@ -1255,6 +1255,7 @@ function adaptRow(row) {
     pog_launch:        str(row, F.POG_LAUNCH),
     pog_end:           str(row, F.POG_END),
     iso_ship_date:     str(row, F.ISO_SHIP_DATE),
+    next_rcpt_dt:      str(row, F.NEXT_RCPT_DT),  // FID 861 — Next Receipt Date
     opn_w:             opn,           // [Opn_W1..Opn_W26] open customer PO quantities
     opn_total:         opn_total,    // sum of opn_w; used in proj_wk/ai_wk recalcs
     inv_flow_beg:        null,        // [Wk1..Wk26] beginning balances
