@@ -5446,7 +5446,32 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         fcst, cap, meta, model = [0] * 26, 0, {}, "Inactive"
         biweekly = False
 
-        # R3 — Inactive conservative L26 floor (2026-04-22).
+        # F65 — Zero-velocity suppression (2026-05-17).
+        # When BOTH L4W and L13W are completely zero, and the item is not a
+        # new launch or international account, skip R3/S6/F19 floors entirely.
+        # These items have no recent demand signal whatsoever; projecting any
+        # floor volume adds noise without evidence of continued need.
+        _zero_velocity = (
+            sum(float(v or 0) for v in hist_for_model[-13:]) == 0 and
+            sum(float(v or 0) for v in hist_for_model[-4:])  == 0 and
+            not _f34_is_new_launch and
+            not is_international and
+            not _is_launching(row)
+        )
+        _f65_zero_vel = _zero_velocity
+
+        if _zero_velocity:
+            # Keep fcst = [0]*26, model = "Inactive" — no floors.
+            meta = {
+                "model":   "Inactive",
+                "drivers": [
+                    "F65 Zero-velocity suppression: L4W and L13W both zero → "
+                    "no AI floor projection (no recent demand signal)"
+                ],
+            }
+
+        if not _zero_velocity:
+            # R3 — Inactive conservative L26 floor (2026-04-22).
         # When the item is Inactive (L13W all zero) BUT has meaningful L26W/L52W
         # activity, plane is likely "paused" not "dead".  Provide a small flat
         # floor forecast = L26W all-weeks avg × 0.3, snapped to master pack.
