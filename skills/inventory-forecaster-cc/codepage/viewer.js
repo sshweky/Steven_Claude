@@ -1981,9 +1981,12 @@ function toggleDetail(key) {
     </div>`;
   }
 
-  // narrative may be \n-joined (viewer.py local) or <br><br>-joined (QB ai_analysis field)
+  // narrative may be \n-joined (viewer.py local) or <br>/<br><br>-joined (QB ai_analysis field).
+  // First collapse double-<br> to a single \n, then convert any remaining single <br> to \n
+  // so every bullet point becomes its own list item regardless of how QB serialised the text.
   const _narParts = (r.narrative || '')
     .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
     .split('\n').filter(s => s.trim());
   // _narUlId: stable element id used by _loadAmzDcInv to inject/replace the
   // live DC inventory bullet after the panel renders.
