@@ -1089,26 +1089,47 @@ async function forceRefresh() {
 // (not in <head>) - but this guard handles both placements safely.
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('searchInput').oninput=applyFilters;
-  document.getElementById('actionFilter').onchange=applyFilters;
-  document.getElementById('countryFilter').onchange=applyFilters;
-  document.getElementById('brandFilter').onchange=applyFilters;
-  document.getElementById('invMgrFilter').onchange=applyFilters;
   document.getElementById('replenOnly').onchange=applyFilters;
   document.getElementById('gapsOnly').onchange=applyFilters;
   document.getElementById('overstockOnly').onchange=applyFilters;
   document.getElementById('hideMulti').onchange=function(){buildTableHead();applyFilters();};
+
+  // Wire up static Action dropdown panel checkboxes
+  buildDdPanel('dd-action',[
+    {v:'PULL_UP'},{v:'FASTER_VESSEL'},{v:'PUSH_OUT'},{v:'SPLIT'},{v:'CANCEL'},{v:'NO_LEVER'},{v:'__NONE__',label:'No recs (clean)'}
+  ],'All Actions',function(s){selActions=s;});
+
+  // Wire up static Priority dropdown panel checkboxes
+  buildDdPanel('dd-priority',[
+    {v:'CRITICAL',label:'&#128308; Critical'},{v:'HIGH',label:'&#128992; High'},{v:'MEDIUM',label:'&#129001; Medium'},{v:'LOW',label:'&#9898; Low'}
+  ],'All Priorities',function(s){selPriorities=s;syncPriorityDd=function(){};applyFilters();});
+  // Override the priority buildDdPanel callback to also sync stats bar
+  var ddPriPanel=document.querySelector('#dd-priority .ms-dd-panel');
+  if(ddPriPanel)ddPriPanel.querySelectorAll('input').forEach(function(cb){
+    cb.addEventListener('change',function(){
+      selPriorities=new Set(getDdValues('dd-priority'));
+      updateDdBtn('dd-priority','All Priorities');
+      applyFilters();
+    });
+  });
+
   document.getElementById('clearBtn').onclick=function(){
     document.getElementById('searchInput').value='';
-    document.getElementById('actionFilter').value='';
-    document.getElementById('countryFilter').value='';
-    document.getElementById('brandFilter').value='';
-    document.getElementById('invMgrFilter').value='';
     document.getElementById('replenOnly').checked=false;
     document.getElementById('gapsOnly').checked=false;
     document.getElementById('overstockOnly').checked=false;
     document.getElementById('hideMulti').checked=true;
+    selActions.clear();selCountries.clear();selBrands.clear();selMgrs.clear();selPriorities.clear();
+    ['dd-action','dd-country','dd-brand','dd-mgr','dd-priority'].forEach(function(id){
+      var el=document.getElementById(id);if(!el)return;
+      el.querySelectorAll('input[type=checkbox]').forEach(function(cb){cb.checked=false;});
+      var labels={
+        'dd-action':'All Actions','dd-country':'All Countries','dd-brand':'All Brands',
+        'dd-mgr':'All Inv Mgrs','dd-priority':'All Priorities'
+      };
+      updateDdBtn(id,labels[id]);
+    });
     Object.keys(colFilters).forEach(function(k){delete colFilters[k];});
-    priorityFilter='';
     currentSort={id:null,dir:1};
     buildTableHead();applyFilters();
   };
