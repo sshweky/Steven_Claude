@@ -43,10 +43,28 @@
 
   /* ── Toolbar ── */
   .toolbar { padding:8px 18px; background:#fff; border-bottom:1px solid #d8dce3; display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; }
-  .toolbar input, .toolbar select { font-size:11px; padding:3px 6px; border:1px solid #ccc; border-radius:4px; font-family:inherit; }
+  .toolbar input { font-size:11px; padding:3px 6px; border:1px solid #ccc; border-radius:4px; font-family:inherit; }
   .toolbar input[type=text] { width:220px; }
   .ms-wrap { display:inline-flex; flex-direction:column; gap:2px; }
   .ms-label { font-size:9px; color:#6a6a6a; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; line-height:1; padding:0 2px; }
+
+  /* ── Multi-select dropdown ── */
+  .ms-dd { position:relative; display:inline-block; }
+  .ms-dd-btn { font-size:11px; padding:3px 22px 3px 8px; border:1px solid #ccc; border-radius:4px; background:#fff; cursor:pointer; white-space:nowrap; text-align:left; min-width:120px; font-family:inherit; position:relative; color:#333; }
+  .ms-dd-btn::after { content:'\25be'; position:absolute; right:6px; top:50%; transform:translateY(-50%); font-size:10px; color:#888; pointer-events:none; }
+  .ms-dd-btn.has-sel { border-color:#1565c0; color:#1565c0; background:#e8f0fe; font-weight:600; }
+  .ms-dd-panel { display:none; position:absolute; top:calc(100% + 3px); left:0; z-index:500; background:#fff; border:1px solid #c0c8d4; border-radius:5px; padding:4px 0; min-width:170px; box-shadow:0 4px 14px rgba(0,0,0,0.14); max-height:240px; overflow-y:auto; }
+  .ms-dd-panel.open { display:block; }
+  .ms-item { display:flex; align-items:center; gap:7px; padding:4px 10px; font-size:11px; cursor:pointer; white-space:nowrap; color:#333; user-select:none; }
+  .ms-item:hover { background:#f0f4ff; }
+  .ms-item input[type=checkbox] { cursor:pointer; accent-color:#1565c0; flex-shrink:0; }
+
+  /* ── Aged inventory cards ── */
+  .age-cards { display:flex; flex-wrap:wrap; gap:10px; }
+  .age-card { flex:1; min-width:130px; padding:12px 14px; border-radius:6px; border:1px solid rgba(0,0,0,0.07); }
+  .age-card-lbl { font-size:12px; color:#666; margin-bottom:4px; font-weight:600; }
+  .age-card-val { font-size:22px; font-weight:700; line-height:1.1; }
+  .age-card-pct { font-size:12px; color:#888; margin-top:3px; }
 
   /* ── Main table ── */
   table.main { width:100%; background:#fff; border-collapse:separate; border-spacing:0; }
@@ -175,28 +193,49 @@
 
 <div class="toolbar">
   <div class="ms-wrap"><span class="ms-label">Search</span><input type="text" id="searchInput" placeholder="mstyle / description / brand"></div>
+
   <div class="ms-wrap"><span class="ms-label">Action</span>
-    <select id="actionFilter">
-      <option value="">All actions</option>
-      <option value="PULL_UP">PULL_UP</option>
-      <option value="FASTER_VESSEL">FASTER_VESSEL</option>
-      <option value="PUSH_OUT">PUSH_OUT</option>
-      <option value="SPLIT">SPLIT</option>
-      <option value="CANCEL">CANCEL</option>
-      <option value="NO_LEVER">NO_LEVER</option>
-      <option value="__NONE__">No recs (clean)</option>
-    </select>
+    <div class="ms-dd" id="dd-action">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-action')">All Actions</button>
+      <div class="ms-dd-panel"></div>
+    </div>
   </div>
-  <div class="ms-wrap"><span class="ms-label">Country</span><select id="countryFilter"><option value="">All countries</option></select></div>
-  <div class="ms-wrap"><span class="ms-label">Brand</span><select id="brandFilter"><option value="">All brands</option></select></div>
-  <div class="ms-wrap"><span class="ms-label">Inv Mgr</span><select id="invMgrFilter"><option value="">All inv mgrs</option></select></div>
+
+  <div class="ms-wrap"><span class="ms-label">Priority</span>
+    <div class="ms-dd" id="dd-priority">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-priority')">All Priorities</button>
+      <div class="ms-dd-panel"></div>
+    </div>
+  </div>
+
+  <div class="ms-wrap"><span class="ms-label">Country</span>
+    <div class="ms-dd" id="dd-country">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-country')">All Countries</button>
+      <div class="ms-dd-panel"></div>
+    </div>
+  </div>
+
+  <div class="ms-wrap"><span class="ms-label">Brand</span>
+    <div class="ms-dd" id="dd-brand">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-brand')">All Brands</button>
+      <div class="ms-dd-panel"></div>
+    </div>
+  </div>
+
+  <div class="ms-wrap"><span class="ms-label">Inv Mgr</span>
+    <div class="ms-dd" id="dd-mgr">
+      <button class="ms-dd-btn" onclick="toggleDd(event,'dd-mgr')">All Inv Mgrs</button>
+      <div class="ms-dd-panel"></div>
+    </div>
+  </div>
+
   <label style="font-size:11px;"><input type="checkbox" id="replenOnly" checked> Replen only</label>
   <label style="font-size:11px;"><input type="checkbox" id="gapsOnly"> OOS Risk</label>
   <label style="font-size:11px;"><input type="checkbox" id="overstockOnly"> Overstock</label>
   <label style="font-size:11px;"><input type="checkbox" id="hideMulti" checked> Hide multi-packs</label>
   <button id="clearBtn" style="padding:4px 10px;background:#fff;border:1px solid #999;border-radius:4px;cursor:pointer;font-size:11px;font-family:inherit;">Clear filters</button>
-  <button onclick="refreshData()" title="Uses cached data if less than 6 hours old" style="padding:4px 10px;background:#fff;border:1px solid #1565c0;border-radius:4px;cursor:pointer;font-size:11px;color:#1565c0;font-family:inherit;">&#128260; Refresh</button>
-  <button onclick="forceRefresh()" title="Clear cache and reload from Quickbase" style="padding:4px 10px;background:#fff;border:1px solid #999;border-radius:4px;cursor:pointer;font-size:11px;color:#555;font-family:inherit;">&#128472; Force</button>
+  <button onclick="refreshData()" title="Uses cached data if less than 6 hours old" style="padding:4px 10px;background:#fff;border:1px solid #1565c0;border-radius:4px;cursor:pointer;font-size:11px;color:#1565c0;font-family:inherit;">&#128260; Refresh Data</button>
+  <button onclick="forceRefresh()" title="Clear cache and reload from Quickbase" style="padding:4px 10px;background:#fff;border:1px solid #999;border-radius:4px;cursor:pointer;font-size:11px;color:#555;font-family:inherit;">&#128472; Force Reload</button>
 </div>
 
 <div style="overflow:auto;max-height:calc(100vh - 120px);">

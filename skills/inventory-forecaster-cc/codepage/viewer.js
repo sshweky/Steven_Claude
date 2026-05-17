@@ -1783,11 +1783,11 @@ function toggleDetail(key) {
   // hdrCells) is not affected.  Appended only to the projection-table header
   // and its corresponding data rows.
   const _wkCount = wks.length || 26;
-  const projHdrCells = hdrCells + '<th style="color:#888;font-size:11px;font-weight:600">Avg/Wk</th>';
-  projCells += `<td style="font-weight:700;color:#555;font-size:10px">${fmtN(Math.round((liveProjTotal + opnTot) / _wkCount * 10) / 10)}</td>`;
-  aiCells   += `<td style="font-weight:700;color:#1565c0;font-size:10px">${fmtN(Math.round((r.ai_total + opnTot) / _wkCount * 10) / 10)}</td>`;
-  sugCells  += `<td style="font-weight:700;color:#555;font-size:10px">${fmtN(Math.round(sugTot / _wkCount * 10) / 10)}</td>`;
-  opnCells  += `<td style="font-weight:700;color:#6d4c00;font-size:10px">${fmtN(Math.round(opnTot / _wkCount * 10) / 10)}</td>`;
+  const projHdrCells = hdrCells + '<th style="color:#888;font-weight:600">Avg/Wk</th>';
+  projCells += `<td style="font-weight:700;color:#555">${fmtN(Math.round((liveProjTotal + opnTot) / _wkCount))}</td>`;
+  aiCells   += `<td style="font-weight:700;color:#1565c0">${fmtN(Math.round((r.ai_total + opnTot) / _wkCount))}</td>`;
+  sugCells  += `<td style="font-weight:700;color:#555">${fmtN(Math.round(sugTot / _wkCount))}</td>`;
+  opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(Math.round(opnTot / _wkCount))}</td>`;
 
   // LY actuals  -  Ordered LY (green) + Shipped LY (blue), W1..W26 alignment.
   // ly_ord[i] = Ord LW-(51-i) = the calendar week 52 weeks before forecast Wi+1.
