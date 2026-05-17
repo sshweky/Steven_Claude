@@ -796,7 +796,7 @@ function syncPriorityDd(){
   var panel=document.querySelector('#dd-priority .ms-dd-panel');
   if(!panel)return;
   panel.querySelectorAll('input[type=checkbox]').forEach(function(cb){cb.checked=selPriorities.has(cb.value);});
-  updateDdBtn('dd-priority','All Priorities');
+  updateDdBtn('dd-priority','All OOS Pri');
 }
 
 function renderTable() {
