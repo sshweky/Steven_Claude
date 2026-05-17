@@ -274,14 +274,29 @@ async function loadData() {
   var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, '', 'Loading Inventory Flow');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
+  // Query 1: active projections only (StatusCust starts with 'A') — full field set for demand
   var prjFieldIds = Object.values(PRJ_F).concat(PRJ_MANUAL);
-  // No filter — load all projections so every mstyle gets brand/description metadata.
-  // Demand (custs[]) is restricted to active-status rows in the loop below.
-  var prjRows = await qbQueryAll(PROJ_TID, prjFieldIds, '', 'Loading Projections');
+  var prjRows = await qbQueryAll(PROJ_TID, prjFieldIds, "{10}.CT.'A'", 'Loading Projections');
+
+  // Query 2: metadata only (Mstyle + Brand + Description, 3 fields) with no filter
+  // Fills brand/description for any mstyle that has zero active-customer rows
+  var prjMetaRows = await qbQueryAll(PROJ_TID, [PRJ_F.Mstyle, PRJ_F.Brand, PRJ_F.Description], '', 'Loading item metadata');
 
   setBar(70); setStatus('Processing data...');
 
-  // Build projections lookup by mstyle
+  // Build metadata lookup first so active-row pass can override if it has richer data
+  var prjMeta = {};
+  for (var i=0; i<prjMetaRows.length; i++) {
+    var mrow = prjMetaRows[i];
+    var mms  = String((mrow[PRJ_F.Mstyle]||{}).value||'').trim();
+    if (!mms) continue;
+    var mdesc  = String((mrow[PRJ_F.Description]||{}).value||'').trim();
+    var mbrand = String((mrow[PRJ_F.Brand]||{}).value||'').trim();
+    if (!prjMeta[mms]) prjMeta[mms] = { desc:mdesc, brand:mbrand };
+    else { if(mdesc && !prjMeta[mms].desc) prjMeta[mms].desc=mdesc; if(mbrand && !prjMeta[mms].brand) prjMeta[mms].brand=mbrand; }
+  }
+
+  // Build projections lookup by mstyle — active rows provide demand + preferred metadata
   var prjByMs = {};
   for (var i=0; i<prjRows.length; i++) {
     var row = prjRows[i];
@@ -289,18 +304,18 @@ async function loadData() {
     var cust = String((row[PRJ_F.CustName]||{}).value||'').trim();
     var desc = String((row[PRJ_F.Description]||{}).value||'').trim();
     var brand= String((row[PRJ_F.Brand]||{}).value||'').trim();
-    var sc   = String((row[PRJ_F.StatusCust]||{}).value||'').trim();
     if (!ms) continue;
-    // Always capture brand/description regardless of customer status
+    var weekly = PRJ_MANUAL.map(function(fid){return toNum((row[fid]||{}).value);});
+    var total  = weekly.reduce(function(a,b){return a+b;},0);
     if (!prjByMs[ms]) prjByMs[ms] = { custs:[], desc:desc, brand:brand };
     else { if(desc && !prjByMs[ms].desc) prjByMs[ms].desc=desc; if(brand && !prjByMs[ms].brand) prjByMs[ms].brand=brand; }
-    // Only include active-status customer demand (StatusCust starts with 'A')
-    if (/^A/i.test(sc)) {
-      var weekly = PRJ_MANUAL.map(function(fid){return toNum((row[fid]||{}).value);});
-      var total  = weekly.reduce(function(a,b){return a+b;},0);
-      prjByMs[ms].custs.push({ customer:cust, weekly:weekly, total:total });
-    }
+    prjByMs[ms].custs.push({ customer:cust, weekly:weekly, total:total });
   }
+  // Merge metadata for any mstyle not covered by the active query
+  Object.keys(prjMeta).forEach(function(ms) {
+    if (!prjByMs[ms]) prjByMs[ms] = { custs:[], desc:prjMeta[ms].desc, brand:prjMeta[ms].brand };
+    else { if(!prjByMs[ms].desc && prjMeta[ms].desc) prjByMs[ms].desc=prjMeta[ms].desc; if(!prjByMs[ms].brand && prjMeta[ms].brand) prjByMs[ms].brand=prjMeta[ms].brand; }
+  });
 
   // Build records from Inventory Flow
   var records = [];
