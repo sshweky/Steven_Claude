@@ -155,10 +155,20 @@ window.QB_CONFIG = {
   // Join key: Mstyle (FID 34).  Data sourced from Amazon Inventory Health feed.
   AMZ_CATALOG_TID: "bqp8vz625",
   AMZ_CATALOG_FID: {
-    MSTYLE: 34,   // Mstyle  -  text join key
-    SOH:    126,  // Sellable On Hand Units
+    MSTYLE:  34,  // Mstyle  -  text join key
+    SOH:    126,  // Sellable On Hand Units (Amazon)
     OPO:    137,  // Amazon Open PO Quantity
     WOS_OH: 151,  // Amazon WOS OH (weeks of supply onhand)
+    // Inventory position cards
+    QTY_OH:  58,  // Qty OH  — P+P warehouse on-hand
+    QTY_IW:  59,  // Qty in Prodn  — in-work / in production (I/W)
+    QTY_IT:  60,  // Qty in Transit  — inbound to P+P warehouse (I/T)
+    PRJ_WK:  13,  // Prj/Wk (All)  — used to compute WOS client-side
+    CUST_OO: 54,  // Cust Open PO Qty  — customer open orders (for OH+OO WOS)
+    // ATS (Available to Ship) cards
+    ATS_NOW: 90,  // ATS OH Now?  — what P+P can ship today
+    ATS_OH:  79,  // ATS Qty OH#  — ATS based on OH only
+    ATS_OO:  81,  // ATS OH+ OO#  — ATS OH + open supplier orders
   },
 
   // -- Field IDs on Inventory History - Weekly (bv2sxg2ji) ------------------
