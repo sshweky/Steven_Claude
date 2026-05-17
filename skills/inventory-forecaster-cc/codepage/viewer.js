@@ -2199,6 +2199,20 @@ function toggleDetail(key) {
   // Amazon Catalog table and injects/refreshes the bullet in AI Analysis.
   // Runs after innerHTML is set so the target <ul> already exists in the DOM.
   if (isAmazonRec && CFG.AMZ_CATALOG_TID) _loadAmzDcInv(r, safeId);
+
+  } catch (err) {
+    // Something threw while building the detail HTML. Surface the error
+    // inside the pane instead of leaving it blank.
+    console.error('[toggleDetail] render error for key', JSON.stringify(key), err);
+    el.innerHTML = `<td colspan="21" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
+      <b style="color:#e65100">&#x26A0; Detail panel render error</b><br>
+      <span style="font-size:11px;color:#555;">Key: <code>${key || '(empty)'}</code><br>
+      Error: <code>${(err && err.message) ? err.message.replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]) : String(err)}</code><br>
+      Check the browser console (F12) for the full stack trace. Try refreshing with
+      <a href="?nocache=1" style="color:#1565c0">?nocache=1</a> to rule out a stale cache.</span>
+    </td>`;
+    el.dataset.loaded = '1';
+  }
 }
 
 // -- Amazon DC Inventory Health live fetch ------------------------------------
