@@ -4197,7 +4197,7 @@ function applyFilters() {
       if (!txt.includes(search)) return false;
     }
     if (volSet.size   && !volSet.has(r.vol_tier))      return false;
-    if (priSet.size   && !priSet.has(r.priority))      return false;
+    if (priSet.size   && (r._snoozed || !priSet.has(r.priority))) return false;
     if (patSet.size   && !patSet.has(r.pattern))       return false;
     if (brandSet.size && !brandSet.has(r.brand))       return false;
     if (mgrSet.size   && !mgrSet.has(r.inv_manager))   return false;
