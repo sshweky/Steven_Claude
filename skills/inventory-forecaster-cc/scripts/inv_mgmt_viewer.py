@@ -2753,6 +2753,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 msg = json.dumps({"status": "loading",
                                   "message": "Pulling from Quickbase — please wait…"}).encode()
                 self.send_response(503)
+                self._cors()
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(msg)))
                 self.end_headers()
@@ -2761,6 +2762,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             accept = (self.headers.get("Accept-Encoding") or "").lower()
             if "gzip" in accept and _PAYLOAD_JSON_GZ:
                 self.send_response(200)
+                self._cors()
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Encoding", "gzip")
                 self.send_header("Content-Length", str(len(_PAYLOAD_JSON_GZ)))
@@ -2769,6 +2771,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             else:
                 raw = gzip.decompress(_PAYLOAD_JSON_GZ) if _PAYLOAD_JSON_GZ else b"[]"
                 self.send_response(200)
+                self._cors()
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(raw)))
                 self.end_headers()
