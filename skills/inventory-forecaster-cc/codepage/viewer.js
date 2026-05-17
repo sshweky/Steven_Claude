@@ -2464,6 +2464,7 @@ function toggleDetail(key) {
     </div>
     ${histHtml}
     ${invFlowSectionHtml}
+    <div id="inv-cards-${safeId}" style="padding:0 12px 8px 12px;"></div>
     ${tellAiBlock}
     ${commentBlock}
   </td>`;
