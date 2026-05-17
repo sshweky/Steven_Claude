@@ -2172,7 +2172,7 @@ function toggleDetail(key) {
     let histHdrCells = '<th class="row-label"></th>';
     let ordCells = '<td class="row-label" style="color:#e65100;font-weight:600">Orders</td>';
     let shpCells = '<td class="row-label" style="color:#6a1b9a;font-weight:600">Shipments</td>';
-    let atsCells = '<td class="row-label" style="color:#00695c;font-weight:600">ATS Inv</td>';
+    let atsCells = '<td class="row-label" style="color:#00695c;font-weight:600">ATS Inv Hist</td>';
     let shpTot = 0, ordTot = 0, atsTot = 0;
     for (let i = 25; i >= 0; i--) {
       const label = _fmtHistDate(26 - i);
