@@ -434,7 +434,7 @@ def fetch_open_pos_forward(keys, today=None, verbose=True, w1_date=None):
             if verbose:
                 print(f"      [vp-q4] cached → {cache_path.name} "
                       f"(reused for {QB_OPEN_POS_CACHE_HOURS}h)")
-        out = _bucket_open_pos_into_weeks(rows, keys, today, verbose=verbose)
+        out = _bucket_open_pos_into_weeks(rows, keys, today, verbose=verbose, w1_date=w1_date)
         return out
     except Exception as _e:
         if verbose:
