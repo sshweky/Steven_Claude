@@ -358,7 +358,7 @@ function _fmtCacheAge(ms) {
 // matching row to every Projections record that shares that mstyle.
 //
 // localStorage cache (above) short-circuits the bulk QB pull on warm loads  -
-// each browser pays one pull per 4-hour window instead of every page open.
+// each browser pays one pull per 6-hour window instead of every page open.
 async function attachInvFlow(records) {
   if (!records.length) return {};
 
