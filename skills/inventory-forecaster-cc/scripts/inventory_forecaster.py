@@ -4554,19 +4554,20 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     # acceleration (l4/l13 ≥ 1.20) explains the recent "spikes".
     hist, f43_corrections = attenuate_recent_spikes(hist, pos_data=pos_data)
     return {
-        "mp":              mp,
-        "hist":            hist,
-        "cust_name":       cust_name,
-        "is_amazon":       is_amazon,
+        "mp":               mp,
+        "hist":             hist,
+        "cust_name":        cust_name,
+        "is_amazon":        is_amazon,
         "is_international": is_international,
-        "pos_data":        pos_data,
-        "amz_catalog":     amz_catalog,
-        "season":          season,
-        "f35_corrections": f35_corrections,
-        "f39_corrections": f39_corrections,
-        "f41_corrections": f41_corrections,
-        "f43_corrections": f43_corrections,
-        "f47_corrections": f47_corrections,
+        "pos_data":         pos_data,
+        "amz_catalog":      amz_catalog,
+        "season":           season,
+        "f35_corrections":  f35_corrections,
+        "f39_corrections":  f39_corrections,
+        "f41_corrections":  f41_corrections,
+        "f43_corrections":  f43_corrections,
+        "f47_corrections":  f47_corrections,
+        "f_ats_corrections": f_ats_corrections,
     }
 
 
