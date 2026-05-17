@@ -2126,7 +2126,26 @@ function toggleDetail(key) {
     </div>
   </div>`;
 
-  el.innerHTML = `<td colspan="18" style="padding:0">
+  // Issue 8: FD Status block — Future Development items often have no AI narrative
+  // or projections yet; show a prominent metadata card so the panel isn't blank.
+  const isFDRecord = (r.asin_status || '').trim().toUpperCase().startsWith('FD');
+  const fdStatusHtml = isFDRecord ? `
+    <div style="margin:8px 12px 0 12px;padding:10px 12px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;font-size:12px;color:#5d4037;">
+      <div style="font-weight:700;font-size:12px;color:#f57f17;margin-bottom:6px;">&#x1F4CB; Future Development — Status @ Cust: <span style="font-weight:400">${(r.asin_status||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px 16px;font-size:11px;">
+        <div><b>Customer:</b> ${(r.cust||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
+        <div><b>Mstyle:</b> ${(r.mstyle||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
+        <div><b>Brand:</b> ${(r.brand||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
+        <div><b>Item Status:</b> ${(r.item_status||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
+        <div><b>Inv Manager:</b> ${(r.inv_manager||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
+        <div><b>Last Ord:</b> ${r.last_ord_date||' -'}</div>
+      </div>
+      <div style="max-width:600px;font-size:11px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(r.desc||'').replace(/"/g,'&quot;')}"><b>Description:</b> ${(r.desc||' -').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</div>
+      <div style="margin-top:6px;font-size:10px;color:#a0845c;font-style:italic;">FD items may have zero projections if a forecast hasn't been run for them yet. Use the Edit MAN toolbar below to enter initial projections manually.</div>
+    </div>` : '';
+
+  el.innerHTML = `<td colspan="21" style="padding:0">
+    ${fdStatusHtml}
     ${_buildPogBlockHtml(r)}
     ${narrativeHtml}
     <div style="overflow-x:auto;padding:8px 12px;">
