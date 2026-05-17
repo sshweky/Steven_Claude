@@ -229,18 +229,22 @@ def _scan_rule_fires(meta=None, alert="", baseline_mode="", model="",
 # Keywords are checked as case-insensitive substrings of the item Description.
 # First match wins — list more specific terms before broader ones.
 CATEGORY_PROFILES = {
-    # ── Outdoor cooking / grilling — peak Apr–Aug, near-zero Nov–Feb ──────────
-    # Kingsford charcoal & adjacencies.  Retailer orders Mar–Jul for consumer
-    # peak May–Aug; cliff in Sep–Feb.
-    "charcoal":      [0.20, 0.25, 0.65, 1.50, 1.90, 2.05, 1.80, 1.50, 0.80, 0.40, 0.22, 0.20],
-    "chimney":       [0.20, 0.25, 0.65, 1.50, 1.90, 2.05, 1.80, 1.50, 0.80, 0.40, 0.22, 0.20],
-    "fire starter":  [0.20, 0.25, 0.65, 1.45, 1.85, 2.00, 1.75, 1.45, 0.80, 0.40, 0.22, 0.20],
-    "firestarter":   [0.20, 0.25, 0.65, 1.45, 1.85, 2.00, 1.75, 1.45, 0.80, 0.40, 0.22, 0.20],
-    "lighter fluid": [0.20, 0.25, 0.65, 1.45, 1.85, 2.00, 1.75, 1.45, 0.80, 0.40, 0.22, 0.20],
-    "grill brush":   [0.25, 0.30, 0.70, 1.40, 1.80, 1.95, 1.70, 1.40, 0.80, 0.40, 0.25, 0.22],
-    "grill cleaner": [0.25, 0.30, 0.70, 1.40, 1.80, 1.95, 1.70, 1.40, 0.80, 0.40, 0.25, 0.22],
-    "wooden fire":   [0.20, 0.25, 0.65, 1.50, 1.90, 2.05, 1.80, 1.50, 0.80, 0.40, 0.22, 0.20],
-    "kingsford":     [0.20, 0.25, 0.65, 1.50, 1.90, 2.05, 1.80, 1.50, 0.80, 0.40, 0.22, 0.20],
+    # ── Outdoor cooking / grilling — RETAIL ORDERING lead-time adjusted ──────
+    # Consumer grilling peaks May–Aug, but RETAILERS place orders Jan–Apr
+    # (8–10 week lead before consumer demand).  Profile models ORDERING
+    # behavior, not consumer demand: peak Feb–Apr, rapid fall-off after May.
+    # Updated 2026-05-17: shifted from consumer-demand peak (May-Jun) to
+    # retail ordering peak (Feb-Apr) to match planner override patterns
+    # (-45.8% aggregate planners cutting AI on Kingsford, 19/31 records DOWN).
+    "charcoal":      [0.50, 1.20, 1.90, 2.10, 1.70, 1.30, 0.70, 0.40, 0.25, 0.22, 0.22, 0.35],
+    "chimney":       [0.50, 1.20, 1.90, 2.10, 1.70, 1.30, 0.70, 0.40, 0.25, 0.22, 0.22, 0.35],
+    "fire starter":  [0.50, 1.15, 1.85, 2.05, 1.65, 1.25, 0.65, 0.35, 0.25, 0.22, 0.22, 0.35],
+    "firestarter":   [0.50, 1.15, 1.85, 2.05, 1.65, 1.25, 0.65, 0.35, 0.25, 0.22, 0.22, 0.35],
+    "lighter fluid": [0.50, 1.15, 1.85, 2.05, 1.65, 1.25, 0.65, 0.35, 0.25, 0.22, 0.22, 0.35],
+    "grill brush":   [0.45, 1.10, 1.80, 2.00, 1.60, 1.20, 0.65, 0.35, 0.25, 0.22, 0.25, 0.35],
+    "grill cleaner": [0.45, 1.10, 1.80, 2.00, 1.60, 1.20, 0.65, 0.35, 0.25, 0.22, 0.25, 0.35],
+    "wooden fire":   [0.50, 1.20, 1.90, 2.10, 1.70, 1.30, 0.70, 0.40, 0.25, 0.22, 0.22, 0.35],
+    "kingsford":     [0.50, 1.20, 1.90, 2.10, 1.70, 1.30, 0.70, 0.40, 0.25, 0.22, 0.22, 0.35],
 
     # ── Paper-goods / outdoor entertaining — peak Apr–Aug ────────────────────
     # Glad/disposable plates, bowls, cups for cookouts/picnics.
@@ -6228,7 +6232,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         for d in meta.get("drivers", [])
     )
     if (not is_amazon and not _f34_is_new_launch and not _f61_is_seasonal
-            and model != "Inactive" and sum(fcst) > 0):
+            and not _f61_has_cat_prof and model != "Inactive" and sum(fcst) > 0):
         _f61_fired = 0
         for _wi in range(8, 26):       # W9-W26 (0-indexed: 8-25)
             if fcst[_wi] > 0:
