@@ -5530,7 +5530,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # is in OFFPRICE_CUST_SUBSTRS.
         _s6_is_offprice = _is_offprice_cust(cust_name)
         _s6_l52_avg = (sum(hist_for_model) / len(hist_for_model)) if hist_for_model else 0
-        if (model == "Inactive" and _s6_is_offprice and _r3_l52_nz >= 2 and
+        if (not _zero_velocity and model == "Inactive" and _s6_is_offprice and _r3_l52_nz >= 2 and
                 _s6_l52_avg > 0 and not _r3_skip):
             _s6_placeholder = snap(_s6_l52_avg * 0.5, mp)
             if _s6_placeholder > 0:
