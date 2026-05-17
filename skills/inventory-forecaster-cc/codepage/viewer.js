@@ -947,6 +947,29 @@ function adaptRow(row) {
   const _l4 = histOrd.slice(-4);
   const ord_per_wk_l4 = _l4.length ? Math.round((_l4.reduce((a,b)=>a+b,0) / 4) * 10) / 10 : 0;
 
+  // Shpd/Wk L4W and L13W — actual shipped units from ship history
+  const _shp4       = histShp.slice(-4);
+  const shpd_wk_l4  = _shp4.length  ? Math.round((_shp4.reduce((a,b)=>a+b,0)  /  4) * 10) / 10 : 0;
+  const _shp13      = histShp.slice(-13);
+  const shpd_wk_l13 = _shp13.length ? Math.round((_shp13.reduce((a,b)=>a+b,0) / 13) * 10) / 10 : 0;
+
+  // Last Ord Date: date of most recent week with a non-zero order, formatted MM/DD.
+  // histOrd is oldest→newest so the most recent week is at the end. We walk
+  // backwards until we find a non-zero entry, then compute its calendar date
+  // by going (histOrd.length - 1 - i) full weeks before last Monday.
+  let last_ord_date = '';
+  for (let _i = histOrd.length - 1; _i >= 0; _i--) {
+    if (histOrd[_i] > 0) {
+      const _weeksBack = histOrd.length - 1 - _i;   // 0 = last wk, 1 = 2 wks ago, ...
+      const _d = new Date();
+      const _dow = _d.getDay();   // 0=Sun, 1=Mon, ...
+      // Snap back to last Monday, then subtract extra weeks
+      _d.setDate(_d.getDate() - (_dow === 0 ? 6 : _dow - 1) - 7 - _weeksBack * 7);
+      last_ord_date = `${String(_d.getMonth()+1).padStart(2,'0')}/${String(_d.getDate()).padStart(2,'0')}`;
+      break;
+    }
+  }
+
   const ai_total     = forecast.reduce((a,b) => a+b, 0);
   const manual_total = manual.reduce((a,b) => a+b, 0);
   const ai_per_wk    = ai_total / 26;
