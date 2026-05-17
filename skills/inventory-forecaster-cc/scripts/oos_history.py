@@ -496,12 +496,20 @@ def fetch_open_pos_forward(keys, today=None, verbose=True, w1_date=None):
             except Exception:
                 continue
 
-            # Forward week: 0 = days [today+1, today+7], 1 = [today+8, today+14], etc.
-            days_forward = (bucket_date - today).days
-            if days_forward <= 0 or days_forward > 26 * 7:
-                n_skipped_old += 1
-                continue
-            n = (days_forward - 1) // 7
+            # Bucket relative to W1_DATE (forecast grid anchor) when available,
+            # otherwise fall back to today-relative bucketing.
+            if w1_date is not None:
+                days_from_w1 = (bucket_date - w1_date).days
+                if days_from_w1 < 0 or days_from_w1 >= 26 * 7:
+                    n_skipped_old += 1
+                    continue
+                n = days_from_w1 // 7
+            else:
+                days_forward = (bucket_date - today).days
+                if days_forward <= 0 or days_forward > 26 * 7:
+                    n_skipped_old += 1
+                    continue
+                n = (days_forward - 1) // 7
             if n < 0 or n > 25:
                 continue
 
