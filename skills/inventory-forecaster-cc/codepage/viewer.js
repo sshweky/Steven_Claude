@@ -2082,6 +2082,8 @@ function toggleDetail(key) {
               title="Revert every week back to its original QB-loaded value. Drops all unsaved edits for this record only.">Reset</button>
       <button class="et-btn clear-all" onclick="fillRowConst('${safeKey}', 0)"
               title="Set every week to 0.">Zero All</button>
+      <button class="et-btn save-row" onclick="saveRecordEdits('${safeKey}')"
+              title="Save only this record's unsaved edits to Quickbase. Other records' edits stay untouched.">Save &#x2713;</button>
       <span class="et-tip">Tip: paste from Excel into any cell to distribute | Ctrl+R = fill right | Enter = next cell</span>
     </div>`;
 
