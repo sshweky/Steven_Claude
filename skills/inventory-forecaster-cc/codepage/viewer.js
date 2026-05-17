@@ -2505,33 +2505,38 @@ async function _loadAmzDcInv(r, safeId) {
   let soh = 0, opo = 0, wos = 0;
   let qtyOh = 0, qtyIw = 0, qtyIt = 0, prjWk = 0, custOo = 0;
   let atsNow = 0, atsOh = 0, atsOo = 0;
+  let fetchOk = false;
   try {
+    // Filter out undefined FIDs so a stale viewer.html doesn't kill the query
+    const selectFids = [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH,
+                        AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
+                        AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO].filter(v => v != null);
     const resp = await qb('/records/query', {
       from:   CFG.AMZ_CATALOG_TID,
-      select: [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH,
-               AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
-               AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO],
+      select: selectFids,
       where:  `{${AF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}`,
       options: { top: 1 },
     });
     const rows = resp.data || [];
-    if (!rows.length) return;
-    const row = rows[0];
-    const nv  = fid => parseFloat((row[fid] && row[fid].value) || 0) || 0;
-    soh    = nv(AF.SOH);
-    opo    = nv(AF.OPO);
-    wos    = nv(AF.WOS_OH);
-    qtyOh  = nv(AF.QTY_OH);
-    qtyIw  = nv(AF.QTY_IW);
-    qtyIt  = nv(AF.QTY_IT);
-    prjWk  = nv(AF.PRJ_WK);
-    custOo = nv(AF.CUST_OO);
-    atsNow = nv(AF.ATS_NOW);
-    atsOh  = nv(AF.ATS_OH);
-    atsOo  = nv(AF.ATS_OO);
+    if (rows.length) {
+      const row = rows[0];
+      const nv  = fid => fid != null ? (parseFloat((row[fid] && row[fid].value) || 0) || 0) : 0;
+      soh    = nv(AF.SOH);
+      opo    = nv(AF.OPO);
+      wos    = nv(AF.WOS_OH);
+      qtyOh  = nv(AF.QTY_OH);
+      qtyIw  = nv(AF.QTY_IW);
+      qtyIt  = nv(AF.QTY_IT);
+      prjWk  = nv(AF.PRJ_WK);
+      custOo = nv(AF.CUST_OO);
+      atsNow = nv(AF.ATS_NOW);
+      atsOh  = nv(AF.ATS_OH);
+      atsOo  = nv(AF.ATS_OO);
+      fetchOk = true;
+    }
   } catch (e) {
     console.warn('[DC Inv] fetch failed for mstyle', mstyle, e);
-    return;
+    // fall through — render cards with zeros rather than silently aborting
   }
 
   // ── AI Analysis bullet (existing behaviour) ───────────────────────────────
