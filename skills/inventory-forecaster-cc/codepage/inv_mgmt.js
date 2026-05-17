@@ -621,7 +621,7 @@ function visibleCols() {
 function buildTableHead() {
   var head=document.getElementById('theadMain');
   var cols=visibleCols();
-  var h1='<tr>';
+  var h1='<tr class="sort-row">';
   cols.forEach(function(c){
     var a=c.align==='right'?' class="right"':'';
     var arrow=(currentSort.id===c.id)?'<span class="sort-arrow">'+(currentSort.dir>0?'&#9650;':'&#9660;')+'</span>':'';
@@ -636,7 +636,7 @@ function buildTableHead() {
     h2+='<th'+a+'><input data-filter="'+c.id+'" type="text" placeholder="filter..." value="'+esc(v)+'"></th>';
   });
   h2+='</tr>';
-  head.innerHTML=h1+h2;
+  head.innerHTML=h2+h1;
   head.querySelectorAll('th[data-col]').forEach(function(th){
     th.onclick=function(){
       var id=th.dataset.col;
@@ -720,7 +720,7 @@ function renderTable() {
   var html='';
   FILTERED.forEach(function(r){
     var safeMs=r.mstyle.replace(/[^a-zA-Z0-9]/g,'_');
-    html+='<tr class="row" data-ms="'+esc(r.mstyle)+'" onclick="toggleDetail(this.dataset.ms)">';
+    html+='<tr class="row row-'+r.priority+'" data-ms="'+esc(r.mstyle)+'" onclick="toggleDetail(this.dataset.ms)">';
     cols.forEach(function(c){html+=c.render(r);});
     html+='</tr>';
     html+='<tr class="detail-pane" id="detail-'+safeMs+'" style="display:none"><td colspan="'+nCols+'"></td></tr>';
