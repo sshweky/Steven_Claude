@@ -2592,15 +2592,15 @@ async function _loadAmzDcInv(r, safeId) {
 
   // card(label, value, valueColor, title)
   const card = (label, value, color = '#222', title = '') =>
-    `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:5px;padding:6px 10px;min-width:90px;flex:1 1 90px;" ${title ? `title="${title}"` : ''}>
+    `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:5px;padding:5px 10px;" ${title ? `title="${title}"` : ''}>
       <div style="font-size:10px;color:#888;font-weight:600;white-space:nowrap;margin-bottom:2px;">${label}</div>
-      <div style="font-size:13px;font-weight:700;color:${color};white-space:nowrap;">${value}</div>
+      <div style="font-size:18px;font-weight:700;color:${color};white-space:nowrap;">${value}</div>
     </div>`;
 
   const divider = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
 
   const invGroup = `
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;">
+    <div style="display:flex;gap:6px;flex-wrap:nowrap;align-items:stretch;">
       ${card('Qty OH',      fmt(qtyOh),               '#37474f')}
       ${card('Qty I/W',     fmt(qtyIw),               '#37474f', 'Qty in Production / In-Work')}
       ${card('Qty I/T',     fmt(qtyIt),               '#37474f', 'Qty in Transit (inbound to warehouse)')}
@@ -2610,7 +2610,7 @@ async function _loadAmzDcInv(r, safeId) {
     </div>`;
 
   const atsGroup = `
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;">
+    <div style="display:flex;gap:6px;flex-wrap:nowrap;align-items:stretch;">
       ${card('ATS Now',     fmt(atsNow),              '#1565c0', 'ATS available to ship today')}
       ${card('ATS OH',      fmt(atsOh),               '#1565c0', 'ATS Qty OH — available from on-hand')}
       ${card('ATS OH+OO',   fmt(atsOo),               '#1565c0', 'ATS OH + open supplier orders')}
@@ -2620,10 +2620,9 @@ async function _loadAmzDcInv(r, safeId) {
     </div>`;
 
   cardsEl.innerHTML = `
-    <div style="border-top:1px solid #ede7f6;padding-top:8px;">
-      <div style="font-size:11px;color:#555;font-weight:600;margin-bottom:6px;">Inventory Position</div>
+    <div style="border-top:1px solid #e0e0e0;padding-top:8px;">
       ${invGroup}
-      <div style="font-size:11px;color:#1565c0;font-weight:600;margin:10px 0 6px 0;">ATS (Available to Ship)</div>
+      <div style="margin-top:14px;"></div>
       ${atsGroup}
     </div>`;
 }
