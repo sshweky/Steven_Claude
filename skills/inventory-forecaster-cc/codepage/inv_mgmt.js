@@ -1087,7 +1087,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('replenOnly').onchange=applyFilters;
   document.getElementById('gapsOnly').onchange=applyFilters;
   document.getElementById('overstockOnly').onchange=applyFilters;
-  document.getElementById('hideMulti').onchange=function(){buildTableHead();applyFilters();};
+  document.getElementById('hideInactive').onchange=applyFilters;
 
   // Wire up static Action dropdown panel checkboxes
   buildDdPanel('dd-action',[
@@ -1105,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('replenOnly').checked=false;
     document.getElementById('gapsOnly').checked=false;
     document.getElementById('overstockOnly').checked=false;
-    document.getElementById('hideMulti').checked=true;
+    document.getElementById('hideInactive').checked=true;
     selActions.clear();selCountries.clear();selBrands.clear();selMgrs.clear();selPriorities.clear();
     ['dd-action','dd-country','dd-brand','dd-mgr','dd-priority'].forEach(function(id){
       var el=document.getElementById(id);if(!el)return;
