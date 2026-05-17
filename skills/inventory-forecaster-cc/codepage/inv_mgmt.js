@@ -1103,8 +1103,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Wire up static Priority dropdown panel checkboxes
   // setState only updates selPriorities; renderStats() (called by applyFilters) redraws stats bar
   buildDdPanel('dd-priority',[
-    {v:'CRITICAL',label:'Critical'},{v:'HIGH',label:'High'},{v:'MEDIUM',label:'Medium'},{v:'LOW',label:'Low'}
-  ],'All Priorities',function(s){selPriorities=s;});
+    {v:'CRITICAL',label:'Critical'},{v:'HIGH',label:'High'},{v:'MEDIUM',label:'Medium'},{v:'LOW',label:'Low'},{v:'NO_OOS',label:'No OOS'}
+  ],'All OOS Pri',function(s){selPriorities=s;});
 
   document.getElementById('clearBtn').onclick=function(){
     document.getElementById('searchInput').value='';
