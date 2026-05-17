@@ -1773,6 +1773,7 @@ function renderPage(page) {
   });
   updatePageNav();
   updateFlagCount();
+  updateReplyCount();
 }
 function renderTable() { renderPage(0); }
 
