@@ -1753,11 +1753,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     _f48_driver  = None
     if len(history) >= 13:
         _f48_l13         = list(history[-13:])
-        # L4 ALL-WEEKS avg — zeros count as real demand signal (a buyer-side
-        # pause is meaningful information about ongoing pace).  VP-validated
-        # against BB13437 where L4 had 1 zero week and L4_avg=1,263 matches
-        # VP's stated L4 ~1,300/wk, vs L4_nz_avg=1,684.
-        _f48_l4_avg      = (sum(history[-4:]) / 4.0) if len(history) >= 4 else 0.0
+        # L8 ALL-WEEKS avg — wider than original L4 to smooth over biweekly
+        # Walmart/Target order variability (single soft week in L4 was pulling
+        # the anchor too low; L8 gives a more stable recent-pace signal while
+        # still staying well inside the OOS spike window).  Zeros count as
+        # real demand signal (buyer-side pause is meaningful).
+        _f48_l4_avg      = (sum(history[-8:]) / 8.0) if len(history) >= 8 else 0.0
         _f48_l13_nz      = [v for v in history[-13:] if v > 0]
         _f48_l13_nz_avg  = (sum(_f48_l13_nz) / len(_f48_l13_nz)) if _f48_l13_nz else 0.0
         _f48_l26_avg     = (sum(history[-26:]) / 26.0) if len(history) >= 26 else _f48_l13_nz_avg
