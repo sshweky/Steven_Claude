@@ -299,3 +299,23 @@ QB codepages (views, pages deployed via `API_AddReplaceDBPage`) are stored and s
 - Stick to ASCII + HTML entities for all rendered strings.
 
 This rule was set by the user on 2026-05-16 after seeing diamond characters in a deployed FD-status panel. Apply it to every file that gets pasted or deployed to QB pages, including viewer.js, viewer.html, and any generated HTML stored in QB fields.
+
+---
+
+## 11. QB Codepage / View encoding rule (PERMANENT — never override)
+
+QB codepages (views, pages deployed via `API_AddReplaceDBPage`) are stored and served in **Latin-1 / Windows-1252**. Any multi-byte UTF-8 character (code point > U+00FF) will be mangled into a diamond question mark or corrupted silently.
+
+**Never use literal Unicode characters in QB views or codepages.** This includes:
+- Em dash `—` (U+2014) — use ` - ` instead
+- En dash `–` (U+2013) — use `-` instead
+- Checkmark `✓` (U+2713) — use HTML entity `&#x2713;` in HTML, or JS escape `✓` in `.textContent` assignments
+- Right arrow `->` symbols (U+2192) — use `->` instead
+- Any character > U+00FF
+
+**Safe alternatives:**
+- HTML entities like `&#x2713;` `&#x26A0;` are safe — they are ASCII bytes in the source file; the browser decodes them.
+- JavaScript Unicode escapes like `'￿'` or `'✓'` are safe — they are 6 ASCII characters in the source; the JS engine decodes them at runtime.
+- Stick to ASCII + HTML entities for all rendered strings.
+
+This rule was set by the user on 2026-05-16 after seeing diamond characters in a deployed FD-status panel. Apply it to every file that gets pasted or deployed to QB pages, including viewer.js, viewer.html, and any generated HTML stored in QB fields.
