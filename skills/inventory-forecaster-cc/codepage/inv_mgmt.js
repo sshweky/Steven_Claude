@@ -613,7 +613,7 @@ var COLS = [
   { id:'priority', label:'OOS Pri', align:'left', numeric:true,
     get:function(r){return {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,NO_OOS:4}[r.priority]!=null?{CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,NO_OOS:4}[r.priority]:9;},
     filterValue:function(r){return r.priority;},
-    render:function(r){return '<td class="pri-'+r.priority+'">'+r.priority+'</td>';} },
+    render:function(r){var lbl=r.priority==='NO_OOS'?'No OOS':r.priority;return '<td class="pri-'+r.priority+'">'+lbl+'</td>';} },
   { id:'mstyle', label:'Mstyle', align:'left',
     get:function(r){return r.mstyle;},
     render:function(r){return '<td><b>'+esc(r.mstyle)+'</b>'+(r.is_multi?' <span class="badge badge-purple" title="Multi-pack (kit)">KIT</span>':'')+'</td>';} },
