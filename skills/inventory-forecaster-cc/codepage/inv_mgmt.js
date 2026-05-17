@@ -285,15 +285,19 @@ async function loadData() {
 
   setStep(2,'active'); setBar(10);
   var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);
-  // Filter on Item Status (fid 294) — field 927 is a formula field QB can't filter on directly.
-  // Include all statuses where the field-927 formula returns true:
-  var IF_STATUS_FILTER = [
-    "Active: Promo","Active: Promo Commt","Active: Replen","Active: Replen Commt",
-    "Active: Multi-Pk Replen","Future Delete",
-    "In Prodn: Promo","In Prodn: Promo Commt","In Prodn: Replen"
-  ].map(function(s){return "{294}.EX.'"+s+"'";}).join(' OR ');
-  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, IF_STATUS_FILTER, 'Loading Inventory Flow');
-  setStatus('IF loaded: ' + ifRows.length + ' records');
+  // QB can't filter on formula fields (fid 927) or lookup fields (fid 294), so load all and
+  // apply the field-927 Case() formula logic client-side after the pull.
+  var ifRowsAll = await qbQueryAll(INVF_TID, ifFieldIds, '', 'Loading Inventory Flow');
+  var IF_ACTIVE_STATUSES = {
+    "Active: Promo":1,"Active: Promo Commt":1,"Active: Replen":1,"Active: Replen Commt":1,
+    "Active: Multi-Pk Replen":1,"Future Delete":1,
+    "In Prodn: Promo":1,"In Prodn: Promo Commt":1,"In Prodn: Replen":1
+  };
+  var ifRows = ifRowsAll.filter(function(row){
+    var s = String((row[IF_F.ItemStatus]||{}).value||'').trim();
+    return IF_ACTIVE_STATUSES[s] === 1;
+  });
+  setStatus('IF: ' + ifRows.length + ' active of ' + ifRowsAll.length + ' total');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
   // Active projections only (StatusCust starts with 'A') — provides demand + brand/description
