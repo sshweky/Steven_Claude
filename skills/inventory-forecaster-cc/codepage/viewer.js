@@ -2498,34 +2498,43 @@ function toggleDetail(key) {
 // forecast run, this replaces it with a fresh live read so data never goes stale.
 async function _loadAmzDcInv(r, safeId) {
   if (!CFG.AMZ_CATALOG_TID) return;
-  const AF      = CFG.AMZ_CATALOG_FID;
-  const mstyle  = (r.mstyle || '').trim();
+  const AF     = CFG.AMZ_CATALOG_FID;
+  const mstyle = (r.mstyle || '').trim();
   if (!mstyle) return;
 
   let soh = 0, opo = 0, wos = 0;
+  let qtyOh = 0, qtyIw = 0, qtyIt = 0, prjWk = 0, custOo = 0;
+  let atsNow = 0, atsOh = 0, atsOo = 0;
   try {
     const resp = await qb('/records/query', {
-      from:    CFG.AMZ_CATALOG_TID,
-      select:  [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH],
-      where:   `{${AF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}`,
+      from:   CFG.AMZ_CATALOG_TID,
+      select: [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH,
+               AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
+               AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO],
+      where:  `{${AF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}`,
       options: { top: 1 },
     });
     const rows = resp.data || [];
-    if (!rows.length) return;   // no Amazon Catalog row for this mstyle
+    if (!rows.length) return;
     const row = rows[0];
-    soh = parseFloat((row[AF.SOH]    && row[AF.SOH].value)    || 0) || 0;
-    opo = parseFloat((row[AF.OPO]    && row[AF.OPO].value)    || 0) || 0;
-    wos = parseFloat((row[AF.WOS_OH] && row[AF.WOS_OH].value) || 0) || 0;
+    const nv  = fid => parseFloat((row[fid] && row[fid].value) || 0) || 0;
+    soh    = nv(AF.SOH);
+    opo    = nv(AF.OPO);
+    wos    = nv(AF.WOS_OH);
+    qtyOh  = nv(AF.QTY_OH);
+    qtyIw  = nv(AF.QTY_IW);
+    qtyIt  = nv(AF.QTY_IT);
+    prjWk  = nv(AF.PRJ_WK);
+    custOo = nv(AF.CUST_OO);
+    atsNow = nv(AF.ATS_NOW);
+    atsOh  = nv(AF.ATS_OH);
+    atsOo  = nv(AF.ATS_OO);
   } catch (e) {
     console.warn('[DC Inv] fetch failed for mstyle', mstyle, e);
     return;
   }
 
-  // WOS colour thresholds match Python build_ai_analysis:
-  //   < 3 wks  -> red    (OOS risk)
-  //   3-7 wks  -> amber  (watch)
-  //   8-15 wks -> normal (healthy)
-  //  >= 16 wks  -> orange (overstocked)
+  // ── AI Analysis bullet (existing behaviour) ───────────────────────────────
   const fmt    = n => Math.round(n).toLocaleString('en-US');
   const fmtWos = n => n.toFixed(1);
   let wosHtml;
@@ -2534,41 +2543,84 @@ async function _loadAmzDcInv(r, safeId) {
   else if (wos < 16) wosHtml = `<b>WOS</b> ${fmtWos(wos)} wks`;
   else               wosHtml = `<b>WOS</b> <span style="color:#f57f17">${fmtWos(wos)} wks (overstocked)</span>`;
 
-  // Always show all three fields  -  display 0 when null/missing.
-  // Use HTML entity separator (no special Unicode chars that can mangle in QB).
-  const sep = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
+  const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
   const bullet = '<b>Amazon DC inventory:</b> ' +
     `<b>Amazon OH</b> ${fmt(soh)} u` + sep +
     `<b>Open PO</b> ${fmt(opo)} u` + sep +
     wosHtml;
 
-  // Find the AI Analysis <ul> (id stamped during panel render above)
   const ul = document.getElementById('ai-bullets-' + safeId);
-  if (!ul) return;
-
-  // Remove any stale DC inventory <li> already in the list (e.g. from the
-  // last forecast run's ai_analysis text).  Prevents duplicate bullets.
-  Array.from(ul.querySelectorAll('li')).forEach(li => {
-    if (/amazon dc inventory/i.test(li.textContent)) li.remove();
-  });
-
-  // Insert the DC inventory bullet right after the "Amazon POS Sales:" bullet
-  // so the two Amazon data lines appear together. Falls back to appending at
-  // the end if no POS bullet is present (e.g. items with no POS data in QB).
-  const li = document.createElement('li');
-  li.style.marginBottom = '4px';
-  li.setAttribute('data-amz-dc-inv', '1');
-  li.innerHTML = bullet;
-  const posBullet = Array.from(ul.querySelectorAll('li')).find(
-    el => /amazon pos sales/i.test(el.textContent) || /consumer demand \(pos\)/i.test(el.textContent)
-  );
-  if (posBullet && posBullet.nextSibling) {
-    ul.insertBefore(li, posBullet.nextSibling);
-  } else if (posBullet) {
-    ul.appendChild(li);   // POS bullet is already last  -  append right after
-  } else {
-    ul.appendChild(li);   // No POS bullet  -  append at end as before
+  if (ul) {
+    Array.from(ul.querySelectorAll('li')).forEach(li => {
+      if (/amazon dc inventory/i.test(li.textContent)) li.remove();
+    });
+    const li = document.createElement('li');
+    li.style.marginBottom = '4px';
+    li.setAttribute('data-amz-dc-inv', '1');
+    li.innerHTML = bullet;
+    const posBullet = Array.from(ul.querySelectorAll('li')).find(
+      el => /amazon pos sales/i.test(el.textContent) || /consumer demand \(pos\)/i.test(el.textContent)
+    );
+    if (posBullet && posBullet.nextSibling) ul.insertBefore(li, posBullet.nextSibling);
+    else ul.appendChild(li);
   }
+
+  // ── Inventory + ATS mini cards ────────────────────────────────────────────
+  const cardsEl = document.getElementById('inv-cards-' + safeId);
+  if (!cardsEl) return;
+
+  // WOS helper: compute weeks of supply; returns null when rate is 0
+  const calcWos = (qty, rate) => (rate > 0 ? qty / rate : null);
+  const wosColor = w => {
+    if (w === null)  return '#bbb';
+    if (w < 3)       return '#c62828';
+    if (w < 8)       return '#e65100';
+    if (w < 16)      return '#1b5e20';
+    return '#f57f17';                    // overstocked
+  };
+  const wosText = w => w === null ? '—' : w.toFixed(1) + ' wks';
+
+  const ohWos     = calcWos(qtyOh,              prjWk);
+  const ohOoWos   = calcWos(qtyOh + custOo,     prjWk);
+  const atsOhWos  = calcWos(atsOh,              prjWk);
+  const atsOoWos  = calcWos(atsOo,              prjWk);
+
+  // card(label, value, valueColor, title)
+  const card = (label, value, color = '#222', title = '') =>
+    `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:5px;padding:6px 10px;min-width:90px;flex:1 1 90px;" ${title ? `title="${title}"` : ''}>
+      <div style="font-size:10px;color:#888;font-weight:600;white-space:nowrap;margin-bottom:2px;">${label}</div>
+      <div style="font-size:13px;font-weight:700;color:${color};white-space:nowrap;">${value}</div>
+    </div>`;
+
+  const divider = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
+
+  const invGroup = `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;">
+      ${card('Qty OH',      fmt(qtyOh),               '#37474f')}
+      ${card('Qty I/W',     fmt(qtyIw),               '#37474f', 'Qty in Production / In-Work')}
+      ${card('Qty I/T',     fmt(qtyIt),               '#37474f', 'Qty in Transit (inbound to warehouse)')}
+      ${divider}
+      ${card('OH WOS',      wosText(ohWos),            wosColor(ohWos),   'Weeks of supply: Qty OH ÷ Prj/Wk')}
+      ${card('OH+OO WOS',   wosText(ohOoWos),          wosColor(ohOoWos), 'Weeks of supply: (Qty OH + Cust Open Orders) ÷ Prj/Wk')}
+    </div>`;
+
+  const atsGroup = `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;">
+      ${card('ATS Now',     fmt(atsNow),              '#1565c0', 'ATS available to ship today')}
+      ${card('ATS OH',      fmt(atsOh),               '#1565c0', 'ATS Qty OH — available from on-hand')}
+      ${card('ATS OH+OO',   fmt(atsOo),               '#1565c0', 'ATS OH + open supplier orders')}
+      ${divider}
+      ${card('ATS OH WOS',    wosText(atsOhWos),      wosColor(atsOhWos),  'ATS OH ÷ Prj/Wk')}
+      ${card('ATS OH+OO WOS', wosText(atsOoWos),      wosColor(atsOoWos), 'ATS OH+OO ÷ Prj/Wk')}
+    </div>`;
+
+  cardsEl.innerHTML = `
+    <div style="border-top:1px solid #ede7f6;padding-top:8px;">
+      <div style="font-size:11px;color:#555;font-weight:600;margin-bottom:6px;">Inventory Position</div>
+      ${invGroup}
+      <div style="font-size:11px;color:#1565c0;font-weight:600;margin:10px 0 6px 0;">ATS (Available to Ship)</div>
+      ${atsGroup}
+    </div>`;
 }
 
 // -- Comment history loader --------------------------------------------------
