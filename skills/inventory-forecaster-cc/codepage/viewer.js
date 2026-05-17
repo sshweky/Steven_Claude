@@ -1739,7 +1739,7 @@ function renderPage(page) {
       <td></td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.key}</td>
       <td style="font-size:11px;white-space:nowrap">${r.inv_manager||''}</td>
-      <td style="font-size:11px;white-space:nowrap">${r.brand||''}</td>
+      <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.brand||'').replace(/"/g,'&quot;')}">${r.brand||''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.cust}</td>
       <td>${r.mstyle}</td>
       <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.desc||'').replace(/"/g,'&quot;')}">${r.desc||''}</td>
