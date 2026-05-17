@@ -649,7 +649,7 @@ def _adapt_forecast_to_validation(rec):
                 else:
                     trend = " — stable"
             narrative_parts.append(
-                f"<b>Consumer demand (POS):</b> "
+                f"<b>Amazon POS Sales:</b> "
                 f"L4W {l4:.0f} | L13W {l13_str} | "
                 f"L26W {l26:.0f} | L52W {l52:.0f}/wk{trend}."
             )
