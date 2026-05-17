@@ -1049,7 +1049,10 @@ function adaptRow(row) {
     proj_wk:           Math.round(proj_per_wk * 10) / 10,
     shp_wk:            ord_l13,
     ord_wk_l4:         ord_per_wk_l4,
-    shpd_wk:           0,
+    shpd_wk_l4:        shpd_wk_l4,
+    shpd_wk_l13:       shpd_wk_l13,
+    shpd_wk:           shpd_wk_l13,      // legacy alias kept for CSV export
+    last_ord_date:     last_ord_date,
     ai_fcst:           forecast,
     ai_total:          ai_total,
     ai_wk:             Math.round(ai_per_wk * 10) / 10,
