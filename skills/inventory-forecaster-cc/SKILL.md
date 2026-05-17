@@ -755,6 +755,16 @@ Sourced from `scripts/analyze_manual_vs_ai.py` run on 2,000 active projections.
 
 ---
 
+## Model Fixes (applied 2026-05-17 — Kingsford lead-time + Amazon buybox)
+
+| Fix | Rule Code | Description |
+|---|---|---|
+| **Kingsford profile shift** | `CATEGORY_PROFILES["kingsford"]` | Shifted all grilling profiles (kingsford, charcoal, chimney, fire starter, grill brush, etc.) from consumer-demand peak (May–Jun) to **retail ordering peak (Feb–Apr)**. Retailers place orders 8–10 weeks before consumer grilling season. Prior profile over-projected May–Aug; planners were cutting AI by -45.8% aggregate. New profile: Jan 0.50 → Feb 1.20 → Mar 1.90 → **Apr 2.10** → May 1.70 → Jun 1.30 → Jul 0.70 → Aug 0.40 → Sep–Nov 0.22–0.25. |
+| **F61 category-profile guard** | `F61` | Added `not _f61_has_cat_prof` to F61 horizon-decay condition. Category-profiled items (Kingsford, charcoal, sunscreen, holiday, ice melt, etc.) are already getting the correct seasonal shape — F61's ×0.88 back-half decay should not overwrite a known seasonal curve. |
+| **F67 — Amazon buy-box $0 dampener** | `F67` | When `Amazon_Buybox == 0` (listing live but no active buy-box price — pricing hold, compliance review, 3P flush) and the item is NOT already in F38f's "Not Buyable" path: W1–W4 cut by 70% (×0.30), W5–W26 unchanged. Assumes buybox restoration within ~4 weeks. Item flagged with driver note. |
+
+---
+
 ## Model Fixes (applied 2026-05-17 — ATS catch-up spike cap)
 
 | Fix | Description |
