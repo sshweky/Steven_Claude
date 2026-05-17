@@ -2249,10 +2249,10 @@ function toggleDetail(key) {
   }
   let histHtml  = '';
   if (histShp.length || histOrd.length || atsHist.length) {
-    let histHdrCells = '<th class="row-label"></th>';
-    let ordCells = '<td class="row-label" style="color:#e65100;font-weight:600;white-space:normal">Orders</td>';
-    let shpCells = '<td class="row-label" style="color:#6a1b9a;font-weight:600;white-space:normal">Shipments</td>';
-    let atsCells = '<td class="row-label" style="color:#00695c;font-weight:600;white-space:normal">ATS Inv Hist</td>';
+    let histHdrCells = '<th class="row-label" style="width:1%;white-space:nowrap"></th>';
+    let ordCells = '<td class="row-label" style="color:#e65100;font-weight:600;white-space:nowrap">Orders</td>';
+    let shpCells = '<td class="row-label" style="color:#6a1b9a;font-weight:600;white-space:nowrap">Shipments</td>';
+    let atsCells = '<td class="row-label" style="color:#00695c;font-weight:600;white-space:nowrap">ATS Inv Hist</td>';
     let shpTot = 0, ordTot = 0, atsTot = 0;
     for (let i = 25; i >= 0; i--) {
       const label = _fmtHistDate(26 - i);
