@@ -777,14 +777,14 @@ function renderStats() {
   var npf=_filterRecords(true);
   var inScope=FILTERED.length,gapsN=FILTERED.filter(function(r){return r.gap_weeks.length>0;}).length;
   var overN=FILTERED.filter(function(r){return r.overstocked;}).length;
-  var pri={CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0};
+  var pri={CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0,NO_OOS:0};
   npf.forEach(function(r){pri[r.priority]=(pri[r.priority]||0)+1;});
   var total=npf.length;
-  var PRI_TIPS={CRITICAL:'CRITICAL: L13W velocity >500/wk with 3+ OOS gap weeks.',HIGH:'HIGH: L13W velocity >200/wk with 2+ OOS gap weeks.',MEDIUM:'MEDIUM: L13W velocity >100/wk with 2+ OOS gap weeks, or overstocked >100/wk.',LOW:'LOW: gap weeks below volume threshold, or no gaps/overstock.'};
+  var PRI_TIPS={CRITICAL:'CRITICAL: L13W >500/wk with 3+ OOS gap weeks.',HIGH:'HIGH: L13W >200/wk with 2+ OOS gap weeks.',MEDIUM:'MEDIUM: L13W >100/wk with 2+ OOS gap weeks.',LOW:'LOW: has OOS gaps, L13W ≤200/wk, Active status (not Future Delete).',NO_OOS:'No OOS: Future Delete status or zero gap weeks — no action needed.'};
   function btn(key,label,color){var active=selPriorities.has(key);return '<button class="pri-btn '+(active?'active':'')+'" data-pri="'+key+'" title="'+PRI_TIPS[key]+'" style="background:'+(active?color:'#ffffff')+';color:'+(active?'#fff':color)+';border:1.5px solid '+color+';">'+label+' <b style="margin-left:4px;">'+(pri[key]||0).toLocaleString()+'</b></button>';}
   var allActive=selPriorities.size===0;
-  var allBtn='<button class="pri-btn '+(allActive?'active':'')+'" data-pri="__ALL__" title="All priorities" style="background:'+(allActive?'#37474f':'#ffffff')+';color:'+(allActive?'#fff':'#37474f')+';border:1.5px solid #37474f;">All <b style="margin-left:4px;">'+total.toLocaleString()+'</b></button>';
-  document.getElementById('statsBar').innerHTML=allBtn+btn('CRITICAL','&#128308; Critical','#b71c1c')+btn('HIGH','&#128992; High','#e65100')+btn('MEDIUM','&#129001; Medium','#f9a825')+btn('LOW','&#9898; Low','#5d4037')+'<div class="stat" style="margin-left:14px;"><b>'+gapsN+'</b> OOS Risk</div><div class="stat"><b>'+overN+'</b> Overstocked</div><div class="stat"><b>'+inScope.toLocaleString()+'</b> Shown</div>';
+  var allBtn='<button class="pri-btn '+(allActive?'active':'')+'" data-pri="__ALL__" title="All OOS priorities" style="background:'+(allActive?'#37474f':'#ffffff')+';color:'+(allActive?'#fff':'#37474f')+';border:1.5px solid #37474f;">All <b style="margin-left:4px;">'+total.toLocaleString()+'</b></button>';
+  document.getElementById('statsBar').innerHTML=allBtn+btn('CRITICAL','&#128308; Critical','#b71c1c')+btn('HIGH','&#128992; High','#e65100')+btn('MEDIUM','&#129001; Medium','#f9a825')+btn('LOW','&#9898; Low','#5d4037')+btn('NO_OOS','&#9898; No OOS','#9e9e9e')+'<div class="stat" style="margin-left:14px;"><b>'+gapsN+'</b> OOS Risk</div><div class="stat"><b>'+overN+'</b> Overstocked</div><div class="stat"><b>'+inScope.toLocaleString()+'</b> Shown</div>';
   document.getElementById('statsBar').querySelectorAll('.pri-btn').forEach(function(b){b.onclick=function(){
     var key=b.dataset.pri;
     if(key==='__ALL__'){selPriorities.clear();}
