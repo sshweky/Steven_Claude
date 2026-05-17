@@ -8194,6 +8194,39 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             f"AI forecast zeroed; verify in Quickbase before accepting.</span>"
         )
 
+    # ── Critical: Unexplained planner truncation ─────────────────────────────
+    # When the planner zeros out >= 6 consecutive tail weeks but Status @ Cust
+    # is Active and no POG End Date exists, the planner knows something the AI
+    # doesn't.  Surface this FIRST and insist on documentation.
+    _sc = (row.get("Status_Cust") or "").upper().strip()
+    _it = (row.get("PT_Item_Status") or "").upper().strip()
+    _pe = (str(row.get("POG_End_Date") or "")).strip()
+    _is_trunc_active  = _sc.startswith("A") and not _sc.startswith("FD") if _sc else False
+    _is_trunc_eol     = any(tok in _it for tok in ("DISC", "PHASE", "EOL", "DELETE"))
+    if _is_trunc_active and not _pe and not _is_trunc_eol and manual_total > 0:
+        # Find where the planner's trailing zero block starts (scan backward)
+        _trunc_idx = None
+        for _w in range(25, -1, -1):
+            if manual[_w] > 0:
+                _trunc_idx = _w + 1   # 0-based index of first trailing zero
+                break
+        if _trunc_idx is None:
+            _trunc_idx = 0
+        _trunc_len    = 26 - _trunc_idx
+        _trunc_ai_vol = sum(forecast[_trunc_idx:])
+        if _trunc_len >= 6 and _trunc_ai_vol > 0:
+            _trunc_wk1 = _trunc_idx + 1
+            critical.insert(0,
+                f"<b>Critical AI Flag:</b> The plan goes to zero at W{_trunc_wk1} "
+                f"and stays flat through W26, but Status @ Cust is Active with no "
+                f"POG End Date on file. The AI would forecast {_trunc_ai_vol:,}u "
+                f"across those {_trunc_len} weeks based on buying history. If there "
+                f"is an event driving this - POG ending, listing drop, distribution "
+                f"cut, or seasonal exit - please document it: enter a POG End Date, "
+                f"update the item status, or add a comment. Without context this "
+                f"looks like missing demand and creates an inventory blind spot."
+            )
+
     # ── Critical: Zero-history guard ─────────────────────────────────────────
     if hist_total == 0 and ai_total > 0:
         model_lbl = _e(rec.get("model", "model"))
