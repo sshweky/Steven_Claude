@@ -2543,12 +2543,20 @@ def normalize_oos_rebuild_ramp(hist, ships):
     i = 0
     while i < n:
         # Find the next ship-zero run where the customer kept ordering.
-        if s[i] == 0 and out[i] > 0:
-            run_start = i
-            while i < n and s[i] == 0 and out[i] > 0:
-                i += 1
-            run_end = i  # first non-OOS index after the run
-            run_len = run_end - run_start
+        # Use 1-week lag window (matching F41): a week is OOS only if
+        # ships[i] + ships[i+1] < 30% of the order — ruling out cases where
+        # the order shipped normally one week later.
+        if out[i] > 0:
+            s_lag = s[i] + (s[i + 1] if i + 1 < n else 0.0)
+            if s_lag / max(float(out[i]), 1.0) < 0.30:
+                run_start = i
+                while i < n and out[i] > 0:
+                    s_lag_w = s[i] + (s[i + 1] if i + 1 < n else 0.0)
+                    if s_lag_w / max(float(out[i]), 1.0) >= 0.30:
+                        break
+                    i += 1
+                run_end = i  # first non-OOS index after the run
+                run_len = run_end - run_start
 
             if run_len >= 3 and run_end < n:
                 # (2) Establish the pre-OOS pace from the prior shipping window.
