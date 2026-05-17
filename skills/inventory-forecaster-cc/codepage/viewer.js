@@ -2240,12 +2240,23 @@ async function _loadAmzDcInv(r, safeId) {
     if (/amazon dc inventory/i.test(li.textContent)) li.remove();
   });
 
-  // Append a fresh live-data bullet at the end of the AI Analysis list
+  // Insert the DC inventory bullet right after the "Amazon POS Sales:" bullet
+  // so the two Amazon data lines appear together. Falls back to appending at
+  // the end if no POS bullet is present (e.g. items with no POS data in QB).
   const li = document.createElement('li');
   li.style.marginBottom = '4px';
   li.setAttribute('data-amz-dc-inv', '1');
   li.innerHTML = bullet;
-  ul.appendChild(li);
+  const posBullet = Array.from(ul.querySelectorAll('li')).find(
+    el => /amazon pos sales/i.test(el.textContent) || /consumer demand \(pos\)/i.test(el.textContent)
+  );
+  if (posBullet && posBullet.nextSibling) {
+    ul.insertBefore(li, posBullet.nextSibling);
+  } else if (posBullet) {
+    ul.appendChild(li);   // POS bullet is already last — append right after
+  } else {
+    ul.appendChild(li);   // No POS bullet — append at end as before
+  }
 }
 
 // -- Comment history loader --------------------------------------------------
