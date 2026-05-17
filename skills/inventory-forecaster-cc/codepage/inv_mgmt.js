@@ -597,14 +597,15 @@ function computeDerived(rec, today) {
     }
   }
 
-  // Priority rollup — volume-weighted waterfall (first match wins)
-  var _gc = rec.gap_weeks.length;
+  // OOS Priority rollup — volume-weighted waterfall (first match wins)
+  var _gc  = rec.gap_weeks.length;
   var _vel = rec.shp_wk_l13;
-  if      (_vel > 500 && _gc >= 3)      rec.priority = 'CRITICAL';
-  else if (_vel > 200 && _gc >= 2)      rec.priority = 'HIGH';
-  else if (_vel > 100 && _gc >= 2)      rec.priority = 'MEDIUM';
-  else if (rec.overstocked && _vel > 100) rec.priority = 'MEDIUM';
-  else                                   rec.priority = 'LOW';
+  var _fd  = /future.?delete/i.test(rec.item_status) || /future.?delete/i.test(rec.sub_status);
+  if      (_fd || _gc === 0)      rec.priority = 'NO_OOS';
+  else if (_vel > 500 && _gc >= 3) rec.priority = 'CRITICAL';
+  else if (_vel > 200 && _gc >= 2) rec.priority = 'HIGH';
+  else if (_vel > 100 && _gc >= 2) rec.priority = 'MEDIUM';
+  else                             rec.priority = 'LOW';
 }
 
 // -- Columns -------------------------------------------------------------------
