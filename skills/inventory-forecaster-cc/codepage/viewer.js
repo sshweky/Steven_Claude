@@ -2764,7 +2764,7 @@ async function addComment(key) {
     fields[CFG.COMMENT_FID.NOTE]        = { value: txt };
     fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
     if (flag)   fields[CFG.COMMENT_FID.FLAG]   = { value: flag };
-    if (author) fields[CFG.COMMENT_FID.AUTHOR] = { value: author };
+    // AUTHOR (fid 9) is a QB User field — QB auto-stamps _CURUSER_ on insert, no need to pass it
 
     const resp  = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
     const recId = (resp && resp.metadata && resp.metadata.createdRecordIds && resp.metadata.createdRecordIds[0]) || '';
