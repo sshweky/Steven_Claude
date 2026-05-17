@@ -9119,7 +9119,7 @@ def main():
               f"{len(amazon_mstyles)} mstyles ...", flush=True)
         AMZUS_COLS = ["Mstyle_model_", "Amazon_Buybox", "MAP_Price", "AUR_L4w",
                       "Days_Amazon_OOS_L30d_", "Sellable_On_Hand_Units",
-                      "ASIN_Buyability_Flag", "ASIN"]
+                      "ASIN_Buyability_Flag", "ASIN", "ASIN_Status"]
         amzus_sel = ", ".join(f"[{c}]" for c in AMZUS_COLS)
         BATCH_AMZUS = 200
         for i in range(0, len(amazon_mstyles), BATCH_AMZUS):
