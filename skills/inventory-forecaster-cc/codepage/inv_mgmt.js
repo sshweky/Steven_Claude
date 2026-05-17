@@ -792,8 +792,9 @@ function renderDetail(r) {
   for(var i=1;i<=26;i++){var s=new Date(w1sun.getTime()+(i-1)*7*86400000);var lbl=(s.getMonth()+1)+'/'+s.getDate();invFlow+='<th title="W'+i+' - week of '+s.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'">'+lbl+'</th>';}
   invFlow+='<th>Total</th></tr>';
 
-  function renderRow(label,arr,hoverFn,hlFn){
-    var html='<tr><td class="lbl">'+label+'</td>';var tot=0;
+  function renderRow(label,arr,hoverFn,hlFn,rowBg,showTotal){
+    var rStyle=rowBg?' style="background:'+rowBg+';"':'';
+    var html='<tr'+rStyle+'><td class="lbl"'+(rowBg?' style="background:'+rowBg+';"':'')+'>'+label+'</td>';var tot=0;
     for(var i=0;i<26;i++){
       var v=arr[i]||0;tot+=v;var c=v<0?'neg':'ok';
       var styleStr='',extra='';
@@ -802,12 +803,12 @@ function renderDetail(r) {
       var sa=styleStr?' style="'+styleStr+'"':'';
       html+='<td class="'+c+'"'+extra+sa+'>'+(v===0?'&#8212;':fmt(v))+'</td>';
     }
-    html+='<td><b>'+fmt(tot)+'</b></td></tr>';return html;
+    html+='<td>'+(showTotal===false?'':'<b>'+fmt(tot)+'</b>')+'</td></tr>';return html;
   }
-  invFlow+=renderRow('Beg Inv',r.beg_inv,null,null);
-  invFlow+=renderRow('Expected Receipts',r.rcv,fmtPoHover,rcvHL);
-  invFlow+=renderRow('Prj Demand',r.prj,fmtPrjHover,null);
-  var wosRow='<tr><td class="lbl">WOS OH</td>';
+  invFlow+=renderRow('Beg Inv',r.beg_inv,null,null,'#dbeafe',false);
+  invFlow+=renderRow('Expected Receipts',r.rcv,fmtPoHover,rcvHL,'#dcfce7');
+  invFlow+=renderRow('Prj Demand',r.prj,fmtPrjHover,null,'#fef9c3');
+  var wosRow='<tr style="background:#fce7f3;"><td class="lbl" style="background:#fce7f3;">WOS OH</td>';
   for(var i=0;i<26;i++){var b=r.beg_inv[i]||0,p=r.prj[i]||0;var v='&#8212;',cls='ok';if(p>0){var w=b/p;v=w.toFixed(1);if(w<r.opt_wos)cls='gap';if(w<0)cls='neg';}else if(b>0){v='&#8734;';}wosRow+='<td class="'+cls+'">'+v+'</td>';}
   wosRow+='<td></td></tr>';
   invFlow+=wosRow+'</table>';
