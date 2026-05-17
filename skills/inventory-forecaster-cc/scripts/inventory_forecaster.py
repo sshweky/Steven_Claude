@@ -9563,7 +9563,13 @@ def main():
         print(f"      [WARN] F69 DI fetch failed: {_e} — DI blending disabled",
               flush=True)
 
-    # Blend each found sibling's raw_ord into its base row's ORD_COLS
+    # Blend each found sibling's raw_ord into its base row's ORD_COLS.
+    # Also detect DI cadence pause: Amazon orders on the 10th monthly with
+    # 65-day lead time, so any PO placed up to ~9 weeks ago should already
+    # be in Order History.  If DI has been silent for ≥ 6 weeks but had
+    # prior history, Amazon has consciously skipped ≥ 1 monthly order window.
+    # That silence is itself a suppression signal — tag the base row so
+    # forecast_record() can dampen the near-term forecast proportionally.
     _f69_blend_count  = 0
     _f69_base_touched = set()
     for _sib_key, _oh in _di_oh.items():
@@ -9580,6 +9586,29 @@ def main():
         _base_row["_di_blend"]    = True
         _base_row["_di_l13_add"]  = float(_base_row.get("_di_l13_add", 0)) + _sib_l13
         _base_row.setdefault("_di_sib_labels", []).append(f"{_sib_ms}(+{_sib_l13:.0f} L13)")
+
+        # ── DI cadence-pause detection ──────────────────────────────────────
+        # Find the most-recent non-zero DI week across the full 52-week window.
+        _di_nz_idxs = [i for i, v in enumerate(_raw_ord) if v > 0]
+        if _di_nz_idxs:
+            _di_last_nz  = max(_di_nz_idxs)          # 0=oldest, 51=most-recent
+            _di_weeks_since = 51 - _di_last_nz        # weeks elapsed since last order
+        else:
+            _di_weeks_since = 52                      # no history at all
+        # Monthly cadence ≈ 4.33 weeks; 65-day lead ≈ 9.3 weeks.
+        # Any PO placed ≥ 9 weeks ago is already factored into Order History.
+        # Silence ≥ 6 weeks = ≥ 1 missed monthly window; count how many.
+        _DI_MONTH_WEEKS = 4.33
+        if _di_weeks_since >= 6 and _di_nz_idxs:
+            _di_missed = max(1, round(_di_weeks_since / _DI_MONTH_WEEKS))
+            # Keep the worst (longest) pause across multiple siblings
+            _prev = _base_row.get("_di_pause_weeks", 0)
+            if _di_weeks_since > _prev:
+                _base_row["_di_pause"]         = True
+                _base_row["_di_pause_weeks"]   = _di_weeks_since
+                _base_row["_di_missed_windows"] = _di_missed
+                _base_row["_di_pause_sib"]     = _sib_ms
+
         _f69_blend_count += 1
         _f69_base_touched.add(_base_row.get("Acct_MStyle_Key_", ""))
 
