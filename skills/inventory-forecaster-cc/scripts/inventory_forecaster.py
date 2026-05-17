@@ -5470,8 +5470,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 ],
             }
 
-        if not _zero_velocity:
-            # R3 — Inactive conservative L26 floor (2026-04-22).
+        # R3 — Inactive conservative L26 floor (2026-04-22).
+        # F65 gate: skip all floors when zero-velocity suppression fires.
         # When the item is Inactive (L13W all zero) BUT has meaningful L26W/L52W
         # activity, plane is likely "paused" not "dead".  Provide a small flat
         # floor forecast = L26W all-weeks avg × 0.3, snapped to master pack.
