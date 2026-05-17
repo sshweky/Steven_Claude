@@ -696,7 +696,7 @@ var COLS = [
   { id:'opt_oh', label:'Opt OH', align:'right', numeric:true, get:function(r){return r.opt_oh;}, render:function(r){return '<td class="right">'+fmt(r.opt_oh)+'</td>';} },
   { id:'lt_wks', label:'LT Wks', align:'right', numeric:true, get:function(r){return r.lt_wks;}, render:function(r){return '<td class="right">'+fmt(r.lt_wks)+'</td>';} },
   { id:'cny_weeks', label:'CNY', align:'right', numeric:true, get:function(r){return r.cny_weeks;}, render:function(r){return '<td class="right">'+fmt(r.cny_weeks)+'</td>';} },
-  { id:'days_oos_next_rcpt', label:'Days OOS&#8594;Rcpt', align:'right', numeric:true, get:function(r){return r.days_oos_next_rcpt;},
+  { id:'days_oos_next_rcpt', label:'Days OOS&#8594;Rcpt', tooltip:'Days OOS until Next Available Receipt', align:'right', numeric:true, get:function(r){return r.days_oos_next_rcpt;},
     render:function(r){return '<td class="right '+(r.days_oos_next_rcpt>0?'pri-CRITICAL':'')+'">'+fmt(r.days_oos_next_rcpt)+'</td>';} },
   { id:'next_rcpt_dt', label:'Next Rcpt', align:'left',
     get:function(r){return r.next_rcpt_dt?r.next_rcpt_dt.toISOString():'zzzz';},
