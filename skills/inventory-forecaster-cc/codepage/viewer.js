@@ -351,6 +351,49 @@ function _fmtCacheAge(ms) {
   return `${h}h ${m % 60}m`;
 }
 
+// -- Projections cache (localStorage, 6h TTL) --------------------------------
+// Caches the full set of adapted projection records so the 5+ paginated QB
+// calls in fetchAllRecords() are skipped on warm loads.  discoverWeeklyFids()
+// still runs every time (one fast metadata call) because week labels rotate
+// every Sunday.  Cache is keyed by version string; bump it any time the shape
+// of adaptRow() output changes to force-invalidate all clients.
+const PRJ_CACHE_KEY    = 'pp_prj_v1';
+const PRJ_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
+
+function _prjCacheBypassed() {
+  try { return new URLSearchParams(location.search).get('nocache') === '1'; }
+  catch (e) { return false; }
+}
+
+function _loadPrjCache() {
+  try {
+    const raw = localStorage.getItem(PRJ_CACHE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || typeof obj.ts !== 'number' || !Array.isArray(obj.records)) return null;
+    const ageMs = Date.now() - obj.ts;
+    if (ageMs > PRJ_CACHE_TTL_MS) return null;
+    return { records: obj.records, ageMs };
+  } catch (e) {
+    return null;
+  }
+}
+
+function _savePrjCache(records) {
+  try {
+    localStorage.setItem(PRJ_CACHE_KEY, JSON.stringify({ ts: Date.now(), records }));
+  } catch (e) {
+    // Quota exceeded — projections data can be large.  Try clearing the old
+    // entry and retrying once; if still too large, skip caching gracefully.
+    try {
+      localStorage.removeItem(PRJ_CACHE_KEY);
+      localStorage.setItem(PRJ_CACHE_KEY, JSON.stringify({ ts: Date.now(), records }));
+    } catch (e2) {
+      console.warn('[Prj] localStorage save failed (probably quota):', e2.message || e2);
+    }
+  }
+}
+
 // -- Pull Inventory Flow (per-mstyle projected balances, receipts, demand) --
 // The Inventory Flow table is keyed by Mstyle (warehouse-level inventory),
 // not Acct-MStyle.  Many Projections records share the same mstyle, so we
