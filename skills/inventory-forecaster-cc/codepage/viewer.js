@@ -2170,13 +2170,13 @@ function toggleDetail(key) {
   let histHtml  = '';
   if (histShp.length || histOrd.length || atsHist.length) {
     let histHdrCells = '<th class="row-label"></th>';
-    let ordCells = '<td class="row-label" style="color:#e65100;font-weight:600">Orders</td>';
-    let shpCells = '<td class="row-label" style="color:#6a1b9a;font-weight:600">Shipments</td>';
-    let atsCells = '<td class="row-label" style="color:#00695c;font-weight:600">ATS Inv Hist</td>';
+    let ordCells = '<td class="row-label" style="color:#e65100;font-weight:600;white-space:normal">Orders</td>';
+    let shpCells = '<td class="row-label" style="color:#6a1b9a;font-weight:600;white-space:normal">Shipments</td>';
+    let atsCells = '<td class="row-label" style="color:#00695c;font-weight:600;white-space:normal">ATS Inv Hist</td>';
     let shpTot = 0, ordTot = 0, atsTot = 0;
     for (let i = 25; i >= 0; i--) {
       const label = _fmtHistDate(26 - i);
-      histHdrCells += `<th style="font-size:10px;font-weight:normal">${label}</th>`;
+      histHdrCells += `<th style="font-size:10px;font-weight:normal;white-space:normal;min-width:0;padding:2px 3px;width:1%">${label}</th>`;
       const sv = histShp[i] || 0;
       shpCells += `<td style="${sv === 0 ? 'color:#bbb' : 'color:#6a1b9a;font-weight:600'}">${fmtN(sv)}</td>`;
       const ov = histOrd[i] || 0;
