@@ -2558,7 +2558,7 @@ async function loadCommentHistory(key, force) {
       const where = `{${F.ACCT_MSTYLE}.EX.'${escKey}'}AND{${F.DATE_CREATED}.OAF.'${cmtCutoff}'}`;
       const resp  = await qb('/records/query', {
         from:    CFG.COMMENTS_TID,
-        select:  [F.RECORD_ID, F.DATE_CREATED, F.NOTE, F.FLAG],
+        select:  [F.RECORD_ID, F.DATE_CREATED, F.NOTE, F.FLAG, F.AUTHOR],
         where:   where,
         sortBy:  [{ fieldId: F.DATE_CREATED, order: 'ASC' }],
         options: { top: 200 },
@@ -2568,16 +2568,25 @@ async function loadCommentHistory(key, force) {
         cmtCont.innerHTML = '<div style="color:#999;font-style:italic;">No mgr/flag comments in the last 90 days.</div>';
       } else {
         cmtCont.innerHTML = rows.map(r => {
-          const ts   = (r[F.DATE_CREATED] && r[F.DATE_CREATED].value) || '';
-          const note = (r[F.NOTE]         && r[F.NOTE].value)         || '';
-          const flag = (r[F.FLAG]         && r[F.FLAG].value)         || '';
-          const flagBadge = flag
+          const ts     = (r[F.DATE_CREATED] && r[F.DATE_CREATED].value) || '';
+          const note   = (r[F.NOTE]         && r[F.NOTE].value)         || '';
+          const flag   = (r[F.FLAG]         && r[F.FLAG].value)         || '';
+          const author = (r[F.AUTHOR]       && r[F.AUTHOR].value)       || '';
+          const isReply = flag === 'Planner Response';
+          const borderColor = isReply ? '#00695c' : '#8b2252';
+          const authorLine  = author ? `<b style="color:${borderColor}">${escHtml(author)}</b> &middot; ` : '';
+          const flagBadge   = (flag && !isReply)
             ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>`
+            : (isReply ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">💬 Planner Response</span>` : '');
+          const reviewBtn = isReply
+            ? `<button onclick="markReviewed('${key.replace(/'/g,"\\'")}', this)" style="font-size:10px;padding:2px 8px;background:#e0f2f1;color:#00695c;border:1px solid #00695c;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Reviewed</button>`
             : '';
           return `
-            <div style="padding:5px 0;border-bottom:1px solid #f0f0f0;">
-              <div style="font-size:10px;color:#888;font-weight:600;">${escHtml(fmtTs(ts))}${flagBadge}</div>
-              <div style="font-size:11px;color:#333;white-space:pre-wrap;line-height:1.35;margin-top:2px;">${escHtml(note)}</div>
+            <div style="padding:6px 6px 6px 10px;margin-bottom:4px;border-left:3px solid ${borderColor};background:${isReply ? '#f1faf9' : '#fdf7fa'};border-radius:0 4px 4px 0;">
+              <div style="font-size:10px;color:#888;font-weight:600;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
+                <span>${authorLine}${escHtml(fmtTs(ts))}</span>${flagBadge}${reviewBtn}
+              </div>
+              <div style="font-size:11px;color:#333;white-space:pre-wrap;line-height:1.35;margin-top:3px;">${escHtml(note)}</div>
             </div>`;
         }).join('');
         cmtCont.scrollTop = cmtCont.scrollHeight;
