@@ -382,7 +382,7 @@ async function loadData() {
     var rec = {
       mstyle:mstyle, country:country,
       brand: pi.brand||'', description: pi.desc||'',
-      inv_manager: String(g(IF_F.InvManager)||'').trim(),
+      inv_manager: qbUser(g(IF_F.InvManager)).trim(),
       item_status: itemStatusFlow, item_status_flow:itemStatusFlow,
       sub_status: String(g(IF_F.SubStatus)||'').trim(),
       season: String(g(IF_F.Season)||'').trim(),
