@@ -738,6 +738,23 @@ Top 104 high-volume acct 1864 records: AI total **2.73M units** vs manual **3.73
 
 ---
 
+## Model Fixes (applied 2026-05-17 — 8-priority algorithm improvements)
+
+Sourced from `scripts/analyze_manual_vs_ai.py` run on 2,000 active projections.
+
+| Fix | Rule Code | Description |
+|---|---|---|
+| **Priority 1 — Order-cadence for all branches** | `apply_ordering_pattern` | Previously only called for dense (Seasonal Baseline) items. Now also called for Croston's and Sparse Intermittent branches, so monthly+ cadence items get demand clustered into order-week chunks across ALL model paths. Bi-weekly (gap=2) is still smoothed to weekly per VP-Q3. |
+| **Priority 2 — Horizon confidence decay** | `F61` | W9-W26 forecast weeks multiplied by ×0.88 for non-Amazon, non-seasonal, non-new-launch items. Planners systematically trim the back half of AI forecasts; this matches observed behavior without cutting near-term W1-W8 signal. |
+| **Priority 3 — Channel suppression** | OFFPRICE_CUST_SUBSTRS | Added DD'S DISCOUNTS, DD'S DISCOUNT, GABRIEL BROTHERS to the off-price customer list. These now get R1/OTB-zero routing (same as Ross, Burlington, etc.). |
+| **Priority 4 — Soft L4W/L13W trend blend** | `F62` | Fills the gap between F26 (hard ×0.85 at 50-70%) and no-action. Ratio 0.70-0.88 → proportional blend ×(0.6×ratio+0.4) ≈ ×0.82 to ×0.93. Ratio 1.12-1.30 → proportional uplift. Skips Amazon (POS blend handles it). |
+| **Priority 5 — Multi-pack baseline floor** | `F63` | For Multi-Pk Replen items where L26W nz avg is ≥1.5× L13W nz avg, lifts the forecast to at least 40% of L26W nz avg × 26w. Addresses the 743% avg delta gap on multi-pack items. |
+| **Priority 6 — Trade calendar fall events** | `F64` | W17-W18 (early Sept fall replenishment) ×1.10; W21-W22 (early Oct holiday pre-order) ×1.08 for all non-Amazon items. Most common planner spike weeks in manual projections. |
+| **Priority 7 — Zero-velocity suppression** | `F65` | When BOTH L4W and L13W are completely zero (not new launch, not international), skips R3/S6/F19 floors entirely. Prevents the AI from inventing demand with no recent signal. |
+| **Priority 8 — Per-customer bias correction** | `F66`, `CUSTOMER_BIAS_CORRECTIONS` | Applies a calibration multiplier for customers where planners override AI >75% of the time in the same direction. PSP Distribution/Theis ×1.25 (AI under-projects); Imperial Distributors ×1.35; Army-Air-Force Exch ×1.40; Pet Pharm ×0.55; H G Buying ×0.45; Petco Mexico ×0.45. |
+
+---
+
 ## Model Fixes (applied 2026-05-17 — ATS catch-up spike cap)
 
 | Fix | Description |
