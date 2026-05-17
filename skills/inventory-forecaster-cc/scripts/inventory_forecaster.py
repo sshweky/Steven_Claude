@@ -7195,6 +7195,9 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         "pog_end":       (str(row.get("POG_End_Date") or ""))[:10],
         "store_count":   int(float(row.get("Store_Count") or 0)),
         "opn_w":         [int(float(row.get(c) or 0)) for c in OPN_COLS],
+        # Status fields — needed by narrative to detect unexplained planner truncations
+        "status_cust":   (str(row.get("Status_Cust") or "")).strip(),
+        "item_status":   (str(row.get("PT_Item_Status") or "")).strip(),
     }
 
 
