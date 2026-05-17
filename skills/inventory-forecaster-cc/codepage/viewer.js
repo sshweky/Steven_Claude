@@ -3917,7 +3917,7 @@ function applyFilters() {
 
 // -- Export Flagged to CSV --------------------------------------------------
 function exportFlagged() {
-  const rows = [['Key','Customer','Mstyle','Description','Inv Mgr','Brand','Priority','Ord/Wk L13W','Proj/Wk','AI Fcst/Wk','AI vs Proj','Proj 26w','Last Comment']];
+  const rows = [['Key','Customer','Mstyle','Description','Inv Mgr','Brand','Priority','Ord/Wk L13W','Proj/Wk (+Open POs)','AI Fcst/Wk (+Open POs)','AI vs Proj','Proj 26w','Last Comment']];
   ALL_RECORDS.forEach(r => {
     if (!r.flagged) return;
     const last = (r.last_comment || '').replace(/"/g,'""');
