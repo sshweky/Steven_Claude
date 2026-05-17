@@ -351,14 +351,28 @@ function _fmtCacheAge(ms) {
   return `${h}h ${m % 60}m`;
 }
 
-// -- Projections cache (localStorage, 6h TTL) --------------------------------
-// Caches the full set of adapted projection records so the 5+ paginated QB
-// calls in fetchAllRecords() are skipped on warm loads.  discoverWeeklyFids()
-// still runs every time (one fast metadata call) because week labels rotate
-// every Sunday.  Cache is keyed by version string; bump it any time the shape
-// of adaptRow() output changes to force-invalidate all clients.
+// -- Projections cache --------------------------------------------------------
+// Two-tier: sessionStorage (primary, tab-scoped, no quota competition) +
+// localStorage (secondary, cross-tab warmup, 6h TTL).
+//
+// Why sessionStorage first?  pim.quickbase.com's localStorage is shared by
+// every QB app in the realm.  When quota fills, _savePrjCache silently fails
+// and every refresh triggers a full re-fetch.  sessionStorage is isolated per
+// tab, never competes with other apps, and is large enough for the dataset.
+//
+// Behaviour per scenario:
+//   Refresh same tab    -> sessionStorage hit  -> instant (no QB calls)
+//   New tab, same day   -> sessionStorage miss, localStorage hit -> instant
+//   New tab, >6h later  -> both miss -> full fetch, repopulates both stores
+//   ?nocache=1 in URL   -> both bypassed -> always fresh pull
+//
+// Bump PRJ_CACHE_KEY any time adaptRow() output shape changes.
 const PRJ_CACHE_KEY    = 'pp_prj_v2';
 const PRJ_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
+
+// FID discovery cache key (sessionStorage only - resets each new tab is fine
+// because discoverWeeklyFids makes a single lightweight /fields call).
+const FID_SESS_KEY = 'pp_fids_v1';
 
 function _prjCacheBypassed() {
   try { return new URLSearchParams(location.search).get('nocache') === '1'; }
@@ -366,6 +380,17 @@ function _prjCacheBypassed() {
 }
 
 function _loadPrjCache() {
+  // 1. Try sessionStorage (instant - no TTL needed, tab session is short-lived)
+  try {
+    const raw = sessionStorage.getItem(PRJ_CACHE_KEY);
+    if (raw) {
+      const obj = JSON.parse(raw);
+      if (obj && Array.isArray(obj.records)) {
+        return { records: obj.records, ageMs: Date.now() - (obj.ts || 0), source: 'session' };
+      }
+    }
+  } catch (e) { /* ignore */ }
+  // 2. Fall back to localStorage (cross-tab, 6h TTL)
   try {
     const raw = localStorage.getItem(PRJ_CACHE_KEY);
     if (!raw) return null;
@@ -373,25 +398,42 @@ function _loadPrjCache() {
     if (!obj || typeof obj.ts !== 'number' || !Array.isArray(obj.records)) return null;
     const ageMs = Date.now() - obj.ts;
     if (ageMs > PRJ_CACHE_TTL_MS) return null;
-    return { records: obj.records, ageMs };
+    return { records: obj.records, ageMs, source: 'local' };
   } catch (e) {
     return null;
   }
 }
 
 function _savePrjCache(records) {
+  const payload = JSON.stringify({ ts: Date.now(), records });
+  // Always save to sessionStorage first (no quota competition).
+  try { sessionStorage.setItem(PRJ_CACHE_KEY, payload); } catch (e) { /* ignore */ }
+  // Also try localStorage so other tabs benefit.
   try {
-    localStorage.setItem(PRJ_CACHE_KEY, JSON.stringify({ ts: Date.now(), records }));
+    localStorage.setItem(PRJ_CACHE_KEY, payload);
   } catch (e) {
-    // Quota exceeded  -  projections data can be large.  Try clearing the old
-    // entry and retrying once; if still too large, skip caching gracefully.
     try {
       localStorage.removeItem(PRJ_CACHE_KEY);
-      localStorage.setItem(PRJ_CACHE_KEY, JSON.stringify({ ts: Date.now(), records }));
+      localStorage.setItem(PRJ_CACHE_KEY, payload);
     } catch (e2) {
-      console.warn('[Prj] localStorage save failed (probably quota):', e2.message || e2);
+      console.warn('[Prj] localStorage quota full - sessionStorage only for this session:', e2.message || e2);
     }
   }
+}
+
+// Cache discoverWeeklyFids() result in sessionStorage so same-tab refreshes
+// skip the /fields metadata call entirely.
+function _loadFidCache() {
+  try {
+    const raw = sessionStorage.getItem(FID_SESS_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || !Array.isArray(obj.manFids)) return null;
+    return obj;
+  } catch (e) { return null; }
+}
+function _saveFidCache(data) {
+  try { sessionStorage.setItem(FID_SESS_KEY, JSON.stringify(data)); } catch (e) { /* ignore */ }
 }
 
 // -- Pull Inventory Flow (per-mstyle projected balances, receipts, demand) --
