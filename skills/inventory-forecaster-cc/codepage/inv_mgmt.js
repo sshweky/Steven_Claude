@@ -969,6 +969,26 @@ async function boot() {
 }
 
 async function refreshData() {
+  var cached=loadCache();
+  if(cached){
+    // Cache is still fresh -- re-render instantly, no network call
+    ALL=cached.data;
+    var asOf=document.getElementById('dataAsOf');
+    if(asOf)asOf.textContent='Data as of '+fmtTimestamp(cached.ts)+' (cached)';
+    buildFilterDropdowns();buildTableHead();applyFilters();
+    return;
+  }
+  // Cache stale or missing -- show loading screen and fetch fresh
+  ALL=[];FILTERED=[];
+  document.getElementById('tbody').innerHTML='';
+  document.getElementById('statsBar').innerHTML='';
+  var scr=document.getElementById('loadingScreen');
+  if(scr){scr.style.display='flex';scr.classList.remove('hidden');}
+  document.getElementById('loadBar').style.width='0%';
+  document.getElementById('loadSteps').innerHTML='<div id="ls1" class="pending">Check cache</div><div id="ls2" class="pending">Load Inventory Flow</div><div id="ls3" class="pending">Load Projections</div><div id="ls4" class="pending">Build view</div>';
+  await boot();
+}
+async function forceRefresh() {
   localStorage.removeItem(CACHE_KEY);
   ALL=[];FILTERED=[];
   document.getElementById('tbody').innerHTML='';
