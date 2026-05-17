@@ -6364,10 +6364,26 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # AI_PRJ for that week.  Per VP guidance: strict zero (not subtract) —
     # the confirmed PO IS the demand signal for that week; downstream replen
     # already counts the PO, so the AI projection on top would be double-count.
-    if open_po_wk:
+    #
+    # PO signal priority (2026-05-17 fix):
+    #   1. Opn_W1..Opn_W26 from the Projections row  — already week-grid-aligned,
+    #      matches exactly what planners see in the viewer.  Use this when the
+    #      row has any nonzero open-PO quantity at all.
+    #   2. fetch_open_pos_forward() (report #27, bucketed by cancel date) — fallback
+    #      only when the Opn_W fields are all zero.  Its cancel-date bucketing can
+    #      shift by ±1 week vs the forecast grid, so we prefer the QB row fields.
+    _opn_row_wk = [float(row.get(c) or 0) for c in OPN_COLS]
+    _opn_row_total = sum(_opn_row_wk)
+    if _opn_row_total > 0:
+        _effective_po_wk = _opn_row_wk          # use QB Opn_W fields (grid-aligned)
+    elif open_po_wk:
+        _effective_po_wk = list(open_po_wk)     # fall back to fetched PO report
+    else:
+        _effective_po_wk = []
+    if _effective_po_wk:
         _po_zeroed = []
         for _i in range(min(26, len(fcst))):
-            _po_qty = float(open_po_wk[_i]) if _i < len(open_po_wk) else 0.0
+            _po_qty = float(_effective_po_wk[_i]) if _i < len(_effective_po_wk) else 0.0
             if _po_qty > 0 and fcst[_i] > 0:
                 _po_zeroed.append((_i + 1, fcst[_i], _po_qty))
                 fcst[_i] = 0
