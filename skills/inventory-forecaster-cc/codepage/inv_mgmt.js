@@ -53,6 +53,7 @@ var IF_F = {
   ShipmentStatusSummary:1224, ATSSummary:912, InventoryNotes:257, StyleAlert:994,
   OOSPriorityNotes:985, ActiveReplCusts:1223,
   SizeCt:533, Fragrance:589, PvtLblExcl:1795, CommitItem:1515, InnerPack:1023, MasterPack:929,
+  UPC:1915, GTIN:1916,
   OOSDates:262, OverCommittedQty:448, OvrComtWOS:444, InvtryAgeDays:1269,
   AgedInv090:1308, AgedInv91180:1310, AgedInv181365:1312, AgedInv365plus:1314, PctTimeInStock:1232
 };
