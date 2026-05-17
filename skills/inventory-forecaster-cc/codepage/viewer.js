@@ -185,11 +185,29 @@ const PAGE_SIZE = 100;
 // We discover them in one /v1/fields call so we don't have to hardcode a
 // fid mapping that goes stale every Monday morning.
 async function discoverWeeklyFids() {
+  // Same-tab refresh: skip the /fields call if session cache is warm.
+  // The cached FIDs are valid until Sunday when columns rotate; on the first
+  // refresh after a Sunday rotation the labels won't match and QB will return
+  // wrong values, so we expire the FID cache at midnight on Sundays.
+  if (!_prjCacheBypassed()) {
+    const cached = _loadFidCache();
+    if (cached) {
+      MAN_PRJ_FIDS     = cached.manFids;
+      MAN_PRJ_LABELS   = cached.manLabels;
+      ORD_HIST_FIDS    = cached.ordFids;
+      SHP_HIST_FIDS    = cached.shpFids;
+      LY_ORD_HIST_FIDS = cached.lyOrdFids;
+      LY_SHP_HIST_FIDS = cached.lyShpFids;
+      W1_DATE          = new Date(cached.w1Date);
+      console.info('[Fids] loaded from session cache');
+      return;
+    }
+  }
   const fields = await qbGet(`/fields?tableId=${CFG.PROJECTIONS_TID}`);
   const manRe  = /^(\d{2})\s(\d{2})\sW(\d{1,2})$/;
   const histRe = /^(Ord|Shp)\s+LW(?:-(\d{1,2}))?$/;
   const man = [];
-  const ord = new Map(); // offset > fid (0 = Ord LW, 1 = Ord LW-1, ...)
+  const ord = new Map(); // offset -> fid (0 = Ord LW, 1 = Ord LW-1, ...)
   const shp = new Map();
   // Stable named fids (KEY, CUST, INV_MGR_NAME, etc.) come straight from
   // CFG.FID  -  we trust the configured IDs rather than looking them up by
@@ -238,7 +256,14 @@ async function discoverWeeklyFids() {
   }
   // W1 date for the projection grid header
   const yr = new Date().getFullYear();
-  W1_DATE  = new Date(`${yr}-${man[0].mm}-${man[0].dd}T00:00:00`);
+  W1_DATE = new Date(`${yr}-${man[0].mm}-${man[0].dd}T00:00:00`);
+  // Persist to session cache for subsequent same-tab refreshes.
+  _saveFidCache({
+    manFids: MAN_PRJ_FIDS, manLabels: MAN_PRJ_LABELS,
+    ordFids: ORD_HIST_FIDS, shpFids: SHP_HIST_FIDS,
+    lyOrdFids: LY_ORD_HIST_FIDS, lyShpFids: LY_SHP_HIST_FIDS,
+    w1Date: W1_DATE.toISOString(),
+  });
 }
 
 // -- Build the QB query select list for one row -----------------------------
