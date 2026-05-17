@@ -304,7 +304,7 @@ async function fetchAllRecords() {
 const INV_FLOW_CACHE_KEY    = 'pp_invflow_v4';  // bumped: added lt_wks + moq fields
 const INV_FLOW_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 
-// Background load promise — resolves when inv flow is attached to ALL_RECORDS.
+// Background load promise  -  resolves when inv flow is attached to ALL_RECORDS.
 // Boot fires this without awaiting so the table renders immediately.
 let _invFlowPromise = null;
 
@@ -383,7 +383,7 @@ function _savePrjCache(records) {
   try {
     localStorage.setItem(PRJ_CACHE_KEY, JSON.stringify({ ts: Date.now(), records }));
   } catch (e) {
-    // Quota exceeded — projections data can be large.  Try clearing the old
+    // Quota exceeded  -  projections data can be large.  Try clearing the old
     // entry and retrying once; if still too large, skip caching gracefully.
     try {
       localStorage.removeItem(PRJ_CACHE_KEY);
@@ -947,14 +947,14 @@ function adaptRow(row) {
   const _l4 = histOrd.slice(-4);
   const ord_per_wk_l4 = _l4.length ? Math.round((_l4.reduce((a,b)=>a+b,0) / 4) * 10) / 10 : 0;
 
-  // Shpd/Wk L4W and L13W — actual shipped units from ship history
+  // Shpd/Wk L4W and L13W  -  actual shipped units from ship history
   const _shp4       = histShp.slice(-4);
   const shpd_wk_l4  = _shp4.length  ? Math.round((_shp4.reduce((a,b)=>a+b,0)  /  4) * 10) / 10 : 0;
   const _shp13      = histShp.slice(-13);
   const shpd_wk_l13 = _shp13.length ? Math.round((_shp13.reduce((a,b)=>a+b,0) / 13) * 10) / 10 : 0;
 
   // Last Ord Date: date of most recent week with a non-zero order, formatted MM/DD.
-  // histOrd is oldest→newest so the most recent week is at the end. We walk
+  // histOrd is oldest->newest so the most recent week is at the end. We walk
   // backwards until we find a non-zero entry, then compute its calendar date
   // by going (histOrd.length - 1 - i) full weeks before last Monday.
   let last_ord_date = '';
@@ -1299,7 +1299,7 @@ function populateFilters() {
 
 function _sortKey(v) {
   const s = (v == null ? '' : String(v)).trim();
-  return s === '' ? '￿' : s.toLowerCase();  // '￿' = sort-last sentinel (XML 1.0 safe; literal U+FFFF breaks API_AddReplaceDBPage)
+  return s === '' ? '\uffff' : s.toLowerCase();  // '\uffff' = sort-last sentinel (XML 1.0 safe; literal U+FFFF breaks API_AddReplaceDBPage)
 }
 
 // -- Header badge counts -----------------------------------------------------
@@ -1710,7 +1710,7 @@ function toggleDetail(key) {
   sugCells  += `<td style="font-weight:700;color:#555">${fmtN(sugTot)}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(opnTot)}</td>`;
 
-  // Avg/Wk column — separate header so the invFlow table (which also reuses
+  // Avg/Wk column  -  separate header so the invFlow table (which also reuses
   // hdrCells) is not affected.  Appended only to the projection-table header
   // and its corresponding data rows.
   const _wkCount = wks.length || 26;
@@ -1855,7 +1855,7 @@ function toggleDetail(key) {
         rcvCells += `<td style="color:#bbb;font-size:10px;background:#f0f7ff"> - </td>`;
       }
       // WOS OH = weeks of coverage via forward simulation (NOT bv/pv for this week
-      // alone — that blows up on large-order spike weeks).
+      // alone  -  that blows up on large-order spike weeks).
       if (_beg && _prj) {
         const bv = _beg[i];
         let wos, wosTxt, wosColor;
@@ -2152,7 +2152,7 @@ function toggleDetail(key) {
     </div>
   </div>`;
 
-  // Issue 8: FD Status block — Future Development items often have no AI narrative
+  // Issue 8: FD Status block  -  Future Development items often have no AI narrative
   // or projections yet; show a prominent metadata card so the panel isn't blank.
   const isFDRecord = (r.asin_status || '').trim().toUpperCase().startsWith('FD');
   const fdStatusHtml = isFDRecord ? `
@@ -2246,10 +2246,10 @@ async function _loadAmzDcInv(r, safeId) {
   }
 
   // WOS colour thresholds match Python build_ai_analysis:
-  //   < 3 wks  → red    (OOS risk)
-  //   3–7 wks  → amber  (watch)
-  //   8–15 wks → normal (healthy)
-  //  ≥ 16 wks  → orange (overstocked)
+  //   < 3 wks  -> red    (OOS risk)
+  //   3-7 wks  -> amber  (watch)
+  //   8-15 wks -> normal (healthy)
+  //  >= 16 wks  -> orange (overstocked)
   const fmt    = n => Math.round(n).toLocaleString('en-US');
   const fmtWos = n => n.toFixed(1);
   let wosHtml;
@@ -2258,7 +2258,7 @@ async function _loadAmzDcInv(r, safeId) {
   else if (wos < 16) wosHtml = `<b>WOS</b> ${fmtWos(wos)} wks`;
   else               wosHtml = `<b>WOS</b> <span style="color:#f57f17">${fmtWos(wos)} wks (overstocked)</span>`;
 
-  // Always show all three fields — display 0 when null/missing.
+  // Always show all three fields  -  display 0 when null/missing.
   // Use HTML entity separator (no special Unicode chars that can mangle in QB).
   const sep = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
   const bullet = '<b>Amazon DC inventory:</b> ' +
@@ -2289,9 +2289,9 @@ async function _loadAmzDcInv(r, safeId) {
   if (posBullet && posBullet.nextSibling) {
     ul.insertBefore(li, posBullet.nextSibling);
   } else if (posBullet) {
-    ul.appendChild(li);   // POS bullet is already last — append right after
+    ul.appendChild(li);   // POS bullet is already last  -  append right after
   } else {
-    ul.appendChild(li);   // No POS bullet — append at end as before
+    ul.appendChild(li);   // No POS bullet  -  append at end as before
   }
 }
 
@@ -2707,7 +2707,7 @@ async function saveRecordEdits(key) {
       data: [fields],
       mergeFieldId: CFG.FID.KEY,
     });
-    // On success — clear dirty state and refresh in-memory record
+    // On success  -  clear dirty state and refresh in-memory record
     const rec = ALL_RECORDS.find(x => x.key === key);
     for (const e of myEdits) {
       DIRTY_EDITS.delete(`${e.key}|${e.weekIdx}`);
@@ -2903,12 +2903,12 @@ function _parseAiAdjustment(text, currentForecast) {
   // push, seasonal sale, etc.) with an expected demand lift.
   //
   // Pattern:  "[month] [promo/event keyword] [Nx or +N% demand lift]"
-  // Examples: "January promo 20% off — 1.2x lift expected"
-  //           "Holiday push Dec — 1.5x demand"
+  // Examples: "January promo 20% off  -  1.2x lift expected"
+  //           "Holiday push Dec  -  1.5x demand"
   //           "Back-to-school promo Aug +30% lift"
   //           "New store launch July, 1.4x lift expected"
   //
-  // Behavior: event weeks → baseline × lift; the 5 weeks BEFORE the event
+  // Behavior: event weeks -> baseline × lift; the 5 weeks BEFORE the event
   // each get an extra (totalExtraDemand / 5) units front-loaded so inventory
   // is built up in time to support the promo.
   //
@@ -2919,7 +2919,7 @@ function _parseAiAdjustment(text, currentForecast) {
     const RAMP_WKS = 5;
     const isEvent  = /promo(?:tion)?|event\b|sale\b|deal\b|launch\b|push\b|program\b|campaign|holiday|seasonal|back[\s-]+to[\s-]+school/.test(lo);
     if (isEvent) {
-      // Extract demand lift  — "Nx lift" takes priority over "+N% lift"
+      // Extract demand lift   -  "Nx lift" takes priority over "+N% lift"
       let liftMult = null, liftLabel = '';
       let lm = lo.match(/(\d+(?:\.\d+)?)\s*x\s+(?:lift|demand|increase|boost|expect)/);
       if (lm) { liftMult = parseFloat(lm[1]); liftLabel = `${lm[1]}x`; }
@@ -2928,7 +2928,7 @@ function _parseAiAdjustment(text, currentForecast) {
         if (lm) { liftMult = 1 + parseFloat(lm[1]) / 100; liftLabel = `+${Math.abs(parseFloat(lm[1]))}%`; }
       }
       if (liftMult && liftMult > 1.0) {
-        // Extract event month(s) — use _monthRangeDynamic so any calendar month works
+        // Extract event month(s)  -  use _monthRangeDynamic so any calendar month works
         const _mRe = '(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)';
         lm = lo.match(new RegExp(_mRe + `(?:\\s*(?:to|through|[\\-\\u2013])\\s*` + _mRe + `)?`));
         if (lm) {
@@ -2963,7 +2963,7 @@ function _parseAiAdjustment(text, currentForecast) {
             deltaTotal: out.reduce((a,b)=>a+b,0) - cur.reduce((a,b)=>a+b,0),
           };
         }
-        // Has lift + event keyword but no recognizable month — fall through to other layers
+        // Has lift + event keyword but no recognizable month  -  fall through to other layers
       }
     }
   }
@@ -2994,7 +2994,7 @@ function _parseAiAdjustment(text, currentForecast) {
     };
   }
 
-  // Pattern: SKU transition / replacement → zero from W{a} through W26
+  // Pattern: SKU transition / replacement -> zero from W{a} through W26
   // "transitioning to EC Suffix starting W13"
   // "switching to new item from W10"
   // "replacing with FF30755EC starting week 15"
