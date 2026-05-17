@@ -6404,6 +6404,66 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             meta["po_total_qty"]      = _po_total_qty
             meta["po_total_removed"]  = _po_total_removed
 
+    # VP-FL (2026-05-17) — Frontload dampening.
+    # When a customer places a significantly above-normal order (W1 open PO or
+    # last-week actual orders >= 2.5x the L13W average), they're pulling forward
+    # demand.  Their inventory position will be elevated for the next 2-4 weeks,
+    # meaning they'll reorder less than normal during that recovery window.
+    #
+    # Detection: use the max of W1 confirmed PO (Opn_W1) and last-week raw orders
+    # (Ord_LW) as the spike signal — whichever fired most recently.
+    #
+    # Dampening: percentage reduction applied to the first N non-zeroed forecast
+    # weeks after the spike, with a decay curve.  Capped at 30% per week to
+    # avoid over-correcting on genuine demand acceleration or seasonal builds.
+    _vfl_opn_w1    = float(row.get("Opn_W1") or 0)
+    _vfl_ord_lw    = float(row.get("Ord_LW")  or 0)
+    _vfl_spike_qty = max(_vfl_opn_w1, _vfl_ord_lw)
+    # L13W average from cleaned hist (non-zero weeks only, more robust than all-weeks)
+    _vfl_hist13 = [float(v or 0) for v in hist[-13:]] if len(hist) >= 13 else list(hist)
+    _vfl_hist13_nz = [v for v in _vfl_hist13 if v > 0]
+    _vfl_l13w_avg  = sum(_vfl_hist13_nz) / len(_vfl_hist13_nz) if _vfl_hist13_nz else 0
+    _vfl_ratio     = (_vfl_spike_qty / _vfl_l13w_avg) if _vfl_l13w_avg > 0 else 0
+    # Trigger: spike >= 2.5x normal AND at least 500 units above baseline (noise filter)
+    _vfl_fires = (
+        _vfl_ratio >= 2.5
+        and _vfl_spike_qty >= _vfl_l13w_avg + 500
+        and _vfl_l13w_avg >= 100              # don't fire on trivially low-volume items
+    )
+    if _vfl_fires:
+        _fire("VP-FL")
+        # dampen_pct scales with severity, capped at 30%
+        _vfl_dampen = min(0.30, (_vfl_ratio - 1.5) * 0.10)
+        # Decay weights for up to 4 affected weeks (diminishing impact over time)
+        _vfl_decay  = [1.00, 0.65, 0.40, 0.20]
+        # How many weeks to affect: 2 for mild spike, up to 4 for extreme
+        _vfl_n_wks  = 2 if _vfl_ratio < 3.0 else (3 if _vfl_ratio < 5.0 else 4)
+        _vfl_applied = []
+        _vfl_slot = 0   # tracks how many non-zeroed weeks we've dampened
+        for _i in range(min(26, len(fcst))):
+            if _vfl_slot >= _vfl_n_wks:
+                break
+            if fcst[_i] <= 0:
+                continue   # already zeroed (VP-Q4 or other) — skip, don't count
+            _vfl_week_dampen = _vfl_dampen * _vfl_decay[_vfl_slot]
+            _vfl_orig = fcst[_i]
+            _vfl_cut  = _vfl_orig * _vfl_week_dampen
+            _vfl_new  = max(0, _vfl_orig - _vfl_cut)
+            if mp and mp > 0:
+                _vfl_new = int(round(_vfl_new / mp)) * int(mp)
+            else:
+                _vfl_new = int(round(_vfl_new))
+            fcst[_i] = _vfl_new
+            _vfl_applied.append((_i + 1, _vfl_orig, _vfl_new))
+            _vfl_slot += 1
+        if _vfl_applied and isinstance(meta, dict):
+            _vfl_wks_str = ",".join(f"W{z[0]}" for z in _vfl_applied)
+            meta.setdefault("drivers", []).append(
+                f"VP-FL frontload dampening: spike {_vfl_spike_qty:,.0f}u = "
+                f"{_vfl_ratio:.1f}x L13W avg ({_vfl_l13w_avg:,.0f}/wk); "
+                f"reduced {_vfl_wks_str} by {_vfl_dampen*100:.0f}% (decay curve)"
+            )
+
     # F52 — Future-Delete (FD) wind-down (2026-05-08, planner request).
     # Items with Status_Cust starting "FD" are being phased out by the
     # customer.  The status sometimes encodes the last-order date as
