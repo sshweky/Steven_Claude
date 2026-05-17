@@ -5098,11 +5098,14 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     pos_data         = _sig["pos_data"]
     amz_catalog      = _sig["amz_catalog"]
     season           = _sig["season"]
-    _f35_corrections = _sig["f35_corrections"]
-    _f39_corrections = _sig.get("f39_corrections") or []
-    _f41_corrections = _sig.get("f41_corrections") or []
-    _f43_corrections = _sig.get("f43_corrections") or []
-    _f47_corrections = _sig.get("f47_corrections") or []
+    _f35_corrections  = _sig["f35_corrections"]
+    _f39_corrections  = _sig.get("f39_corrections")  or []
+    _f41_corrections  = _sig.get("f41_corrections")  or []
+    _f43_corrections  = _sig.get("f43_corrections")  or []
+    _f47_corrections  = _sig.get("f47_corrections")  or []
+    _f_ats_corrections = _sig.get("f_ats_corrections") or []
+    if _f_ats_corrections:
+        _fire("VP-ATS")
     l13w             = float(row.get("Shpd_Wk_L13W_cust_") or 0)
 
     # R4 (Amazon Private Label skip) removed 2026-05-05.  APL items ARE shipped;
