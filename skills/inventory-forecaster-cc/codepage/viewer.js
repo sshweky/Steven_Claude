@@ -3945,7 +3945,7 @@ function exportAllInView() {
   }
   const header = [
     'Key','Inv Manager','Brand','Customer','Mstyle','Description','Priority',
-    'Ord/Wk L13W','Shpd/Wk L13W','Proj/Wk','AI Fcst/Wk','AI vs Proj %',
+    'Ord/Wk L13W','Shpd/Wk L13W','Proj/Wk (+Open POs)','AI Fcst/Wk (+Open POs)','AI vs Proj %',
     'Proj 26w','AI 26w','Last Comment','Flagged'
   ];
   const rows = [header];
