@@ -304,8 +304,8 @@ async function loadData() {
     var mrow = prjMetaRows[i];
     var mms  = String((mrow[PRJ_F.Mstyle]||{}).value||'').trim();
     if (!mms) continue;
-    var mdesc  = String((mrow[PRJ_F.Description]||{}).value||'').trim();
-    var mbrand = String((mrow[PRJ_F.Brand]||{}).value||'').trim();
+    var mdesc  = stripHtml((mrow[PRJ_F.Description]||{}).value);
+    var mbrand = stripHtml((mrow[PRJ_F.Brand]||{}).value);
     if (!prjMeta[mms]) prjMeta[mms] = { desc:mdesc, brand:mbrand };
     else { if(mdesc && !prjMeta[mms].desc) prjMeta[mms].desc=mdesc; if(mbrand && !prjMeta[mms].brand) prjMeta[mms].brand=mbrand; }
   }
