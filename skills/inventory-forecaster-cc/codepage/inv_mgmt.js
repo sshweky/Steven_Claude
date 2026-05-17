@@ -967,9 +967,24 @@ function renderDetail(r) {
   var kpiStrip='<div class="kpi-strip">'+kpi('ATS Now',fmt(r.ats_now),'Available to sell - after holds / allocations',r.ats_now<0?'#c62828':'')+kpi('ATS WOS OH',fmt(r.ats_wos_oh),'Weeks of supply on hand (per QB)',wosColor(r.ats_wos_oh))+kpi('Open Cust PO',fmt(r.open_cust_po_qty),'Outstanding customer PO qty awaiting shipment','')+kpi('Hold Qty',fmt(r.hold_qty),'Hold Order Qty - orders parked, not shipping',r.hold_qty>0?'#e65100':'')+kpi('Days->Next Rcpt',fmt(r.days_oos_next_rcpt),'Days OOS until next supplier receipt arrives',oosColor(r.days_oos_next_rcpt))+kpi('Pipe Excess',fmt(r.pipeline_excess),'Total pipeline - 26w demand - safety stock. Positive = overstock',excessColor(r.pipeline_excess))+kpi('PipeWOS',(r.pipeline_wos==null?'&#8734;':fmt(r.pipeline_wos)),'Pipeline weeks of supply (all I/T + I/W + OH / 26w demand)','')+kpi('LT + CNY',fmt(r.lt_wks)+' + '+fmt(r.cny_weeks),'Lead time (weeks) + Chinese New Year shutdown weeks','')+kpi('Days OOS L12m',fmt(r.days_oos_l12m),'Days out-of-stock in trailing 12 months',r.days_oos_l12m>30?'#c62828':'')+kpi('Customers',fmt(r.customer_count),'Active Acct-MStyles rolled up into this mstyle','')+kpi('Manual Demand',fmt(r.manual_demand_26w),'26-week sum of customer manual projections (rolled up)','')+'</div>'+(r.is_multi?'<div style="margin-top:8px;padding:6px 10px;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;font-size:11px;color:#5d4037;">&#127873; <b>Multi-pack:</b> Each unit = '+r.pcs_per_kit+' pcs of root <b>'+esc(r.root_mstyle)+'</b>. Root OH: <b>'+fmt(r.qty_oh_root)+'</b> pcs -> can assemble <b>'+fmt(r.assembleable_kits)+'</b> more kits. Total effective kit availability: '+fmt((r.beg_inv&&r.beg_inv[0])||0)+' on-hand + '+fmt(r.assembleable_kits)+' buildable = <b>'+fmt(((r.beg_inv&&r.beg_inv[0])||0)+r.assembleable_kits)+'</b> kits.</div>':'');
 
   var totalAged=(r.aged_inv_0_90||0)+(r.aged_inv_91_180||0)+(r.aged_inv_181_365||0)+(r.aged_inv_365plus||0);
-  function agePct(n){return totalAged>0?' ('+Math.round(n/totalAged*100)+'%)':'';}
-  function ageColor(days){return days>180?'#c62828':days>90?'#e65100':'inherit';}
-  var agedInvHtml='<div class="kv-grid"><div><b>Inv Age (Days):</b> <span style="color:'+ageColor(r.invtry_age_days)+'">'+fmt(r.invtry_age_days)+'</span></div><div><b>0-90 Days:</b> '+fmt(r.aged_inv_0_90)+agePct(r.aged_inv_0_90)+'</div><div><b>91-180 Days:</b> <span style="color:'+(r.aged_inv_91_180>0?'#e65100':'inherit')+'">'+fmt(r.aged_inv_91_180)+agePct(r.aged_inv_91_180)+'</span></div><div><b>181-365 Days:</b> <span style="color:'+(r.aged_inv_181_365>0?'#c62828':'inherit')+'">'+fmt(r.aged_inv_181_365)+agePct(r.aged_inv_181_365)+'</span></div><div><b>&gt;365 Days:</b> <span style="color:'+(r.aged_inv_365plus>0?'#c62828':'inherit')+';font-weight:'+(r.aged_inv_365plus>0?'700':'400')+'">'+fmt(r.aged_inv_365plus)+agePct(r.aged_inv_365plus)+'</span></div></div>';
+  function agePct(n){return totalAged>0?Math.round(n/totalAged*100)+'%':'--';}
+  function ageCard(lbl,val,pct,bg,valColor){
+    return '<div class="age-card" style="background:'+bg+';">'
+      +'<div class="age-card-lbl">'+lbl+'</div>'
+      +'<div class="age-card-val" style="color:'+valColor+'">'+fmt(val)+'</div>'
+      +'<div class="age-card-pct">'+pct+' of total</div>'
+      +'</div>';
+  }
+  var ageHeader='<div style="display:flex;align-items:center;gap:18px;margin-bottom:10px;">'
+    +'<div><span style="font-size:11px;color:#666;">Avg Inv Age</span><div style="font-size:22px;font-weight:700;color:'+(r.invtry_age_days>180?'#c62828':r.invtry_age_days>90?'#e65100':'#1565c0')+'">'+fmt(r.invtry_age_days)+' <span style="font-size:13px;font-weight:400;color:#888;">days</span></div></div>'
+    +'<div><span style="font-size:11px;color:#666;">Total Aged Inv</span><div style="font-size:22px;font-weight:700;color:#333;">'+fmt(totalAged)+' <span style="font-size:13px;font-weight:400;color:#888;">units</span></div></div>'
+    +'</div>';
+  var agedInvHtml=ageHeader+'<div class="age-cards">'
+    +ageCard('0 - 90 Days',r.aged_inv_0_90,agePct(r.aged_inv_0_90),'#f0fdf4','#15803d')
+    +ageCard('91 - 180 Days',r.aged_inv_91_180,agePct(r.aged_inv_91_180),'#fff7ed',(r.aged_inv_91_180>0?'#c2410c':'#666'))
+    +ageCard('181 - 365 Days',r.aged_inv_181_365,agePct(r.aged_inv_181_365),'#fef2f2',(r.aged_inv_181_365>0?'#b91c1c':'#666'))
+    +ageCard('365+ Days',r.aged_inv_365plus,agePct(r.aged_inv_365plus),'#fdf2f8',(r.aged_inv_365plus>0?'#9d174d':'#666'))
+    +'</div>';
 
   return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+stockStatusBox+'</div></div><div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">- hover Expected Receipts cells for PO detail / hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div><div class="section"><h3>&#127919; Recommended Actions</h3><div class="recs-wrap">'+recs+'</div></div></div>';
 }
