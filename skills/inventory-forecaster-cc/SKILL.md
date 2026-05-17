@@ -642,6 +642,14 @@ Phase 4 — Write-back
 
 ---
 
+## Model Fixes (applied 2026-05-17 — DI direct-import sibling blending)
+
+| Fix | Rule Code | Description |
+|---|---|---|
+| **F69 — DI sibling history blend** | `F69`, Phase 2.9b pre-pass | Amazon sometimes orders product direct from P+P's overseas factory instead of through the warehouse ("Direct Import" / "DI"). These variants share the base mstyle but carry a suffix of **MPP** or **ADF** (e.g., FF8654MPP, FF8654ADF). Amazon writes its own POs 35–65 days before factory shipment (~10 week transit to Amazon DC); P+P does not project for them. However, their L52W order history is real product demand. Fix: in a pre-pass (Phase 2.9b), scan all rows for MPP/ADF suffixes, find the corresponding base record (same account, stripped suffix), and **accumulate the sibling's weekly ORD_COLS into the base row in-place**. The forecaster then sees total demand (warehouse + factory-direct) as its signal. DI sibling records themselves receive a zero AI projection (model = "DI Direct Import (F69)") since Amazon manages those POs. Driver note added to base record: "F69 DI blend: FF8654MPP(+NNN L13) direct-import history added to base demand signal." |
+
+---
+
 ## Fulfillment Mode Conventions (mstyle suffixes + AI Events)
 
 Some mstyles carry a suffix that signals a non-standard fulfillment mode. These are **not** separate SKUs — they share the same item but ship differently.
