@@ -480,6 +480,13 @@ window.QB_CONFIG = {
   <button onclick="changePage(1)" id="nextBtn" style="padding:3px 10px;">Next &#8594;</button>
 </div>
 
+<!-- Director notification banner — shown when planner replies are pending -->
+<div id="replyBanner" style="display:none;">
+  <span>💬 <span id="replyBannerCount">0</span> planner replies awaiting your review</span>
+  <button onclick="toggleReplyOnly()">View Replies</button>
+  <button onclick="document.getElementById('replyBanner').style.display='none'" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);">Dismiss</button>
+</div>
+
 <table>
 <thead>
   <!-- Each <th> declares the record-field it maps to via data-sort-key.

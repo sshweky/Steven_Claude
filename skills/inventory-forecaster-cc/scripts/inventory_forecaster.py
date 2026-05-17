@@ -2301,6 +2301,91 @@ def normalize_ats_oos_weeks(hist, ats_l26):
     return [int(round(v)) for v in out], corrections
 
 
+def normalize_ats_catchup_spikes(hist, ats_l26):
+    """
+    VP-ATS-Catch (2026-05-17) — Cap post-OOS catch-up order spikes using ATS data.
+
+    Companion to VP-ATS. VP-ATS fills zero-order weeks during OOS (suppressed demand).
+    This rule handles the opposite end: inflated orders in the 1-3 weeks immediately
+    after ATS restores, caused by pent-up / duplicate orders from the OOS period.
+
+    Per planner feedback (1864-FF9297/24): weeks of 2/15 & 2/22 showed elevated
+    catch-up orders immediately after an OOS period confirmed by near-zero ATS.
+    Those weeks were included in L13W nz-avg, pulling the baseline — and therefore
+    the AI forecast — too high.
+
+    Detection at ATS index k (k ∈ 2..24):
+      • Prior ≥2 OOS weeks confirmed: ats_l26[k-1] < ats_thresh
+                                  AND ats_l26[k-2] < ats_thresh
+      • ATS restoration: ats_l26[k] >= ats_thresh * 2 (supply meaningfully returned)
+      • Pre-OOS baseline: L13 nz-avg from order history before the OOS onset
+      • Catch-up spike: hist[26+k+offset] > pre_baseline * 1.5 for offset 0..2
+
+    Action: Cap those catch-up weeks to pre_baseline (strip the backlog excess).
+
+    Guards:
+      • All-zero ATS → data unavailable, skip
+      • Pre-OOS nz-count < 3 → no reliable baseline, skip
+      • pre_baseline < 10 → too sparse, skip
+      • Negative ATS values → data artifact, skip
+
+    Returns:
+        (normalized_hist, corrections)
+        corrections: list of {week_idx, orig_val, capped_to, ats_at_restoration}
+    """
+    n = len(hist)
+    orig = [float(v or 0) for v in hist]
+    out  = list(orig)
+    corrections = []
+
+    if n < 27 or not ats_l26 or len(ats_l26) < 26:
+        return [int(round(v)) for v in out], corrections
+    if sum(ats_l26) == 0:
+        return [int(round(v)) for v in out], corrections
+
+    for k in range(2, 25):
+        ats_cur = float(ats_l26[k] or 0)
+        ats_p1  = float(ats_l26[k-1] or 0)
+        ats_p2  = float(ats_l26[k-2] or 0)
+        if ats_cur < 0:
+            continue
+
+        # Pre-OOS baseline: orders from before the OOS onset (before week k-2 in hist)
+        hist_oos_onset = 26 + k - 2
+        pre_lo = max(0, hist_oos_onset - 13)
+        pre_nz = [orig[j] for j in range(pre_lo, hist_oos_onset) if orig[j] > 0]
+        if len(pre_nz) < 3:
+            continue
+        pre_baseline = sum(pre_nz) / len(pre_nz)
+        if pre_baseline < 10:
+            continue
+
+        ats_thresh = max(10.0, 0.25 * pre_baseline)
+
+        # Both prior weeks must be OOS (ATS constrained)
+        if ats_p1 >= ats_thresh or ats_p2 >= ats_thresh:
+            continue
+        # Current week: ATS must have meaningfully restored (2× threshold)
+        if ats_cur < ats_thresh * 2:
+            continue
+
+        # Cap catch-up window: up to 3 weeks starting at restoration point
+        catch_ceil = pre_baseline * 1.5
+        for offset in range(min(3, n - (26 + k))):
+            j = 26 + k + offset
+            if out[j] > catch_ceil:
+                orig_val = out[j]
+                out[j] = int(round(pre_baseline))
+                corrections.append({
+                    "week_idx":           j,
+                    "orig_val":           round(orig_val, 1),
+                    "capped_to":          round(pre_baseline, 1),
+                    "ats_at_restoration": round(ats_cur, 1),
+                })
+
+    return [int(round(v)) for v in out], corrections
+
+
 def get_ship_history(row):
     """Return 52-week shipment history (oldest→newest), aligned 1:1 with
     get_history() order-side output.  Reads Shp_LW_n columns the same way
