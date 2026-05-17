@@ -305,6 +305,7 @@ async function loadData() {
     if (!mstyle) continue;
     var country = String(g(IF_F.Country)||'').trim();
     var isMulti = toBool(g(IF_F.KitStyle));
+    if (isMulti) continue; // multi-packs always excluded
     var pcsKit  = toNum(g(IF_F.PcsKitUse)) || 1;
     var rootMs  = String(g(IF_F.RootMstyle)||'').trim();
 
