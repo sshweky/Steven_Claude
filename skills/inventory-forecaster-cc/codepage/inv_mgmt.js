@@ -779,7 +779,7 @@ function renderStats() {
   var pri={CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0};
   npf.forEach(function(r){pri[r.priority]=(pri[r.priority]||0)+1;});
   var total=npf.length;
-  var PRI_TIPS={CRITICAL:'CRITICAL: most severe stockout situations.',HIGH:'HIGH: gap week deficit >= 2.0 weeks below Opt WOS.',MEDIUM:'MEDIUM: has any gap week, or pipeline excess > 2,500 units.',LOW:'LOW: no gap weeks and not overstocked.'};
+  var PRI_TIPS={CRITICAL:'CRITICAL: L13W velocity >500/wk with 3+ OOS gap weeks.',HIGH:'HIGH: L13W velocity >200/wk with 2+ OOS gap weeks.',MEDIUM:'MEDIUM: L13W velocity >100/wk with 2+ OOS gap weeks, or overstocked >100/wk.',LOW:'LOW: gap weeks below volume threshold, or no gaps/overstock.'};
   function btn(key,label,color){var active=selPriorities.has(key);return '<button class="pri-btn '+(active?'active':'')+'" data-pri="'+key+'" title="'+PRI_TIPS[key]+'" style="background:'+(active?color:'#ffffff')+';color:'+(active?'#fff':color)+';border:1.5px solid '+color+';">'+label+' <b style="margin-left:4px;">'+(pri[key]||0).toLocaleString()+'</b></button>';}
   var allActive=selPriorities.size===0;
   var allBtn='<button class="pri-btn '+(allActive?'active':'')+'" data-pri="__ALL__" title="All priorities" style="background:'+(allActive?'#37474f':'#ffffff')+';color:'+(allActive?'#fff':'#37474f')+';border:1.5px solid #37474f;">All <b style="margin-left:4px;">'+total.toLocaleString()+'</b></button>';
