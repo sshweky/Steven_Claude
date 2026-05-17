@@ -328,6 +328,8 @@ async function fetchAllRecords() {
 // v2 = added Opt WOS / Opt WOS Final / Next Avl Rcpt Dt scalars per mstyle
 const INV_FLOW_CACHE_KEY    = 'pp_invflow_v4';  // bumped: added lt_wks + moq fields
 const INV_FLOW_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
+const ATS_HIST_CACHE_KEY    = 'pp_ats_v1';
+const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 
 // Background load promise  -  resolves when inv flow is attached to ALL_RECORDS.
 // Boot fires this without awaiting so the table renders immediately.
