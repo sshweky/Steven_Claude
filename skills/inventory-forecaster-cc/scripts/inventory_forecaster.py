@@ -8125,7 +8125,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         l13_anomaly = (l13 == 0 and l4 > 0 and l26 > 0)
         # Always emit a compact POS run-rate line so planners see consumer
         # velocity even when the trend is flat (<10% change L4W vs L13W).
-        # "Consumer demand (POS)" matches the viewer's idempotency check.
+        # "Amazon POS Sales:" matches the viewer's idempotency check.
         if l4 > 0 or l13 > 0:
             _l13_display = ((l4 + l26) / 2.0) if l13_anomaly else l13
             _trend_ratio = (l4 / _l13_display) if _l13_display > 0 else 1.0
