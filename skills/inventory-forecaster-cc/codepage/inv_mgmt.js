@@ -732,7 +732,7 @@ function _filterRecords(skipPri) {
   var replen=document.getElementById('replenOnly').checked;
   var gaps=document.getElementById('gapsOnly').checked;
   var over=document.getElementById('overstockOnly').checked;
-  var hideMulti=document.getElementById('hideMulti').checked;
+  var hideInactive=document.getElementById('hideInactive').checked;
   var activeCols=[];
   Object.keys(colFilters).forEach(function(cid){var c=COLS.find(function(x){return x.id===cid;});if(c)activeCols.push({c:c,needle:colFilters[cid].toLowerCase()});});
   return ALL.filter(function(r){
@@ -740,10 +740,10 @@ function _filterRecords(skipPri) {
     if(selCountries.size>0&&!selCountries.has(r.country))return false;
     if(selBrands.size>0&&!selBrands.has(r.brand))return false;
     if(selMgrs.size>0&&!selMgrs.has(r.inv_manager))return false;
+    if(hideInactive&&!r.is_replen)return false;
     if(replen&&!r.is_replen)return false;
     if(gaps&&r.gap_weeks.length===0)return false;
     if(over&&!r.overstocked)return false;
-    if(hideMulti&&r.is_multi)return false;
     if(selActions.size>0){
       if(selActions.has('__NONE__')){if(r.recommendations.length!==0)return false;}
       else{if(!r.recommendations.some(function(rc){return selActions.has(rc.action);}))return false;}
