@@ -1943,7 +1943,7 @@ function toggleDetail(key) {
     } else if (_hasInvFlow && !_isReplen) {
       gapBannerHtml = `
         <div style="margin-top:6px;padding:4px 10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;color:#888;font-style:italic;">
-          Gap analysis only runs on Replen items (PT Item Status: ${escHtml(r.item_status || 'unknown')}).
+          Gap analysis only runs on Replen items (PT Item Status: ${(r.item_status || 'unknown').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}).
         </div>`;
     } else if (_hasInvFlow && _optWos <= 0) {
       gapBannerHtml = `
