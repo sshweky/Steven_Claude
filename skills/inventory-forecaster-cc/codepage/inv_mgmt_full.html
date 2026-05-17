@@ -168,7 +168,7 @@
 
 <!-- All JS inline — no external page dependency -->
 <script>
-﻿// Immediate diagnostic — if this runs, JS is executing
+// Immediate diagnostic — if this runs, JS is executing
 (function(){
   var el = document.getElementById('loadStatus');
   if (el) el.textContent = 'Script executing...';
@@ -1081,7 +1081,7 @@ function generateRecoSheet() {
   var headers=['Mstyle','Action','PO #','Supplier','Qty Open','Current ETD','Current ETA','Requested ETD','Requested ETA'];
   var rows=recoSheet.map(function(r){return[r.mstyle,r.action,r.po_number,r.supplier,r.qty_open,r.curr_etd,r.curr_eta,r.req_etd,r.req_eta];});
   var csv=[headers].concat(rows).map(function(row){return row.map(function(v){return'"'+String(v!=null?v:'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  var blob=new Blob([''+csv],{type:'text/csv;charset=utf-8;'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PO_Recommendations_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 
