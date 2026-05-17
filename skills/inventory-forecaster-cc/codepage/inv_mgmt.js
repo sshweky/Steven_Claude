@@ -17,7 +17,7 @@ var QB_REALM  = 'pim.quickbase.com';
 var QB_TOKEN  = 'QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s';
 var INVF_TID  = 'bpsaju5pm';
 var PROJ_TID  = 'bpd237tvm';
-var CACHE_KEY = 'pp_inv_mgmt_codepage_v1';
+var CACHE_KEY = 'pp_inv_mgmt_codepage_v2';
 var CACHE_TTL = 6 * 60 * 60 * 1000;
 
 var OPT_WOS_DEFAULT       = 4.0;
