@@ -642,6 +642,31 @@ Phase 4 — Write-back
 
 ---
 
+## Fulfillment Mode Conventions (mstyle suffixes + AI Events)
+
+Some mstyles carry a suffix that signals a non-standard fulfillment mode. These are **not** separate SKUs — they share the same item but ship differently.
+
+| Suffix | Name | Meaning |
+|---|---|---|
+| `COS` | Cost / Direct Ship | Ships direct from factory to retailer/Amazon, bypassing P+P warehouse. Longer lead times (factory → customer vs. warehouse → customer). No warehouse inventory signal. |
+| `EC` | eCommerce / Drop-Ship | Similar direct-ship model, typically for eComm / FBA fulfillment. Bypasses warehouse. |
+
+**AI Event transitions**
+
+When P+P switches a style to one of these modes, an AI Event notification is generated, e.g.:
+
+> *"Switching to EC effective wk 15"*
+> *"Switching to COS effective wk 8"*
+
+The **effective week** is the boundary: orders before that week follow the prior fulfillment logic; orders from that week forward use the new mode's lead-time and ordering assumptions.
+
+**Forecaster implications (current state — no code change yet):**
+- COS/EC items are currently treated the same as standard items; the suffix is not yet detected.
+- When a "Switching to COS/EC effective wk N" event appears, the forecaster should ideally shift lead-time assumptions and suppress near-term warehouse-dependent signals starting at wk N.
+- Flag for future implementation if forecasting accuracy degrades post-switch.
+
+---
+
 ## Key Model Constants
 
 ```python
