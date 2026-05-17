@@ -368,7 +368,7 @@ def _bucket_open_pos_into_weeks(rows, in_scope_keys, today, verbose=True, w1_dat
     return out
 
 
-def fetch_open_pos_forward(keys, today=None, verbose=True):
+def fetch_open_pos_forward(keys, today=None, verbose=True, w1_date=None):
     """VP-Q4: Pull confirmed open customer POs for the forward 26-week window.
 
     Returns: { acct_mstyle_key: [w1_open_qty, w2_open_qty, ..., w26_open_qty] }
