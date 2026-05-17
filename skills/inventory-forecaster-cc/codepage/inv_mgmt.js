@@ -271,7 +271,11 @@ async function loadData() {
 
   setStep(2,'active'); setBar(10);
   var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);
-  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, '', 'Loading Inventory Flow');
+  // Exclude statuses that are never actionable — reduces load from ~12k to active items only
+  var _excl = ['Restricted','Ready to Sell','Ready to Quote','Components',
+                'Discontinued','Dropped','In Development'];
+  var ifWhere = _excl.map(function(s){return "{294}.XEX.'"+s+"'";}).join('AND');
+  var ifRows = await qbQueryAll(INVF_TID, ifFieldIds, ifWhere, 'Loading Inventory Flow');
 
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
   var prjFieldIds = Object.values(PRJ_F).concat(PRJ_MANUAL);
