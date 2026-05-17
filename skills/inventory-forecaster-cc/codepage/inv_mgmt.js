@@ -165,7 +165,7 @@ function poStatus(po, today, country) {
 }
 
 // -- Utilities -----------------------------------------------------------------
-function fmt(n) { if (n == null) return ''; return Number(n).toLocaleString('en-US', {maximumFractionDigits:1}); }
+function fmt(n) { if (n == null || n === '' || n === undefined) return '0'; var num=Number(n); if (isNaN(num)) return String(n); return num.toLocaleString('en-US', {maximumFractionDigits:1}); }
 function esc(s) { return String(s == null ? '' : s).replace(/[<>&"']/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];}); }
 function fmtDate(d) {
   if (!d) return '&#8212;';
