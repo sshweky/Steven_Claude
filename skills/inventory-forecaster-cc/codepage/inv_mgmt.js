@@ -792,7 +792,6 @@ function syncPriorityDd(){
   panel.querySelectorAll('input[type=checkbox]').forEach(function(cb){cb.checked=selPriorities.has(cb.value);});
   updateDdBtn('dd-priority','All Priorities');
 }
-}
 
 function renderTable() {
   var tb=document.getElementById('tbody');
