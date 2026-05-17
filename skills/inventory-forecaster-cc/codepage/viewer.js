@@ -2474,7 +2474,7 @@ function toggleDetail(key) {
   // Live Amazon DC inventory health  -  fetches fresh SOH/OPO/WOS from the
   // Amazon Catalog table and injects/refreshes the bullet in AI Analysis.
   // Runs after innerHTML is set so the target <ul> already exists in the DOM.
-  if (isAmazonRec && CFG.AMZ_CATALOG_TID) _loadAmzDcInv(r, safeId);
+  if (CFG.AMZ_CATALOG_TID && r.mstyle) _loadAmzDcInv(r, safeId);
 
   } catch (err) {
     // Something threw while building the detail HTML. Surface the error
