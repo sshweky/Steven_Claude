@@ -597,11 +597,14 @@ function computeDerived(rec, today) {
     }
   }
 
-  // Priority rollup
-  if (rec.recommendations.some(function(r){return r.priority==='CRITICAL';})) rec.priority='CRITICAL';
-  else if (rec.gap_weeks.some(function(g){return g.deficit>=2.0;})) rec.priority='HIGH';
-  else if (rec.gap_weeks.length>0||rec.overstocked) rec.priority='MEDIUM';
-  else rec.priority='LOW';
+  // Priority rollup — volume-weighted waterfall (first match wins)
+  var _gc = rec.gap_weeks.length;
+  var _vel = rec.shp_wk_l13;
+  if      (_vel > 500 && _gc >= 3)      rec.priority = 'CRITICAL';
+  else if (_vel > 200 && _gc >= 2)      rec.priority = 'HIGH';
+  else if (_vel > 100 && _gc >= 2)      rec.priority = 'MEDIUM';
+  else if (rec.overstocked && _vel > 100) rec.priority = 'MEDIUM';
+  else                                   rec.priority = 'LOW';
 }
 
 // -- Columns -------------------------------------------------------------------
