@@ -788,7 +788,7 @@ function renderDetail(r) {
   function rcvHL(wi){var a=weekAction[wi];if(a==='PUSH_OUT')return'background:#fff3e0;color:#e65100;font-weight:600;';if(a==='PULL_UP')return'background:#e3f2fd;color:#1565c0;font-weight:600;';return null;}
 
   // 26-week grid
-  var invFlow='<table class="subtbl grid26"><tr><th class="lbl"></th>';
+  var invFlow='<table class="subtbl grid26"><tr style="background:#ede9fe;"><th class="lbl" style="background:#ede9fe;"></th>';
   for(var i=1;i<=26;i++){var s=new Date(w1sun.getTime()+(i-1)*7*86400000);var lbl=(s.getMonth()+1)+'/'+s.getDate();invFlow+='<th title="W'+i+' - week of '+s.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'">'+lbl+'</th>';}
   invFlow+='<th>Total</th></tr>';
 
