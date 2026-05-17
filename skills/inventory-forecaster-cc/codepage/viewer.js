@@ -2181,7 +2181,7 @@ function toggleDetail(key) {
           </div>`;
       } else {
         const mstyle = encodeURIComponent(r.mstyle || '');
-        const invMgmtUrl = `https://pim.quickbase.com/db/bpsaju5pm?a=q&query=%7B20.EX.'${mstyle}'%7D`;
+        const invMgmtUrl = `inv_mgmt.html?mstyle=${encodeURIComponent(mstyle)}`;
         gapBannerHtml = `
           <div style="margin-top:6px;padding:6px 10px;background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;font-size:11px;color:#b71c1c;">
             &#x26a0;&#xfe0f; <b>Inventory Gap:</b> ${_gap.weeks.length} week${_gap.weeks.length === 1 ? '' : 's'} below Opt WOS (${optWosStr})
