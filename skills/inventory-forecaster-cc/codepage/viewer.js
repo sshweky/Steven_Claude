@@ -341,6 +341,16 @@ function _invFlowCacheBypassed() {
 }
 
 function _loadInvFlowCache() {
+  // 1. sessionStorage first (tab-scoped, no quota competition with other QB apps)
+  try {
+    const raw = sessionStorage.getItem(INV_FLOW_CACHE_KEY);
+    if (raw) {
+      const obj = JSON.parse(raw);
+      if (obj && typeof obj.ts === 'number' && obj.map)
+        return { map: obj.map, ageMs: Date.now() - obj.ts, source: 'session' };
+    }
+  } catch (e) { /* ignore */ }
+  // 2. localStorage fallback (cross-tab, 6h TTL)
   try {
     const raw = localStorage.getItem(INV_FLOW_CACHE_KEY);
     if (!raw) return null;
@@ -348,26 +358,37 @@ function _loadInvFlowCache() {
     if (!obj || typeof obj.ts !== 'number' || !obj.map) return null;
     const ageMs = Date.now() - obj.ts;
     if (ageMs > INV_FLOW_CACHE_TTL_MS) return null;
-    return { map: obj.map, ageMs };
+    return { map: obj.map, ageMs, source: 'local' };
   } catch (e) {
     return null;
   }
 }
 
 function _saveInvFlowCache(map) {
+  const payload = JSON.stringify({ ts: Date.now(), map });
+  // Always save to sessionStorage first (no quota competition)
+  try { sessionStorage.setItem(INV_FLOW_CACHE_KEY, payload); } catch (e) { /* ignore */ }
+  // Also try localStorage so other tabs and browser refreshes benefit
   try {
-    localStorage.setItem(INV_FLOW_CACHE_KEY, JSON.stringify({ ts: Date.now(), map }));
+    localStorage.setItem(INV_FLOW_CACHE_KEY, payload);
   } catch (e) {
-    // Quota exceeded most likely.  Try wiping the old entry and retrying once;
-    // if it still fails, just log and move on  -  the in-memory map still works.
     try {
       localStorage.removeItem(INV_FLOW_CACHE_KEY);
-      localStorage.setItem(INV_FLOW_CACHE_KEY, JSON.stringify({ ts: Date.now(), map }));
+      localStorage.setItem(INV_FLOW_CACHE_KEY, payload);
     } catch (e2) {
-      console.warn('[InvFlow] localStorage save failed (probably quota):', e2.message || e2);
+      console.warn('[InvFlow] localStorage quota full - sessionStorage only for this session:', e2.message || e2);
     }
   }
 }
+
+// Clear every local cache (both stores, both keys) and reload fresh from QB
+function clearAllCaches() {
+  [INV_FLOW_CACHE_KEY, PRJ_CACHE_KEY, FID_SESS_KEY].forEach(k => {
+    try { localStorage.removeItem(k); }   catch (e) { /* ignore */ }
+    try { sessionStorage.removeItem(k); } catch (e) { /* ignore */ }
+  });
+}
+function forceRefresh() { clearAllCaches(); location.reload(); }
 
 function _fmtCacheAge(ms) {
   const m = Math.floor(ms / 60000);
