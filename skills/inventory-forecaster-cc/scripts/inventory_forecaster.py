@@ -96,7 +96,8 @@ INTERNATIONAL_CUST_SUBSTRS = [
 OFFPRICE_CUST_SUBSTRS = [
     "BURLINGTON", "ROSS STORES", "TJ MAXX", "T J MAXX", "MARSHALLS",
     "KOHL", "SAM'S CLUB", "VARIETY WHOLESALERS", "OLLIE", "BIG LOTS",
-    "FIVE BELOW", "FRAGRANCENET",
+    "FIVE BELOW", "FRAGRANCENET", "DD'S DISCOUNTS", "DD'S DISCOUNT",
+    "GABRIEL BROTHERS",
 ]
 # T4 — E-commerce retailers (non-Amazon) where the planner has forward-looking
 # POS insight that isn't visible in raw order history.  For Seasonal Baseline
