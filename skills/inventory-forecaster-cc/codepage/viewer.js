@@ -4352,6 +4352,7 @@ async function bootstrap() {
     await new Promise(r => setTimeout(r, 16));
     FILTERED_RECORDS = ALL_RECORDS.slice();
     renderTable();
+    updateReplyCount();  // show banner if planner replies exist
 
     const ms = (performance.now() - t0).toFixed(0);
     console.log(`Codepage viewer bootstrap completed in ${ms}ms`);
