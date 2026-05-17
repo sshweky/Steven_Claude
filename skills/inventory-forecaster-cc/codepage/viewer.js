@@ -2159,34 +2159,47 @@ function toggleDetail(key) {
   }
   const histShp = r.hist_shp || [];
   const histOrd = r.hist_ord || [];
+  const atsHist = r.ats_hist || [];
+  // If ATS is still loading and detail is open, re-render once it resolves
+  if (!r.ats_hist && _atsHistPromise) {
+    _atsHistPromise.then(() => {
+      const panel = document.getElementById('detail-panel');
+      if (panel && panel.dataset.rid === String(r.rid)) renderDetail(r);
+    });
+  }
   let histHtml  = '';
-  if (histShp.length || histOrd.length) {
+  if (histShp.length || histOrd.length || atsHist.length) {
     let histHdrCells = '<th class="row-label"></th>';
-    let shpCells     = '<td class="row-label" style="color:#6a1b9a;font-weight:600">Shipments</td>';
-    let ordCells     = '<td class="row-label" style="color:#e65100;font-weight:600">Orders</td>';
-    let shpTot = 0, ordTot = 0;
+    let ordCells = '<td class="row-label" style="color:#e65100;font-weight:600">Orders</td>';
+    let shpCells = '<td class="row-label" style="color:#6a1b9a;font-weight:600">Shipments</td>';
+    let atsCells = '<td class="row-label" style="color:#00695c;font-weight:600">ATS Inv</td>';
+    let shpTot = 0, ordTot = 0, atsTot = 0;
     for (let i = 25; i >= 0; i--) {
-      // i=25 > Last Wk (1 week before W1); i=0 > 26 weeks before W1
       const label = _fmtHistDate(26 - i);
       histHdrCells += `<th style="font-size:10px;font-weight:normal">${label}</th>`;
       const sv = histShp[i] || 0;
       shpCells += `<td style="${sv === 0 ? 'color:#bbb' : 'color:#6a1b9a;font-weight:600'}">${fmtN(sv)}</td>`;
       const ov = histOrd[i] || 0;
       ordCells += `<td style="${ov === 0 ? 'color:#bbb' : 'color:#e65100;font-weight:600'}">${fmtN(ov)}</td>`;
-      shpTot += sv;  ordTot += ov;
+      const av = atsHist[i] || 0;
+      atsCells += `<td style="${av === 0 ? 'color:#bbb' : 'color:#00695c'}">${fmtN(av)}</td>`;
+      shpTot += sv;  ordTot += ov;  atsTot += av;
     }
     histHdrCells += '<th>Total</th><th style="color:#888;font-weight:600">Avg/Wk</th>';
-    shpCells     += `<td style="font-weight:700;color:#6a1b9a">${fmtN(shpTot)}</td>`;
-    shpCells     += `<td style="font-weight:700;color:#6a1b9a">${fmtN(Math.round(shpTot / 26))}</td>`;
-    ordCells     += `<td style="font-weight:700;color:#e65100">${fmtN(ordTot)}</td>`;
-    ordCells     += `<td style="font-weight:700;color:#e65100">${fmtN(Math.round(ordTot / 26))}</td>`;
+    ordCells += `<td style="font-weight:700;color:#e65100">${fmtN(ordTot)}</td>`;
+    ordCells += `<td style="font-weight:700;color:#e65100">${fmtN(Math.round(ordTot / 26))}</td>`;
+    shpCells += `<td style="font-weight:700;color:#6a1b9a">${fmtN(shpTot)}</td>`;
+    shpCells += `<td style="font-weight:700;color:#6a1b9a">${fmtN(Math.round(shpTot / 26))}</td>`;
+    atsCells += `<td style="font-weight:700;color:#00695c">${fmtN(atsTot)}</td>`;
+    atsCells += `<td style="font-weight:700;color:#00695c">${fmtN(Math.round(atsTot / 26))}</td>`;
     histHtml = `
     <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:2px solid #ede7f6;">
       <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">L26W History</div>
       <table class="dtbl">
         <tr>${histHdrCells}</tr>
-        <tr>${shpCells}</tr>
         <tr>${ordCells}</tr>
+        <tr>${shpCells}</tr>
+        <tr>${atsCells}</tr>
       </table>
     </div>`;
   }
