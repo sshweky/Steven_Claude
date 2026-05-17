@@ -2702,6 +2702,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if "404" in (fmt % args) or "500" in (fmt % args):
             super().log_message(fmt, *args)
 
+    def do_OPTIONS(self):
+        """Handle CORS preflight so QB code page (pim.quickbase.com) can fetch from localhost."""
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Accept-Encoding, Accept, Content-Type")
+        self.end_headers()
+
+    def _cors(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+
     def do_GET(self):
         if self.path in ("/", "/index.html"):
             body = _HTML_PAGE.encode("utf-8")
