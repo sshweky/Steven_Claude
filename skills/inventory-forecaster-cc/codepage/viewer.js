@@ -1088,6 +1088,7 @@ function adaptRow(row) {
     pog_end:           str(row, F.POG_END),
     iso_ship_date:     str(row, F.ISO_SHIP_DATE),
     opn_w:             opn,           // [Opn_W1..Opn_W26] open customer PO quantities
+    opn_total:         opn_total,    // sum of opn_w; used in proj_wk/ai_wk recalcs
     inv_flow_beg:        null,        // [Wk1..Wk26] beginning balances
     inv_flow_rcv:        null,        // [RcvWk1..RcvWk26] expected receipts
     inv_flow_prj:        null,        // [Prj Wk1..Wk26] projected demand draw
