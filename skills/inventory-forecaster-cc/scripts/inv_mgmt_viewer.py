@@ -2743,6 +2743,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 "record_count": len(_RECORDS),
             }).encode("utf-8")
             self.send_response(200)
+            self._cors()
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
