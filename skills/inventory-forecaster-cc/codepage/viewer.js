@@ -2496,7 +2496,7 @@ async function copyToMan(key, source, btn) {
     });
 
     rec.proj_total = sourceVals.reduce((a,b) => a+b, 0);
-    rec.proj_wk    = Math.round((rec.proj_total / 26) * 10) / 10;
+    rec.proj_wk    = Math.round(((rec.proj_total + (rec.opn_total || 0)) / 26) * 10) / 10;
     rec.weeks_slim = rec.weeks_slim.map((w, i) => ({ ...w, projection: Math.round(sourceVals[i] || 0), severity: 'OK' }));
     rec.max_sev    = 'OK';
     rec.n_flags    = 0;
