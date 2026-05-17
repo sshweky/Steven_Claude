@@ -4146,8 +4146,9 @@ async function bootstrap() {
     if (_prjCached) {
       ALL_RECORDS = _prjCached.records;
       const ageStr = _fmtCacheAge(_prjCached.ageMs);
-      _setDetail(`Projections: served from local cache (${ageStr} old)  -  append ?nocache=1 to URL for fresh pull`);
-      console.info(`[Prj] loaded ${ALL_RECORDS.length.toLocaleString()} records from localStorage cache (age ${ageStr})`);
+      const src = _prjCached.source === 'session' ? 'session cache' : 'local cache';
+      _setDetail(`Projections: served from ${src} (${ageStr} old)  -  append ?nocache=1 to URL for fresh pull`);
+      console.info(`[Prj] loaded ${ALL_RECORDS.length.toLocaleString()} records from ${src} (age ${ageStr})`);
     } else {
       _setDetail('Querying Quickbase for active records');
       const rawRows = await fetchAllRecords();
