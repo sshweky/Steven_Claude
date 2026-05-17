@@ -3383,7 +3383,7 @@ async function applyAiAdjustment(key) {
   // Update the in-memory AI forecast \u2014 does NOT touch MAN projections at all.
   rec.ai_fcst  = vals.slice();
   rec.ai_total = vals.reduce((a, b) => a + b, 0);
-  rec.ai_wk    = Math.round((rec.ai_total / 26) * 10) / 10;
+  rec.ai_wk    = Math.round(((rec.ai_total + (rec.opn_total || 0)) / 26) * 10) / 10;
 
   // Re-render the detail panel (AI row reflects the new values immediately).
   const detEl = document.getElementById('detail-' + key);
