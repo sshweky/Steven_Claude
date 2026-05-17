@@ -5899,6 +5899,55 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
     manual_wks = [float(row.get(c) or 0) for c in ORIG_PRJ_COLS]
 
+    # F68 — Amazon inactive-channel long-term zero (2026-05-17).
+    #
+    # Two-gate hybrid:
+    #   Gate 1 — ASIN Status: if the catalog flags the ASIN as "active" or
+    #     "FD" (Forecasted Demand), Amazon's buying system believes it should
+    #     be ordering — treat as active regardless of recent order silence
+    #     (stockout, compliance hold, or short-term gap).  Skip F68.
+    #   Gate 2 — Sparse-signal check: if Gate 1 does NOT confirm active AND
+    #     L13W = 0 AND L26W has ≤ 2 non-zero weeks, there is no sustainable
+    #     Amazon replenishment pattern.  Assume a long-term channel issue
+    #     (item not converting on Amazon, brand not a fit for Amazon's
+    #     demographic, listing compliance issue, or Vendor Central program
+    #     ended) and zero out the AI forecast.
+    #
+    # Designed to catch brands like Fraganzia and Fabuloso (multicultural
+    # market brands that perform at brick-and-mortar but not on Amazon),
+    # A&H Core Grooming (high 3P competition → lost search position → buyer
+    # stopped ordering), and any other Acct-MStyle where Amazon placed a
+    # trial stocking order but never established a replenishment rhythm.
+    #
+    # Does NOT fire when amz_catalog is None (data load gap — conservative).
+    # Does NOT replace F38f ("Not Buyable"/"ASIN Suppressed" flag — that is
+    # handled upstream with W1-4 zero + catch-up assumption).
+    if is_amazon and amz_catalog and model not in ("Inactive",):
+        _f68_status = (amz_catalog.get("ASIN_Status") or "").strip()
+        _f68_active = bool(
+            "active" in _f68_status.lower() or
+            "fd"     in _f68_status.lower()
+        )
+        if not _f68_active:
+            _f68_l13_tot = sum(float(v or 0) for v in hist_for_model[-13:])
+            _f68_l26_nz  = sum(1 for v in hist_for_model[-26:]
+                               if float(v or 0) > 0)
+            if _f68_l13_tot == 0 and _f68_l26_nz <= 2:
+                fcst     = [0] * 26
+                model    = "Inactive (F68)"
+                biweekly = False
+                meta     = {
+                    "model":   "Inactive (F68)",
+                    "drivers": [
+                        f"F68 Amazon inactive channel: ASIN_Status="
+                        f"'{_f68_status or 'unknown'}' (not Active/FD), "
+                        f"L13W orders=0, L26W non-zero weeks={_f68_l26_nz} ≤ 2 — "
+                        f"no sustainable Amazon replenishment pattern detected; "
+                        f"long-term channel issue assumed (brand channel fit, "
+                        f"listing compliance, or VC program ended)"
+                    ],
+                }
+
     # F20 — Heuristic deactivation check (2026-04-22).  The Heuristic model
     # reads post-ramp / historical avg baselines from items that classify()
     # routed away from Inactive.  On items the planner has explicitly zeroed
