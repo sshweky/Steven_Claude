@@ -2219,6 +2219,84 @@ def normalize_stockout_recovery(hist):
     return [int(round(v)) for v in out], corrections
 
 
+def normalize_ats_oos_weeks(hist, ats_l26):
+    """
+    VP-ATS (2026-05-17) — ATS-confirmed OOS zero-week fill.
+
+    Uses Available-to-Sell (ATS) inventory data to identify weeks where
+    zero orders were caused by us being out-of-stock rather than by genuine
+    demand absence.  When ATS ≈ 0 AND orders were also near-zero, the
+    customer stopped ordering because we had nothing to sell — those weeks
+    should be treated as demand-intent = baseline, not as demand = 0.
+
+    Running AFTER F35 is intentional: F35 first strips the post-gap
+    catch-up spike (backlog normalization); VP-ATS then fills the confirmed
+    OOS zero-weeks with baseline so the rest of the pipeline (F47, F41,
+    F6, F50, Croston, seasonal) sees a clean demand signal instead of
+    OOS-induced gaps.
+
+    hist:     52-week order history list (oldest→newest, indices 0..51).
+    ats_l26:  26-week ATS list (oldest→newest, indices 0..25), where
+              ats_l26[k] aligns with hist[26+k].  Typically from
+              oos_history.fetch_ats_history() — one record per Mstyle.
+
+    Detection criteria for an ATS-confirmed OOS week at hist-index i (26..51):
+      1. Orders near-zero: hist[i] < max(10, 10% of prior L13 nz-avg)
+      2. ATS constrained:  ats_l26[i-26] < max(10, 25% of prior L13 nz-avg)
+         (we had less than a quarter-week of supply available to ship)
+      3. Prior L13 had ≥3 non-zero weeks (item has an established demand signal)
+
+    When all conditions are met the week is filled with the L13 nz-avg
+    computed from the ORIGINAL (pre-fill) history to prevent cascading
+    inflation across consecutive OOS weeks.
+
+    Guard: if ALL 26 ATS values are zero the data is likely missing/not yet
+    loaded — skip all fills to avoid false positives.
+
+    Returns:
+        (normalized_hist, corrections)
+        corrections: list of {week_idx, ats_val, baseline, filled_to}
+    """
+    n    = len(hist)
+    orig = [float(v or 0) for v in hist]   # immutable baseline source
+    out  = list(orig)
+    corrections = []
+
+    if n < 27 or not ats_l26 or len(ats_l26) < 26:
+        return [int(round(v)) for v in out], corrections
+
+    # Guard: all-zero ATS means data unavailable — skip to avoid false fills.
+    if sum(ats_l26) == 0:
+        return [int(round(v)) for v in out], corrections
+
+    for i in range(26, min(52, n)):
+        ats_idx = i - 26
+        ats_val = float(ats_l26[ats_idx] or 0)
+
+        # L13 nz-avg from ORIGINAL history prior to this week
+        prior_lo = max(0, i - 13)
+        prior_nz = [orig[j] for j in range(prior_lo, i) if orig[j] > 0]
+        if len(prior_nz) < 3:
+            continue   # sparse — no reliable baseline, skip
+        baseline = sum(prior_nz) / len(prior_nz)
+        if baseline < 10:
+            continue
+
+        near_zero_thresh = max(10.0, 0.10 * baseline)
+        ats_thresh       = max(10.0, 0.25 * baseline)
+
+        if orig[i] < near_zero_thresh and ats_val < ats_thresh:
+            out[i] = baseline
+            corrections.append({
+                "week_idx":  i,
+                "ats_val":   round(ats_val,  1),
+                "baseline":  round(baseline, 1),
+                "filled_to": round(baseline, 1),
+            })
+
+    return [int(round(v)) for v in out], corrections
+
+
 def get_ship_history(row):
     """Return 52-week shipment history (oldest→newest), aligned 1:1 with
     get_history() order-side output.  Reads Shp_LW_n columns the same way
