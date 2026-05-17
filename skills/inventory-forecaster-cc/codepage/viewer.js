@@ -1538,7 +1538,7 @@ function _priCell(r) {
     return `<span class="pri-snoozed" title="Snoozed — ${hrsRem}h remaining">SNOOZED</span>`;
   }
   const safeKey = r.key.replace(/'/g, "\\'");
-  return `${priLabel(r.priority)}<button class="snooze-btn" onclick="snooze48('${safeKey}')" title="Ignore priority for 48 hours">Snooze 48 hrs</button>`;
+  return `${priLabel(r.priority)}<button class="snooze-btn" onclick="snooze48('${safeKey}')" title="Snooze this item for 48 hours — priority will be ignored and badge will show as SNOOZED until the period expires">Snooze</button>`;
 }
 
 function borderClass(s) {
