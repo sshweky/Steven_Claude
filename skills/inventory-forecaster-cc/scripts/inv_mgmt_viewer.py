@@ -2717,6 +2717,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if self.path in ("/", "/index.html"):
             body = _HTML_PAGE.encode("utf-8")
             self.send_response(200)
+            self._cors()
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
