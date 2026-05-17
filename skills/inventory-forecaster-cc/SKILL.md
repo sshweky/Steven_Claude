@@ -38,6 +38,58 @@ When the user says **"Update Sales Index"** (or "refresh seasonal indexes", "reb
 
 ---
 
+## Trigger: "Analyze Manual vs AI Projections"
+
+When the user says **"analyze manual vs AI"**, **"compare manual projections to AI"**, **"find algorithm improvements"**, **"projection methodology audit"**, **"where is AI vs manual off"**, **"run the manual vs AI analysis"**, or any request to audit planner vs model methodology differences and surface improvement opportunities:
+
+1. Run the self-contained analysis pipeline:
+   ```bash
+   cd <skill_directory>
+   python scripts/analyze_manual_vs_ai.py
+   ```
+   Add `--limit N` to cap the number of records fetched (useful for quick spot-checks):
+   ```bash
+   python scripts/analyze_manual_vs_ai.py --limit 200
+   ```
+
+2. The script does everything end-to-end:
+   - **Step 1 — Discover MAN PRJ field IDs** via `GET /v1/fields` on the Projections table. Finds all 26 weekly manual projection columns by matching the regex `^\d{2} \d{2} W(\d+)` against field labels. This is dynamic — no hard-coded FIDs.
+   - **Step 2 — Fetch projections** via paginated `POST /v1/records/query`, filter `{F_STATUS LIKE 'A%'}`. Pulls AI_PRJ_W1-W26, all 26 MAN PRJ columns, L13W order history cols, plus metadata (Customer, MStyle, Brand, Description, Manager, Item_Status). Processes up to `--limit` records.
+   - **Step 3 — Enrich** each record with computed metrics: `delta_pct` (manual vs AI % gap), `direction` (UP/DOWN/FLAT), `man_zeros` (zero-week count in manual plan), `killed` (manual plan is all zeros), `front_load_score` (what % of demand is in first 13 weeks), `spike_weeks` (weeks where manual is ≥3× median), `man_vs_l13` and `ai_vs_l13` (each plan total relative to L13W avg × 26), `trend_ratio` (L4W/L13W), `vol_tier` (HIGH ≥ 1,000/wk · MEDIUM 200-999 · LOW < 200).
+   - **Step 4 — Build a 12-section markdown report** (see report structure below).
+   - **Step 5 — Save outputs** to the `analysis/` directory.
+
+3. **Output files** (all written to `<skill_directory>/analysis/`):
+
+   | File | Contents |
+   |---|---|
+   | `manual_vs_ai_analysis.md` | Full 12-section markdown report with algorithm hypotheses |
+   | `manual_vs_ai_stats.csv` | Row-level stats: one row per projection with all computed metrics |
+   | `analysis_results.json` | Machine-readable aggregates (bias rates, vol-tier breakdown, customer breakdown, manager breakdown) |
+
+4. **Report sections:**
+
+   | # | Section | What it surfaces |
+   |---|---|---|
+   | 1 | Composition | Record count, vol-tier split, how many records were analyzed |
+   | 2 | Overall bias | % UP/DOWN/FLAT, mean delta, median delta |
+   | 3 | By customer | Per-customer bias rates and unit gaps (sorted by absolute gap) |
+   | 4 | By brand | Brand-level skew — helps identify if a brand's items are systematically over/under |
+   | 5 | By item status | Active/Replen/Phase-out breakdown — useful for detecting EOL misclassification |
+   | 6 | By volume tier | HIGH/MEDIUM/LOW tier gaps — where the biggest unit-gap exposure lives |
+   | 7 | Week profile | Week-by-week avg ratio manual/AI across the 26-week horizon — detects front/back-load skew |
+   | 8 | Kill patterns | Records where manual is all zeros vs AI has volume — likely AI over-projection candidates |
+   | 9 | Spike patterns | Weeks where manual has a ≥3× spike relative to its own median |
+   | 10 | L13W anchoring | How well each plan tracks the last-13-weeks trend; over/under-planners vs baseline |
+   | 11 | By manager | Per-planner bias direction — helps identify coaching opportunities vs systemic model gaps |
+   | 12 | **Algorithm hypotheses** | Auto-generated list of concrete improvement candidates, ranked by record count + unit gap, with suggested fix direction |
+
+5. **Interpreting the hypotheses table** (Section 12): Each hypothesis maps a pattern observed in the data to a proposed model fix. Hypotheses with the largest record counts and unit gaps are highest priority. After reviewing with the user, implement confirmed hypotheses in `scripts/inventory_forecaster.py` and document them in the **Model Fixes** tables in this SKILL.md.
+
+6. **Cadence:** Run this analysis at least monthly, or any time after a large batch of manual projections is updated. The script pulls fresh data each run — no stale cache.
+
+---
+
 ## Prerequisites (one-time)
 
 ```bash
