@@ -109,6 +109,21 @@ ECOM_CUST_SUBSTRS = [
     "PETSMART.COM",
 ]
 
+# F66 — Per-customer bias correction.  Customers where planners override AI
+# in the same direction >75% of the time get a post-model calibration multiplier.
+# Derived from manual-vs-AI analysis (2026-05-17).
+# Multipliers: > 1.0 = AI under-projects, < 1.0 = AI over-projects.
+# International accounts (Mexico) handled separately by is_international flag.
+CUSTOMER_BIAS_CORRECTIONS = {
+    "PSP DISTRIBUTION":          1.25,
+    "THEIS DISTRIBUTING":        1.25,
+    "IMPERIAL DISTRIBUTORS":     1.35,
+    "ARMY-AIR-FORCE EXCH":       1.40,
+    "PET PHARM":                 0.55,
+    "H G BUYING":                0.45,
+    "PETCO MEXICO":              0.45,
+}
+
 # F19 — Conservative inactive floor (on-by-default 2026-05-06).  Items
 # classified Inactive with manual_total ≥ 5,000 get a 50% manual-shaped floor
 # instead of a flat zero forecast — when there's evidence the item is "paused
