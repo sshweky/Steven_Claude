@@ -686,6 +686,17 @@ function actionTag(r) {
   return '<span class="badge '+cls+'">'+top+'</span>'+(r.recommendations.length>1?' <span style="color:#888;font-size:10px;">+'+( r.recommendations.length-1)+'</span>':'');
 }
 
+var COL_WIDTHS = {
+  priority:52, mstyle:78, description:155, brand:82, country:52, inv_manager:78,
+  status_sub:88, item_rank:42, customer_count:38,
+  qty_oh:62, ats_now:62, qty_oh_root:72,
+  it_qty:52, iw_qty:52, hold_qty:52, open_cust_po_qty:72,
+  shp_wk_l4:58, shp_wk_l13:62, prj_wk:52, prj_l4w_change:52,
+  opt_wos:52, ats_wos_oh:58, opt_oh:58, lt_wks:48, cny_weeks:38,
+  days_oos_next_rcpt:68, next_rcpt_dt:68, gap_weeks_n:52,
+  pipeline_excess:72, pipeline_wos:62, action:72
+};
+
 function visibleCols() {
   var hideMulti=(document.getElementById('hideMulti')||{}).checked;
   return COLS.filter(function(c){return !(hideMulti&&c.id==='qty_oh_root');});
