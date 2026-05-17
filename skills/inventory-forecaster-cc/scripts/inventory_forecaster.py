@@ -4613,6 +4613,11 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     # can first normalize any post-gap catch-up spike) and BEFORE F47/F41
     # (so those normalizations see ATS-corrected demand intent).
     hist, f_ats_corrections = normalize_ats_oos_weeks(hist, ats_hist_l26)
+    # VP-ATS-Catch — cap post-OOS catch-up spike weeks.  Runs immediately
+    # after VP-ATS so the cap sees ATS-filled (not raw-zero) history for
+    # pre-OOS baseline, then the rest of the pipeline (F47/F41/F39/F43)
+    # sees a clean signal without inflated catch-up orders.
+    hist, f_ats_catch_corrections = normalize_ats_catchup_spikes(hist, ats_hist_l26)
     # F41 — Shipment-confirmed phantom-order dedupe.  Pull per-week ship
     # history and cross-check: if order N wasn't fulfilled within the 1-wk
     # lag window, a similar-qty order in N+1 / N+2 is a phantom reorder.
