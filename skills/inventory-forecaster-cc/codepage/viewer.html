@@ -63,6 +63,8 @@ window.QB_CONFIG = {
     LAST_COMMENT_DATE: 1584,
     FLAGGED:               1592,   // boolean checkbox  -  true/false flag for inventory mgr review
     PLANNER_REPLY_PENDING: 1599,  // boolean checkbox  -  set when planner posts a reply (added 2026-05-17)
+    MANAGER_REPLY_PENDING: 0,     // boolean checkbox  -  set when director posts "Needs Planner Action"
+                                  // *** ADD THIS FIELD to the Projections table in QB, then put its FID here ***
     // POG / ISO context  -  used by the Inventory Plan block in the detail panel
     STORE_COUNT:  14,     // numeric  -  # stores carrying this item
     EST_ISO_QTY:  1010,   // numeric (formula)  -  qty needed for initial in-store fill
