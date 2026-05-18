@@ -4113,7 +4113,7 @@ function filterPri(pri) {
 function resetAllFilters() {
   const search = document.getElementById('search');
   if (search) search.value = '';
-  ['volFilter','priFilter','patFilter','brandFilter','mgrFilter','custFilter'].forEach(id => {
+  ['volFilter','priFilter','patFilter','brandFilter','mgrFilter','custFilter','fcstStatusFilter'].forEach(id => {
     const el = document.getElementById(id);
     if (el && typeof el._clearSelection === 'function') el._clearSelection();
   });
