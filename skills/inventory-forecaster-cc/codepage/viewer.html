@@ -102,6 +102,17 @@ window.QB_CONFIG = {
     SEND_TO:      41,   // text  -  display name of the intended recipient
   },
 
+  // -- Field IDs on Order History (bpe4maa4c) ------------------------------
+  ORDER_HIST_FID: {
+    ACCT_MSTYLE:  33,   // "Acct-MStyle" (hyphen label - label discovery fails without this)
+    CANCEL_DATE:  10,   // "Cancel Date"
+    QTY_CXLD:     17,   // "Qty Cxld"
+    EXCEP_APPR:   382,  // "Exception Approval"
+    EXCEP_NOTES:  415,  // "Exception Approval Notes"
+    QTY_OPEN:     15,   // "Qty Open"
+    CUST_NAME:    97,   // "Cust Name"
+  },
+
   // -- Field IDs on Inventory Flow (bpsaju5pm) -----------------------------
   // Three parallel 26-week series  -  all numeric, stable IDs (the rich-text
   // MM_DD_W1 rolling-label columns were discarded in favor of these clean

@@ -341,29 +341,19 @@ async function discoverInvFlowTextFids() {
 // in module-level vars so subsequent panels don't re-fetch.
 async function discoverOrdHistFids() {
   if (ORD_HIST_QTY_CXLD_FID) return;
-  try {
-    const fields = await qbGet(`/fields?tableId=${CFG.ORDER_HIST_TID}`);
-    for (const f of fields) {
-      const lbl = (f.label || '').trim().toLowerCase()
-                    .replace(/[\s_+]+/g, '_').replace(/^_|_$/g, '');
-      if      (lbl === 'acct_mstyle')              ORD_HIST_ACCT_MSTYLE_FID = f.id;
-      else if (lbl === 'cancel_date')               ORD_HIST_CANCEL_DATE_FID = f.id;
-      else if (lbl === 'qty_cxld')                  ORD_HIST_QTY_CXLD_FID    = f.id;
-      else if (lbl === 'exception_approval')        ORD_HIST_EXCEP_APPR_FID  = f.id;
-      else if (lbl === 'exception_approval_notes')  ORD_HIST_EXCEP_NOTES_FID = f.id;
-      else if (lbl === 'qty_open')                  ORD_HIST_QTY_OPEN_FID    = f.id;
-      else if (lbl === 'customer'     || lbl === 'cust_name' ||
-               lbl === 'customer_name'|| lbl === 'acct_name' ||
-               lbl === 'account_name' || lbl === 'cust_no')  ORD_HIST_CUST_NAME_FID = f.id;
-    }
-    console.info('[OrdHist] FIDs discovered:', {
-      acct_mstyle: ORD_HIST_ACCT_MSTYLE_FID, cancel_date: ORD_HIST_CANCEL_DATE_FID,
-      qty_cxld: ORD_HIST_QTY_CXLD_FID, excep: ORD_HIST_EXCEP_APPR_FID,
-      notes: ORD_HIST_EXCEP_NOTES_FID, qty_open: ORD_HIST_QTY_OPEN_FID,
-      cust_name: ORD_HIST_CUST_NAME_FID });
-  } catch (e) {
-    console.warn('[OrdHist] discoverOrdHistFids failed:', e.message || e);
-  }
+  const fids = CFG.ORDER_HIST_FID || {};
+  ORD_HIST_ACCT_MSTYLE_FID = fids.ACCT_MSTYLE || null;
+  ORD_HIST_CANCEL_DATE_FID = fids.CANCEL_DATE  || null;
+  ORD_HIST_QTY_CXLD_FID   = fids.QTY_CXLD     || null;
+  ORD_HIST_EXCEP_APPR_FID  = fids.EXCEP_APPR   || null;
+  ORD_HIST_EXCEP_NOTES_FID = fids.EXCEP_NOTES  || null;
+  ORD_HIST_QTY_OPEN_FID    = fids.QTY_OPEN     || null;
+  ORD_HIST_CUST_NAME_FID   = fids.CUST_NAME    || null;
+  console.info('[OrdHist] FIDs from CFG:', {
+    acct_mstyle: ORD_HIST_ACCT_MSTYLE_FID, cancel_date: ORD_HIST_CANCEL_DATE_FID,
+    qty_cxld: ORD_HIST_QTY_CXLD_FID, excep: ORD_HIST_EXCEP_APPR_FID,
+    notes: ORD_HIST_EXCEP_NOTES_FID, qty_open: ORD_HIST_QTY_OPEN_FID,
+    cust_name: ORD_HIST_CUST_NAME_FID });
 }
 
 // -- Build the QB query select list for one row -----------------------------
