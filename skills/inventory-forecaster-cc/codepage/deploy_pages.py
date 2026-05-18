@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Deploy Inventory Management Viewer to QB InventoryTrack codepages.
-Targets pages by ID so the correct production pages are always updated:
-  pageID=52  ->  inv_mgmt_full.html  (Inventory Management Viewer - HTML shell)
-  pageID=56  ->  inv_mgmt.js         (Inventory Management Viewer - JS logic, loaded by pageID=52)
+Deploy BOTH viewers to QB InventoryTrack app (bpd24h9wy).
 
-NOTE: pageID=49 and pageID=50 are the FORECAST VIEWER (a separate tool).
-Do NOT deploy to 49/50 - they are unrelated to this skill.
+  FORECAST MANAGER VIEWER (projections, flag comments, AI analysis):
+    pageID=49  ->  viewer.js          (JS logic)
+    pageID=50  ->  viewer.html        (HTML shell, loads viewer.js via pageID=49)
 
-viewer.html and viewer.js are NOT deployed here - they are a separate dev prototype.
+  INVENTORY MANAGEMENT VIEWER (OOS gap analysis, PO recommendations):
+    pageID=52  ->  inv_mgmt_full.html (HTML shell, loads inv_mgmt.js via pageID=56)
+    pageID=56  ->  inv_mgmt.js        (JS logic)
 
 Handles U+FFFF (invalid in XML 1.0) by replacing with U+FFFD before upload.
 """
@@ -24,8 +24,10 @@ HERE   = Path(__file__).parent
 
 # Map filename -> production page ID
 PAGE_IDS = {
-    "inv_mgmt_full.html": 52,
-    "inv_mgmt.js":        56,
+    "viewer.js":          49,   # Forecast Manager Viewer - JS
+    "viewer.html":        50,   # Forecast Manager Viewer - HTML
+    "inv_mgmt_full.html": 52,   # Inventory Management Viewer - HTML
+    "inv_mgmt.js":        56,   # Inventory Management Viewer - JS
 }
 
 def upload_page(filename: str):
@@ -86,9 +88,21 @@ def upload_page(filename: str):
         return False
 
 if __name__ == "__main__":
-    ok_js   = upload_page("inv_mgmt.js")
-    ok_html = upload_page("inv_mgmt_full.html")
-    if ok_js and ok_html:
-        print("\n[OK] Both pages deployed. Hard-refresh the viewer tab (Ctrl+Shift+R).")
+    import sys
+    # Usage: python deploy_pages.py [forecast|invmgmt|all]
+    target = sys.argv[1] if len(sys.argv) > 1 else "all"
+
+    results = []
+    if target in ("forecast", "all"):
+        print("--- Forecast Manager Viewer (pages 49/50) ---")
+        results.append(upload_page("viewer.js"))
+        results.append(upload_page("viewer.html"))
+    if target in ("invmgmt", "all"):
+        print("--- Inventory Management Viewer (pages 52/56) ---")
+        results.append(upload_page("inv_mgmt.js"))
+        results.append(upload_page("inv_mgmt_full.html"))
+
+    if all(results):
+        print("\n[OK] All pages deployed. Hard-refresh open tabs (Ctrl+Shift+R).")
     else:
         print("\n[WARN] One or more uploads failed.")

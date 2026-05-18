@@ -1,38 +1,39 @@
 ---
-name: Inventory Management Viewer - correct files and page IDs
-description: The real production files for the Inventory Management Viewer are inv_mgmt_full.html and inv_mgmt.js — NOT viewer.html/viewer.js
+name: QB Codepage viewer architecture - which files go to which pages
+description: Two separate viewers in InventoryTrack app (bpd24h9wy). Forecast Manager = viewer.html/viewer.js on pages 50/49. Inventory Management = inv_mgmt_full.html/inv_mgmt.js on pages 52/56.
 type: reference
 originSessionId: 192e4f01-3664-463b-bda7-b157c0280869
 ---
-## Production Files (Inventory Management Viewer)
+## Two Viewers -- MEMORIZE THIS
 
-| File | QB Page ID | Size |
-|------|-----------|------|
-| `inv_mgmt_full.html` | 52 | ~136 KB |
-| `inv_mgmt.js` | 56 | ~81 KB |
+Both live in: `C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\codepage\`
 
-Both files live in:
-`C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\codepage\`
+### Forecast Manager Viewer
+Projections, flag comments, AI analysis, planner responses.
 
-## Other Pages (DO NOT TOUCH)
+| File | QB Page ID |
+|------|-----------|
+| `viewer.html` | 50 (HTML shell) |
+| `viewer.js` | 49 (JS logic, loaded by page 50 via pageID=49) |
 
-| Page ID | Files | What it is |
-|---------|-------|------------|
-| 49 | (Forecast Viewer JS) | Forecast Viewer - separate tool |
-| 50 | (Forecast Viewer HTML) | Forecast Viewer - separate tool |
+### Inventory Management Viewer
+OOS gap analysis, PO recommendations, inventory flow.
 
-## viewer.html / viewer.js
-
-These files in the same codepage folder are NOT the production Inventory Management Viewer. Do not deploy them to pages 52/56.
+| File | QB Page ID |
+|------|-----------|
+| `inv_mgmt_full.html` | 52 (HTML shell) |
+| `inv_mgmt.js` | 56 (JS logic, loaded by page 52 via pageID=56) |
 
 ## Deploy Script
 
-`deploy_pages.py` in the same folder — deploys inv_mgmt_full.html -> pageID=52, inv_mgmt.js -> pageID=56.
+`deploy_pages.py` -- supports targeted deploys:
+- `python deploy_pages.py forecast`  -> deploys viewer.js (49) + viewer.html (50)
+- `python deploy_pages.py invmgmt`   -> deploys inv_mgmt.js (56) + inv_mgmt_full.html (52)
+- `python deploy_pages.py all`       -> deploys all four pages
 
-**WARNING:** As of 2026-05-18, `API_AddReplaceDBPage` returns errcode=0 but does NOT write content (silent failure). Pages must be restored manually via QB UI (Settings > Pages > Edit > paste content). Root cause unknown — investigate before next deploy.
+**NEVER run without explicit user instruction.**
 
-## Manual Restore Steps
+## Notes
 
-1. QB Settings ⚙ → Pages
-2. Find page 52 or 56 → Edit
-3. Select all → delete → paste from local file → Save
+- `API_GetDBPage` (legacy XML API) returns empty pagebody even for pages that have content -- do not use it to verify deploys.
+- `viewer_qb_current.js` in the same folder is a stale backup snapshot -- not needed.
