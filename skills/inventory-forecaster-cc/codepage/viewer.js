@@ -3069,10 +3069,21 @@ async function addComment(key) {
     fields[CFG.COMMENT_FID.NOTE]        = { value: txt };
     fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
     if (flag) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
-    // AUTHOR (FID 40) is a plain text field — NOT auto-stamped by QB.
-    // We must set it explicitly on every insert so the comment thread shows who wrote it.
+    // AUTHOR (FID 40) — plain text, must be set explicitly on every insert.
     if (CFG.COMMENT_FID.AUTHOR && CURRENT_USER.name)
       fields[CFG.COMMENT_FID.AUTHOR] = { value: CURRENT_USER.name };
+
+    // SEND_TO (FID 41) — derived from the flag direction so recipients are explicit:
+    //   "Needs Planner Action"  → send to the record's inv_manager (the planner)
+    //   "Planner Response"      → send to the managers (director / VP)
+    //   All others              → no specific recipient
+    if (CFG.COMMENT_FID.SEND_TO) {
+      const _recForTo = ALL_RECORDS.find(x => x.key === key);
+      let _sendTo = '';
+      if (flag === 'Needs Planner Action')  _sendTo = (_recForTo && _recForTo.inv_manager) || 'Planner';
+      else if (flag === 'Planner Response') _sendTo = CFG.MANAGER_NAMES ? CFG.MANAGER_NAMES.join(', ') : 'Director';
+      if (_sendTo) fields[CFG.COMMENT_FID.SEND_TO] = { value: _sendTo };
+    }
 
     const resp  = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
     const recId = (resp && resp.metadata && resp.metadata.createdRecordIds && resp.metadata.createdRecordIds[0]) || '';
