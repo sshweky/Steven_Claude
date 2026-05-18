@@ -2140,6 +2140,9 @@ function autoFlagOnComment(key) {
     }
     return;
   }
+  // FYI comments are informational — don't auto-flag the row
+  const flagSel = document.getElementById('cmt-flag-' + key);
+  if (flagSel && flagSel.value === 'FYI') return;
   if (rec.flagged) return;       // already flagged (QB or manual) — leave alone
   if (rec._auto_flagged) return; // already pre-flagged this session
   // Update UI immediately so the row tints and counter increments while typing.
@@ -2959,6 +2962,7 @@ async function toggleDetail(key) {
             <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
               <option value="Needs Action" ${!_USER_IS_PLANNER ? 'selected' : ''} style="color:#1565c0;font-weight:600;">Needs Action</option>
               <option value="Planner Response" ${_USER_IS_PLANNER ? 'selected' : ''} style="color:#00695c;font-weight:600;">Planner Response</option>
+              <option value="FYI" style="color:#616161;">FYI</option>
               <option value="Resolved">Resolved</option>
             </select>
           </label>
@@ -3466,19 +3470,22 @@ async function loadCommentHistory(key, force) {
           const flag   = (r[F.FLAG]         && r[F.FLAG].value)         || '';
           const author = (r[F.AUTHOR]       && r[F.AUTHOR].value)       || '';
           const sendTo = (F.SEND_TO && r[F.SEND_TO] && r[F.SEND_TO].value) || '';
-          const isReply    = flag === 'Planner Response';
+          const isReply     = flag === 'Planner Response';
           const isToPlanner = flag === 'Needs Action';
-          const borderColor = isReply ? '#00695c' : (isToPlanner ? '#1565c0' : '#8b2252');
-          const bgColor     = isReply ? '#f1faf9'  : (isToPlanner ? '#e8f0fe' : '#fdf7fa');
-          // "From: Author → To: Recipient" header line
-          const fromPart  = author ? `<b style="color:${borderColor}">${escHtml(author)}</b>` : '';
-          const toPart    = sendTo ? ` <span style="color:#888">-&gt;</span> <b style="color:${borderColor}">${escHtml(sendTo)}</b>` : '';
+          const isFyi       = flag === 'FYI';
+          const borderColor = isFyi ? '#9e9e9e' : (isReply ? '#00695c' : (isToPlanner ? '#1565c0' : '#8b2252'));
+          const bgColor     = isFyi ? '#fafafa'  : (isReply ? '#f1faf9'  : (isToPlanner ? '#e8f0fe' : '#fdf7fa'));
+          // "From: Author → To: Recipient" header line — omitted for FYI (no directed recipient)
+          const fromPart   = (!isFyi && author) ? `<b style="color:${borderColor}">${escHtml(author)}</b>` : (isFyi && author ? `<span style="color:#757575">${escHtml(author)}</span>` : '');
+          const toPart     = (!isFyi && sendTo) ? ` <span style="color:#888">-&gt;</span> <b style="color:${borderColor}">${escHtml(sendTo)}</b>` : '';
           const authorLine = (fromPart || toPart) ? `${fromPart}${toPart} &middot; ` : '';
-          const flagBadge  = isReply
-            ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">Planner Response</span>`
-            : isToPlanner
-              ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">Needs Action</span>`
-              : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
+          const flagBadge  = isFyi
+            ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#f5f5f5;color:#757575;margin-left:6px;vertical-align:middle;">FYI</span>`
+            : isReply
+              ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">Planner Response</span>`
+              : isToPlanner
+                ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">Needs Action</span>`
+                : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
           const reviewBtn = isReply
             ? `<button onclick="markReviewed('${key.replace(/'/g,"\\'")}', this)" style="font-size:10px;padding:2px 8px;background:#e0f2f1;color:#00695c;border:1px solid #00695c;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Reviewed</button>`
             : '';
@@ -3571,7 +3578,7 @@ async function addComment(key) {
     const fields = {};
     fields[CFG.COMMENT_FID.NOTE]        = { value: txt };
     fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
-    const _QB_VALID_FLAGS = new Set(['Needs Action', 'Resolved']);
+    const _QB_VALID_FLAGS = new Set(['Needs Action', 'Resolved', 'FYI']);
     if (flag && _QB_VALID_FLAGS.has(flag)) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
     // AUTHOR — text (FID 40) + user (FID 42)
     if (CFG.COMMENT_FID.AUTHOR && CURRENT_USER.name)
@@ -3582,7 +3589,8 @@ async function addComment(key) {
     // SEND_TO — text (FID 41) + user (FID 43)
     //   "Needs Action"    → planner (inv_manager of the record)
     //   "Planner Response"→ primary manager (Mikey Scott)
-    if (CFG.COMMENT_FID.SEND_TO || CFG.COMMENT_FID.SEND_TO_USER) {
+    //   "FYI"             → no recipient (informational only)
+    if (flag !== 'FYI' && (CFG.COMMENT_FID.SEND_TO || CFG.COMMENT_FID.SEND_TO_USER)) {
       const _recForTo = ALL_RECORDS.find(x => x.key === key);
       let _sendToText  = '';
       let _sendToEmail = '';
@@ -3655,8 +3663,10 @@ async function addComment(key) {
   if (typeof loadCommentHistory === 'function') loadCommentHistory(key, true);
 
   // --- Step 3: Routing — update Projections pending-flags (best-effort) ----
+  // FYI comments are informational — no routing, no pending flags.
   // Non-fatal: the comment is already saved.  Badge updates are skipped but
   // comment history still shows on reload.
+  if (flag === 'FYI') return;
   try {
     if (flag === 'Needs Action' && CFG.FID.MANAGER_REPLY_PENDING) {
       const pf = {};
