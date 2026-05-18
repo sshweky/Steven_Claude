@@ -312,18 +312,25 @@ async function discoverWeeklyFids() {
 // Discover the FID for Open_Supplier_POs on the Inventory Flow table.
 // Runs once at startup; result stored in INV_FLOW_SUPP_PO_FID.
 async function discoverInvFlowTextFids() {
-  if (INV_FLOW_SUPP_PO_FID) return;
+  if (INV_FLOW_SUPP_PO_FID && INV_FLOW_ATS_NOW_FID) return;
   try {
     const fields = await qbGet(`/fields?tableId=${CFG.INV_FLOW_TID}`);
     for (const f of fields) {
-      const lbl = (f.label || '').trim().toLowerCase().replace(/[\s_]+/g, '_');
-      if (lbl === 'open_supplier_pos') {
-        INV_FLOW_SUPP_PO_FID = f.id;
-        console.info('[InvFlow] Open_Supplier_POs FID:', f.id);
-        break;
-      }
+      // Normalize: lowercase, collapse spaces/underscores/+ into single underscore,
+      // strip leading/trailing underscores so "ATS OH+OO" → "ats_oh_oo"
+      const lbl = (f.label || '').trim().toLowerCase()
+                    .replace(/[\s_+]+/g, '_').replace(/^_|_$/g, '');
+      if      (lbl === 'open_supplier_pos')  INV_FLOW_SUPP_PO_FID   = f.id;
+      else if (lbl === 'ats_now')            INV_FLOW_ATS_NOW_FID   = f.id;
+      else if (lbl === 'ats_oh')             INV_FLOW_ATS_OH_FID    = f.id;
+      else if (lbl === 'ats_oh_oo')          INV_FLOW_ATS_OO_FID    = f.id;
+      else if (lbl === 'ats_wos_oh')         INV_FLOW_ATS_OH_WOS_FID = f.id;
+      else if (lbl === 'ats_wos_oh_oo')      INV_FLOW_ATS_OO_WOS_FID = f.id;
     }
-    if (!INV_FLOW_SUPP_PO_FID) console.warn('[InvFlow] Open_Supplier_POs field not found in /fields response');
+    console.info('[InvFlow] text/ATS FIDs discovered:',
+      { supp_pos: INV_FLOW_SUPP_PO_FID, ats_now: INV_FLOW_ATS_NOW_FID,
+        ats_oh: INV_FLOW_ATS_OH_FID, ats_oo: INV_FLOW_ATS_OO_FID,
+        ats_oh_wos: INV_FLOW_ATS_OH_WOS_FID, ats_oo_wos: INV_FLOW_ATS_OO_WOS_FID });
   } catch (e) {
     console.warn('[InvFlow] discoverInvFlowTextFids failed:', e.message || e);
   }
@@ -397,7 +404,7 @@ async function fetchAllRecords(mgrName) {
 // Cache version is in the key.  Bump it (_v1 -> _v2) on any schema change
 // to force-invalidate all clients on next page load.
 // v2 = added Opt WOS / Opt WOS Final / Next Avl Rcpt Dt scalars per mstyle
-const INV_FLOW_CACHE_KEY    = 'pp_invflow_v5';  // bumped: added supp_pos (Open_Supplier_POs)
+const INV_FLOW_CACHE_KEY    = 'pp_invflow_v6';  // bumped: added supp_pos + ATS scalar FIDs
 const INV_FLOW_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 const ATS_HIST_CACHE_KEY    = 'pp_ats_v1';
 const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
@@ -405,7 +412,12 @@ const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 // Background load promise  -  resolves when inv flow is attached to ALL_RECORDS.
 // Boot fires this without awaiting so the table renders immediately.
 let _invFlowPromise = null;
-let INV_FLOW_SUPP_PO_FID = null;   // discovered at startup from /fields on INV_FLOW_TID
+let INV_FLOW_SUPP_PO_FID  = null;   // discovered at startup from /fields on INV_FLOW_TID
+let INV_FLOW_ATS_NOW_FID  = null;   // ATS_Now
+let INV_FLOW_ATS_OH_FID   = null;   // ATS_OH_
+let INV_FLOW_ATS_OO_FID   = null;   // ATS_OH_OO_
+let INV_FLOW_ATS_OH_WOS_FID  = null; // ATS_WOS_OH_
+let INV_FLOW_ATS_OO_WOS_FID  = null; // ATS_WOS_OH_OO_
 
 // Escape hatch: ?nocache=1 in the URL bypasses cache for a single load
 // (useful when planners suspect stale data).
@@ -738,7 +750,12 @@ async function attachInvFlow(records) {
           r.inv_flow_next_rcpt = d.next_rcpt || '';
           r.inv_flow_lt_wks    = d.lt_wks   || 0;
           r.inv_flow_moq       = d.moq      || 0;
-          r.inv_flow_supp_pos  = d.supp_pos || '';
+          r.inv_flow_supp_pos  = d.supp_pos  || '';
+          r.inv_flow_ats_now   = d.ats_now   || 0;
+          r.inv_flow_ats_oh    = d.ats_oh    || 0;
+          r.inv_flow_ats_oo    = d.ats_oo    || 0;
+          r.inv_flow_ats_oh_wos = d.ats_oh_wos || 0;
+          r.inv_flow_ats_oo_wos = d.ats_oo_wos || 0;
           nMatched++;
         }
       }
@@ -762,8 +779,13 @@ async function attachInvFlow(records) {
   const LT_WKS     = CFG.INV_FLOW_LT_WKS;
   const MOQ        = CFG.INV_FLOW_MOQ;
   const SUPP_PO    = INV_FLOW_SUPP_PO_FID;
+  const ATS_NOW    = INV_FLOW_ATS_NOW_FID;
+  const ATS_OH     = INV_FLOW_ATS_OH_FID;
+  const ATS_OO     = INV_FLOW_ATS_OO_FID;
+  const ATS_OH_WOS = INV_FLOW_ATS_OH_WOS_FID;
+  const ATS_OO_WOS = INV_FLOW_ATS_OO_WOS_FID;
   const sel        = [FK, ...BIDS, ...RIDS, ...PIDS, ...(OIDS||[]), OPT_WOS, OPT_FINAL, NEXT_RCPT, LT_WKS, MOQ,
-                      ...(SUPP_PO ? [SUPP_PO] : [])];
+                      ...[SUPP_PO, ATS_NOW, ATS_OH, ATS_OO, ATS_OH_WOS, ATS_OO_WOS].filter(Boolean)];
   const TOP        = 1000;
   const map        = {};
   let totalFetched = 0;
@@ -828,7 +850,12 @@ async function attachInvFlow(records) {
         next_rcpt: strCell(row, NEXT_RCPT),  // ISO YYYY-MM-DD or empty
         lt_wks:    numCell(row, LT_WKS),     // Lead Time in weeks
         moq:       numCell(row, MOQ),        // Minimum Order Quantity
-        supp_pos:  SUPP_PO ? strCell(row, SUPP_PO) : '',  // Open_Supplier_POs text
+        supp_pos:  SUPP_PO    ? strCell(row, SUPP_PO)    : '',
+        ats_now:   ATS_NOW   ? numCell(row, ATS_NOW)   : 0,
+        ats_oh:    ATS_OH    ? numCell(row, ATS_OH)    : 0,
+        ats_oo:    ATS_OO    ? numCell(row, ATS_OO)    : 0,
+        ats_oh_wos: ATS_OH_WOS ? numCell(row, ATS_OH_WOS) : 0,
+        ats_oo_wos: ATS_OO_WOS ? numCell(row, ATS_OO_WOS) : 0,
       };
     }
     totalFetched += rows.length;
@@ -849,7 +876,12 @@ async function attachInvFlow(records) {
       r.inv_flow_next_rcpt = d.next_rcpt || '';
       r.inv_flow_lt_wks    = d.lt_wks  || 0;
       r.inv_flow_moq       = d.moq     || 0;
-      r.inv_flow_supp_pos  = d.supp_pos || '';
+      r.inv_flow_supp_pos   = d.supp_pos   || '';
+      r.inv_flow_ats_now    = d.ats_now    || 0;
+      r.inv_flow_ats_oh     = d.ats_oh     || 0;
+      r.inv_flow_ats_oo     = d.ats_oo     || 0;
+      r.inv_flow_ats_oh_wos = d.ats_oh_wos || 0;
+      r.inv_flow_ats_oo_wos = d.ats_oo_wos || 0;
       nMatched++;
     }
   }
@@ -1503,6 +1535,11 @@ function adaptRow(row) {
     inv_flow_lt_wks:     0,           // numeric  -  lead time in weeks
     inv_flow_moq:        0,           // numeric  -  minimum order quantity
     inv_flow_supp_pos:   '',          // text  -  Open_Supplier_POs (raw multi-line)
+    inv_flow_ats_now:    0,           // numeric  -  ATS_Now
+    inv_flow_ats_oh:     0,           // numeric  -  ATS_OH_
+    inv_flow_ats_oo:     0,           // numeric  -  ATS_OH_OO_
+    inv_flow_ats_oh_wos: 0,           // numeric  -  ATS_WOS_OH_
+    inv_flow_ats_oo_wos: 0,           // numeric  -  ATS_WOS_OH_OO_
     ats_hist:            null,        // [26] ATS inv history oldest->newest (LW-25..LW)
   };
 }
@@ -2605,6 +2642,12 @@ async function toggleDetail(key) {
         <div style="font-size:18px;font-weight:700;color:${col};white-space:nowrap;">${val}</div>
       </div>`;
     const _cdivider = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
+    const _atsNow   = r.inv_flow_ats_now    || 0;
+    const _atsOh    = r.inv_flow_ats_oh     || 0;
+    const _atsOo    = r.inv_flow_ats_oo     || 0;
+    const _atsOhWos = r.inv_flow_ats_oh_wos || 0;
+    const _atsOoWos = r.inv_flow_ats_oo_wos || 0;
+    const _hasAts   = _atsNow > 0 || _atsOh > 0 || _atsOo > 0;
     const _invCardsHtml = _hasInvFlow ? `
       <div style="border-top:1px solid #e0e0e0;padding-top:8px;margin-top:6px;display:flex;gap:6px;flex-wrap:nowrap;align-items:stretch;overflow-x:auto;">
         ${_ccard('Qty OH',    _cfmt(_cardQtyOh), '#37474f', 'P+P warehouse on-hand (Inv Flow Wk1 beginning balance)')}
@@ -2614,7 +2657,13 @@ async function toggleDetail(key) {
         ${_cdivider}
         ${_ccard('OH WOS',    _cwt(_cardOhWos),  _cwc(_cardOhWos),  'Weeks of supply on-hand only')}
         ${_ccard('OH+OO WOS', _cwt(_cardOoWos),  _cwc(_cardOoWos),  'Weeks of supply: OH + I/T + I/W pipeline')}
-        <div id="inv-cards-amz-${safeIdForTotal}" style="display:contents;"></div>
+        ${_hasAts ? _cdivider : ''}
+        ${_hasAts ? _ccard('ATS Now',       _cfmt(_atsNow),   '#1565c0', 'Available to ship today (Inv Flow ATS_Now)') : ''}
+        ${_hasAts ? _ccard('ATS OH',        _cfmt(_atsOh),    '#1565c0', 'ATS based on on-hand only (Inv Flow ATS_OH)') : ''}
+        ${_hasAts ? _ccard('ATS OH+OO',     _cfmt(_atsOo),    '#1565c0', 'ATS OH + open supplier orders (Inv Flow ATS_OH_OO)') : ''}
+        ${_hasAts ? _cdivider : ''}
+        ${_hasAts ? _ccard('ATS OH WOS',    _cwt(_atsOhWos),  _cwc(_atsOhWos),  'ATS OH / Prj/Wk (Inv Flow ATS_WOS_OH)') : ''}
+        ${_hasAts ? _ccard('ATS OH+OO WOS', _cwt(_atsOoWos),  _cwc(_atsOoWos),  'ATS OH+OO / Prj/Wk (Inv Flow ATS_WOS_OH_OO)') : ''}
       </div>` : '';
 
     invFlowSectionHtml = `
@@ -2974,37 +3023,8 @@ async function _loadAmzDcInv(r, safeId) {
     else ul.appendChild(li);
   }
 
-  // ── Amazon ATS cards (injected after the base inv-flow cards) ────────────
-  // Base cards (Qty OH, I/W, I/T, Next Rcpt, OH WOS, OH+OO WOS) are now
-  // rendered inline from Inventory Flow data — no fetch required.
-  // Only the ATS cards are Amazon-specific and come from the Catalog query.
-  const amzCardsEl = document.getElementById('inv-cards-amz-' + safeId);
-  if (!amzCardsEl) return;
-
-  if (!fetchOk || (atsNow === 0 && atsOh === 0 && atsOo === 0)) return;
-
-  const calcWos = (qty, rate) => (rate > 0 ? qty / rate : 0);
-  const wosColor = w => w === 0 ? '#bbb' : w < 3 ? '#c62828' : w < 8 ? '#e65100' : w < 16 ? '#1b5e20' : '#f57f17';
-  const wosText  = w => w === 0 ? '0' : w.toFixed(1) + ' wks';
-  const atsOhWos = calcWos(atsOh, prjWk);
-  const atsOoWos = calcWos(atsOo, prjWk);
-
-  const card = (label, value, color = '#222', title = '') =>
-    `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:5px;padding:5px 10px;"${title ? ` title="${title}"` : ''}>
-      <div style="font-size:10px;color:#888;font-weight:600;white-space:nowrap;margin-bottom:2px;">${label}</div>
-      <div style="font-size:18px;font-weight:700;color:${color};white-space:nowrap;">${value}</div>
-    </div>`;
-  const divider = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
-  const gap     = `<div style="width:20px;flex:none;"></div>`;
-
-  amzCardsEl.innerHTML =
-    gap +
-    card('ATS Now',       fmt(atsNow), '#1565c0', 'ATS available to ship today') +
-    card('ATS OH',        fmt(atsOh),  '#1565c0', 'ATS Qty OH — available from on-hand') +
-    card('ATS OH+OO',     fmt(atsOo),  '#1565c0', 'ATS OH + open supplier orders') +
-    divider +
-    card('ATS OH WOS',    wosText(atsOhWos), wosColor(atsOhWos), 'ATS OH / Prj/Wk') +
-    card('ATS OH+OO WOS', wosText(atsOoWos), wosColor(atsOoWos), 'ATS OH+OO / Prj/Wk');
+  // ATS cards are now sourced from Inventory Flow and rendered inline —
+  // nothing left for _loadAmzDcInv to do after the DC inventory bullet above.
 }
 
 // -- Comment history loader --------------------------------------------------
