@@ -2834,12 +2834,9 @@ async function toggleDetail(key) {
         <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
           <label style="font-size:11px;color:#555;">Status:
             <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
-              <option value="Needs Planner Action" ${!_USER_IS_PLANNER ? 'selected' : ''} style="color:#1565c0;font-weight:600;">Needs Planner Action</option>
-              <option value="Investigating">Investigating</option>
-              <option value="In Progress">In Progress</option>
+              <option value="Needs Action" ${!_USER_IS_PLANNER ? 'selected' : ''} style="color:#1565c0;font-weight:600;">Needs Action</option>
               <option value="Planner Response" ${_USER_IS_PLANNER ? 'selected' : ''} style="color:#00695c;font-weight:600;">Planner Response</option>
               <option value="Resolved">Resolved</option>
-              <option value="Dismissed">Dismissed</option>
             </select>
           </label>
           <button id="cmt-btn-${safeKey}" onclick="addComment('${safeKey}')" style="padding:5px 14px;background:#8b2252;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:11px;">Save</button>
@@ -3294,7 +3291,7 @@ async function loadCommentHistory(key, force) {
           const author = (r[F.AUTHOR]       && r[F.AUTHOR].value)       || '';
           const sendTo = (F.SEND_TO && r[F.SEND_TO] && r[F.SEND_TO].value) || '';
           const isReply    = flag === 'Planner Response';
-          const isToPlanner = flag === 'Needs Planner Action';
+          const isToPlanner = flag === 'Needs Action';
           const borderColor = isReply ? '#00695c' : (isToPlanner ? '#1565c0' : '#8b2252');
           const bgColor     = isReply ? '#f1faf9'  : (isToPlanner ? '#e8f0fe' : '#fdf7fa');
           // "From: Author → To: Recipient" header line
@@ -3304,7 +3301,7 @@ async function loadCommentHistory(key, force) {
           const flagBadge  = isReply
             ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">Planner Response</span>`
             : isToPlanner
-              ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">Needs Planner Action</span>`
+              ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">Needs Action</span>`
               : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
           const reviewBtn = isReply
             ? `<button onclick="markReviewed('${key.replace(/'/g,"\\'")}', this)" style="font-size:10px;padding:2px 8px;background:#e0f2f1;color:#00695c;border:1px solid #00695c;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Reviewed</button>`
@@ -3398,19 +3395,20 @@ async function addComment(key) {
     const fields = {};
     fields[CFG.COMMENT_FID.NOTE]        = { value: txt };
     fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
-    if (flag) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
+    const _QB_VALID_FLAGS = new Set(['Needs Action', 'Resolved']);
+    if (flag && _QB_VALID_FLAGS.has(flag)) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
     // AUTHOR (FID 40) — plain text, must be set explicitly on every insert.
     if (CFG.COMMENT_FID.AUTHOR && CURRENT_USER.name)
       fields[CFG.COMMENT_FID.AUTHOR] = { value: CURRENT_USER.name };
 
     // SEND_TO (FID 41) — derived from the flag direction so recipients are explicit:
-    //   "Needs Planner Action"  → send to the record's inv_manager (the planner)
+    //   "Needs Action"  → send to the record's inv_manager (the planner)
     //   "Planner Response"      → send to the managers (director / VP)
     //   All others              → no specific recipient
     if (CFG.COMMENT_FID.SEND_TO) {
       const _recForTo = ALL_RECORDS.find(x => x.key === key);
       let _sendTo = '';
-      if (flag === 'Needs Planner Action')  _sendTo = (_recForTo && _recForTo.inv_manager) || 'Planner';
+      if (flag === 'Needs Action')  _sendTo = (_recForTo && _recForTo.inv_manager) || 'Planner';
       else if (flag === 'Planner Response') _sendTo = CFG.MANAGER_NAMES ? CFG.MANAGER_NAMES.join(', ') : 'Director';
       if (_sendTo) fields[CFG.COMMENT_FID.SEND_TO] = { value: _sendTo };
     }
@@ -3427,7 +3425,7 @@ async function addComment(key) {
   msg.textContent = recId ? 'Saved (rec #' + recId + ')' : 'Saved';
   msg.style.color = '#2e7d32';
   document.getElementById('cmt-text-' + key).value = '';
-  document.getElementById('cmt-flag-' + key).value = _USER_IS_PLANNER ? 'Planner Response' : 'Needs Planner Action';
+  document.getElementById('cmt-flag-' + key).value = _USER_IS_PLANNER ? 'Planner Response' : 'Needs Action';
   const rec    = ALL_RECORDS.find(x => x.key === key);
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   if (rec) {
@@ -3443,7 +3441,7 @@ async function addComment(key) {
   // Non-fatal: the comment is already saved.  Badge updates are skipped but
   // comment history still shows on reload.
   try {
-    if (flag === 'Needs Planner Action' && CFG.FID.MANAGER_REPLY_PENDING) {
+    if (flag === 'Needs Action' && CFG.FID.MANAGER_REPLY_PENDING) {
       const pf = {};
       pf[CFG.FID.KEY]                   = { value: key };
       pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: true };
