@@ -476,8 +476,27 @@ function _loadPrjCache() {
   }
 }
 
+// Fields that are ONLY used in the detail panel (row expand) — never in the
+// main table.  Stripping them before caching shrinks the payload from ~15 MB
+// to ~2–3 MB so it reliably fits in localStorage (quota shared with other QB
+// apps on pim.quickbase.com).  They are lazy-fetched from QB the first time
+// a planner expands a row (_lazyLoadDetail).
+const _PRJ_CACHE_STRIP = new Set([
+  'ai_fcst', 'weeks_slim', 'suggested', 'opn_w',
+  'hist_ord', 'hist_shp', 'ly_ord', 'ly_shp', 'narrative',
+]);
+
 function _savePrjCache(records) {
-  const payload = JSON.stringify({ ts: Date.now(), records });
+  // Strip heavy arrays + narrative, mark records as needing lazy detail load.
+  const slim = records.map(r => {
+    const out = {};
+    for (const k of Object.keys(r)) {
+      if (!_PRJ_CACHE_STRIP.has(k)) out[k] = r[k];
+    }
+    out._needs_detail = true;
+    return out;
+  });
+  const payload = JSON.stringify({ ts: Date.now(), records: slim });
   // Always save to sessionStorage first (no quota competition).
   try { sessionStorage.setItem(PRJ_CACHE_KEY, payload); } catch (e) { /* ignore */ }
   // Also try localStorage so other tabs benefit.
@@ -491,6 +510,53 @@ function _savePrjCache(records) {
       console.warn('[Prj] localStorage quota full - sessionStorage only for this session:', e2.message || e2);
     }
   }
+}
+
+// Lazy-fetch the stripped detail fields for one cached record.
+// Called on first expand of a row served from localStorage/sessionStorage.
+async function _lazyLoadDetail(r) {
+  const selectFids = [
+    ...CFG.AI_PRJ_FIDS,
+    ...CFG.SUG_FIDS,
+    ...CFG.OPN_FIDS,
+    ...MAN_PRJ_FIDS,
+    ...ORD_HIST_FIDS,
+    ...SHP_HIST_FIDS,
+    ...LY_ORD_HIST_FIDS,
+    ...LY_SHP_HIST_FIDS,
+    CFG.FID.AI_ANALYSIS,
+    CFG.FID.AI_ALERT,
+  ].filter(Boolean);
+  const data = await qbPost('/v1/records/query', {
+    from:    CFG.PROJECTIONS_TID,
+    select:  [...new Set(selectFids)],
+    where:   `{${CFG.FID.KEY}.EX.'${String(r.key).replace(/'/g, "\\'")}'}`,
+    options: { top: 1 },
+  });
+  if (!data.data || !data.data[0]) return;
+  const row = data.data[0];
+
+  const forecast = CFG.AI_PRJ_FIDS.map(fid => num(row, fid));
+  const manual   = MAN_PRJ_FIDS  .map(fid => num(row, fid));
+  r.ai_fcst   = forecast;
+  r.suggested = CFG.SUG_FIDS.map(fid => num(row, fid));
+  r.opn_w     = CFG.OPN_FIDS.map(fid => num(row, fid));
+  r.hist_ord  = ORD_HIST_FIDS.map(fid => num(row, fid));
+  r.hist_shp  = SHP_HIST_FIDS.map(fid => num(row, fid));
+  r.ly_ord    = LY_ORD_HIST_FIDS.map(fid => num(row, fid));
+  r.ly_shp    = LY_SHP_HIST_FIDS.map(fid => num(row, fid));
+  r.narrative = str(row, CFG.FID.AI_ANALYSIS) || str(row, CFG.FID.AI_ALERT);
+  // Re-compute weeks_slim (per-week AI vs manual severity)
+  const weeks_slim = [];
+  for (let i = 0; i < 26; i++) {
+    const m = manual[i] || 0, a = forecast[i] || 0;
+    let sev = 'OK';
+    if ((m === 0 && a > 0) || (a === 0 && m > 0)) sev = 'ALERT';
+    else if (m > 0 && (a / m > 3 || m / Math.max(a, 1) > 3)) sev = 'ALERT';
+    weeks_slim.push({ week: i + 1, projection: m, severity: sev });
+  }
+  r.weeks_slim    = weeks_slim;
+  r._needs_detail = false;
 }
 
 // Cache discoverWeeklyFids() result in sessionStorage so same-tab refreshes
