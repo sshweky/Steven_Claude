@@ -424,56 +424,105 @@ function _fmtCacheAge(ms) {
 }
 
 // -- Projections cache --------------------------------------------------------
-// Two-tier: sessionStorage (primary, tab-scoped, no quota competition) +
-// localStorage (secondary, cross-tab warmup, 6h TTL).
+// Two-tier: sessionStorage (primary, tab-scoped, instant F5 refresh) +
+// IndexedDB (secondary, cross-tab / cross-session, 6h TTL, ~50MB quota).
 //
-// Why sessionStorage first?  pim.quickbase.com's localStorage is shared by
-// every QB app in the realm.  When quota fills, _savePrjCache silently fails
-// and every refresh triggers a full re-fetch.  sessionStorage is isolated per
-// tab, never competes with other apps, and is large enough for the dataset.
+// Why not localStorage?  pim.quickbase.com's localStorage is shared by every
+// QB app in the realm.  With 80 users and multiple apps the quota fills and
+// _savePrjCache silently failed, causing a cold 5,000-record fetch every
+// session.  IndexedDB is a named per-app database — no quota competition.
+// Arrays are still stripped (_PRJ_CACHE_STRIP) to keep the payload small.
 //
 // Behaviour per scenario:
-//   Refresh same tab    -> sessionStorage hit  -> instant (no QB calls)
-//   New tab, same day   -> sessionStorage miss, localStorage hit -> instant
-//   New tab, >6h later  -> both miss -> full fetch, repopulates both stores
-//   ?nocache=1 in URL   -> both bypassed -> always fresh pull
+//   F5 same tab            -> sessionStorage hit  -> instant (0 QB calls)
+//   New tab, <6h old data  -> IndexedDB hit        -> fast   (0 QB calls)
+//   New tab, >6h / no data -> both miss            -> full fetch + save both
+//   ?nocache=1 in URL      -> bypassed             -> always fresh pull
 //
 // Bump PRJ_CACHE_KEY any time adaptRow() output shape changes.
-const PRJ_CACHE_KEY    = 'pp_prj_v3';  // v3: arrays stripped, lazy-loaded on row expand
+const PRJ_CACHE_KEY    = 'pp_prj_v4';  // v4: IndexedDB + stripped arrays
 const PRJ_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 
 // FID discovery cache key (sessionStorage only - resets each new tab is fine
 // because discoverWeeklyFids makes a single lightweight /fields call).
 const FID_SESS_KEY = 'pp_fids_v1';
 
+// -- Minimal IndexedDB key-value wrapper -------------------------------------
+// All errors degrade gracefully — falls back to cold fetch, never throws.
+const _idb = (() => {
+  let _db = null;
+  const _ready = new Promise(resolve => {
+    try {
+      const req = indexedDB.open('pp_viewer_v1', 1);
+      req.onupgradeneeded = e => {
+        try { e.target.result.createObjectStore('kv'); } catch (_) {}
+      };
+      req.onsuccess = e => { _db = e.target.result; resolve(true); };
+      req.onerror   = ()  => resolve(false);
+    } catch (_) { resolve(false); }
+  });
+  return {
+    async get(key) {
+      if (!await _ready || !_db) return undefined;
+      return new Promise(res => {
+        try {
+          const req = _db.transaction('kv','readonly').objectStore('kv').get(key);
+          req.onsuccess = e => res(e.target.result);
+          req.onerror   = ()  => res(undefined);
+        } catch (_) { res(undefined); }
+      });
+    },
+    async set(key, value) {
+      if (!await _ready || !_db) return;
+      return new Promise(res => {
+        try {
+          const req = _db.transaction('kv','readwrite').objectStore('kv').put(value, key);
+          req.onsuccess = () => res();
+          req.onerror   = () => res();
+        } catch (_) { res(); }
+      });
+    },
+    async del(key) {
+      if (!await _ready || !_db) return;
+      return new Promise(res => {
+        try {
+          const req = _db.transaction('kv','readwrite').objectStore('kv').delete(key);
+          req.onsuccess = () => res();
+          req.onerror   = () => res();
+        } catch (_) { res(); }
+      });
+    },
+  };
+})();
+
 function _prjCacheBypassed() {
   try { return new URLSearchParams(location.search).get('nocache') === '1'; }
   catch (e) { return false; }
 }
 
-function _loadPrjCache() {
-  // 1. Try sessionStorage (instant - no TTL needed, tab session is short-lived)
+async function _loadPrjCache() {
+  // 1. sessionStorage (instant, same-tab F5)
   try {
     const raw = sessionStorage.getItem(PRJ_CACHE_KEY);
     if (raw) {
       const obj = JSON.parse(raw);
-      if (obj && Array.isArray(obj.records)) {
+      if (obj && Array.isArray(obj.records))
         return { records: obj.records, ageMs: Date.now() - (obj.ts || 0), source: 'session' };
+    }
+  } catch (e) { /* ignore */ }
+  // 2. IndexedDB (cross-tab, cross-session, 6h TTL)
+  try {
+    const obj = await _idb.get(PRJ_CACHE_KEY);
+    if (obj && Array.isArray(obj.records)) {
+      const ageMs = Date.now() - (obj.ts || 0);
+      if (ageMs <= PRJ_CACHE_TTL_MS) {
+        // Warm sessionStorage so same-tab refreshes are instant from here on
+        try { sessionStorage.setItem(PRJ_CACHE_KEY, JSON.stringify(obj)); } catch (_) {}
+        return { records: obj.records, ageMs, source: 'idb' };
       }
     }
   } catch (e) { /* ignore */ }
-  // 2. Fall back to localStorage (cross-tab, 6h TTL)
-  try {
-    const raw = localStorage.getItem(PRJ_CACHE_KEY);
-    if (!raw) return null;
-    const obj = JSON.parse(raw);
-    if (!obj || typeof obj.ts !== 'number' || !Array.isArray(obj.records)) return null;
-    const ageMs = Date.now() - obj.ts;
-    if (ageMs > PRJ_CACHE_TTL_MS) return null;
-    return { records: obj.records, ageMs, source: 'local' };
-  } catch (e) {
-    return null;
-  }
+  return null;
 }
 
 // Fields that are ONLY used in the detail panel (row expand) — never in the
