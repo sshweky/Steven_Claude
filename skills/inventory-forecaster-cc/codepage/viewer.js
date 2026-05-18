@@ -2567,7 +2567,7 @@ async function toggleDetail(key) {
           wos = _wosForward(bv, _prj, i);
           const maxWks = 26 - i;   // remaining weeks in the horizon
           if (wos >= maxWks) {
-            wosTxt = maxWks >= 26 ? '26+' : _invFmt1(wos);
+            wosTxt = _invFmt1(wos);
             wosColor = '#1b5e20';                      // covered through horizon
           } else {
             wosTxt = _invFmt1(wos);
@@ -2970,7 +2970,7 @@ async function toggleDetail(key) {
   // Only fetch cxld data once inv flow is done loading (avoids concurrent QB
   // calls that can stall the inv flow bulk scan).  If inv flow is already
   // attached (_hasInvFlow) or already resolved/null, start immediately.
-  if (CFG.ORDER_HIST_TID && (_hasInvFlow || !_invFlowPromise)) _loadOrdHistCxld(r, safeIdForTotal);
+  if (CFG.ORDER_HIST_TID) _loadOrdHistCxld(r, safeIdForTotal);
   if (CFG.ORDER_HIST_TID) _loadOpenOrderDetails(r, safeId);
 
   } catch (err) {
