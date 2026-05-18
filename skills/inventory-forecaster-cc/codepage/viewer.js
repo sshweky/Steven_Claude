@@ -2785,7 +2785,7 @@ async function toggleDetail(key) {
   <div style="margin:10px 12px 12px 12px;padding:12px;background:#f7f9fc;border:1px solid #d8dce3;border-radius:6px;">
     <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11px;color:#555;cursor:pointer;">
       <span>Flag for inv mgr review:</span>
-      <button id="flg-${safeId}" class="${flagCls2}" onclick="toggleFlag('${safeKey}')" title="Toggle the QB Flagged boolean for this projection">&#x2691;</button>
+      <button id="flg-${safeId}" class="${flagCls2}" onclick="toggleFlag('${safeKey}')" title="Toggle the QB Flagged boolean for this projection">&#x2691; Flag Projection</button>
     </label>
     <div style="display:flex;gap:14px;align-items:flex-start;">
       <!-- LEFT: Add a Comment (25%)  -  for planner <-> mgr dialogue -->
@@ -3217,7 +3217,7 @@ async function addComment(key) {
       const pf = {};
       pf[CFG.FID.KEY]                   = { value: key };
       pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: true };
-      await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
+      await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
       if (rec) rec.manager_reply_pending = true;
       const badgeCell = document.getElementById('row-badges-' + safeId);
       if (badgeCell && !badgeCell.querySelector('.mgr-badge'))
@@ -3232,7 +3232,7 @@ async function addComment(key) {
       pf[CFG.FID.KEY]                   = { value: key };
       pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: true };
       if (CFG.FID.MANAGER_REPLY_PENDING) pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
-      await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
+      await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
       if (rec) { rec.planner_reply_pending = true; rec.manager_reply_pending = false; }
       const badgeCell = document.getElementById('row-badges-' + safeId);
       if (badgeCell) {
@@ -3253,7 +3253,7 @@ async function addComment(key) {
         pf[CFG.FID.KEY]                   = { value: key };
         pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: false };
         if (CFG.FID.MANAGER_REPLY_PENDING) pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
-        await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
+        await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
         if (rec) { rec.planner_reply_pending = false; rec.manager_reply_pending = false; }
         const badgeCell = document.getElementById('row-badges-' + safeId);
         if (badgeCell) {
