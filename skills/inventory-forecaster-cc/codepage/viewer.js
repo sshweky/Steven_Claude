@@ -2701,12 +2701,8 @@ async function toggleDetail(key) {
       if (_opn && _opn.length === 26) {
         const ov = _opn[i];
         opnTot += ov;
-        let opnTip = ov > 0 ? `${fmtN(ov)} units open (all customers combined)` : '';
-        if (i === 0 && ov > 0) opnTip += '\nIncludes past-due (Wk0) + current week (Wk1)';
-        const opnTitleAttr = opnTip ? ` title="${opnTip.replace(/"/g, '&quot;')}"` : '';
-        const opnCursor = opnTip ? ' cursor:help;' : '';
         opnCells += ov > 0
-          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;${opnCursor}"${opnTitleAttr}>${fmtN(ov)}</td>`
+          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help">${fmtN(ov)}</td>`
           : `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       } else {
         opnCells += `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
