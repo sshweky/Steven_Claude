@@ -407,12 +407,14 @@ function _saveAtsHistCache(map) {
   }
 }
 
-// Clear every local cache (both stores, both keys) and reload fresh from QB
+// Clear every local cache and reload fresh from QB
 function clearAllCaches() {
   [INV_FLOW_CACHE_KEY, ATS_HIST_CACHE_KEY, PRJ_CACHE_KEY, FID_SESS_KEY].forEach(k => {
     try { localStorage.removeItem(k); }   catch (e) { /* ignore */ }
     try { sessionStorage.removeItem(k); } catch (e) { /* ignore */ }
   });
+  // Clear IndexedDB projection cache
+  _idb.del(PRJ_CACHE_KEY).catch(() => {});
 }
 function forceRefresh() { clearAllCaches(); location.reload(); }
 
