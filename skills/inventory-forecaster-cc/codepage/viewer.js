@@ -4695,6 +4695,9 @@ async function bootstrap() {
       + `to Quickbase in this browser, then reload this page.\n\nDetails: ${e.message}`
       );
     }
+    // Decode who the visitor is from the JWT we just fetched.
+    // Done early so the name is available before any UI renders.
+    await fetchCurrentUser();
 
     _setBoot('Loading projections...');
     _setDetail('Discovering rolling weekly column IDs (manual prj + Ord LW + Shp LW)');
@@ -4757,6 +4760,22 @@ async function bootstrap() {
     await new Promise(r => setTimeout(r, 16));
     populateFilters();
     refreshHeaderBadges();
+
+    // -- Role detection: planner vs director/VP ---------------------------------
+    // A planner is anyone whose display name appears as an inv_manager in the data.
+    // Directors/VPs typically don't own records, so they see everything by default.
+    {
+      const _mgrs = new Set(ALL_RECORDS.map(r => (r.inv_manager || '').toLowerCase()).filter(Boolean));
+      _USER_IS_PLANNER = Boolean(CURRENT_USER.name && _mgrs.has(CURRENT_USER.name.toLowerCase()));
+      if (_USER_IS_PLANNER) {
+        SHOW_MY_RECORDS_ONLY = true;
+        console.info(`[Auth] Planner view: auto-filtering to "${CURRENT_USER.name}"`);
+      }
+      // Update the user badge and My Records button to reflect the resolved identity
+      const _ub = document.getElementById('current-user-badge');
+      if (_ub) _ub.textContent = CURRENT_USER.name || '—';
+      _syncMyRecordsButton();
+    }
 
     _setBoot('Rendering review table...');
     _setDetail(`${ALL_RECORDS.length.toLocaleString()} rows | paginated 100 per page`);
