@@ -12,3 +12,4 @@
 - [reference_quickbase_api_rules.md](reference_quickbase_api_rules.md) — Universal rule book for accessing QB without throttling: bulk write patterns, retry/backoff policy, anti-patterns, pre-flight checklist. Apply to any chat/script/skill that touches Quickbase.
 - [reference_cdata_mcp.md](reference_cdata_mcp.md) — CData MCP auth (Basic email:PAT), response format, and inventory forecaster setup notes
 - [reference_contacts.md](reference_contacts.md) — Key internal contacts: Mikey Scott (Director of Inventory Management), Nancy Lee (VP Supply Chain)
+- [reference_inv_mgmt_codepages.md](reference_inv_mgmt_codepages.md) — Production inv mgmt viewer files: inv_mgmt_full.html (pg 52) + inv_mgmt.js (pg 56); NOT viewer.html/viewer.js; deploy API broken as of 2026-05-18
