@@ -309,6 +309,26 @@ async function discoverWeeklyFids() {
   });
 }
 
+// Discover the FID for Open_Supplier_POs on the Inventory Flow table.
+// Runs once at startup; result stored in INV_FLOW_SUPP_PO_FID.
+async function discoverInvFlowTextFids() {
+  if (INV_FLOW_SUPP_PO_FID) return;
+  try {
+    const fields = await qbGet(`/fields?tableId=${CFG.INV_FLOW_TID}`);
+    for (const f of fields) {
+      const lbl = (f.label || '').trim().toLowerCase().replace(/[\s_]+/g, '_');
+      if (lbl === 'open_supplier_pos') {
+        INV_FLOW_SUPP_PO_FID = f.id;
+        console.info('[InvFlow] Open_Supplier_POs FID:', f.id);
+        break;
+      }
+    }
+    if (!INV_FLOW_SUPP_PO_FID) console.warn('[InvFlow] Open_Supplier_POs field not found in /fields response');
+  } catch (e) {
+    console.warn('[InvFlow] discoverInvFlowTextFids failed:', e.message || e);
+  }
+}
+
 // -- Build the QB query select list for one row -----------------------------
 function buildSelectFids() {
   const F = CFG.FID;
@@ -377,7 +397,7 @@ async function fetchAllRecords(mgrName) {
 // Cache version is in the key.  Bump it (_v1 -> _v2) on any schema change
 // to force-invalidate all clients on next page load.
 // v2 = added Opt WOS / Opt WOS Final / Next Avl Rcpt Dt scalars per mstyle
-const INV_FLOW_CACHE_KEY    = 'pp_invflow_v4';  // bumped: added lt_wks + moq fields
+const INV_FLOW_CACHE_KEY    = 'pp_invflow_v5';  // bumped: added supp_pos (Open_Supplier_POs)
 const INV_FLOW_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 const ATS_HIST_CACHE_KEY    = 'pp_ats_v1';
 const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
@@ -385,6 +405,7 @@ const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 // Background load promise  -  resolves when inv flow is attached to ALL_RECORDS.
 // Boot fires this without awaiting so the table renders immediately.
 let _invFlowPromise = null;
+let INV_FLOW_SUPP_PO_FID = null;   // discovered at startup from /fields on INV_FLOW_TID
 
 // Escape hatch: ?nocache=1 in the URL bypasses cache for a single load
 // (useful when planners suspect stale data).
@@ -717,6 +738,7 @@ async function attachInvFlow(records) {
           r.inv_flow_next_rcpt = d.next_rcpt || '';
           r.inv_flow_lt_wks    = d.lt_wks   || 0;
           r.inv_flow_moq       = d.moq      || 0;
+          r.inv_flow_supp_pos  = d.supp_pos || '';
           nMatched++;
         }
       }
@@ -739,7 +761,9 @@ async function attachInvFlow(records) {
   const NEXT_RCPT  = CFG.INV_FLOW_NEXT_RCPT_DT;
   const LT_WKS     = CFG.INV_FLOW_LT_WKS;
   const MOQ        = CFG.INV_FLOW_MOQ;
-  const sel        = [FK, ...BIDS, ...RIDS, ...PIDS, ...(OIDS||[]), OPT_WOS, OPT_FINAL, NEXT_RCPT, LT_WKS, MOQ];
+  const SUPP_PO    = INV_FLOW_SUPP_PO_FID;
+  const sel        = [FK, ...BIDS, ...RIDS, ...PIDS, ...(OIDS||[]), OPT_WOS, OPT_FINAL, NEXT_RCPT, LT_WKS, MOQ,
+                      ...(SUPP_PO ? [SUPP_PO] : [])];
   const TOP        = 1000;
   const map        = {};
   let totalFetched = 0;
@@ -800,10 +824,11 @@ async function attachInvFlow(records) {
         rcv: RIDS.map(fid => numCell(row, fid)),
         prj: PIDS.map(fid => numCell(row, fid)),
         opn: opnDisplay,
-        opt_wos: opt_wos,
+        opt_wos:   opt_wos,
         next_rcpt: strCell(row, NEXT_RCPT),  // ISO YYYY-MM-DD or empty
         lt_wks:    numCell(row, LT_WKS),     // Lead Time in weeks
         moq:       numCell(row, MOQ),        // Minimum Order Quantity
+        supp_pos:  SUPP_PO ? strCell(row, SUPP_PO) : '',  // Open_Supplier_POs text
       };
     }
     totalFetched += rows.length;
@@ -824,6 +849,7 @@ async function attachInvFlow(records) {
       r.inv_flow_next_rcpt = d.next_rcpt || '';
       r.inv_flow_lt_wks    = d.lt_wks  || 0;
       r.inv_flow_moq       = d.moq     || 0;
+      r.inv_flow_supp_pos  = d.supp_pos || '';
       nMatched++;
     }
   }
@@ -1476,6 +1502,7 @@ function adaptRow(row) {
     inv_flow_next_rcpt:  '',          // ISO date  -  when next supplier receipt arrives
     inv_flow_lt_wks:     0,           // numeric  -  lead time in weeks
     inv_flow_moq:        0,           // numeric  -  minimum order quantity
+    inv_flow_supp_pos:   '',          // text  -  Open_Supplier_POs (raw multi-line)
     ats_hist:            null,        // [26] ATS inv history oldest->newest (LW-25..LW)
   };
 }
@@ -2306,6 +2333,47 @@ async function toggleDetail(key) {
   const _rcv = r.inv_flow_rcv || null;
   const _prj = r.inv_flow_prj || null;
   const _hasInvFlow = !!(_beg || _rcv || _prj);
+
+  // -- Supplier PO helpers (for Expected Receipts hover tooltips) -------------
+  function _parseSupplierPOs(text) {
+    if (!text) return [];
+    return text.split(/[\r\n;]+/).map(l => l.trim()).filter(Boolean).map(line => {
+      const poM   = line.match(/^([^-]+)/);
+      const suppM = line.match(/^[^-]+-\s*([^-]+?)\s*-\s*I\/T/i);
+      const itM   = line.match(/I\/T:\s*([\d,]+)\s*pcs/i);
+      const iwM   = line.match(/I\/W:\s*([\d,]+)\s*pcs/i);
+      const etdM  = line.match(/ETD:\s*(\d{2}-\d{2}-\d{4})/i);
+      const etaM  = line.match(/ETA:\s*(\d{2}-\d{2}-\d{4})/i);
+      let etaDate = null;
+      if (etaM) {
+        const [mm, dd, yyyy] = etaM[1].split('-').map(Number);
+        etaDate = new Date(yyyy, mm - 1, dd);
+      }
+      return {
+        po:       ((poM ? poM[1] : '').trim().split('-')[0] || '').trim(),
+        supplier: (suppM ? suppM[1] : '').trim(),
+        itQty:    itM ? parseInt((itM[1] || '0').replace(/,/g, ''), 10) : 0,
+        iwQty:    iwM ? parseInt((iwM[1] || '0').replace(/,/g, ''), 10) : 0,
+        etd:      etdM ? etdM[1] : '',
+        eta:      etaM ? etaM[1] : '',
+        etaDate,
+      };
+    }).filter(p => p.po || p.supplier);
+  }
+  function _rcvTooltip(pos, weekIdx) {
+    if (!pos.length) return '';
+    const weekStart = W1_DATE ? new Date(W1_DATE.getTime() + weekIdx * 7 * 86400000) : null;
+    const weekEnd   = weekStart ? new Date(weekStart.getTime() + 6 * 86400000) : null;
+    const matched   = weekStart ? pos.filter(p => p.etaDate && p.etaDate >= weekStart && p.etaDate <= weekEnd) : [];
+    const display   = matched.length ? matched : pos;
+    const prefix    = matched.length ? '' : 'All open supplier POs:\n';
+    return prefix + display.map(p => {
+      const qty = p.itQty > 0 ? `${p.itQty.toLocaleString()} pcs I/T`
+                : p.iwQty > 0 ? `${p.iwQty.toLocaleString()} pcs I/W` : '';
+      return `PO ${p.po} · ${p.supplier}${qty ? '\n  ' + qty : ''}${p.etd ? ' · ETD ' + p.etd : ''}${p.eta ? ' → ETA ' + p.eta : ''}`;
+    }).join('\n');
+  }
+  const _suppPos = _parseSupplierPOs(r.inv_flow_supp_pos || '');
   // If the background load is still running, re-render once it finishes
   if (!_hasInvFlow && _invFlowPromise) {
     _invFlowPromise.then(() => {
@@ -2406,7 +2474,10 @@ async function toggleDetail(key) {
         const rv = _rcv[i];
         rcvTot += rv;
         const color = rv > 0 ? '#1565c0' : '#bbb';
-        rcvCells += `<td style="color:${color};font-size:10px;background:#f0f7ff">${rv > 0 ? fmtN(rv) : '&mdash;'}</td>`;
+        const tipText = rv > 0 ? _rcvTooltip(_suppPos, i) : '';
+        const titleAttr = tipText ? ` title="${tipText.replace(/"/g, '&quot;')}"` : '';
+        const cursor = tipText ? ` cursor:help;` : '';
+        rcvCells += `<td style="color:${color};font-size:10px;background:#f0f7ff;${cursor}"${titleAttr}>${rv > 0 ? fmtN(rv) : '&mdash;'}</td>`;
       } else {
         rcvCells += `<td style="color:#bbb;font-size:10px;background:#f0f7ff"> - </td>`;
       }
@@ -2452,9 +2523,12 @@ async function toggleDetail(key) {
       if (_opn && _opn.length === 26) {
         const ov = _opn[i];
         opnTot += ov;
-        const titleAttr = i === 0 ? ' title="Includes past-due (Wk0) + current week (Wk1)"' : '';
+        let opnTip = ov > 0 ? `${fmtN(ov)} units open (all customers combined)` : '';
+        if (i === 0 && ov > 0) opnTip += '\nIncludes past-due (Wk0) + current week (Wk1)';
+        const opnTitleAttr = opnTip ? ` title="${opnTip.replace(/"/g, '&quot;')}"` : '';
+        const opnCursor = opnTip ? ' cursor:help;' : '';
         opnCells += ov > 0
-          ? `<td style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1"${titleAttr}>${fmtN(ov)}</td>`
+          ? `<td style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;${opnCursor}"${opnTitleAttr}>${fmtN(ov)}</td>`
           : `<td style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       } else {
         opnCells += `<td style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
@@ -4841,7 +4915,7 @@ async function bootstrap() {
 
     _setBoot('Loading projections...');
     _setDetail('Discovering rolling weekly column IDs (manual prj + Ord LW + Shp LW)');
-    await discoverWeeklyFids();
+    await Promise.all([discoverWeeklyFids(), discoverInvFlowTextFids()]);
     _setDetail(`Found 26 manual prj cols (${MAN_PRJ_LABELS[0]} ... ${MAN_PRJ_LABELS[25]})  |  ${ORD_HIST_FIDS.length} Ord LW  |  ${SHP_HIST_FIDS.length} Shp LW`);
     await new Promise(r => setTimeout(r, 16));
 
