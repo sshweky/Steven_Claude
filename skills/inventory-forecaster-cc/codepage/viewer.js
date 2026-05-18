@@ -2966,17 +2966,25 @@ async function loadCommentHistory(key, force) {
           const note   = (r[F.NOTE]         && r[F.NOTE].value)         || '';
           const flag   = (r[F.FLAG]         && r[F.FLAG].value)         || '';
           const author = (r[F.AUTHOR]       && r[F.AUTHOR].value)       || '';
-          const isReply = flag === 'Planner Response';
-          const borderColor = isReply ? '#00695c' : '#8b2252';
-          const authorLine  = author ? `<b style="color:${borderColor}">${escHtml(author)}</b> &middot; ` : '';
-          const flagBadge   = (flag && !isReply)
-            ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>`
-            : (isReply ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">💬 Planner Response</span>` : '');
+          const sendTo = (F.SEND_TO && r[F.SEND_TO] && r[F.SEND_TO].value) || '';
+          const isReply    = flag === 'Planner Response';
+          const isToPlanner = flag === 'Needs Planner Action';
+          const borderColor = isReply ? '#00695c' : (isToPlanner ? '#1565c0' : '#8b2252');
+          const bgColor     = isReply ? '#f1faf9'  : (isToPlanner ? '#e8f0fe' : '#fdf7fa');
+          // "From: Author → To: Recipient" header line
+          const fromPart  = author ? `<b style="color:${borderColor}">${escHtml(author)}</b>` : '';
+          const toPart    = sendTo ? ` <span style="color:#888">→</span> <b style="color:${borderColor}">${escHtml(sendTo)}</b>` : '';
+          const authorLine = (fromPart || toPart) ? `${fromPart}${toPart} &middot; ` : '';
+          const flagBadge  = isReply
+            ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">💬 Planner Response</span>`
+            : isToPlanner
+              ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">▶ Needs Planner Action</span>`
+              : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
           const reviewBtn = isReply
             ? `<button onclick="markReviewed('${key.replace(/'/g,"\\'")}', this)" style="font-size:10px;padding:2px 8px;background:#e0f2f1;color:#00695c;border:1px solid #00695c;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Reviewed</button>`
             : '';
           return `
-            <div style="padding:6px 6px 6px 10px;margin-bottom:4px;border-left:3px solid ${borderColor};background:${isReply ? '#f1faf9' : '#fdf7fa'};border-radius:0 4px 4px 0;">
+            <div style="padding:6px 6px 6px 10px;margin-bottom:4px;border-left:3px solid ${borderColor};background:${bgColor};border-radius:0 4px 4px 0;">
               <div style="font-size:10px;color:#888;font-weight:600;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
                 <span>${authorLine}${escHtml(fmtTs(ts))}</span>${flagBadge}${reviewBtn}
               </div>
