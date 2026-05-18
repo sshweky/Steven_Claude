@@ -383,7 +383,7 @@ function buildSelectFids() {
   const F = CFG.FID;
   const sel = [
     F.KEY, F.MSTYLE, F.CUST, F.DESCRIPTION, F.STATUS_CUST, F.ITEM_STATUS,
-    F.INV_MGR_NAME, F.BRAND_NAME, F.MASTER_PACK,
+    F.INV_MGR_USER, F.INV_MGR_NAME, F.BRAND_NAME, F.MASTER_PACK,
     F.AI_ALERT, F.AI_ANALYSIS, F.ORD_WK_L26W, F.ORD_WK_L13,
     F.LAST_COMMENT, F.LAST_COMMENT_DATE, F.FLAGGED, F.PLANNER_REPLY_PENDING,
     ...(F.MANAGER_REPLY_PENDING ? [F.MANAGER_REPLY_PENDING] : []),  // optional — set FID in CFG
@@ -1609,6 +1609,7 @@ function adaptRow(row) {
     asin_status:       str(row, F.STATUS_CUST),
     item_status:       str(row, F.ITEM_STATUS),
     inv_manager:       str(row, F.INV_MGR_NAME),
+    inv_manager_email: ((row[F.INV_MGR_USER] && row[F.INV_MGR_USER].value && row[F.INV_MGR_USER].value.email) || ''),
     brand:             str(row, F.BRAND_NAME),
     pattern:           _parseModel(str(row, F.AI_ALERT) || str(row, F.AI_ANALYSIS)),
     ai_model:          _parseModel(str(row, F.AI_ALERT) || str(row, F.AI_ANALYSIS)),
@@ -3572,20 +3573,28 @@ async function addComment(key) {
     fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
     const _QB_VALID_FLAGS = new Set(['Needs Action', 'Resolved']);
     if (flag && _QB_VALID_FLAGS.has(flag)) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
-    // AUTHOR (FID 40) — plain text, must be set explicitly on every insert.
+    // AUTHOR — text (FID 40) + user (FID 42)
     if (CFG.COMMENT_FID.AUTHOR && CURRENT_USER.name)
       fields[CFG.COMMENT_FID.AUTHOR] = { value: CURRENT_USER.name };
+    if (CFG.COMMENT_FID.AUTHOR_USER && CURRENT_USER.email)
+      fields[CFG.COMMENT_FID.AUTHOR_USER] = { value: CURRENT_USER.email };
 
-    // SEND_TO (FID 41) — derived from the flag direction so recipients are explicit:
-    //   "Needs Action"  → send to the record's inv_manager (the planner)
-    //   "Planner Response"      → send to the managers (director / VP)
-    //   All others              → no specific recipient
-    if (CFG.COMMENT_FID.SEND_TO) {
+    // SEND_TO — text (FID 41) + user (FID 43)
+    //   "Needs Action"    → planner (inv_manager of the record)
+    //   "Planner Response"→ primary manager (Mikey Scott)
+    if (CFG.COMMENT_FID.SEND_TO || CFG.COMMENT_FID.SEND_TO_USER) {
       const _recForTo = ALL_RECORDS.find(x => x.key === key);
-      let _sendTo = '';
-      if (flag === 'Needs Action')  _sendTo = (_recForTo && _recForTo.inv_manager) || 'Planner';
-      else if (flag === 'Planner Response') _sendTo = CFG.MANAGER_NAMES ? CFG.MANAGER_NAMES.join(', ') : 'Director';
-      if (_sendTo) fields[CFG.COMMENT_FID.SEND_TO] = { value: _sendTo };
+      let _sendToText  = '';
+      let _sendToEmail = '';
+      if (flag === 'Needs Action') {
+        _sendToText  = (_recForTo && _recForTo.inv_manager)       || 'Planner';
+        _sendToEmail = (_recForTo && _recForTo.inv_manager_email) || '';
+      } else if (flag === 'Planner Response') {
+        _sendToText  = CFG.MANAGER_NAMES ? CFG.MANAGER_NAMES.join(', ') : 'Director';
+        _sendToEmail = (CFG.MANAGER_NAMES && CFG.MANAGER_EMAILS && CFG.MANAGER_EMAILS[0]) || '';
+      }
+      if (_sendToText  && CFG.COMMENT_FID.SEND_TO)      fields[CFG.COMMENT_FID.SEND_TO]      = { value: _sendToText };
+      if (_sendToEmail && CFG.COMMENT_FID.SEND_TO_USER) fields[CFG.COMMENT_FID.SEND_TO_USER] = { value: _sendToEmail };
     }
 
     const resp = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });

@@ -27,7 +27,8 @@ window.QB_CONFIG = {
   // their own QB permissions; nothing sensitive is stored in this page.
   REALM:      "pim.quickbase.com",
   APP_DBID:   "bqkdiemav",          // App-level DBID  -  temp token scoped here covers ALL tables in app
-  MANAGER_NAMES: ["Mikey Scott", "Nancy Lee"],  // Recipients when a planner sends a Planner Response comment
+  MANAGER_NAMES:  ["Mikey Scott", "Nancy Lee"],   // Recipients when a planner sends a Planner Response comment
+  MANAGER_EMAILS: ["M.Scott@petspeople.com", "N.Lee@petspeople.com"],  // QB user emails for Send To (User) field
 
   // -- Tables --------------------------------------------------------------
   PROJECTIONS_TID: "bpd237tvm",   // InventoryTrack > Projections
@@ -47,6 +48,7 @@ window.QB_CONFIG = {
     DESCRIPTION:   205,
     STATUS_CUST:    10,   // Status @ Cust
     ITEM_STATUS:   374,   // PT Item Status
+    INV_MGR_USER: 936,    // "Inventory Manager"  -  user type (formula); gives .email for Send To writes
     INV_MGR_NAME: 1586,   // "Inv Mgr (name)"  -  formula UserToName([Inventory
                           // Manager]) that returns the customer-level mgr's
                           // plain name (e.g. "John Grossi" for all Amazon
@@ -101,6 +103,8 @@ window.QB_CONFIG = {
     DATE_CREATED: 1,    // QB built-in  -  used to render the 30-day history list
     AUTHOR:       40,   // text  -  name of person who wrote the comment
     SEND_TO:      41,   // text  -  display name of the intended recipient
+    AUTHOR_USER:  42,   // user  -  QB user field for comment author
+    SEND_TO_USER: 43,   // user  -  QB user field for intended recipient
   },
 
   // -- Field IDs on Order History (bpe4maa4c) ------------------------------
