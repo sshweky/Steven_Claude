@@ -679,7 +679,7 @@ var COLS = [
   { id:'open_cust_po_qty', label:'Open Cust PO', align:'right', numeric:true, get:function(r){return r.open_cust_po_qty;}, render:function(r){return '<td class="right">'+fmt(r.open_cust_po_qty)+'</td>';} },
   { id:'shp_wk_l4', label:'Shpd/Wk L4', align:'right', numeric:true, get:function(r){return r.shp_wk_l4;}, render:function(r){return '<td class="right">'+fmt(r.shp_wk_l4)+'</td>';} },
   { id:'shp_wk_l13', label:'Shpd/Wk L13', align:'right', numeric:true, get:function(r){return r.shp_wk_l13;}, render:function(r){return '<td class="right">'+fmt(r.shp_wk_l13)+'</td>';} },
-  { id:'prj_wk', label:'Prj/Wk', align:'right', numeric:true, get:function(r){return r.prj_wk;}, render:function(r){return '<td class="right">'+fmt(r.prj_wk)+'</td>';} },
+  { id:'prj_wk', label:'Prj/Wk', align:'right', numeric:true, get:function(r){return r.prj_wk;}, render:function(r){return '<td class="right">'+fmtInt(r.prj_wk)+'</td>';} },
   { id:'prj_l4w_change', label:'+/- L4w', align:'right', numeric:true, get:function(r){return r.prj_l4w_change;},
     render:function(r){var l4w=r.prj_l4w_change;var up=l4w>5,dn=l4w<-5;var clr=up?'#2e7d32':dn?'#c62828':'inherit';var arr=up?'&#9650;':dn?'&#9660;':'';return '<td class="right" style="color:'+clr+';font-weight:'+(up||dn?'600':'400')+'">'+(arr?arr+' ':'')+fmt(l4w)+'%</td>';} },
   { id:'opt_wos', label:'Opt WOS', align:'right', numeric:true, get:function(r){return r.opt_wos;}, render:function(r){return '<td class="right">'+fmt(r.opt_wos)+'</td>';} },
