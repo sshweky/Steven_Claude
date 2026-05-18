@@ -1827,6 +1827,17 @@ function toggleReplyOnly() {
     btn.style.fontWeight    = '800';
   }
   applyFilters();
+
+let SHOW_OFF_PLAN_ONLY = false;
+function toggleOffPlanOnly() {
+  SHOW_OFF_PLAN_ONLY = !SHOW_OFF_PLAN_ONLY;
+  const btn = document.getElementById('offPlanOnlyBtn');
+  if (btn) {
+    btn.style.background = SHOW_OFF_PLAN_ONLY ? '#6a1b9a' : '#fff';
+    btn.style.color      = SHOW_OFF_PLAN_ONLY ? '#fff'    : '#6a1b9a';
+    btn.style.fontWeight = '800';
+  }
+  applyFilters();
 }
 
 // -- Render: pagination -----------------------------------------------------
