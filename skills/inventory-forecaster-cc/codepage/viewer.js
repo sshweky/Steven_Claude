@@ -1455,6 +1455,7 @@ function adaptRow(row) {
     last_comment_date:     str(row, F.LAST_COMMENT_DATE),
     flagged:               bool(row, F.FLAGGED),
     planner_reply_pending: bool(row, F.PLANNER_REPLY_PENDING),
+    manager_reply_pending: F.MANAGER_REPLY_PENDING ? bool(row, F.MANAGER_REPLY_PENDING) : false,
     master_pack:       num(row, F.MASTER_PACK) || 1,
     // POG / ISO context (added 2026-05-10)  -  used by the Inventory Plan
     // block in the detail panel.  inv_flow_wk attached separately after
