@@ -2099,24 +2099,41 @@ async function _commitStatusEdit(key, newValue, cellEl) {
 // Fires on the FIRST keystroke in the mgr-comment textarea.  If the row
 // isn't already flagged, auto-flag it so the comment is visible to mgrs
 // in the Show-Flagged-Only view.  Idempotent  -  `_auto_flagged` guard
-// prevents repeated toggles, and we only set Flagged=true (never false).
+// prevents repeated toggles.  QB write is deferred to addComment() so that
+// merely typing (without saving) never creates a spurious QB flag.
 function autoFlagOnComment(key) {
   const rec = ALL_RECORDS.find(x => x.key === key);
   if (!rec) return;
   const txt = document.getElementById('cmt-text-' + key);
   const isEmpty = !txt || !txt.value.trim();
+  const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   if (isEmpty) {
-    // Comment cleared  -  undo the auto-flag if we set it (don't touch manual flags)
-    if (rec._auto_flagged && rec.flagged) {
+    // Comment cleared — undo the pre-flag (UI only; no QB call since we haven't
+    // written to QB yet — that only happens on Save).
+    if (rec._auto_flagged) {
       rec._auto_flagged = false;
-      toggleFlag(key);
+      if (rec.flagged) {
+        rec.flagged = false;
+        const btn = document.getElementById('flg-' + safeId);
+        if (btn) btn.className = 'flag-btn';
+        const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
+        if (tr) tr.classList.remove('row-flagged');
+        updateFlagCount();
+      }
     }
     return;
   }
-  if (rec.flagged) return;          // already flagged  -  leave alone
-  if (rec._auto_flagged) return;    // already auto-flagged this session
+  if (rec.flagged) return;       // already flagged (QB or manual) — leave alone
+  if (rec._auto_flagged) return; // already pre-flagged this session
+  // Update UI immediately so the row tints and counter increments while typing.
+  // QB write is deferred to addComment().
   rec._auto_flagged = true;
-  toggleFlag(key);
+  rec.flagged = true;
+  const btn = document.getElementById('flg-' + safeId);
+  if (btn) btn.className = 'flag-btn flagged';
+  const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
+  if (tr) tr.classList.add('row-flagged');
+  updateFlagCount();
 }
 
 async function toggleFlag(key) {
@@ -2286,7 +2303,7 @@ function renderPage(page) {
 
     const _safeId2 = r.key.replace(/[^a-zA-Z0-9]/g,'_');
     tr.innerHTML = `
-      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.flagged ? '<span title="Flagged for manager review" style="color:#c62828;font-size:11px;font-weight:700;">[F]</span>' : ''}${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">[R]</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>' : ''}</td>
+      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">[R]</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>' : ''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.key}</td>
       <td style="font-size:11px;white-space:nowrap">${r.inv_manager||''}</td>
       <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.brand||'').replace(/"/g,'&quot;')}">${r.brand||''}</td>
@@ -3529,6 +3546,16 @@ async function addComment(key) {
   document.getElementById('cmt-flag-' + key).value = _USER_IS_PLANNER ? 'Planner Response' : 'Needs Action';
   const rec    = ALL_RECORDS.find(x => x.key === key);
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+  // Deferred auto-flag QB write: only now that the comment is saved do we
+  // write Flagged=true to QB (autoFlagOnComment updated UI only, not QB).
+  if (rec && rec._auto_flagged && rec.flagged) {
+    try {
+      const pf = {};
+      pf[CFG.FID.KEY]     = { value: key };
+      pf[CFG.FID.FLAGGED] = { value: true };
+      await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
+    } catch (_) { /* non-critical — UI already reflects flagged state */ }
+  }
   if (rec) {
     const stamp = new Date().toISOString().slice(0,16).replace('T',' ');
     const flagTag = flag ? ' ['+flag+']' : '';
