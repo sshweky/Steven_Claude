@@ -434,7 +434,7 @@ async function fetchAllRecords(mgrName) {
 // Cache version is in the key.  Bump it (_v1 -> _v2) on any schema change
 // to force-invalidate all clients on next page load.
 // v2 = added Opt WOS / Opt WOS Final / Next Avl Rcpt Dt scalars per mstyle
-const INV_FLOW_CACHE_KEY    = 'pp_invflow_v6';  // bumped: added supp_pos + ATS scalar FIDs
+const INV_FLOW_CACHE_KEY    = 'pp_invflow_v7';  // bumped: force fresh fetch to pick up new mstyle rows
 const INV_FLOW_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 const ATS_HIST_CACHE_KEY    = 'pp_ats_v1';
 const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
