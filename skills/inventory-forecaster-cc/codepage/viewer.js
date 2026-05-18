@@ -2050,7 +2050,8 @@ function renderPage(page) {
     const tr = document.createElement('tr');
     tr.className = borderClass(r.max_sev)
       + (r.flagged               ? ' row-flagged'        : '')
-      + (r.planner_reply_pending ? ' row-reply-pending'  : '');
+      + (r.planner_reply_pending ? ' row-reply-pending'  : '')
+      + (r.manager_reply_pending ? ' row-mgr-pending'    : '');
     tr.dataset.key = r.key;
 
     const aiVsProj = r.proj_total > 0 ? ((r.ai_total - r.proj_total) / r.proj_total * 100) : 0;
