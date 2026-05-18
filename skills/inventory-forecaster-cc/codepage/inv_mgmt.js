@@ -230,6 +230,7 @@ var selCountries  = new Set();
 var selBrands     = new Set();
 var selMgrs       = new Set();
 var selPriorities = new Set();
+var selStockStatus = new Set();
 var recoSheet = [];
 
 // -- Multi-select dropdown helpers ---------------------------------------------
