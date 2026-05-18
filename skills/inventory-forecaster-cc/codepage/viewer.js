@@ -4486,6 +4486,7 @@ function applyFilters() {
     if (FLAGGED_ONLY       && !r.flagged)               return false;
     if (SHOW_REPLY_ONLY    && !r.planner_reply_pending) return false;
     if (SHOW_OFF_PLAN_ONLY && r.fcst_status !== 'Over-Projected' && r.fcst_status !== 'Under-Projected') return false;
+    if (SHOW_MY_RECORDS_ONLY && CURRENT_USER.name && (r.inv_manager || '').toLowerCase() !== CURRENT_USER.name.toLowerCase()) return false;
     if (search) {
       const txt = (r.key + ' ' + r.cust + ' ' + r.mstyle + ' ' + (r.desc||'') + ' ' + (r.brand||'') + ' ' + (r.inv_manager||'')).toLowerCase();
       if (!txt.includes(search)) return false;
