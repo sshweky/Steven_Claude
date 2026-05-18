@@ -725,7 +725,7 @@ var COL_WIDTHS = {
   qty_oh:48, ats_now:48, qty_oh_root:56,
   it_qty:38, iw_qty:38, hold_qty:38, open_cust_po_qty:52,
   shp_wk_l4:44, shp_wk_l13:46, prj_wk:40, prj_l4w_change:44,
-  opt_wos:40, ats_wos_oh:44, opt_oh:44, lt_wks:38, cny_weeks:32,
+  opt_wos:40, ats_wos_oh:44, ats_wos_oh_oo:52, opt_oh:44, lt_wks:38, cny_weeks:32,
   days_oos_next_rcpt:46, next_rcpt_dt:54, gap_weeks_n:38,
   pipeline_excess:54, pipeline_wos:48, action:96
 };
