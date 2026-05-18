@@ -2454,7 +2454,11 @@ async function toggleDetail(key) {
   if (!_hasInvFlow && _invFlowPromise) {
     _invFlowPromise.finally(() => {
       const panel = document.getElementById('detail-panel');
-      if (panel && panel.dataset.rid === String(r.rid)) renderDetail(r);
+      if (panel && panel.dataset.rid === String(r.rid)) {
+        el.dataset.loaded = '';
+        el.style.display = 'none';
+        toggleDetail(key);
+      }
     });
   }
   const _invFmt1 = n => {
@@ -2746,7 +2750,11 @@ async function toggleDetail(key) {
   if (!r.ats_hist && _atsHistPromise) {
     _atsHistPromise.then(() => {
       const panel = document.getElementById('detail-panel');
-      if (panel && panel.dataset.rid === String(r.rid)) renderDetail(r);
+      if (panel && panel.dataset.rid === String(r.rid)) {
+        el.dataset.loaded = '';
+        el.style.display = 'none';
+        toggleDetail(key);
+      }
     });
   }
   let histHtml  = '';
@@ -5222,7 +5230,12 @@ async function bootstrap() {
       const ridStr = panel && panel.dataset.rid;
       if (!ridStr) return;
       const openRec = ALL_RECORDS.find(x => String(x.rid) === ridStr);
-      if (openRec) renderDetail(openRec);
+      if (!openRec) return;
+      const openEl = document.getElementById('detail-' + openRec.key);
+      if (!openEl || openEl.style.display !== 'table-row') return;
+      openEl.dataset.loaded = '';
+      openEl.style.display = 'none';
+      toggleDetail(openRec.key);
     }
 
     _invFlowPromise = Promise.race([_invFlowLoad, _invFlowTimer])
