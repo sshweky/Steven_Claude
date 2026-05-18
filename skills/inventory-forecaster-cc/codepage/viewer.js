@@ -2220,10 +2220,10 @@ function renderPage(page) {
       <td style="font-size:11px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.item_status||'').replace(/"/g,'&quot;')}">${r.item_status||''}</td>
       <td style="white-space:nowrap">${_priCell(r)}</td>
       <td style="font-size:11px;color:#888;white-space:nowrap">${r.last_ord_date || ' -'}</td>
-      <td>${fmtN(Math.round(r.ord_wk_l4 || 0))}</td>
       <td style="color:#6a1b9a">${fmtN(Math.round(r.shpd_wk_l4 || 0))}</td>
-      <td>${fmtN(Math.round(r.shp_wk))}</td>
       <td style="color:#6a1b9a">${fmtN(Math.round(r.shpd_wk_l13 || 0))}</td>
+      <td>${fmtN(Math.round(r.ord_wk_l4 || 0))}</td>
+      <td>${fmtN(Math.round(r.shp_wk))}</td>
       <td>${fmtN(Math.round(r.proj_wk))}</td>
       <td style="color:#1565c0;font-weight:600">${fmtN(Math.round(r.ai_wk))}</td>
       <td style="color:#555" title="Average of Suggested W1..W26">${fmtN(Math.round(r.sugg_wk))}</td>
