@@ -3298,19 +3298,27 @@ async function _loadAmzDcInv(r, safeId) {
   let atsNow = 0, atsOh = 0, atsOo = 0;
   let fetchOk = false;
   try {
-    // Filter out undefined FIDs so a stale viewer.html doesn't kill the query
     const selectFids = [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH,
                         AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
                         AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO].filter(v => v != null);
-    const resp = await qb('/records/query', {
-      from:   CFG.AMZ_CATALOG_TID,
-      select: selectFids,
-      where:  `{${AF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}`,
-      options: { top: 1 },
-    });
-    const rows = resp.data || [];
-    if (rows.length) {
-      const row = rows[0];
+    // Try exact mstyle first; if no row found, retry without /N pack-size suffix
+    // (catalog table sometimes stores bare mstyle without the case-size qualifier).
+    const tryMstyles = [mstyle];
+    const stripped = mstyle.replace(/\/\d+$/, '');
+    if (stripped !== mstyle) tryMstyles.push(stripped);
+
+    let row = null;
+    for (const ms of tryMstyles) {
+      const resp = await qb('/records/query', {
+        from:   CFG.AMZ_CATALOG_TID,
+        select: selectFids,
+        where:  `{${AF.MSTYLE}.EX.'${ms.replace(/'/g, "''")}'}`,
+        options: { top: 1 },
+      });
+      const rows = resp.data || [];
+      if (rows.length) { row = rows[0]; break; }
+    }
+    if (row) {
       const nv  = fid => fid != null ? (parseFloat((row[fid] && row[fid].value) || 0) || 0) : 0;
       soh    = nv(AF.SOH);
       opo    = nv(AF.OPO);
@@ -3327,7 +3335,6 @@ async function _loadAmzDcInv(r, safeId) {
     }
   } catch (e) {
     console.warn('[DC Inv] fetch failed for mstyle', mstyle, e);
-    // fall through — render cards with zeros rather than silently aborting
   }
 
   // ── AI Analysis bullet (existing behaviour) ───────────────────────────────
@@ -3340,10 +3347,12 @@ async function _loadAmzDcInv(r, safeId) {
   else               wosHtml = `<b>WOS</b> <span style="color:#f57f17">${fmtWos(wos)} wks (overstocked)</span>`;
 
   const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
-  const bullet = '<b>Amazon DC inventory:</b> ' +
-    `<b>Amazon OH</b> ${fmt(soh)} u` + sep +
-    `<b>Open PO</b> ${fmt(opo)} u` + sep +
-    wosHtml;
+  const bullet = fetchOk
+    ? '<b>Amazon DC inventory:</b> ' +
+        `<b>Amazon OH</b> ${fmt(soh)} u` + sep +
+        `<b>Open PO</b> ${fmt(opo)} u` + sep +
+        wosHtml
+    : '<b>Amazon DC inventory:</b> <span style="color:#999;font-style:italic">not in catalog (no data)</span>';
 
   const ul = document.getElementById('ai-bullets-' + safeId);
   if (ul) {
