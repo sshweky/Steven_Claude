@@ -439,7 +439,7 @@ function _fmtCacheAge(ms) {
 //   ?nocache=1 in URL   -> both bypassed -> always fresh pull
 //
 // Bump PRJ_CACHE_KEY any time adaptRow() output shape changes.
-const PRJ_CACHE_KEY    = 'pp_prj_v2';
+const PRJ_CACHE_KEY    = 'pp_prj_v3';  // v3: arrays stripped, lazy-loaded on row expand
 const PRJ_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 
 // FID discovery cache key (sessionStorage only - resets each new tab is fine
