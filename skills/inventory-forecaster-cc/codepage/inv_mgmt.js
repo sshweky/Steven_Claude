@@ -667,7 +667,7 @@ var COLS = [
     filterValue:function(r){return r.priority;},
     render:function(r){var lbl=r.priority==='NO_OOS'?'No OOS':r.priority;return '<td class="pri-'+r.priority+'">'+lbl+'</td>';} },
   { id:'stock_status', label:'Stock Status', align:'left',
-    get:function(r){return {Over-Stocked:0,'Under-Stocked':1,'In Stock':2,'Inactive':3}[r.stock_status]!=null?{'Over-Stocked':0,'Under-Stocked':1,'In Stock':2,'Inactive':3}[r.stock_status]:9;},
+    get:function(r){return {'Over-Stocked':0,'Under-Stocked':1,'In Stock':2,'Inactive':3}[r.stock_status]!=null?{'Over-Stocked':0,'Under-Stocked':1,'In Stock':2,'Inactive':3}[r.stock_status]:9;},
     filterValue:function(r){return r.stock_status;},
     render:function(r){
       var styles={'Over-Stocked':'background:#e65100;color:#fff','Under-Stocked':'background:#c62828;color:#fff','In Stock':'background:#2e7d32;color:#fff','Inactive':'background:#757575;color:#fff'};
