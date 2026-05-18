@@ -9,4 +9,4 @@
 - [reference_inv_history_weekly.md](reference_inv_history_weekly.md) — Inventory History - Weekly schema: relationship 35, summary field FIDs (64–116), date formula fields (68–119) in History
 - [reference_quickbase_api_rules.md](reference_quickbase_api_rules.md) — Universal rule book for accessing QB without throttling: bulk write patterns, retry/backoff policy, anti-patterns, pre-flight checklist. Apply to any chat/script/skill that touches Quickbase.
 - [reference_cdata_mcp.md](reference_cdata_mcp.md) — CData MCP auth (Basic email:PAT), response format, and inventory forecaster setup notes
-- [reference_contacts.md](reference_contacts.md) — Key internal contacts: Mikey Scott (Inventory Director), Nancy Lee (forecasting collaborator)
+- [reference_contacts.md](reference_contacts.md) — Key internal contacts: Mikey Scott (Inventory Director), Nancy Lee (VP Supply Chain)
