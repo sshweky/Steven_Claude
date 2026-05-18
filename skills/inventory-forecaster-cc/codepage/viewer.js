@@ -452,12 +452,15 @@ function _saveAtsHistCache(map) {
 
 // Clear every local cache and reload fresh from QB
 function clearAllCaches() {
-  [INV_FLOW_CACHE_KEY, ATS_HIST_CACHE_KEY, PRJ_CACHE_KEY, FID_SESS_KEY].forEach(k => {
+  const _ckAll = [INV_FLOW_CACHE_KEY, ATS_HIST_CACHE_KEY, FID_SESS_KEY,
+                  _prjCacheKey(), PRJ_CACHE_KEY_ALL];
+  _ckAll.forEach(k => {
     try { localStorage.removeItem(k); }   catch (e) { /* ignore */ }
     try { sessionStorage.removeItem(k); } catch (e) { /* ignore */ }
   });
-  // Clear IndexedDB projection cache
-  _idb.del(PRJ_CACHE_KEY).catch(() => {});
+  // Clear IndexedDB projection cache — both user-specific and shared 'all' key
+  _idb.del(_prjCacheKey()).catch(() => {});
+  _idb.del(PRJ_CACHE_KEY_ALL).catch(() => {});
 }
 function forceRefresh() { clearAllCaches(); location.reload(); }
 
@@ -484,8 +487,18 @@ function _fmtCacheAge(ms) {
 //   New tab, >6h / no data -> both miss            -> full fetch + save both
 //   ?nocache=1 in URL      -> bypassed             -> always fresh pull
 //
-// Bump PRJ_CACHE_KEY any time adaptRow() output shape changes.
-const PRJ_CACHE_KEY    = 'pp_prj_v4';  // v4: IndexedDB + stripped arrays
+// Cache key: user-specific when identity is known so each user's browser only
+// caches what they actually loaded (planners get ~400–500 records; directors
+// get the full 5 k set).  This prevents cross-contamination on shared machines
+// and avoids a director overwriting a planner's small cache (or vice-versa).
+// Bump the base version any time adaptRow() output shape changes.
+const PRJ_CACHE_KEY_BASE = 'pp_prj_v5';
+const PRJ_CACHE_KEY_ALL  = 'pp_prj_v5_all';   // directors / unknown users
+function _prjCacheKey() {
+  if (!CURRENT_USER.name) return PRJ_CACHE_KEY_ALL;
+  const safe = CURRENT_USER.name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 32);
+  return `${PRJ_CACHE_KEY_BASE}_u_${safe}`;
+}
 const PRJ_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 
 // FID discovery cache key (sessionStorage only - resets each new tab is fine
@@ -546,9 +559,10 @@ function _prjCacheBypassed() {
 }
 
 async function _loadPrjCache() {
+  const key = _prjCacheKey();
   // 1. sessionStorage (instant, same-tab F5)
   try {
-    const raw = sessionStorage.getItem(PRJ_CACHE_KEY);
+    const raw = sessionStorage.getItem(key);
     if (raw) {
       const obj = JSON.parse(raw);
       if (obj && Array.isArray(obj.records))
@@ -557,12 +571,12 @@ async function _loadPrjCache() {
   } catch (e) { /* ignore */ }
   // 2. IndexedDB (cross-tab, cross-session, 6h TTL)
   try {
-    const obj = await _idb.get(PRJ_CACHE_KEY);
+    const obj = await _idb.get(key);
     if (obj && Array.isArray(obj.records)) {
       const ageMs = Date.now() - (obj.ts || 0);
       if (ageMs <= PRJ_CACHE_TTL_MS) {
         // Warm sessionStorage so same-tab refreshes are instant from here on
-        try { sessionStorage.setItem(PRJ_CACHE_KEY, JSON.stringify(obj)); } catch (_) {}
+        try { sessionStorage.setItem(key, JSON.stringify(obj)); } catch (_) {}
         return { records: obj.records, ageMs, source: 'idb' };
       }
     }
@@ -592,11 +606,12 @@ async function _savePrjCache(records) {
     return out;
   });
   const cacheObj = { ts: Date.now(), records: slim };
+  const key = _prjCacheKey();
   // sessionStorage (same-tab F5 refresh — instant)
-  try { sessionStorage.setItem(PRJ_CACHE_KEY, JSON.stringify(cacheObj)); } catch (_) {}
+  try { sessionStorage.setItem(key, JSON.stringify(cacheObj)); } catch (_) {}
   // IndexedDB (cross-tab / cross-session — no quota competition)
   try {
-    await _idb.set(PRJ_CACHE_KEY, cacheObj);
+    await _idb.set(key, cacheObj);
   } catch (e) {
     console.warn('[Prj] IDB save failed:', e.message || e);
   }
