@@ -535,8 +535,9 @@ const _PRJ_CACHE_STRIP = new Set([
   'hist_ord', 'hist_shp', 'ly_ord', 'ly_shp', 'narrative',
 ]);
 
-function _savePrjCache(records) {
-  // Strip heavy arrays + narrative, mark records as needing lazy detail load.
+async function _savePrjCache(records) {
+  // Strip heavy arrays + narrative before caching — detail-panel only fields,
+  // fetched lazily from QB on first row expand (_lazyLoadDetail).
   const slim = records.map(r => {
     const out = {};
     for (const k of Object.keys(r)) {
@@ -545,19 +546,14 @@ function _savePrjCache(records) {
     out._needs_detail = true;
     return out;
   });
-  const payload = JSON.stringify({ ts: Date.now(), records: slim });
-  // Always save to sessionStorage first (no quota competition).
-  try { sessionStorage.setItem(PRJ_CACHE_KEY, payload); } catch (e) { /* ignore */ }
-  // Also try localStorage so other tabs benefit.
+  const cacheObj = { ts: Date.now(), records: slim };
+  // sessionStorage (same-tab F5 refresh — instant)
+  try { sessionStorage.setItem(PRJ_CACHE_KEY, JSON.stringify(cacheObj)); } catch (_) {}
+  // IndexedDB (cross-tab / cross-session — no quota competition)
   try {
-    localStorage.setItem(PRJ_CACHE_KEY, payload);
+    await _idb.set(PRJ_CACHE_KEY, cacheObj);
   } catch (e) {
-    try {
-      localStorage.removeItem(PRJ_CACHE_KEY);
-      localStorage.setItem(PRJ_CACHE_KEY, payload);
-    } catch (e2) {
-      console.warn('[Prj] localStorage quota full - sessionStorage only for this session:', e2.message || e2);
-    }
+    console.warn('[Prj] IDB save failed:', e.message || e);
   }
 }
 
