@@ -1243,6 +1243,7 @@ function adaptRow(row) {
     brand:             str(row, F.BRAND_NAME),
     pattern:           _parseModel(str(row, F.AI_ALERT) || str(row, F.AI_ANALYSIS)),
     ai_model:          _parseModel(str(row, F.AI_ALERT) || str(row, F.AI_ANALYSIS)),
+    fcst_status:       _fcstStatus(_parseModel(str(row, F.AI_ALERT) || str(row, F.AI_ANALYSIS)), ai_total, manual_total),
     biweekly:          false,
     proj_wk:           Math.round(proj_per_wk * 10) / 10,
     shp_wk:            ord_l13,
