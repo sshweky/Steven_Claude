@@ -2594,12 +2594,12 @@ async function toggleDetail(key) {
         <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
           <label style="font-size:11px;color:#555;">Status:
             <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
-              <option value="Needs Action" selected>Needs Action</option>
+              <option value="Needs Planner Action" ${!_USER_IS_PLANNER ? 'selected' : ''} style="color:#1565c0;font-weight:600;">▶ Needs Planner Action</option>
               <option value="Investigating">Investigating</option>
               <option value="In Progress">In Progress</option>
-              <option value="Resolved">Resolved</option>
+              <option value="Planner Response" ${_USER_IS_PLANNER ? 'selected' : ''} style="color:#00695c;font-weight:600;">💬 Planner Response</option>
+              <option value="Resolved">✓ Resolved</option>
               <option value="Dismissed">Dismissed</option>
-              <option value="Planner Response" style="color:#00695c;font-weight:600;">💬 Planner Response</option>
             </select>
           </label>
           <button id="cmt-btn-${safeKey}" onclick="addComment('${safeKey}')" style="padding:5px 14px;background:#8b2252;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:11px;">Save</button>
