@@ -101,14 +101,29 @@ function _decodeJwt(token) {
 
 async function fetchCurrentUser() {
   try {
-    const token   = await getTempToken(CFG.PROJECTIONS_TID);
-    const p       = _decodeJwt(token);
-    // QB temp token payload fields: sub (user ID), name (display name), email
-    const name    = (p.name || p.fullName || p.display_name || '').trim();
-    const email   = (p.email || '').trim();
-    const id      = (p.sub   || '').trim();
-    CURRENT_USER  = {
-      name:  name  || (email ? email.split('@')[0].replace(/[._]/g, ' ') : 'Unknown'),
+    const token = await getTempToken(CFG.PROJECTIONS_TID);
+    const p     = _decodeJwt(token);
+    const id    = (p.sub || '').trim();
+    // Try JWT payload fields first (QB sometimes includes these)
+    let name  = (p.name || p.fullName || p.display_name || '').trim();
+    let email = (p.email || '').trim();
+
+    // JWT payload rarely includes name/email for QB temp tokens — fall back to
+    // the /users/{id} REST endpoint which always returns the full display name.
+    if ((!name || !email) && id) {
+      try {
+        const hdrs = await _hdrs(CFG.PROJECTIONS_TID);
+        const resp = await fetch(`https://${CFG.REALM}/api/v1/users/${encodeURIComponent(id)}`, { headers: hdrs });
+        if (resp.ok) {
+          const u = await resp.json();
+          name  = name  || (u.name  || u.userName || '').trim();
+          email = email || (u.email || '').trim();
+        }
+      } catch (_) { /* non-fatal — fall through to email-based fallback */ }
+    }
+
+    CURRENT_USER = {
+      name:  name || (email ? email.split('@')[0].replace(/[._]/g, ' ') : ''),
       email: email,
       id:    id,
     };
