@@ -183,6 +183,7 @@ function poStatus(po, today, country) {
 
 // -- Utilities -----------------------------------------------------------------
 function fmt(n) { if (n == null || n === '' || n === undefined) return '0'; var num=Number(n); if (isNaN(num)) return String(n); return num.toLocaleString('en-US', {maximumFractionDigits:1}); }
+function fmtInt(n) { if (n == null || n === '' || n === undefined) return '0'; var num=Math.round(Number(n)); if (isNaN(num)) return String(n); return num.toLocaleString('en-US', {maximumFractionDigits:0}); }
 function esc(s) { return String(s == null ? '' : s).replace(/[<>&"']/g, function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];}); }
 // Strip HTML tags and common entities from QB-returned rich-text fields
 function stripHtml(s) {
