@@ -1211,8 +1211,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('gapsOnly').checked=false;
     document.getElementById('overstockOnly').checked=false;
     document.getElementById('hideInactive').checked=true;
-    selActions.clear();selCountries.clear();selBrands.clear();selMgrs.clear();selPriorities.clear();
-    ['dd-action','dd-country','dd-brand','dd-mgr','dd-priority'].forEach(function(id){
+    selActions.clear();selCountries.clear();selBrands.clear();selMgrs.clear();selPriorities.clear();selStockStatus.clear();
+    ['dd-action','dd-country','dd-brand','dd-mgr','dd-priority','dd-stock-status'].forEach(function(id){
       var el=document.getElementById(id);if(!el)return;
       el.querySelectorAll('input[type=checkbox]').forEach(function(cb){cb.checked=false;});
       var labels={
