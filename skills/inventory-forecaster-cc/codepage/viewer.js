@@ -2584,6 +2584,39 @@ async function toggleDetail(key) {
 
     const _ltWks  = r.inv_flow_lt_wks  || 0;
     const _moq    = r.inv_flow_moq     || 0;
+
+    // -- Inventory position cards (always from Inv Flow, no QB fetch needed) --
+    const _cardQtyOh  = _beg ? Math.round(_beg[0]) : 0;
+    const _cardQtyIw  = _suppPos.reduce((s, p) => s + p.iwQty, 0);
+    const _cardQtyIt  = _suppPos.reduce((s, p) => s + p.itQty, 0);
+    const _cardPrjAvg = _prj ? (_prj.reduce((s, v) => s + v, 0) / 26) : 0;
+    const _cardOhWos  = (_beg && _prj) ? _wosForward(_beg[0], _prj, 0) : 0;
+    const _cardOoQty  = _cardQtyIw + _cardQtyIt;
+    const _cardOoWos  = _cardPrjAvg > 0 ? (_cardQtyOh + _cardOoQty) / _cardPrjAvg : 0;
+    const _cardNextRcpt = _gap.nextRcptDate
+      ? _gap.nextRcptDate.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+      : '';
+    const _cwc = w => w === 0 ? '#bbb' : w < 3 ? '#c62828' : w < 8 ? '#e65100' : w < 16 ? '#1b5e20' : '#f57f17';
+    const _cwt = w => w === 0 ? '0' : w.toFixed(1) + ' wks';
+    const _cfmt = n => Math.round(n).toLocaleString('en-US');
+    const _ccard = (lbl, val, col = '#222', tip = '') =>
+      `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:5px;padding:5px 10px;"${tip ? ` title="${tip.replace(/"/g,'&quot;')}"` : ''}>
+        <div style="font-size:10px;color:#888;font-weight:600;white-space:nowrap;margin-bottom:2px;">${lbl}</div>
+        <div style="font-size:18px;font-weight:700;color:${col};white-space:nowrap;">${val}</div>
+      </div>`;
+    const _cdivider = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
+    const _invCardsHtml = _hasInvFlow ? `
+      <div style="border-top:1px solid #e0e0e0;padding-top:8px;margin-top:6px;display:flex;gap:6px;flex-wrap:nowrap;align-items:stretch;overflow-x:auto;">
+        ${_ccard('Qty OH',    _cfmt(_cardQtyOh), '#37474f', 'P+P warehouse on-hand (Inv Flow Wk1 beginning balance)')}
+        ${_ccard('Qty I/W',   _cfmt(_cardQtyIw), '#37474f', 'In production / in-work (from open supplier POs)')}
+        ${_ccard('Qty I/T',   _cfmt(_cardQtyIt), '#37474f', 'In transit to warehouse (from open supplier POs)')}
+        ${_cardNextRcpt ? _ccard('Next Rcpt', _cardNextRcpt, '#c62828', 'Next scheduled supplier receipt date') : ''}
+        ${_cdivider}
+        ${_ccard('OH WOS',    _cwt(_cardOhWos),  _cwc(_cardOhWos),  'Weeks of supply on-hand only')}
+        ${_ccard('OH+OO WOS', _cwt(_cardOoWos),  _cwc(_cardOoWos),  'Weeks of supply: OH + I/T + I/W pipeline')}
+        <div id="inv-cards-amz-${safeIdForTotal}" style="display:contents;"></div>
+      </div>` : '';
+
     invFlowSectionHtml = `
       <div style="margin:12px 12px 0 12px;">
         <div style="font-weight:700;font-size:12px;color:#333;margin-bottom:4px;padding-left:2px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -2604,7 +2637,7 @@ async function toggleDetail(key) {
           </table>
         </div>
         ${gapBannerHtml}
-        <div id="inv-cards-${safeIdForTotal}" style="margin-top:6px;" data-next-rcpt="${r.next_rcpt_dt ? new Date(r.next_rcpt_dt + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''}"></div>
+        ${_invCardsHtml}
       </div>`;
   }
 
@@ -2941,55 +2974,37 @@ async function _loadAmzDcInv(r, safeId) {
     else ul.appendChild(li);
   }
 
-  // ── Inventory + ATS mini cards ────────────────────────────────────────────
-  const cardsEl = document.getElementById('inv-cards-' + safeId);
-  if (!cardsEl) return;
+  // ── Amazon ATS cards (injected after the base inv-flow cards) ────────────
+  // Base cards (Qty OH, I/W, I/T, Next Rcpt, OH WOS, OH+OO WOS) are now
+  // rendered inline from Inventory Flow data — no fetch required.
+  // Only the ATS cards are Amazon-specific and come from the Catalog query.
+  const amzCardsEl = document.getElementById('inv-cards-amz-' + safeId);
+  if (!amzCardsEl) return;
 
-  // WOS: 0 when rate is zero (never use special chars — show 0)
+  if (!fetchOk || (atsNow === 0 && atsOh === 0 && atsOo === 0)) return;
+
   const calcWos = (qty, rate) => (rate > 0 ? qty / rate : 0);
-  const wosColor = w => {
-    if (w === 0)   return '#bbb';
-    if (w < 3)     return '#c62828';
-    if (w < 8)     return '#e65100';
-    if (w < 16)    return '#1b5e20';
-    return '#f57f17';
-  };
-  const wosText = w => w === 0 ? '0' : w.toFixed(1) + ' wks';
+  const wosColor = w => w === 0 ? '#bbb' : w < 3 ? '#c62828' : w < 8 ? '#e65100' : w < 16 ? '#1b5e20' : '#f57f17';
+  const wosText  = w => w === 0 ? '0' : w.toFixed(1) + ' wks';
+  const atsOhWos = calcWos(atsOh, prjWk);
+  const atsOoWos = calcWos(atsOo, prjWk);
 
-  const ohWos     = calcWos(qtyOh,          prjWk);
-  const ohOoWos   = calcWos(qtyOh + custOo, prjWk);
-  const atsOhWos  = calcWos(atsOh,          prjWk);
-  const atsOoWos  = calcWos(atsOo,          prjWk);
-
-  // card(label, value, valueColor, title)
   const card = (label, value, color = '#222', title = '') =>
-    `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:5px;padding:5px 10px;" ${title ? `title="${title}"` : ''}>
+    `<div style="background:#fff;border:1px solid #e0e0e0;border-radius:5px;padding:5px 10px;"${title ? ` title="${title}"` : ''}>
       <div style="font-size:10px;color:#888;font-weight:600;white-space:nowrap;margin-bottom:2px;">${label}</div>
       <div style="font-size:18px;font-weight:700;color:${color};white-space:nowrap;">${value}</div>
     </div>`;
+  const divider = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
+  const gap     = `<div style="width:20px;flex:none;"></div>`;
 
-  const nextRcpt = cardsEl.dataset.nextRcpt || '';
-
-  const groupGap = `<div style="width:20px;flex:none;"></div>`;
-  const divider  = `<div style="width:1px;background:#e0e0e0;align-self:stretch;margin:0 4px;flex:none;"></div>`;
-
-  cardsEl.innerHTML = `
-    <div style="border-top:1px solid #e0e0e0;padding-top:8px;display:flex;gap:6px;flex-wrap:nowrap;align-items:stretch;">
-      ${card('Qty OH',        fmt(qtyOh),          '#37474f')}
-      ${card('Qty I/W',       fmt(qtyIw),          '#37474f', 'Qty in Production / In-Work')}
-      ${card('Qty I/T',       fmt(qtyIt),          '#37474f', 'Qty in Transit (inbound to warehouse)')}
-      ${card('Next Rcpt',     nextRcpt || '0',     nextRcpt ? '#c62828' : '#bbb', 'Next scheduled receipt date')}
-      ${divider}
-      ${card('OH WOS',        wosText(ohWos),       wosColor(ohWos),   'Weeks of supply: Qty OH / Prj/Wk')}
-      ${card('OH+OO WOS',     wosText(ohOoWos),     wosColor(ohOoWos), 'Weeks of supply: (Qty OH + Cust Open Orders) / Prj/Wk')}
-      ${groupGap}
-      ${card('ATS Now',       fmt(atsNow),          '#1565c0', 'ATS available to ship today')}
-      ${card('ATS OH',        fmt(atsOh),           '#1565c0', 'ATS Qty OH - available from on-hand')}
-      ${card('ATS OH+OO',     fmt(atsOo),           '#1565c0', 'ATS OH + open supplier orders')}
-      ${divider}
-      ${card('ATS OH WOS',    wosText(atsOhWos),    wosColor(atsOhWos), 'ATS OH / Prj/Wk')}
-      ${card('ATS OH+OO WOS', wosText(atsOoWos),    wosColor(atsOoWos), 'ATS OH+OO / Prj/Wk')}
-    </div>`;
+  amzCardsEl.innerHTML =
+    gap +
+    card('ATS Now',       fmt(atsNow), '#1565c0', 'ATS available to ship today') +
+    card('ATS OH',        fmt(atsOh),  '#1565c0', 'ATS Qty OH — available from on-hand') +
+    card('ATS OH+OO',     fmt(atsOo),  '#1565c0', 'ATS OH + open supplier orders') +
+    divider +
+    card('ATS OH WOS',    wosText(atsOhWos), wosColor(atsOhWos), 'ATS OH / Prj/Wk') +
+    card('ATS OH+OO WOS', wosText(atsOoWos), wosColor(atsOoWos), 'ATS OH+OO / Prj/Wk');
 }
 
 // -- Comment history loader --------------------------------------------------
