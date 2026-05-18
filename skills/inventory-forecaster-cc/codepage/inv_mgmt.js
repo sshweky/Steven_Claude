@@ -753,7 +753,7 @@ function actionTag(r) {
 }
 
 var COL_WIDTHS = {
-  priority:66, mstyle:84, description:120, brand:68, country:44, inv_manager:68,
+  priority:66, stock_status:88, mstyle:84, description:120, brand:68, country:44, inv_manager:68,
   status_sub:72, item_rank:34, customer_count:32,
   qty_oh:48, ats_now:48, qty_oh_root:56,
   it_qty:38, iw_qty:38, hold_qty:38, open_cust_po_qty:52,
