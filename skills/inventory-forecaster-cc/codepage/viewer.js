@@ -192,6 +192,8 @@ function _setFreshness(field, ts) {
 // -- State ------------------------------------------------------------------
 let ALL_RECORDS      = [];
 let FILTERED_RECORDS = [];
+let CURRENT_USER     = { name: '', email: '', id: '' };   // resolved in bootstrap via JWT
+let _USER_IS_PLANNER = false;   // true when CURRENT_USER.name matches an inv_manager value
 let MAN_PRJ_FIDS     = [];   // 26 fids for date-stamped manual prj cols (rolling weekly)
 let MAN_PRJ_LABELS   = [];
 // -- Unsaved MAN projection edits -----------------------------------------
