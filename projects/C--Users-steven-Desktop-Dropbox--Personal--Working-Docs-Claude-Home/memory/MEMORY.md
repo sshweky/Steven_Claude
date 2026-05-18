@@ -2,6 +2,7 @@
 
 ## Feedback
 - [feedback_forecasting_methodology.md](feedback_forecasting_methodology.md) — Forecasting model tuning: HW trend collapse, Croston's over-projection, baseline should use all-weeks avg, viewer preferences, narrative style
+- [feedback_no_unicode_chars.md](feedback_no_unicode_chars.md) — Never use em-dashes, replacement chars, ellipsis, or any non-ASCII Unicode anywhere -- causes diamond-question-mark in browser
 
 ## References
 - [reference_github_sync.md](reference_github_sync.md) — GitHub repo (sshweky/Steven_Claude) syncs C:\Users\steven\.claude — git commands, what's included/excluded

@@ -1856,11 +1856,11 @@ function _priCell(r) {
     const expMs  = (_getSnoozes()[r.key] || 0) - Date.now();
     const hrsRem = Math.max(0, expMs / 3600000).toFixed(1);
     const safeKey = r.key.replace(/'/g, "\\'");
-    return `<span class="pri-snoozed" title="Snoozed — ${hrsRem}h remaining">SNOOZED</span>`
+    return `<span class="pri-snoozed" title="Snoozed - ${hrsRem}h remaining">SNOOZED</span>`
          + `<button class="snooze-btn" onclick="unsnooze('${safeKey}')" title="Remove snooze and restore original priority immediately" style="color:#1565c0;border-color:#1565c0;">UnSnooze</button>`;
   }
   const safeKey = r.key.replace(/'/g, "\\'");
-  return `${priLabel(r.priority)}<button class="snooze-btn" onclick="snooze48('${safeKey}')" title="Snooze this item for 48 hours — priority will be ignored and badge will show as SNOOZED until the period expires">Snooze</button>`;
+  return `${priLabel(r.priority)}<button class="snooze-btn" onclick="snooze48('${safeKey}')" title="Snooze this item for 48 hours - priority will be ignored and badge will show as SNOOZED until the period expires">Snooze</button>`;
 }
 
 function borderClass(s) {
@@ -2202,7 +2202,7 @@ function renderPage(page) {
 
     const _safeId2 = r.key.replace(/[^a-zA-Z0-9]/g,'_');
     tr.innerHTML = `
-      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.flagged ? '<span title="Flagged for manager review" style="color:#c62828;font-size:13px;">⚑</span>' : ''}${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">💬</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged — planner action required">📋</span>' : ''}</td>
+      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.flagged ? '<span title="Flagged for manager review" style="color:#c62828;font-size:11px;font-weight:700;">[F]</span>' : ''}${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">[R]</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>' : ''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.key}</td>
       <td style="font-size:11px;white-space:nowrap">${r.inv_manager||''}</td>
       <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.brand||'').replace(/"/g,'&quot;')}">${r.brand||''}</td>
@@ -2271,11 +2271,11 @@ async function toggleDetail(key) {
   // to keep the cache small.  Fetch just this one record's arrays from QB now.
   const _lazyRec = ALL_RECORDS.find(x => x.key === key);
   if (_lazyRec && _lazyRec._needs_detail) {
-    el.innerHTML = `<td colspan="24" style="padding:10px 16px;color:#888;font-style:italic;font-size:12px">⏳ Loading detail…</td>`;
+    el.innerHTML = `<td colspan="24" style="padding:10px 16px;color:#888;font-style:italic;font-size:12px">Loading detail...</td>`;
     try {
       await _lazyLoadDetail(_lazyRec);
     } catch (_le) {
-      el.innerHTML = `<td colspan="24" style="padding:12px 16px;background:#fff3e0"><b style="color:#c62828">⚠ Could not load detail: ${_le.message}</b> — <a href="?nocache=1" style="color:#1565c0">reload fresh</a></td>`;
+      el.innerHTML = `<td colspan="24" style="padding:12px 16px;background:#fff3e0"><b style="color:#c62828">Could not load detail: ${_le.message}</b> - <a href="?nocache=1" style="color:#1565c0">reload fresh</a></td>`;
       el.dataset.loaded = '1';
       return;
     }
@@ -2439,7 +2439,7 @@ async function toggleDetail(key) {
     return prefix + display.map(p => {
       const qty = p.itQty > 0 ? `${p.itQty.toLocaleString()} pcs I/T`
                 : p.iwQty > 0 ? `${p.iwQty.toLocaleString()} pcs I/W` : '';
-      return `PO ${p.po} · ${p.supplier}${qty ? '\n  ' + qty : ''}${p.etd ? ' · ETD ' + p.etd : ''}${p.eta ? ' → ETA ' + p.eta : ''}`;
+      return `PO ${p.po} | ${p.supplier}${qty ? '\n  ' + qty : ''}${p.etd ? ' | ETD ' + p.etd : ''}${p.eta ? ' -> ETA ' + p.eta : ''}`;
     }).join('\n');
   }
   const _suppPos = _parseSupplierPOs(r.inv_flow_supp_pos || '');
@@ -2827,11 +2827,11 @@ async function toggleDetail(key) {
         <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
           <label style="font-size:11px;color:#555;">Status:
             <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
-              <option value="Needs Planner Action" ${!_USER_IS_PLANNER ? 'selected' : ''} style="color:#1565c0;font-weight:600;">▶ Needs Planner Action</option>
+              <option value="Needs Planner Action" ${!_USER_IS_PLANNER ? 'selected' : ''} style="color:#1565c0;font-weight:600;">Needs Planner Action</option>
               <option value="Investigating">Investigating</option>
               <option value="In Progress">In Progress</option>
-              <option value="Planner Response" ${_USER_IS_PLANNER ? 'selected' : ''} style="color:#00695c;font-weight:600;">💬 Planner Response</option>
-              <option value="Resolved">✓ Resolved</option>
+              <option value="Planner Response" ${_USER_IS_PLANNER ? 'selected' : ''} style="color:#00695c;font-weight:600;">Planner Response</option>
+              <option value="Resolved">Resolved</option>
               <option value="Dismissed">Dismissed</option>
             </select>
           </label>
@@ -3208,12 +3208,12 @@ async function loadCommentHistory(key, force) {
           const bgColor     = isReply ? '#f1faf9'  : (isToPlanner ? '#e8f0fe' : '#fdf7fa');
           // "From: Author → To: Recipient" header line
           const fromPart  = author ? `<b style="color:${borderColor}">${escHtml(author)}</b>` : '';
-          const toPart    = sendTo ? ` <span style="color:#888">→</span> <b style="color:${borderColor}">${escHtml(sendTo)}</b>` : '';
+          const toPart    = sendTo ? ` <span style="color:#888">-&gt;</span> <b style="color:${borderColor}">${escHtml(sendTo)}</b>` : '';
           const authorLine = (fromPart || toPart) ? `${fromPart}${toPart} &middot; ` : '';
           const flagBadge  = isReply
-            ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">💬 Planner Response</span>`
+            ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">Planner Response</span>`
             : isToPlanner
-              ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">▶ Needs Planner Action</span>`
+              ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">Needs Planner Action</span>`
               : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
           const reviewBtn = isReply
             ? `<button onclick="markReviewed('${key.replace(/'/g,"\\'")}', this)" style="font-size:10px;padding:2px 8px;background:#e0f2f1;color:#00695c;border:1px solid #00695c;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Reviewed</button>`
@@ -3333,7 +3333,7 @@ async function addComment(key) {
   }
 
   // --- Step 2: Comment saved — update UI immediately -----------------------
-  msg.textContent = recId ? '✓ Saved (rec #' + recId + ')' : '✓ Saved';
+  msg.textContent = recId ? 'Saved (rec #' + recId + ')' : 'Saved';
   msg.style.color = '#2e7d32';
   document.getElementById('cmt-text-' + key).value = '';
   document.getElementById('cmt-flag-' + key).value = _USER_IS_PLANNER ? 'Planner Response' : 'Needs Planner Action';
@@ -3360,7 +3360,7 @@ async function addComment(key) {
       if (rec) rec.manager_reply_pending = true;
       const badgeCell = document.getElementById('row-badges-' + safeId);
       if (badgeCell && !badgeCell.querySelector('.mgr-badge'))
-        badgeCell.insertAdjacentHTML('beforeend', '<span class="mgr-badge" title="Manager flagged — planner action required">\u{1F4CB}</span>');
+        badgeCell.insertAdjacentHTML('beforeend', '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>');
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) tr.classList.add('row-mgr-pending');
       updateForMeCount();
@@ -3376,7 +3376,7 @@ async function addComment(key) {
       const badgeCell = document.getElementById('row-badges-' + safeId);
       if (badgeCell) {
         if (!badgeCell.querySelector('.reply-badge'))
-          badgeCell.insertAdjacentHTML('beforeend', '<span class="reply-badge" title="Planner reply awaiting director review">\u{1F4AC}</span>');
+          badgeCell.insertAdjacentHTML('beforeend', '<span class="reply-badge" title="Planner reply awaiting director review">[R]</span>');
         const mb = badgeCell.querySelector('.mgr-badge'); if (mb) mb.remove();
       }
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
@@ -3444,7 +3444,7 @@ async function markReviewed(key, btnEl) {
     updateFlagCount();
     updateReplyCount();
     updateForMeCount();
-    if (btnEl) { btnEl.textContent = '✓ Reviewed'; btnEl.style.background = '#e8f5e9'; btnEl.style.color = '#2e7d32'; }
+    if (btnEl) { btnEl.textContent = 'Reviewed'; btnEl.style.background = '#e8f5e9'; btnEl.style.color = '#2e7d32'; }
   } catch(e) {
     if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Mark Reviewed'; }
     alert('Failed to mark reviewed: ' + e.message);
@@ -5084,7 +5084,7 @@ async function bootstrap() {
       ALL_RECORDS = _prjCached.records;
       const ageStr = _fmtCacheAge(_prjCached.ageMs);
       const src = _prjCached.source === 'session' ? 'session cache' : 'IndexedDB cache';
-      _setDetail(`Projections: served from ${src} (${ageStr} old)  —  append ?nocache=1 to URL for a fresh pull`);
+      _setDetail(`Projections: served from ${src} (${ageStr} old) - append ?nocache=1 to URL for a fresh pull`);
       console.info(`[Prj] loaded ${ALL_RECORDS.length.toLocaleString()} records from ${src} (age ${ageStr})`);
     } else {
       // When the visitor's identity is known, try a manager-filtered fetch first.
@@ -5190,7 +5190,7 @@ async function bootstrap() {
       }
       // Update the user badge and My Records button to reflect the resolved identity
       const _ub = document.getElementById('current-user-badge');
-      if (_ub) _ub.textContent = CURRENT_USER.name || '—';
+      if (_ub) _ub.textContent = CURRENT_USER.name || '-';
       _syncMyRecordsButton();
     }
 
