@@ -441,7 +441,8 @@ const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 
 // Background load promise  -  resolves when inv flow is attached to ALL_RECORDS.
 // Boot fires this without awaiting so the table renders immediately.
-let _invFlowPromise = null;
+let _invFlowPromise  = null;
+let _openDetailKey   = null;  // key of whichever detail panel is currently expanded
 let INV_FLOW_SUPP_PO_FID  = null;   // discovered at startup from /fields on INV_FLOW_TID
 let INV_FLOW_ATS_NOW_FID  = null;   // ATS_Now
 let INV_FLOW_ATS_OH_FID   = null;   // ATS_OH_
@@ -2270,7 +2271,8 @@ function changePage(delta) {
 async function toggleDetail(key) {
   const el = document.getElementById('detail-' + key);
   if (!el) return;
-  if (el.style.display === 'table-row') { el.style.display = 'none'; return; }
+  if (el.style.display === 'table-row') { el.style.display = 'none'; _openDetailKey = null; return; }
+  _openDetailKey = key;
   el.style.display = 'table-row';
   if (el.dataset.loaded === '1') return;
 
@@ -2453,12 +2455,10 @@ async function toggleDetail(key) {
   // If the background load is still running, re-render once it finishes
   if (!_hasInvFlow && _invFlowPromise) {
     _invFlowPromise.finally(() => {
-      const panel = document.getElementById('detail-panel');
-      if (panel && panel.dataset.rid === String(r.rid)) {
-        el.dataset.loaded = '';
-        el.style.display = 'none';
-        toggleDetail(key);
-      }
+      if (_openDetailKey !== key) return;
+      el.dataset.loaded = '';
+      el.style.display = 'none';
+      toggleDetail(key);
     });
   }
   const _invFmt1 = n => {
@@ -2748,13 +2748,11 @@ async function toggleDetail(key) {
   const atsHist = r.ats_hist || [];
   // If ATS is still loading and detail is open, re-render once it resolves
   if (!r.ats_hist && _atsHistPromise) {
-    _atsHistPromise.then(() => {
-      const panel = document.getElementById('detail-panel');
-      if (panel && panel.dataset.rid === String(r.rid)) {
-        el.dataset.loaded = '';
-        el.style.display = 'none';
-        toggleDetail(key);
-      }
+    _atsHistPromise.finally(() => {
+      if (_openDetailKey !== key) return;
+      el.dataset.loaded = '';
+      el.style.display = 'none';
+      toggleDetail(key);
     });
   }
   let histHtml  = '';
@@ -5226,16 +5224,12 @@ async function bootstrap() {
     // Re-render whatever detail panel is currently open after inv flow settles.
     // Called from every settlement path so no panel is ever left on "Loading...".
     function _reRenderOpenPanel() {
-      const panel  = document.getElementById('detail-panel');
-      const ridStr = panel && panel.dataset.rid;
-      if (!ridStr) return;
-      const openRec = ALL_RECORDS.find(x => String(x.rid) === ridStr);
-      if (!openRec) return;
-      const openEl = document.getElementById('detail-' + openRec.key);
+      if (!_openDetailKey) return;
+      const openEl = document.getElementById('detail-' + _openDetailKey);
       if (!openEl || openEl.style.display !== 'table-row') return;
       openEl.dataset.loaded = '';
       openEl.style.display = 'none';
-      toggleDetail(openRec.key);
+      toggleDetail(_openDetailKey);
     }
 
     _invFlowPromise = Promise.race([_invFlowLoad, _invFlowTimer])
