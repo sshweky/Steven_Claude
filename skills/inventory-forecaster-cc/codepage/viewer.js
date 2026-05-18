@@ -2702,7 +2702,7 @@ async function toggleDetail(key) {
         const ov = _opn[i];
         opnTot += ov;
         opnCells += ov > 0
-          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help" title="${fmtN(ov)} units">${fmtN(ov)}</td>`
+          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help" title="${(r.cust||'').replace(/"/g,'&quot;')}: ${fmtN(ov)} units\n(loading cancel date...)">${fmtN(ov)}</td>`
           : `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       } else {
         opnCells += `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
