@@ -336,6 +336,31 @@ async function discoverInvFlowTextFids() {
   }
 }
 
+// -- Discover Order History FIDs for Qty Cxld row ---------------------------
+// Called lazily the first time a detail panel opens. One /fields call; cached
+// in module-level vars so subsequent panels don't re-fetch.
+async function discoverOrdHistFids() {
+  if (ORD_HIST_QTY_CXLD_FID) return;
+  try {
+    const fields = await qbGet(`/fields?tableId=${CFG.ORDER_HIST_TID}`);
+    for (const f of fields) {
+      const lbl = (f.label || '').trim().toLowerCase()
+                    .replace(/[\s_+]+/g, '_').replace(/^_|_$/g, '');
+      if      (lbl === 'acct_mstyle')              ORD_HIST_ACCT_MSTYLE_FID = f.id;
+      else if (lbl === 'cancel_date')               ORD_HIST_CANCEL_DATE_FID = f.id;
+      else if (lbl === 'qty_cxld')                  ORD_HIST_QTY_CXLD_FID    = f.id;
+      else if (lbl === 'exception_approval')        ORD_HIST_EXCEP_APPR_FID  = f.id;
+      else if (lbl === 'exception_approval_notes')  ORD_HIST_EXCEP_NOTES_FID = f.id;
+    }
+    console.info('[OrdHist] FIDs discovered:', {
+      acct_mstyle: ORD_HIST_ACCT_MSTYLE_FID, cancel_date: ORD_HIST_CANCEL_DATE_FID,
+      qty_cxld: ORD_HIST_QTY_CXLD_FID, excep: ORD_HIST_EXCEP_APPR_FID,
+      notes: ORD_HIST_EXCEP_NOTES_FID });
+  } catch (e) {
+    console.warn('[OrdHist] discoverOrdHistFids failed:', e.message || e);
+  }
+}
+
 // -- Build the QB query select list for one row -----------------------------
 function buildSelectFids() {
   const F = CFG.FID;
@@ -418,6 +443,13 @@ let INV_FLOW_ATS_OH_FID   = null;   // ATS_OH_
 let INV_FLOW_ATS_OO_FID   = null;   // ATS_OH_OO_
 let INV_FLOW_ATS_OH_WOS_FID  = null; // ATS_WOS_OH_
 let INV_FLOW_ATS_OO_WOS_FID  = null; // ATS_WOS_OH_OO_
+
+// Order History (bpe4maa4c) FIDs — discovered lazily on first detail open
+let ORD_HIST_ACCT_MSTYLE_FID = null;
+let ORD_HIST_CANCEL_DATE_FID = null;
+let ORD_HIST_QTY_CXLD_FID    = null;
+let ORD_HIST_EXCEP_APPR_FID  = null;
+let ORD_HIST_EXCEP_NOTES_FID = null;
 
 // Escape hatch: ?nocache=1 in the URL bypasses cache for a single load
 // (useful when planners suspect stale data).
@@ -2742,6 +2774,7 @@ async function toggleDetail(key) {
         <tr>${histHdrCells}</tr>
         <tr>${ordCells}</tr>
         <tr>${shpCells}</tr>
+        <tr id="cxld-row-${safeIdForTotal}"></tr>
         <tr>${atsCells}</tr>
       </table>
     </div>`;
@@ -2928,6 +2961,7 @@ async function toggleDetail(key) {
   // Amazon Catalog table and injects/refreshes the bullet in AI Analysis.
   // Runs after innerHTML is set so the target <ul> already exists in the DOM.
   if (CFG.AMZ_CATALOG_TID && r.mstyle && isAmazonRec) _loadAmzDcInv(r, safeId);
+  if (CFG.ORDER_HIST_TID) _loadOrdHistCxld(r, safeIdForTotal);
 
   } catch (err) {
     // Something threw while building the detail HTML. Surface the error
@@ -2941,6 +2975,96 @@ async function toggleDetail(key) {
       <a href="?nocache=1" style="color:#1565c0">?nocache=1</a> to rule out a stale cache.</span>
     </td>`;
     el.dataset.loaded = '1';
+  }
+}
+
+// -- L26W Qty Cancelled (Exception Approval only) ----------------------------
+// Queries Order History for rows where Exception_Approval='yes' and Qty_Cxld>0
+// within the L26W window, buckets by Cancel_Date week, then fills the placeholder
+// <tr id="cxld-row-..."> row in the history table.  Row is removed if no data.
+async function _loadOrdHistCxld(r, safeId) {
+  const rowEl = document.getElementById('cxld-row-' + safeId);
+  if (!rowEl || !CFG.ORDER_HIST_TID || !W1_DATE) return;
+
+  try {
+    await discoverOrdHistFids();
+    if (!ORD_HIST_QTY_CXLD_FID || !ORD_HIST_ACCT_MSTYLE_FID ||
+        !ORD_HIST_CANCEL_DATE_FID || !ORD_HIST_EXCEP_APPR_FID) {
+      rowEl.remove(); return;
+    }
+
+    // 26-week window ending at W1_DATE; QB date filter uses MM-DD-YYYY
+    const dateFrom = new Date(W1_DATE.getTime());
+    dateFrom.setDate(W1_DATE.getDate() - 26 * 7);
+    const _qbDate = d => {
+      const s = d.toISOString().slice(0, 10);
+      return `${s.slice(5, 7)}-${s.slice(8, 10)}-${s.slice(0, 4)}`;
+    };
+
+    const select = [ORD_HIST_CANCEL_DATE_FID, ORD_HIST_QTY_CXLD_FID];
+    if (ORD_HIST_EXCEP_NOTES_FID) select.push(ORD_HIST_EXCEP_NOTES_FID);
+
+    const escKey = r.key.replace(/'/g, "''");
+    const where = `{${ORD_HIST_ACCT_MSTYLE_FID}.EX.'${escKey}'}` +
+                  `AND{${ORD_HIST_EXCEP_APPR_FID}.EX.'yes'}` +
+                  `AND{${ORD_HIST_QTY_CXLD_FID}.GT.0}` +
+                  `AND{${ORD_HIST_CANCEL_DATE_FID}.OAF.'${_qbDate(dateFrom)}'}`;
+
+    const resp = await qb('/records/query', {
+      from: CFG.ORDER_HIST_TID,
+      select,
+      where,
+      options: { skip: 0, top: 1000 },
+    });
+
+    const data = (resp && resp.data) || [];
+
+    // Bucket into the same 26 weekly slots as histOrd/histShp
+    // Index 0 = oldest (26 wk ago), index 25 = most recent (LW)
+    const cxldByWeek  = new Array(26).fill(0);
+    const notesByWeek = Array.from({ length: 26 }, () => []);
+
+    const _sv  = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
+
+    for (const rec of data) {
+      const rawDate = _sv(rec, ORD_HIST_CANCEL_DATE_FID);
+      if (!rawDate) continue;
+      const cancelDate = new Date(rawDate);
+      if (isNaN(cancelDate.getTime())) continue;
+      // weeksAgo: 1 = last week (LW), 26 = 26 weeks ago
+      const msDiff   = W1_DATE.getTime() - cancelDate.getTime();
+      const weeksAgo = Math.ceil(msDiff / (7 * 86400000));
+      const idx      = 26 - weeksAgo;  // 0 = oldest, 25 = LW
+      if (idx < 0 || idx >= 26) continue;
+      const qty = parseFloat(_sv(rec, ORD_HIST_QTY_CXLD_FID)) || 0;
+      cxldByWeek[idx] += qty;
+      if (ORD_HIST_EXCEP_NOTES_FID) {
+        const note = _sv(rec, ORD_HIST_EXCEP_NOTES_FID);
+        if (note) notesByWeek[idx].push(String(note));
+      }
+    }
+
+    const total = cxldByWeek.reduce((s, v) => s + v, 0);
+    if (total === 0) { rowEl.remove(); return; }
+
+    let cells = '<td class="row-label" style="color:#b71c1c;font-weight:600;white-space:nowrap">Qty Cxld *</td>';
+    for (let i = 0; i < 26; i++) {
+      const v     = cxldByWeek[i];
+      const notes = notesByWeek[i];
+      const tip   = notes.length ? notes.join(' | ') : '';
+      const col   = v === 0 ? 'color:#bbb' : 'color:#b71c1c;font-weight:600';
+      const attr  = tip
+        ? ` title="${tip.replace(/"/g, '&quot;').replace(/</g, '&lt;')}" style="${col};cursor:help"`
+        : ` style="${col}"`;
+      cells += `<td${attr}>${fmtN(v)}</td>`;
+    }
+    cells += `<td style="font-weight:700;color:#b71c1c">${fmtN(total)}</td>`;
+    cells += `<td style="font-weight:700;color:#b71c1c">${fmtN(Math.round(total / 26))}</td>`;
+    rowEl.innerHTML = cells;
+
+  } catch (e) {
+    console.warn('[OrdHist] cxld row load failed:', e.message || e);
+    rowEl.remove();
   }
 }
 
