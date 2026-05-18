@@ -1980,6 +1980,34 @@ function updateFlagCount() {
   if (el) el.textContent = n + ' flagged for manager';
 }
 
+// -- For-Me count & banner ---------------------------------------------------
+// For planners: count of records where manager flagged action needed for them.
+// For directors/VPs: mirrors replyCount (planner responses awaiting review).
+// Called after any pending-flag change so the badge and banner stay current.
+function updateForMeCount() {
+  let n;
+  if (_USER_IS_PLANNER && CURRENT_USER.name) {
+    const myName = CURRENT_USER.name.toLowerCase();
+    n = ALL_RECORDS.filter(r => r.manager_reply_pending &&
+        (r.inv_manager || '').toLowerCase() === myName).length;
+  } else if (_USER_IS_PLANNER) {
+    n = ALL_RECORDS.filter(r => r.manager_reply_pending).length;
+  } else {
+    n = ALL_RECORDS.filter(r => r.planner_reply_pending).length;
+  }
+  const el  = document.getElementById('forMeCount');
+  const btn = document.getElementById('forMeBtn');
+  if (el) { el.textContent = n + ' item' + (n === 1 ? '' : 's') + ' for me'; el.style.display = n ? 'inline' : 'none'; }
+  if (btn) btn.style.fontWeight = (SHOW_FOR_ME_ONLY ? '800' : '600');
+  const banner = document.getElementById('forMeBanner');
+  const bannerCount = document.getElementById('forMeBannerCount');
+  if (banner && bannerCount) {
+    bannerCount.textContent = n;
+    if (n > 0 && banner.dataset.dismissed !== '1') banner.style.display = 'flex';
+    else if (n === 0) banner.style.display = 'none';
+  }
+}
+
 function updateReplyCount() {
   const n = ALL_RECORDS.filter(r => r.planner_reply_pending).length;
   const el  = document.getElementById('replyCount');
