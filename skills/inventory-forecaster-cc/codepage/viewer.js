@@ -764,6 +764,35 @@ function _parseModel(txt) {
   return '';
 }
 
+// Forecast status flag: 'Over-Projected' | 'Under-Projected' | 'On Plan' | 'Inactive' | ''
+// Noise filter: max(ai, man) < 1,000 OR |ai−man| < 500 → blank (no flag).
+// Threshold: ±10% of manual total.
+//   pct > +10% → AI sees more than manual → manual is Under-Projected
+//   pct < −10% → AI sees less than manual → manual is Over-Projected
+function _fcstStatus(ai_model, ai_total, proj_total) {
+  if (ai_model === 'Inactive') return 'Inactive';
+  const maxVal = Math.max(ai_total, proj_total);
+  const gap    = Math.abs(ai_total - proj_total);
+  if (maxVal < 1000 || gap < 500) return '';
+  const pct = proj_total > 0 ? (ai_total - proj_total) / proj_total * 100 : 0;
+  if (pct <= -10) return 'Over-Projected';
+  if (pct >=  10) return 'Under-Projected';
+  return 'On Plan';
+}
+
+// Colored pill badge for forecast status (returns HTML string or '').
+function _fcstStatusBadge(status) {
+  const styles = {
+    'Over-Projected':  'background:#c62828;color:#fff',
+    'Under-Projected': 'background:#e65100;color:#fff',
+    'On Plan':         'background:#2e7d32;color:#fff',
+    'Inactive':        'background:#757575;color:#fff',
+  };
+  const st = styles[status];
+  if (!st) return '';
+  return `<span style="${st};display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap">${status}</span>`;
+}
+
 // Customer-friendly label  -  generalized 2026-05-08 to support any retailer's
 // POS data (not just Amazon).  As Walmart/Petsmart/Petco POS feeds come
 // online, the labeling automatically adapts.  Mirrors _friendly_cust_name in
