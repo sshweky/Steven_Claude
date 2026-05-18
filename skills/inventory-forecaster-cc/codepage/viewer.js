@@ -1997,6 +1997,23 @@ function toggleOffPlanOnly() {
   applyFilters();
 }
 
+// "My Records" — filters the table to records owned by the current visitor.
+// Planners get this on by default (bootstrap sets SHOW_MY_RECORDS_ONLY=true).
+// Directors/VPs default to off (see all records) but can toggle it on.
+let SHOW_MY_RECORDS_ONLY = false;
+function toggleMyRecords() {
+  SHOW_MY_RECORDS_ONLY = !SHOW_MY_RECORDS_ONLY;
+  _syncMyRecordsButton();
+  applyFilters();
+}
+function _syncMyRecordsButton() {
+  const btn = document.getElementById('myRecordsBtn');
+  if (!btn) return;
+  btn.style.background = SHOW_MY_RECORDS_ONLY ? '#1565c0' : '#fff';
+  btn.style.color      = SHOW_MY_RECORDS_ONLY ? '#fff'    : '#1565c0';
+  btn.style.fontWeight = '800';
+}
+
 // -- Render: pagination -----------------------------------------------------
 function renderPage(page) {
   currentPage = page;
