@@ -5121,9 +5121,11 @@ async function bootstrap() {
     // completes (usually a few seconds after the UI appears).
     _invFlowPromise = attachInvFlow(ALL_RECORDS).then(() => {
       _setFreshness('invflow-loaded-at', Date.now());
+      _invFlowPromise = null;   // null BEFORE render callbacks fire so resolved-but-empty mstyles
+                                // show "(no QB Inventory Flow row)" instead of looping forever
     }).catch(e => {
       console.warn('Inventory Flow load failed (non-fatal):', e);
-      _invFlowPromise = null;   // prevent infinite re-render loop in the detail panel
+      _invFlowPromise = null;   // same null-out on failure path
       const el = document.getElementById('invflow-loaded-at');
       if (el) el.textContent = 'unavailable';
     });
