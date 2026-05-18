@@ -666,7 +666,7 @@ var COLS = [
   { id:'item_rank', label:'Rank', align:'left', get:function(r){return r.item_rank;}, render:function(r){return '<td>'+esc(r.item_rank)+'</td>';} },
   { id:'customer_count', label:'Cust', align:'right', numeric:true, get:function(r){return r.customer_count;}, render:function(r){return '<td class="right">'+r.customer_count+'</td>';} },
   { id:'qty_oh', label:'Qty OH', align:'right', numeric:true, get:function(r){return r.qty_oh;},
-    render:function(r){return '<td class="right '+(r.qty_oh<0?'neg':'')+'">'+fmt(r.qty_oh)+'</td>';} },
+    render:function(r){return '<td class="right '+(r.qty_oh<0?'neg':'')+'">'+fmtInt(r.qty_oh)+'</td>';} },
   { id:'ats_now', label:'ATS Now', align:'right', numeric:true, get:function(r){return r.ats_now;},
     render:function(r){return '<td class="right '+(r.ats_now<0?'neg':'')+'">'+fmt(r.ats_now)+'</td>';} },
   { id:'qty_oh_root', label:'Pcs OH (root)', align:'right', numeric:true,
