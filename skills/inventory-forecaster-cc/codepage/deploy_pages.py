@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Deploy viewer.html and viewer.js to QB InventoryTrack codepages.
-Targets pages by ID (not by name) so the correct production pages are always
-updated:
-  pageID=52  ->  viewer.html  (Inventory Management Viewer - HTML shell)
-  pageID=56  ->  viewer.js    (Inventory Management Viewer - JS logic, loaded by pageID=52)
+Deploy Inventory Management Viewer to QB InventoryTrack codepages.
+Targets pages by ID so the correct production pages are always updated:
+  pageID=52  ->  inv_mgmt_full.html  (Inventory Management Viewer - HTML shell)
+  pageID=56  ->  inv_mgmt.js         (Inventory Management Viewer - JS logic, loaded by pageID=52)
 
 NOTE: pageID=49 and pageID=50 are the FORECAST VIEWER (a separate tool).
 Do NOT deploy to 49/50 - they are unrelated to this skill.
+
+viewer.html and viewer.js are NOT deployed here - they are a separate dev prototype.
 
 Handles U+FFFF (invalid in XML 1.0) by replacing with U+FFFD before upload.
 """
@@ -23,8 +24,8 @@ HERE   = Path(__file__).parent
 
 # Map filename -> production page ID
 PAGE_IDS = {
-    "viewer.html": 52,
-    "viewer.js":   56,
+    "inv_mgmt_full.html": 52,
+    "inv_mgmt.js":        56,
 }
 
 def upload_page(filename: str):
@@ -85,8 +86,8 @@ def upload_page(filename: str):
         return False
 
 if __name__ == "__main__":
-    ok_js   = upload_page("viewer.js")
-    ok_html = upload_page("viewer.html")
+    ok_js   = upload_page("inv_mgmt.js")
+    ok_html = upload_page("inv_mgmt_full.html")
     if ok_js and ok_html:
         print("\n[OK] Both pages deployed. Hard-refresh the viewer tab (Ctrl+Shift+R).")
     else:
