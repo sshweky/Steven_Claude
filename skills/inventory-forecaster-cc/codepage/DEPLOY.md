@@ -11,8 +11,14 @@ the local Python viewer (`scripts/viewer.py`) one-for-one.
 | `viewer.js`   | Bootstrap, QB REST calls, filters, sort, render, expand panel, Use AI / Use Sugg / Flag / Comment |
 | `DEPLOY.md`   | This file |
 
-`viewer.html` references `viewer.js` via `<script src="?a=dbpage&pagename=viewer.js">`,
-so both must live as separate pages **in the same QB app**.
+`viewer.html` (pageID=52) loads `viewer.js` (pageID=56) via
+`<script src="/db/bpd24h9wy?a=dbpage&pageID=56">`.
+
+**Page IDs (InventoryTrack app `bpd24h9wy`):**
+- pageID=52 = Inventory Management Viewer HTML shell
+- pageID=56 = Inventory Management Viewer JS logic
+- pageID=49 = Forecast Viewer JS (separate tool - do NOT touch)
+- pageID=50 = Forecast Viewer HTML (separate tool - do NOT touch)
 
 ---
 
@@ -93,26 +99,26 @@ the viewer has at least Modify rights on both.
 
 ---
 
-## Step 3 — Create the two pages in QB
+## Step 3 — Deploy to QB
 
-1. In a browser, open the **Inventory** app:
-   `https://pim.quickbase.com/db/bqkdiemav`
-2. Click the gear ⚙ in the top-right → **Pages**
-3. Click **+ New Page**
-4. **Page name:** `viewer.js`
-   **Type:** *Page (HTML/text)* (the only one — QB doesn't distinguish JS from HTML for codepages, the file extension in the name is what matters for `Content-Type`)
-5. Paste the entire contents of `viewer.js` and **Save**
-6. Click **+ New Page** again
-7. **Page name:** `viewer.html`
-   **Type:** *Page (HTML/text)*
-8. Paste the entire contents of `viewer.html` (with your token already pasted in) and **Save**
+Run the deploy script from this folder:
+
+```bash
+cd C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\codepage
+python deploy_pages.py
+```
+
+This uploads `viewer.js` to pageID=56 and `viewer.html` to pageID=52 in the
+InventoryTrack app (`bpd24h9wy`) using `API_AddReplaceDBPage` targeted by ID.
+
+After deploying, hard-refresh the viewer tab (Ctrl+Shift+R) to pick up the new version.
 
 ---
 
 ## Step 4 — Open it
 
 ```
-https://pim.quickbase.com/db/bqkdiemav?a=dbpage&pagename=viewer.html
+https://pim.quickbase.com/db/bpd24h9wy?a=dbpage&pageID=52
 ```
 
 Bookmark that URL or add it as an app menu link (Settings → App Properties → Variables → Pages → "Add").

@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """
 Deploy viewer.html and viewer.js to QB InventoryTrack codepages.
+Targets pages by ID (not by name) so the correct production pages are always
+updated:
+  pageID=52  ->  viewer.html  (Inventory Management Viewer - HTML shell)
+  pageID=56  ->  viewer.js    (Inventory Management Viewer - JS logic, loaded by pageID=52)
+
+NOTE: pageID=49 and pageID=50 are the FORECAST VIEWER (a separate tool).
+Do NOT deploy to 49/50 - they are unrelated to this skill.
+
 Handles U+FFFF (invalid in XML 1.0) by replacing with U+FFFD before upload.
-U+FFFD sorts just below U+FFFE/FFFF so sort-last semantics are preserved.
 """
-import urllib.request, urllib.error, urllib.parse, re
+import urllib.request, urllib.error, re
 from html import escape as html_escape
 from pathlib import Path
 
@@ -14,17 +21,22 @@ APP_ID = "bpd24h9wy"
 URL    = f"https://{REALM}/db/{APP_ID}"
 HERE   = Path(__file__).parent
 
+# Map filename -> production page ID
+PAGE_IDS = {
+    "viewer.html": 52,
+    "viewer.js":   56,
+}
+
 def upload_page(filename: str):
-    path = HERE / filename
+    page_id = PAGE_IDS[filename]
+    path    = HERE / filename
     content = path.read_text(encoding="utf-8")
-    # U+FFFF is an invalid XML 1.0 character — replace with U+FFFD (replacement
-    # character) which sorts just below FFFF so sort-last semantics are preserved.
-    FFFF  = "￿"   # literal U+FFFF
-    FFFD  = "�"   # literal U+FFFD (valid in XML 1.0, ≤ FFFF)
+
+    FFFF  = "￿"
+    FFFD  = "�"
     n_replaced = content.count(FFFF)
     content_xml = content.replace(FFFF, FFFD)
 
-    # Verify no more invalid XML 1.0 chars remain
     def is_invalid(c):
         n = ord(c)
         if n in (0x9, 0xA, 0xD): return False
@@ -42,14 +54,14 @@ def upload_page(filename: str):
         f'<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<qdbapi>\n'
         f'  <usertoken>{TOKEN}</usertoken>\n'
-        f'  <pagename>{filename}</pagename>\n'
+        f'  <pageID>{page_id}</pageID>\n'
         f'  <pagetype>1</pagetype>\n'
         f'  <pagetext>{esc}</pagetext>\n'
         f'</qdbapi>'
     )
 
     xml_bytes = body.encode("utf-8")
-    print(f"{filename}: {len(content):,} chars  ->  XML {len(xml_bytes):,}B  "
+    print(f"{filename} -> pageID={page_id}: {len(content):,} chars  ->  XML {len(xml_bytes):,}B  "
           f"(U+FFFF->FFFD: {n_replaced})")
 
     req = urllib.request.Request(
