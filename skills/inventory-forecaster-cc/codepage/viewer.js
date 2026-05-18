@@ -351,11 +351,16 @@ async function discoverOrdHistFids() {
       else if (lbl === 'qty_cxld')                  ORD_HIST_QTY_CXLD_FID    = f.id;
       else if (lbl === 'exception_approval')        ORD_HIST_EXCEP_APPR_FID  = f.id;
       else if (lbl === 'exception_approval_notes')  ORD_HIST_EXCEP_NOTES_FID = f.id;
+      else if (lbl === 'qty_open')                  ORD_HIST_QTY_OPEN_FID    = f.id;
+      else if (lbl === 'customer'     || lbl === 'cust_name' ||
+               lbl === 'customer_name'|| lbl === 'acct_name' ||
+               lbl === 'account_name' || lbl === 'cust_no')  ORD_HIST_CUST_NAME_FID = f.id;
     }
     console.info('[OrdHist] FIDs discovered:', {
       acct_mstyle: ORD_HIST_ACCT_MSTYLE_FID, cancel_date: ORD_HIST_CANCEL_DATE_FID,
       qty_cxld: ORD_HIST_QTY_CXLD_FID, excep: ORD_HIST_EXCEP_APPR_FID,
-      notes: ORD_HIST_EXCEP_NOTES_FID });
+      notes: ORD_HIST_EXCEP_NOTES_FID, qty_open: ORD_HIST_QTY_OPEN_FID,
+      cust_name: ORD_HIST_CUST_NAME_FID });
   } catch (e) {
     console.warn('[OrdHist] discoverOrdHistFids failed:', e.message || e);
   }
@@ -450,6 +455,8 @@ let ORD_HIST_CANCEL_DATE_FID = null;
 let ORD_HIST_QTY_CXLD_FID    = null;
 let ORD_HIST_EXCEP_APPR_FID  = null;
 let ORD_HIST_EXCEP_NOTES_FID = null;
+let ORD_HIST_QTY_OPEN_FID    = null;  // Qty_Open  - for open order hover
+let ORD_HIST_CUST_NAME_FID   = null;  // Customer name - for open order hover
 
 // Escape hatch: ?nocache=1 in the URL bypasses cache for a single load
 // (useful when planners suspect stale data).
@@ -2597,10 +2604,10 @@ async function toggleDetail(key) {
         const opnTitleAttr = opnTip ? ` title="${opnTip.replace(/"/g, '&quot;')}"` : '';
         const opnCursor = opnTip ? ' cursor:help;' : '';
         opnCells += ov > 0
-          ? `<td style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;${opnCursor}"${opnTitleAttr}>${fmtN(ov)}</td>`
-          : `<td style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
+          ? `<td id="opn-cell-${safeId}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;${opnCursor}"${opnTitleAttr}>${fmtN(ov)}</td>`
+          : `<td id="opn-cell-${safeId}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       } else {
-        opnCells += `<td style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
+        opnCells += `<td id="opn-cell-${safeId}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       }
     }
     // Total cells (sum for beg/rcv/opn; WOS total is not meaningful so leave as dash)
@@ -2964,6 +2971,7 @@ async function toggleDetail(key) {
   // calls that can stall the inv flow bulk scan).  If inv flow is already
   // attached (_hasInvFlow) or already resolved/null, start immediately.
   if (CFG.ORDER_HIST_TID && (_hasInvFlow || !_invFlowPromise)) _loadOrdHistCxld(r, safeIdForTotal);
+  if (CFG.ORDER_HIST_TID) _loadOpenOrderDetails(r, safeId);
 
   } catch (err) {
     // Something threw while building the detail HTML. Surface the error
@@ -3067,6 +3075,89 @@ async function _loadOrdHistCxld(r, safeId) {
   } catch (e) {
     console.warn('[OrdHist] cxld row load failed:', e.message || e);
     rowEl.remove();
+  }
+}
+
+// -- Open order hover: per-customer breakdown with cancel date ----------------
+// Queries Order History for rows where Qty_Open > 0, groups by customer +
+// cancel date, and rewrites the title attr on each opn-cell-* <td> so hovering
+// shows a breakdown rather than the generic "all customers combined" fallback.
+async function _loadOpenOrderDetails(r, safeId) {
+  if (!CFG.ORDER_HIST_TID || !W1_DATE) return;
+
+  try {
+    await discoverOrdHistFids();
+    if (!ORD_HIST_QTY_OPEN_FID || !ORD_HIST_ACCT_MSTYLE_FID || !ORD_HIST_CANCEL_DATE_FID) return;
+
+    const select = [ORD_HIST_CANCEL_DATE_FID, ORD_HIST_QTY_OPEN_FID];
+    if (ORD_HIST_CUST_NAME_FID) select.push(ORD_HIST_CUST_NAME_FID);
+
+    const escKey = r.key.replace(/'/g, "''");
+    const where  = `{${ORD_HIST_ACCT_MSTYLE_FID}.EX.'${escKey}'}` +
+                   `AND{${ORD_HIST_QTY_OPEN_FID}.GT.0}`;
+
+    const resp = await qb('/records/query', {
+      from: CFG.ORDER_HIST_TID,
+      select,
+      where,
+      options: { skip: 0, top: 2000 },
+    });
+
+    const data = (resp && resp.data) || [];
+    if (!data.length) return;
+
+    const _sv = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
+    const _fmtDate = d => {
+      const s = new Date(d).toISOString().slice(0, 10);
+      return s.slice(5, 7) + '/' + s.slice(8, 10);
+    };
+
+    // byWeek[i] = array of { cust, qty, cancelDate } for cell index i (0=W1..25=W26)
+    const byWeek = Array.from({ length: 26 }, () => []);
+
+    for (const rec of data) {
+      const rawDate = _sv(rec, ORD_HIST_CANCEL_DATE_FID);
+      if (!rawDate) continue;
+      const cancelDate = new Date(rawDate);
+      if (isNaN(cancelDate.getTime())) continue;
+      const qty = parseFloat(_sv(rec, ORD_HIST_QTY_OPEN_FID)) || 0;
+      if (qty <= 0) continue;
+
+      // Forward-week bucketing: cell 0 = W1 (includes past-due), cell i = W(i+1)
+      const daysDiff = Math.floor((cancelDate.getTime() - W1_DATE.getTime()) / 86400000);
+      let cellIdx = Math.floor(daysDiff / 7);
+      if (cellIdx < 0) cellIdx = 0;   // past-due -> cell 0 (W1)
+      if (cellIdx >= 26) continue;    // beyond forecast horizon
+
+      const cust = ORD_HIST_CUST_NAME_FID ? (String(_sv(rec, ORD_HIST_CUST_NAME_FID) || '')).trim() : '';
+      byWeek[cellIdx].push({ cust: cust || 'Customer', qty, cancelDate: _fmtDate(rawDate) });
+    }
+
+    for (let i = 0; i < 26; i++) {
+      const entries = byWeek[i];
+      if (!entries.length) continue;
+      const cell = document.getElementById('opn-cell-' + safeId + '-' + i);
+      if (!cell) continue;
+
+      // Aggregate by customer (a customer may have multiple open POs in the week)
+      const custMap = {};
+      for (const e of entries) {
+        if (!custMap[e.cust]) custMap[e.cust] = { qty: 0, dates: new Set() };
+        custMap[e.cust].qty += e.qty;
+        custMap[e.cust].dates.add(e.cancelDate);
+      }
+
+      const lines = [];
+      if (i === 0) lines.push('Includes past-due + W1:');
+      for (const [cust, info] of Object.entries(custMap)) {
+        const dateStr = [...info.dates].sort().join(', ');
+        lines.push(`${cust}: ${fmtN(info.qty)} units | cancel ${dateStr}`);
+      }
+      cell.title = lines.join('\n');
+      cell.style.cursor = 'help';
+    }
+  } catch (e) {
+    console.warn('[OrdHist] open order hover load failed:', e.message || e);
   }
 }
 
