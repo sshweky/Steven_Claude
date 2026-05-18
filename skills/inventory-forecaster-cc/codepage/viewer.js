@@ -4737,8 +4737,23 @@ async function bootstrap() {
       _setDetail(`Projections: served from ${src} (${ageStr} old)  —  append ?nocache=1 to URL for a fresh pull`);
       console.info(`[Prj] loaded ${ALL_RECORDS.length.toLocaleString()} records from ${src} (age ${ageStr})`);
     } else {
-      _setDetail('Querying Quickbase for active records');
-      const rawRows = await fetchAllRecords();
+      // When the visitor's identity is known, try a manager-filtered fetch first.
+      // Planners typically own 400–500 records; this cuts load time proportionally.
+      // If 0 records come back the visitor is a director/VP — fall back to full load.
+      let rawRows;
+      if (CURRENT_USER.name) {
+        _setDetail(`Querying QB for "${CURRENT_USER.name}" records...`);
+        rawRows = await fetchAllRecords(CURRENT_USER.name);
+        if (rawRows.length === 0) {
+          _setDetail('No records assigned to this user — loading full dataset');
+          rawRows = await fetchAllRecords();
+        } else {
+          _setDetail(`${rawRows.length.toLocaleString()} records for "${CURRENT_USER.name}" received`);
+        }
+      } else {
+        _setDetail('Querying Quickbase for active records');
+        rawRows = await fetchAllRecords();
+      }
       _setBoot('Parsing projection data...');
       _setDetail(`${rawRows.length.toLocaleString()} records received | adapting to UI shape`);
       await new Promise(r => setTimeout(r, 16));
