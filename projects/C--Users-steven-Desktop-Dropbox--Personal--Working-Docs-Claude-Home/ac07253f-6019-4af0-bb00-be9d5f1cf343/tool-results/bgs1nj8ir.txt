@@ -1,0 +1,713 @@
+Total unique mstyles: 708
+Mstyles with manual demand > 0: 379
+
+MStyle               Accts  Man 26w Total Status
+---------------------------------------------------------------------------
+FF7297AMZ                1         31,325  A
+BB26924                  1         27,000  A: Off-Price
+SF8170                   3         25,300  A
+FF10479PX2               1         20,720  A
+FF8991                   2         20,508  A, A: NEW 4/25
+BB13435                  1         16,050  A
+BB13436                  1         16,050  A
+BB13437                  1         16,050  A
+FF35147                  3         15,183  A
+BB12022/12               5         14,963  A
+BB14500                  1         14,340  A
+BB36058                  1         13,260  A
+BB13447                  2         13,060  A
+BB29728DG                1         13,000  A
+BB0722                   1         12,600  A: Off-Price
+BB13448                  1         12,060  A
+FF7488                   3         10,878  A, A: Promo Commt
+BB13436CLR/12            2          9,085  A
+FF9297AU                 2          8,875  A
+FF31183                  1          8,778  A: Promo Commt
+FF5780                   1          8,778  A: Promo Commt
+FF33872                  3          8,582  A
+BB31553CLR/9             1          8,310  A
+FF33867                  2          8,300  A
+FF26777                  3          8,000  A
+FF12655                  2          7,740  A, A: Off-Price
+FF8298                   1          6,765  A
+FF31325                  1          6,000  A
+FF36326                  1          5,852  A: Promo Commt
+FF36327                  1          5,852  A: Promo Commt
+FF8287                   2          5,400  A, A: Promo
+FF8882PX2                1          5,200  A
+BB30276                  4          5,050  A, A: Off-Price
+FF12379/6                4          5,000  A, A: Off-Price, A: Repl Commt
+FF36211                  1          5,000  A
+FF36214                  1          5,000  A
+FF5716                   3          4,840  A
+BB0759                   1          4,800  A: Off-Price
+FF7260                   3          4,789  A, A: Promo Commt
+SF8173                   6          4,550  A, FD
+FF36328                  1          4,389  A: Promo Commt
+FF36329                  1          4,389  A: Promo Commt
+FF15585                  2          4,350  A, A: Repl Commt
+BB16535                  1          4,320  A: NEW 9/25
+FF9291AU                 2          4,273  A
+FF9298                   3          4,066  A
+BB38970                  1          4,025  A
+FF5952                   2          4,000  A
+BB33526                  1          4,000  A: Off-Price
+BB13435PX3               1          3,970  A
+FF11899/24               4          3,932  A
+BB35904                  1          3,900  A
+BB0332                   2          3,875  A
+FF10159                  3          3,730  A, A: Promo
+BB35041                  6          3,708  A
+BB21951                  1          3,600  A: Off-Price
+BB35093                  7          3,290  A, A: Off-Price
+FF20206                  2          3,246  A
+FF15589                  6          3,236  A, A: Repl Commt
+FF6989                   1          3,200  A
+SF8169                   1          3,200  A
+FF14365                  2          3,156  A, A: Off-Price
+FF33876                  1          3,000  A
+BB22095                  1          3,000  A: Off-Price
+FF8882                   1          3,000  A: Off-Price
+BB35095                  4          2,960  A
+BB13533CAN               2          2,880  A
+BB35032                  3          2,754  A
+FF27259                  1          2,742  A
+FF8431                   2          2,716  A
+FF10477                  3          2,600  A, A: Promo
+BB30587                  3          2,550  A, A: Off-Price
+BB35094                  1          2,550  A
+FF9290/24                4          2,540  A
+FF9297/24                2          2,502  A
+FF7118                   3          2,448  A, A: Off-Price
+FF10479PX6               1          2,415  A
+FF27265                  1          2,406  A
+FF7210                   1          2,400  A
+BB26411PX2               1          2,384  A
+FF10530                  2          2,326  A
+BB0080                   1          2,250  A: Off-Price
+FF9297PDQ                1          2,210  A
+FF10479                  2          2,200  A
+BB12022                  1          2,160  A
+BB36796                  1          2,100  A
+FF34466                  2          2,092  A, A: Off-Price
+FF4935PX2                1          2,090  A
+FF12302/24               5          2,087  A
+FF12380/6                1          2,000  A: Repl Commt
+FF31062                  2          1,940  A
+FF31064                  4          1,900  A
+FF7612                   1          1,830  A
+FF7613                   1          1,830  A
+FF31063                  2          1,824  A, A: Repl Commt
+FF15588                  5          1,812  A, A: Repl Commt, FD
+BB0481                   1          1,800  A
+BB35039                  5          1,760  A
+FF16704                  1          1,752  A
+FF7549                   1          1,700  A: Repl Commt
+BB0015                   1          1,650  A: Off-Price
+FF5766AMZ2               1          1,635  A
+FF27263                  1          1,632  A
+BB36558                  2          1,610  A, A: Off-Price
+FF27260                  1          1,600  A
+SF8174                   4          1,564  A
+FF12717                  2          1,560  A
+FF9291/24                1          1,560  A
+FF34430                  1          1,500  A
+SF8168                   1          1,500  A
+FF27267                  1          1,500  FD
+FF7613HL                 1          1,500  A
+FF8258                   2          1,495  A, A: Reactivated
+FF30755                  3          1,482  A, A: Off-Price, A: Repl Commt
+FF8433                   2          1,405  A
+FF7258                   2          1,400  A, A: Off-Price
+FF16705                  1          1,332  A
+BB36671                  2          1,320  A, A: Off-Price
+BB35100                  4          1,310  A, A: Off-Price
+BB35101                  2          1,300  A
+FF9291PDQ                2          1,300  A
+FF22074                  1          1,300  A
+FF11926                  2          1,296  A
+BB13437CLR/12            2          1,200  A
+BB36058CLR/12            2          1,200  A
+BB13447CLR/12            1          1,200  A
+BB14500CLR/9             1          1,200  A
+BB31552CLR/9             1          1,200  A
+FF12302/24PCS2           1          1,190  A
+BB22255                  1          1,176  A: Promo Commt
+FF8653PX4                1          1,170  A
+FF4577                   3          1,160  A
+BB13455CAN               2          1,152  A
+FF7639                   2          1,130  A, A: Repl Commt
+BB13435PX6               1          1,125  A
+BB35916                  1          1,040  A
+FF8256                   4          1,021  A, A: Reactivated
+FF7372                   1          1,020  A
+FF7297                   1          1,000  A
+BB13437PCS6              1            990  A
+FF10162                  1            980  A
+FF13116                  2            960  A
+BB35043                  3            960  A, A: Repl Commt
+BB36670                  1            960  A: Off-Price
+FF7267AMZ2               1            945  A
+FF8882PX6                1            943  A
+FF13877                  4            916  A
+FF4776                   2            900  A
+FF4935                   2            900  A
+FF7531                   2            870  A, A: Repl Commt
+FF4517AU                 1            870  A
+BB0237                   1            840  A: Off-Price
+BB38259                  2            800  A
+FF12301/24AU             1            787  A
+FF22318                  2            783  A
+BB0083                   3            702  A, A: Off-Price
+FF20208                  2            700  A
+FF13876                  3            696  A
+BB13448CLR/12            1            685  A
+FF4775                   2            684  A
+BB32329                  1            684  A
+FF15718                  2            665  A: Off-Price, A: Reactivated
+FF11348                  4            636  FD
+FF7120                   3            606  A, A: AU
+FF34428                  2            600  A, A: Repl Commt
+FF12805                  1            600  FD
+FF20209                  1            600  A
+FF30749                  1            600  A
+FF31186                  1            600  A
+FF7267                   2            600  A
+FF8423                   1            600  A
+FF28039AU                2            583  A, A: Off-Price
+FF12837                  1            552  A
+FF31455                  1            540  A
+BB0131                   4            532  A
+FF35027                  2            520  FD
+FF12649                  1            520  A
+FF5715                   2            490  A
+FF34468                  1            490  A
+FF12301/24               1            480  A
+FF20210                  2            480  A
+FF31068                  1            480  A
+FF4934                   2            480  A
+FF7263                   2            480  A
+FF11926MX                2            480  A
+FF28457PX6               1            480  A
+BB0098                   2            480  A, A: Off-Price
+FF22070                  2            468  A
+FF13875                  4            440  A
+FF4923AMZ                1            420  A
+FF33567                  2            412  A
+FF33573                  2            412  A
+BB23576                  1            400  A: Off-Price
+FF28039                  3            400  FD
+FF7261                   2            400  A
+FF7540                   1            400  A: Repl Commt
+SF8167                   1            400  A
+BB0149                   2            400  A
+FF7542                   1            399  FD
+BB0018PCS2               1            397  A
+FF28017AU                1            390  A
+FF4934AU                 1            390  A: Off-Price
+BB35098                  2            360  A
+FF13874                  1            360  A
+FF5772                   1            360  A
+FF7266                   2            360  A
+FF12376                  3            356  A, A: AU, A: Off-Price
+BB11483PX6               1            355  A
+SF8167AU                 1            352  A
+FF11899                  1            350  FD
+FF12008/4                1            342  A
+FF22071                  2            338  A
+FF12806                  1            336  A: AU
+FF4849PX2                1            315  A
+FF33541                  1            312  A: ECOMM
+FF33542                  1            312  A: ECOMM
+FF4933                   1            312  A
+FF31327                  2            306  A
+FF13879                  2            296  A
+FF18911/24               1            286  A
+FF12300/24               1            282  A
+FF30757                  1            282  A
+FF33568                  1            282  A
+FF33569                  1            282  A
+FF33868                  2            282  A
+FF33871                  2            282  A
+FF37778                  1            282  A
+FF37779                  1            282  A
+FF37780                  1            282  A
+FF11349                  6            280  FD
+BB16137                  1            270  A
+FF13881                  3            268  A
+FF11927                  2            266  A
+FF25670                  1            264  A
+BB24877PX8               1            260  A
+BB27019PX10              1            260  A
+FF31064PCS2              1            260  A
+FF33571                  1            260  A
+SF8167PS                 1            260  A
+FF34467                  1            260  A
+FF33135AU                1            252  A
+FF13880                  2            248  A
+BB32329PCS2              1            245  A
+FF12380/6PCS2            1            245  A
+FF28036                  3            240  A
+FF18404/4                1            240  A
+FF18959                  2            240  A
+FF4849PX6                1            240  A
+FF33567PCS2              1            235  A
+FF27261                  1            234  A
+FF13878PX6               1            225  A
+BB31553PX3               1            220  A
+FF31324AU                1            215  A
+FF12823PX12              1            210  A
+FF34096                  1            210  A
+FF34408                  1            210  A
+FF34413                  1            210  A
+FF35397                  1            210  A
+FF35849                  1            210  A
+FF8654                   2            208  A
+FF13877PX6               1            208  A
+FF4771                   3            206  A
+FF31324                  2            205  A
+FF12508                  1            200  A
+FF13878                  2            196  A
+BB21235                  1            192  A
+FF13875PX6               1            190  A
+FF6305AU                 1            184  A
+BB16180                  2            180  A
+FF31061                  1            180  A
+FF33135                  3            180  A, A: AU, A: NEW
+FF33137                  3            180  A, A: AU, A: NEW
+FF33139                  3            180  A, A: AU, A: NEW
+BB19242                  2            180  A
+BB21235PCS2              1            180  A
+BB30050                  1            180  A
+BB35237                  1            180  A
+BB35516PCS2              1            180  A
+FF7266PCS2               1            180  A
+FF8608AU                 1            178  A
+FF19534/24               1            176  A
+BB16534PX12              1            175  A
+FF12655AU                1            174  A
+FF12823                  4            160  A
+FF12825                  2            160  A
+FF18956                  1            160  A
+FF18958                  1            160  A
+BB0102                   2            150  A, A: Off-Price
+BB19109                  1            150  A: Off-Price
+FF33137AU                1            148  A
+FF19546PCS6              1            144  A
+FF27687PCS3              1            144  A
+FF29045                  1            144  A
+FF12375                  2            140  A, A: AU
+BB0150                   1            140  A
+FF8990                   1            135  A
+FF4537AU                 1            133  A
+FF12846                  1            130  A
+BB15065PX12              1            130  A
+BB15075PX12              1            130  A
+BB34682PCS6              1            130  A
+BB34683PCS6              1            130  A
+BB35514PCS6              1            130  A
+BB35516PCS6              1            130  A
+BB35517PCS6              1            130  A
+BB35519PCS6              1            130  A
+BB35520PCS6              1            130  A
+BB35522PCS6              1            130  A
+BB35639PCS6              1            130  A
+BB35649PCS6              1            130  A
+BB35913PCS6              1            130  A
+BB35914PCS6              1            130  A
+BB36316PCS6              1            130  A
+BB36317PCS6              1            130  A
+BB36318PCS6              1            130  A
+BB36319PCS6              1            130  A
+FF31456                  1            130  A
+FF4930                   2            130  A
+FF8651/8PCS8             1            130  A
+FF28429                  1            130  A: ECOMM
+BB14658                  1            130  A
+BB13447CLR               1            130  FD
+BB13448CLR               1            130  FD
+BB24877                  1            130  A
+BB26053                  1            130  A
+BB27206                  1            130  A
+BB27207                  1            130  FD
+BB27977                  1            130  FD
+BB28360                  1            130  A
+BB28361                  1            130  A
+BB30134                  1            130  FD
+BB36058CLR               1            130  FD
+FF31065                  2            120  FD
+FF28017                  2            120  FD
+FF5807                   2            120  A
+BB30317PCS12             1            120  A
+BB33124                  1            120  A
+BB33703                  1            120  A
+BB35520                  1            120  A
+FF7942AU                 1            111  A
+BB19242PCS2              1            110  A
+FF33139AU                1            100  A
+FF13154                  2             99  A, A: Reactivated
+BB0009                   1             90  A
+BB0080AMZ6               1             90  A
+BB36981PCS6              1             90  A
+FF9756                   1             84  A
+FF12824PX12              1             84  A
+FF31293PCS2              1             70  A
+FF31295PCS6              1             70  A
+FF7110AU                 1             70  A
+FF4849                   2             66  A
+FF5766                   2             66  A
+FF12379/6PCS2            1             55  A
+FF8651/8PCS2             1             55  A
+FF15584                  1             52  A
+FF4517PS                 1             50  A
+FF22317                  1             48  A
+FF22321                  1             48  FD
+FF22323                  1             48  A
+FF4936                   2             48  A
+FF9281AU                 1             48  A
+BB12383                  1             48  A
+BB16997                  1             46  FD
+FF13421AU                1             37  A
+FF18959AU                1             37  A
+FF20208AU                1             37  A
+FF9318AU                 1             37  A
+FF22187PCS3              1             36  A
+BB0705                   2             26  A
+FF4933AU                 1             26  A
+FF7217AU                 1             26  A
+FF9314AU                 1             26  A
+FF9315AU                 1             26  A
+FF9721AU                 1             26  A
+FF12806PCS48             1             24  A
+FF8651PCS8               1             20  A
+BB12479                  1             18  A
+BB17004                  1             18  FD
+FF12843KL                1              0  FD
+FF12849KL                1              0  FD
+FF13063KL                1              0  A: Promo Commt
+FF13069KL                1              0  A: Promo Commt
+FF13115KL                1              0  A: Repl Commt
+FF14364KL                1              0  FD
+FF15134KL                1              0  FD
+FF36356KL                1              0  A: Repl Commt
+FF8831                   2              0  A
+FF9718KL                 1              0  FD
+FF15583                  2              0  FD
+FF12824                  1              0  A: Repl Commt
+FF20868                  1              0  A: Repl Commt
+BB11483                  1              0  A
+BB13533                  3              0  FD
+FF26291                  1              0  FD
+FF9488                   4              0  FD
+BB0491                   1              0  FD
+FF8855                   3              0  FD
+BB0490                   1              0  A
+BB13457                  2              0  FD
+BB13603                  4              0  FD
+BB13461                  1              0  FD
+FF9486                   2              0  FD
+BB0081                   1              0  A: Off-Price
+BB0082                   1              0  A: Off-Price
+BB16316                  1              0  A: Off-Price
+BB35096                  1              0  A
+FF4545                   3              0  FD
+FF30746                  1              0  FD
+FF7218                   1              0  FD
+FF7120AU                 1              0  A: AU
+FF11143                  2              0  FD
+FF12621AU                1              0  A: Repl Commt
+FF25501                  1              0  FD
+FF31068AU                1              0  FD
+FF7541                   1              0  A: Repl Commt
+FF9249AU                 1              0  A: Repl Commt
+BB13460CAN               1              0  A
+BB11150                  1              0  A: Off-Price
+BB12028                  1              0  A: Off-Price
+BB12752                  1              0  A: Off-Price
+BB19110                  1              0  A: Off-Price
+BB19112                  1              0  A: Off-Price
+BB19113                  1              0  A: Off-Price
+BB21949                  1              0  A: Off-Price
+BB26921                  1              0  A: Off-Price
+BB29120                  1              0  A: Off-Price
+BB33525                  1              0  A: Off-Price
+BB33530                  1              0  A: Off-Price
+BB33532                  1              0  A: Off-Price
+BB33534                  1              0  A: Off-Price
+BB34389                  1              0  A: NEW 5/25
+FF12377                  2              0  A
+BB0018                   1              0  A
+BB0096AMZ12              1              0  A
+BB0098AMZ12              1              0  A
+BB0100AMZ12              1              0  A
+BB0100CFPCS12            1              0  A
+BB0126AMZ6               1              0  A
+BB0191                   1              0  A
+BB0192                   1              0  A: Promo Commt
+BB0192PCS6               1              0  A: Promo
+BB0193                   1              0  A: Promo Commt
+BB0332PCS5               1              0  A
+BB0409                   1              0  A
+BB0424                   1              0  A
+BB0489                   1              0  FD
+BB0669PCS6               1              0  FD
+BB0703                   1              0  FD
+BB11417PCS2              1              0  Auto Add
+BB11603                  1              0  A
+BB12145                  1              0  FD
+BB13435/6                1              0  FD
+BB13436CLR               1              0  FD
+BB13437PX3               1              0  A
+BB13437PX6               1              0  A
+BB13449PCS3              1              0  FD
+BB13533PCS12             1              0  FD
+BB15070PCS2              1              0  Auto Add
+BB17007                  1              0  FD
+BB19943PCS24             1              0  A
+BB19944                  1              0  A: Promo
+BB19944PCS24             1              0  A
+BB21235PCS12             1              0  A
+BB21949PCS6              1              0  A
+BB22257                  1              0  A: Promo Commt
+BB24711PCS2              1              0  A
+BB24877PCS8              1              0  FD
+BB26279                  1              0  A: Promo
+BB26280PCS12             1              0  A: Promo
+BB26614PCS8              1              0  A
+BB27019PCS10             1              0  FD
+BB27359/10               1              0  A
+BB30317                  1              0  A: Promo
+BB30320                  1              0  FD
+BB30371PCS12             1              0  A
+BB30424/10               1              0  A
+BB30424PCS12             1              0  A
+BB31203                  1              0  A: Promo
+BB31204                  1              0  A: Promo
+BB31205                  1              0  A: Promo
+BB31205PCS4              1              0  A
+BB31553PCS24             1              0  A
+BB31649PCS12             1              0  A
+BB33242PCS12             1              0  A
+BB33246PCS12             1              0  A
+BB34682PCS2              1              0  Auto Add
+BB34683PCS2              1              0  Auto Add
+BB35094CAN               1              0  A
+BB35913PCS2              1              0  Auto Add
+BB35914PCS2              1              0  Auto Add
+BB36140                  1              0  A: Promo
+BB37425                  1              0  Auto Add
+BB38258                  1              0  A: NEW
+BB38262                  1              0  A: NEW
+BB38263                  1              0  A: NEW
+BB38264                  1              0  A: NEW
+FF10159PCS2              1              0  A
+FF10475PCS2              1              0  A
+FF10477PCS2              1              0  A
+FF11266                  1              0  FD
+FF11348/6                1              0  A
+FF11899/24PCS2           1              0  Auto Add
+FF12302EC                1              0  FD
+FF12353                  1              0  A
+FF12353COS               1              0  A
+FF12354COS               1              0  A
+FF12355COS               1              0  A
+FF12373/24               1              0  Auto Add
+FF12375PCS2              1              0  FD
+FF12378PCS2              1              0  FD
+FF13162                  1              0  FD
+FF13874PX6               1              0  A
+FF13876PX6               1              0  A
+FF14076                  1              0  A: Promo
+FF14302                  1              0  A: Promo
+FF14303                  1              0  A: Promo
+FF14646                  1              0  A: NEW
+FF15850BL                1              0  A: Promo
+FF16027                  1              0  A: Promo Commt
+FF16900PCS6              1              0  FD
+FF16968                  1              0  A: Promo
+FF16970                  1              0  A: Promo
+FF16971                  1              0  A: Promo
+FF17544                  1              0  A
+FF17546                  1              0  A
+FF17547                  1              0  A
+FF17552                  1              0  A
+FF17553                  1              0  A
+FF17554                  1              0  A
+FF17555                  1              0  A
+FF17556                  1              0  A
+FF17557                  1              0  A
+FF17558                  1              0  A
+FF17561                  1              0  A
+FF17562                  1              0  A
+FF17564                  1              0  A
+FF17565                  1              0  A
+FF17570                  1              0  A
+FF17572                  1              0  A
+FF17574                  1              0  A
+FF17575                  1              0  A
+FF17576                  1              0  A
+FF17578                  1              0  A
+FF17924                  1              0  A
+FF18170                  1              0  A: Promo
+FF18826                  1              0  FD
+FF18903/24               1              0  A
+FF18958PCS24             1              0  A
+FF19341                  1              0  A
+FF19536/24               1              0  A
+FF20332                  1              0  FD
+FF21696                  1              0  A: Promo
+FF21709                  1              0  A: Promo
+FF21831                  1              0  A: Promo
+FF21832                  1              0  A: Promo
+FF21839                  1              0  A: Promo
+FF21862                  1              0  A: NEW
+FF21876                  1              0  A: NEW
+FF21904                  1              0  A: Promo
+FF22119                  1              0  A: NEW
+FF22122                  1              0  A: Promo
+FF22128                  1              0  A: Promo Commt
+FF22912-23               1              0  A: Promo
+FF22913                  1              0  A: Promo
+FF22914                  1              0  A: Promo
+FF22915                  1              0  A: Promo
+FF22916-23               1              0  A: Promo
+FF22917                  1              0  A: Promo
+FF22918                  1              0  A: Promo
+FF22919                  1              0  A: Promo
+FF22922                  1              0  A: Promo
+FF22923                  1              0  A: Promo
+FF22927                  1              0  A: Promo
+FF22928                  1              0  A: Promo
+FF22929                  1              0  A: Promo
+FF22930                  1              0  A: Promo
+FF22931                  1              0  A: Promo
+FF22960                  1              0  A: Promo
+FF22961                  1              0  A: Promo
+FF22962                  1              0  A: Promo
+FF22978                  1              0  A: Promo
+FF22979                  1              0  A: Promo
+FF22981                  1              0  A: Promo
+FF22982                  1              0  A: Promo
+FF23008                  1              0  A: Promo
+FF23201                  1              0  A: Promo
+FF23218                  1              0  A: Promo
+FF23330                  1              0  A: Promo
+FF23331                  1              0  A: Promo
+FF23339/12               1              0  A: Promo Commt
+FF23445                  1              0  A: Promo
+FF23459                  1              0  A: Promo
+FF23460                  1              0  A: Promo
+FF23461                  1              0  A: Promo
+FF23468                  1              0  A: Promo
+FF23544/24               1              0  A: Promo
+FF24120                  1              0  A: Promo
+FF24123                  1              0  A: Promo
+FF24146                  1              0  FD
+FF24555-23               1              0  Auto Add
+FF24684-23               1              0  FD
+FF25934                  2              0  FD
+FF26385                  1              0  A
+FF27385                  1              0  A: Promo
+FF27391                  1              0  A: NEW
+FF27394                  1              0  A: NEW
+FF27719                  1              0  A: Promo
+FF27720                  1              0  A: Promo
+FF30506                  1              0  FD
+FF31198                  1              0  A
+FF31292PCS2              1              0  Auto Add
+FF31451                  1              0  A
+FF31566                  1              0  FD
+FF32041                  1              0  A: Promo
+FF32464                  1              0  A: Promo
+FF32829                  1              0  A: NEW
+FF32966                  1              0  A: NEW
+FF33570                  1              0  A
+FF33572                  1              0  A
+FF35923                  1              0  A: Promo
+FF38640                  1              0  A
+FF38641                  1              0  A
+FF38642                  1              0  A
+FF4771AMZ3               1              0  A
+FF4771COS                1              0  A
+FF4775COS                1              0  A
+FF4849COS                1              0  A
+FF4923                   1              0  A
+FF4923PCS2               1              0  A
+FF4923PCS6               1              0  A
+FF4930AMZ2COS            1              0  A: NEW
+FF4935AMZ                1              0  A
+FF4936PX2                1              0  A
+FF5769                   1              0  A
+FF5776                   1              0  A
+FF5776PCS6               1              0  A
+FF5777                   1              0  A
+FF5807AMZ                1              0  A
+FF5807COS                1              0  A
+FF6553                   1              0  A
+FF6553COS                1              0  A
+FF6554COS                1              0  A
+FF6636                   1              0  A
+FF7258AMZ2               1              0  A
+FF7258COS                1              0  A
+FF7258CP6                1              0  A
+FF7261AMZ                1              0  A
+FF7261PCS2               1              0  A
+FF7266COS                1              0  A
+FF7266PX2                1              0  A
+FF7267AMZ                1              0  A
+FF7267COS                1              0  A
+FF7267CP6                1              0  A
+FF7297CP6                1              0  A
+FF7372AMZ2               1              0  A
+FF7488AMZ2               1              0  FD
+FF7613PCS24              1              0  A
+FF7617PCS4               1              0  FD
+FF8423PCS4               1              0  A
+FF8424PCS3               1              0  A
+FF8424PCS4               1              0  A
+FF8433PCS24              1              0  A
+FF8649                   1              0  A
+FF8653PCS2               1              0  A
+FF8654PX2                1              0  A
+FF8991PCS3               1              0  A
+FF9297                   1              0  FD
+FF9573                   1              0  FD
+FF9573PCS4               1              0  FD
+FF9720PCS2               1              0  FD
+FF9754                   1              0  FD
+FF9954                   1              0  FD
+SF8190                   1              0  FD
+FF9758AU                 1              0  FD
+FF4533                   4              0  FD
+FF4537                   5              0  FD
+BB13437CLR               1              0  FD
+BB24711                  1              0  A: NEW 10/25
+BB34403                  1              0  A: NEW 10/25
+FF28402                  1              0  A: ECOMM
+BB0236                   1              0  A
+BB11981                  1              0  FD
+BB31649                  1              0  A: Promo
+FF15746                  1              0  FD
+FF27262                  1              0  FD
+FF30512                  1              0  FD
+FF33877                  1              0  A
+FF4541                   2              0  FD
+FF8850                   2              0  FD
+FF9281                   1              0  A
+FF9360                   1              0  FD
+BB0235                   1              0  A
+FF9290CA                 1              0  A
+BB0131EC                 1              0  A
+BB0496                   1              0  A
+BB35099                  1              0  A
+BB35103                  2              0  A, A: Off-Price
+BB21167                  1              0  FD
+BB35097                  2              0  A
+FF9489                   1              0  FD
+FF12378                  1              0  A
+FF7110                   1              0  A
+FF7112                   1              0  A
+FF7115                   1              0  A
+FF4533AMZ2               1              0  FD
+FF9793                   1              0  FD
+FF9794                   1              0  FD

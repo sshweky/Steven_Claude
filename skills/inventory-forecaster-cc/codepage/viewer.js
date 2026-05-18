@@ -4515,7 +4515,16 @@ async function bootstrap() {
     _setDetail(`${ALL_RECORDS.length.toLocaleString()} rows | paginated 100 per page`);
     await new Promise(r => setTimeout(r, 16));
     FILTERED_RECORDS = ALL_RECORDS.slice();
+    // Pre-populate search from ?search= URL param (e.g. links in email reports)
+    try {
+      const _urlSearch = new URLSearchParams(location.search).get('search');
+      if (_urlSearch) {
+        const _si = document.getElementById('search');
+        if (_si) _si.value = _urlSearch;
+      }
+    } catch(e) {}
     renderTable();
+    applyFilters();
     updateReplyCount();  // show banner if planner replies exist
 
     const ms = (performance.now() - t0).toFixed(0);
