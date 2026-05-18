@@ -448,13 +448,22 @@ function computeDerived(rec, today) {
   rec.demand_26w     = rec.prj.reduce(function(s,v){return s+v;},0);
   rec.assembleable_kits = (rec.is_multi && rec.pcs_per_kit>0) ? Math.floor(rec.qty_oh_root/rec.pcs_per_kit) : 0;
 
+  // OH Excess & OH+OO Excess — both measured at the Next Available Receipt date.
+  // Cumulative projected demand is burned week-by-week up to (but not including) the receipt week.
+  // OH Excess   = qty_oh minus demand consumed before receipt arrives.
+  // OH+OO Excess = (qty_oh + IT + IW + all open PO qty) minus same demand.
+  var nrIdx = rec.next_rcpt_dt ? Math.max(0, wkIdxForDate(today, rec.next_rcpt_dt)) : -1;
+  var weeksToRcpt = (nrIdx >= 0) ? Math.min(nrIdx, 26) : 26;
+  var cumDemandToRcpt = 0;
+  for (var _wi = 0; _wi < weeksToRcpt; _wi++) { cumDemandToRcpt += (rec.prj[_wi] || 0); }
+  rec.oh_excess       = Math.round(rec.qty_oh - cumDemandToRcpt);
+  rec.pipeline_excess = Math.round((rec.qty_oh + rec.it_qty + rec.iw_qty + openPOTotal) - cumDemandToRcpt);
+
+  // Pipeline WOS — 26-week view, used for overstock flag
   if (rec.demand_26w > 0) {
-    var safety = rec.opt_wos * (rec.demand_26w / 26.0);
-    rec.pipeline_excess = Math.round(rec.pipeline_total - rec.demand_26w - safety);
-    rec.pipeline_wos    = parseFloat((rec.pipeline_total * 26.0 / rec.demand_26w).toFixed(1));
+    rec.pipeline_wos = parseFloat((rec.pipeline_total * 26.0 / rec.demand_26w).toFixed(1));
   } else {
-    rec.pipeline_excess = rec.pipeline_total;
-    rec.pipeline_wos    = rec.pipeline_total > 0 ? null : 0;
+    rec.pipeline_wos = rec.pipeline_total > 0 ? null : 0;
   }
   rec.overstocked = (rec.pipeline_excess > OVERSTOCK_EXCESS_TH)
     || (rec.demand_26w > 0 && rec.pipeline_wos != null && rec.pipeline_wos > OVERSTOCK_WOS_TH);
