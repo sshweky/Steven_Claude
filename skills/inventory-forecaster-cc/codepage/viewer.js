@@ -2702,7 +2702,7 @@ async function toggleDetail(key) {
         const ov = _opn[i];
         opnTot += ov;
         opnCells += ov > 0
-          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help">${fmtN(ov)}</td>`
+          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help" title="${fmtN(ov)} units">${fmtN(ov)}</td>`
           : `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       } else {
         opnCells += `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
@@ -3210,6 +3210,7 @@ async function _loadOpenOrderDetails(r, safeId) {
     });
 
     const data = (resp && resp.data) || [];
+    console.info(`[OrdHist] open orders for ${r.key}: ${data.length} rows  FIDs: acct=${ORD_HIST_ACCT_MSTYLE_FID} cancel=${ORD_HIST_CANCEL_DATE_FID} qty_open=${ORD_HIST_QTY_OPEN_FID} cust=${ORD_HIST_CUST_NAME_FID}`);
     if (!data.length) return;
 
     const _sv = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
