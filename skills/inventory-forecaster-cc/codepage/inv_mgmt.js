@@ -851,6 +851,7 @@ function _filterRecords(skipPri) {
       else{if(!r.recommendations.some(function(rc){return selActions.has(rc.action);}))return false;}
     }
     if(!skipPri&&selPriorities.size>0&&!selPriorities.has(r.priority))return false;
+    if(selStockStatus.size>0&&!selStockStatus.has(r.stock_status))return false;
     for(var i=0;i<activeCols.length;i++){var ac=activeCols[i];var val=ac.c.filterValue?ac.c.filterValue(r):ac.c.get(r);if(val==null)return false;if(String(val).toLowerCase().indexOf(ac.needle)<0)return false;}
     return true;
   });
