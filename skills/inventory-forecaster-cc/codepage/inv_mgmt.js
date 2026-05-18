@@ -666,6 +666,15 @@ var COLS = [
     get:function(r){return {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,NO_OOS:4}[r.priority]!=null?{CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,NO_OOS:4}[r.priority]:9;},
     filterValue:function(r){return r.priority;},
     render:function(r){var lbl=r.priority==='NO_OOS'?'No OOS':r.priority;return '<td class="pri-'+r.priority+'">'+lbl+'</td>';} },
+  { id:'stock_status', label:'Stock Status', align:'left',
+    get:function(r){return {Over-Stocked:0,'Under-Stocked':1,'In Stock':2,'Inactive':3}[r.stock_status]!=null?{'Over-Stocked':0,'Under-Stocked':1,'In Stock':2,'Inactive':3}[r.stock_status]:9;},
+    filterValue:function(r){return r.stock_status;},
+    render:function(r){
+      var styles={'Over-Stocked':'background:#e65100;color:#fff','Under-Stocked':'background:#c62828;color:#fff','In Stock':'background:#2e7d32;color:#fff','Inactive':'background:#757575;color:#fff'};
+      var st=styles[r.stock_status];
+      if(!st)return'<td></td>';
+      return'<td><span style="'+st+';display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap">'+r.stock_status+'</span></td>';
+    } },
   { id:'mstyle', label:'Mstyle', align:'left',
     get:function(r){return r.mstyle;},
     render:function(r){return '<td style="font-weight:700;color:#1a4dff;font-size:12px;white-space:nowrap;">'+esc(r.mstyle)+(r.is_multi?' <span class="badge badge-purple" title="Multi-pack (kit)">KIT</span>':'')+'</td>';} },
