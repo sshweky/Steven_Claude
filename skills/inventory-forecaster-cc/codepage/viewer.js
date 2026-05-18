@@ -2604,10 +2604,10 @@ async function toggleDetail(key) {
         const opnTitleAttr = opnTip ? ` title="${opnTip.replace(/"/g, '&quot;')}"` : '';
         const opnCursor = opnTip ? ' cursor:help;' : '';
         opnCells += ov > 0
-          ? `<td id="opn-cell-${safeId}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;${opnCursor}"${opnTitleAttr}>${fmtN(ov)}</td>`
-          : `<td id="opn-cell-${safeId}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
+          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;${opnCursor}"${opnTitleAttr}>${fmtN(ov)}</td>`
+          : `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       } else {
-        opnCells += `<td id="opn-cell-${safeId}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
+        opnCells += `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       }
     }
     // Total cells (sum for beg/rcv/opn; WOS total is not meaningful so leave as dash)
