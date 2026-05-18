@@ -2961,7 +2961,10 @@ async function toggleDetail(key) {
   // Amazon Catalog table and injects/refreshes the bullet in AI Analysis.
   // Runs after innerHTML is set so the target <ul> already exists in the DOM.
   if (CFG.AMZ_CATALOG_TID && r.mstyle && isAmazonRec) _loadAmzDcInv(r, safeId);
-  if (CFG.ORDER_HIST_TID) _loadOrdHistCxld(r, safeIdForTotal);
+  // Only fetch cxld data once inv flow is done loading (avoids concurrent QB
+  // calls that can stall the inv flow bulk scan).  If inv flow is already
+  // attached (_hasInvFlow) or already resolved/null, start immediately.
+  if (CFG.ORDER_HIST_TID && (_hasInvFlow || !_invFlowPromise)) _loadOrdHistCxld(r, safeIdForTotal);
 
   } catch (err) {
     // Something threw while building the detail HTML. Surface the error
@@ -5123,6 +5126,7 @@ async function bootstrap() {
       _setFreshness('invflow-loaded-at', Date.now());
     }).catch(e => {
       console.warn('Inventory Flow load failed (non-fatal):', e);
+      _invFlowPromise = null;   // prevent infinite re-render loop in the detail panel
       const el = document.getElementById('invflow-loaded-at');
       if (el) el.textContent = 'unavailable';
     });
