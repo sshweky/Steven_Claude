@@ -647,6 +647,17 @@ function computeDerived(rec, today) {
   else if (_vel > 200 && _gc >= 2) rec.priority = 'HIGH';
   else if (_vel > 100 && _gc >= 2) rec.priority = 'MEDIUM';
   else                             rec.priority = 'LOW';
+
+  // Stock status badge — mirrors fcst_status pill on the projections manager view
+  if (!rec.is_replen || rec.demand_26w === 0) {
+    rec.stock_status = 'Inactive';
+  } else if (rec.overstocked) {
+    rec.stock_status = 'Over-Stocked';
+  } else if (rec.gap_weeks.length > 0 || (rec.ats_wos_oh > 0 && rec.ats_wos_oh < rec.opt_wos)) {
+    rec.stock_status = 'Under-Stocked';
+  } else {
+    rec.stock_status = 'In Stock';
+  }
 }
 
 // -- Columns -------------------------------------------------------------------
