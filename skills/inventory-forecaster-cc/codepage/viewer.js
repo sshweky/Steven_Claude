@@ -2452,7 +2452,7 @@ async function toggleDetail(key) {
   const _suppPos = _parseSupplierPOs(r.inv_flow_supp_pos || '');
   // If the background load is still running, re-render once it finishes
   if (!_hasInvFlow && _invFlowPromise) {
-    _invFlowPromise.then(() => {
+    _invFlowPromise.finally(() => {
       const panel = document.getElementById('detail-panel');
       if (panel && panel.dataset.rid === String(r.rid)) renderDetail(r);
     });
