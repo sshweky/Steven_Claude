@@ -1166,7 +1166,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('clearBtn').onclick=function(){
     document.getElementById('searchInput').value='';
-    document.getElementById('replenOnly').checked=false;
     document.getElementById('gapsOnly').checked=false;
     document.getElementById('overstockOnly').checked=false;
     document.getElementById('hideInactive').checked=true;
