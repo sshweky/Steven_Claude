@@ -3296,11 +3296,14 @@ async function _loadAmzDcInv(r, safeId) {
   let soh = 0, opo = 0, wos = 0;
   let qtyOh = 0, qtyIw = 0, qtyIt = 0, prjWk = 0, custOo = 0;
   let atsNow = 0, atsOh = 0, atsOo = 0;
+  let posL4w = 0, posL13w = 0, posL26w = 0, posL52w = 0, posLw = 0;
   let fetchOk = false;
   try {
     const selectFids = [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH,
                         AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
-                        AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO].filter(v => v != null);
+                        AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO,
+                        AF.POS_L4W, AF.POS_L13W, AF.POS_L26W, AF.POS_L52W, AF.POS_LW,
+                       ].filter(v => v != null);
     // Try exact mstyle first; if no row found, retry without /N pack-size suffix
     // (catalog table sometimes stores bare mstyle without the case-size qualifier).
     const tryMstyles = [mstyle];
@@ -3331,23 +3334,48 @@ async function _loadAmzDcInv(r, safeId) {
       atsNow = nv(AF.ATS_NOW);
       atsOh  = nv(AF.ATS_OH);
       atsOo  = nv(AF.ATS_OO);
+      posL4w  = nv(AF.POS_L4W);
+      posL13w = nv(AF.POS_L13W);
+      posL26w = nv(AF.POS_L26W);
+      posL52w = nv(AF.POS_L52W);
+      posLw   = nv(AF.POS_LW);
       fetchOk = true;
     }
   } catch (e) {
     console.warn('[DC Inv] fetch failed for mstyle', mstyle, e);
   }
 
-  // ── AI Analysis bullet (existing behaviour) ───────────────────────────────
+  // ── AI Analysis bullets ───────────────────────────────────────────────────
   const fmt    = n => Math.round(n).toLocaleString('en-US');
   const fmtWos = n => n.toFixed(1);
+  const fmtPos = n => n % 1 === 0 ? Math.round(n).toLocaleString('en-US') : n.toFixed(1);
+  const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
+
+  // POS bullet
+  const hasPos = fetchOk && (posL4w > 0 || posL13w > 0 || posL26w > 0 || posL52w > 0);
+  let posBulletHtml;
+  if (!fetchOk) {
+    posBulletHtml = '<b>Amazon POS sales:</b> <span style="color:#999;font-style:italic">not in catalog (no data)</span>';
+  } else if (!hasPos) {
+    posBulletHtml = '<b>Amazon POS sales:</b> <span style="color:#999;font-style:italic">no consumer sales data</span>';
+  } else {
+    const posItems = [];
+    if (posLw  > 0) posItems.push(`<b>LW</b> ${fmtPos(posLw)} u`);
+    if (posL4w  > 0) posItems.push(`<b>L4W avg</b> ${fmtPos(posL4w)} u/wk`);
+    if (posL13w > 0) posItems.push(`<b>L13W avg</b> ${fmtPos(posL13w)} u/wk`);
+    if (posL26w > 0) posItems.push(`<b>L26W avg</b> ${fmtPos(posL26w)} u/wk`);
+    if (posL52w > 0) posItems.push(`<b>L52W avg</b> ${fmtPos(posL52w)} u/wk`);
+    posBulletHtml = '<b>Amazon POS sales:</b> ' + posItems.join(sep);
+  }
+
+  // DC inv bullet
   let wosHtml;
   if      (wos < 3)  wosHtml = `<b>WOS</b> <span style="color:#c62828;font-weight:600">${fmtWos(wos)} wks &#9888;</span>`;
   else if (wos < 8)  wosHtml = `<b>WOS</b> <span style="color:#e65100">${fmtWos(wos)} wks</span>`;
   else if (wos < 16) wosHtml = `<b>WOS</b> ${fmtWos(wos)} wks`;
   else               wosHtml = `<b>WOS</b> <span style="color:#f57f17">${fmtWos(wos)} wks (overstocked)</span>`;
 
-  const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
-  const bullet = fetchOk
+  const dcBulletHtml = fetchOk
     ? '<b>Amazon DC inventory:</b> ' +
         `<b>Amazon OH</b> ${fmt(soh)} u` + sep +
         `<b>Open PO</b> ${fmt(opo)} u` + sep +
@@ -3356,18 +3384,25 @@ async function _loadAmzDcInv(r, safeId) {
 
   const ul = document.getElementById('ai-bullets-' + safeId);
   if (ul) {
+    // Remove any stale versions of both bullets
     Array.from(ul.querySelectorAll('li')).forEach(li => {
-      if (/amazon dc inventory/i.test(li.textContent)) li.remove();
+      if (/amazon dc inventory/i.test(li.textContent) || /amazon pos sales/i.test(li.textContent)) li.remove();
     });
-    const li = document.createElement('li');
-    li.style.marginBottom = '4px';
-    li.setAttribute('data-amz-dc-inv', '1');
-    li.innerHTML = bullet;
-    const posBullet = Array.from(ul.querySelectorAll('li')).find(
-      el => /amazon pos sales/i.test(el.textContent) || /consumer demand \(pos\)/i.test(el.textContent)
-    );
-    if (posBullet && posBullet.nextSibling) ul.insertBefore(li, posBullet.nextSibling);
-    else ul.appendChild(li);
+
+    const mkLi = (html, attr) => {
+      const li = document.createElement('li');
+      li.style.marginBottom = '4px';
+      li.setAttribute(attr, '1');
+      li.innerHTML = html;
+      return li;
+    };
+
+    const dcLi  = mkLi(dcBulletHtml,  'data-amz-dc-inv');
+    const posLi = mkLi(posBulletHtml, 'data-amz-pos');
+
+    // Insert POS then DC inv at end (they appear together in order)
+    ul.appendChild(posLi);
+    ul.appendChild(dcLi);
   }
 
   // ATS cards are now sourced from Inventory Flow and rendered inline —
