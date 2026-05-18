@@ -5116,19 +5116,45 @@ async function bootstrap() {
 
     // -- Pull Inventory Flow in the background (non-blocking) ---------------
     // inv_flow_* fields are only used in the detail panel, never in the main
-    // table, so we fire this without awaiting.  The table renders immediately
-    // and inventory balance rows populate as soon as the background fetch
-    // completes (usually a few seconds after the UI appears).
-    _invFlowPromise = attachInvFlow(ALL_RECORDS).then(() => {
-      _setFreshness('invflow-loaded-at', Date.now());
-      _invFlowPromise = null;   // null BEFORE render callbacks fire so resolved-but-empty mstyles
-                                // show "(no QB Inventory Flow row)" instead of looping forever
-    }).catch(e => {
-      console.warn('Inventory Flow load failed (non-fatal):', e);
-      _invFlowPromise = null;   // same null-out on failure path
-      const el = document.getElementById('invflow-loaded-at');
-      if (el) el.textContent = 'unavailable';
-    });
+    // table, so we fire this without awaiting.  The table renders immediately.
+    //
+    // 20-second timeout: if the bulk QB scan stalls, we null _invFlowPromise so
+    // "Loading inventory balances..." clears in any open detail panel.  The scan
+    // continues silently; when it eventually resolves it re-renders the currently
+    // open panel so data appears without the user having to re-click.
+    const _invFlowLoad = attachInvFlow(ALL_RECORDS);
+    const _invFlowTimer = new Promise((_, rej) =>
+      setTimeout(() => rej(new Error('inv-flow-timeout')), 20000));
+
+    _invFlowPromise = Promise.race([_invFlowLoad, _invFlowTimer])
+      .then(() => {
+        _setFreshness('invflow-loaded-at', Date.now());
+        _invFlowPromise = null;
+      })
+      .catch(e => {
+        _invFlowPromise = null;
+        const el = document.getElementById('invflow-loaded-at');
+        if (e.message === 'inv-flow-timeout') {
+          console.warn('[InvFlow] still loading after 20s — panel will update when ready');
+          if (el) el.textContent = 'loading...';
+          // Load is still running in background; re-render open panel when it finishes
+          _invFlowLoad.then(() => {
+            _setFreshness('invflow-loaded-at', Date.now());
+            const panel = document.getElementById('detail-panel');
+            const ridAttr = panel && panel.dataset.rid;
+            if (ridAttr) {
+              const openRec = ALL_RECORDS.find(x => String(x.rid) === ridAttr);
+              if (openRec) renderDetail(openRec);
+            }
+          }).catch(e2 => {
+            console.warn('[InvFlow] load failed after timeout:', e2.message);
+            if (el) el.textContent = 'unavailable';
+          });
+        } else {
+          console.warn('[InvFlow] load failed (non-fatal):', e);
+          if (el) el.textContent = 'unavailable';
+        }
+      });
 
     _atsHistPromise = attachAtsHistory(ALL_RECORDS).then(() => {
       _setFreshness('atshist-loaded-at', Date.now());
