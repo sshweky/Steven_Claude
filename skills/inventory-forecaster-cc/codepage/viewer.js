@@ -331,14 +331,21 @@ function buildSelectFids() {
   return sel;
 }
 
-// -- Pull all active projections from QB ------------------------------------
-async function fetchAllRecords() {
+// -- Pull active projections from QB ----------------------------------------
+// mgrName (optional): when provided, wraps the status filter with an additional
+// inv_manager equality check so only one planner's records come back.
+// QB supports parentheses in WHERE: ({A}OR{B})AND{C}
+// Directors/VPs pass no mgrName and receive the full dataset.
+async function fetchAllRecords(mgrName) {
   const sel = buildSelectFids();
-  // Match the forecaster's SQL filter (Status_Cust LIKE 'A%' OR LIKE 'FD%')  - 
+  // Match the forecaster's SQL filter (Status_Cust LIKE 'A%' OR LIKE 'FD%')  -
   // includes both Active and Future-Delete items so the codepage record count
   // lines up with forecast_results.json + the local viewer.  FD items get the
   // F52 wind-down treatment, so planners need to see them here too.
-  const where = `{${CFG.FID.STATUS_CUST}.SW.'A'}OR{${CFG.FID.STATUS_CUST}.SW.'FD'}`;
+  const _baseWhere = `{${CFG.FID.STATUS_CUST}.SW.'A'}OR{${CFG.FID.STATUS_CUST}.SW.'FD'}`;
+  const where = mgrName
+    ? `(${_baseWhere})AND{${CFG.FID.INV_MGR_NAME}.EX.'${mgrName.replace(/'/g, "\\'")}'}`
+    : _baseWhere;
   const TOP = 1000;
   let skip = 0;
   const all = [];
