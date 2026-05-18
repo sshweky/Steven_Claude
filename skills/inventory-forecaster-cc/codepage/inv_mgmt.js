@@ -431,7 +431,7 @@ async function loadData() {
       qty_oh_root:0, it_iw_root:0, ats_oh_oo_root:0, assembleable_kits:0,
       open_pos:openPos,
       manual_demand_26w:manDem26w, customer_demand:custDemand, demand_26w:0,
-      pipeline_total:0, pipeline_excess:0, pipeline_wos:0,
+      pipeline_total:0, oh_excess:0, pipeline_excess:0, pipeline_wos:0,
       gap_weeks:[], overstocked:false, recommendations:[], priority:'LOW', flag:''
     };
 
