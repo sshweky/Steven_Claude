@@ -2816,10 +2816,9 @@ async function toggleDetail(key) {
   // comments only).  Tell-AI dialogue lives in its own block above.
   const commentBlock = `
   <div style="margin:10px 12px 12px 12px;padding:12px;background:#f7f9fc;border:1px solid #d8dce3;border-radius:6px;">
-    <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11px;color:#555;cursor:pointer;">
-      <span>Flag for inv mgr review:</span>
+    <div style="margin-bottom:8px;">
       <button id="flg-${safeId}" class="${flagCls2}" onclick="toggleFlag('${safeKey}')" title="Toggle the QB Flagged boolean for this projection">&#x2691; Flag Projection</button>
-    </label>
+    </div>
     <div style="display:flex;gap:14px;align-items:flex-start;">
       <!-- LEFT: Add a Comment (25%)  -  for planner <-> mgr dialogue -->
       <div style="flex:0 0 25%;min-width:0;">
@@ -3302,13 +3301,9 @@ async function addComment(key) {
   if (!txt) { msg.textContent = 'Comment cannot be empty.'; msg.style.color = '#c62828'; return; }
   btn.disabled = true; btn.textContent = 'Saving...'; msg.textContent = '';
 
+  // --- Step 1: INSERT comment record (fatal if it fails) ---------------------
+  let recId = '';
   try {
-    const today = new Date();
-    const daysToSat = (6 - today.getDay() + 7) % 7;
-    const dow = new Date(today); dow.setDate(today.getDate() + daysToSat);
-    const dowStr = dow.toISOString().slice(0, 10);
-    void dowStr;  // QB computes DATE_OF_WEEK itself \u2014 do not include in payload
-
     const fields = {};
     fields[CFG.COMMENT_FID.NOTE]        = { value: txt };
     fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
@@ -3329,17 +3324,34 @@ async function addComment(key) {
       if (_sendTo) fields[CFG.COMMENT_FID.SEND_TO] = { value: _sendTo };
     }
 
-    const resp  = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
-    const recId = (resp && resp.metadata && resp.metadata.createdRecordIds && resp.metadata.createdRecordIds[0]) || '';
+    const resp = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
+    recId = (resp && resp.metadata && resp.metadata.createdRecordIds && resp.metadata.createdRecordIds[0]) || '';
+  } catch (e) {
+    msg.textContent = 'Failed to save comment: ' + e.message; msg.style.color = '#c62828';
+    btn.textContent = 'Save'; btn.disabled = false;
+    return;
+  }
 
-    // -- Routing: update Projections pending-flags based on flag direction ----
-    //   "Needs Planner Action"  -> director flagged for planner  -> MANAGER_REPLY_PENDING = true
-    //   "Planner Response"      -> planner replied to director   -> PLANNER_REPLY_PENDING = true
-    //                                                               MANAGER_REPLY_PENDING = false
-    //   "Resolved"              -> closes the loop               -> both flags cleared
-    const rec    = ALL_RECORDS.find(x => x.key === key);
-    const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+  // --- Step 2: Comment saved — update UI immediately -----------------------
+  msg.textContent = recId ? '✓ Saved (rec #' + recId + ')' : '✓ Saved';
+  msg.style.color = '#2e7d32';
+  document.getElementById('cmt-text-' + key).value = '';
+  document.getElementById('cmt-flag-' + key).value = _USER_IS_PLANNER ? 'Planner Response' : 'Needs Planner Action';
+  const rec    = ALL_RECORDS.find(x => x.key === key);
+  const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+  if (rec) {
+    const stamp = new Date().toISOString().slice(0,16).replace('T',' ');
+    const flagTag = flag ? ' ['+flag+']' : '';
+    rec.last_comment = `${stamp}${flagTag}: ${txt.slice(0,200)}`;
+    rec.last_comment_date = new Date().toISOString();
+  }
+  btn.textContent = 'Save'; btn.disabled = false;
+  if (typeof loadCommentHistory === 'function') loadCommentHistory(key, true);
 
+  // --- Step 3: Routing — update Projections pending-flags (best-effort) ----
+  // Non-fatal: the comment is already saved.  Badge updates are skipped but
+  // comment history still shows on reload.
+  try {
     if (flag === 'Needs Planner Action' && CFG.FID.MANAGER_REPLY_PENDING) {
       const pf = {};
       pf[CFG.FID.KEY]                   = { value: key };
@@ -3393,23 +3405,8 @@ async function addComment(key) {
         updateForMeCount();
       }
     }
-
-    msg.textContent = recId ? '✓ Saved (rec #' + recId + ')' : '✓ Saved';
-    msg.style.color = '#2e7d32';
-    document.getElementById('cmt-text-' + key).value = '';
-    // Reset dropdown to the role-appropriate default flag
-    document.getElementById('cmt-flag-' + key).value = _USER_IS_PLANNER ? 'Planner Response' : 'Needs Planner Action';
-    if (rec) {
-      const stamp = new Date().toISOString().slice(0,16).replace('T',' ');
-      const flagTag = flag ? ' ['+flag+']' : '';
-      rec.last_comment = `${stamp}${flagTag}: ${txt.slice(0,200)}`;
-      rec.last_comment_date = new Date().toISOString();
-    }
-    btn.textContent = 'Save'; btn.disabled = false;
-    if (typeof loadCommentHistory === 'function') loadCommentHistory(key, true);
   } catch (e) {
-    msg.textContent = 'Failed: ' + e.message; msg.style.color = '#c62828';
-    btn.textContent = 'Save'; btn.disabled = false;
+    console.warn('[addComment] routing write failed (comment was saved):', e.message);
   }
 }
 
