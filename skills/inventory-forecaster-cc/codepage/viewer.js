@@ -2061,7 +2061,7 @@ function renderPage(page) {
 
     const _safeId2 = r.key.replace(/[^a-zA-Z0-9]/g,'_');
     tr.innerHTML = `
-      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.flagged ? '<span title="Flagged for manager review" style="color:#c62828;font-size:13px;">⚑</span>' : ''}${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">💬</span>' : ''}</td>
+      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.flagged ? '<span title="Flagged for manager review" style="color:#c62828;font-size:13px;">⚑</span>' : ''}${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">💬</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged — planner action required">📋</span>' : ''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.key}</td>
       <td style="font-size:11px;white-space:nowrap">${r.inv_manager||''}</td>
       <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.brand||'').replace(/"/g,'&quot;')}">${r.brand||''}</td>
