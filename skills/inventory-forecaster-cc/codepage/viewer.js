@@ -1827,6 +1827,7 @@ function toggleReplyOnly() {
     btn.style.fontWeight    = '800';
   }
   applyFilters();
+}
 
 let SHOW_OFF_PLAN_ONLY = false;
 function toggleOffPlanOnly() {
