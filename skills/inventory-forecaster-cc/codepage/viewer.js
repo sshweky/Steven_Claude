@@ -3001,8 +3001,7 @@ async function _loadOrdHistCxld(r, safeId) {
 
   try {
     await discoverOrdHistFids();
-    if (!ORD_HIST_QTY_CXLD_FID || !ORD_HIST_ACCT_MSTYLE_FID ||
-        !ORD_HIST_CANCEL_DATE_FID || !ORD_HIST_EXCEP_APPR_FID) {
+    if (!ORD_HIST_QTY_CXLD_FID || !ORD_HIST_ACCT_MSTYLE_FID || !ORD_HIST_CANCEL_DATE_FID) {
       rowEl.remove(); return;
     }
 
@@ -3019,7 +3018,6 @@ async function _loadOrdHistCxld(r, safeId) {
 
     const escKey = r.key.replace(/'/g, "''");
     const where = `{${ORD_HIST_ACCT_MSTYLE_FID}.EX.'${escKey}'}` +
-                  `AND{${ORD_HIST_EXCEP_APPR_FID}.EX.'yes'}` +
                   `AND{${ORD_HIST_QTY_CXLD_FID}.GT.0}` +
                   `AND{${ORD_HIST_CANCEL_DATE_FID}.OAF.'${_qbDate(dateFrom)}'}`;
 
