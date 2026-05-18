@@ -470,6 +470,9 @@ window.QB_CONFIG = {
   <div class="ms-wrap"><span class="ms-label">Inv Mgr</span>
     <div id="mgrFilter" class="ms" data-all-label="All Inventory Mgrs"></div>
   </div>
+  <div class="ms-wrap"><span class="ms-label">Fcst Status</span>
+    <div id="fcstStatusFilter" class="ms" data-all-label="All Statuses"></div>
+  </div>
   <div class="ms-wrap"><span class="ms-label">AI vs Proj</span>
     <select id="aiDiffFilter" onchange="applyFilters()">
       <option value="0">All (any difference)</option>
@@ -529,6 +532,7 @@ window.QB_CONFIG = {
     <th class="sortable" data-sort-key="ai_wk"        data-col-type="number"  onclick="cycleSort('ai_wk')"     title="Average AI forecast per week (26-wk), including open POs in zeroed-out weeks">AI Fcst/Wk<br><span style="font-size:9px;font-weight:400;color:#aaa">(+Open POs)</span> <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="sugg_wk"      data-col-type="number"  onclick="cycleSort('sugg_wk')" title="Average of Suggested W1..W26">Sugg /Wk <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="ai_vs_proj"   data-col-type="number"  onclick="cycleSort('ai_vs_proj')">AI vs Proj <span class="sort-ind"></span></th>
+    <th class="sortable" data-sort-key="fcst_status"  data-col-type="string"  onclick="cycleSort('fcst_status')" title="Forecast status vs manual projection (±10% threshold, min 1,000u volume / 500u gap)">Fcst Status <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="ai_vs_l13"    data-col-type="number"  onclick="cycleSort('ai_vs_l13')">AI vs L13 <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="man_vs_l13"   data-col-type="number"  onclick="cycleSort('man_vs_l13')">Man vs L13 <span class="sort-ind"></span></th>
   </tr>
@@ -554,6 +558,7 @@ window.QB_CONFIG = {
     <th><input class="col-filter" data-field="ai_wk"        data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
     <th><input class="col-filter" data-field="sugg_wk"      data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
     <th><input class="col-filter" data-field="ai_vs_proj"   data-col-type="number"  oninput="applyFilters()" placeholder=">10, <-5..."></th>
+    <th><input class="col-filter" data-field="fcst_status"  data-col-type="string"  oninput="applyFilters()" placeholder="Over/Under..."></th>
     <th><input class="col-filter" data-field="ai_vs_l13"    data-col-type="number"  oninput="applyFilters()" placeholder=">10, <-5..."></th>
     <th><input class="col-filter" data-field="man_vs_l13"   data-col-type="number"  oninput="applyFilters()" placeholder=">10, <-5..."></th>
   </tr>

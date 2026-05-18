@@ -1464,14 +1464,16 @@ function populateFilters() {
     pattern:     new Set(),
     vol:         new Set(),
     pri:         new Set(),
+    fcst_status: new Set(),
   };
   ALL_RECORDS.forEach(r => {
-    if (r.brand)       sets.brand.add(r.brand);
-    if (r.inv_manager) sets.inv_manager.add(r.inv_manager);
-    if (r.cust)        sets.cust.add(r.cust);
-    if (r.pattern)     sets.pattern.add(r.pattern);
-    if (r.vol_tier)    sets.vol.add(r.vol_tier);
-    if (r.priority)    sets.pri.add(r.priority);
+    if (r.brand)        sets.brand.add(r.brand);
+    if (r.inv_manager)  sets.inv_manager.add(r.inv_manager);
+    if (r.cust)         sets.cust.add(r.cust);
+    if (r.pattern)      sets.pattern.add(r.pattern);
+    if (r.vol_tier)     sets.vol.add(r.vol_tier);
+    if (r.priority)     sets.pri.add(r.priority);
+    if (r.fcst_status)  sets.fcst_status.add(r.fcst_status);
   });
   // Volume / priority have a natural rank  -  sort by it.  The dropdown shows
   // just the tier name; the threshold definition lives in a hover tooltip
@@ -1491,12 +1493,15 @@ function populateFilters() {
   const volOpts = [...sets.vol].map(v => ({ value: v, label: v, tooltip: VOL_TIPS[v] || '' }));
   const priOpts = [...sets.pri].map(v => ({ value: v, label: v, tooltip: PRI_TIPS[v] || '' }));
   const orderBy = ranks => (a, b) => ranks.indexOf(a.value) - ranks.indexOf(b.value);
-  createMultiSelect('volFilter',   volOpts,         orderBy(volRank));
-  createMultiSelect('priFilter',   priOpts,         orderBy(priRank));
-  createMultiSelect('patFilter',   sets.pattern);
-  createMultiSelect('brandFilter', sets.brand);
-  createMultiSelect('mgrFilter',   sets.inv_manager);
-  createMultiSelect('custFilter',  sets.cust);
+  const FCST_STATUS_RANK = ['Over-Projected', 'Under-Projected', 'On Plan', 'Inactive'];
+  const fcstStatusOpts = [...sets.fcst_status].map(v => ({ value: v, label: v }));
+  createMultiSelect('volFilter',        volOpts,         orderBy(volRank));
+  createMultiSelect('priFilter',        priOpts,         orderBy(priRank));
+  createMultiSelect('patFilter',        sets.pattern);
+  createMultiSelect('brandFilter',      sets.brand);
+  createMultiSelect('mgrFilter',        sets.inv_manager);
+  createMultiSelect('custFilter',       sets.cust);
+  createMultiSelect('fcstStatusFilter', fcstStatusOpts,  orderBy(FCST_STATUS_RANK));
 }
 
 function _sortKey(v) {
@@ -1865,6 +1870,7 @@ function renderPage(page) {
       <td style="color:#1565c0;font-weight:600">${fmtN(Math.round(r.ai_wk))}</td>
       <td style="color:#555" title="Average of Suggested W1..W26">${fmtN(Math.round(r.sugg_wk))}</td>
       <td style="font-size:14px;font-weight:800;color:${aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888'}">${aiVsProj >= 0 ? '+' : ''}${aiVsProj.toFixed(1)}%</td>
+      <td style="text-align:center">${_fcstStatusBadge(r.fcst_status)}</td>
       <td style="font-size:13px;font-weight:700;color:${!l13Avail ? '#888' : (aiVsL13 > 0 ? '#2e7d32' : aiVsL13 < 0 ? '#c62828' : '#888')}">${l13Avail ? (aiVsL13 >= 0 ? '+' : '') + aiVsL13.toFixed(1) + '%' : ' - '}</td>
       <td style="font-size:13px;font-weight:700;color:${!l13Avail ? '#888' : (manVsL13 > 0 ? '#2e7d32' : manVsL13 < 0 ? '#c62828' : '#888')}">${l13Avail ? (manVsL13 >= 0 ? '+' : '') + manVsL13.toFixed(1) + '%' : ' - '}</td>
     `;
@@ -1874,7 +1880,7 @@ function renderPage(page) {
     dtr.className = 'detail-pane';
     dtr.id = 'detail-' + r.key;
     dtr.dataset.loaded = '0';
-    dtr.innerHTML = `<td colspan="23"></td>`;
+    dtr.innerHTML = `<td colspan="24"></td>`;
     tb.appendChild(dtr);
   });
   updatePageNav();
@@ -4258,12 +4264,13 @@ function _syncFlaggedOnlyButton() {
 
 function applyFilters() {
   const search    = document.getElementById('search').value.toLowerCase();
-  const volSet    = _msSel('volFilter');
-  const priSet    = _msSel('priFilter');
-  const patSet    = _msSel('patFilter');
-  const brandSet  = _msSel('brandFilter');
-  const mgrSet    = _msSel('mgrFilter');
-  const custSet   = _msSel('custFilter');
+  const volSet        = _msSel('volFilter');
+  const priSet        = _msSel('priFilter');
+  const patSet        = _msSel('patFilter');
+  const brandSet      = _msSel('brandFilter');
+  const mgrSet        = _msSel('mgrFilter');
+  const custSet       = _msSel('custFilter');
+  const fcstStatusSet = _msSel('fcstStatusFilter');
   const aiDiffEl  = document.getElementById('aiDiffFilter');
   const aiDiffMin = aiDiffEl ? parseFloat(aiDiffEl.value) : 0;
   const colPreds  = _readColFilters();
@@ -4280,12 +4287,13 @@ function applyFilters() {
       const txt = (r.key + ' ' + r.cust + ' ' + r.mstyle + ' ' + (r.desc||'') + ' ' + (r.brand||'') + ' ' + (r.inv_manager||'')).toLowerCase();
       if (!txt.includes(search)) return false;
     }
-    if (volSet.size   && !volSet.has(r.vol_tier))      return false;
-    if (priSet.size   && (r._snoozed || !priSet.has(r.priority))) return false;
-    if (patSet.size   && !patSet.has(r.pattern))       return false;
-    if (brandSet.size && !brandSet.has(r.brand))       return false;
-    if (mgrSet.size   && !mgrSet.has(r.inv_manager))   return false;
-    if (custSet.size  && !custSet.has(r.cust))         return false;
+    if (volSet.size        && !volSet.has(r.vol_tier))                  return false;
+    if (priSet.size        && (r._snoozed || !priSet.has(r.priority))) return false;
+    if (patSet.size        && !patSet.has(r.pattern))                  return false;
+    if (brandSet.size      && !brandSet.has(r.brand))                  return false;
+    if (mgrSet.size        && !mgrSet.has(r.inv_manager))              return false;
+    if (custSet.size       && !custSet.has(r.cust))                    return false;
+    if (fcstStatusSet.size && !fcstStatusSet.has(r.fcst_status))       return false;
     if (aiDiffMin > 0) {
       const aiVsProj = r.proj_total > 0 ? Math.abs((r.ai_total - r.proj_total) / r.proj_total * 100) : 0;
       if (aiVsProj < aiDiffMin) return false;
