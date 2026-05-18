@@ -4133,6 +4133,9 @@ function resetAllFilters() {
   FLAGGED_ONLY = false;
   try { sessionStorage.setItem('flaggedOnly', '0'); } catch (e) { /* ignore */ }
   _syncFlaggedOnlyButton();
+  SHOW_OFF_PLAN_ONLY = false;
+  const _opBtn = document.getElementById('offPlanOnlyBtn');
+  if (_opBtn) { _opBtn.style.background = '#fff'; _opBtn.style.color = '#6a1b9a'; _opBtn.style.fontWeight = '600'; }
   applyFilters();
 }
 
