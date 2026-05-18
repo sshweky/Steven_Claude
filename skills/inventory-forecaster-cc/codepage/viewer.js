@@ -3689,6 +3689,30 @@ async function addComment(key) {
       if (CFG.FID.MANAGER_REPLY_PENDING) pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
       await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
       if (rec) { rec.planner_reply_pending = true; rec.manager_reply_pending = false; }
+
+      // Mark all open "Needs Action" comments for this key as "Resolved"
+      // so the manager's original thread entries no longer show the action badge.
+      // Best-effort — comment is already saved even if this step fails.
+      try {
+        const escKey = key.replace(/'/g, "''");
+        const openNa = await qb('/records/query', {
+          from: CFG.COMMENTS_TID,
+          select: [CFG.COMMENT_FID.RECORD_ID],
+          where: `{${CFG.COMMENT_FID.ACCT_MSTYLE}.EX.'${escKey}'} AND {${CFG.COMMENT_FID.FLAG}.EX.'Needs Action'}`,
+          options: { top: 100 },
+        });
+        const toResolve = (openNa.data || []).map(row => {
+          const rid = row[String(CFG.COMMENT_FID.RECORD_ID)] && row[String(CFG.COMMENT_FID.RECORD_ID)].value;
+          if (!rid) return null;
+          const upd = {};
+          upd[CFG.COMMENT_FID.RECORD_ID] = { value: rid };
+          upd[CFG.COMMENT_FID.FLAG]       = { value: 'Resolved' };
+          return upd;
+        }).filter(Boolean);
+        if (toResolve.length) {
+          await qb('/records', { to: CFG.COMMENTS_TID, data: toResolve, mergeFieldId: CFG.COMMENT_FID.RECORD_ID });
+        }
+      } catch (_naErr) { /* non-fatal */ }
       const badgeCell = document.getElementById('row-badges-' + safeId);
       if (badgeCell) {
         if (!badgeCell.querySelector('.reply-badge'))
