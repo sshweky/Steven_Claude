@@ -1196,6 +1196,10 @@ document.addEventListener('DOMContentLoaded', function() {
     {v:'PULL_UP'},{v:'FASTER_VESSEL'},{v:'PUSH_OUT'},{v:'SPLIT'},{v:'CANCEL'},{v:'NO_LEVER'},{v:'__NONE__',label:'No recs (clean)'}
   ],'All Actions',function(s){selActions=s;});
 
+  buildDdPanel('dd-stock-status',[
+    {v:'Over-Stocked'},{v:'Under-Stocked'},{v:'In Stock'},{v:'Inactive'}
+  ],'All Statuses',function(s){selStockStatus=s;});
+
   // Wire up static Priority dropdown panel checkboxes
   // setState only updates selPriorities; renderStats() (called by applyFilters) redraws stats bar
   buildDdPanel('dd-priority',[
