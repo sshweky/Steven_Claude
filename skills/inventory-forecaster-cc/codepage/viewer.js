@@ -3247,7 +3247,6 @@ async function _loadOpenOrderDetails(r, safeId) {
       }
 
       const lines = [];
-      if (i === 0) lines.push('Includes past-due + W1:');
       for (const [cust, info] of Object.entries(custMap)) {
         const dateStr = [...info.dates].sort().join(', ');
         lines.push(`${cust}: ${fmtN(info.qty)} units | cancel ${dateStr}`);
