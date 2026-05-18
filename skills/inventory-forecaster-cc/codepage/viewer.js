@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------------
 // QB CODEPAGE: viewer.js
 // Pets+People  -  Inventory Forecaster Validation Viewer (codepage edition)
 //
@@ -3023,42 +3023,82 @@ async function addComment(key) {
     const fields = {};
     fields[CFG.COMMENT_FID.NOTE]        = { value: txt };
     fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
-    if (flag)   fields[CFG.COMMENT_FID.FLAG]   = { value: flag };
-    // AUTHOR (fid 9) is a QB User field — QB auto-stamps _CURUSER_ on insert, no need to pass it
+    if (flag) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
+    // AUTHOR (FID 40) is a plain text field — NOT auto-stamped by QB.
+    // We must set it explicitly on every insert so the comment thread shows who wrote it.
+    if (CFG.COMMENT_FID.AUTHOR && CURRENT_USER.name)
+      fields[CFG.COMMENT_FID.AUTHOR] = { value: CURRENT_USER.name };
 
     const resp  = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
     const recId = (resp && resp.metadata && resp.metadata.createdRecordIds && resp.metadata.createdRecordIds[0]) || '';
 
-    // If status is Resolved, auto-clear the flag on the Projections record
-    if (flag === 'Resolved') {
-      const recRes = ALL_RECORDS.find(x => x.key === key);
-      if (recRes && recRes.flagged) await toggleFlag(key);
+    // -- Routing: update Projections pending-flags based on flag direction ----
+    //   "Needs Planner Action"  -> director flagged for planner  -> MANAGER_REPLY_PENDING = true
+    //   "Planner Response"      -> planner replied to director   -> PLANNER_REPLY_PENDING = true
+    //                                                               MANAGER_REPLY_PENDING = false
+    //   "Resolved"              -> closes the loop               -> both flags cleared
+    const rec    = ALL_RECORDS.find(x => x.key === key);
+    const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+
+    if (flag === 'Needs Planner Action' && CFG.FID.MANAGER_REPLY_PENDING) {
+      const pf = {};
+      pf[CFG.FID.KEY]                   = { value: key };
+      pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: true };
+      await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
+      if (rec) rec.manager_reply_pending = true;
+      const badgeCell = document.getElementById('row-badges-' + safeId);
+      if (badgeCell && !badgeCell.querySelector('.mgr-badge'))
+        badgeCell.insertAdjacentHTML('beforeend', '<span class="mgr-badge" title="Manager flagged — planner action required">\u{1F4CB}</span>');
+      const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
+      if (tr) tr.classList.add('row-mgr-pending');
+      updateForMeCount();
     }
 
-    // If this is a planner response, flip Planner_Reply_Pending on the Projections record
     if (flag === 'Planner Response') {
       const pf = {};
       pf[CFG.FID.KEY]                   = { value: key };
       pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: true };
+      if (CFG.FID.MANAGER_REPLY_PENDING) pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
       await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
-      // Optimistic UI
-      const rec = ALL_RECORDS.find(x => x.key === key);
-      if (rec) rec.planner_reply_pending = true;
-      const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+      if (rec) { rec.planner_reply_pending = true; rec.manager_reply_pending = false; }
       const badgeCell = document.getElementById('row-badges-' + safeId);
-      if (badgeCell && !badgeCell.querySelector('.reply-badge')) {
-        badgeCell.insertAdjacentHTML('beforeend', '<span class="reply-badge" title="Planner reply awaiting director review">\ud83d\udcac</span>');
+      if (badgeCell) {
+        if (!badgeCell.querySelector('.reply-badge'))
+          badgeCell.insertAdjacentHTML('beforeend', '<span class="reply-badge" title="Planner reply awaiting director review">\u{1F4AC}</span>');
+        const mb = badgeCell.querySelector('.mgr-badge'); if (mb) mb.remove();
       }
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
-      if (tr) tr.classList.add('row-reply-pending');
+      if (tr) { tr.classList.add('row-reply-pending'); tr.classList.remove('row-mgr-pending'); }
       updateReplyCount();
+      updateForMeCount();
     }
 
-    msg.textContent = recId ? `\u2713 Saved (rec #${recId})` : '\u2713 Saved';
+    if (flag === 'Resolved') {
+      if (rec && rec.flagged) await toggleFlag(key);
+      if (rec && (rec.planner_reply_pending || rec.manager_reply_pending)) {
+        const pf = {};
+        pf[CFG.FID.KEY]                   = { value: key };
+        pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: false };
+        if (CFG.FID.MANAGER_REPLY_PENDING) pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
+        await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
+        if (rec) { rec.planner_reply_pending = false; rec.manager_reply_pending = false; }
+        const badgeCell = document.getElementById('row-badges-' + safeId);
+        if (badgeCell) {
+          const rb = badgeCell.querySelector('.reply-badge'); if (rb) rb.remove();
+          const mb = badgeCell.querySelector('.mgr-badge');   if (mb) mb.remove();
+        }
+        const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
+        if (tr) tr.classList.remove('row-reply-pending', 'row-mgr-pending');
+        updateReplyCount();
+        updateForMeCount();
+      }
+    }
+
+    msg.textContent = recId ? '✓ Saved (rec #' + recId + ')' : '✓ Saved';
     msg.style.color = '#2e7d32';
     document.getElementById('cmt-text-' + key).value = '';
-    document.getElementById('cmt-flag-' + key).value = 'Needs Action';
-    const rec = ALL_RECORDS.find(x => x.key === key);
+    // Reset dropdown to the role-appropriate default flag
+    document.getElementById('cmt-flag-' + key).value = _USER_IS_PLANNER ? 'Planner Response' : 'Needs Planner Action';
     if (rec) {
       const stamp = new Date().toISOString().slice(0,16).replace('T',' ');
       const flagTag = flag ? ' ['+flag+']' : '';
@@ -3076,9 +3116,10 @@ async function addComment(key) {
 // -- Mark Reviewed > clear Planner_Reply_Pending + FLAGGED on Projections ----
 //
 // Called from the "Mark Reviewed" button on a Planner Response comment bubble.
-// Two QB field clears on the Projections record:
-//   - Planner_Reply_Pending → false  (removes the 💬 badge)
-//   - FLAGGED               → false  (removes the flag tint; closes the loop)
+// Clears on the Projections record:
+//   - Planner_Reply_Pending → false  (removes 💬 badge)
+//   - Manager_Reply_Pending → false  (removes 📋 badge — loop fully closed)
+//   - FLAGGED               → false  (removes red tint)
 async function markReviewed(key, btnEl) {
   if (btnEl) { btnEl.disabled = true; btnEl.textContent = '...'; }
   try {
@@ -3086,24 +3127,26 @@ async function markReviewed(key, btnEl) {
     pf[CFG.FID.KEY]                   = { value: key };
     pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: false };
     pf[CFG.FID.FLAGGED]               = { value: false };
+    if (CFG.FID.MANAGER_REPLY_PENDING) pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
     await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
 
     // Optimistic UI
     const rec = ALL_RECORDS.find(x => x.key === key);
-    if (rec) { rec.planner_reply_pending = false; rec.flagged = false; rec._auto_flagged = false; }
+    if (rec) { rec.planner_reply_pending = false; rec.manager_reply_pending = false; rec.flagged = false; rec._auto_flagged = false; }
     const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
     const badgeCell = document.getElementById('row-badges-' + safeId);
     if (badgeCell) {
-      const rb = badgeCell.querySelector('.reply-badge');
-      if (rb) rb.remove();
+      const rb = badgeCell.querySelector('.reply-badge'); if (rb) rb.remove();
+      const mb = badgeCell.querySelector('.mgr-badge');   if (mb) mb.remove();
       badgeCell.innerHTML = '';   // clear flag indicator too
     }
     const flagBtn = document.getElementById('flg-' + safeId);
     if (flagBtn) flagBtn.className = 'flag-btn';
     const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
-    if (tr) { tr.classList.remove('row-reply-pending', 'row-flagged'); }
+    if (tr) { tr.classList.remove('row-reply-pending', 'row-mgr-pending', 'row-flagged'); }
     updateFlagCount();
     updateReplyCount();
+    updateForMeCount();
     if (btnEl) { btnEl.textContent = '✓ Reviewed'; btnEl.style.background = '#e8f5e9'; btnEl.style.color = '#2e7d32'; }
   } catch(e) {
     if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Mark Reviewed'; }
