@@ -432,7 +432,7 @@ async function loadData() {
       open_pos:openPos,
       manual_demand_26w:manDem26w, customer_demand:custDemand, demand_26w:0,
       pipeline_total:0, oh_excess:0, pipeline_excess:0, pipeline_wos:0,
-      gap_weeks:[], overstocked:false, recommendations:[], priority:'LOW', flag:''
+      gap_weeks:[], overstocked:false, stock_status:'', recommendations:[], priority:'LOW', flag:''
     };
 
     computeDerived(rec, today);
