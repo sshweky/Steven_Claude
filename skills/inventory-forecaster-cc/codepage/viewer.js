@@ -640,7 +640,7 @@ async function _lazyLoadDetail(r) {
     CFG.FID.AI_ANALYSIS,
     CFG.FID.AI_ALERT,
   ].filter(Boolean);
-  const data = await qbPost('/v1/records/query', {
+  const data = await qb('/v1/records/query', {
     from:    CFG.PROJECTIONS_TID,
     select:  [...new Set(selectFids)],
     where:   `{${CFG.FID.KEY}.EX.'${String(r.key).replace(/'/g, "\\'")}'}`,
