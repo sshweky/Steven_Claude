@@ -4440,6 +4440,8 @@ function resetAllFilters() {
   //   planners → back ON (their natural view); directors/VPs → back OFF (see all)
   SHOW_MY_RECORDS_ONLY = _USER_IS_PLANNER;
   _syncMyRecordsButton();
+  SHOW_FOR_ME_ONLY = false;
+  _syncForMeButton();
   applyFilters();
 }
 
@@ -4924,7 +4926,8 @@ async function bootstrap() {
     } catch(e) {}
     renderTable();
     applyFilters();
-    updateReplyCount();  // show banner if planner replies exist
+    updateReplyCount();   // show 💬 banner if planner replies exist (directors)
+    updateForMeCount();   // show 📋 banner if items need attention (planners)
 
     const ms = (performance.now() - t0).toFixed(0);
     console.log(`Codepage viewer bootstrap completed in ${ms}ms`);
