@@ -926,6 +926,92 @@ async function attachInvFlow(records) {
   return map;
 }
 
+// -- On-demand single-mstyle Inventory Flow loader ---------------------------
+// Used by toggleDetail when the bulk attachInvFlow scan hasn't finished.
+// Fetches one row from Inventory Flow for r.mstyle and attaches it to r.
+// One query (typically <500 ms) versus waiting on the full table scan.
+// Returns true if data was attached, false otherwise.
+const _oneInvFlowInFlight = new Map();  // mstyle -> Promise (dedupe concurrent calls)
+async function _loadOneInvFlowRow(r) {
+  if (!r || !r.mstyle || !CFG.INV_FLOW_TID) return false;
+  if (r.inv_flow_beg) return true;                    // already attached
+  if (_oneInvFlowInFlight.has(r.mstyle)) return _oneInvFlowInFlight.get(r.mstyle);
+
+  const FK         = CFG.INV_FLOW_FK_MSTYLE;
+  const BIDS       = CFG.INV_FLOW_BEG_FIDS;
+  const RIDS       = CFG.INV_FLOW_RCV_FIDS;
+  const PIDS       = CFG.INV_FLOW_PRJ_FIDS;
+  const OIDS       = CFG.INV_FLOW_OPN_FIDS;
+  const OPT_WOS    = CFG.INV_FLOW_OPT_WOS;
+  const OPT_FINAL  = CFG.INV_FLOW_OPT_WOS_FINAL;
+  const NEXT_RCPT  = CFG.INV_FLOW_NEXT_RCPT_DT;
+  const LT_WKS     = CFG.INV_FLOW_LT_WKS;
+  const MOQ        = CFG.INV_FLOW_MOQ;
+  const SUPP_PO    = INV_FLOW_SUPP_PO_FID;
+  const ATS_NOW    = INV_FLOW_ATS_NOW_FID;
+  const ATS_OH     = INV_FLOW_ATS_OH_FID;
+  const ATS_OO     = INV_FLOW_ATS_OO_FID;
+  const ATS_OH_WOS = INV_FLOW_ATS_OH_WOS_FID;
+  const ATS_OO_WOS = INV_FLOW_ATS_OO_WOS_FID;
+  const sel = [FK, ...BIDS, ...RIDS, ...PIDS, ...(OIDS||[]), OPT_WOS, OPT_FINAL, NEXT_RCPT, LT_WKS, MOQ,
+               ...[SUPP_PO, ATS_NOW, ATS_OH, ATS_OO, ATS_OH_WOS, ATS_OO_WOS].filter(Boolean)];
+
+  const numCell = (row, fid) => {
+    const cell = row[String(fid)];
+    if (!cell || cell.value == null || cell.value === '') return 0;
+    const n = Number(cell.value);
+    return Number.isFinite(n) ? n : 0;
+  };
+  const strCell = (row, fid) => {
+    const cell = row[String(fid)];
+    return (cell && cell.value != null) ? String(cell.value) : '';
+  };
+
+  const escMstyle = r.mstyle.replace(/'/g, "''");
+  const p = (async () => {
+    try {
+      const resp = await qb('/records/query', {
+        from: CFG.INV_FLOW_TID,
+        select: sel,
+        where: `{${FK}.EX.'${escMstyle}'}`,
+        options: { top: 1, skip: 0 },
+      });
+      const row = (resp && resp.data && resp.data[0]) || null;
+      if (!row) return false;
+      const _final = numCell(row, OPT_FINAL);
+      const _base  = numCell(row, OPT_WOS);
+      const opt_wos = _final > 0 ? _final : _base;
+      const opnRaw = OIDS ? OIDS.map(fid => numCell(row, fid)) : [];
+      const opnDisplay = opnRaw.length === 27 ? [opnRaw[0] + opnRaw[1], ...opnRaw.slice(2)] : [];
+      // Only attach if bulk scan hasn't already attached this record's data
+      if (!r.inv_flow_beg) {
+        r.inv_flow_beg       = BIDS.map(fid => numCell(row, fid));
+        r.inv_flow_rcv       = RIDS.map(fid => numCell(row, fid));
+        r.inv_flow_prj       = PIDS.map(fid => numCell(row, fid));
+        r.inv_flow_opn       = opnDisplay;
+        r.inv_flow_opt_wos   = opt_wos;
+        r.inv_flow_next_rcpt = strCell(row, NEXT_RCPT);
+        r.inv_flow_lt_wks    = numCell(row, LT_WKS);
+        r.inv_flow_moq       = numCell(row, MOQ);
+        r.inv_flow_supp_pos   = SUPP_PO    ? strCell(row, SUPP_PO)    : '';
+        r.inv_flow_ats_now    = ATS_NOW   ? numCell(row, ATS_NOW)   : 0;
+        r.inv_flow_ats_oh     = ATS_OH    ? numCell(row, ATS_OH)    : 0;
+        r.inv_flow_ats_oo     = ATS_OO    ? numCell(row, ATS_OO)    : 0;
+        r.inv_flow_ats_oh_wos = ATS_OH_WOS ? numCell(row, ATS_OH_WOS) : 0;
+        r.inv_flow_ats_oo_wos = ATS_OO_WOS ? numCell(row, ATS_OO_WOS) : 0;
+      }
+      return true;
+    } catch (e) {
+      console.warn('[InvFlow] single-row load failed for', r.mstyle, e.message || e);
+      return false;
+    } finally {
+      _oneInvFlowInFlight.delete(r.mstyle);
+    }
+  })();
+  _oneInvFlowInFlight.set(r.mstyle, p);
+  return p;
+}
+
 // -- ATS (Available to Sell) L26W history from Inventory History - Weekly ----
 let _atsHistPromise = null;
 async function attachAtsHistory(records) {
@@ -2442,7 +2528,18 @@ async function toggleDetail(key) {
     }).join('\n');
   }
   const _suppPos = _parseSupplierPOs(r.inv_flow_supp_pos || '');
-  // If the background load is still running, re-render once it finishes
+  // Hybrid load: kick off a single-row fetch so this panel doesn't have to wait
+  // for the whole-table bulk scan to finish.  Whichever resolves first wins.
+  if (!_hasInvFlow && CFG.INV_FLOW_TID && r.mstyle) {
+    _loadOneInvFlowRow(r).then(ok => {
+      if (ok && _openDetailKey === key) {
+        el.dataset.loaded = '';
+        el.style.display = 'none';
+        toggleDetail(key);
+      }
+    });
+  }
+  // If the background bulk load is still running, also re-render once it finishes
   if (!_hasInvFlow && _invFlowPromise) {
     _invFlowPromise.finally(() => {
       if (_openDetailKey !== key) return;
@@ -2989,10 +3086,21 @@ async function _loadOrdHistCxld(r, safeId) {
   const rowEl = document.getElementById('cxld-row-' + safeId);
   if (!rowEl || !CFG.ORDER_HIST_TID || !W1_DATE) return;
 
+  // Pre-render an empty cxld row so it always shows even if the query yields
+  // no cancellations.  Filled in below; left in-place with zeros otherwise.
+  const _emptyCxldRow = () => {
+    let cells = '<td class="row-label" style="color:#b71c1c;font-weight:600;white-space:nowrap">Qty Cxld</td>';
+    for (let i = 0; i < 26; i++) cells += '<td style="color:#bbb">0</td>';
+    cells += '<td style="color:#bbb;font-weight:700">0</td>';
+    cells += '<td style="color:#bbb;font-weight:700">0</td>';
+    rowEl.innerHTML = cells;
+  };
+  _emptyCxldRow();
+
   try {
     await discoverOrdHistFids();
     if (!ORD_HIST_QTY_CXLD_FID || !ORD_HIST_ACCT_MSTYLE_FID || !ORD_HIST_CANCEL_DATE_FID) {
-      rowEl.remove(); return;
+      return;  // leave the empty row in place
     }
 
     // 26-week window ending at W1_DATE; QB date filter uses MM-DD-YYYY
@@ -3046,7 +3154,7 @@ async function _loadOrdHistCxld(r, safeId) {
     }
 
     const total = cxldByWeek.reduce((s, v) => s + v, 0);
-    if (total === 0) { rowEl.remove(); return; }
+    if (total === 0) return;  // leave empty row in place
 
     let cells = '<td class="row-label" style="color:#b71c1c;font-weight:600;white-space:nowrap">Qty Cxld *</td>';
     for (let i = 0; i < 26; i++) {
@@ -3065,7 +3173,7 @@ async function _loadOrdHistCxld(r, safeId) {
 
   } catch (e) {
     console.warn('[OrdHist] cxld row load failed:', e.message || e);
-    rowEl.remove();
+    // leave the empty row in place so structure stays consistent
   }
 }
 
