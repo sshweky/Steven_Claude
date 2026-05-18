@@ -5215,33 +5215,43 @@ async function bootstrap() {
     const _invFlowTimer = new Promise((_, rej) =>
       setTimeout(() => rej(new Error('inv-flow-timeout')), 20000));
 
+    // Re-render whatever detail panel is currently open after inv flow settles.
+    // Called from every settlement path so no panel is ever left on "Loading...".
+    function _reRenderOpenPanel() {
+      const panel  = document.getElementById('detail-panel');
+      const ridStr = panel && panel.dataset.rid;
+      if (!ridStr) return;
+      const openRec = ALL_RECORDS.find(x => String(x.rid) === ridStr);
+      if (openRec) renderDetail(openRec);
+    }
+
     _invFlowPromise = Promise.race([_invFlowLoad, _invFlowTimer])
       .then(() => {
         _setFreshness('invflow-loaded-at', Date.now());
         _invFlowPromise = null;
+        _reRenderOpenPanel();
       })
       .catch(e => {
         _invFlowPromise = null;
         const el = document.getElementById('invflow-loaded-at');
         if (e.message === 'inv-flow-timeout') {
-          console.warn('[InvFlow] still loading after 20s — panel will update when ready');
+          console.warn('[InvFlow] still loading after 20s - panel will update when ready');
           if (el) el.textContent = 'loading...';
-          // Load is still running in background; re-render open panel when it finishes
+          // Re-render now so "Loading..." clears (shows "(no row)" or whatever data
+          // is already attached).  Background load re-renders again when it finishes.
+          _reRenderOpenPanel();
           _invFlowLoad.then(() => {
             _setFreshness('invflow-loaded-at', Date.now());
-            const panel = document.getElementById('detail-panel');
-            const ridAttr = panel && panel.dataset.rid;
-            if (ridAttr) {
-              const openRec = ALL_RECORDS.find(x => String(x.rid) === ridAttr);
-              if (openRec) renderDetail(openRec);
-            }
+            _reRenderOpenPanel();
           }).catch(e2 => {
             console.warn('[InvFlow] load failed after timeout:', e2.message);
             if (el) el.textContent = 'unavailable';
+            _reRenderOpenPanel();
           });
         } else {
           console.warn('[InvFlow] load failed (non-fatal):', e);
           if (el) el.textContent = 'unavailable';
+          _reRenderOpenPanel();
         }
       });
 
