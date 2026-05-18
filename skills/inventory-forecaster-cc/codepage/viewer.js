@@ -77,6 +77,47 @@ async function _hdrs(dbid) {
   };
 }
 
+// -- Current User Identity ---------------------------------------------------
+// Decoded once during bootstrap by reading the QB temp token JWT payload.
+// QB signs temp tokens as JWTs; we only read the (unsigned) payload to extract
+// the visitor's display name and email — no signature verification needed.
+//
+// The name is matched case-insensitively against inv_manager values in the
+// loaded records to determine whether the visitor is a planner (owns records)
+// or a director/VP/other (no records assigned to them).
+//   Planner → SHOW_MY_RECORDS_ONLY auto-set to true on load
+//   Director/VP → see all records by default; can still click "My Records"
+//                 but it will show 0 results unless their name is in the data.
+
+function _decodeJwt(token) {
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) return {};
+    const b64    = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
+    return JSON.parse(atob(padded));
+  } catch (_) { return {}; }
+}
+
+async function fetchCurrentUser() {
+  try {
+    const token   = await getTempToken(CFG.PROJECTIONS_TID);
+    const p       = _decodeJwt(token);
+    // QB temp token payload fields: sub (user ID), name (display name), email
+    const name    = (p.name || p.fullName || p.display_name || '').trim();
+    const email   = (p.email || '').trim();
+    const id      = (p.sub   || '').trim();
+    CURRENT_USER  = {
+      name:  name  || (email ? email.split('@')[0].replace(/[._]/g, ' ') : 'Unknown'),
+      email: email,
+      id:    id,
+    };
+    console.info(`[Auth] Current user: "${CURRENT_USER.name}" (${CURRENT_USER.email || id || '?'})`);
+  } catch (e) {
+    console.warn('[Auth] Could not decode current user from JWT:', e.message);
+  }
+}
+
 // Extract the dbid an API call targets so we can fetch the right temp token.
 //   - body.from  > records/query, records DELETE
 //   - body.to    > records POST (insert/upsert)
