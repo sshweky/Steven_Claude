@@ -424,8 +424,8 @@ async function fetchAllRecords(mgrName) {
 // Cache version is in the key.  Bump it (_v1 -> _v2) on any schema change
 // to force-invalidate all clients on next page load.
 // v2 = added Opt WOS / Opt WOS Final / Next Avl Rcpt Dt scalars per mstyle
-const INV_FLOW_CACHE_KEY    = 'pp_invflow_v7';  // bumped: force fresh fetch to pick up new mstyle rows
-const INV_FLOW_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
+const INV_FLOW_CACHE_KEY    = 'pp_invflow_v8';  // bumped: IDB-primary cache, 24h TTL
+const INV_FLOW_CACHE_TTL_MS = 24 * 60 * 60 * 1000;  // 24 hours (InvFlow updates once/day)
 const ATS_HIST_CACHE_KEY    = 'pp_ats_v1';
 const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
 
@@ -456,8 +456,8 @@ function _invFlowCacheBypassed() {
   catch (e) { return false; }
 }
 
-function _loadInvFlowCache() {
-  // 1. sessionStorage first (tab-scoped, no quota competition with other QB apps)
+async function _loadInvFlowCache() {
+  // 1. sessionStorage (instant same-tab F5, no async needed)
   try {
     const raw = sessionStorage.getItem(INV_FLOW_CACHE_KEY);
     if (raw) {
@@ -466,34 +466,28 @@ function _loadInvFlowCache() {
         return { map: obj.map, ageMs: Date.now() - obj.ts, source: 'session' };
     }
   } catch (e) { /* ignore */ }
-  // 2. localStorage fallback (cross-tab, 6h TTL)
+  // 2. IndexedDB (cross-tab, cross-session — no quota competition with other QB apps)
   try {
-    const raw = localStorage.getItem(INV_FLOW_CACHE_KEY);
-    if (!raw) return null;
-    const obj = JSON.parse(raw);
-    if (!obj || typeof obj.ts !== 'number' || !obj.map) return null;
-    const ageMs = Date.now() - obj.ts;
-    if (ageMs > INV_FLOW_CACHE_TTL_MS) return null;
-    return { map: obj.map, ageMs, source: 'local' };
-  } catch (e) {
-    return null;
-  }
+    const obj = await _idb.get(INV_FLOW_CACHE_KEY);
+    if (obj && typeof obj.ts === 'number' && obj.map) {
+      const ageMs = Date.now() - obj.ts;
+      if (ageMs <= INV_FLOW_CACHE_TTL_MS) {
+        // Warm sessionStorage so same-tab refreshes skip IDB next time
+        try { sessionStorage.setItem(INV_FLOW_CACHE_KEY, JSON.stringify(obj)); } catch (_) {}
+        return { map: obj.map, ageMs, source: 'idb' };
+      }
+    }
+  } catch (e) { /* ignore */ }
+  return null;
 }
 
-function _saveInvFlowCache(map) {
-  const payload = JSON.stringify({ ts: Date.now(), map });
-  // Always save to sessionStorage first (no quota competition)
-  try { sessionStorage.setItem(INV_FLOW_CACHE_KEY, payload); } catch (e) { /* ignore */ }
-  // Also try localStorage so other tabs and browser refreshes benefit
-  try {
-    localStorage.setItem(INV_FLOW_CACHE_KEY, payload);
-  } catch (e) {
-    try {
-      localStorage.removeItem(INV_FLOW_CACHE_KEY);
-      localStorage.setItem(INV_FLOW_CACHE_KEY, payload);
-    } catch (e2) {
-      console.warn('[InvFlow] localStorage quota full - sessionStorage only for this session:', e2.message || e2);
-    }
+async function _saveInvFlowCache(map) {
+  const obj = { ts: Date.now(), map };
+  // sessionStorage: fast same-tab F5 path
+  try { sessionStorage.setItem(INV_FLOW_CACHE_KEY, JSON.stringify(obj)); } catch (_) {}
+  // IndexedDB: primary persistent store — no quota competition, survives browser restart
+  try { await _idb.set(INV_FLOW_CACHE_KEY, obj); } catch (e) {
+    console.warn('[InvFlow] IDB save failed:', e && e.message);
   }
 }
 
@@ -529,9 +523,10 @@ function clearAllCaches() {
     try { localStorage.removeItem(k); }   catch (e) { /* ignore */ }
     try { sessionStorage.removeItem(k); } catch (e) { /* ignore */ }
   });
-  // Clear IndexedDB projection cache — both user-specific and shared 'all' key
+  // Clear IndexedDB caches — projections + inv flow
   _idb.del(_prjCacheKey()).catch(() => {});
   _idb.del(PRJ_CACHE_KEY_ALL).catch(() => {});
+  _idb.del(INV_FLOW_CACHE_KEY).catch(() => {});
 }
 function forceRefresh() { clearAllCaches(); location.reload(); }
 
@@ -762,11 +757,10 @@ async function attachInvFlow(records) {
   if (!records.length) return {};
 
   // -- Cache fast-path ----------------------------------------------------
-  // If localStorage has a fresh map (<6h old), attach from there and skip
-  // the entire bulk QB pull.  Saves ~12 paginated /records/query calls per
-  // page load, per user, per 4-hour window.
+  // IndexedDB-primary cache (24h TTL) — survives browser restarts, no quota
+  // competition with other QB apps.  sessionStorage warm on same-tab F5.
   if (!_invFlowCacheBypassed()) {
-    const cached = _loadInvFlowCache();
+    const cached = await _loadInvFlowCache();
     if (cached && cached.map) {
       let nMatched = 0;
       for (const r of records) {
@@ -790,8 +784,8 @@ async function attachInvFlow(records) {
         }
       }
       const ageStr = _fmtCacheAge(cached.ageMs);
-      console.info(`[InvFlow] loaded from localStorage cache (age ${ageStr})  -  ${Object.keys(cached.map).length} mstyles, ${nMatched} records attached`);
-      _setDetail(`Inventory Flow: served from local cache (${ageStr} old)  -  append ?nocache=1 to URL for fresh pull`);
+      console.info(`[InvFlow] loaded from ${cached.source} cache (age ${ageStr})  -  ${Object.keys(cached.map).length} mstyles, ${nMatched} records attached`);
+      _setDetail(`Inventory Flow: served from cache (${ageStr} old)  -  append ?nocache=1 to URL for fresh pull`);
       return cached.map;
     }
   } else {
@@ -816,7 +810,7 @@ async function attachInvFlow(records) {
   const ATS_OO_WOS = INV_FLOW_ATS_OO_WOS_FID;
   const sel        = [FK, ...BIDS, ...RIDS, ...PIDS, ...(OIDS||[]), OPT_WOS, OPT_FINAL, NEXT_RCPT, LT_WKS, MOQ,
                       ...[SUPP_PO, ATS_NOW, ATS_OH, ATS_OO, ATS_OH_WOS, ATS_OO_WOS].filter(Boolean)];
-  const TOP        = 1000;
+  const TOP        = 5000;
   const map        = {};
   let totalFetched = 0;
 
@@ -920,7 +914,7 @@ async function attachInvFlow(records) {
   // Persist to localStorage so subsequent loads (this browser, this user)
   // within the next 6 hours short-circuit the bulk pull.
   if (Object.keys(map).length > 0) {
-    _saveInvFlowCache(map);
+    await _saveInvFlowCache(map);
     console.info(`[InvFlow] saved ${Object.keys(map).length} mstyles to localStorage cache`);
   }
   return map;
