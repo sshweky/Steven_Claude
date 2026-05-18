@@ -4638,12 +4638,12 @@ async function bootstrap() {
     await new Promise(r => setTimeout(r, 16));
 
     _setBoot('Loading projections...');
-    const _prjCached = !_prjCacheBypassed() && _loadPrjCache();
+    const _prjCached = !_prjCacheBypassed() && await _loadPrjCache();
     if (_prjCached) {
       ALL_RECORDS = _prjCached.records;
       const ageStr = _fmtCacheAge(_prjCached.ageMs);
-      const src = _prjCached.source === 'session' ? 'session cache' : 'local cache';
-      _setDetail(`Projections: served from ${src} (${ageStr} old)  -  append ?nocache=1 to URL for fresh pull`);
+      const src = _prjCached.source === 'session' ? 'session cache' : 'IndexedDB cache';
+      _setDetail(`Projections: served from ${src} (${ageStr} old)  —  append ?nocache=1 to URL for a fresh pull`);
       console.info(`[Prj] loaded ${ALL_RECORDS.length.toLocaleString()} records from ${src} (age ${ageStr})`);
     } else {
       _setDetail('Querying Quickbase for active records');
@@ -4652,8 +4652,8 @@ async function bootstrap() {
       _setDetail(`${rawRows.length.toLocaleString()} records received | adapting to UI shape`);
       await new Promise(r => setTimeout(r, 16));
       ALL_RECORDS = rawRows.map(adaptRow);
-      _savePrjCache(ALL_RECORDS);
-      console.info(`[Prj] saved ${ALL_RECORDS.length.toLocaleString()} records to localStorage cache`);
+      await _savePrjCache(ALL_RECORDS);
+      console.info(`[Prj] saved ${ALL_RECORDS.length.toLocaleString()} records to IndexedDB cache`);
     }
     _setFreshness('prj-loaded-at', Date.now());
     _initSnoozeFlags();   // stamp r._snoozed from localStorage before first render
