@@ -2066,6 +2066,23 @@ function _syncMyRecordsButton() {
   btn.style.fontWeight = '800';
 }
 
+// "📬 For Me" — role-aware inbox filter:
+//   Planners    → records where MANAGER_REPLY_PENDING = true (items the director flagged for them)
+//   Directors   → records where PLANNER_REPLY_PENDING = true (same as "Show Replies Only")
+let SHOW_FOR_ME_ONLY = false;
+function toggleForMe() {
+  SHOW_FOR_ME_ONLY = !SHOW_FOR_ME_ONLY;
+  _syncForMeButton();
+  applyFilters();
+}
+function _syncForMeButton() {
+  const btn = document.getElementById('forMeBtn');
+  if (!btn) return;
+  btn.style.background = SHOW_FOR_ME_ONLY ? '#e65100' : '#fff';
+  btn.style.color      = SHOW_FOR_ME_ONLY ? '#fff'    : '#e65100';
+  btn.style.fontWeight = '800';
+}
+
 // -- Render: pagination -----------------------------------------------------
 function renderPage(page) {
   currentPage = page;
