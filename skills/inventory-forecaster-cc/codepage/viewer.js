@@ -784,7 +784,7 @@ function _fcstStatus(ai_model, ai_total, proj_total) {
 function _fcstStatusBadge(status) {
   const styles = {
     'Over-Projected':  'background:#c62828;color:#fff',
-    'Under-Projected': 'background:#e65100;color:#fff',
+    'Under-Projected': 'background:#66bb6a;color:#fff',
     'On Plan':         'background:#2e7d32;color:#fff',
     'Inactive':        'background:#757575;color:#fff',
   };
