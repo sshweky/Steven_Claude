@@ -108,18 +108,25 @@ async function fetchCurrentUser() {
     let name  = (p.name || p.fullName || p.display_name || '').trim();
     let email = (p.email || '').trim();
 
-    // JWT payload rarely includes name/email for QB temp tokens — fall back to
-    // the /users/{id} REST endpoint which always returns the full display name.
-    if ((!name || !email) && id) {
+    // QB temp tokens do not include name/email in the JWT payload.
+    // Resolve display name from the Record Owner (FID 4, user type) of any
+    // Projections record owned by this user — QB auto-stamps user-type fields
+    // reliably.  We query with the QB user ID from the JWT sub claim.
+    if (!name && id) {
       try {
-        const hdrs = await _hdrs(CFG.PROJECTIONS_TID);
-        const resp = await fetch(`https://${CFG.REALM}/api/v1/users/${encodeURIComponent(id)}`, { headers: hdrs });
-        if (resp.ok) {
-          const u = await resp.json();
-          name  = name  || (u.name  || u.userName || '').trim();
-          email = email || (u.email || '').trim();
+        const r = await qb('/records/query', {
+          from:    CFG.PROJECTIONS_TID,
+          select:  [4],
+          where:   `{4.EX.'${id}'}`,
+          options: { top: 1 },
+        });
+        const row   = (r.data || [])[0];
+        const owner = row && row[4] && row[4].value;
+        if (owner) {
+          name  = name  || (owner.name  || owner.userName || '').trim();
+          email = email || (owner.email || '').trim();
         }
-      } catch (_) { /* non-fatal — fall through to email-based fallback */ }
+      } catch (_) { /* non-fatal */ }
     }
 
     CURRENT_USER = {
@@ -3583,6 +3590,29 @@ async function addComment(key) {
 
     const resp = await qb('/records', { to: CFG.COMMENTS_TID, data: [fields] });
     recId = (resp && resp.metadata && resp.metadata.createdRecordIds && resp.metadata.createdRecordIds[0]) || '';
+
+    // If CURRENT_USER.name was empty (e.g. manager with no owned Projections
+    // records), read the Record Owner (FID 4, user type) back from the comment
+    // QB just stamped, cache it, and back-fill FID 40 on the same record.
+    if (!CURRENT_USER.name && recId) {
+      try {
+        const probe = await qb('/records/query', {
+          from: CFG.COMMENTS_TID, select: [3, 4],
+          where: `{3.EX.${recId}}`, options: { top: 1 },
+        });
+        const owner = ((probe.data || [])[0] || {})[4] && probe.data[0][4].value;
+        if (owner) {
+          CURRENT_USER.name  = (owner.name  || owner.userName || '').trim();
+          CURRENT_USER.email = CURRENT_USER.email || (owner.email || '').trim();
+        }
+        if (CURRENT_USER.name && CFG.COMMENT_FID.AUTHOR) {
+          const upd = {};
+          upd[CFG.COMMENT_FID.RECORD_ID] = { value: recId };
+          upd[CFG.COMMENT_FID.AUTHOR]    = { value: CURRENT_USER.name };
+          await qb('/records', { to: CFG.COMMENTS_TID, data: [upd], mergeFieldId: CFG.COMMENT_FID.RECORD_ID });
+        }
+      } catch (_) { /* non-fatal */ }
+    }
   } catch (e) {
     msg.textContent = 'Failed to save comment: ' + e.message; msg.style.color = '#c62828';
     btn.textContent = 'Save'; btn.disabled = false;
