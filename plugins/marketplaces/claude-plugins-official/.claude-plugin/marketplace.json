@@ -1788,6 +1788,22 @@
       "homepage": "https://help.sap.com/docs/MDK"
     },
     {
+      "name": "save-to-spotify",
+      "description": "Create polished audio episodes with TTS narration, rich timelines, cover images, and save them to Spotify via the save-to-spotify CLI.",
+      "author": {
+        "name": "Spotify"
+      },
+      "category": "productivity",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/spotify/save-to-spotify.git",
+        "path": "plugin",
+        "ref": "main",
+        "sha": "b3d362f7851d184098dcb220ba2fab10c996d1f2"
+      },
+      "homepage": "https://github.com/spotify/save-to-spotify"
+    },
+    {
       "name": "security-guidance",
       "description": "Security reminder hook that warns about potential security issues when editing files, including command injection, XSS, and unsafe code patterns",
       "author": {
