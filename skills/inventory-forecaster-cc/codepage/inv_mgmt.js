@@ -1276,7 +1276,7 @@ function renderDetail(r) {
   // Purchase recommendation detail vars
   var purTrigIdx    = r.purchase_rec_trigger_idx;  // 0-based index of trigger week (e.g. 15 = Wk16)
   var purTrigWk     = purTrigIdx >= 0 ? purTrigIdx + 1 : 0;  // 1-based week label
-  var purTrigInv    = purTrigIdx >= 0 ? (r.beg_inv[purTrigIdx] || 0) : 0;
+  var purTrigInv    = purTrigIdx >= 0 ? ((r.ats_sim_beg && r.ats_sim_beg[purTrigIdx]) || 0) : 0;
   var purBufUnits   = PUR_REC_BUFFER_WKS * r.prj_wk;
   var purTarget     = r.opt_oh + purBufUnits;
   var purGap        = Math.max(0, purTarget - purTrigInv);
