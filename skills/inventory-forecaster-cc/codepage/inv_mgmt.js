@@ -763,7 +763,7 @@ var COLS = [
     get:function(r){if(!r.recommendations.length)return'CLEAN';var c={};r.recommendations.forEach(function(rc){c[rc.action]=(c[rc.action]||0)+1;});return Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0];},
     render:function(r){return '<td>'+actionTag(r)+'</td>';} },
   { id:'purchase_rec', label:'Pur Rec', align:'right', numeric:true,
-    tooltip:'Qty to order now so projected inv at Next Avl Rcpt Dt meets Opt OH + 2-week buffer.\nETD = today + (LT Trans Days - Transit Days).',
+    tooltip:'Qty to order now so projected inv at Next Avl Rcpt Dt meets Opt OH target.\nETD = Nxt Avl ETD field (soonest available ETD date).',
     get:function(r){return r.purchase_rec||0;},
     render:function(r){
       if(!r.purchase_rec)return'<td class="right" style="color:#bbb;">&#8212;</td>';
