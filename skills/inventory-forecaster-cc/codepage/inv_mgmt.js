@@ -1784,10 +1784,11 @@ async function boot() {
   try {
     var records=await loadData();
     ALL=records;
-    await saveCache(records);
     setStep(4,'active');setBar(85);setStatus('Building view...');
     await new Promise(function(r){setTimeout(r,50);});
     buildFilterDropdowns();buildTableHead();applyFilters();
+    // Defer cache write until after first render so JSON.stringify doesn't block the UI
+    setTimeout(function(){saveCache(records).catch(function(){});},200);
     var ts=Date.now();
     var asOf=document.getElementById('dataAsOf');
     if(asOf)asOf.textContent='Data as of '+fmtTimestamp(ts);
