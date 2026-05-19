@@ -385,7 +385,7 @@ async function loadData() {
       beg_inv:beg_inv, rcv:rcv, prj:prj,
       opt_wos:optWOS, opt_oh:toNum(g(IF_F.OptOH)),
       next_rcpt_dt:nextRcptDt,
-      lt_trans_days:toNum(g(IF_F.LTTransDays)), transit_days:toNum(g(IF_F.TransitDays)),
+      lt_trans_days:toNum(g(IF_F.LTTransDays)), transit_days:toNum(g(IF_F.TransitDays)), nxt_avl_etd:g(IF_F.NxtAvlETD)||null,
       lt_wks:toNum(g(IF_F.LTWks)), cny_weeks:toNum(g(IF_F.CNYWeeks)), lt_opt_weeks:toNum(g(IF_F.LTOptWeeks)),
       moq:toNum(g(IF_F.MOQ)),
       qty_oh:toNum(g(IF_F.QtyOH)), ats_qty_oh:toNum(g(IF_F.ATSQtyOH)),
