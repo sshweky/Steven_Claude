@@ -1191,14 +1191,26 @@ function toggleDetail(mstyle) {
     dtr.dataset.loaded = '';  // mark as NOT loaded so it re-renders when data arrives
     _detailPromise.then(function() {
       if (dtr.style.display === 'table-row') {
-        dtr.querySelector('td').innerHTML = renderDetail(r);
-        dtr.dataset.loaded = '1';
+        try {
+          dtr.querySelector('td').innerHTML = renderDetail(r);
+          dtr.dataset.loaded = '1';
+        } catch(e) {
+          dtr.querySelector('td').innerHTML = '<div style="padding:20px;color:#c62828;">Error rendering detail panel: ' + esc(String(e)) + '</div>';
+          dtr.dataset.loaded = '1';
+          console.error('[InvMgmt] renderDetail failed:', e);
+        }
       }
     });
     return;
   }
-  dtr.querySelector('td').innerHTML=renderDetail(r);
-  dtr.dataset.loaded='1';
+  try {
+    dtr.querySelector('td').innerHTML = renderDetail(r);
+    dtr.dataset.loaded = '1';
+  } catch(e) {
+    dtr.querySelector('td').innerHTML = '<div style="padding:20px;color:#c62828;">Error rendering detail panel: ' + esc(String(e)) + '</div>';
+    dtr.dataset.loaded = '1';
+    console.error('[InvMgmt] renderDetail failed:', e);
+  }
 }
 
 // Re-render the detail panel for a given mstyle (e.g. after supplier selection or needQty change)
