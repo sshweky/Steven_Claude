@@ -2781,13 +2781,13 @@ function renderPage(page) {
       <td style="color:#6a1b9a">${fmtN(Math.round(r.shpd_wk_l13 || 0))}</td>
       <td>${fmtN(Math.round(r.ord_wk_l4 || 0))}</td>
       <td>${fmtN(Math.round(r.shp_wk))}</td>
-      <td>${fmtN(Math.round(r.proj_wk))}</td>
-      <td style="color:#1565c0;font-weight:600">${fmtN(Math.round(r.ai_wk))}</td>
+      <td id="metric-projwk-${_safeId2}">${fmtN(Math.round(r.proj_wk))}</td>
+      <td id="metric-aiwk-${_safeId2}" style="color:#1565c0;font-weight:600">${fmtN(Math.round(r.ai_wk))}</td>
       <td style="color:#555" title="Average of Suggested W1..W26">${fmtN(Math.round(r.sugg_wk))}</td>
-      <td style="font-size:14px;font-weight:800;color:${aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888'}">${aiVsProj >= 0 ? '+' : ''}${aiVsProj.toFixed(1)}%</td>
-      <td style="text-align:center">${_fcstStatusBadge(r.fcst_status)}</td>
-      <td style="font-size:13px;font-weight:700;color:${!l13Avail ? '#888' : (aiVsL13 > 0 ? '#2e7d32' : aiVsL13 < 0 ? '#c62828' : '#888')}">${l13Avail ? (aiVsL13 >= 0 ? '+' : '') + aiVsL13.toFixed(1) + '%' : ' - '}</td>
-      <td style="font-size:13px;font-weight:700;color:${!l13Avail ? '#888' : (manVsL13 > 0 ? '#2e7d32' : manVsL13 < 0 ? '#c62828' : '#888')}">${l13Avail ? (manVsL13 >= 0 ? '+' : '') + manVsL13.toFixed(1) + '%' : ' - '}</td>
+      <td id="metric-aiproj-${_safeId2}" style="font-size:14px;font-weight:800;color:${aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888'}">${aiVsProj >= 0 ? '+' : ''}${aiVsProj.toFixed(1)}%</td>
+      <td id="metric-fcst-${_safeId2}" style="text-align:center">${_fcstStatusBadge(r.fcst_status)}</td>
+      <td id="metric-ail13-${_safeId2}" style="font-size:13px;font-weight:700;color:${!l13Avail ? '#888' : (aiVsL13 > 0 ? '#2e7d32' : aiVsL13 < 0 ? '#c62828' : '#888')}">${l13Avail ? (aiVsL13 >= 0 ? '+' : '') + aiVsL13.toFixed(1) + '%' : ' - '}</td>
+      <td id="metric-manl13-${_safeId2}" style="font-size:13px;font-weight:700;color:${!l13Avail ? '#888' : (manVsL13 > 0 ? '#2e7d32' : manVsL13 < 0 ? '#c62828' : '#888')}">${l13Avail ? (manVsL13 >= 0 ? '+' : '') + manVsL13.toFixed(1) + '%' : ' - '}</td>
     `;
     tb.appendChild(tr);
 
