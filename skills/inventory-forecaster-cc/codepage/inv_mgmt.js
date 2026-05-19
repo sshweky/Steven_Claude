@@ -664,7 +664,7 @@ function computeDerived(rec, today) {
   // Purchase Recommendation
   // Trigger: projected inventory at Next Avl Rcpt Dt (Wk = ceil(LT_Trans_Days/7)) < Opt_OH + 2-week buffer
   // Order qty: gap rounded up to MOQ, minimum 6 runs (6 x MOQ)
-  // Required ETD: today + (LT_Trans_Days - Transit_Days)
+  // ETD: taken directly from Nxt Avl ETD field (FID 1917)
   rec.purchase_rec = 0;
   rec.purchase_rec_etd = null;
   if (rec.is_replen && rec.prj_wk > 0 && rec.moq > 0 && rec.lt_trans_days > 0 && rec.opt_oh > 0) {
