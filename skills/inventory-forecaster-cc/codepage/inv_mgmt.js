@@ -379,7 +379,9 @@ async function loadData() {
   var today = new Date(); today.setHours(0,0,0,0);
 
   setStep(2,'active'); setBar(10);
-  var ifFieldIds = Object.values(IF_F).concat(IF_BEG, IF_RCV, IF_PRJ, IF_ATS);
+  // Phase 1: scalars + beg_inv + prj only -- enough to compute all main-table columns.
+  // IF_RCV, IF_ATS, and supplier FIDs are loaded in background (phase 2).
+  var ifFieldIds = IF_F_MAIN_FIDS.concat(IF_BEG, IF_PRJ);
   // QB can't filter on formula fields (fid 927) or lookup fields (fid 294), so load all and
   // apply the field-927 Case() formula logic client-side after the pull.
   var ifRowsAll = await qbQueryAll(INVF_TID, ifFieldIds, '', 'Loading Inventory Flow');
