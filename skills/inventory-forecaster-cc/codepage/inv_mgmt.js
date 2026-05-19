@@ -576,20 +576,24 @@ async function loadData() {
 // -- Phase 2: background load of detail-only fields (IF_RCV, IF_ATS, supplier) --
 var _detailPromise = null;
 async function attachDetailData(records) {
-  // Check IDB cache first
+  // Check IDB cache first (stored as JSON string to avoid structured-clone failures)
   try {
-    var cached = await _idb.get(CACHE_KEY_DTL);
-    if (cached && typeof cached.ts === 'number' && cached.map &&
-        Date.now() - cached.ts <= CACHE_TTL) {
-      _applyDetailMap(records, cached.map);
-      console.info('[InvMgmt] detail data loaded from IDB cache');
-      return;
+    var rawDtl = await _idb.get(CACHE_KEY_DTL);
+    if (typeof rawDtl === 'string') {
+      var cachedDtl = JSON.parse(rawDtl, _jsonDes);
+      if (cachedDtl && typeof cachedDtl.ts === 'number' && cachedDtl.map &&
+          Date.now() - cachedDtl.ts <= CACHE_TTL) {
+        _applyDetailMap(records, cachedDtl.map);
+        console.info('[InvMgmt] detail data loaded from IDB cache');
+        return;
+      }
     }
   } catch(_) {}
 
   // Fresh pull: mstyle + IF_RCV + IF_ATS + supplier FIDs
+  // Use same pre-filter as main load to avoid pulling 12K+ rows
   var detailFids = [IF_F.Mstyle].concat(IF_RCV, IF_ATS, IF_SUPP_FIDS);
-  var rows = await qbQueryAll(INVF_TID, detailFids, '', 'Loading detail data');
+  var rows = await qbQueryAll(INVF_TID, detailFids, IF_PRE_FILTER, 'Loading detail data');
   var map = {};
   rows.forEach(function(row) {
     var gv = function(fid) { return (row[fid]||{}).value; };
