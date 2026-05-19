@@ -1294,9 +1294,25 @@ function _buildPogBlockHtml(r) {
           <b>Store count:</b>
           <input type="number" min="0" step="1" id="store-count-${safeKey}" value="${stores || ''}"
                  onchange="saveStoreCount('${safeKey}',this.value,this)"
-                 title="Click to edit  -  autosaves on change"
+                 title="Autosaves on change"
                  placeholder="0"
                  style="font-size:11px;padding:2px 6px;border:1px solid #c7e2bf;border-radius:3px;background:#fff;color:#2e4f24;font-family:inherit;margin-left:4px;width:80px;">
+        </div>
+        <div>
+          <b>Estimated ISO:</b>
+          <input type="number" min="0" step="1" id="est-iso-input-${safeKey}" value="${estIsoInput || ''}"
+                 onchange="saveEstIsoInput('${safeKey}',this.value,this)"
+                 title="Expected initial stocking order qty the customer will place (~4 wks before POG). Used by AI forecaster for ramp projections."
+                 placeholder="0"
+                 style="font-size:11px;padding:2px 6px;border:1px solid #c7e2bf;border-radius:3px;background:#fff;color:#2e4f24;font-family:inherit;margin-left:4px;width:90px;">
+        </div>
+        <div>
+          <b>Initial UPSPW:</b>
+          <input type="number" min="0" step="0.01" id="init-upspw-${safeKey}" value="${initUpspw || ''}"
+                 onchange="saveInitUpspw('${safeKey}',this.value,this)"
+                 title="Baseline units-per-store-per-week before sales history is available. AI uses this for weeks 1-4 ramp projections."
+                 placeholder="0"
+                 style="font-size:11px;padding:2px 6px;border:1px solid #c7e2bf;border-radius:3px;background:#fff;color:#2e4f24;font-family:inherit;margin-left:4px;width:70px;">
         </div>
         <div><b>Master pack:</b> ${mp.toLocaleString()}/case</div>
         ${estIso ? `<div><b>QB Est. ISO Qty:</b> ${estIso.toLocaleString()}</div>` : ''}
