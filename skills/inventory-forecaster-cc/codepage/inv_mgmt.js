@@ -56,7 +56,22 @@ var IF_F = {
   SizeCt:533, Fragrance:589, PvtLblExcl:1795, CommitItem:1515, InnerPack:1023, MasterPack:929,
   UPC:1915, GTIN:1916,
   OOSDates:262, OverCommittedQty:448, OvrComtWOS:444, InvtryAgeDays:1269,
-  AgedInv090:1308, AgedInv91180:1310, AgedInv181365:1312, AgedInv365plus:1314, PctTimeInStock:1232
+  AgedInv090:1308, AgedInv91180:1310, AgedInv181365:1312, AgedInv365plus:1314, PctTimeInStock:1232,
+  // Main supplier
+  SupplierInfo:1830, FOBCost:220, ELC_NJ:1028, ELC_LA:1026,
+  MU_NJ:1809, MU_LA:1810, QtyOrdSupplier:1833, PctUnitsOrdSupplier:1834,
+  // Alt Supplier 1
+  Alt1Name:1702, Alt1FOB:1705, Alt1MOQ:1708, Alt1LT:1711,
+  Alt1ELC_NJ:1816, Alt1ELC_LA:1813, Alt1MU_NJ:1819, Alt1MU_LA:1822,
+  Alt1QtyOrd:1835, Alt1PctOrd:1838,
+  // Alt Supplier 2
+  Alt2Name:1703, Alt2FOB:1706, Alt2MOQ:1709, Alt2LT:1712,
+  Alt2ELC_NJ:1817, Alt2ELC_LA:1814, Alt2MU_NJ:1820, Alt2MU_LA:1823,
+  Alt2QtyOrd:1836, Alt2PctOrd:1839,
+  // Alt Supplier 3
+  Alt3Name:1704, Alt3FOB:1707, Alt3MOQ:1710, Alt3LT:1713,
+  Alt3ELC_NJ:1818, Alt3ELC_LA:1815, Alt3MU_NJ:1821, Alt3MU_LA:1824,
+  Alt3QtyOrd:1837, Alt3PctOrd:1840
 };
 var IF_BEG = [134,8,9,10,110,111,112,113,114,115,116,117,118,128,129,130,131,120,121,122,123,124,125,126,127,119];
 var IF_RCV = [28,35,36,50,51,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85];
