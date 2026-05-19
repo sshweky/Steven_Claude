@@ -1243,31 +1243,158 @@ function renderDetail(r) {
   Object.keys(poByWeek).forEach(function(wi){poByWeek[wi].forEach(function(p){var action=recByPo[p.po_number];if(action&&(!weekAction[wi]||action==='PULL_UP'))weekAction[wi]=action;});});
   function rcvHL(wi){var a=weekAction[wi];if(a==='PUSH_OUT')return'background:#fff3e0;color:#e65100;font-weight:600;';if(a==='PULL_UP')return'background:#e3f2fd;color:#1565c0;font-weight:600;';return null;}
 
-  // 26-week grid
-  var invFlow='<table class="subtbl grid26"><tr style="background:#ede9fe;"><th class="lbl" style="background:#ede9fe;"></th>';
-  for(var i=1;i<=26;i++){var s=new Date(w1sun.getTime()+(i-1)*7*86400000);var lbl=(s.getMonth()+1)+'/'+s.getDate();invFlow+='<th title="W'+i+' - week of '+s.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'">'+lbl+'</th>';}
-  invFlow+='<th>Total</th></tr>';
-
-  function renderRow(label,arr,hoverFn,hlFn,rowBg,showTotal){
-    var rStyle=rowBg?' style="background:'+rowBg+';"':'';
-    var html='<tr'+rStyle+'><td class="lbl"'+(rowBg?' style="background:'+rowBg+';"':'')+'>'+label+'</td>';var tot=0;
-    for(var i=0;i<26;i++){
-      var v=arr[i]||0;tot+=v;var c=v<0?'neg':'ok';
-      var styleStr='',extra='';
-      if(hoverFn){var tip=hoverFn(i);if(tip){extra+=' title="'+tip.replace(/"/g,'&quot;')+'"';styleStr+='cursor:help;';}}
-      if(hlFn){var hl=hlFn(i);if(hl)styleStr+=hl;}
-      var sa=styleStr?' style="'+styleStr+'"':'';
-      html+='<td class="'+c+'"'+extra+sa+'>'+(v===0?'&#8212;':fmt(v))+'</td>';
+  // -- Forward-simulation WOS (matches Forecast Manager viewer logic) ---------
+  // Simulates week-by-week depletion so spike weeks don't distort WOS.
+  function _wosForward(bv, prj, startIdx) {
+    if (!bv || bv <= 0 || !prj) return 0;
+    var inv = bv, j;
+    for (j = startIdx; j < prj.length; j++) {
+      var d = prj[j] || 0;
+      if (d > 0) {
+        if (inv <= d) return (j - startIdx) + (inv / d);
+        inv -= d;
+      }
     }
-    html+='<td>'+(showTotal===false?'':'<b>'+fmt(tot)+'</b>')+'</td></tr>';return html;
+    return prj.length - startIdx;
   }
-  invFlow+=renderRow('Beg Inv',r.beg_inv,null,null,'#dbeafe',false);
-  invFlow+=renderRow('Expected Receipts',r.rcv,fmtPoHover,rcvHL,'#dcfce7');
-  invFlow+=renderRow('Prj Demand',r.prj,fmtPrjHover,null,'#fef9c3');
-  var wosRow='<tr style="background:#fce7f3;"><td class="lbl" style="background:#fce7f3;">WOS OH</td>';
-  for(var i=0;i<26;i++){var b=r.beg_inv[i]||0,p=r.prj[i]||0;var v='&#8212;',cls='ok';if(p>0){var w=b/p;v=w.toFixed(1);if(w<r.opt_wos)cls='gap';if(w<0)cls='neg';}else if(b>0){v='&#8734;';}wosRow+='<td class="'+cls+'">'+v+'</td>';}
-  wosRow+='<td></td></tr>';
-  invFlow+=wosRow+'</table>';
+
+  // -- Gap pre-compute: weeks below Opt WOS before next receipt ---------------
+  var _ifOptWos = r.opt_wos || 0;
+  var _ifGap = { weeks: [], nextRcptWeekIdx: -1, nextRcptDate: null };
+  if (r.is_replen && _ifOptWos > 0) {
+    var _nrDate = r.next_rcpt_dt || null;  // already a Date object (set in loadData)
+    var _nrIdx  = _nrDate ? wkIdxForDate(today, _nrDate) : 25;
+    _ifGap.nextRcptDate    = _nrDate;
+    _ifGap.nextRcptWeekIdx = _nrIdx;
+    var _checkUntil = (_nrIdx < 0) ? -1 : Math.min(25, _nrIdx);
+    for (var gi = 0; gi <= _checkUntil; gi++) {
+      var _gbv  = r.beg_inv[gi] || 0;
+      var _gwos = _wosForward(_gbv, r.prj, gi);
+      if (_gbv <= 0 || _gwos < _ifOptWos) {
+        _ifGap.weeks.push({ wi: gi + 1, wos: _gwos, deficit: _ifOptWos - _gwos });
+      }
+    }
+  }
+
+  // -- 26-week grid (Forecast Manager style: per-cell coloring + gap flags) ---
+  var _invFmt1 = function(n) {
+    if (n == null || !isFinite(n)) return ' - ';
+    return n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  };
+  var _mpLow  = r.master_pack || 1;
+  var _lowThr = _mpLow * 2;
+
+  var begCells = '<td class="lbl" style="color:#6d4c00;font-weight:600;background:#fffbea" title="Beginning-of-week projected warehouse inventory (Wk1..Wk26)">Beg Inv</td>';
+  var prjCells = '<td class="lbl" style="color:#2e7d32;font-weight:600;background:#f1f8e9" title="Projected demand this week (Prj Wk1..Prj Wk26) - hover for customer breakdown">Prj Demand</td>';
+  var rcvCells = '<td class="lbl" style="color:#1565c0;font-weight:600;background:#f0f7ff" title="Expected supplier receipts that week (RcvWk1..RcvWk26) - hover for PO detail">Expected Receipts</td>';
+  var opnCells = '<td class="lbl" style="color:#00695c;font-weight:600;background:#e0f2f1" title="Open supplier PO qty landing this week (I/T + I/W by warehouse ETA)">Open Supplier POs</td>';
+  var wosCells = '<td class="lbl" style="color:#4a148c;font-weight:600;background:#f8f0fb" title="Weeks of Supply Onhand: forward simulation from Beg Inv over projected demand">WOS OH</td>';
+  var begTot = 0, prjTot = 0, rcvTot = 0, opnTot = 0;
+
+  for (var i = 0; i < 26; i++) {
+    // -- Beg Inv: color-coded by health vs projected demand --
+    var bv = r.beg_inv[i] || 0;
+    begTot += bv;
+    var prjThisWk = r.prj[i] || 0;
+    var begClr = '#6d4c00';
+    if      (bv < 0)                                          begClr = '#c62828';
+    else if (bv === 0 && prjThisWk > 0)                       begClr = '#c62828';
+    else if (bv > 0 && bv < _lowThr && prjThisWk > 0)         begClr = '#e65100';
+    else if (bv === 0)                                         begClr = '#bbb';
+    begCells += '<td style="color:'+begClr+';font-size:10px;background:#fffbea">'+fmt(Math.round(bv))+'</td>';
+
+    // -- Prj Demand: show dash for zero, tooltip with customer breakdown --
+    var pv = r.prj[i] || 0;
+    prjTot += pv;
+    var prjClr = pv > 0 ? '#2e7d32' : '#bbb';
+    var prjTip = fmtPrjHover(i);
+    var prjTA  = prjTip ? ' title="'+prjTip.replace(/"/g,'&quot;')+'"' : '';
+    prjCells += '<td style="color:'+prjClr+';font-size:10px;background:#f1f8e9;'+(pv>0?'cursor:help;':'')+'"'+prjTA+'>'+(pv>0?fmt(Math.round(pv)):'&#8212;')+'</td>';
+
+    // -- Expected Receipts: hover = PO detail; PUSH_OUT/PULL_UP highlighting --
+    var rv = r.rcv[i] || 0;
+    rcvTot += rv;
+    var rcvClr = rv > 0 ? '#1565c0' : '#bbb';
+    var rcvTip = fmtPoHover(i);
+    var rcvTA  = rcvTip ? ' title="'+rcvTip.replace(/"/g,'&quot;')+'"' : '';
+    var rcvHlS = rcvHL(i) || '';
+    rcvCells += '<td style="color:'+rcvClr+';font-size:10px;background:#f0f7ff;'+(rcvTip?'cursor:help;':'')+rcvHlS+'"'+rcvTA+'>'+(rv>0?fmt(rv):'&#8212;')+'</td>';
+
+    // -- Open Supplier POs: I/T + I/W quantities landing this week by ETA --
+    var opnQty = 0;
+    var opnPos = poByWeek[i] || [];
+    for (var opi = 0; opi < opnPos.length; opi++) {
+      opnQty += (opnPos[opi].in_transit_qty || 0) + (opnPos[opi].in_work_qty || 0);
+    }
+    opnTot += opnQty;
+    opnCells += '<td style="color:'+(opnQty>0?'#00695c':'#bbb')+';font-size:10px;background:#e0f2f1;">'+(opnQty>0?fmt(opnQty):'&#8212;')+'</td>';
+
+    // -- WOS OH: forward simulation; gap weeks highlighted in red --
+    var wosVal, wosTxt, wosClr, wosCellBg = '#f8f0fb';
+    if (bv > 0) {
+      wosVal = _wosForward(bv, r.prj, i);
+      var maxWks = 26 - i;
+      if (wosVal >= maxWks) {
+        wosTxt = _invFmt1(wosVal); wosClr = '#1b5e20';
+      } else {
+        wosTxt = _invFmt1(wosVal);
+        if      (wosVal < 1)                               wosClr = '#c62828';
+        else if (wosVal < _ifOptWos && _ifOptWos > 0)      wosClr = '#e65100';
+        else if (wosVal < 4)                               wosClr = '#e65100';
+        else                                               wosClr = '#4a148c';
+      }
+    } else {
+      wosVal = 0; wosTxt = ' - '; wosClr = '#bbb';
+    }
+    var isGapWk = _ifOptWos > 0 && _ifGap.nextRcptWeekIdx >= 0
+      && i <= Math.min(25, _ifGap.nextRcptWeekIdx) && bv > 0 && wosVal < _ifOptWos;
+    if (isGapWk) { wosCellBg = '#ffebee'; wosClr = '#c62828'; }
+    var wosXtra = isGapWk ? ' title="Gap: WOS '+_invFmt1(wosVal)+' &lt; Opt WOS '+_invFmt1(_ifOptWos)+'"' : '';
+    var wosBold = (isGapWk || (bv > 0 && wosVal < 4)) ? 700 : 400;
+    wosCells += '<td style="color:'+wosClr+';font-size:10px;background:'+wosCellBg+';font-weight:'+wosBold+'"'+wosXtra+'>'+wosTxt+'</td>';
+  }
+
+  // Total cells (WOS total is not meaningful so leave as dash)
+  begCells += '<td style="font-weight:700;color:#6d4c00;background:#fffbea">'+fmt(Math.round(begTot))+'</td>';
+  prjCells += '<td style="font-weight:700;color:#2e7d32;background:#f1f8e9">'+fmt(Math.round(prjTot))+'</td>';
+  rcvCells += '<td style="font-weight:700;color:#1565c0;background:#f0f7ff">'+fmt(Math.round(rcvTot))+'</td>';
+  opnCells += '<td style="font-weight:700;color:#00695c;background:#e0f2f1">'+fmt(opnTot)+'</td>';
+  wosCells += '<td style="color:#bbb;background:#f8f0fb" title="WOS total not meaningful"> - </td>';
+
+  // Header row with MM/DD week dates
+  var ifHdr = '<th class="lbl" style="background:#ede9fe;"></th>';
+  for (var i = 1; i <= 26; i++) {
+    var s = new Date(w1sun.getTime() + (i-1)*7*86400000);
+    var lbl = (s.getMonth()+1)+'/'+s.getDate();
+    ifHdr += '<th title="W'+i+' - week of '+s.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'">'+lbl+'</th>';
+  }
+  ifHdr += '<th>Total</th>';
+
+  var invFlow = '<table class="subtbl grid26"><tr style="background:#ede9fe;">'+ifHdr+'</tr>'
+    +'<tr>'+begCells+'</tr>'
+    +'<tr>'+prjCells+'</tr>'
+    +'<tr>'+rcvCells+'</tr>'
+    +'<tr>'+opnCells+'</tr>'
+    +'<tr>'+wosCells+'</tr>'
+    +'</table>';
+
+  // Gap banner (placed outside the overflow-x:auto scroll div -- see return statement)
+  var invGapBanner = '';
+  if (_ifOptWos > 0 && r.is_replen) {
+    var _optStr = _invFmt1(_ifOptWos);
+    var _nrStr  = _ifGap.nextRcptDate
+      ? _ifGap.nextRcptDate.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+      : 'unknown';
+    var _nrWkStr = (_ifGap.nextRcptWeekIdx >= 0 && _ifGap.nextRcptWeekIdx <= 25)
+      ? '(W'+(_ifGap.nextRcptWeekIdx+1)+')' : (_ifGap.nextRcptWeekIdx > 25 ? '(beyond W26)' : '');
+    if (_ifGap.weeks.length === 0) {
+      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;font-size:11px;color:#1b5e20;">&#10003; <b>No gaps:</b> all weeks through next receipt '+_nrStr+' '+_nrWkStr+' maintain '+_optStr+' WOS (Opt WOS).</div>';
+    } else {
+      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;font-size:11px;color:#b71c1c;">&#x26a0; <b>Inventory Gap:</b> '+_ifGap.weeks.length+' week'+(_ifGap.weeks.length===1?'':'s')+' below Opt WOS ('+_optStr+') before next receipt '+_nrStr+' '+_nrWkStr+'. Moving up open POs may close this gap.</div>';
+    }
+  } else if (!r.is_replen) {
+    invGapBanner = '<div style="margin-top:6px;padding:4px 10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;color:#888;font-style:italic;">Gap analysis only runs on Replen items (Status: '+esc(r.item_status_flow||'unknown')+').</div>';
+  }
 
   // Open POs
   var pos='<table class="subtbl"><tr><th>PO #</th><th>Supplier</th><th class="right">I/T</th><th class="right">I/W</th><th>ETD</th><th>ETA</th><th class="right">Transit</th><th>Status</th></tr>';
