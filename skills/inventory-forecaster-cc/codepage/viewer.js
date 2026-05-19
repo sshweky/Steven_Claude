@@ -1629,6 +1629,7 @@ function adaptRow(row) {
     cust:              _stripHtml(str(row, F.CUST)),
     desc:              str(row, F.DESCRIPTION),
     asin_status:       str(row, F.STATUS_CUST),
+    is_seasonal:       is_seasonal,
     item_status:       str(row, F.ITEM_STATUS),
     inv_manager:       str(row, F.INV_MGR_NAME),
     inv_manager_email: ((row[F.INV_MGR_USER] && row[F.INV_MGR_USER].value && row[F.INV_MGR_USER].value.email) || ''),
