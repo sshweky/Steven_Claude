@@ -4062,10 +4062,11 @@ async function loadCommentHistory(key, force) {
           const rid    = (r[F.RECORD_ID]    && r[F.RECORD_ID].value)    || 0;
           const isReply     = flag === 'Planner Response';
           const isToPlanner = flag === 'Needs Action';
+          const isMgrResp   = flag === 'Manager Response';
           const isFyi       = flag === 'FYI';
-          const borderColor = isFyi ? '#9e9e9e' : (isReply ? '#00695c' : (isToPlanner ? '#1565c0' : '#8b2252'));
-          const bgColor     = isFyi ? '#fafafa'  : (isReply ? '#f1faf9'  : (isToPlanner ? '#e8f0fe' : '#fdf7fa'));
-          // "From: Author → To: Recipient" header line — omitted for FYI (no directed recipient)
+          const borderColor = isFyi ? '#9e9e9e' : (isReply ? '#00695c' : (isToPlanner ? '#1565c0' : (isMgrResp ? '#e65100' : '#8b2252')));
+          const bgColor     = isFyi ? '#fafafa'  : (isReply ? '#f1faf9'  : (isToPlanner ? '#e8f0fe' : (isMgrResp ? '#fff8f0' : '#fdf7fa')));
+          // "From: Author -> To: Recipient" header line -- omitted for FYI (no directed recipient)
           const fromPart   = (!isFyi && author) ? `<b style="color:${borderColor}">${escHtml(author)}</b>` : (isFyi && author ? `<span style="color:#757575">${escHtml(author)}</span>` : '');
           const toPart     = (!isFyi && sendTo) ? ` <span style="color:#888">-&gt;</span> <b style="color:${borderColor}">${escHtml(sendTo)}</b>` : '';
           const authorLine = (fromPart || toPart) ? `${fromPart}${toPart} &middot; ` : '';
@@ -4075,10 +4076,16 @@ async function loadCommentHistory(key, force) {
               ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e0f2f1;color:#00695c;margin-left:6px;vertical-align:middle;">Planner Response</span>`
               : isToPlanner
                 ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">Needs Action</span>`
-                : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
+                : isMgrResp
+                  ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#e65100;margin-left:6px;vertical-align:middle;">Manager Response</span>`
+                  : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
+          // "Mark Reviewed" only appears on Planner Response bubbles (director action)
+          // "Mark Read" appears on Manager Response bubbles (planner acknowledges)
           const reviewBtn = isReply
             ? `<button onclick="markReviewed('${key.replace(/'/g,"\\'")}', ${rid}, this)" style="font-size:10px;padding:2px 8px;background:#e0f2f1;color:#00695c;border:1px solid #00695c;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Reviewed</button>`
-            : '';
+            : isMgrResp
+              ? `<button onclick="markMgrResponseRead('${key.replace(/'/g,"\\'")}', ${rid}, this)" style="font-size:10px;padding:2px 8px;background:#fff3e0;color:#e65100;border:1px solid #e65100;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Read</button>`
+              : '';
           return `
             <div style="padding:6px 6px 6px 10px;margin-bottom:4px;border-left:3px solid ${borderColor};background:${bgColor};border-radius:0 4px 4px 0;">
               <div style="font-size:10px;color:#888;font-weight:600;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
