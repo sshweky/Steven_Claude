@@ -1,0 +1,1 @@
+{"agentType":"general-purpose","description":"Refactor inv_mgmt.js to use two-phase loading + IndexedDB caching"}

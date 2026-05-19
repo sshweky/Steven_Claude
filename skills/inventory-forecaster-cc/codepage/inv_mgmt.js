@@ -17,8 +17,10 @@ var QB_REALM  = 'pim.quickbase.com';
 var QB_TOKEN  = 'QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s';
 var INVF_TID  = 'bpsaju5pm';
 var PROJ_TID  = 'bpd237tvm';
-var CACHE_KEY = 'pp_inv_mgmt_codepage_v2';
-var CACHE_TTL = 6 * 60 * 60 * 1000;
+var CACHE_KEY     = 'pp_inv_mgmt_v3';          // main (phase 1) IDB key
+var CACHE_KEY_DTL = 'pp_inv_mgmt_dtl_v3';      // detail (phase 2) IDB key
+var CACHE_KEY_SS  = 'pp_inv_mgmt_ss_v3';       // sessionStorage fast-path key
+var CACHE_TTL     = 24 * 60 * 60 * 1000;       // 24h (was 6h)
 
 var OPT_WOS_DEFAULT       = 4.0;
 var PUR_REC_BUFFER_WKS    = 4;     // extra weeks of demand added to Opt_OH as reorder buffer (~monthly reorder cycle)
