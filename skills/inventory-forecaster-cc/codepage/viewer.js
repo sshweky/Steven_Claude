@@ -3903,6 +3903,7 @@ async function loadCommentHistory(key, force) {
           const flag   = (r[F.FLAG]         && r[F.FLAG].value)         || '';
           const author = (r[F.AUTHOR]       && r[F.AUTHOR].value)       || '';
           const sendTo = (F.SEND_TO && r[F.SEND_TO] && r[F.SEND_TO].value) || '';
+          const rid    = (r[F.RECORD_ID]    && r[F.RECORD_ID].value)    || 0;
           const isReply     = flag === 'Planner Response';
           const isToPlanner = flag === 'Needs Action';
           const isFyi       = flag === 'FYI';
