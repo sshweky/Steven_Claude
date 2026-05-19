@@ -9885,10 +9885,17 @@ def main():
             if m:
                 _man_prj_fids[int(m.group(1))] = fid
         _auto_proj_count = sum(1 for r in to_write if r.get("auto_project"))
+        _w1_po_count     = sum(1 for r in to_write
+                               if (r.get("opn_w") or [0])[0] > 0)
         if _auto_proj_count:
             print(f"      Auto Project: {_auto_proj_count} records will have manual projections replaced with AI values")
             if len(_man_prj_fids) < 26:
                 print(f"      [WARN] Auto Project: only {len(_man_prj_fids)} MAN PRJ week FIDs found (expected 26) — partial copy")
+        if _w1_po_count:
+            print(f"      W1 PO zero-out: {_w1_po_count} records have an open PO in W1 — MAN PRJ W1 will be set to 0")
+        _man_w1_fid = _man_prj_fids.get(1)   # FID for the current MAN PRJ W1 column
+        if _w1_po_count and not _man_w1_fid:
+            print(f"      [WARN] W1 PO zero-out: MAN PRJ W1 FID not found in field map — skipping")
         payload = []
         for rec in to_write:
             row = {merge_fid: rec["key"], ai_alert_fid: _sanitize_for_qb(rec.get("alert", ""))}
@@ -9901,6 +9908,12 @@ def main():
                 for wk, fid in _man_prj_fids.items():
                     idx = wk - 1
                     row[fid] = int(round(rec["forecast"][idx])) if idx < len(rec["forecast"]) else 0
+            # W1 PO zero-out: if there is an open customer PO in W1, set MAN PRJ W1 = 0.
+            # The customer has already committed — the manual projection is redundant
+            # and causes double-counting in inventory planning.  W2-W26 are untouched.
+            _opn_w = rec.get("opn_w") or []
+            if _man_w1_fid and _opn_w and _opn_w[0] > 0:
+                row[_man_w1_fid] = 0
             payload.append(row)
         n_ok, n_fail, errors = qb_bulk_update(QB_PROJ_TABLE, payload, merge_fid)
         # Track completed keys: assume in-order success for the batches that returned OK.
