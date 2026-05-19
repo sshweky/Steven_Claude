@@ -1171,23 +1171,28 @@ function renderDetail(r) {
   if (!r.is_replen || r.prj_wk <= 0 || r.moq <= 0 || r.lt_trans_days <= 0 || r.opt_oh <= 0) {
     purRecSection = '';
   } else if (r.purchase_rec > 0) {
+    var purETDLabel = r.purchase_rec_push_supplier
+      ? '<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b> <span style="color:#c62828;font-size:10px;font-weight:700;">&#9888; PUSH SUPPLIER</span>'
+      : (r.purchase_rec_etd ? '<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b>' : '&#8212;');
     purRecSection = '<div class="section"><h3>&#128722; Purchase Recommendation</h3>'
       +'<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">'
       +kvBox('New Order Required',
         kvRow('Recommended Qty','<b style="font-size:16px;color:#1a237e;">'+fmtInt(r.purchase_rec)+'</b> units')
-        +kvRow('Nxt Avl ETD',r.purchase_rec_etd?'<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b>':'&#8212;')
+        +kvRow('Required ETD', purETDLabel)
+        +kvRow('Receipt Needed By',r.purchase_rec_receipt_date?'<b>'+fmtDate(r.purchase_rec_receipt_date)+'</b>':'&#8212;')
         +kvRow('MOQ (floor)',fmtInt(r.moq)+' units'),
         '#fff3e0','1')
       +kvBox('Calculation',
-        kvRow('Receipt Week','Wk '+purRcptWk+' (ceil('+r.lt_trans_days+'d / 7))')
-        +kvRow('Prj Inv at Wk '+purRcptWk,fmtInt(purPrjAtRcpt)+' units')
-        +kvRow('Target (Opt OH)',fmtInt(purTarget)+' units')
-        +kvRow('Gap to Target',fmtInt(purGap)+' units'),
+        kvRow('Trigger Week','Wk '+purTrigWk+' (first dip below Opt OH)')
+        +kvRow('Prj Inv at Wk '+purTrigWk,fmtInt(purTrigInv)+' units')
+        +kvRow('Opt OH Target',fmtInt(r.opt_oh)+' units')
+        +kvRow('Gap (order qty)',fmtInt(purGap)+' units')
+        +kvRow('Req ETD formula','Receipt ('+fmtDate(r.purchase_rec_receipt_date)+') - '+r.lt_trans_days+'d LT'),
         '#f3e5f5','1')
       +'</div></div>';
   } else {
     purRecSection = '<div class="section"><h3>&#128722; Purchase Recommendation</h3>'
-      +'<div style="color:#1b5e20;font-style:italic;">&#10003; No new order needed - Wk '+purRcptWk+' projected inventory ('+fmtInt(purPrjAtRcpt)+' units) meets Opt OH target ('+fmtInt(purTarget)+' units).</div>'
+      +'<div style="color:#1b5e20;font-style:italic;">&#10003; No new order needed - projected inventory stays above Opt OH ('+fmtInt(r.opt_oh)+' units) through the 26-week window.</div>'
       +'</div>';
   }
 
