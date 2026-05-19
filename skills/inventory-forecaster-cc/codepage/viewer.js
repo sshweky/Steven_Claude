@@ -3060,12 +3060,19 @@ async function toggleDetail(key) {
       if (_prj) {
         const pv = _prj[i] || 0;
         prjTot += pv;
-        const color  = pv > 0 ? '#2e7d32' : '#bbb';
-        const custLbl = (r.cust || r.acct_txt || '').replace(/"/g, '&quot;');
-        const tipText = custLbl
-          ? `${custLbl}: ${fmtN(Math.round(pv))} units projected`
-          : `${fmtN(Math.round(pv))} units projected`;
-        prjCells += `<td style="color:${color};font-size:10px;background:#f1f8e9;${pv > 0 ? 'cursor:help;' : ''}" title="${tipText}">${pv > 0 ? fmtN(Math.round(pv)) : '&mdash;'}</td>`;
+        const color = pv > 0 ? '#2e7d32' : '#bbb';
+        // Build per-customer breakdown from ALL_RECORDS for this mstyle
+        const custLines = ALL_RECORDS
+          .filter(x => x.mstyle === r.mstyle && x.weeks_slim && x.weeks_slim[i])
+          .map(x => {
+            const wv = Math.round(x.weeks_slim[i].ai_proj || x.weeks_slim[i].projection || 0);
+            return wv > 0 ? (x.cust || x.acct_txt || x.key) + ': ' + fmtN(wv) : null;
+          })
+          .filter(Boolean);
+        const tipText = custLines.length
+          ? custLines.join('\n') + '\n\nTotal: ' + fmtN(Math.round(pv))
+          : fmtN(Math.round(pv)) + ' units projected';
+        prjCells += `<td style="color:${color};font-size:10px;background:#f1f8e9;${pv > 0 ? 'cursor:help;' : ''}" title="${tipText.replace(/"/g, '&quot;')}">${pv > 0 ? fmtN(Math.round(pv)) : '&mdash;'}</td>`;
       } else {
         prjCells += `<td style="color:#bbb;font-size:10px;background:#f1f8e9"> - </td>`;
       }
