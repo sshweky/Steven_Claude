@@ -434,7 +434,8 @@ async function loadData() {
       manual_demand_26w:manDem26w, customer_demand:custDemand, demand_26w:0,
       pipeline_total:0, oh_excess:0, pipeline_excess:0, pipeline_wos:0,
       gap_weeks:[], overstocked:false, stock_status:'', recommendations:[], priority:'LOW', flag:'',
-      purchase_rec:0, purchase_rec_etd:null
+      purchase_rec:0, purchase_rec_etd:null, purchase_rec_push_supplier:false,
+      purchase_rec_receipt_date:null, purchase_rec_trigger_idx:-1
     };
 
     computeDerived(rec, today);
