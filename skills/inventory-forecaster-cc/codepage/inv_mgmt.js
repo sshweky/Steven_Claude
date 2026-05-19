@@ -36,6 +36,51 @@ var OVERSTOCK_WOS_TH      = 33;
 var MIN_PULLUP_DAYS       = 7;
 var MIN_RESOLVED_GAP_DEF  = 1.0;
 
+// -- IndexedDB cache (no quota limits, survives browser restart) ---------------
+var _idb = (function() {
+  var _db = null; var STORE = 'kv';
+  function _open() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise(function(res, rej) {
+      var req = indexedDB.open('pp_inv_mgmt_idb_v1', 1);
+      req.onupgradeneeded = function(e) { e.target.result.createObjectStore(STORE); };
+      req.onsuccess = function(e) { _db = e.target.result; res(_db); };
+      req.onerror   = function(e) { rej(e.target.error); };
+    });
+  }
+  return {
+    get: function(key) {
+      return _open().then(function(db) {
+        return new Promise(function(res, rej) {
+          var tx = db.transaction(STORE,'readonly');
+          var req = tx.objectStore(STORE).get(key);
+          req.onsuccess = function() { res(req.result||null); };
+          req.onerror   = function(e) { rej(e.target.error); };
+        });
+      });
+    },
+    set: function(key, val) {
+      return _open().then(function(db) {
+        return new Promise(function(res, rej) {
+          var tx = db.transaction(STORE,'readwrite');
+          var req = tx.objectStore(STORE).put(val, key);
+          req.onsuccess = function() { res(); };
+          req.onerror   = function(e) { rej(e.target.error); };
+        });
+      });
+    },
+    del: function(key) {
+      return _open().then(function(db) {
+        return new Promise(function(res) {
+          var tx = db.transaction(STORE,'readwrite');
+          tx.objectStore(STORE).delete(key);
+          tx.oncomplete = res; tx.onerror = res;
+        });
+      }).catch(function(){});
+    }
+  };
+})();
+
 // -- Field ID maps -------------------------------------------------------------
 var IF_F = {
   Mstyle:20, Country:223, ItemStatus:294, SubStatus:297, Season:1068, ItemRank:1573,
