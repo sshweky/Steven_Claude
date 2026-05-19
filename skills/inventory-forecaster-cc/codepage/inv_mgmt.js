@@ -1603,7 +1603,7 @@ async function boot() {
 }
 
 async function forceRefresh() {
-  clearCache();
+  await clearCache();
   ALL=[];FILTERED=[];
   document.getElementById('tbody').innerHTML='';
   document.getElementById('statsBar').innerHTML='';
