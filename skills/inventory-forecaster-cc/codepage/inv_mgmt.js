@@ -1528,11 +1528,13 @@ function renderDetail(r) {
       +'<div class="age-card-pct">'+pct+' of total</div>'
       +'</div>';
   }
-  var ageHeader='<div style="display:flex;align-items:center;gap:18px;margin-bottom:10px;">'
-    +'<div><span style="font-size:11px;color:#666;">Avg Inv Age</span><div style="font-size:22px;font-weight:700;color:'+(r.invtry_age_days>180?'#c62828':r.invtry_age_days>90?'#e65100':'#1565c0')+'">'+Math.round(r.invtry_age_days||0)+' <span style="font-size:13px;font-weight:400;color:#888;">days</span></div></div>'
-    +'<div><span style="font-size:11px;color:#666;">Total Aged Inv</span><div style="font-size:22px;font-weight:700;color:#333;">'+fmt(totalAged)+' <span style="font-size:13px;font-weight:400;color:#888;">units</span></div></div>'
-    +'</div>';
-  var agedInvHtml=ageHeader+'<div class="age-cards">'
+  var _ageClr=r.invtry_age_days>180?'#c62828':r.invtry_age_days>90?'#e65100':'#1565c0';
+  var agedInvHtml='<div class="age-cards">'
+    +'<div class="age-card" style="background:#f0f4ff;">'
+    +'<div class="age-card-lbl">Avg Inv Age</div>'
+    +'<div class="age-card-val" style="color:'+_ageClr+'">'+Math.round(r.invtry_age_days||0)+'</div>'
+    +'<div class="age-card-pct">days</div>'
+    +'</div>'
     +ageCard('0 - 90 Days',r.aged_inv_0_90,agePct(r.aged_inv_0_90),'#f0fdf4','#15803d')
     +ageCard('91 - 180 Days',r.aged_inv_91_180,agePct(r.aged_inv_91_180),'#fff7ed',(r.aged_inv_91_180>0?'#c2410c':'#666'))
     +ageCard('181 - 365 Days',r.aged_inv_181_365,agePct(r.aged_inv_181_365),'#fef2f2',(r.aged_inv_181_365>0?'#b91c1c':'#666'))
