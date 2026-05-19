@@ -9837,6 +9837,19 @@ def main():
                      "Field map fetched but could not resolve required fids.")
         if not ai_analysis_fid:
             print("      [WARN] [AI Analysis] field not found in Projections — narratives will not be written.")
+        # Auto Project: discover MAN PRJ FIDs dynamically (date-stamped labels like "05 19 W1").
+        # Used to copy AI forecast values into manual projection columns for auto-project records.
+        import re as _re
+        _man_prj_fids = {}  # week_number (1..26) -> fid
+        for label, fid in fmap.items():
+            m = _re.match(r'^\d{2} \d{2} W(\d+)$', label)
+            if m:
+                _man_prj_fids[int(m.group(1))] = fid
+        _auto_proj_count = sum(1 for r in to_write if r.get("auto_project"))
+        if _auto_proj_count:
+            print(f"      Auto Project: {_auto_proj_count} records will have manual projections replaced with AI values")
+            if len(_man_prj_fids) < 26:
+                print(f"      [WARN] Auto Project: only {len(_man_prj_fids)} MAN PRJ week FIDs found (expected 26) — partial copy")
         payload = []
         for rec in to_write:
             row = {merge_fid: rec["key"], ai_alert_fid: _sanitize_for_qb(rec.get("alert", ""))}
@@ -9844,6 +9857,11 @@ def main():
                 row[ai_analysis_fid] = _sanitize_for_qb(rec.get("ai_analysis", ""))
             for i, fid in enumerate(wk_fids):
                 row[fid] = int(round(rec["forecast"][i])) if i < len(rec["forecast"]) else 0
+            # Auto Project: copy AI forecast values into MAN PRJ columns for flagged records
+            if rec.get("auto_project") and _man_prj_fids:
+                for wk, fid in _man_prj_fids.items():
+                    idx = wk - 1
+                    row[fid] = int(round(rec["forecast"][idx])) if idx < len(rec["forecast"]) else 0
             payload.append(row)
         n_ok, n_fail, errors = qb_bulk_update(QB_PROJ_TABLE, payload, merge_fid)
         # Track completed keys: assume in-order success for the batches that returned OK.
