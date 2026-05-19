@@ -1451,7 +1451,11 @@ function renderDetail(r) {
   for (var i = 1; i <= 26; i++) {
     var s = new Date(w1sun.getTime() + (i-1)*7*86400000);
     var lbl = (s.getMonth()+1)+'/'+s.getDate();
-    ifHdr += '<th title="W'+i+' - week of '+s.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'">'+lbl+'</th>';
+    ifHdr += '<th title="W'+i+' - week of '+s.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+      +'" style="line-height:1.15;">'
+      +'<div style="font-size:9px;color:#7b1fa2;font-weight:600;">Wk'+i+'</div>'
+      +'<div>'+lbl+'</div>'
+      +'</th>';
   }
   ifHdr += '<th>Total</th>';
 
