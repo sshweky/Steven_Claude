@@ -1189,7 +1189,7 @@ function renderDetail(r) {
       +kvBox('Calculation',
         kvRow('Trigger Week','Wk '+purTrigWk+' (first dip below Opt OH)')
         +kvRow('Prj Inv at Wk '+purTrigWk,fmtInt(purTrigInv)+' units')
-        +kvRow('Target (Opt OH + 6wk buffer)',fmtInt(purTarget)+' = '+fmtInt(r.opt_oh)+' + '+fmtInt(purBufUnits))
+        +kvRow('Target (Opt OH + 4wk buffer)',fmtInt(purTarget)+' = '+fmtInt(r.opt_oh)+' + '+fmtInt(purBufUnits))
         +kvRow('Gap (order qty)',fmtInt(purGap)+' units')
         +kvRow('Req ETD formula','Receipt ('+fmtDate(r.purchase_rec_receipt_date)+') - '+r.lt_trans_days+'d LT'),
         '#f3e5f5','1')
