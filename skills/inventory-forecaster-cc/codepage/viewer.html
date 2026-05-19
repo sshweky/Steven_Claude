@@ -535,16 +535,11 @@ window.QB_CONFIG = {
 </div>
 
 <!-- Director notification banner — shown when planner replies are pending -->
-<div id="replyBanner" style="display:none;">
-  <span>💬 <span id="replyBannerCount">0</span> planner replies awaiting your review</span>
-  <button onclick="toggleReplyOnly()">View Replies</button>
-  <button onclick="const b=document.getElementById('replyBanner');b.style.display='none';b.dataset.dismissed='1';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);">Dismiss</button>
-</div>
-<!-- Planner notification banner — shown when manager has flagged items needing planner action -->
-<div id="forMeBanner" style="display:none;background:#e65100;color:#fff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin:8px 0 4px 0;align-items:center;gap:12px;flex-wrap:wrap;">
-  <span>📋 <span id="forMeBannerCount">0</span> items need your attention</span>
-  <button onclick="toggleForMe()" style="font-size:12px;padding:3px 12px;background:#fff;color:#e65100;border:none;border-radius:4px;cursor:pointer;font-weight:700;">View Items</button>
-  <button onclick="const b=document.getElementById('forMeBanner');b.style.display='none';b.dataset.dismissed='1';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);font-size:12px;padding:3px 12px;border-radius:4px;cursor:pointer;">Dismiss</button>
+<!-- Unified attention banner — directors see planner replies; planners see manager-flagged items -->
+<div id="attnBanner" style="display:none;">
+  <span id="attnBannerText"></span>
+  <button id="attnBannerViewBtn" onclick="window._attnBannerAction&&window._attnBannerAction()">View</button>
+  <button onclick="const b=document.getElementById('attnBanner');b.style.display='none';b.dataset.dismissed='1';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);">Dismiss</button>
 </div>
 
 <table>
