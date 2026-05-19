@@ -248,6 +248,7 @@ var selMgrs       = new Set();
 var selPriorities = new Set();
 var selStockStatus = new Set();
 var recoSheet = [];
+var purchaseSelections = {};   // keyed by mstyle; { needQty: number, chosenSupplier: string }
 
 // -- Multi-select dropdown helpers ---------------------------------------------
 function toggleDd(evt, ddId) {
