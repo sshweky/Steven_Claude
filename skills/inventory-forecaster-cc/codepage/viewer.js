@@ -4197,7 +4197,7 @@ async function addComment(key) {
       const _recForTo = ALL_RECORDS.find(x => x.key === key);
       let _sendToText  = '';
       let _sendToEmail = '';
-      if (flag === 'Needs Action') {
+      if (flag === 'Needs Action' || flag === 'Manager Response') {
         _sendToText  = (_recForTo && _recForTo.inv_manager)       || 'Planner';
         _sendToEmail = (_recForTo && _recForTo.inv_manager_email) || '';
       } else if (flag === 'Planner Response') {
