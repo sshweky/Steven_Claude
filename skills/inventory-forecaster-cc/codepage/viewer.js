@@ -3060,8 +3060,12 @@ async function toggleDetail(key) {
       if (_prj) {
         const pv = _prj[i] || 0;
         prjTot += pv;
-        const color = pv > 0 ? '#2e7d32' : '#bbb';
-        prjCells += `<td style="color:${color};font-size:10px;background:#f1f8e9">${pv > 0 ? fmtN(Math.round(pv)) : '&mdash;'}</td>`;
+        const color  = pv > 0 ? '#2e7d32' : '#bbb';
+        const custLbl = (r.cust || r.acct_txt || '').replace(/"/g, '&quot;');
+        const tipText = custLbl
+          ? `${custLbl}: ${fmtN(Math.round(pv))} units projected`
+          : `${fmtN(Math.round(pv))} units projected`;
+        prjCells += `<td style="color:${color};font-size:10px;background:#f1f8e9;${pv > 0 ? 'cursor:help;' : ''}" title="${tipText}">${pv > 0 ? fmtN(Math.round(pv)) : '&mdash;'}</td>`;
       } else {
         prjCells += `<td style="color:#bbb;font-size:10px;background:#f1f8e9"> - </td>`;
       }
