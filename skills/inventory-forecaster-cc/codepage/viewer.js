@@ -4325,7 +4325,7 @@ async function addComment(key) {
         badgeCell.insertAdjacentHTML('beforeend', '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>');
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) tr.classList.add('row-mgr-pending');
-      updateForMeCount();
+      refreshForMeKeys();
     }
 
     if (flag === 'Planner Response') {
@@ -4368,7 +4368,7 @@ async function addComment(key) {
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) { tr.classList.add('row-reply-pending'); tr.classList.remove('row-mgr-pending'); }
       updateReplyCount();
-      updateForMeCount();
+      refreshForMeKeys();
     }
 
     if (flag === 'Manager Response' && CFG.FID.MANAGER_REPLY_PENDING) {
@@ -4389,7 +4389,7 @@ async function addComment(key) {
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) { tr.classList.add('row-mgr-pending'); tr.classList.remove('row-reply-pending'); }
       updateReplyCount();
-      updateForMeCount();
+      refreshForMeKeys();
     }
 
     if (flag === 'Resolved') {
@@ -4409,7 +4409,7 @@ async function addComment(key) {
         const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
         if (tr) tr.classList.remove('row-reply-pending', 'row-mgr-pending');
         updateReplyCount();
-        updateForMeCount();
+        refreshForMeKeys();
       }
     }
   } catch (e) {
