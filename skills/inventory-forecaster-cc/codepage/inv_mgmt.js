@@ -675,8 +675,7 @@ function computeDerived(rec, today) {
       var _purGap = Math.max(0, _purTarget - _prjAtRcpt);
       if (_purGap > 0) {
         rec.purchase_rec = Math.max(_purGap, rec.moq);
-        var _etdDays = rec.lt_trans_days - rec.transit_days;
-        if (_etdDays > 0) rec.purchase_rec_etd = addDays(today, _etdDays);
+        rec.purchase_rec_etd = rec.nxt_avl_etd ? new Date(rec.nxt_avl_etd) : null;
       }
     }
   }
