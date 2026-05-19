@@ -1563,15 +1563,26 @@ function adaptRow(row) {
                  : (vol_tier === 'MEDIUM' && pct_abs > 10) ? 'MEDIUM'
                  : 'LOW';
 
-  // Per-week severity (ALERT when AI vs manual diverges by >3x or one side is 0)
+  // Seasonal customers (A: Promo, A: OffPrice) order 1-3x per year — zero-weeks
+  // between order events are normal and must not generate ALERT flags.
+  const is_seasonal = /^A:\s*(Promo|OffPrice)\b/i.test(str(row, F.STATUS_CUST));
+
+  // Per-week severity.  For seasonal records: only alert when we project an order
+  // (m > 0) that significantly diverges from AI — not just because a week is 0.
   const weeks_slim = [];
   let any_alert = false;
   for (let i = 0; i < 26; i++) {
     const m = manual[i] || 0;
     const a = forecast[i] || 0;
     let sev = 'OK';
-    if ((m === 0 && a > 0) || (a === 0 && m > 0)) { sev = 'ALERT'; any_alert = true; }
-    else if (m > 0 && (a / m > 3 || m / Math.max(a, 1) > 3)) { sev = 'ALERT'; any_alert = true; }
+    if (is_seasonal) {
+      // Alert only when we project orders but AI strongly disagrees
+      if (m > 0 && a === 0) { sev = 'ALERT'; any_alert = true; }
+      else if (m > 0 && a > 0 && (a / m > 3 || m / Math.max(a, 1) > 3)) { sev = 'ALERT'; any_alert = true; }
+    } else {
+      if ((m === 0 && a > 0) || (a === 0 && m > 0)) { sev = 'ALERT'; any_alert = true; }
+      else if (m > 0 && (a / m > 3 || m / Math.max(a, 1) > 3)) { sev = 'ALERT'; any_alert = true; }
+    }
     weeks_slim.push({ week: i + 1, projection: m, severity: sev });
   }
 
