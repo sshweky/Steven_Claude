@@ -2229,7 +2229,7 @@ async function toggleFlag(key) {
 
 async function toggleAutoProject(key) {
   const rec = ALL_RECORDS.find(x => x.key === key);
-  if (!rec || !F.AUTO_PROJECT) return;
+  if (!rec || !CFG.FID.AUTO_PROJECT) return;
   const newVal = !rec.auto_project;
   // Optimistic UI
   rec.auto_project = newVal;
