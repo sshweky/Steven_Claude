@@ -748,6 +748,11 @@ async function _lazyLoadDetail(r) {
   r.ai_fcst   = forecast;
   r.suggested = CFG.SUG_FIDS.map(fid => num(row, fid));
   r.opn_w     = CFG.OPN_FIDS.map(fid => num(row, fid));
+  // Recompute conflict with fresh PO + manual data (r.is_offprice preserved from adaptRow)
+  const { conflicts: _lazyCfls, hasConflict: _lazyCfl } =
+    _computePoPrjConflicts(r.opn_w, manual, r.is_offprice || false);
+  r.po_prj_conflicts    = _lazyCfls;
+  r.has_po_prj_conflict = _lazyCfl;
   r.hist_ord  = ORD_HIST_FIDS.map(fid => num(row, fid));
   r.hist_shp  = SHP_HIST_FIDS.map(fid => num(row, fid));
   r.ly_ord    = LY_ORD_HIST_FIDS.map(fid => num(row, fid));
