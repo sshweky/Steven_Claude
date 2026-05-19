@@ -3495,7 +3495,6 @@ async function toggleDetail(key) {
     </div>` : '';
 
   el.innerHTML = `<td colspan="21" style="padding:0">
-    ${switchoverHtml}
     ${fdStatusHtml}
     ${_buildPogBlockHtml(r)}
     ${narrativeHtml}
@@ -3514,6 +3513,7 @@ async function toggleDetail(key) {
     </div>
     ${histHtml}
     ${invFlowSectionHtml}
+    ${switchoverHtml}
     ${tellAiBlock}
     ${commentBlock}
   </td>`;
