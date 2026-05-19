@@ -2254,34 +2254,6 @@ function toggleReplyOnly() {
   applyFilters();
 }
 
-let SHOW_OFF_PLAN_ONLY = false;
-function toggleOffPlanOnly() {
-  SHOW_OFF_PLAN_ONLY = !SHOW_OFF_PLAN_ONLY;
-  const btn = document.getElementById('offPlanOnlyBtn');
-  if (btn) {
-    btn.style.background = SHOW_OFF_PLAN_ONLY ? '#6a1b9a' : '#fff';
-    btn.style.color      = SHOW_OFF_PLAN_ONLY ? '#fff'    : '#6a1b9a';
-    btn.style.fontWeight = '800';
-  }
-  applyFilters();
-}
-
-// "My Records" — filters the table to records owned by the current visitor.
-// Planners get this on by default (bootstrap sets SHOW_MY_RECORDS_ONLY=true).
-// Directors/VPs default to off (see all records) but can toggle it on.
-let SHOW_MY_RECORDS_ONLY = false;
-function toggleMyRecords() {
-  SHOW_MY_RECORDS_ONLY = !SHOW_MY_RECORDS_ONLY;
-  _syncMyRecordsButton();
-  applyFilters();
-}
-function _syncMyRecordsButton() {
-  const btn = document.getElementById('myRecordsBtn');
-  if (!btn) return;
-  btn.style.background = SHOW_MY_RECORDS_ONLY ? '#1565c0' : '#fff';
-  btn.style.color      = SHOW_MY_RECORDS_ONLY ? '#fff'    : '#1565c0';
-  btn.style.fontWeight = '800';
-}
 
 // "📬 For Me" — role-aware inbox filter:
 //   Planners    → records where MANAGER_REPLY_PENDING = true (items the director flagged for them)
