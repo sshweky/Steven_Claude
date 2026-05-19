@@ -1141,7 +1141,32 @@ function renderDetail(r) {
     +ageCard('365+ Days',r.aged_inv_365plus,agePct(r.aged_inv_365plus),'#fdf2f8',(r.aged_inv_365plus>0?'#9d174d':'#666'))
     +'</div>';
 
-  return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+stockStatusBox+'</div></div><div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">- hover Expected Receipts cells for PO detail / hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div><div class="section"><h3>&#127919; Recommended Actions</h3><div class="recs-wrap">'+recs+'</div></div></div>';
+  // Purchase Recommendation section
+  var purRecSection;
+  if (!r.is_replen || r.prj_wk <= 0 || r.moq <= 0 || r.lt_trans_days <= 0 || r.opt_oh <= 0) {
+    purRecSection = '';
+  } else if (r.purchase_rec > 0) {
+    purRecSection = '<div class="section"><h3>&#128722; Purchase Recommendation</h3>'
+      +'<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">'
+      +kvBox('New Order Required',
+        kvRow('Recommended Qty','<b style="font-size:16px;color:#1a237e;">'+fmtInt(r.purchase_rec)+'</b> units')
+        +kvRow('Required ETD',r.purchase_rec_etd?'<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b>':'&#8212;')
+        +kvRow('6-Run Min',fmtInt(6*r.moq)+' units (6 x '+fmtInt(r.moq)+' MOQ)'),
+        '#fff3e0','1')
+      +kvBox('Calculation',
+        kvRow('Receipt Week','Wk '+purRcptWk+' (ceil('+r.lt_trans_days+'d / 7))')
+        +kvRow('Prj Inv at Wk '+purRcptWk,fmtInt(purPrjAtRcpt)+' units')
+        +kvRow('Target (Opt OH + 2wk)',fmtInt(purTarget)+' = '+fmtInt(r.opt_oh)+' + '+fmtInt(2*r.prj_wk))
+        +kvRow('Gap to Target',fmtInt(purGap)+' units'),
+        '#f3e5f5','1')
+      +'</div></div>';
+  } else {
+    purRecSection = '<div class="section"><h3>&#128722; Purchase Recommendation</h3>'
+      +'<div style="color:#1b5e20;font-style:italic;">&#10003; No new order needed - Wk '+purRcptWk+' projected inventory ('+fmtInt(purPrjAtRcpt)+' units) meets target ('+fmtInt(purTarget)+' units = Opt OH + 2-wk buffer).</div>'
+      +'</div>';
+  }
+
+  return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+stockStatusBox+'</div></div><div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">- hover Expected Receipts cells for PO detail / hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div>'+purRecSection+'<div class="section"><h3>&#127919; Recommended Actions</h3><div class="recs-wrap">'+recs+'</div></div></div>';
 }
 
 // -- Reco spreadsheet ----------------------------------------------------------
