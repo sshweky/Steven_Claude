@@ -663,20 +663,46 @@ function computeDerived(rec, today) {
   }
 
   // Purchase Recommendation
-  // Trigger: projected inventory at Next Avl Rcpt Dt (Wk = ceil(LT_Trans_Days/7)) < Opt_OH + 2-week buffer
-  // Order qty: gap rounded up to MOQ, minimum 6 runs (6 x MOQ)
-  // ETD: taken directly from Nxt Avl ETD field (FID 1917)
+  // Trigger: find last week where beg_inv >= Opt_OH; trigger = next week (first sustained dip below)
+  // Qty: Opt_OH - beg_inv[trigger week], floor at MOQ
+  // Required receipt date: start of last-above week (one week before trigger)
+  // Required ETD: receipt_date - LT_Trans_Days; display = max(required_ETD, Nxt_Avl_ETD)
+  //   Exception: if Nxt_Avl_ETD is within 14 days after required_ETD, use required_ETD + flag push-supplier
   rec.purchase_rec = 0;
   rec.purchase_rec_etd = null;
-  if (rec.is_replen && rec.prj_wk > 0 && rec.moq > 0 && rec.lt_trans_days > 0 && rec.opt_oh > 0) {
-    var _rcptWk = Math.ceil(rec.lt_trans_days / 7);
-    if (_rcptWk >= 1 && _rcptWk <= 26) {
-      var _prjAtRcpt = rec.beg_inv[_rcptWk - 1] || 0;
-      var _purTarget = rec.opt_oh;
-      var _purGap = Math.max(0, _purTarget - _prjAtRcpt);
+  rec.purchase_rec_push_supplier = false;
+  rec.purchase_rec_receipt_date = null;
+  rec.purchase_rec_trigger_idx = -1;
+  if (rec.is_replen && rec.prj_wk > 0 && rec.moq > 0 && rec.opt_oh > 0) {
+    var _lastAbove = -1;
+    for (var _i = 0; _i < 26; _i++) {
+      if ((rec.beg_inv[_i] || 0) >= rec.opt_oh) _lastAbove = _i;
+    }
+    var _trigIdx = (_lastAbove >= 0 && _lastAbove < 25) ? _lastAbove + 1 : -1;
+    if (_trigIdx >= 1 && _trigIdx <= 25) {
+      var _trigInv = rec.beg_inv[_trigIdx] || 0;
+      var _purGap = Math.max(0, rec.opt_oh - _trigInv);
       if (_purGap > 0) {
         rec.purchase_rec = Math.max(_purGap, rec.moq);
-        rec.purchase_rec_etd = rec.nxt_avl_etd ? new Date(rec.nxt_avl_etd) : null;
+        rec.purchase_rec_trigger_idx = _trigIdx;
+        // Receipt needed by: start of last-above week (one week before trigger)
+        var _rcptDate = wkSunday(today, _lastAbove);
+        rec.purchase_rec_receipt_date = _rcptDate;
+        // Required ETD = receipt date minus full LT_Trans_Days
+        var _reqETD = addDays(_rcptDate, -rec.lt_trans_days);
+        var _nxtETD = rec.nxt_avl_etd ? new Date(rec.nxt_avl_etd) : null;
+        if (!_nxtETD) {
+          rec.purchase_rec_etd = _reqETD;
+        } else {
+          var _diffDays = Math.round((_nxtETD - _reqETD) / 86400000);
+          if (_diffDays > 14) {
+            rec.purchase_rec_etd = _nxtETD;          // too late to hit ideal — use next avl
+            rec.purchase_rec_push_supplier = false;
+          } else {
+            rec.purchase_rec_etd = _reqETD;          // within 2 wks — push supplier
+            rec.purchase_rec_push_supplier = _diffDays > 0;
+          }
+        }
       }
     }
   }
