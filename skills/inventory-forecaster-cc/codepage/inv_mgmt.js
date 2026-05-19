@@ -685,7 +685,9 @@ function computeDerived(rec, today) {
       var _purTarget = rec.opt_oh + PUR_REC_BUFFER_WKS * rec.prj_wk;
       var _purGap = Math.max(0, _purTarget - _trigInv);
       if (_purGap > 0) {
-        rec.purchase_rec = Math.max(_purGap, rec.moq);
+        var _mp = Math.round(toNum(rec.master_pack)) || 1;
+        var _purQty = Math.max(_purGap, rec.moq);
+        rec.purchase_rec = _mp > 1 ? Math.ceil(_purQty / _mp) * _mp : _purQty;
         rec.purchase_rec_trigger_idx = _trigIdx;
         // Receipt needed by: start of last-above week (one week before trigger)
         var _rcptDate = wkSunday(today, _lastAbove);
