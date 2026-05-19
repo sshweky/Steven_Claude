@@ -1255,6 +1255,15 @@ function _refreshRowMetrics(key) {
     manL13El.textContent = l13Avail ? (manVsL13 >= 0 ? '+' : '') + (Math.round(manVsL13 * 10) / 10).toFixed(1) + '%' : ' - ';
     manL13El.style.color = !l13Avail ? '#888' : manVsL13 > 0 ? '#2e7d32' : manVsL13 < 0 ? '#c62828' : '#888';
   }
+
+  // Recompute PO/PRJ conflict from updated projection values and refresh badge
+  const _updatedManProj = (rec.weeks_slim || []).map(w => w.projection || 0);
+  const { conflicts: _newCfls, hasConflict: _newHasCfl } =
+    _computePoPrjConflicts(rec.opn_w || [], _updatedManProj, rec.is_offprice || false);
+  rec.po_prj_conflicts    = _newCfls;
+  rec.has_po_prj_conflict = _newHasCfl;
+  const conflictBadgeEl = document.getElementById('conflict-badge-' + sid);
+  if (conflictBadgeEl) conflictBadgeEl.style.display = _newHasCfl ? 'inline-block' : 'none';
 }
 
 // Colored pill badge for forecast status (returns HTML string or '').
