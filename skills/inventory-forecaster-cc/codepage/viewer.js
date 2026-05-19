@@ -4052,7 +4052,12 @@ async function loadCommentHistory(key, force) {
             ? ((_authorUser.name && _authorUser.name !== 'Unknown') ? _authorUser.name : (_authorUser.email || ''))
             : '';
           const author = (_authorText && _authorText !== 'Unknown') ? _authorText : (_authorUserName || _authorText);
-          const sendTo = (F.SEND_TO && r[F.SEND_TO] && r[F.SEND_TO].value) || '';
+          const _sendToText = (F.SEND_TO && r[F.SEND_TO] && r[F.SEND_TO].value) || '';
+          const _sendToUser = F.SEND_TO_USER && r[F.SEND_TO_USER] && r[F.SEND_TO_USER].value;
+          const _sendToUserName = _sendToUser
+            ? ((_sendToUser.name && _sendToUser.name !== 'Unknown') ? _sendToUser.name : (_sendToUser.email || ''))
+            : '';
+          const sendTo = _sendToText || _sendToUserName;
           const rid    = (r[F.RECORD_ID]    && r[F.RECORD_ID].value)    || 0;
           const isReply     = flag === 'Planner Response';
           const isToPlanner = flag === 'Needs Action';
