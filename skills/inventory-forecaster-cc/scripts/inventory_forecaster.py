@@ -7450,6 +7450,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Viewer display fields — pulled fresh from QB every run so the viewer
         # never shows stale data without a round-trip enrichment query.
         "flagged_qb":    bool(row.get("Flagged") in (True, 1, "true", "1", "yes")),
+        "auto_project":  bool(row.get("Auto_Project") in (True, 1, "true", "1", "yes")),
         "pog_launch":    (str(row.get("POG_Launch_Date") or ""))[:10],
         "pog_end":       (str(row.get("POG_End_Date") or ""))[:10],
         "store_count":   int(float(row.get("Store_Count") or 0)),
