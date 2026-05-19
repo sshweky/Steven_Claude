@@ -660,6 +660,27 @@ function computeDerived(rec, today) {
   } else {
     rec.stock_status = 'In Stock';
   }
+
+  // Purchase Recommendation
+  // Trigger: projected inventory at Next Avl Rcpt Dt (Wk = ceil(LT_Trans_Days/7)) < Opt_OH + 2-week buffer
+  // Order qty: gap rounded up to MOQ, minimum 6 runs (6 x MOQ)
+  // Required ETD: today + (LT_Trans_Days - Transit_Days)
+  rec.purchase_rec = 0;
+  rec.purchase_rec_etd = null;
+  if (rec.is_replen && rec.prj_wk > 0 && rec.moq > 0 && rec.lt_trans_days > 0 && rec.opt_oh > 0) {
+    var _rcptWk = Math.ceil(rec.lt_trans_days / 7);
+    if (_rcptWk >= 1 && _rcptWk <= 26) {
+      var _prjAtRcpt = rec.beg_inv[_rcptWk - 1] || 0;
+      var _purTarget = rec.opt_oh + 2 * rec.prj_wk;
+      var _purGap = Math.max(0, _purTarget - _prjAtRcpt);
+      if (_purGap > 0) {
+        var _purRounded = Math.ceil(_purGap / rec.moq) * rec.moq;
+        rec.purchase_rec = Math.max(_purRounded, 6 * rec.moq);
+        var _etdDays = rec.lt_trans_days - rec.transit_days;
+        if (_etdDays > 0) rec.purchase_rec_etd = addDays(today, _etdDays);
+      }
+    }
+  }
 }
 
 // -- Columns -------------------------------------------------------------------
