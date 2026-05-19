@@ -120,6 +120,24 @@ var IF_F = {
   Alt3ELC_NJ:1818, Alt3ELC_LA:1815, Alt3MU_NJ:1821, Alt3MU_LA:1824,
   Alt3QtyOrd:1837, Alt3PctOrd:1840
 };
+// Supplier FIDs that are only needed for the detail panel (phase 2 load)
+var IF_SUPP_FIDS = [
+  IF_F.SupplierInfo, IF_F.FOBCost, IF_F.ELC_NJ, IF_F.ELC_LA,
+  IF_F.MU_NJ, IF_F.MU_LA, IF_F.QtyOrdSupplier, IF_F.PctUnitsOrdSupplier,
+  IF_F.Alt1Name, IF_F.Alt1FOB, IF_F.Alt1MOQ, IF_F.Alt1LT,
+  IF_F.Alt1ELC_NJ, IF_F.Alt1ELC_LA, IF_F.Alt1MU_NJ, IF_F.Alt1MU_LA,
+  IF_F.Alt1QtyOrd, IF_F.Alt1PctOrd,
+  IF_F.Alt2Name, IF_F.Alt2FOB, IF_F.Alt2MOQ, IF_F.Alt2LT,
+  IF_F.Alt2ELC_NJ, IF_F.Alt2ELC_LA, IF_F.Alt2MU_NJ, IF_F.Alt2MU_LA,
+  IF_F.Alt2QtyOrd, IF_F.Alt2PctOrd,
+  IF_F.Alt3Name, IF_F.Alt3FOB, IF_F.Alt3MOQ, IF_F.Alt3LT,
+  IF_F.Alt3ELC_NJ, IF_F.Alt3ELC_LA, IF_F.Alt3MU_NJ, IF_F.Alt3MU_LA,
+  IF_F.Alt3QtyOrd, IF_F.Alt3PctOrd
+];
+// Main scalar FIDs: everything in IF_F except supplier detail fields
+var IF_F_MAIN_FIDS = Object.values(IF_F).filter(function(fid) {
+  return IF_SUPP_FIDS.indexOf(fid) === -1;
+});
 var IF_BEG = [134,8,9,10,110,111,112,113,114,115,116,117,118,128,129,130,131,120,121,122,123,124,125,126,127,119];
 var IF_RCV = [28,35,36,50,51,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85];
 var IF_PRJ = [146,147,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173];
