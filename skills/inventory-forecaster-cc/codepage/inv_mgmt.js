@@ -1541,25 +1541,35 @@ async function boot() {
   var scr=document.getElementById('loadingScreen');
   setStep(1,'active');setBar(5);setStatus('Checking cache...');
 
-  var cached=loadCache();
+  var cached = await loadCache();
   if(cached){
-    setBar(80);setStatus('Loading from cache...');
-    ALL=cached.data;
+    setBar(80);setStatus('Loading from cache (' + cached.src + ')...');
+    ALL=cached.obj.data;
     var asOf=document.getElementById('dataAsOf');
-    if(asOf)asOf.textContent='Data as of '+fmtTimestamp(cached.ts)+' (cached)';
+    if(asOf)asOf.textContent='Data as of '+fmtTimestamp(cached.obj.ts)+' (cached)';
     setBar(90);setStatus('Building view...');
     setStep(4,'active');
     buildFilterDropdowns();buildTableHead();applyFilters();
     setBar(100);setStep(4,'done');
     await new Promise(function(r){setTimeout(r,350);});
     if(scr){scr.classList.add('hidden');setTimeout(function(){scr.style.display='none';},500);}
+    // Fire phase 2 (detail data) in background -- non-blocking
+    _detailPromise = attachDetailData(ALL).catch(function(e) {
+      console.warn('[InvMgmt] detail data load failed (non-fatal):', e);
+      _detailPromise = null;
+    }).then(function() {
+      _detailPromise = null;
+      // Re-render any currently open detail panel
+      var open = document.querySelector('.detail-pane[style*="table-row"]');
+      if (open) { open.dataset.loaded = ''; open.style.display = 'none'; }
+    });
     return;
   }
 
   try {
     var records=await loadData();
     ALL=records;
-    saveCache(records);
+    await saveCache(records);
     setStep(4,'active');setBar(85);setStatus('Building view...');
     await new Promise(function(r){setTimeout(r,50);});
     buildFilterDropdowns();buildTableHead();applyFilters();
@@ -1569,6 +1579,16 @@ async function boot() {
     setBar(100);setStep(4,'done');setStatus('Ready!');
     await new Promise(function(r){setTimeout(r,350);});
     if(scr){scr.classList.add('hidden');setTimeout(function(){scr.style.display='none';},500);}
+    // Fire phase 2 (detail data) in background -- non-blocking
+    _detailPromise = attachDetailData(ALL).catch(function(e) {
+      console.warn('[InvMgmt] detail data load failed (non-fatal):', e);
+      _detailPromise = null;
+    }).then(function() {
+      _detailPromise = null;
+      // Re-render any currently open detail panel
+      var open = document.querySelector('.detail-pane[style*="table-row"]');
+      if (open) { open.dataset.loaded = ''; open.style.display = 'none'; }
+    });
   } catch(err) {
     var msg = err.message || String(err);
     setStatus('Load failed');
