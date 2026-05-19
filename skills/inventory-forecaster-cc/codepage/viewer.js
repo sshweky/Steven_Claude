@@ -1686,6 +1686,8 @@ function adaptRow(row) {
     // attachInvFlow() runs.
     store_count:       num(row, F.STORE_COUNT),
     est_iso_qty:       num(row, F.EST_ISO_QTY),
+    est_iso_input:     F.EST_ISO_INPUT ? num(row, F.EST_ISO_INPUT) : 0,
+    init_upspw:        F.INIT_UPSPW    ? num(row, F.INIT_UPSPW)    : 0,
     pog_launch:        str(row, F.POG_LAUNCH),
     pog_end:           str(row, F.POG_END),
     iso_ship_date:     str(row, F.ISO_SHIP_DATE),
