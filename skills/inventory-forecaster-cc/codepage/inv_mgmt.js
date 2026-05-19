@@ -402,11 +402,8 @@ async function loadData() {
   var ifFieldIds = IF_F_MAIN_FIDS.concat(IF_BEG, IF_PRJ);
   // QB can't filter on formula fields (fid 927) or lookup fields (fid 294), so load all and
   // apply the field-927 Case() formula logic client-side after the pull.
-  // Pre-filter server-side: exclude truly inactive items (qty_oh=0 AND opt_wos=0).
-  // ItemStatus (fid 294) is a lookup and cannot be used in QB WHERE clause,
-  // so we use two numeric fields that are always present on active items.
-  // Client-side ItemStatus filter still runs afterwards for precision.
-  var IF_PRE_FILTER = '{24.GT.0}OR{137.GT.0}';
+  // IF_PRE_FILTER (module-level) excludes truly inactive items; client-side ItemStatus filter
+  // runs afterwards for precision.
   var ifRowsAll = await qbQueryAll(INVF_TID, ifFieldIds, IF_PRE_FILTER, 'Loading Inventory Flow');
   var IF_ACTIVE_STATUSES = {
     "Active: Promo":1,"Active: Promo Commt":1,"Active: Replen":1,"Active: Replen Commt":1,
