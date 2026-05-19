@@ -7715,6 +7715,7 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         "stockout_corrections": _f35_corrections_v if _f35_corrections_v else [],
         # Viewer display fields — pulled fresh from QB every run.
         "flagged_qb":    bool(row.get("Flagged") in (True, 1, "true", "1", "yes")),
+        "auto_project":  bool(row.get("Auto_Project") in (True, 1, "true", "1", "yes")),
         "pog_launch":    (str(row.get("POG_Launch_Date") or ""))[:10],
         "pog_end":       (str(row.get("POG_End_Date") or ""))[:10],
         "store_count":   int(float(row.get("Store_Count") or 0)),
