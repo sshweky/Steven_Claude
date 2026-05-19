@@ -3164,6 +3164,25 @@ async function toggleDetail(key) {
     </div>
   </div>`;
 
+  // -- COS / EC Switchover alert (base style only) ---------------------------
+  // Shown when a COS or EC variant of this style has started receiving orders
+  // or manual projections, signalling that this base style should be closed.
+  const _variantMstyle   = SWITCHOVER_MAP.get(r.key);
+  const switchoverHtml   = _variantMstyle ? `
+    <div id="switchover-alert-${safeKey}" style="margin:8px 12px 0 12px;padding:10px 14px;background:#fff8e1;border:2px solid #f9a825;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <span style="font-size:18px;line-height:1;">&#x26A0;&#xFE0F;</span>
+      <span style="flex:1;min-width:200px;">
+        <b style="font-size:13px;color:#e65100;">Switchover Alert</b><br>
+        Orders and projections have moved to <b>${_variantMstyle.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])}</b>.
+        This projection should be marked <b>CLOSED</b>.
+        <span class="switchover-err" style="color:#c62828;margin-left:6px;"></span>
+      </span>
+      <button id="close-base-btn-${safeKey}" onclick="closeBaseStyle('${r.key.replace(/'/g,"\\'")}')"
+        style="font-size:12px;padding:5px 14px;background:#e65100;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700;white-space:nowrap;">
+        Mark as CLOSED
+      </button>
+    </div>` : '';
+
   // Issue 8: FD Status block  -  Future Development items often have no AI narrative
   // or projections yet; show a prominent metadata card so the panel isn't blank.
   const isFDRecord = (r.asin_status || '').trim().toUpperCase().startsWith('FD');
