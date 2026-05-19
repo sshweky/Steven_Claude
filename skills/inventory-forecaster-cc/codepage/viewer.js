@@ -1170,6 +1170,64 @@ function _fcstStatus(ai_model, ai_total, proj_total) {
   return 'On Plan';
 }
 
+// Instantly refresh the 6 metric cells in the main table row for a given key.
+// Called after any AI or manual projection save so the row reflects the new
+// values without a full re-render.  Uses the IDs stamped by renderPage.
+function _refreshRowMetrics(key) {
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (!rec) return;
+  const sid = key.replace(/[^a-zA-Z0-9]/g, '_');
+
+  // Recalculate all derived metrics from current in-memory state
+  const opnTotal  = rec.opn_total  || 0;
+  const aiTotal   = rec.ai_total   || 0;
+  const projTotal = rec.proj_total || 0;
+  const aiWk      = Math.round(((aiTotal   + opnTotal) / 26) * 10) / 10;
+  const projWk    = Math.round(((projTotal + opnTotal) / 26) * 10) / 10;
+  const aiVsProj  = projTotal > 0 ? (aiTotal - projTotal) / projTotal * 100 : 0;
+  const l13       = rec.shp_wk || 0;
+  const l13Avail  = l13 > 0;
+  const aiVsL13   = l13Avail ? (aiWk   - l13) / l13 * 100 : 0;
+  const manVsL13  = l13Avail ? (projWk - l13) / l13 * 100 : 0;
+  const fcstStatus = _fcstStatus(rec.ai_model, aiTotal, projTotal);
+
+  // Persist back onto the record so filters / exports stay consistent
+  rec.ai_wk      = aiWk;
+  rec.proj_wk    = projWk;
+  rec.ai_vs_l13  = Math.round(aiVsL13  * 10) / 10;
+  rec.man_vs_l13 = Math.round(manVsL13 * 10) / 10;
+  rec.pct_diff   = aiVsProj;
+  rec.fcst_status = fcstStatus;
+
+  // Patch DOM cells
+  const projWkEl = document.getElementById('metric-projwk-' + sid);
+  if (projWkEl) projWkEl.textContent = fmtN(Math.round(projWk));
+
+  const aiWkEl = document.getElementById('metric-aiwk-' + sid);
+  if (aiWkEl) aiWkEl.textContent = fmtN(Math.round(aiWk));
+
+  const aiProjEl = document.getElementById('metric-aiproj-' + sid);
+  if (aiProjEl) {
+    aiProjEl.textContent = (aiVsProj >= 0 ? '+' : '') + aiVsProj.toFixed(1) + '%';
+    aiProjEl.style.color = aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888';
+  }
+
+  const fcstEl = document.getElementById('metric-fcst-' + sid);
+  if (fcstEl) fcstEl.innerHTML = _fcstStatusBadge(fcstStatus);
+
+  const aiL13El = document.getElementById('metric-ail13-' + sid);
+  if (aiL13El) {
+    aiL13El.textContent = l13Avail ? (aiVsL13 >= 0 ? '+' : '') + (Math.round(aiVsL13 * 10) / 10).toFixed(1) + '%' : ' - ';
+    aiL13El.style.color = !l13Avail ? '#888' : aiVsL13 > 0 ? '#2e7d32' : aiVsL13 < 0 ? '#c62828' : '#888';
+  }
+
+  const manL13El = document.getElementById('metric-manl13-' + sid);
+  if (manL13El) {
+    manL13El.textContent = l13Avail ? (manVsL13 >= 0 ? '+' : '') + (Math.round(manVsL13 * 10) / 10).toFixed(1) + '%' : ' - ';
+    manL13El.style.color = !l13Avail ? '#888' : manVsL13 > 0 ? '#2e7d32' : manVsL13 < 0 ? '#c62828' : '#888';
+  }
+}
+
 // Colored pill badge for forecast status (returns HTML string or '').
 function _fcstStatusBadge(status) {
   const styles = {
