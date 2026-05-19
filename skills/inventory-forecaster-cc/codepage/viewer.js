@@ -4260,7 +4260,7 @@ async function addComment(key) {
   // Reset comment form flag control after save
   const _fyiChkReset = document.getElementById('cmt-fyi-' + key);
   if (_fyiChkReset) { _fyiChkReset.checked = false; }
-  else { const _sel = document.getElementById('cmt-flag-' + key); if (_sel) _sel.value = 'Needs Action'; }
+  else { const _sel = document.getElementById('cmt-flag-' + key); if (_sel) _sel.value = (rec && rec.planner_reply_pending) ? 'Manager Response' : 'Needs Action'; }
   const rec    = ALL_RECORDS.find(x => x.key === key);
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   // Deferred auto-flag QB write: only now that the comment is saved do we
