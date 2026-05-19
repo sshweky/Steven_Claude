@@ -2598,16 +2598,8 @@ async function closeBaseStyle(key) {
 
 // -- For-Me count (badge + button) -------------------------------------------
 function updateForMeCount() {
-  let n;
-  if (_USER_IS_PLANNER && CURRENT_USER.name) {
-    const myName = CURRENT_USER.name.toLowerCase();
-    n = ALL_RECORDS.filter(r => r.manager_reply_pending &&
-        (r.inv_manager || '').toLowerCase() === myName).length;
-  } else if (_USER_IS_PLANNER) {
-    n = ALL_RECORDS.filter(r => r.manager_reply_pending).length;
-  } else {
-    n = ALL_RECORDS.filter(r => r.planner_reply_pending).length;
-  }
+  // Count loaded projection records that have an active comment addressed to me
+  const n = ALL_RECORDS.filter(r => _FOR_ME_KEYS.has(r.key)).length;
   const el  = document.getElementById('forMeCount');
   const btn = document.getElementById('forMeBtn');
   if (el) { el.textContent = n + ' item' + (n === 1 ? '' : 's') + ' for me'; el.style.display = n ? 'inline' : 'none'; }
