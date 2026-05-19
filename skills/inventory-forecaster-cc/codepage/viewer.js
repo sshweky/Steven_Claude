@@ -2357,6 +2357,38 @@ function buildSwitchoverMap() {
   );
 }
 
+// Returns the index (0-based) of the first week that belongs to the NEW style,
+// or -1 if no manual switchover is active for this key.
+// weekDates: array of 26 JS Date objects, one per projection week (Mon of that week).
+function _switchoverWeekIndex(key, weekDates) {
+  const sw = MANUAL_SWITCHOVER_MAP.get(key) || MANUAL_SWITCHOVER_REVERSE.get(key);
+  if (!sw || !sw.date) return -1;
+  const cutoff = sw.date;
+  // First week whose Monday is >= switchover date
+  for (let i = 0; i < weekDates.length; i++) {
+    if (weekDates[i] >= cutoff) return i;
+  }
+  return weekDates.length;   // switchover is beyond the 26-week window
+}
+
+// Builds an array of 26 JS Date objects (each is the Monday of that proj week).
+// Week 0 = current week (last Monday).  Cached for the session.
+let _weekDateCache = null;
+function _getWeekDates() {
+  if (_weekDateCache) return _weekDateCache;
+  const today = new Date();
+  const dow   = today.getDay();
+  const lastMon = new Date(today);
+  lastMon.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+  lastMon.setHours(0, 0, 0, 0);
+  _weekDateCache = Array.from({ length: 26 }, (_, i) => {
+    const d = new Date(lastMon);
+    d.setDate(lastMon.getDate() + i * 7);
+    return d;
+  });
+  return _weekDateCache;
+}
+
 // Writes Status_Cust = 'CLOSED' on the base style after planner confirms.
 async function closeBaseStyle(key) {
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
