@@ -5392,7 +5392,7 @@ async function saveAiCommentOnly(key) {
     const A = CFG.AI_COMMENT_FID;
     const fields = {};
     fields[A.ACCT_MSTYLE] = { value: key };
-    fields[A.NOTE]        = { value: ta.value.trim() };
+    fields[A.NOTE]        = { value: _replaceWeekRefsWithDates(ta.value.trim()) };
     fields[A.IGNORED]     = { value: true };   // unparseable -> never replay
     await qb('/records', { to: CFG.AI_COMMENTS_TID, data: [fields] });
     ta.value = '';
