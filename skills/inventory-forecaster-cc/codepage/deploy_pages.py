@@ -70,7 +70,7 @@ def upload_page(filename: str):
     req = urllib.request.Request(
         f"{URL}?a=API_AddReplaceDBPage",
         data=xml_bytes,
-        headers={"Content-Type": "application/xml", "QB-Realm-Hostname": REALM},
+        headers={"Content-Type": "text/xml; charset=UTF-8", "QB-Realm-Hostname": REALM},
         method="POST",
     )
     try:
