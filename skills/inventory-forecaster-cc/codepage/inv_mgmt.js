@@ -1212,24 +1212,153 @@ function renderDetail(r) {
     var purETDLabel = r.purchase_rec_push_supplier
       ? '<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b> <span style="color:#c62828;font-size:10px;font-weight:700;">&#9888; PUSH SUPPLIER</span>'
       : (r.purchase_rec_etd ? '<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b>' : '&#8212;');
-    purRecSection = '<div class="section"><h3>&#128722; Purchase Recommendation</h3>'
-      +'<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">'
-      +kvBox('New Order Required',
-        kvRow('Recommended Qty','<b style="font-size:16px;color:#1a237e;">'+fmtInt(r.purchase_rec)+'</b> units')
-        +kvRow('Required ETD', purETDLabel)
-        +kvRow('Receipt Needed By',r.purchase_rec_receipt_date?'<b>'+fmtDate(r.purchase_rec_receipt_date)+'</b>':'&#8212;')
-        +kvRow('MOQ (floor)',fmtInt(r.moq)+' units'),
-        '#fff3e0','1')
-      +kvBox('Calculation',
-        kvRow('Trigger Week','Wk '+purTrigWk+' (first dip below Opt OH)')
-        +kvRow('Prj Inv at Wk '+purTrigWk,fmtInt(purTrigInv)+' units')
-        +kvRow('Target (Opt OH + 4wk buffer)',fmtInt(purTarget)+' = '+fmtInt(r.opt_oh)+' + '+fmtInt(purBufUnits))
-        +kvRow('Gap (order qty)',fmtInt(purGap)+' units')
-        +kvRow('Req ETD formula','Receipt ('+fmtDate(r.purchase_rec_receipt_date)+') - '+r.lt_trans_days+'d LT'),
-        '#f3e5f5','1')
-      +'</div></div>';
+
+    // Retrieve persisted selections for this mstyle
+    var purSel = purchaseSelections[r.mstyle] || {};
+    var needQtyVal = purSel.needQty != null ? purSel.needQty : r.purchase_rec;
+    var chosenSupplier = purSel.chosenSupplier || '';
+
+    // Summary bar
+    var purSummary = '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;background:#e8eaf6;border:1px solid #c5cae9;border-radius:6px;padding:12px 16px;margin-bottom:14px;">'
+      +'<div style="flex:0 0 auto;">'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;">Recommended Qty</div>'
+        +'<div style="font-size:22px;font-weight:700;color:#1a237e;">'+fmtInt(r.purchase_rec)+' <span style="font-size:12px;font-weight:400;color:#666;">units</span></div>'
+      +'</div>'
+      +'<div style="flex:0 0 auto;">'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;">Required ETD</div>'
+        +'<div style="font-size:16px;font-weight:700;">'+purETDLabel+'</div>'
+      +'</div>'
+      +'<div style="flex:0 0 auto;">'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;">Receipt Needed By</div>'
+        +'<div style="font-size:14px;font-weight:600;color:#333;">'+(r.purchase_rec_receipt_date?fmtDate(r.purchase_rec_receipt_date):'&#8212;')+'</div>'
+      +'</div>'
+      +'<div style="flex:0 0 auto;">'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;">Calc: Wk '+purTrigWk+' Prj OH</div>'
+        +'<div style="font-size:13px;color:#444;">'+fmtInt(purTrigInv)+' + '+fmtInt(purGap)+' needed = '+fmtInt(purTarget)+'</div>'
+      +'</div>'
+      +'<div style="flex:0 0 auto;margin-left:auto;">'
+        +'<label style="font-size:11px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Need Qty (editable)</label>'
+        +'<input type="number" id="needQty_'+esc(r.mstyle)+'" value="'+needQtyVal+'" min="0" step="1" '
+          +'style="width:120px;font-size:16px;font-weight:700;color:#1a237e;border:2px solid #7986cb;border-radius:4px;padding:4px 8px;text-align:right;font-family:inherit;" '
+          +'onchange="(function(el){var ms=\''+esc(r.mstyle)+'\';if(!purchaseSelections[ms])purchaseSelections[ms]={};purchaseSelections[ms].needQty=parseInt(el.value)||0;})(this)">'
+      +'</div>'
+      +'</div>';
+
+    // Build supplier columns
+    // Each entry: { key, label, fob, moq, lt, elc_nj, elc_la, mu_nj, mu_la, qty_ord, pct_ord, infoHtml }
+    // For main supplier: parse from supplier_info HTML or use individual fields
+    var suppCols = [];
+
+    // Main supplier - extract name from supplier_info if possible, else use FOB cost presence
+    var mainName = '';
+    if (r.supplier_info) {
+      var nameMatch = stripHtml(r.supplier_info).match(/^([^\n]+)/);
+      if (nameMatch) mainName = nameMatch[1].trim();
+    }
+    if (!mainName && r.fob_cost > 0) mainName = 'Main Supplier';
+    if (mainName || r.fob_cost > 0 || r.elc_nj > 0) {
+      suppCols.push({ key:'main', label: mainName || 'Main Supplier',
+        fob:r.fob_cost, moq:r.moq, lt:r.lt_trans_days,
+        elc_nj:r.elc_nj, elc_la:r.elc_la, mu_nj:r.mu_nj, mu_la:r.mu_la,
+        qty_ord:r.qty_ord_supplier, pct_ord:r.pct_units_ord_supplier });
+    }
+    if (r.alt1_name) {
+      suppCols.push({ key:'alt1', label:r.alt1_name,
+        fob:r.alt1_fob, moq:r.alt1_moq, lt:r.alt1_lt,
+        elc_nj:r.alt1_elc_nj, elc_la:r.alt1_elc_la, mu_nj:r.alt1_mu_nj, mu_la:r.alt1_mu_la,
+        qty_ord:r.alt1_qty_ord, pct_ord:r.alt1_pct_ord });
+    }
+    if (r.alt2_name) {
+      suppCols.push({ key:'alt2', label:r.alt2_name,
+        fob:r.alt2_fob, moq:r.alt2_moq, lt:r.alt2_lt,
+        elc_nj:r.alt2_elc_nj, elc_la:r.alt2_elc_la, mu_nj:r.alt2_mu_nj, mu_la:r.alt2_mu_la,
+        qty_ord:r.alt2_qty_ord, pct_ord:r.alt2_pct_ord });
+    }
+    if (r.alt3_name) {
+      suppCols.push({ key:'alt3', label:r.alt3_name,
+        fob:r.alt3_fob, moq:r.alt3_moq, lt:r.alt3_lt,
+        elc_nj:r.alt3_elc_nj, elc_la:r.alt3_elc_la, mu_nj:r.alt3_mu_nj, mu_la:r.alt3_mu_la,
+        qty_ord:r.alt3_qty_ord, pct_ord:r.alt3_pct_ord });
+    }
+
+    // Determine best MU% column for highlighting (highest NJ MU%)
+    var bestMU = suppCols.reduce(function(best, s){ return (s.mu_nj||0) > best ? (s.mu_nj||0) : best; }, 0);
+
+    var suppTable = '';
+    if (suppCols.length > 0) {
+      // Metric rows
+      var rows = [
+        { lbl:'FOB Cost',      fn:function(s){ return fmtCur(s.fob); } },
+        { lbl:'MOQ',           fn:function(s){ return s.moq ? fmtInt(s.moq)+' units' : '&#8212;'; } },
+        { lbl:'Lead Time',     fn:function(s){ return s.lt ? s.lt+' days' : '&#8212;'; } },
+        { lbl:'ELC NJ',        fn:function(s){ return fmtCur(s.elc_nj); } },
+        { lbl:'ELC LA',        fn:function(s){ return fmtCur(s.elc_la); } },
+        { lbl:'MU% NJ',        fn:function(s){ return fmtPct(s.mu_nj); }, highlight:function(s){ return (s.mu_nj||0) === bestMU && bestMU > 0; } },
+        { lbl:'MU% LA',        fn:function(s){ return fmtPct(s.mu_la); } },
+        { lbl:'Units Ordered', fn:function(s){ return s.qty_ord ? fmtInt(s.qty_ord) : '&#8212;'; } },
+        { lbl:'% of Orders',   fn:function(s){ return s.pct_ord ? fmtPct(s.pct_ord) : '&#8212;'; } }
+      ];
+
+      // Table header
+      suppTable += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      suppTable += '<thead><tr style="background:#3f51b5;color:#fff;">'
+        +'<th style="padding:8px 10px;text-align:left;font-weight:600;min-width:120px;border-right:1px solid #5c6bc0;">Metric</th>';
+      suppCols.forEach(function(s, idx) {
+        var isBest = (s.mu_nj||0) === bestMU && bestMU > 0;
+        var hdrBg = idx === 0 ? 'background:#283593;' : (isBest ? 'background:#1b5e20;' : 'background:#3f51b5;');
+        suppTable += '<th style="padding:8px 10px;text-align:center;font-weight:600;min-width:150px;'+hdrBg+'border-right:1px solid #5c6bc0;">';
+        if (idx === 0) suppTable += '<span style="font-size:9px;opacity:0.8;display:block;text-transform:uppercase;letter-spacing:0.5px;">Main</span>';
+        else suppTable += '<span style="font-size:9px;opacity:0.8;display:block;text-transform:uppercase;letter-spacing:0.5px;">ALT '+(idx)+'</span>';
+        suppTable += '<span style="font-size:13px;">'+esc(s.label)+'</span></th>';
+      });
+      suppTable += '</tr></thead><tbody>';
+
+      // Data rows
+      rows.forEach(function(row, ri) {
+        var rowBg = ri % 2 === 0 ? '#f5f5f5' : '#ffffff';
+        suppTable += '<tr style="background:'+rowBg+';">'
+          +'<td style="padding:6px 10px;font-weight:600;color:#555;border-right:1px solid #e0e0e0;border-bottom:1px solid #e9ecef;">'+row.lbl+'</td>';
+        suppCols.forEach(function(s) {
+          var val = row.fn(s);
+          var isHL = row.highlight && row.highlight(s);
+          var cellStyle = 'padding:6px 10px;text-align:center;border-right:1px solid #e0e0e0;border-bottom:1px solid #e9ecef;';
+          if (isHL) cellStyle += 'background:#e8f5e9;color:#1b5e20;font-weight:700;';
+          suppTable += '<td style="'+cellStyle+'">'+val+'</td>';
+        });
+        suppTable += '</tr>';
+      });
+
+      // Choose this Supplier row
+      suppTable += '<tr style="background:#e8eaf6;border-top:2px solid #7986cb;">'
+        +'<td style="padding:8px 10px;font-weight:700;color:#3f51b5;border-right:1px solid #c5cae9;">Choose</td>';
+      suppCols.forEach(function(s) {
+        var isChosen = chosenSupplier === s.key;
+        var btnStyle = isChosen
+          ? 'background:#1b5e20;color:#fff;border:2px solid #1b5e20;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;'
+          : 'background:#fff;color:#3f51b5;border:2px solid #7986cb;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;';
+        var btnLabel = isChosen ? '&#10003; Selected' : 'Choose this Supplier';
+        suppTable += '<td style="padding:8px 10px;text-align:center;border-right:1px solid #c5cae9;">'
+          +'<button style="'+btnStyle+'" '
+            +'onclick="(function(btn){var ms=\''+esc(r.mstyle)+'\';var key=\''+s.key+'\';'
+              +'if(!purchaseSelections[ms])purchaseSelections[ms]={};'
+              +'purchaseSelections[ms].chosenSupplier=key;'
+              +'renderDetailForMstyle(ms);})(this)">'
+          +btnLabel+'</button></td>';
+      });
+      suppTable += '</tr></tbody></table></div>';
+    } else {
+      suppTable = '<div style="color:#888;font-style:italic;font-size:12px;">No supplier data available for this item.</div>';
+    }
+
+    purRecSection = '<div class="section"><h3>&#128722; Recommended Purchase</h3>'
+      +purSummary
+      +'<div style="margin-top:4px;margin-bottom:8px;font-size:11px;color:#666;">'
+        +'<b>Calc:</b> Opt OH ('+fmtInt(r.opt_oh)+') + 4-wk buffer ('+fmtInt(purBufUnits)+') - Wk '+purTrigWk+' Prj OH ('+fmtInt(purTrigInv)+') = <b>'+fmtInt(purGap)+'</b> units gap, floored at MOQ ('+fmtInt(r.moq)+'), rounded to master pack.'
+      +'</div>'
+      +suppTable
+      +'</div>';
   } else {
-    purRecSection = '<div class="section"><h3>&#128722; Purchase Recommendation</h3>'
+    purRecSection = '<div class="section"><h3>&#128722; Recommended Purchase</h3>'
       +'<div style="color:#1b5e20;font-style:italic;">&#10003; No new order needed - projected inventory stays above Opt OH ('+fmtInt(r.opt_oh)+' units) through the 26-week window.</div>'
       +'</div>';
   }
