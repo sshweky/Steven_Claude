@@ -6300,7 +6300,7 @@ async function bootstrap() {
     renderTable();
     applyFilters();
     updateReplyCount();   // show 💬 banner if planner replies exist (directors)
-    updateForMeCount();   // show 📋 banner if items need attention (planners)
+    refreshForMeKeys();   // async — populates _FOR_ME_KEYS from SEND_TO on active comments, then calls updateForMeCount
 
     const ms = (performance.now() - t0).toFixed(0);
     console.log(`Codepage viewer bootstrap completed in ${ms}ms`);
