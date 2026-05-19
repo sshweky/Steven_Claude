@@ -1256,12 +1256,12 @@ function renderDetail(r) {
       +'</div>'
       +'</div>';
 
-    // Build supplier columns
+    // Build supplier columns - extract main name from before first <br> in supplier_info
     var suppCols = [];
     var mainName = '';
     if (r.supplier_info) {
-      var nameMatch = stripHtml(r.supplier_info).match(/^([^\n]+)/);
-      if (nameMatch) mainName = nameMatch[1].trim();
+      var beforeBr = r.supplier_info.split(/<br\s*\/?>/i)[0];
+      mainName = stripHtml(beforeBr).trim();
     }
     if (!mainName && r.fob_cost > 0) mainName = 'Main Supplier';
     if (mainName || r.fob_cost > 0 || r.elc_nj > 0) {
@@ -1286,13 +1286,28 @@ function renderDetail(r) {
     // Best MU% NJ for green highlight
     var bestMU = suppCols.reduce(function(b, s){ return (s.mu_nj||0) > b ? (s.mu_nj||0) : b; }, 0);
 
-    // Supplier card layout
-    function suppCardRow(lbl, val, highlight) {
-      var vStyle = highlight ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
-      return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
-        +'<span style="color:#666;min-width:90px;">'+lbl+'</span>'
-        +'<span style="'+vStyle+'text-align:right;">'+val+'</span>'
+    // Card row helpers
+    function scRow(lbl, val, hl) {
+      var vStyle = hl ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
+      return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
+        +'<span style="color:#666;">'+lbl+'</span>'
+        +'<span style="'+vStyle+'">'+val+'</span>'
         +'</div>';
+    }
+    // Two values on one line, each with its own sub-label
+    function scRowPair(lbl1, val1, lbl2, val2, hl1, hl2) {
+      var s1 = hl1 ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
+      var s2 = hl2 ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
+      return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
+        +'<span style="color:#666;">'+lbl1+'</span>'
+        +'<span style="'+s1+'margin-right:10px;">'+val1+'</span>'
+        +'<span style="color:#666;">'+lbl2+'</span>'
+        +'<span style="'+s2+'">'+val2+'</span>'
+        +'</div>';
+    }
+    // Section divider with label inside the card body
+    function scSection(lbl) {
+      return '<div style="font-size:9px;font-weight:700;color:#9e9e9e;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 2px;">'+lbl+'</div>';
     }
 
     var suppCards = '<div style="display:flex;gap:12px;flex-wrap:wrap;">';
@@ -1310,25 +1325,19 @@ function renderDetail(r) {
           : 'width:100%;padding:7px;font-size:11px;font-weight:600;border:1px solid #7986cb;border-radius:4px;cursor:pointer;background:#fff;color:#3f51b5;font-family:inherit;';
         var btnLabel = isChosen ? '&#10003; Selected' : 'Choose this Supplier';
 
-        suppCards += '<div style="flex:1;min-width:180px;max-width:260px;border:'+cardBorder+';border-radius:6px;background:'+cardBg+';overflow:hidden;">'
-          // Card header
+        suppCards += '<div style="flex:1;min-width:190px;max-width:260px;border:'+cardBorder+';border-radius:6px;background:'+cardBg+';overflow:hidden;">'
           +'<div style="background:'+hdrBg+';color:#fff;padding:8px 10px;">'
             +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;opacity:0.8;margin-bottom:2px;">'+esc(s.badge)+'</div>'
             +'<div style="font-size:13px;font-weight:700;line-height:1.25;">'+esc(s.label)+'</div>'
           +'</div>'
-          // Card body
           +'<div style="padding:8px 10px;">'
-            +suppCardRow('FOB Cost', fmtCur(s.fob))
-            +suppCardRow('MOQ', s.moq ? fmtInt(s.moq)+' units' : '&#8212;')
-            +suppCardRow('Lead Time', s.lt ? s.lt+' days' : '&#8212;')
-            +suppCardRow('ELC NJ', fmtCur(s.elc_nj))
-            +suppCardRow('ELC LA', fmtCur(s.elc_la))
-            +suppCardRow('MU% NJ', fmtPct(s.mu_nj), isBestMU)
-            +suppCardRow('MU% LA', fmtPct(s.mu_la))
-            +suppCardRow('Units Ordered', s.qty_ord ? fmtInt(s.qty_ord) : '&#8212;')
-            +suppCardRow('% of Orders', s.pct_ord ? fmtPct(s.pct_ord) : '&#8212;')
+            +scRow('FOB Cost', fmtCur(s.fob))
+            +scRowPair('Lead Time', s.lt ? s.lt+'d' : '&#8212;', 'MOQ', s.moq ? fmtInt(s.moq) : '&#8212;')
+            +scRowPair('ELC NJ', fmtCur(s.elc_nj), 'ELC LA', fmtCur(s.elc_la))
+            +scRowPair('MU% NJ', fmtPct(s.mu_nj), 'MU% LA', fmtPct(s.mu_la), isBestMU, false)
+            +scSection('Ordered from Supplier')
+            +scRowPair('Units', s.qty_ord ? fmtInt(s.qty_ord) : '&#8212;', '% Total', s.pct_ord ? fmtPct(s.pct_ord) : '&#8212;')
           +'</div>'
-          // Choose button
           +'<div style="padding:8px 10px;border-top:1px solid #eee;">'
             +'<button style="'+btnStyle+'" '
               +'onclick="(function(){var ms=\''+esc(r.mstyle)+'\';var key=\''+s.key+'\';'
