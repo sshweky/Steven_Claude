@@ -5297,7 +5297,7 @@ async function applyAiAdjustment(key) {
 
   // Encode intent for potential future F58 replay (stored in the note).
   const intent   = _encodeAiIntent(rec.ai_fcst || [], vals, W1_DATE);
-  const noteText = `${rec._ai_adjust_text}${intent ? ' ' + intent : ''}`;
+  const noteText = `${_replaceWeekRefsWithDates(rec._ai_adjust_text)}${intent ? ' ' + intent : ''}`;
 
   const safeId    = key.replace(/[^a-zA-Z0-9]/g, '_');
   const previewDiv = document.getElementById('ai-adj-preview-' + safeId);
