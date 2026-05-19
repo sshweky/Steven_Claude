@@ -622,7 +622,10 @@ async function attachDetailData(records) {
     };
   });
   _applyDetailMap(records, map);
-  try { await _idb.set(CACHE_KEY_DTL, { ts: Date.now(), map: map }); } catch(_) {}
+  try {
+    var dtlJson = JSON.stringify({ ts: Date.now(), map: map }, _jsonSer);
+    await _idb.set(CACHE_KEY_DTL, dtlJson);
+  } catch(e) { console.warn('[InvMgmt] detail IDB save failed:', e && e.message); }
   console.info('[InvMgmt] detail data loaded fresh and cached');
 }
 function _applyDetailMap(records, map) {
