@@ -3056,6 +3056,15 @@ async function toggleDetail(key) {
       } else {
         begCells += `<td style="color:#bbb;font-size:10px;background:#fffbea"> - </td>`;
       }
+      // Projected Demand
+      if (_prj) {
+        const pv = _prj[i] || 0;
+        prjTot += pv;
+        const color = pv > 0 ? '#2e7d32' : '#bbb';
+        prjCells += `<td style="color:${color};font-size:10px;background:#f1f8e9">${pv > 0 ? fmtN(Math.round(pv)) : '&mdash;'}</td>`;
+      } else {
+        prjCells += `<td style="color:#bbb;font-size:10px;background:#f1f8e9"> - </td>`;
+      }
       // Expected Receipts
       if (_rcv) {
         const rv = _rcv[i];
