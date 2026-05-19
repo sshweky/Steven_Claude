@@ -961,6 +961,12 @@ function renderDetail(r) {
   var lag=isUSA?USA_WAREHOUSE_LAG:WAREHOUSE_LAG_DAYS;
   var w1sun=new Date(today);w1sun.setDate(today.getDate()-today.getDay());
 
+  // Purchase recommendation detail vars
+  var purRcptWk = r.lt_trans_days > 0 ? Math.ceil(r.lt_trans_days / 7) : 0;
+  var purPrjAtRcpt = (purRcptWk >= 1 && purRcptWk <= 26) ? (r.beg_inv[purRcptWk - 1] || 0) : 0;
+  var purTarget = r.opt_oh + 2 * r.prj_wk;
+  var purGap = Math.max(0, purTarget - purPrjAtRcpt);
+
   // Map POs to forecast weeks via ETA + warehouse lag
   var poByWeek={};
   (r.open_pos||[]).forEach(function(p){
