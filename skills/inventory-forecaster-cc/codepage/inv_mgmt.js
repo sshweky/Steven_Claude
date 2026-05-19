@@ -21,6 +21,9 @@ var CACHE_KEY     = 'pp_inv_mgmt_v3';          // main (phase 1) IDB key
 var CACHE_KEY_DTL = 'pp_inv_mgmt_dtl_v3';      // detail (phase 2) IDB key
 var CACHE_KEY_SS  = 'pp_inv_mgmt_ss_v3';       // sessionStorage fast-path key
 var CACHE_TTL     = 24 * 60 * 60 * 1000;       // 24h (was 6h)
+// Pre-filter: exclude truly inactive items (qty_oh=0 AND opt_wos=0).
+// ItemStatus (fid 294) is a lookup -- cannot be used in QB WHERE -- so we use numeric fields.
+var IF_PRE_FILTER = '{24.GT.0}OR{137.GT.0}';
 
 var OPT_WOS_DEFAULT       = 4.0;
 var PUR_REC_BUFFER_WKS    = 4;     // extra weeks of demand added to Opt_OH as reorder buffer (~monthly reorder cycle)
