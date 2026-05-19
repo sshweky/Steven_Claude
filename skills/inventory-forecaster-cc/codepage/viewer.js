@@ -4247,7 +4247,6 @@ async function loadCommentHistory(key, force) {
   const aiCutoff  = new Date(Date.now() - 183 * 86400 * 1000).toISOString();  // AI adjustments:    6 months
   const escKey = key.replace(/'/g, "''");
 
-  const escHtml = s => String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]);
   const fmtTs = ts => {
     try { return new Date(ts).toLocaleString('en-US', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }); }
     catch (e) { return ts || ''; }
