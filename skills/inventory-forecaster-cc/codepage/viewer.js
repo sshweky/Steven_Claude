@@ -4197,9 +4197,21 @@ async function addComment(key) {
 //   - Planner_Reply_Pending → false  (removes 💬 badge)
 //   - Manager_Reply_Pending → false  (removes 📋 badge — loop fully closed)
 //   - FLAGGED               → false  (removes red tint)
-async function markReviewed(key, btnEl) {
+async function markReviewed(key, commentRid, btnEl) {
   if (btnEl) { btnEl.disabled = true; btnEl.textContent = '...'; }
   try {
+    // 1. Flip the FLAG on the specific comment record to "Reviewed"
+    if (commentRid) {
+      const cf = {};
+      cf[CFG.COMMENT_FID.RECORD_ID] = { value: commentRid };
+      cf[CFG.COMMENT_FID.FLAG]      = { value: 'Reviewed' };
+      await qb('/records', {
+        to: CFG.COMMENTS_TID,
+        data: [cf],
+        mergeFieldId: CFG.COMMENT_FID.RECORD_ID,
+      });
+    }
+    // 2. Clear pending-reply and flagged state on the Projections record
     const pf = {};
     pf[CFG.FID.KEY]                   = { value: key };
     pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: false };
