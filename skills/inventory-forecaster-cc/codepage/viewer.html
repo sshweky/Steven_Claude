@@ -503,9 +503,6 @@ window.QB_CONFIG = {
   <div class="ms-wrap"><span class="ms-label">Inv Mgr</span>
     <div id="mgrFilter" class="ms" data-all-label="All Inventory Mgrs"></div>
   </div>
-  <div class="ms-wrap"><span class="ms-label">Fcst Status</span>
-    <div id="fcstStatusFilter" class="ms" data-all-label="All Statuses"></div>
-  </div>
   <div class="ms-wrap"><span class="ms-label">AI vs Proj</span>
     <select id="aiDiffFilter" onchange="applyFilters()">
       <option value="0">All (any difference)</option>
@@ -514,12 +511,13 @@ window.QB_CONFIG = {
       <option value="50">AI vs Proj &gt; 50%</option>
     </select>
   </div>
+  <div class="ms-wrap"><span class="ms-label">Fcst Status</span>
+    <div id="fcstStatusFilter" class="ms" data-all-label="All Statuses"></div>
+  </div>
   <button type="button" onclick="resetSort()" title="Restore the default order (Inv Mgr -> Brand -> Customer -> Mstyle); leaves filters alone" style="font-size:11px;padding:4px 10px;border:1px solid #1565c0;background:#fff;color:#1565c0;border-radius:4px;cursor:pointer;font-weight:600;">Reset Sort</button>
-  <button type="button" id="flaggedOnlyBtn" onclick="toggleFlaggedOnly()" title="Show only records flagged for inventory mgr review (toggle)" style="font-size:11px;padding:4px 10px;border:1px solid #c62828;background:#fff;color:#c62828;border-radius:4px;cursor:pointer;font-weight:600;">&#x2691; Show Flagged Only</button>
-  <button type="button" id="replyOnlyBtn" onclick="toggleReplyOnly()" title="Show only records with a planner reply awaiting director review" style="font-size:11px;padding:4px 10px;border:1px solid #00695c;background:#fff;color:#00695c;border-radius:4px;cursor:pointer;font-weight:600;">💬 Show Replies Only</button>
-  <button type="button" id="forMeBtn" onclick="toggleForMe()" title="📬 Show items that need your attention: planners see manager-flagged items; directors see planner responses" style="font-size:11px;padding:4px 10px;border:1px solid #e65100;background:#fff;color:#e65100;border-radius:4px;cursor:pointer;font-weight:600;">📬 For Me</button>
-  <button type="button" id="offPlanOnlyBtn" onclick="toggleOffPlanOnly()" title="Show only Over-Projected and Under-Projected records (items where AI and manual diverge by >10%)" style="font-size:11px;padding:4px 10px;border:1px solid #6a1b9a;background:#fff;color:#6a1b9a;border-radius:4px;cursor:pointer;font-weight:600;">↕ Show Off-Plan Only</button>
-  <button type="button" id="myRecordsBtn" onclick="toggleMyRecords()" title="Show only records assigned to you as Inv Manager. Planners start with this on; directors/VPs start with it off." style="font-size:11px;padding:4px 10px;border:1px solid #1565c0;background:#fff;color:#1565c0;border-radius:4px;cursor:pointer;font-weight:600;">👤 My Records</button>
+  <button type="button" id="flaggedOnlyBtn" onclick="toggleFlaggedOnly()" title="Show only records flagged for inventory mgr review (toggle)" style="font-size:11px;padding:4px 10px;border:1px solid #c62828;background:#fff;color:#c62828;border-radius:4px;cursor:pointer;font-weight:600;">&#x2691; Show Flagged</button>
+  <button type="button" id="replyOnlyBtn" onclick="toggleReplyOnly()" title="Show only records with a planner reply awaiting director review" style="font-size:11px;padding:4px 10px;border:1px solid #00695c;background:#fff;color:#00695c;border-radius:4px;cursor:pointer;font-weight:600;">&#x1F4AC; Show Replies</button>
+  <button type="button" id="forMeBtn" onclick="toggleForMe()" title="📬 Show items that need your attention: planners see manager-flagged items; directors see planner responses" style="font-size:11px;padding:4px 10px;border:1px solid #e65100;background:#fff;color:#e65100;border-radius:4px;cursor:pointer;font-weight:600;">&#x1F4EC; For Me</button>
   <button type="button" onclick="resetAllFilters()" title="Clear search box and reset every filter to its default" style="font-size:11px;padding:4px 10px;border:1px solid #c62828;background:#fff;color:#c62828;border-radius:4px;cursor:pointer;font-weight:600;">x Clear Filters</button>
   <button type="button" onclick="forceRefresh()" title="Clear cache and reload all data from Quickbase" style="font-size:11px;padding:4px 10px;border:1px solid #1565c0;background:#fff;color:#1565c0;border-radius:4px;cursor:pointer;font-weight:600;">&#128260; Refresh from QB</button>
   <span class="stat" id="statLine">... records shown</span>
