@@ -160,34 +160,43 @@ async function qbQueryAll(tableId, fieldIds, where, label) {
   return all;
 }
 
-// -- Cache (localStorage with sessionStorage fallback for large datasets) ------
-function saveCache(data) {
-  var payload = JSON.stringify({ ts: Date.now(), data: data });
-  // Try localStorage first (persists across browser refreshes for up to CACHE_TTL)
-  try {
-    localStorage.setItem(CACHE_KEY, payload);
-    sessionStorage.removeItem(CACHE_KEY); // clear session copy if ls succeeded
-    return;
-  } catch(e) {}
-  // localStorage full (QuotaExceededError) -- fall back to sessionStorage
-  // sessionStorage survives Ctrl+R but clears when the tab closes
-  try { sessionStorage.setItem(CACHE_KEY, payload); } catch(e) {}
+// -- Cache (IndexedDB primary, sessionStorage fast-path for same-tab F5) ------
+async function saveCache(data) {
+  var obj = { ts: Date.now(), data: data };
+  try { sessionStorage.setItem(CACHE_KEY_SS, JSON.stringify(obj)); } catch(_) {}
+  try { await _idb.set(CACHE_KEY, obj); } catch(e) {
+    console.warn('[InvMgmt] IDB save failed:', e && e.message);
+  }
+  // Evict stale old-version keys
+  try { localStorage.removeItem('pp_inv_mgmt_codepage_v2'); } catch(_) {}
+  try { sessionStorage.removeItem('pp_inv_mgmt_codepage_v2'); } catch(_) {}
 }
-function loadCache() {
-  // Prefer localStorage (cross-refresh), fall back to sessionStorage
-  var raw = null;
-  try { raw = localStorage.getItem(CACHE_KEY); } catch(e) {}
-  if (!raw) { try { raw = sessionStorage.getItem(CACHE_KEY); } catch(e) {} }
-  if (!raw) return null;
+async function loadCache() {
+  // 1. sessionStorage -- instant same-tab F5, no async needed
   try {
-    var obj = JSON.parse(raw);
-    if (Date.now() - obj.ts > CACHE_TTL) return null;
-    return obj;
-  } catch(e) { return null; }
+    var raw = sessionStorage.getItem(CACHE_KEY_SS);
+    if (raw) {
+      var obj = JSON.parse(raw);
+      if (obj && typeof obj.ts === 'number' && obj.data &&
+          Date.now() - obj.ts <= CACHE_TTL) return { obj: obj, src: 'session' };
+    }
+  } catch(_) {}
+  // 2. IndexedDB -- cross-tab, cross-session
+  try {
+    var obj = await _idb.get(CACHE_KEY);
+    if (obj && typeof obj.ts === 'number' && obj.data &&
+        Date.now() - obj.ts <= CACHE_TTL) {
+      try { sessionStorage.setItem(CACHE_KEY_SS, JSON.stringify(obj)); } catch(_) {}
+      return { obj: obj, src: 'idb' };
+    }
+  } catch(_) {}
+  return null;
 }
-function clearCache() {
-  try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
-  try { sessionStorage.removeItem(CACHE_KEY); } catch(e) {}
+async function clearCache() {
+  try { localStorage.removeItem('pp_inv_mgmt_codepage_v2'); } catch(_) {}
+  try { sessionStorage.removeItem(CACHE_KEY_SS); } catch(_) {}
+  try { await _idb.del(CACHE_KEY); } catch(_) {}
+  try { await _idb.del(CACHE_KEY_DTL); } catch(_) {}
 }
 function fmtTimestamp(ts) {
   var d = new Date(ts);
