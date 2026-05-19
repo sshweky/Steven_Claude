@@ -85,9 +85,8 @@ async function _hdrs(dbid) {
 // The name is matched case-insensitively against inv_manager values in the
 // loaded records to determine whether the visitor is a planner (owns records)
 // or a director/VP/other (no records assigned to them).
-//   Planner → SHOW_MY_RECORDS_ONLY auto-set to true on load
-//   Director/VP → see all records by default; can still click "My Records"
-//                 but it will show 0 results unless their name is in the data.
+//   Planner → _USER_IS_PLANNER = true; server-side QB fetch pre-filters to their records
+//   Director/VP → see all records by default
 
 function _decodeJwt(token) {
   try {
