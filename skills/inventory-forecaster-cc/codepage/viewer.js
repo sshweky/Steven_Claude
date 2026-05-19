@@ -2200,6 +2200,60 @@ async function toggleFlag(key) {
   }
 }
 
+async function toggleAutoProject(key) {
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (!rec || !F.AUTO_PROJECT) return;
+  const newVal = !rec.auto_project;
+  // Optimistic UI
+  rec.auto_project = newVal;
+  const safeId = key.replace(/[^a-zA-Z0-9]/g,'_');
+  const btn = document.getElementById('autoproj-' + safeId);
+  if (btn) {
+    btn.textContent = '\u{1F504} Auto Project' + (newVal ? ': ON' : ': OFF');
+    btn.style.borderColor  = newVal ? '#1b5e20' : '#bbb';
+    btn.style.background   = newVal ? '#e8f5e9' : '#f5f5f5';
+    btn.style.color        = newVal ? '#1b5e20' : '#555';
+    btn.style.fontWeight   = newVal ? '700' : '400';
+  }
+  // Update [A] badge in table row
+  const badgeCell = document.getElementById('row-badges-' + safeId);
+  if (badgeCell) {
+    let aBadge = badgeCell.querySelector('.auto-proj-badge');
+    if (newVal && !aBadge) {
+      aBadge = document.createElement('span');
+      aBadge.className = 'auto-proj-badge';
+      aBadge.title = 'Auto Project: AI projections will replace manual projections on each forecast run';
+      aBadge.style.cssText = 'display:inline-block;background:#1b5e20;color:#fff;border-radius:3px;padding:0 4px;font-size:10px;font-weight:700;letter-spacing:0.3px;margin-left:2px;';
+      aBadge.textContent = '[A]';
+      badgeCell.appendChild(aBadge);
+    } else if (!newVal && aBadge) {
+      aBadge.remove();
+    }
+  }
+  try {
+    const fields = {};
+    fields[CFG.FID.KEY]          = { value: key };
+    fields[F.AUTO_PROJECT]       = { value: newVal };
+    await qb('/records', {
+      to: CFG.PROJECTIONS_TID,
+      data: [fields],
+      mergeFieldId: CFG.FID.KEY,
+    });
+  } catch (e) {
+    // Revert on failure
+    console.error('toggleAutoProject failed:', e);
+    rec.auto_project = !newVal;
+    if (btn) {
+      btn.textContent = '\u{1F504} Auto Project' + (rec.auto_project ? ': ON' : ': OFF');
+      btn.style.borderColor = rec.auto_project ? '#1b5e20' : '#bbb';
+      btn.style.background  = rec.auto_project ? '#e8f5e9' : '#f5f5f5';
+      btn.style.color       = rec.auto_project ? '#1b5e20' : '#555';
+      btn.style.fontWeight  = rec.auto_project ? '700' : '400';
+      btn.title = 'Save failed: ' + e.message;
+    }
+  }
+}
+
 function updateFlagCount() {
   const n = ALL_RECORDS.filter(r => r.flagged).length;
   const el = document.getElementById('flagCount');
