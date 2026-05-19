@@ -2415,7 +2415,6 @@ async function saveSwitchoverField(key, field, value) {
   }
   try {
     await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
-    if (statusEl) { statusEl.style.color = '#2e7d32'; statusEl.textContent = '✓ Saved'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2500); }
     // Rebuild the switchover map so week locking reflects the change immediately.
     // Invalidate the week-date cache in case date changed.
     if (field === 'date') _weekDateCache = null;
@@ -2431,6 +2430,67 @@ async function saveSwitchoverField(key, field, value) {
     // Collapse and re-expand to re-render locked weeks and card status line
     const tr = document.getElementById('detail-' + safeId);
     if (tr) { tr.dataset.loaded = ''; }   // force re-render on next open
+
+    // -- Auto-create target Projections record when activating a switchover ------
+    // Only fires when the checkbox is being turned ON and a target mstyle is set.
+    // A separate insert is safer than merging into the main write above because
+    // the new record's KEY is different from the base style's KEY.
+    if (field === 'active' && value && rec.switchover_to_mstyle) {
+      const toMstyle = rec.switchover_to_mstyle.trim().toUpperCase();
+      const acctNum  = rec.key.slice(0, rec.key.length - rec.mstyle.length - 1);
+      const newKey   = acctNum + '-' + toMstyle;
+      if (!ALL_RECORDS.some(x => x.key === newKey)) {
+        if (statusEl) { statusEl.style.color = '#1565c0'; statusEl.textContent = 'Saved - creating record...'; }
+        const nf = {};
+        nf[CFG.FID.KEY]         = { value: newKey };
+        nf[CFG.FID.MSTYLE]      = { value: toMstyle };
+        nf[CFG.FID.ACCT_NUM]    = { value: parseInt(acctNum, 10) || 0 };
+        nf[CFG.FID.ACCT_TXT]    = { value: acctNum };
+        nf[CFG.FID.CUST]        = { value: rec.cust || '' };
+        nf[CFG.FID.STATUS_CUST] = { value: 'AUTO ADD' };
+        try {
+          await qb('/records', { to: CFG.PROJECTIONS_TID, data: [nf], mergeFieldId: CFG.FID.KEY });
+          // Add a minimal in-memory stub so the new row is immediately visible in
+          // the grid (and the switchover badge links up) without a full page reload.
+          ALL_RECORDS.push({
+            key:    newKey,  mstyle: toMstyle,  cust: rec.cust || '',
+            acct_num: acctNum,
+            asin_status:     'AUTO ADD',
+            inv_manager:     rec.inv_manager || '',
+            severity: '', volume: '', pattern: '',
+            brand:    rec.brand    || '',
+            description: '', priority: 0, note: '',
+            hist_ord:  Array(26).fill(0),
+            hist_ship: Array(26).fill(0),
+            weeks_slim: Array(26).fill(null).map(() => ({ projection: 0, ai_proj: 0, locked: false })),
+            has_comments:          false,
+            manager_reply_pending: false,
+            planner_reply_pending: false,
+            switchover_active:     false,
+            switchover_to_mstyle:  '',
+            switchover_date:       '',
+          });
+          buildSwitchoverMap();
+          if (statusEl) {
+            statusEl.style.color = '#2e7d32';
+            statusEl.textContent = '✓ Saved + new record created';
+            setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3500);
+          }
+        } catch (createErr) {
+          // The checkbox save already succeeded -- surface the create failure separately
+          // so the planner knows to add the record manually.
+          if (statusEl) {
+            statusEl.style.color = '#e65100';
+            statusEl.textContent = 'Saved, but auto-create failed: ' + (createErr.message || 'error');
+          }
+        }
+      } else {
+        // Target record already exists -- just show a normal save confirmation.
+        if (statusEl) { statusEl.style.color = '#2e7d32'; statusEl.textContent = '✓ Saved'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2500); }
+      }
+    } else {
+      if (statusEl) { statusEl.style.color = '#2e7d32'; statusEl.textContent = '✓ Saved'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2500); }
+    }
   } catch (e) {
     if (statusEl) { statusEl.style.color = '#c62828'; statusEl.textContent = 'Save failed: ' + (e.message || 'error'); }
     // Roll back in-memory
