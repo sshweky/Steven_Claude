@@ -5501,6 +5501,7 @@ window.autoFlagOnComment = autoFlagOnComment;
 window.editStatusCust = editStatusCust;
 window.toggleFlaggedOnly  = toggleFlaggedOnly;
 window.toggleForMe        = toggleForMe;
+window.closeBaseStyle     = closeBaseStyle;
 window.previewAiAdjustment = previewAiAdjustment;
 window.applyAiAdjustment   = applyAiAdjustment;
 window.cancelAiAdjustment  = cancelAiAdjustment;
