@@ -792,7 +792,7 @@ var COL_WIDTHS = {
   shp_wk_l4:44, shp_wk_l13:46, prj_wk:40, prj_l4w_change:44,
   opt_wos:40, ats_wos_oh:44, ats_wos_oh_oo:52, opt_oh:44, lt_wks:38, cny_weeks:32,
   days_oos_next_rcpt:46, next_rcpt_dt:54, gap_weeks_n:38,
-  oh_excess:54, pipeline_excess:58, pipeline_wos:48, action:96
+  oh_excess:54, pipeline_excess:58, pipeline_wos:48, action:96, purchase_rec:60
 };
 
 function visibleCols() {
