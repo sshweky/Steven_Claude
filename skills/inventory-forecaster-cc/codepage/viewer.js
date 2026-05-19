@@ -3586,7 +3586,10 @@ async function toggleDetail(key) {
       </div>` : ''}
     </div>`;
 
-  const switchoverHtml = _cosEcHtml + _receivingHtml + _manualSwitchoverCard;
+  // Hide the setup card on the variant/destination side — the planner only needs
+  // to manage the switchover from the base style row. The receiving banner still
+  // shows so the variant row makes clear where its history came from.
+  const switchoverHtml = _cosEcHtml + _receivingHtml + (_manSwRev ? '' : _manualSwitchoverCard);
 
   // Issue 8: FD Status block  -  Future Development items often have no AI narrative
   // or projections yet; show a prominent metadata card so the panel isn't blank.
