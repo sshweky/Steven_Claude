@@ -5688,6 +5688,58 @@ async function restoreAiComment(rid, key) {
 }
 window.restoreAiComment = restoreAiComment;
 
+// Inline edit for AI Comment note text.
+// editAiComment   — swaps the display div for an editable textarea
+// cancelAiCommentEdit — reverts without saving
+// saveAiCommentEdit   — writes updated NOTE to QB, preserving the [ai-intent] machine tag
+function editAiComment(rid) {
+  const displayEl = document.getElementById('ai-note-display-' + rid);
+  const editEl    = document.getElementById('ai-note-edit-'    + rid);
+  const ta        = document.getElementById('ai-note-ta-'      + rid);
+  if (!displayEl || !editEl) return;
+  displayEl.style.display = 'none';
+  editEl.style.display    = 'block';
+  if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+}
+window.editAiComment = editAiComment;
+
+function cancelAiCommentEdit(rid) {
+  const displayEl = document.getElementById('ai-note-display-' + rid);
+  const editEl    = document.getElementById('ai-note-edit-'    + rid);
+  if (!displayEl || !editEl) return;
+  displayEl.style.display = '';
+  editEl.style.display    = 'none';
+}
+window.cancelAiCommentEdit = cancelAiCommentEdit;
+
+async function saveAiCommentEdit(rid, key) {
+  const ta    = document.getElementById('ai-note-ta-'      + rid);
+  const rowEl = document.getElementById('ai-comment-row-'  + rid);
+  if (!ta || !rowEl) return;
+  const newText = ta.value.trim();
+  if (!newText) return;
+  // Re-append the [ai-intent ...] machine tag from the original note so
+  // the forecaster can still replay the numeric adjustment after the edit.
+  const fullNote    = rowEl.dataset.fullNote || '';
+  const intentMatch = fullNote.match(/\s*\[ai-intent[^\]]*\]/);
+  const intentTag   = intentMatch ? intentMatch[0] : '';
+  const finalNote   = newText + intentTag;
+  const saveBtn = ta.parentElement && ta.parentElement.querySelector('button');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+  try {
+    const A = CFG.AI_COMMENT_FID;
+    const fields = {};
+    fields[A.RECORD_ID] = { value: rid };
+    fields[A.NOTE]      = { value: finalNote };
+    await qb('/records', { to: CFG.AI_COMMENTS_TID, data: [fields], mergeFieldId: A.RECORD_ID });
+    if (typeof loadCommentHistory === 'function') loadCommentHistory(key, true);
+  } catch (e) {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
+    alert('Save failed: ' + (e.message || e));
+  }
+}
+window.saveAiCommentEdit = saveAiCommentEdit;
+
 async function saveAiCommentOnly(key) {
   // Couldn't parse  -  save the planner's text as an AI Comment anyway, for
   // the audit trail (someone may pick up the thread later).  Writes to
