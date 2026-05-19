@@ -136,6 +136,9 @@ async function fetchCurrentUser() {
     console.info(`[Auth] Current user: "${CURRENT_USER.name}" (${CURRENT_USER.email || id || '?'})`);
   } catch (e) {
     console.warn('[Auth] Could not decode current user from JWT:', e.message);
+  } finally {
+    // Always unblock addComment() regardless of success or failure above.
+    if (_userReadyResolve) _userReadyResolve();
   }
 }
 
