@@ -3128,7 +3128,39 @@ async function toggleDetail(key) {
     return (d.getMonth() + 1) + '/' + d.getDate();
   }
   const histShp = r.hist_shp || [];
-  const histOrd = r.hist_ord || [];
+  // -- History stitching for manual switchover new styles --------------------
+  // If this row is the RECEIVING side of a manual switchover, blend in the
+  // base style's order history for the pre-switchover weeks so the demand
+  // signal spans the full window.  hist_ord is oldest→newest (index 0 = 26
+  // weeks ago, index 25 = last week).
+  let histOrd = (r.hist_ord || []).slice();
+  const _swRevEntry = MANUAL_SWITCHOVER_REVERSE.get(r.key);
+  if (_swRevEntry) {
+    const baseRec = ALL_RECORDS.find(b => b.key === _swRevEntry.fromKey);
+    if (baseRec && baseRec.hist_ord) {
+      const baseOrd = baseRec.hist_ord;
+      if (_swRevEntry.date) {
+        // Find the stitch index: how many weeks ago was the switchover date?
+        const today    = new Date(); today.setHours(0,0,0,0);
+        const dow      = today.getDay();
+        const lastMon  = new Date(today); lastMon.setDate(today.getDate() - (dow===0?6:dow-1));
+        const cutoff   = new Date(_swRevEntry.date); cutoff.setHours(0,0,0,0);
+        const weeksAgo = Math.round((lastMon - cutoff) / (7 * 86400000));
+        // stitch_idx: last hist_ord index that belongs to the BASE style
+        // hist_ord[25] = last week (weeksAgo=1), hist_ord[25-k] = k+1 weeks ago
+        const stitchIdx = Math.min(25, Math.max(-1, 25 - weeksAgo));
+        for (let _i = 0; _i <= stitchIdx; _i++) {
+          if ((baseOrd[_i] || 0) > 0) histOrd[_i] = baseOrd[_i];
+          else if (!histOrd[_i]) histOrd[_i] = 0;
+        }
+      } else {
+        // No date set: fill zeros in new style's history from base style
+        for (let _i = 0; _i < histOrd.length; _i++) {
+          if (!histOrd[_i] && (baseOrd[_i] || 0) > 0) histOrd[_i] = baseOrd[_i];
+        }
+      }
+    }
+  }
   const atsHist = r.ats_hist || [];
   // If ATS is still loading and detail is open, re-render once it resolves
   if (!r.ats_hist && _atsHistPromise) {
