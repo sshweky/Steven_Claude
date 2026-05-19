@@ -553,6 +553,85 @@ async function loadData() {
   return records;
 }
 
+// -- Phase 2: background load of detail-only fields (IF_RCV, IF_ATS, supplier) --
+var _detailPromise = null;
+async function attachDetailData(records) {
+  // Check IDB cache first
+  try {
+    var cached = await _idb.get(CACHE_KEY_DTL);
+    if (cached && typeof cached.ts === 'number' && cached.map &&
+        Date.now() - cached.ts <= CACHE_TTL) {
+      _applyDetailMap(records, cached.map);
+      console.info('[InvMgmt] detail data loaded from IDB cache');
+      return;
+    }
+  } catch(_) {}
+
+  // Fresh pull: mstyle + IF_RCV + IF_ATS + supplier FIDs
+  var detailFids = [IF_F.Mstyle].concat(IF_RCV, IF_ATS, IF_SUPP_FIDS);
+  var rows = await qbQueryAll(INVF_TID, detailFids, '', 'Loading detail data');
+  var map = {};
+  rows.forEach(function(row) {
+    var gv = function(fid) { return (row[fid]||{}).value; };
+    var ms = String(gv(IF_F.Mstyle)||'').trim();
+    if (!ms) return;
+    map[ms] = {
+      rcv:  IF_RCV.map(function(fid){ return Math.round(toNum(gv(fid))); }),
+      ats:  IF_ATS.map(function(fid){ return Math.round(toNum(gv(fid))); }),
+      supplier_info:         String(gv(IF_F.SupplierInfo)||''),
+      fob_cost:              toNum(gv(IF_F.FOBCost)),
+      elc_nj:                toNum(gv(IF_F.ELC_NJ)),
+      elc_la:                toNum(gv(IF_F.ELC_LA)),
+      mu_nj:                 toNum(gv(IF_F.MU_NJ)),
+      mu_la:                 toNum(gv(IF_F.MU_LA)),
+      qty_ord_supplier:      toNum(gv(IF_F.QtyOrdSupplier)),
+      pct_units_ord_supplier:toNum(gv(IF_F.PctUnitsOrdSupplier)),
+      alt1_name: String(gv(IF_F.Alt1Name)||''), alt1_fob:toNum(gv(IF_F.Alt1FOB)), alt1_moq:toNum(gv(IF_F.Alt1MOQ)), alt1_lt:toNum(gv(IF_F.Alt1LT)),
+      alt1_elc_nj:toNum(gv(IF_F.Alt1ELC_NJ)), alt1_elc_la:toNum(gv(IF_F.Alt1ELC_LA)), alt1_mu_nj:toNum(gv(IF_F.Alt1MU_NJ)), alt1_mu_la:toNum(gv(IF_F.Alt1MU_LA)),
+      alt1_qty_ord:toNum(gv(IF_F.Alt1QtyOrd)), alt1_pct_ord:toNum(gv(IF_F.Alt1PctOrd)),
+      alt2_name: String(gv(IF_F.Alt2Name)||''), alt2_fob:toNum(gv(IF_F.Alt2FOB)), alt2_moq:toNum(gv(IF_F.Alt2MOQ)), alt2_lt:toNum(gv(IF_F.Alt2LT)),
+      alt2_elc_nj:toNum(gv(IF_F.Alt2ELC_NJ)), alt2_elc_la:toNum(gv(IF_F.Alt2ELC_LA)), alt2_mu_nj:toNum(gv(IF_F.Alt2MU_NJ)), alt2_mu_la:toNum(gv(IF_F.Alt2MU_LA)),
+      alt2_qty_ord:toNum(gv(IF_F.Alt2QtyOrd)), alt2_pct_ord:toNum(gv(IF_F.Alt2PctOrd)),
+      alt3_name: String(gv(IF_F.Alt3Name)||''), alt3_fob:toNum(gv(IF_F.Alt3FOB)), alt3_moq:toNum(gv(IF_F.Alt3MOQ)), alt3_lt:toNum(gv(IF_F.Alt3LT)),
+      alt3_elc_nj:toNum(gv(IF_F.Alt3ELC_NJ)), alt3_elc_la:toNum(gv(IF_F.Alt3ELC_LA)), alt3_mu_nj:toNum(gv(IF_F.Alt3MU_NJ)), alt3_mu_la:toNum(gv(IF_F.Alt3MU_LA)),
+      alt3_qty_ord:toNum(gv(IF_F.Alt3QtyOrd)), alt3_pct_ord:toNum(gv(IF_F.Alt3PctOrd))
+    };
+  });
+  _applyDetailMap(records, map);
+  try { await _idb.set(CACHE_KEY_DTL, { ts: Date.now(), map: map }); } catch(_) {}
+  console.info('[InvMgmt] detail data loaded fresh and cached');
+}
+function _applyDetailMap(records, map) {
+  var today = new Date(); today.setHours(0,0,0,0);
+  records.forEach(function(rec) {
+    var d = map[rec.mstyle];
+    if (!d) { rec._detail_loaded = true; return; }
+    rec.rcv           = d.rcv;
+    // ATS array fields used in detail panel
+    rec._ats_arr      = d.ats;
+    rec.supplier_info         = d.supplier_info;
+    rec.fob_cost              = d.fob_cost;
+    rec.elc_nj                = d.elc_nj;
+    rec.elc_la                = d.elc_la;
+    rec.mu_nj                 = d.mu_nj;
+    rec.mu_la                 = d.mu_la;
+    rec.qty_ord_supplier      = d.qty_ord_supplier;
+    rec.pct_units_ord_supplier= d.pct_units_ord_supplier;
+    rec.alt1_name = d.alt1_name; rec.alt1_fob = d.alt1_fob; rec.alt1_moq = d.alt1_moq; rec.alt1_lt = d.alt1_lt;
+    rec.alt1_elc_nj = d.alt1_elc_nj; rec.alt1_elc_la = d.alt1_elc_la; rec.alt1_mu_nj = d.alt1_mu_nj; rec.alt1_mu_la = d.alt1_mu_la;
+    rec.alt1_qty_ord = d.alt1_qty_ord; rec.alt1_pct_ord = d.alt1_pct_ord;
+    rec.alt2_name = d.alt2_name; rec.alt2_fob = d.alt2_fob; rec.alt2_moq = d.alt2_moq; rec.alt2_lt = d.alt2_lt;
+    rec.alt2_elc_nj = d.alt2_elc_nj; rec.alt2_elc_la = d.alt2_elc_la; rec.alt2_mu_nj = d.alt2_mu_nj; rec.alt2_mu_la = d.alt2_mu_la;
+    rec.alt2_qty_ord = d.alt2_qty_ord; rec.alt2_pct_ord = d.alt2_pct_ord;
+    rec.alt3_name = d.alt3_name; rec.alt3_fob = d.alt3_fob; rec.alt3_moq = d.alt3_moq; rec.alt3_lt = d.alt3_lt;
+    rec.alt3_elc_nj = d.alt3_elc_nj; rec.alt3_elc_la = d.alt3_elc_la; rec.alt3_mu_nj = d.alt3_mu_nj; rec.alt3_mu_la = d.alt3_mu_la;
+    rec.alt3_qty_ord = d.alt3_qty_ord; rec.alt3_pct_ord = d.alt3_pct_ord;
+    rec._detail_loaded = true;
+    // Re-run purchase_rec computation now that supplier data is available
+    computeDerived(rec, today);
+  });
+}
+
 // -- computeDerived ------------------------------------------------------------
 function computeDerived(rec, today) {
   var openPOTotal = rec.open_pos.reduce(function(s,p){return s+(p.qty||0);},0);
