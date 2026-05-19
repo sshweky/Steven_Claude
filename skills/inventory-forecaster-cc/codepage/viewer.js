@@ -5497,13 +5497,11 @@ async function bootstrap() {
       const _mgrs = new Set(ALL_RECORDS.map(r => (r.inv_manager || '').toLowerCase()).filter(Boolean));
       _USER_IS_PLANNER = Boolean(CURRENT_USER.name && _mgrs.has(CURRENT_USER.name.toLowerCase()));
       if (_USER_IS_PLANNER) {
-        SHOW_MY_RECORDS_ONLY = true;
-        console.info(`[Auth] Planner view: auto-filtering to "${CURRENT_USER.name}"`);
+        console.info(`[Auth] Planner identified: "${CURRENT_USER.name}"`);
       }
-      // Update the user badge and My Records button to reflect the resolved identity
+      // Update the user badge in the freshness strip
       const _ub = document.getElementById('current-user-badge');
       if (_ub) _ub.textContent = CURRENT_USER.name || '-';
-      _syncMyRecordsButton();
     }
 
     _setBoot('Rendering review table...');
