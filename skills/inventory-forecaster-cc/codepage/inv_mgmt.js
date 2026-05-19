@@ -21,6 +21,7 @@ var CACHE_KEY = 'pp_inv_mgmt_codepage_v2';
 var CACHE_TTL = 6 * 60 * 60 * 1000;
 
 var OPT_WOS_DEFAULT       = 4.0;
+var PUR_REC_BUFFER_WKS    = 6;     // extra weeks of demand added to Opt_OH as reorder buffer (~monthly reorder cycle)
 var WAREHOUSE_LAG_DAYS    = 10;
 var USA_WAREHOUSE_LAG     = 3;
 var FAST_VESSEL_TRANSIT   = 18;
