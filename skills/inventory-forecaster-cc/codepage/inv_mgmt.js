@@ -767,7 +767,7 @@ var COLS = [
     get:function(r){return r.purchase_rec||0;},
     render:function(r){
       if(!r.purchase_rec)return'<td class="right" style="color:#bbb;">&#8212;</td>';
-      var tip=fmtInt(r.purchase_rec)+' units'+(r.purchase_rec_etd?' | ETD: '+fmtDate(r.purchase_rec_etd):'');
+      var tip=fmtInt(r.purchase_rec)+' units'+(r.purchase_rec_etd?' | Nxt Avl ETD: '+fmtDate(r.purchase_rec_etd):'');
       return'<td class="right" title="'+tip+'" style="font-weight:700;color:#1a237e;">'+fmtInt(r.purchase_rec)+'</td>';
     }
   }
