@@ -1239,7 +1239,7 @@ function renderDetail(r) {
         +'<input type="number" id="needQty_'+esc(r.mstyle)+'" value="'+needQtyVal+'" min="0" step="1" '
           +'style="width:110px;font-size:18px;font-weight:700;color:#1a237e;border:2px solid #7986cb;border-radius:4px;padding:2px 6px;text-align:right;font-family:inherit;background:#fff;" '
           +'onchange="(function(el){var ms=\''+esc(r.mstyle)+'\';if(!purchaseSelections[ms])purchaseSelections[ms]={};purchaseSelections[ms].needQty=parseInt(el.value)||0;})(this)">'
-        +'<div style="font-size:10px;color:#888;margin-top:1px;">editable</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">&nbsp;</div>'
       +'</div>'
       // Required ETD
       +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
