@@ -4360,16 +4360,17 @@ async function markReviewed(key, commentRid, btnEl) {
     if (CFG.FID.MANAGER_REPLY_PENDING) pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
     await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
 
-    // Optimistic UI
+    // Optimistic UI -- update in-memory record first so detail re-render reads clean state
     const rec = ALL_RECORDS.find(x => x.key === key);
     if (rec) { rec.planner_reply_pending = false; rec.manager_reply_pending = false; rec.flagged = false; rec._auto_flagged = false; }
     const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+    // Remove only the pending-reply badges -- do NOT wipe innerHTML (would destroy [S], [A], switchover badges)
     const badgeCell = document.getElementById('row-badges-' + safeId);
     if (badgeCell) {
       const rb = badgeCell.querySelector('.reply-badge'); if (rb) rb.remove();
       const mb = badgeCell.querySelector('.mgr-badge');   if (mb) mb.remove();
-      badgeCell.innerHTML = '';   // clear flag indicator too
     }
+    // Clear flag button and row tint classes
     const flagBtn = document.getElementById('flg-' + safeId);
     if (flagBtn) flagBtn.className = 'flag-btn';
     const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
@@ -4377,6 +4378,16 @@ async function markReviewed(key, commentRid, btnEl) {
     updateFlagCount();
     updateReplyCount();
     updateForMeCount();
+    // Force detail panel re-render so comment history shows updated reviewed state
+    const detailEl = document.getElementById('detail-' + key);
+    if (detailEl && detailEl.style.display === 'table-row') {
+      detailEl.dataset.loaded = '0';
+      detailEl.style.display = 'none';
+      toggleDetail(key);
+    } else if (detailEl) {
+      // Panel is closed -- just reset so next open picks up fresh comment state
+      detailEl.dataset.loaded = '0';
+    }
     if (btnEl) { btnEl.textContent = 'Reviewed'; btnEl.style.background = '#e8f5e9'; btnEl.style.color = '#2e7d32'; }
   } catch(e) {
     if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Mark Reviewed'; }
