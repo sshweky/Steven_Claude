@@ -2293,7 +2293,7 @@ function _updateAttnBanner() {
     action   = toggleReplyOnly;
   }
 
-  if (textEl) textEl.textContent = icon + ' ' + n + ' ' + msg;
+  if (textEl) textEl.textContent = (icon ? icon + ' ' : '') + n + ' ' + msg;
   if (btnEl)  { btnEl.textContent = btnLabel; window._attnBannerAction = action; }
   if (n > 0 && banner.dataset.dismissed !== '1') banner.style.display = 'flex';
   else if (n === 0) { banner.style.display = 'none'; delete banner.dataset.dismissed; }
