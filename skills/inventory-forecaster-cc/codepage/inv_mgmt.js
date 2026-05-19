@@ -1015,6 +1015,17 @@ function toggleDetail(mstyle) {
   dtr.dataset.loaded='1';
 }
 
+// Re-render the detail panel for a given mstyle (e.g. after supplier selection or needQty change)
+function renderDetailForMstyle(mstyle) {
+  var id = 'detail-' + mstyle.replace(/[^a-zA-Z0-9]/g, '_');
+  var dtr = document.getElementById(id);
+  if (!dtr || dtr.style.display !== 'table-row') return;
+  var r = ALL.find(function(x) { return x.mstyle === mstyle; });
+  if (!r) return;
+  dtr.querySelector('td').innerHTML = renderDetail(r);
+  dtr.dataset.loaded = '1';
+}
+
 // -- renderDetail --------------------------------------------------------------
 function renderDetail(r) {
   var today=new Date();today.setHours(0,0,0,0);
