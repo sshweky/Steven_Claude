@@ -3564,8 +3564,7 @@ async function addComment(key) {
     const fields = {};
     fields[CFG.COMMENT_FID.NOTE]        = { value: txt };
     fields[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
-    const _QB_VALID_FLAGS = new Set(['Needs Action', 'Resolved', 'FYI']);
-    if (flag && _QB_VALID_FLAGS.has(flag)) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
+    if (flag) fields[CFG.COMMENT_FID.FLAG] = { value: flag };
     // AUTHOR — text (FID 40) + user (FID 42)
     if (CFG.COMMENT_FID.AUTHOR && CURRENT_USER.name)
       fields[CFG.COMMENT_FID.AUTHOR] = { value: CURRENT_USER.name };
