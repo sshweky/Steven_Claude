@@ -2204,10 +2204,40 @@ function updateFlagCount() {
   if (el) el.textContent = n + ' flagged for manager';
 }
 
-// -- For-Me count & banner ---------------------------------------------------
-// For planners: count of records where manager flagged action needed for them.
-// For directors/VPs: mirrors replyCount (planner responses awaiting review).
-// Called after any pending-flag change so the badge and banner stay current.
+// -- Unified attention banner ------------------------------------------------
+// Directors → count of planner_reply_pending; Planners → manager_reply_pending
+// for their own name.  One banner, role-appropriate message and action button.
+function _updateAttnBanner() {
+  const banner  = document.getElementById('attnBanner');
+  const textEl  = document.getElementById('attnBannerText');
+  const btnEl   = document.getElementById('attnBannerViewBtn');
+  if (!banner) return;
+
+  let n, icon, msg, btnLabel, action;
+  if (_USER_IS_PLANNER) {
+    const myName = CURRENT_USER.name ? CURRENT_USER.name.toLowerCase() : '';
+    n = myName
+      ? ALL_RECORDS.filter(r => r.manager_reply_pending && (r.inv_manager || '').toLowerCase() === myName).length
+      : ALL_RECORDS.filter(r => r.manager_reply_pending).length;
+    icon     = '📋';
+    msg      = n === 1 ? 'item needs your attention' : 'items need your attention';
+    btnLabel = 'View Items';
+    action   = toggleForMe;
+  } else {
+    n        = ALL_RECORDS.filter(r => r.planner_reply_pending).length;
+    icon     = '💬';
+    msg      = n === 1 ? 'planner reply awaiting your review' : 'planner replies awaiting your review';
+    btnLabel = 'View Replies';
+    action   = toggleReplyOnly;
+  }
+
+  if (textEl) textEl.textContent = icon + ' ' + n + ' ' + msg;
+  if (btnEl)  { btnEl.textContent = btnLabel; window._attnBannerAction = action; }
+  if (n > 0 && banner.dataset.dismissed !== '1') banner.style.display = 'flex';
+  else if (n === 0) { banner.style.display = 'none'; delete banner.dataset.dismissed; }
+}
+
+// -- For-Me count (badge + button) -------------------------------------------
 function updateForMeCount() {
   let n;
   if (_USER_IS_PLANNER && CURRENT_USER.name) {
@@ -2223,30 +2253,17 @@ function updateForMeCount() {
   const btn = document.getElementById('forMeBtn');
   if (el) { el.textContent = n + ' item' + (n === 1 ? '' : 's') + ' for me'; el.style.display = n ? 'inline' : 'none'; }
   if (btn) btn.style.fontWeight = (SHOW_FOR_ME_ONLY ? '800' : '600');
-  const banner = document.getElementById('forMeBanner');
-  const bannerCount = document.getElementById('forMeBannerCount');
-  if (banner && bannerCount) {
-    bannerCount.textContent = n;
-    if (n > 0 && banner.dataset.dismissed !== '1') banner.style.display = 'flex';
-    else if (n === 0) banner.style.display = 'none';
-  }
+  _updateAttnBanner();
 }
 
+// -- Reply count (badge + button) --------------------------------------------
 function updateReplyCount() {
   const n = ALL_RECORDS.filter(r => r.planner_reply_pending).length;
   const el  = document.getElementById('replyCount');
   const btn = document.getElementById('replyOnlyBtn');
   if (el) { el.textContent = n + ' repl' + (n === 1 ? 'y' : 'ies') + ' pending'; el.style.display = n ? 'inline' : 'none'; }
   if (btn) btn.style.fontWeight = (SHOW_REPLY_ONLY ? '800' : '600');
-  // Notification banner — shown at top when there are pending replies
-  const banner = document.getElementById('replyBanner');
-  const bannerCount = document.getElementById('replyBannerCount');
-  if (banner && bannerCount) {
-    bannerCount.textContent = n;
-    // Show banner when data has loaded and replies exist; don't re-show if user dismissed
-    if (n > 0 && banner.dataset.dismissed !== '1') banner.style.display = 'flex';
-    else if (n === 0) banner.style.display = 'none';
-  }
+  _updateAttnBanner();
 }
 
 let SHOW_REPLY_ONLY = false;
