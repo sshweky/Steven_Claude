@@ -1211,47 +1211,53 @@ function renderDetail(r) {
   if (!r.is_replen || r.prj_wk <= 0 || r.moq <= 0 || r.lt_trans_days <= 0 || r.opt_oh <= 0) {
     purRecSection = '';
   } else if (r.purchase_rec > 0) {
-    var purETDLabel = r.purchase_rec_push_supplier
-      ? '<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b> <span style="color:#c62828;font-size:10px;font-weight:700;">&#9888; PUSH SUPPLIER</span>'
-      : (r.purchase_rec_etd ? '<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b>' : '&#8212;');
-
     // Retrieve persisted selections for this mstyle
     var purSel = purchaseSelections[r.mstyle] || {};
     var needQtyVal = purSel.needQty != null ? purSel.needQty : r.purchase_rec;
     var chosenSupplier = purSel.chosenSupplier || '';
 
-    // Summary bar
-    var purSummary = '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;background:#e8eaf6;border:1px solid #c5cae9;border-radius:6px;padding:12px 16px;margin-bottom:14px;">'
-      +'<div style="flex:0 0 auto;">'
-        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;">Recommended Qty</div>'
-        +'<div style="font-size:22px;font-weight:700;color:#1a237e;">'+fmtInt(r.purchase_rec)+' <span style="font-size:12px;font-weight:400;color:#666;">units</span></div>'
+    // Summary bar: Rec Qty | Need Qty | Required ETD | Receipt Needed By
+    var etdColor = r.purchase_rec_push_supplier ? '#c62828' : '#e65100';
+    var etdDisplay = r.purchase_rec_etd ? fmtDate(r.purchase_rec_etd) : '&#8212;';
+    var pushBadge = r.purchase_rec_push_supplier
+      ? ' <span style="font-size:10px;font-weight:700;background:#c62828;color:#fff;border-radius:3px;padding:1px 5px;vertical-align:middle;">PUSH SUPPLIER</span>'
+      : '';
+    var nxtAvlNote = (r.purchase_rec_push_supplier && r.nxt_avl_etd)
+      ? '<div style="font-size:10px;color:#c62828;margin-top:2px;">Supplier earliest: '+fmtDate(r.nxt_avl_etd)+'</div>'
+      : '';
+
+    var purSummary = '<div style="display:flex;gap:0;flex-wrap:wrap;align-items:stretch;background:#e8eaf6;border:1px solid #c5cae9;border-radius:6px;margin-bottom:16px;overflow:hidden;">'
+      // Rec Qty
+      +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Recommended Qty</div>'
+        +'<div style="font-size:24px;font-weight:700;color:#1a237e;line-height:1;">'+fmtInt(r.purchase_rec)+'</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">units</div>'
       +'</div>'
-      +'<div style="flex:0 0 auto;">'
-        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;">Required ETD</div>'
-        +'<div style="font-size:16px;font-weight:700;">'+purETDLabel+'</div>'
-      +'</div>'
-      +'<div style="flex:0 0 auto;">'
-        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;">Receipt Needed By</div>'
-        +'<div style="font-size:14px;font-weight:600;color:#333;">'+(r.purchase_rec_receipt_date?fmtDate(r.purchase_rec_receipt_date):'&#8212;')+'</div>'
-      +'</div>'
-      +'<div style="flex:0 0 auto;">'
-        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;">Calc: Wk '+purTrigWk+' Prj OH</div>'
-        +'<div style="font-size:13px;color:#444;">'+fmtInt(purTrigInv)+' + '+fmtInt(purGap)+' needed = '+fmtInt(purTarget)+'</div>'
-      +'</div>'
-      +'<div style="flex:0 0 auto;margin-left:auto;">'
-        +'<label style="font-size:11px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Need Qty (editable)</label>'
+      // Need Qty (editable)
+      +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Need Qty</div>'
         +'<input type="number" id="needQty_'+esc(r.mstyle)+'" value="'+needQtyVal+'" min="0" step="1" '
-          +'style="width:120px;font-size:16px;font-weight:700;color:#1a237e;border:2px solid #7986cb;border-radius:4px;padding:4px 8px;text-align:right;font-family:inherit;" '
+          +'style="width:110px;font-size:18px;font-weight:700;color:#1a237e;border:2px solid #7986cb;border-radius:4px;padding:2px 6px;text-align:right;font-family:inherit;background:#fff;" '
           +'onchange="(function(el){var ms=\''+esc(r.mstyle)+'\';if(!purchaseSelections[ms])purchaseSelections[ms]={};purchaseSelections[ms].needQty=parseInt(el.value)||0;})(this)">'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">editable</div>'
+      +'</div>'
+      // Required ETD
+      +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Required ETD</div>'
+        +'<div style="font-size:18px;font-weight:700;color:'+etdColor+';">'+etdDisplay+pushBadge+'</div>'
+        +nxtAvlNote
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">Receipt - '+r.lt_trans_days+'d LT</div>'
+      +'</div>'
+      // Receipt Needed By
+      +'<div style="flex:0 0 auto;padding:12px 20px;">'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Receipt Needed By</div>'
+        +'<div style="font-size:18px;font-weight:700;color:#333;">'+(r.purchase_rec_receipt_date?fmtDate(r.purchase_rec_receipt_date):'&#8212;')+'</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">before Wk '+purTrigWk+' dip</div>'
       +'</div>'
       +'</div>';
 
     // Build supplier columns
-    // Each entry: { key, label, fob, moq, lt, elc_nj, elc_la, mu_nj, mu_la, qty_ord, pct_ord, infoHtml }
-    // For main supplier: parse from supplier_info HTML or use individual fields
     var suppCols = [];
-
-    // Main supplier - extract name from supplier_info if possible, else use FOB cost presence
     var mainName = '';
     if (r.supplier_info) {
       var nameMatch = stripHtml(r.supplier_info).match(/^([^\n]+)/);
@@ -1259,105 +1265,86 @@ function renderDetail(r) {
     }
     if (!mainName && r.fob_cost > 0) mainName = 'Main Supplier';
     if (mainName || r.fob_cost > 0 || r.elc_nj > 0) {
-      suppCols.push({ key:'main', label: mainName || 'Main Supplier',
+      suppCols.push({ key:'main', badge:'Main', label:mainName||'Main Supplier',
         fob:r.fob_cost, moq:r.moq, lt:r.lt_trans_days,
         elc_nj:r.elc_nj, elc_la:r.elc_la, mu_nj:r.mu_nj, mu_la:r.mu_la,
         qty_ord:r.qty_ord_supplier, pct_ord:r.pct_units_ord_supplier });
     }
-    if (r.alt1_name) {
-      suppCols.push({ key:'alt1', label:r.alt1_name,
-        fob:r.alt1_fob, moq:r.alt1_moq, lt:r.alt1_lt,
-        elc_nj:r.alt1_elc_nj, elc_la:r.alt1_elc_la, mu_nj:r.alt1_mu_nj, mu_la:r.alt1_mu_la,
-        qty_ord:r.alt1_qty_ord, pct_ord:r.alt1_pct_ord });
+    if (r.alt1_name) suppCols.push({ key:'alt1', badge:'ALT 1', label:r.alt1_name,
+      fob:r.alt1_fob, moq:r.alt1_moq, lt:r.alt1_lt,
+      elc_nj:r.alt1_elc_nj, elc_la:r.alt1_elc_la, mu_nj:r.alt1_mu_nj, mu_la:r.alt1_mu_la,
+      qty_ord:r.alt1_qty_ord, pct_ord:r.alt1_pct_ord });
+    if (r.alt2_name) suppCols.push({ key:'alt2', badge:'ALT 2', label:r.alt2_name,
+      fob:r.alt2_fob, moq:r.alt2_moq, lt:r.alt2_lt,
+      elc_nj:r.alt2_elc_nj, elc_la:r.alt2_elc_la, mu_nj:r.alt2_mu_nj, mu_la:r.alt2_mu_la,
+      qty_ord:r.alt2_qty_ord, pct_ord:r.alt2_pct_ord });
+    if (r.alt3_name) suppCols.push({ key:'alt3', badge:'ALT 3', label:r.alt3_name,
+      fob:r.alt3_fob, moq:r.alt3_moq, lt:r.alt3_lt,
+      elc_nj:r.alt3_elc_nj, elc_la:r.alt3_elc_la, mu_nj:r.alt3_mu_nj, mu_la:r.alt3_mu_la,
+      qty_ord:r.alt3_qty_ord, pct_ord:r.alt3_pct_ord });
+
+    // Best MU% NJ for green highlight
+    var bestMU = suppCols.reduce(function(b, s){ return (s.mu_nj||0) > b ? (s.mu_nj||0) : b; }, 0);
+
+    // Supplier card layout
+    function suppCardRow(lbl, val, highlight) {
+      var vStyle = highlight ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
+      return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
+        +'<span style="color:#666;min-width:90px;">'+lbl+'</span>'
+        +'<span style="'+vStyle+'text-align:right;">'+val+'</span>'
+        +'</div>';
     }
-    if (r.alt2_name) {
-      suppCols.push({ key:'alt2', label:r.alt2_name,
-        fob:r.alt2_fob, moq:r.alt2_moq, lt:r.alt2_lt,
-        elc_nj:r.alt2_elc_nj, elc_la:r.alt2_elc_la, mu_nj:r.alt2_mu_nj, mu_la:r.alt2_mu_la,
-        qty_ord:r.alt2_qty_ord, pct_ord:r.alt2_pct_ord });
-    }
-    if (r.alt3_name) {
-      suppCols.push({ key:'alt3', label:r.alt3_name,
-        fob:r.alt3_fob, moq:r.alt3_moq, lt:r.alt3_lt,
-        elc_nj:r.alt3_elc_nj, elc_la:r.alt3_elc_la, mu_nj:r.alt3_mu_nj, mu_la:r.alt3_mu_la,
-        qty_ord:r.alt3_qty_ord, pct_ord:r.alt3_pct_ord });
-    }
 
-    // Determine best MU% column for highlighting (highest NJ MU%)
-    var bestMU = suppCols.reduce(function(best, s){ return (s.mu_nj||0) > best ? (s.mu_nj||0) : best; }, 0);
-
-    var suppTable = '';
-    if (suppCols.length > 0) {
-      // Metric rows
-      var rows = [
-        { lbl:'FOB Cost',      fn:function(s){ return fmtCur(s.fob); } },
-        { lbl:'MOQ',           fn:function(s){ return s.moq ? fmtInt(s.moq)+' units' : '&#8212;'; } },
-        { lbl:'Lead Time',     fn:function(s){ return s.lt ? s.lt+' days' : '&#8212;'; } },
-        { lbl:'ELC NJ',        fn:function(s){ return fmtCur(s.elc_nj); } },
-        { lbl:'ELC LA',        fn:function(s){ return fmtCur(s.elc_la); } },
-        { lbl:'MU% NJ',        fn:function(s){ return fmtPct(s.mu_nj); }, highlight:function(s){ return (s.mu_nj||0) === bestMU && bestMU > 0; } },
-        { lbl:'MU% LA',        fn:function(s){ return fmtPct(s.mu_la); } },
-        { lbl:'Units Ordered', fn:function(s){ return s.qty_ord ? fmtInt(s.qty_ord) : '&#8212;'; } },
-        { lbl:'% of Orders',   fn:function(s){ return s.pct_ord ? fmtPct(s.pct_ord) : '&#8212;'; } }
-      ];
-
-      // Table header
-      suppTable += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
-      suppTable += '<thead><tr style="background:#3f51b5;color:#fff;">'
-        +'<th style="padding:8px 10px;text-align:left;font-weight:600;min-width:120px;border-right:1px solid #5c6bc0;">Metric</th>';
-      suppCols.forEach(function(s, idx) {
-        var isBest = (s.mu_nj||0) === bestMU && bestMU > 0;
-        var hdrBg = idx === 0 ? 'background:#283593;' : (isBest ? 'background:#1b5e20;' : 'background:#3f51b5;');
-        suppTable += '<th style="padding:8px 10px;text-align:center;font-weight:600;min-width:150px;'+hdrBg+'border-right:1px solid #5c6bc0;">';
-        if (idx === 0) suppTable += '<span style="font-size:9px;opacity:0.8;display:block;text-transform:uppercase;letter-spacing:0.5px;">Main</span>';
-        else suppTable += '<span style="font-size:9px;opacity:0.8;display:block;text-transform:uppercase;letter-spacing:0.5px;">ALT '+(idx)+'</span>';
-        suppTable += '<span style="font-size:13px;">'+esc(s.label)+'</span></th>';
-      });
-      suppTable += '</tr></thead><tbody>';
-
-      // Data rows
-      rows.forEach(function(row, ri) {
-        var rowBg = ri % 2 === 0 ? '#f5f5f5' : '#ffffff';
-        suppTable += '<tr style="background:'+rowBg+';">'
-          +'<td style="padding:6px 10px;font-weight:600;color:#555;border-right:1px solid #e0e0e0;border-bottom:1px solid #e9ecef;">'+row.lbl+'</td>';
-        suppCols.forEach(function(s) {
-          var val = row.fn(s);
-          var isHL = row.highlight && row.highlight(s);
-          var cellStyle = 'padding:6px 10px;text-align:center;border-right:1px solid #e0e0e0;border-bottom:1px solid #e9ecef;';
-          if (isHL) cellStyle += 'background:#e8f5e9;color:#1b5e20;font-weight:700;';
-          suppTable += '<td style="'+cellStyle+'">'+val+'</td>';
-        });
-        suppTable += '</tr>';
-      });
-
-      // Choose this Supplier row
-      suppTable += '<tr style="background:#e8eaf6;border-top:2px solid #7986cb;">'
-        +'<td style="padding:8px 10px;font-weight:700;color:#3f51b5;border-right:1px solid #c5cae9;">Choose</td>';
+    var suppCards = '<div style="display:flex;gap:12px;flex-wrap:wrap;">';
+    if (suppCols.length === 0) {
+      suppCards += '<div style="color:#888;font-style:italic;font-size:12px;">No supplier data available for this item.</div>';
+    } else {
       suppCols.forEach(function(s) {
         var isChosen = chosenSupplier === s.key;
+        var isBestMU = (s.mu_nj||0) === bestMU && bestMU > 0;
+        var cardBorder = isChosen ? '2px solid #1b5e20' : (isBestMU ? '2px solid #43a047' : '1px solid #ddd');
+        var cardBg = isChosen ? '#f1f8e9' : '#fff';
+        var hdrBg = s.key === 'main' ? '#283593' : '#3f51b5';
         var btnStyle = isChosen
-          ? 'background:#1b5e20;color:#fff;border:2px solid #1b5e20;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;'
-          : 'background:#fff;color:#3f51b5;border:2px solid #7986cb;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;';
+          ? 'width:100%;padding:7px;font-size:11px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:#1b5e20;color:#fff;font-family:inherit;'
+          : 'width:100%;padding:7px;font-size:11px;font-weight:600;border:1px solid #7986cb;border-radius:4px;cursor:pointer;background:#fff;color:#3f51b5;font-family:inherit;';
         var btnLabel = isChosen ? '&#10003; Selected' : 'Choose this Supplier';
-        suppTable += '<td style="padding:8px 10px;text-align:center;border-right:1px solid #c5cae9;">'
-          +'<button style="'+btnStyle+'" '
-            +'onclick="(function(btn){var ms=\''+esc(r.mstyle)+'\';var key=\''+s.key+'\';'
-              +'if(!purchaseSelections[ms])purchaseSelections[ms]={};'
-              +'purchaseSelections[ms].chosenSupplier=key;'
-              +'renderDetailForMstyle(ms);})(this)">'
-          +btnLabel+'</button></td>';
+
+        suppCards += '<div style="flex:1;min-width:180px;max-width:260px;border:'+cardBorder+';border-radius:6px;background:'+cardBg+';overflow:hidden;">'
+          // Card header
+          +'<div style="background:'+hdrBg+';color:#fff;padding:8px 10px;">'
+            +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;opacity:0.8;margin-bottom:2px;">'+esc(s.badge)+'</div>'
+            +'<div style="font-size:13px;font-weight:700;line-height:1.25;">'+esc(s.label)+'</div>'
+          +'</div>'
+          // Card body
+          +'<div style="padding:8px 10px;">'
+            +suppCardRow('FOB Cost', fmtCur(s.fob))
+            +suppCardRow('MOQ', s.moq ? fmtInt(s.moq)+' units' : '&#8212;')
+            +suppCardRow('Lead Time', s.lt ? s.lt+' days' : '&#8212;')
+            +suppCardRow('ELC NJ', fmtCur(s.elc_nj))
+            +suppCardRow('ELC LA', fmtCur(s.elc_la))
+            +suppCardRow('MU% NJ', fmtPct(s.mu_nj), isBestMU)
+            +suppCardRow('MU% LA', fmtPct(s.mu_la))
+            +suppCardRow('Units Ordered', s.qty_ord ? fmtInt(s.qty_ord) : '&#8212;')
+            +suppCardRow('% of Orders', s.pct_ord ? fmtPct(s.pct_ord) : '&#8212;')
+          +'</div>'
+          // Choose button
+          +'<div style="padding:8px 10px;border-top:1px solid #eee;">'
+            +'<button style="'+btnStyle+'" '
+              +'onclick="(function(){var ms=\''+esc(r.mstyle)+'\';var key=\''+s.key+'\';'
+                +'if(!purchaseSelections[ms])purchaseSelections[ms]={};'
+                +'purchaseSelections[ms].chosenSupplier=key;'
+                +'renderDetailForMstyle(ms);})()">'
+            +btnLabel+'</button>'
+          +'</div>'
+          +'</div>';
       });
-      suppTable += '</tr></tbody></table></div>';
-    } else {
-      suppTable = '<div style="color:#888;font-style:italic;font-size:12px;">No supplier data available for this item.</div>';
     }
+    suppCards += '</div>';
 
     purRecSection = '<div class="section"><h3>&#128722; Recommended Purchase</h3>'
       +purSummary
-      +'<div style="margin-top:4px;margin-bottom:8px;font-size:11px;color:#666;">'
-        +'<b>Calc:</b> Opt OH ('+fmtInt(r.opt_oh)+') + 4-wk buffer ('+fmtInt(purBufUnits)+') - Wk '+purTrigWk+' Prj OH ('+fmtInt(purTrigInv)+') = <b>'+fmtInt(purGap)+'</b> units gap, floored at MOQ ('+fmtInt(r.moq)+'), rounded to master pack.'
-      +'</div>'
-      +suppTable
+      +suppCards
       +'</div>';
   } else {
     purRecSection = '<div class="section"><h3>&#128722; Recommended Purchase</h3>'
