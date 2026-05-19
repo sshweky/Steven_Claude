@@ -1399,6 +1399,58 @@ async function saveStoreCount(key, rawValue, el) {
 }
 window.saveStoreCount = saveStoreCount;
 
+// Inline Estimated ISO save  -  writes FID 1606 (planner-entered ISO order qty).
+// AI forecaster reads this field to build initial ramp projections for new items.
+async function saveEstIsoInput(key, rawValue, el) {
+  const safeKey = key.replace(/'/g, '&#39;');
+  const msg = document.getElementById('pog-msg-' + safeKey);
+  const trimmed = String(rawValue || '').trim();
+  const value = trimmed === '' ? null : Math.max(0, parseInt(trimmed, 10) || 0);
+  if (msg) { msg.textContent = 'Saving...'; msg.style.color = '#888'; }
+  if (el) el.style.background = '#fff9c4';
+  try {
+    const fields = {};
+    fields[CFG.FID.KEY]           = { value: key };
+    fields[CFG.FID.EST_ISO_INPUT] = { value: value };
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    if (rec) rec.est_iso_input = value || 0;
+    if (msg) { msg.textContent = '✓ Estimated ISO saved'; msg.style.color = '#2e7d32'; setTimeout(() => { if (msg) msg.textContent = ''; }, 2500); }
+    if (el) el.style.background = '#e8f5e9';
+    setTimeout(() => { if (el) el.style.background = '#fff'; }, 2000);
+  } catch (e) {
+    if (msg) { msg.textContent = `Save failed: ${e.message || e}`; msg.style.color = '#c62828'; }
+    if (el) el.style.background = '#ffebee';
+  }
+}
+window.saveEstIsoInput = saveEstIsoInput;
+
+// Inline Initial UPSPW save  -  writes FID 1607 (planner-entered units/store/week baseline).
+// AI forecaster uses this as the projection rate for weeks 1-4 before sales history exists.
+async function saveInitUpspw(key, rawValue, el) {
+  const safeKey = key.replace(/'/g, '&#39;');
+  const msg = document.getElementById('pog-msg-' + safeKey);
+  const trimmed = String(rawValue || '').trim();
+  const value = trimmed === '' ? null : Math.max(0, parseFloat(trimmed) || 0);
+  if (msg) { msg.textContent = 'Saving...'; msg.style.color = '#888'; }
+  if (el) el.style.background = '#fff9c4';
+  try {
+    const fields = {};
+    fields[CFG.FID.KEY]        = { value: key };
+    fields[CFG.FID.INIT_UPSPW] = { value: value };
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    if (rec) rec.init_upspw = value || 0;
+    if (msg) { msg.textContent = '✓ Initial UPSPW saved'; msg.style.color = '#2e7d32'; setTimeout(() => { if (msg) msg.textContent = ''; }, 2500); }
+    if (el) el.style.background = '#e8f5e9';
+    setTimeout(() => { if (el) el.style.background = '#fff'; }, 2000);
+  } catch (e) {
+    if (msg) { msg.textContent = `Save failed: ${e.message || e}`; msg.style.color = '#c62828'; }
+    if (el) el.style.background = '#ffebee';
+  }
+}
+window.saveInitUpspw = saveInitUpspw;
+
 // Client-side ordered-units WoW line for non-POS records.  The multi-window
 // L4/L13/L26/L52 "order rate" panel was REMOVED 2026-05-08 per planner
 // feedback  -  it used non-zero averaging which contradicted the smart Order
