@@ -724,21 +724,12 @@ function computeDerived(rec, today) {
         // Receipt needed by: start of last-above week (one week before trigger)
         var _rcptDate = wkSunday(today, _lastAbove);
         rec.purchase_rec_receipt_date = _rcptDate;
-        // Required ETD = receipt date minus full LT_Trans_Days
+        // Required ETD = receipt date minus full LT_Trans_Days (always show formula result)
         var _reqETD = addDays(_rcptDate, -rec.lt_trans_days);
+        rec.purchase_rec_etd = _reqETD;
+        // Push supplier flag: supplier's next avail ETD is later than what we need
         var _nxtETD = rec.nxt_avl_etd ? new Date(rec.nxt_avl_etd) : null;
-        if (!_nxtETD) {
-          rec.purchase_rec_etd = _reqETD;
-        } else {
-          var _diffDays = Math.round((_nxtETD - _reqETD) / 86400000);
-          if (_diffDays > 14) {
-            rec.purchase_rec_etd = _nxtETD;          // too late to hit ideal — use next avl
-            rec.purchase_rec_push_supplier = false;
-          } else {
-            rec.purchase_rec_etd = _reqETD;          // within 2 wks — push supplier
-            rec.purchase_rec_push_supplier = _diffDays > 0;
-          }
-        }
+        rec.purchase_rec_push_supplier = !!(_nxtETD && _nxtETD > _reqETD);
       }
     }
   }
