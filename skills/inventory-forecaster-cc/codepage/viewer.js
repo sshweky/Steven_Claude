@@ -2293,6 +2293,69 @@ function _updateAttnBanner() {
   else if (n === 0) { banner.style.display = 'none'; delete banner.dataset.dismissed; }
 }
 
+// -- COS / EC Switchover detection ------------------------------------------
+// Maps base Acct-MStyle key  →  variant MStyle (e.g. "12446-SF8168PS" → "SF8168PSCOS")
+// for Amazon records where the variant has at least one order or manual projection.
+// Built once after ALL_RECORDS loads; rebuilt on forceRefresh.
+const SWITCHOVER_MAP = new Map();
+
+function buildSwitchoverMap() {
+  SWITCHOVER_MAP.clear();
+  for (const r of ALL_RECORDS) {
+    if (!/amazon/i.test(r.cust || '')) continue;          // Amazon-only
+    const m = r.mstyle.match(/^(.+?)(COS|EC)$/i);
+    if (!m) continue;                                      // not a COS/EC variant
+    // Switchover has triggered if any order or any manual projection exists
+    const hasOrders = r.hist_ord.some(v => v > 0);
+    const hasProjs  = r.weeks_slim.some(w => (w.projection || 0) > 0);
+    if (!hasOrders && !hasProjs) continue;
+    // Derive base key by replacing the variant mstyle with the base mstyle
+    const baseMstyle = m[1];
+    const baseKey = r.key.replace(r.mstyle, baseMstyle);
+    if (ALL_RECORDS.some(b => b.key === baseKey)) {
+      SWITCHOVER_MAP.set(baseKey, r.mstyle);
+    }
+  }
+  console.info(`[Switchover] ${SWITCHOVER_MAP.size} base style(s) detected as switched over to COS/EC`);
+}
+
+// Writes Status_Cust = 'CLOSED' on the base style after planner confirms.
+async function closeBaseStyle(key) {
+  const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+  const alertEl = document.getElementById('switchover-alert-' + safeId);
+  const btn     = document.getElementById('close-base-btn-'   + safeId);
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (!rec) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+  const prev = rec.asin_status;
+  rec.asin_status = 'CLOSED';
+  _STATUS_CHOICES_CACHE = null;
+  try {
+    const fields = {};
+    fields[CFG.FID.KEY]         = { value: key };
+    fields[CFG.FID.STATUS_CUST] = { value: 'CLOSED' };
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
+    // Update the status cell in the main table row
+    const statusCell = document.getElementById('status-cell-' + safeId);
+    if (statusCell) statusCell.textContent = 'CLOSED';
+    // Remove the switchover row badge
+    const badgeCell = document.getElementById('row-badges-' + safeId);
+    if (badgeCell) { const sb = badgeCell.querySelector('.switchover-badge'); if (sb) sb.remove(); }
+    // Replace the alert with a success message
+    if (alertEl) alertEl.innerHTML = `
+      <span style="font-size:13px;font-weight:700;color:#2e7d32;">&#x2713; Marked as CLOSED.</span>
+      <span style="font-size:12px;color:#555;margin-left:8px;">Status @ Cust updated successfully.</span>`;
+    SWITCHOVER_MAP.delete(key);
+  } catch (e) {
+    rec.asin_status = prev;
+    if (btn) { btn.disabled = false; btn.textContent = 'Mark as CLOSED'; }
+    if (alertEl) {
+      const errEl = alertEl.querySelector('.switchover-err');
+      if (errEl) errEl.textContent = 'Save failed: ' + (e.message || 'unknown error');
+    }
+  }
+}
+
 // -- For-Me count (badge + button) -------------------------------------------
 function updateForMeCount() {
   let n;
