@@ -7284,21 +7284,39 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         if is_amazon and amz_catalog and _f59h_wos > 0:
             _f59h_vel     = _f59_l13w_avg if _f59_l13w_avg > 0 else max(sum(fcst) / 26, 1)
             _f59h_opo_wos = _f59h_opo / max(_f59h_vel, 1)
+            _f59h_is_replen = "replen" in (row.get("PT_Item_Status") or "").lower()
 
             if _f59h_wos > 12:
-                # Above target range — soft taper.  1.5% per week above 12, cap 20%.
-                # Mild by design: DC-level ordering continues even in an overstocked
-                # network; we don't want to cut projections aggressively.
-                _f59h_trim = min(0.20, (_f59h_wos - 12) * 0.015)
-                for i in range(min(8, len(fcst))):
-                    fcst[i] = snap(max(0, fcst[i] * (1 - _f59h_trim)), mp)
-                _fire("F59h")
-                if isinstance(meta, dict):
-                    meta.setdefault("drivers", []).append(
-                        f"F59h DC above target range: WOS={_f59h_wos:.1f}wks "
-                        f"(target 8–12wks), SOH={_f59h_soh:,.0f}u, "
-                        f"OPO={_f59h_opo:,.0f}u — W1-W8 -{_f59h_trim*100:.0f}% soft taper"
-                    )
+                if _f59h_is_replen:
+                    # FXX — Amazon Replen overstock: power-curve dampening across
+                    # all 26 weeks.  Amazon has many independent DCs so some sporadic
+                    # demand persists even when aggregate WOS is high — floor at 10%.
+                    # Formula: max(0.10, (12 / wos) ^ 1.5)
+                    # wos=16 → 53%  wos=20 → 38%  wos=24 → 27%  wos=29 → 21%  wos=40+ → 10%
+                    _f59h_dampen = max(0.10, (12.0 / _f59h_wos) ** 1.5)
+                    fcst = [snap(max(0, v * _f59h_dampen), mp) if v > 0 else 0
+                            for v in fcst]
+                    _fire("F59h")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F59h Amazon-Replen overstock dampen: WOS={_f59h_wos:.1f}wks "
+                            f"(target 12wks) — all 26W x{_f59h_dampen:.0%} "
+                            f"(floor 10%); SOH={_f59h_soh:,.0f}u OPO={_f59h_opo:,.0f}u"
+                        )
+                else:
+                    # Above target range — soft taper.  1.5% per week above 12, cap 20%.
+                    # Mild by design: DC-level ordering continues even in an overstocked
+                    # network; we don't want to cut projections aggressively.
+                    _f59h_trim = min(0.20, (_f59h_wos - 12) * 0.015)
+                    for i in range(min(8, len(fcst))):
+                        fcst[i] = snap(max(0, fcst[i] * (1 - _f59h_trim)), mp)
+                    _fire("F59h")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F59h DC above target range: WOS={_f59h_wos:.1f}wks "
+                            f"(target 8–12wks), SOH={_f59h_soh:,.0f}u, "
+                            f"OPO={_f59h_opo:,.0f}u — W1-W8 -{_f59h_trim*100:.0f}% soft taper"
+                        )
             elif _f59h_wos < 3 and _f59h_opo == 0:
                 _fire("F59h")
                 if isinstance(meta, dict):
