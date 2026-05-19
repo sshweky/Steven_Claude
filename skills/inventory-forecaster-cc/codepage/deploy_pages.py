@@ -52,14 +52,14 @@ def upload_page(filename: str):
         print(f"  [WARN] {len(still_bad)} remaining invalid XML chars: "
               f"{[hex(ord(c)) for c in set(still_bad)]}")
 
-    esc  = html_escape(content_xml)
+    # QB requires <pagebody> with CDATA -- <pagetext> returns errcode=0 but writes blank content
     body = (
-        f'<?xml version="1.0" encoding="UTF-8"?>\n'
-        f'<qdbapi>\n'
-        f'  <usertoken>{TOKEN}</usertoken>\n'
-        f'  <pageID>{page_id}</pageID>\n'
-        f'  <pagetype>1</pagetype>\n'
-        f'  <pagetext>{esc}</pagetext>\n'
+        f'<?xml version="1.0" encoding="UTF-8"?>'
+        f'<qdbapi>'
+        f'<usertoken>{TOKEN}</usertoken>'
+        f'<pageID>{page_id}</pageID>'
+        f'<pagetype>1</pagetype>'
+        f'<pagebody><![CDATA[{content_xml}]]></pagebody>'
         f'</qdbapi>'
     )
 
