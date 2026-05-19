@@ -215,6 +215,11 @@ let ALL_RECORDS      = [];
 let FILTERED_RECORDS = [];
 let CURRENT_USER     = { name: '', email: '', id: '' };   // resolved in bootstrap via JWT
 let _USER_IS_PLANNER = false;   // true when CURRENT_USER.name matches an inv_manager value
+// Promise that resolves once fetchCurrentUser() finishes (success or failure).
+// addComment() awaits this so the author is always written on the first try,
+// even if the user submits a comment before the bootstrap identity call returns.
+let _userReadyResolve = null;
+const _USER_READY = new Promise(res => { _userReadyResolve = res; });
 let MAN_PRJ_FIDS     = [];   // 26 fids for date-stamped manual prj cols (rolling weekly)
 let MAN_PRJ_LABELS   = [];
 // -- Unsaved MAN projection edits -----------------------------------------
