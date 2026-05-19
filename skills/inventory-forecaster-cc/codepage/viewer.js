@@ -3126,8 +3126,9 @@ async function toggleDetail(key) {
         opnCells += `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       }
     }
-    // Total cells (sum for beg/rcv/opn; WOS total is not meaningful so leave as dash)
+    // Total cells (sum for beg/prj/rcv/opn; WOS total is not meaningful so leave as dash)
     begCells += _beg ? `<td style="font-weight:700;color:#6d4c00;background:#fffbea">${fmtN(Math.round(begTot))}</td>` : `<td style="color:#bbb;background:#fffbea"> - </td>`;
+    prjCells += _prj ? `<td style="font-weight:700;color:#2e7d32;background:#f1f8e9">${fmtN(Math.round(prjTot))}</td>` : `<td style="color:#bbb;background:#f1f8e9"> - </td>`;
     rcvCells += _rcv ? `<td style="font-weight:700;color:#1565c0;background:#f0f7ff">${fmtN(Math.round(rcvTot))}</td>` : `<td style="color:#bbb;background:#f0f7ff"> - </td>`;
     opnCells += (_opn && _opn.length === 26)
       ? `<td style="font-weight:700;color:#00695c;background:#e0f2f1">${fmtN(opnTot)}</td>`
