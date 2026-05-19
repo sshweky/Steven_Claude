@@ -2299,30 +2299,62 @@ function _updateAttnBanner() {
   else if (n === 0) { banner.style.display = 'none'; delete banner.dataset.dismissed; }
 }
 
-// -- COS / EC Switchover detection ------------------------------------------
-// Maps base Acct-MStyle key  →  variant MStyle (e.g. "12446-SF8168PS" → "SF8168PSCOS")
-// for Amazon records where the variant has at least one order or manual projection.
-// Built once after ALL_RECORDS loads; rebuilt on forceRefresh.
-const SWITCHOVER_MAP = new Map();
+// -- Switchover detection ---------------------------------------------------
+// Two maps are maintained:
+//
+//   SWITCHOVER_MAP (auto-detected COS/EC, Amazon only)
+//     baseKey  →  variantMstyle  (string)
+//
+//   MANUAL_SWITCHOVER_MAP (planner-configured, any customer)
+//     baseKey  →  { toMstyle, toKey, date }
+//       date = JS Date of the switchover week (null if not yet set)
+//
+//   MANUAL_SWITCHOVER_REVERSE (indexed by the NEW style's key)
+//     newKey   →  { fromKey, fromMstyle, date }
+//
+// Both are built after ALL_RECORDS loads and rebuilt on forceRefresh.
+
+const SWITCHOVER_MAP            = new Map();  // COS/EC auto-detected
+const MANUAL_SWITCHOVER_MAP     = new Map();  // planner-configured base → new
+const MANUAL_SWITCHOVER_REVERSE = new Map();  // planner-configured new  → base
 
 function buildSwitchoverMap() {
   SWITCHOVER_MAP.clear();
+  MANUAL_SWITCHOVER_MAP.clear();
+  MANUAL_SWITCHOVER_REVERSE.clear();
+
+  // -- Auto-detect COS/EC variants (Amazon only) ----------------------------
   for (const r of ALL_RECORDS) {
-    if (!/amazon/i.test(r.cust || '')) continue;          // Amazon-only
+    if (!/amazon/i.test(r.cust || '')) continue;
     const m = r.mstyle.match(/^(.+?)(COS|EC)$/i);
-    if (!m) continue;                                      // not a COS/EC variant
-    // Switchover has triggered if any order or any manual projection exists
+    if (!m) continue;
     const hasOrders = r.hist_ord.some(v => v > 0);
     const hasProjs  = r.weeks_slim.some(w => (w.projection || 0) > 0);
     if (!hasOrders && !hasProjs) continue;
-    // Derive base key by replacing the variant mstyle with the base mstyle
     const baseMstyle = m[1];
-    const baseKey = r.key.replace(r.mstyle, baseMstyle);
+    const baseKey    = r.key.replace(r.mstyle, baseMstyle);
     if (ALL_RECORDS.some(b => b.key === baseKey)) {
       SWITCHOVER_MAP.set(baseKey, r.mstyle);
     }
   }
-  console.info(`[Switchover] ${SWITCHOVER_MAP.size} base style(s) detected as switched over to COS/EC`);
+
+  // -- Manual switchovers (planner-configured via checkbox + fields) --------
+  for (const r of ALL_RECORDS) {
+    if (!r.switchover_active || !r.switchover_to_mstyle) continue;
+    const toMstyle = r.switchover_to_mstyle.trim().toUpperCase();
+    if (!toMstyle) continue;
+    // Derive the target key: same account prefix, different mstyle
+    // Key format: AcctNum-MStyle  →  replace mstyle part
+    const toKey = r.key.replace(r.mstyle, toMstyle);
+    const date  = r.switchover_date ? new Date(r.switchover_date) : null;
+    MANUAL_SWITCHOVER_MAP.set(r.key, { toMstyle, toKey, date });
+    MANUAL_SWITCHOVER_REVERSE.set(toKey, { fromKey: r.key, fromMstyle: r.mstyle, date });
+  }
+
+  console.info(
+    `[Switchover] ${SWITCHOVER_MAP.size} COS/EC auto | ` +
+    `${MANUAL_SWITCHOVER_MAP.size} manual configured`
+  );
 }
 
 // Writes Status_Cust = 'CLOSED' on the base style after planner confirms.
