@@ -2328,8 +2328,8 @@ function buildSwitchoverMap() {
     if (!/amazon/i.test(r.cust || '')) continue;
     const m = r.mstyle.match(/^(.+?)(COS|EC)$/i);
     if (!m) continue;
-    const hasOrders = r.hist_ord.some(v => v > 0);
-    const hasProjs  = r.weeks_slim.some(w => (w.projection || 0) > 0);
+    const hasOrders = r.hist_ord  && r.hist_ord.some(v => v > 0);
+    const hasProjs  = r.weeks_slim && r.weeks_slim.some(w => (w.projection || 0) > 0);
     if (!hasOrders && !hasProjs) continue;
     const baseMstyle = m[1];
     const baseKey    = r.key.replace(r.mstyle, baseMstyle);
