@@ -3921,7 +3921,7 @@ async function loadCommentHistory(key, force) {
                 ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">Needs Action</span>`
                 : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
           const reviewBtn = isReply
-            ? `<button onclick="markReviewed('${key.replace(/'/g,"\\'")}', this)" style="font-size:10px;padding:2px 8px;background:#e0f2f1;color:#00695c;border:1px solid #00695c;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Reviewed</button>`
+            ? `<button onclick="markReviewed('${key.replace(/'/g,"\\'")}', ${rid}, this)" style="font-size:10px;padding:2px 8px;background:#e0f2f1;color:#00695c;border:1px solid #00695c;border-radius:3px;cursor:pointer;font-weight:600;margin-left:8px;">Mark Reviewed</button>`
             : '';
           return `
             <div style="padding:6px 6px 6px 10px;margin-bottom:4px;border-left:3px solid ${borderColor};background:${bgColor};border-radius:0 4px 4px 0;">
