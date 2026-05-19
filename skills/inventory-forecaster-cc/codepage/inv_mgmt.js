@@ -1168,8 +1168,12 @@ function syncPriorityDd(){
 function renderTable() {
   var tb=document.getElementById('tbody');
   var cols=visibleCols();var nCols=cols.length;
+  var totalPages=Math.max(1,Math.ceil(FILTERED.length/PAGE_SIZE));
+  if(currentPage>=totalPages)currentPage=totalPages-1;
+  var start=currentPage*PAGE_SIZE;
+  var pageData=FILTERED.slice(start,start+PAGE_SIZE);
   var html='';
-  FILTERED.forEach(function(r){
+  pageData.forEach(function(r){
     var safeMs=r.mstyle.replace(/[^a-zA-Z0-9]/g,'_');
     html+='<tr class="row row-'+r.priority+'" data-ms="'+esc(r.mstyle)+'" onclick="toggleDetail(this.dataset.ms)">';
     cols.forEach(function(c){html+=c.render(r);});
@@ -1177,6 +1181,31 @@ function renderTable() {
     html+='<tr class="detail-pane" id="detail-'+safeMs+'" style="display:none"><td colspan="'+nCols+'"></td></tr>';
   });
   tb.innerHTML=html;
+  renderPagination(totalPages);
+}
+function renderPagination(totalPages) {
+  var bar=document.getElementById('pgBar');
+  if(!bar)return;
+  if(FILTERED.length<=PAGE_SIZE){bar.innerHTML='';return;}
+  var html='';
+  html+='<button onclick="goPage('+Math.max(0,currentPage-1)+')"'+(currentPage===0?' disabled':'')+'>&#8592; Prev</button>';
+  // show at most 7 page buttons centered around currentPage
+  var start=Math.max(0,currentPage-3), end=Math.min(totalPages-1,start+6);
+  start=Math.max(0,end-6);
+  for(var p=start;p<=end;p++){
+    html+='<button class="'+(p===currentPage?'pg-active':'')+'" onclick="goPage('+p+')">'+(p+1)+'</button>';
+  }
+  html+='<button onclick="goPage('+Math.min(totalPages-1,currentPage+1)+')"'+(currentPage===totalPages-1?' disabled':'')+'>Next &#8594;</button>';
+  var s=currentPage*PAGE_SIZE+1, e=Math.min(FILTERED.length,(currentPage+1)*PAGE_SIZE);
+  html+='<span class="pg-info">'+s+'&#8211;'+e+' of '+FILTERED.length.toLocaleString()+'</span>';
+  bar.innerHTML=html;
+}
+function goPage(p) {
+  currentPage=p;
+  renderTable();
+  // scroll table back to top
+  var wrap=document.getElementById('mainTable');
+  if(wrap&&wrap.parentElement)wrap.parentElement.scrollTop=0;
 }
 
 function toggleDetail(mstyle) {
