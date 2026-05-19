@@ -2896,10 +2896,11 @@ async function toggleDetail(key) {
   lyShpCells += `<td style="font-weight:700;color:#1565c0">${fmtN(Math.round(lyShpTot / 26))}</td>`;
 
   // -- Inventory Flow section ----------------------------------------------
-  // Three rows from QB Inventory Flow table, keyed by mstyle:
+  // Four rows from QB Inventory Flow table, keyed by mstyle:
   //   1) Beg Inv          (Wk1..Wk26 numeric, beginning-of-week balance)
-  //   2) Expected Receipts (RcvWk1..RcvWk26 numeric)
-  //   3) WOS OH            = Beg Inv / Prj demand, computed client-side, 1 decimal
+  //   2) Prj Demand       (PrjWk1..PrjWk26 numeric, projected weekly demand)
+  //   3) Expected Receipts (RcvWk1..RcvWk26 numeric)
+  //   4) WOS OH            = Beg Inv / Prj demand, computed client-side, 1 decimal
   // Always rendered so planners see whether QB has data (dashes when missing).
   const _beg = r.inv_flow_beg || null;
   const _rcv = r.inv_flow_rcv || null;
