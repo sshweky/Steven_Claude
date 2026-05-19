@@ -4042,7 +4042,16 @@ async function loadCommentHistory(key, force) {
           const ts     = (r[F.DATE_CREATED] && r[F.DATE_CREATED].value) || '';
           const note   = (r[F.NOTE]         && r[F.NOTE].value)         || '';
           const flag   = (r[F.FLAG]         && r[F.FLAG].value)         || '';
-          const author = (r[F.AUTHOR]       && r[F.AUTHOR].value)       || '';
+          const _authorText = (r[F.AUTHOR] && r[F.AUTHOR].value) || '';
+          const _authorUser = F.AUTHOR_USER && r[F.AUTHOR_USER] && r[F.AUTHOR_USER].value;
+          // AUTHOR (FID 40) is a plain-text field written from CURRENT_USER.name at comment-save
+          // time.  For directors/VPs who own no Projections records, that lookup can fail and
+          // write nothing (or an old "Unknown" default).  AUTHOR_USER (FID 42) is a QB user
+          // field that always carries reliable identity data — use it as fallback.
+          const _authorUserName = _authorUser
+            ? ((_authorUser.name && _authorUser.name !== 'Unknown') ? _authorUser.name : (_authorUser.email || ''))
+            : '';
+          const author = (_authorText && _authorText !== 'Unknown') ? _authorText : (_authorUserName || _authorText);
           const sendTo = (F.SEND_TO && r[F.SEND_TO] && r[F.SEND_TO].value) || '';
           const rid    = (r[F.RECORD_ID]    && r[F.RECORD_ID].value)    || 0;
           const isReply     = flag === 'Planner Response';
