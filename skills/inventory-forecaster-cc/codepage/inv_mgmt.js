@@ -674,8 +674,7 @@ function computeDerived(rec, today) {
       var _purTarget = rec.opt_oh;
       var _purGap = Math.max(0, _purTarget - _prjAtRcpt);
       if (_purGap > 0) {
-        var _purRounded = Math.ceil(_purGap / rec.moq) * rec.moq;
-        rec.purchase_rec = Math.max(_purRounded, 6 * rec.moq);
+        rec.purchase_rec = Math.max(_purGap, rec.moq);
         var _etdDays = rec.lt_trans_days - rec.transit_days;
         if (_etdDays > 0) rec.purchase_rec_etd = addDays(today, _etdDays);
       }
