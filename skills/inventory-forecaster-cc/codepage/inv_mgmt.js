@@ -892,13 +892,22 @@ function computeDerived(rec, today) {
   rec.purchase_rec_receipt_date = null;
   rec.purchase_rec_trigger_idx = -1;
   if (rec.is_replen && rec.prj_wk > 0 && rec.moq > 0 && rec.opt_oh > 0) {
+    // Forward-simulate ATS OH+OO through 26 weeks by subtracting projected demand.
+    // Using ATS (available-to-ship) instead of raw Qty OH so holds/allocations are excluded.
+    var _atsRunning = rec.ats_oh_oo || 0;
+    var _atsSimBeg = [];
+    for (var _i = 0; _i < 26; _i++) {
+      _atsSimBeg[_i] = _atsRunning;
+      _atsRunning = Math.max(0, _atsRunning - (rec.prj[_i] || 0));
+    }
+    rec.ats_sim_beg = _atsSimBeg;
     var _lastAbove = -1;
     for (var _i = 0; _i < 26; _i++) {
-      if ((rec.beg_inv[_i] || 0) >= rec.opt_oh) _lastAbove = _i;
+      if (_atsSimBeg[_i] >= rec.opt_oh) _lastAbove = _i;
     }
     var _trigIdx = (_lastAbove >= 0 && _lastAbove < 25) ? _lastAbove + 1 : -1;
     if (_trigIdx >= 1 && _trigIdx <= 25) {
-      var _trigInv = rec.beg_inv[_trigIdx] || 0;
+      var _trigInv = _atsSimBeg[_trigIdx];
       var _purTarget = rec.opt_oh + PUR_REC_BUFFER_WKS * rec.prj_wk;
       var _purGap = Math.max(0, _purTarget - _trigInv);
       if (_purGap > 0) {
