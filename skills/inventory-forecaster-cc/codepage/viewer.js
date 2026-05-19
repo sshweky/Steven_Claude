@@ -4358,7 +4358,7 @@ async function markReviewed(key, commentRid, btnEl) {
     pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: false };
     pf[CFG.FID.FLAGGED]               = { value: false };
     if (CFG.FID.MANAGER_REPLY_PENDING) pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
-    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf] });
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
 
     // Optimistic UI
     const rec = ALL_RECORDS.find(x => x.key === key);
