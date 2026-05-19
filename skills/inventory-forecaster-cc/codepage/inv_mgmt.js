@@ -763,7 +763,16 @@ var COLS = [
     render:function(r){return '<td class="right">'+(r.pipeline_wos==null?'&#8734;':fmt(r.pipeline_wos))+'</td>';} },
   { id:'action', label:'Action', align:'left',
     get:function(r){if(!r.recommendations.length)return'CLEAN';var c={};r.recommendations.forEach(function(rc){c[rc.action]=(c[rc.action]||0)+1;});return Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0];},
-    render:function(r){return '<td>'+actionTag(r)+'</td>';} }
+    render:function(r){return '<td>'+actionTag(r)+'</td>';} },
+  { id:'purchase_rec', label:'Pur Rec', align:'right', numeric:true,
+    tooltip:'Qty to order now so projected inv at Next Avl Rcpt Dt meets Opt OH + 2-week buffer.\nETD = today + (LT Trans Days - Transit Days).',
+    get:function(r){return r.purchase_rec||0;},
+    render:function(r){
+      if(!r.purchase_rec)return'<td class="right" style="color:#bbb;">&#8212;</td>';
+      var tip=fmtInt(r.purchase_rec)+' units'+(r.purchase_rec_etd?' | ETD: '+fmtDate(r.purchase_rec_etd):'');
+      return'<td class="right" title="'+tip+'" style="font-weight:700;color:#1a237e;">'+fmtInt(r.purchase_rec)+'</td>';
+    }
+  }
 ];
 
 function actionTag(r) {
