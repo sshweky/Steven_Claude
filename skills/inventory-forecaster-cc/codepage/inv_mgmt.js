@@ -1158,6 +1158,18 @@ function toggleDetail(mstyle) {
   if(dtr.dataset.loaded==='1')return;
   var r=ALL.find(function(x){return x.mstyle===mstyle;});
   if(!r)return;
+  // If detail data hasn't loaded yet, show a loading placeholder and wait
+  if (!r._detail_loaded && _detailPromise) {
+    dtr.querySelector('td').innerHTML = '<div style="padding:20px;color:#666;font-style:italic;">&#8987; Loading supplier and detail data... (usually a few seconds on first open)</div>';
+    dtr.dataset.loaded = '';  // mark as NOT loaded so it re-renders when data arrives
+    _detailPromise.then(function() {
+      if (dtr.style.display === 'table-row') {
+        dtr.querySelector('td').innerHTML = renderDetail(r);
+        dtr.dataset.loaded = '1';
+      }
+    });
+    return;
+  }
   dtr.querySelector('td').innerHTML=renderDetail(r);
   dtr.dataset.loaded='1';
 }
