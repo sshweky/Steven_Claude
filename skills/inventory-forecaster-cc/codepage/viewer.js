@@ -4997,13 +4997,6 @@ function resetAllFilters() {
   FLAGGED_ONLY = false;
   try { sessionStorage.setItem('flaggedOnly', '0'); } catch (e) { /* ignore */ }
   _syncFlaggedOnlyButton();
-  SHOW_OFF_PLAN_ONLY = false;
-  const _opBtn = document.getElementById('offPlanOnlyBtn');
-  if (_opBtn) { _opBtn.style.background = '#fff'; _opBtn.style.color = '#6a1b9a'; _opBtn.style.fontWeight = '600'; }
-  // "My Records" resets to the user's role default:
-  //   planners → back ON (their natural view); directors/VPs → back OFF (see all)
-  SHOW_MY_RECORDS_ONLY = _USER_IS_PLANNER;
-  _syncMyRecordsButton();
   SHOW_FOR_ME_ONLY = false;
   _syncForMeButton();
   applyFilters();
