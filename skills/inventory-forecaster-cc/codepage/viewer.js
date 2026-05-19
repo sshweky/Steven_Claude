@@ -4167,7 +4167,11 @@ async function loadCommentHistory(key, force) {
 // -- Add comment > INSERT into Projection Comments table --------------------
 async function addComment(key) {
   const txt    = document.getElementById('cmt-text-'   + key).value.trim();
-  const flag   = document.getElementById('cmt-flag-'   + key).value;
+  // Planners only get a FYI checkbox — flag is always "Planner Response" unless checked
+  const _fyiChk = document.getElementById('cmt-fyi-' + key);
+  const flag = _fyiChk
+    ? (_fyiChk.checked ? 'FYI' : 'Planner Response')
+    : (document.getElementById('cmt-flag-' + key) || {value: 'Needs Action'}).value;
   const btn    = document.getElementById('cmt-btn-'    + key);
   const msg    = document.getElementById('cmt-msg-'    + key);
   if (!txt) { msg.textContent = 'Comment cannot be empty.'; msg.style.color = '#c62828'; return; }
