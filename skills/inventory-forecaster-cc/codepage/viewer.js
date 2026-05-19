@@ -5650,12 +5650,14 @@ async function saveAiCommentOnly(key) {
   const ta = document.getElementById('ai-adj-text-' + safeId);
   const previewDiv = document.getElementById('ai-adj-preview-' + safeId);
   if (!ta || !ta.value.trim()) return;
+  await _USER_READY;
   try {
     const A = CFG.AI_COMMENT_FID;
     const fields = {};
     fields[A.ACCT_MSTYLE] = { value: key };
     fields[A.NOTE]        = { value: _replaceWeekRefsWithDates(ta.value.trim()) };
     fields[A.IGNORED]     = { value: true };   // unparseable -> never replay
+    if (A.AUTHOR && CURRENT_USER.email) fields[A.AUTHOR] = { value: CURRENT_USER.email };
     await qb('/records', { to: CFG.AI_COMMENTS_TID, data: [fields] });
     ta.value = '';
     if (previewDiv) previewDiv.innerHTML = '<div style="color:#2e7d32;font-size:11px;padding:6px 0;">\u2713 Saved as comment (marked Ignored  -  F58 will not auto-apply).</div>';
