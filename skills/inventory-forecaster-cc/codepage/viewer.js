@@ -5940,10 +5940,7 @@ function applyFilters() {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
     if (FLAGGED_ONLY       && !r.flagged)               return false;
     if (SHOW_REPLY_ONLY    && !r.planner_reply_pending) return false;
-    if (SHOW_FOR_ME_ONLY) {
-      const _needsMyAtt = _USER_IS_PLANNER ? r.manager_reply_pending : r.planner_reply_pending;
-      if (!_needsMyAtt) return false;
-    }
+    if (SHOW_FOR_ME_ONLY && !_FOR_ME_KEYS.has(r.key)) return false;
     if (search) {
       const txt = (r.key + ' ' + r.cust + ' ' + r.mstyle + ' ' + (r.desc||'') + ' ' + (r.brand||'') + ' ' + (r.inv_manager||'')).toLowerCase();
       if (!txt.includes(search)) return false;
