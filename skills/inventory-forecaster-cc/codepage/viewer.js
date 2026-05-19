@@ -3455,15 +3455,19 @@ async function toggleDetail(key) {
         <div style="font-weight:600;color:#8b2252;margin-bottom:6px;font-size:12px;">Add a Comment <span style="font-weight:400;color:#999;font-size:10px;"> -  for inv mgr</span></div>
         <textarea id="cmt-text-${safeKey}" oninput="autoFlagOnComment('${safeKey}')" placeholder="Write a comment for the mgr review..." style="width:100%;min-height:80px;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
         <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
-          <label style="font-size:11px;color:#555;">Status:
-            <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
-              <option value="Needs Action" ${!_USER_IS_PLANNER ? 'selected' : ''} style="color:#1565c0;font-weight:600;">Needs Action</option>
-              <option value="Manager Response" style="color:#e65100;font-weight:600;">Manager Response</option>
-              <option value="Planner Response" ${_USER_IS_PLANNER ? 'selected' : ''} style="color:#00695c;font-weight:600;">Planner Response</option>
-              <option value="FYI" style="color:#616161;">FYI</option>
-              <option value="Resolved">Resolved</option>
-            </select>
-          </label>
+          ${_USER_IS_PLANNER
+            ? `<label style="font-size:11px;color:#616161;display:flex;align-items:center;gap:4px;cursor:pointer;">
+                 <input type="checkbox" id="cmt-fyi-${safeKey}" style="cursor:pointer;"> Mark as FYI
+               </label>`
+            : `<label style="font-size:11px;color:#555;">Type:
+                 <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
+                   <option value="Needs Action" selected style="color:#1565c0;font-weight:600;">Needs Action</option>
+                   <option value="Manager Response" style="color:#e65100;font-weight:600;">Manager Response</option>
+                   <option value="FYI" style="color:#616161;">FYI</option>
+                   <option value="Resolved">Resolved</option>
+                 </select>
+               </label>`
+          }
           <button id="cmt-btn-${safeKey}" onclick="addComment('${safeKey}')" style="padding:5px 14px;background:#8b2252;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:11px;">Save</button>
         </div>
         <div id="cmt-msg-${safeKey}" style="font-size:11px;color:#666;margin-top:4px;"></div>
