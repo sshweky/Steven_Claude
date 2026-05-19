@@ -5629,6 +5629,7 @@ async function applyAiAdjustment(key) {
   rec.ai_fcst  = vals.slice();
   rec.ai_total = vals.reduce((a, b) => a + b, 0);
   rec.ai_wk    = Math.round(((rec.ai_total + (rec.opn_total || 0)) / 26) * 10) / 10;
+  _refreshRowMetrics(key);
 
   // Re-render the detail panel (AI row reflects the new values immediately).
   const detEl = document.getElementById('detail-' + key);
