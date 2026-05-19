@@ -5538,6 +5538,7 @@ async function bootstrap() {
     const _prjCached = !_prjCacheBypassed() && await _loadPrjCache();
     if (_prjCached) {
       ALL_RECORDS = _prjCached.records;
+      buildSwitchoverMap();
       const ageStr = _fmtCacheAge(_prjCached.ageMs);
       const src = _prjCached.source === 'session' ? 'session cache' : 'IndexedDB cache';
       _setDetail(`Projections: served from ${src} (${ageStr} old) - append ?nocache=1 to URL for a fresh pull`);
