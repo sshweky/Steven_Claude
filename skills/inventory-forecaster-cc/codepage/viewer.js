@@ -1728,6 +1728,9 @@ function adaptRow(row) {
   // Seasonal customers (A: Promo, A: OffPrice) order 1-3x per year — zero-weeks
   // between order events are normal and must not generate ALERT flags.
   const is_seasonal = /^A:\s*(Promo|OffPrice)\b/i.test(str(row, F.STATUS_CUST));
+  // Off-price is a subset of seasonal: POs ship same/next week so we widen the
+  // PO/PRJ conflict window to 4 weeks for this account type.
+  const is_offprice = /^A:\s*OffPrice\b/i.test(str(row, F.STATUS_CUST));
 
   // Per-week severity.  For seasonal records: only alert when we project an order
   // (m > 0) that significantly diverges from AI — not just because a week is 0.
