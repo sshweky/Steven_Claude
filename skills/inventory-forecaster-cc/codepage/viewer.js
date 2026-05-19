@@ -2638,9 +2638,43 @@ function toggleReplyOnly() {
 }
 
 
-// "📬 For Me" — role-aware inbox filter:
-//   Planners    → records where MANAGER_REPLY_PENDING = true (items the director flagged for them)
-//   Directors   → records where PLANNER_REPLY_PENDING = true (same as "Show Replies Only")
+// "📬 For Me" — driven by SEND_TO on active comments, not boolean flags on the projection.
+// _FOR_ME_KEYS is the set of projection keys where at least one non-resolved/non-reviewed
+// comment is explicitly addressed to the current user (SEND_TO text contains their name,
+// or SEND_TO_USER email matches their email).  Refreshed at load and after any comment action.
+let _FOR_ME_KEYS = new Set();
+
+async function refreshForMeKeys() {
+  if (!CURRENT_USER.name && !CURRENT_USER.email) return;
+  try {
+    const F = CFG.COMMENT_FID;
+    // Active flags only — skip informational/closed entries
+    const activeFlags = ['Needs Action', 'Planner Response', 'Manager Response'];
+    const flagClause  = activeFlags.map(f => `{${F.FLAG}.EX.'${f}'}`).join('OR');
+    // Match on SEND_TO text (contains, handles comma-separated lists) OR SEND_TO_USER email
+    const escName  = (CURRENT_USER.name  || '').replace(/'/g, "''");
+    const escEmail = (CURRENT_USER.email || '').replace(/'/g, "''");
+    const nameClause  = escName  ? `{${F.SEND_TO}.CT.'${escName}'}`             : null;
+    const emailClause = (F.SEND_TO_USER && escEmail) ? `{${F.SEND_TO_USER}.EX.'${escEmail}'}` : null;
+    const recipClause = (nameClause && emailClause) ? `(${nameClause}OR${emailClause})`
+                      : (nameClause || emailClause);
+    if (!recipClause) return;
+    const where = `${recipClause}AND(${flagClause})`;
+    const resp = await qb('/records/query', {
+      from:    CFG.COMMENTS_TID,
+      select:  [F.ACCT_MSTYLE],
+      where,
+      options: { top: 2000 },
+    });
+    _FOR_ME_KEYS = new Set(
+      (resp.data || [])
+        .map(row => row[F.ACCT_MSTYLE] && row[F.ACCT_MSTYLE].value)
+        .filter(Boolean)
+    );
+    updateForMeCount();
+  } catch (_) { /* non-fatal — filter falls back to empty set */ }
+}
+
 let SHOW_FOR_ME_ONLY = false;
 function toggleForMe() {
   SHOW_FOR_ME_ONLY = !SHOW_FOR_ME_ONLY;
