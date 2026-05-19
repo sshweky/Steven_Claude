@@ -1668,7 +1668,10 @@ function adaptRow(row) {
     pog_end:           str(row, F.POG_END),
     iso_ship_date:     str(row, F.ISO_SHIP_DATE),
     next_rcpt_dt:      str(row, F.NEXT_RCPT_DT),  // FID 861 — Next Receipt Date
-    auto_project:      F.AUTO_PROJECT ? bool(row, F.AUTO_PROJECT) : false,  // FID 1601
+    auto_project:        F.AUTO_PROJECT         ? bool(row, F.AUTO_PROJECT)         : false,
+    switchover_active:   F.SWITCHOVER_ACTIVE    ? bool(row, F.SWITCHOVER_ACTIVE)    : false,
+    switchover_to_mstyle:F.SWITCHOVER_TO_MSTYLE ? str(row, F.SWITCHOVER_TO_MSTYLE)  : '',
+    switchover_date:     F.SWITCHOVER_DATE      ? str(row, F.SWITCHOVER_DATE)        : '',
     opn_w:             opn,           // [Opn_W1..Opn_W26] open customer PO quantities
     opn_total:         opn_total,    // sum of opn_w; used in proj_wk/ai_wk recalcs
     inv_flow_beg:        null,        // [Wk1..Wk26] beginning balances
