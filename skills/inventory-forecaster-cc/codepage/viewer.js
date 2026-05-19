@@ -3266,7 +3266,7 @@ async function toggleDetail(key) {
   // Shown when a COS or EC variant of this style has started receiving orders
   // or manual projections, signalling that this base style should be closed.
   const _variantMstyle   = SWITCHOVER_MAP.get(r.key);
-  const switchoverHtml   = _variantMstyle ? `
+  const _cosEcHtml       = _variantMstyle ? `
     <div id="switchover-alert-${safeKey}" style="margin:8px 12px 0 12px;padding:10px 14px;background:#fff8e1;border:2px solid #f9a825;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
       <span style="font-size:18px;line-height:1;">&#x26A0;&#xFE0F;</span>
       <span style="flex:1;min-width:200px;">
@@ -3280,6 +3280,58 @@ async function toggleDetail(key) {
         Mark as CLOSED
       </button>
     </div>` : '';
+
+  // -- Manual switchover setup card (any style can be a base) ---------------
+  // Shows on ALL rows so planners can configure a switchover from scratch,
+  // and shows the current status when one is already configured.
+  const _manSw      = MANUAL_SWITCHOVER_MAP.get(r.key);
+  const _manSwRev   = MANUAL_SWITCHOVER_REVERSE.get(r.key);
+  const _swChecked  = r.switchover_active ? 'checked' : '';
+  const _swToVal    = (r.switchover_to_mstyle || '').replace(/"/g,'&quot;');
+  const _swDateVal  = r.switchover_date ? r.switchover_date.slice(0,10) : '';
+  const _esc        = s => (s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]);
+
+  // Receiving-side banner (shown on the NEW style's row)
+  const _receivingHtml = _manSwRev ? `
+    <div style="margin:8px 12px 0 12px;padding:8px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px;font-size:12px;color:#0d47a1;">
+      &#x21C4; <b>Receiving switchover from ${_esc(_manSwRev.fromMstyle)}</b>
+      ${_manSwRev.date ? '&mdash; effective ' + _manSwRev.date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''}
+      &mdash; pre-switchover order history is included in demand calculations.
+    </div>` : '';
+
+  const _manualSwitchoverCard = `
+    <div id="sw-card-${safeKey}" style="margin:8px 12px 0 12px;padding:10px 14px;background:#fafafa;border:1px solid #e0e0e0;border-radius:6px;font-size:12px;">
+      <div style="font-weight:700;font-size:12px;color:#444;margin-bottom:8px;">&#x21C4; Style Switchover</div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;color:#e65100;">
+          <input type="checkbox" id="sw-active-${safeKey}" ${_swChecked}
+            onchange="saveSwitchoverField('${r.key.replace(/'/g,"\\'")}','active',this.checked)"
+            style="width:15px;height:15px;cursor:pointer;">
+          Switchover Active
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#555;">New MStyle:</span>
+          <input type="text" id="sw-mstyle-${safeKey}" value="${_swToVal}" placeholder="e.g. BB38259"
+            style="font-size:12px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;width:110px;text-transform:uppercase;"
+            onblur="saveSwitchoverField('${r.key.replace(/'/g,"\\'")}','mstyle',this.value)"
+            onkeydown="if(event.key==='Enter')this.blur()">
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#555;">Switch Date:</span>
+          <input type="date" id="sw-date-${safeKey}" value="${_swDateVal}"
+            style="font-size:12px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;"
+            onchange="saveSwitchoverField('${r.key.replace(/'/g,"\\'")}','date',this.value)">
+        </label>
+        <span id="sw-status-${safeKey}" style="font-size:11px;color:#888;"></span>
+      </div>
+      ${_manSw ? `<div style="margin-top:6px;font-size:11px;color:#1565c0;">
+        &#x2713; Active: projections split at week
+        <b>${_manSw.date ? _manSw.date.toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '?'}</b>
+        &mdash; base style owns weeks before, <b>${_esc(_manSw.toMstyle)}</b> owns weeks on/after.
+      </div>` : ''}
+    </div>`;
+
+  const switchoverHtml = _cosEcHtml + _receivingHtml + _manualSwitchoverCard;
 
   // Issue 8: FD Status block  -  Future Development items often have no AI narrative
   // or projections yet; show a prominent metadata card so the panel isn't blank.
