@@ -3236,6 +3236,7 @@ async function toggleDetail(key) {
           <table class="dtbl">
             <tr>${hdrCells}</tr>
             <tr>${begCells}</tr>
+            <tr>${prjCells}</tr>
             <tr>${rcvCells}</tr>
             <tr>${opnCells}</tr>
             <tr>${wosCells}</tr>
