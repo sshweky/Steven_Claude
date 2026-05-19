@@ -1154,6 +1154,30 @@ function _parseModel(txt) {
   return '';
 }
 
+// Detect weeks where an Open Customer PO and a Manual Projection exist in the
+// same week (all customers) or within a 4-week window (off-price accounts).
+// Returns { conflicts: [{poWk,prjWk,poQty,prjQty}], hasConflict: bool }
+// Off-price rationale: POs ship the same or next week, so a nearby projection
+// double-counts demand even when it's not literally the same calendar week.
+function _computePoPrjConflicts(opnW, manProj, isOffprice) {
+  const nearWks = isOffprice ? 3 : 0;   // 0 = same week only; 3 = ±3 wks (4-wk window)
+  const conflicts = [];
+  const seen = new Set();
+  for (let i = 0; i < 26; i++) {
+    const poQty = opnW[i] || 0;
+    if (!poQty) continue;
+    for (let j = Math.max(0, i - nearWks); j <= Math.min(25, i + nearWks); j++) {
+      const prjQty = manProj[j] || 0;
+      if (!prjQty) continue;
+      const pk = `${i}_${j}`;
+      if (seen.has(pk)) continue;
+      seen.add(pk);
+      conflicts.push({ poWk: i + 1, prjWk: j + 1, poQty, prjQty });
+    }
+  }
+  return { conflicts, hasConflict: conflicts.length > 0 };
+}
+
 // Forecast status flag: 'Over-Projected' | 'Under-Projected' | 'On Plan' | 'Inactive' | ''
 // Noise filter: max(ai, man) < 1,000 OR |ai−man| < 500 → blank (no flag).
 // Threshold: ±10% of manual total.
