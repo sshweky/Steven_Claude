@@ -2175,6 +2175,8 @@ function autoFlagOnComment(key) {
     return;
   }
   // FYI comments are informational — don't auto-flag the row
+  const _fyiChkAuto = document.getElementById('cmt-fyi-' + key);
+  if (_fyiChkAuto && _fyiChkAuto.checked) return;
   const flagSel = document.getElementById('cmt-flag-' + key);
   if (flagSel && flagSel.value === 'FYI') return;
   if (rec.flagged) return;       // already flagged (QB or manual) — leave alone
