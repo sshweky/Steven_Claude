@@ -4442,6 +4442,51 @@ async function markReviewed(key, commentRid, btnEl) {
   }
 }
 
+// -- Mark Read > planner acknowledges a Manager Response comment -------------
+// Mirrors markReviewed but in the opposite direction: planner has read the
+// director's follow-up, so MANAGER_REPLY_PENDING clears and the [M] badge goes away.
+async function markMgrResponseRead(key, commentRid, btnEl) {
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '...'; }
+  try {
+    // 1. Flip the FLAG on the specific comment record to "Reviewed"
+    if (commentRid) {
+      const cf = {};
+      cf[CFG.COMMENT_FID.RECORD_ID] = { value: commentRid };
+      cf[CFG.COMMENT_FID.FLAG]      = { value: 'Reviewed' };
+      await qb('/records', { to: CFG.COMMENTS_TID, data: [cf], mergeFieldId: CFG.COMMENT_FID.RECORD_ID });
+    }
+    // 2. Clear manager-reply-pending on the Projections record
+    const pf = {};
+    pf[CFG.FID.KEY]                   = { value: key };
+    pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: false };
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
+
+    // Optimistic UI
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    if (rec) rec.manager_reply_pending = false;
+    const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+    const badgeCell = document.getElementById('row-badges-' + safeId);
+    if (badgeCell) { const mb = badgeCell.querySelector('.mgr-badge'); if (mb) mb.remove(); }
+    const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
+    if (tr) tr.classList.remove('row-mgr-pending');
+    updateReplyCount();
+    updateForMeCount();
+    // Force detail re-render so comment shows updated state
+    const detailEl = document.getElementById('detail-' + key);
+    if (detailEl && detailEl.style.display === 'table-row') {
+      detailEl.dataset.loaded = '0';
+      detailEl.style.display = 'none';
+      toggleDetail(key);
+    } else if (detailEl) {
+      detailEl.dataset.loaded = '0';
+    }
+    if (btnEl) { btnEl.textContent = 'Read'; btnEl.style.background = '#fff3e0'; btnEl.style.color = '#e65100'; }
+  } catch(e) {
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Mark Read'; }
+    alert('Failed to mark read: ' + e.message);
+  }
+}
+
 // -- Use AI / Use Suggested > upsert manual prj cols ------------------------
 async function copyToMan(key, source, btn) {
   const label = source === 'ai' ? 'AI PRJ' : 'Suggested';
