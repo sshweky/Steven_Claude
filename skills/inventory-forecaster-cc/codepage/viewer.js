@@ -4332,6 +4332,27 @@ async function addComment(key) {
       updateForMeCount();
     }
 
+    if (flag === 'Manager Response' && CFG.FID.MANAGER_REPLY_PENDING) {
+      // Director is replying to the planner's response -- planner needs to read it,
+      // but PLANNER_REPLY_PENDING is cleared (director already saw the planner's reply).
+      const pf = {};
+      pf[CFG.FID.KEY]                   = { value: key };
+      pf[CFG.FID.MANAGER_REPLY_PENDING] = { value: true };
+      pf[CFG.FID.PLANNER_REPLY_PENDING] = { value: false };
+      await qb('/records', { to: CFG.PROJECTIONS_TID, data: [pf], mergeFieldId: CFG.FID.KEY });
+      if (rec) { rec.manager_reply_pending = true; rec.planner_reply_pending = false; }
+      const badgeCell = document.getElementById('row-badges-' + safeId);
+      if (badgeCell) {
+        if (!badgeCell.querySelector('.mgr-badge'))
+          badgeCell.insertAdjacentHTML('beforeend', '<span class="mgr-badge" title="Manager responded - planner action required">[M]</span>');
+        const rb = badgeCell.querySelector('.reply-badge'); if (rb) rb.remove();
+      }
+      const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
+      if (tr) { tr.classList.add('row-mgr-pending'); tr.classList.remove('row-reply-pending'); }
+      updateReplyCount();
+      updateForMeCount();
+    }
+
     if (flag === 'Resolved') {
       if (rec && rec.flagged) await toggleFlag(key);
       if (rec && (rec.planner_reply_pending || rec.manager_reply_pending)) {
