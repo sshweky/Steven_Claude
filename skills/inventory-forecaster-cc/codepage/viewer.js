@@ -396,6 +396,7 @@ function buildSelectFids() {
     ...(F.MANAGER_REPLY_PENDING ? [F.MANAGER_REPLY_PENDING] : []),  // optional — set FID in CFG
     // POG / ISO context (added 2026-05-10)
     F.STORE_COUNT, F.EST_ISO_QTY, F.POG_LAUNCH, F.POG_END, F.ISO_SHIP_DATE, F.NEXT_RCPT_DT,
+    ...(F.AUTO_PROJECT ? [F.AUTO_PROJECT] : []),
   ];
   CFG.AI_PRJ_FIDS.forEach(fid => sel.push(fid));
   CFG.SUG_FIDS.forEach(fid => sel.push(fid));
