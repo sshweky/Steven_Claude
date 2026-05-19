@@ -4903,7 +4903,7 @@ function _parseAiAdjustment(text, currentForecast) {
   // Pattern: zero / cover with PO in W{a}[-W{b}]
   // When "starting / from / onward" language is present with a single week,
   // extend the zero to W26 (e.g. "zero starting W13" = zero W13-W26).
-  m = lo.match(/(?:zero|no\s*orders?|po\s*covers?|covered\s*by\s*po)[^\d]*w?(\d{1,2})(?:\s*[--]\s*w?(\d{1,2}))?/);
+  m = lo.match(/(?:zero|no\s*orders?|po\s*covers?|covered\s*by\s*po)[^\d]*w(?:k|eek)?\s*(\d{1,2})(?:\s*[--]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
   if (m) {
     const a = _clamp(parseInt(m[1], 10));
     const hasFrom = /\b(?:starting|from|onward|forward|onwards|through\s+end)\b/.test(lo);
