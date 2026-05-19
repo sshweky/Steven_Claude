@@ -2281,13 +2281,13 @@ function _updateAttnBanner() {
     n = myName
       ? ALL_RECORDS.filter(r => r.manager_reply_pending && (r.inv_manager || '').toLowerCase() === myName).length
       : ALL_RECORDS.filter(r => r.manager_reply_pending).length;
-    icon     = '📋';
+    icon     = '';
     msg      = n === 1 ? 'item needs your attention' : 'items need your attention';
     btnLabel = 'View Items';
     action   = toggleForMe;
   } else {
     n        = ALL_RECORDS.filter(r => r.planner_reply_pending).length;
-    icon     = '💬';
+    icon     = '';
     msg      = n === 1 ? 'planner reply awaiting your review' : 'planner replies awaiting your review';
     btnLabel = 'View Replies';
     action   = toggleReplyOnly;
