@@ -179,10 +179,22 @@ async function qbQueryAll(tableId, fieldIds, where, label) {
 }
 
 // -- Cache (IndexedDB primary, sessionStorage fast-path for same-tab F5) ------
+// Date-aware JSON serialization so IDB stores a plain string (avoids structured-clone
+// failures for Date objects in open_pos, next_rcpt_dt, purchase_rec_etd, etc.)
+var _DATE_TAG = '__D__';
+function _jsonSer(key, val) {
+  return (val instanceof Date) ? _DATE_TAG + val.toISOString() : val;
+}
+function _jsonDes(key, val) {
+  return (typeof val === 'string' && val.indexOf(_DATE_TAG) === 0)
+    ? new Date(val.slice(_DATE_TAG.length)) : val;
+}
 async function saveCache(data) {
-  var obj = { ts: Date.now(), data: data };
-  try { sessionStorage.setItem(CACHE_KEY_SS, JSON.stringify(obj)); } catch(_) {}
-  try { await _idb.set(CACHE_KEY, obj); } catch(e) {
+  var json = JSON.stringify({ ts: Date.now(), data: data }, _jsonSer);
+  // sessionStorage fast-path (may fail silently if quota exceeded -- that's OK)
+  try { sessionStorage.setItem(CACHE_KEY_SS, json); } catch(_) {}
+  // IDB stores the JSON string (not a structured object) -- always serializable
+  try { await _idb.set(CACHE_KEY, json); } catch(e) {
     console.warn('[InvMgmt] IDB save failed:', e && e.message);
   }
   // Evict stale old-version keys
@@ -194,18 +206,21 @@ async function loadCache() {
   try {
     var raw = sessionStorage.getItem(CACHE_KEY_SS);
     if (raw) {
-      var obj = JSON.parse(raw);
+      var obj = JSON.parse(raw, _jsonDes);
       if (obj && typeof obj.ts === 'number' && obj.data &&
           Date.now() - obj.ts <= CACHE_TTL) return { obj: obj, src: 'session' };
     }
   } catch(_) {}
   // 2. IndexedDB -- cross-tab, cross-session
   try {
-    var obj = await _idb.get(CACHE_KEY);
-    if (obj && typeof obj.ts === 'number' && obj.data &&
-        Date.now() - obj.ts <= CACHE_TTL) {
-      try { sessionStorage.setItem(CACHE_KEY_SS, JSON.stringify(obj)); } catch(_) {}
-      return { obj: obj, src: 'idb' };
+    var stored = await _idb.get(CACHE_KEY);
+    if (typeof stored === 'string') {
+      var obj = JSON.parse(stored, _jsonDes);
+      if (obj && typeof obj.ts === 'number' && obj.data &&
+          Date.now() - obj.ts <= CACHE_TTL) {
+        try { sessionStorage.setItem(CACHE_KEY_SS, stored); } catch(_) {}
+        return { obj: obj, src: 'idb' };
+      }
     }
   } catch(_) {}
   return null;
