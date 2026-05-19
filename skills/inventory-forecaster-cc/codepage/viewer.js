@@ -4232,12 +4232,16 @@ async function loadCommentHistory(key, force) {
             : '';
           // Strip [ai-intent ...] machine tag from display
           const noteDisplay = note.replace(/\s*\[ai-intent[^\]]*\]/g, '').trim();
-          // x Ignore button only on active (non-ignored) entries
+          // x Ignore on active entries; Restore on ignored entries
           const ignoreBtn = (!ignored && rid)
             ? `<button onclick="ignoreAiComment(${rid}, '${key.replace(/'/g, "&#39;")}')"
                        title="Stop applying this adjustment on future forecaster runs (audit trail preserved)"
                        style="float:right;font-size:9px;padding:1px 6px;border:1px solid #c62828;background:#fff;color:#c62828;border-radius:3px;cursor:pointer;font-weight:600;margin-left:6px;">x Ignore</button>`
-            : '';
+            : (ignored && rid)
+              ? `<button onclick="restoreAiComment(${rid}, '${key.replace(/'/g, "&#39;")}')"
+                         title="Re-activate this adjustment so F58 applies it on future forecaster runs"
+                         style="float:right;font-size:9px;padding:1px 6px;border:1px solid #2e7d32;background:#fff;color:#2e7d32;border-radius:3px;cursor:pointer;font-weight:600;margin-left:6px;">Restore</button>`
+              : '';
           // Greyed-out style for ignored rows
           const rowStyle = ignored ? 'padding:5px 0;border-bottom:1px solid #f0f0f0;opacity:0.5;' : 'padding:5px 0;border-bottom:1px solid #f0f0f0;';
           return `
