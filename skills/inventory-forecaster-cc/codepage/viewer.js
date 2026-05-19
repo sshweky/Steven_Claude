@@ -750,13 +750,20 @@ async function _lazyLoadDetail(r) {
   r.ly_ord    = LY_ORD_HIST_FIDS.map(fid => num(row, fid));
   r.ly_shp    = LY_SHP_HIST_FIDS.map(fid => num(row, fid));
   r.narrative = str(row, CFG.FID.AI_ANALYSIS) || str(row, CFG.FID.AI_ALERT);
-  // Re-compute weeks_slim (per-week AI vs manual severity)
+  // Re-compute weeks_slim (per-week AI vs manual severity).
+  // Seasonal customers: 0-weeks between orders are normal — suppress those alerts.
+  const _isSeasonal = r.is_seasonal || false;
   const weeks_slim = [];
   for (let i = 0; i < 26; i++) {
     const m = manual[i] || 0, a = forecast[i] || 0;
     let sev = 'OK';
-    if ((m === 0 && a > 0) || (a === 0 && m > 0)) sev = 'ALERT';
-    else if (m > 0 && (a / m > 3 || m / Math.max(a, 1) > 3)) sev = 'ALERT';
+    if (_isSeasonal) {
+      if (m > 0 && a === 0) sev = 'ALERT';
+      else if (m > 0 && a > 0 && (a / m > 3 || m / Math.max(a, 1) > 3)) sev = 'ALERT';
+    } else {
+      if ((m === 0 && a > 0) || (a === 0 && m > 0)) sev = 'ALERT';
+      else if (m > 0 && (a / m > 3 || m / Math.max(a, 1) > 3)) sev = 'ALERT';
+    }
     weeks_slim.push({ week: i + 1, projection: m, severity: sev });
   }
   r.weeks_slim    = weeks_slim;
