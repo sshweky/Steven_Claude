@@ -989,10 +989,12 @@ function renderDetail(r) {
   var w1sun=new Date(today);w1sun.setDate(today.getDate()-today.getDay());
 
   // Purchase recommendation detail vars
-  var purTrigIdx = r.purchase_rec_trigger_idx;  // 0-based index of trigger week (e.g. 15 = Wk16)
-  var purTrigWk  = purTrigIdx >= 0 ? purTrigIdx + 1 : 0;  // 1-based week label
-  var purTrigInv = purTrigIdx >= 0 ? (r.beg_inv[purTrigIdx] || 0) : 0;
-  var purGap     = Math.max(0, r.opt_oh - purTrigInv);
+  var purTrigIdx    = r.purchase_rec_trigger_idx;  // 0-based index of trigger week (e.g. 15 = Wk16)
+  var purTrigWk     = purTrigIdx >= 0 ? purTrigIdx + 1 : 0;  // 1-based week label
+  var purTrigInv    = purTrigIdx >= 0 ? (r.beg_inv[purTrigIdx] || 0) : 0;
+  var purBufUnits   = PUR_REC_BUFFER_WKS * r.prj_wk;
+  var purTarget     = r.opt_oh + purBufUnits;
+  var purGap        = Math.max(0, purTarget - purTrigInv);
 
   // Map POs to forecast weeks via ETA + warehouse lag
   var poByWeek={};
