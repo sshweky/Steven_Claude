@@ -1162,7 +1162,7 @@ function renderDetail(r) {
       +'</div></div>';
   } else {
     purRecSection = '<div class="section"><h3>&#128722; Purchase Recommendation</h3>'
-      +'<div style="color:#1b5e20;font-style:italic;">&#10003; No new order needed - Wk '+purRcptWk+' projected inventory ('+fmtInt(purPrjAtRcpt)+' units) meets target ('+fmtInt(purTarget)+' units = Opt OH + 2-wk buffer).</div>'
+      +'<div style="color:#1b5e20;font-style:italic;">&#10003; No new order needed - Wk '+purRcptWk+' projected inventory ('+fmtInt(purPrjAtRcpt)+' units) meets Opt OH target ('+fmtInt(purTarget)+' units).</div>'
       +'</div>';
   }
 
