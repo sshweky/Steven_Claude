@@ -5412,7 +5412,8 @@ async function clearAllFlags() {
 
 // Expose handlers the inline onclick attributes call
 window.toggleDetail   = toggleDetail;
-window.toggleFlag     = toggleFlag;
+window.toggleFlag        = toggleFlag;
+window.toggleAutoProject = toggleAutoProject;
 window.autoFlagOnComment = autoFlagOnComment;
 window.editStatusCust = editStatusCust;
 window.toggleFlaggedOnly  = toggleFlaggedOnly;
