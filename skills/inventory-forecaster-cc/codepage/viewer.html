@@ -70,7 +70,9 @@ window.QB_CONFIG = {
     MANAGER_REPLY_PENDING: 1600,  // boolean checkbox  -  set when director posts "Needs Planner Action"
     // POG / ISO context  -  used by the Inventory Plan block in the detail panel
     STORE_COUNT:  14,     // numeric  -  # stores carrying this item
-    EST_ISO_QTY:  1010,   // numeric (formula)  -  qty needed for initial in-store fill
+    EST_ISO_QTY:  1010,   // numeric (formula)  -  QB auto-calculated qty needed for initial in-store fill
+    EST_ISO_INPUT: 1606,  // numeric  -  planner-entered estimated ISO order qty (AI uses for ramp projections)
+    INIT_UPSPW:   1607,   // numeric  -  planner-entered initial units-per-store-per-week (AI ramp baseline)
     POG_LAUNCH:   1594,   // date  -  POG start (item goes IN store)
     POG_END:      1595,   // date  -  POG end (item comes OUT of store)
     ISO_SHIP_DATE: 1060,  // text  -  when the customer expects to receive the ISO load
