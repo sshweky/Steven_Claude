@@ -5244,6 +5244,22 @@ function previewAiAdjustment(key) {
 // absolute integer value the planner wanted at that week.  F58 in the
 // forecaster reads each date, maps it to the current-horizon week index, and
 // writes the value (or skips the date if it's no longer in the horizon).
+// Replaces week-number tokens (W7, Wk7, Week 7) in planner-written text with
+// their actual calendar date (MM/DD of the Monday that starts that week).
+// Keeps the text human-readable in QB history even after the rolling horizon
+// has shifted and those week numbers would point to different dates.
+// Out-of-range or non-numeric tokens are left untouched.
+function _replaceWeekRefsWithDates(text) {
+  if (!text || !W1_DATE || isNaN(W1_DATE.getTime())) return text;
+  return text.replace(/\bw(?:k|eek)?\s*(\d{1,2})\b/gi, (match, n) => {
+    const wkNum = parseInt(n, 10);
+    if (wkNum < 1 || wkNum > 26) return match;
+    const d = new Date(W1_DATE);
+    d.setDate(W1_DATE.getDate() + (wkNum - 1) * 7);
+    return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+  });
+}
+
 function _encodeAiIntent(currentVals, newVals, w1Date) {
   if (!Array.isArray(newVals) || newVals.length !== 26) return '';
   if (!w1Date) return '';
