@@ -3551,6 +3551,13 @@ async function addComment(key) {
   if (!txt) { msg.textContent = 'Comment cannot be empty.'; msg.style.color = '#c62828'; return; }
   btn.disabled = true; btn.textContent = 'Saving...'; msg.textContent = '';
 
+  // Block until the bootstrap identity call finishes — eliminates the race
+  // condition where a fast user submits before fetchCurrentUser() returns,
+  // leaving CURRENT_USER.name empty and skipping the author write.
+  // This is instant if identity already resolved; only delays on the very
+  // first comment of a fresh page load.
+  await _USER_READY;
+
   // --- Step 1: INSERT comment record (fatal if it fails) ---------------------
   let recId = '';
   try {
