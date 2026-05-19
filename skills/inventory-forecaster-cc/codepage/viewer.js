@@ -4029,7 +4029,7 @@ async function loadCommentHistory(key, force) {
       const where = `{${F.ACCT_MSTYLE}.EX.'${escKey}'}AND{${F.DATE_CREATED}.OAF.'${cmtCutoff}'}`;
       const resp  = await qb('/records/query', {
         from:    CFG.COMMENTS_TID,
-        select:  [F.RECORD_ID, F.DATE_CREATED, F.NOTE, F.FLAG, F.AUTHOR, ...(F.SEND_TO ? [F.SEND_TO] : [])],
+        select:  [F.RECORD_ID, F.DATE_CREATED, F.NOTE, F.FLAG, F.AUTHOR, ...(F.AUTHOR_USER ? [F.AUTHOR_USER] : []), ...(F.SEND_TO ? [F.SEND_TO] : [])],
         where:   where,
         sortBy:  [{ fieldId: F.DATE_CREATED, order: 'ASC' }],
         options: { top: 200 },
