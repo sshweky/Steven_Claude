@@ -671,7 +671,7 @@ function computeDerived(rec, today) {
     var _rcptWk = Math.ceil(rec.lt_trans_days / 7);
     if (_rcptWk >= 1 && _rcptWk <= 26) {
       var _prjAtRcpt = rec.beg_inv[_rcptWk - 1] || 0;
-      var _purTarget = rec.opt_oh + 2 * rec.prj_wk;
+      var _purTarget = rec.opt_oh;
       var _purGap = Math.max(0, _purTarget - _prjAtRcpt);
       if (_purGap > 0) {
         var _purRounded = Math.ceil(_purGap / rec.moq) * rec.moq;
@@ -964,7 +964,7 @@ function renderDetail(r) {
   // Purchase recommendation detail vars
   var purRcptWk = r.lt_trans_days > 0 ? Math.ceil(r.lt_trans_days / 7) : 0;
   var purPrjAtRcpt = (purRcptWk >= 1 && purRcptWk <= 26) ? (r.beg_inv[purRcptWk - 1] || 0) : 0;
-  var purTarget = r.opt_oh + 2 * r.prj_wk;
+  var purTarget = r.opt_oh;
   var purGap = Math.max(0, purTarget - purPrjAtRcpt);
 
   // Map POs to forecast weeks via ETA + warehouse lag
