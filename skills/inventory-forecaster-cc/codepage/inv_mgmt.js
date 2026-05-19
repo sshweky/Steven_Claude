@@ -203,6 +203,7 @@ async function saveCache(data) {
   // Evict stale old-version keys
   try { localStorage.removeItem('pp_inv_mgmt_codepage_v2'); } catch(_) {}
   try { sessionStorage.removeItem('pp_inv_mgmt_codepage_v2'); } catch(_) {}
+  try { sessionStorage.removeItem('pp_inv_mgmt_ss_v3'); } catch(_) {}
 }
 async function loadCache() {
   // 1. sessionStorage -- instant same-tab F5, no async needed
