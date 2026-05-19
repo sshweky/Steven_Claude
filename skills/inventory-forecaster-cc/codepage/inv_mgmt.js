@@ -37,7 +37,7 @@ var MIN_RESOLVED_GAP_DEF  = 1.0;
 var IF_F = {
   Mstyle:20, Country:223, ItemStatus:294, SubStatus:297, Season:1068, ItemRank:1573,
   NVO:1487, NewItemNoPrj:1893, KitStyle:1759, PcsKitUse:1882, RootMstyle:792,
-  OptWOS:137, OptWOSFinal:1897, OptOH:234, NextAvlRcptDt:235,
+  OptWOS:137, OptWOSFinal:1897, OptOH:234, NextAvlRcptDt:235, NxtAvlETD:1917,
   LTTransDays:225, TransitDays:1751, LTWks:1525, CNYWeeks:1891, LTOptWeeks:446,
   OpenSupplierPOs:241, MOQ:226, InvManager:981,
   QtyOH:24, ATSQtyOH:179, ATSNow:932, ATSOHplusOO:180, ATSOHOOwKits:1722,
