@@ -5584,12 +5584,14 @@ async function applyAiAdjustment(key) {
   // Save to AI Comments table (bv2jirwts)  \u2014  kept separate from Projection
   // Comments (planner <-> mgr) so the AI Event thread stays isolated.
   // loadCommentHistory() reads both tables and shows both in the history panel.
+  await _USER_READY;
   try {
     const A = CFG.AI_COMMENT_FID;
     const aiFields = {};
     aiFields[A.ACCT_MSTYLE] = { value: key };
     aiFields[A.NOTE]        = { value: noteText };
     aiFields[A.IGNORED]     = { value: false };
+    if (A.AUTHOR && CURRENT_USER.email) aiFields[A.AUTHOR] = { value: CURRENT_USER.email };
     await qb('/records', { to: CFG.AI_COMMENTS_TID, data: [aiFields] });
   } catch (e) {
     if (previewDiv) {
