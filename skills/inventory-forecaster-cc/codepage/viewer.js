@@ -1754,6 +1754,10 @@ function adaptRow(row) {
   const ai_vs_l13  = ord_l13 > 0 ? ((ai_per_wk   - ord_l13) / ord_l13 * 100) : 0;
   const man_vs_l13 = ord_l13 > 0 ? ((proj_per_wk - ord_l13) / ord_l13 * 100) : 0;
 
+  // PO / Manual Projection overlap detection
+  const { conflicts: po_prj_conflicts, hasConflict: has_po_prj_conflict } =
+    _computePoPrjConflicts(opn, manual, is_offprice);
+
   // Build narrative.  Primary source is QB AI_ANALYSIS / AI_ALERT (rich text
   // written by scripts/inventory_forecaster.py during the last forecast run).
   // We then *augment* with a client-side order-trend insight to keep the
