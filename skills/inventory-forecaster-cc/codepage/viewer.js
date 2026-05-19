@@ -3499,6 +3499,7 @@ async function toggleDetail(key) {
     </div>` : '';
 
   el.innerHTML = `<td colspan="21" style="padding:0">
+    ${autoProjectBtn}
     ${fdStatusHtml}
     ${_buildPogBlockHtml(r)}
     ${narrativeHtml}
