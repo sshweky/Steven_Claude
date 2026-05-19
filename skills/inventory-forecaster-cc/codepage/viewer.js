@@ -4209,8 +4209,12 @@ async function addComment(key) {
         });
         const owner = ((probe.data || [])[0] || {})[4] && probe.data[0][4].value;
         if (owner) {
-          CURRENT_USER.name  = (owner.name  || owner.userName || '').trim();
-          CURRENT_USER.email = CURRENT_USER.email || (owner.email || '').trim();
+          // owner.name can come back as "Unknown" from QB for users without a display name set;
+          // fall back to userName, then derive a readable name from email
+          const rawName = (owner.name && owner.name !== 'Unknown' ? owner.name : '') || owner.userName || '';
+          const ownerEmail = (owner.email || '').trim();
+          CURRENT_USER.name  = rawName.trim() || (ownerEmail ? ownerEmail.split('@')[0].replace(/[._]/g, ' ') : '');
+          CURRENT_USER.email = CURRENT_USER.email || ownerEmail;
         }
         if (CURRENT_USER.name && CFG.COMMENT_FID.AUTHOR) {
           const upd = {};
