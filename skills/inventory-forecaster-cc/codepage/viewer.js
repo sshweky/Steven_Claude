@@ -4700,6 +4700,7 @@ async function copyToMan(key, source, btn) {
     rec.weeks_slim = rec.weeks_slim.map((w, i) => ({ ...w, projection: Math.round(sourceVals[i] || 0), severity: 'OK' }));
     rec.max_sev    = 'OK';
     rec.n_flags    = 0;
+    _refreshRowMetrics(key);
 
     // copyToMan just overwrote all 26 weeks. Drop any pending unsaved edits
     // on this record (they're meaningless now) and refresh the inputs in any
