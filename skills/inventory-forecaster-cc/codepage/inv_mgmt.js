@@ -1302,7 +1302,10 @@ function renderDetail(r) {
   var _ifOptWos = r.opt_wos || 0;
   var _ifGap = { weeks: [], nextRcptWeekIdx: -1, nextRcptDate: null };
   if (r.is_replen && _ifOptWos > 0) {
-    var _nrDate = r.next_rcpt_dt || null;  // already a Date object (set in loadData)
+    // Coerce to Date -- may arrive as a string if loaded from a cache that lacked __D__ tags
+    var _nrRaw  = r.next_rcpt_dt || null;
+    var _nrDate = _nrRaw ? (_nrRaw instanceof Date ? _nrRaw : new Date(_nrRaw)) : null;
+    if (_nrDate && isNaN(_nrDate.getTime())) _nrDate = null;
     var _nrIdx  = _nrDate ? wkIdxForDate(today, _nrDate) : 25;
     _ifGap.nextRcptDate    = _nrDate;
     _ifGap.nextRcptWeekIdx = _nrIdx;
