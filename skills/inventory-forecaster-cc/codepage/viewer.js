@@ -1212,11 +1212,13 @@ function _friendlyCustName(cust) {
 // for ~4 weeks until store inventory needs replenishing.  Lead time from
 // cancel-date to in-store is 2-4 weeks.
 function _buildPogBlockHtml(r) {
-  const pogLaunch = r.pog_launch || '';
-  const pogEnd    = r.pog_end    || '';
-  const stores    = Number(r.store_count || 0);
-  const mp        = Number(r.master_pack || 1);
-  const estIso    = Number(r.est_iso_qty || 0);
+  const pogLaunch   = r.pog_launch    || '';
+  const pogEnd      = r.pog_end       || '';
+  const stores      = Number(r.store_count   || 0);
+  const mp          = Number(r.master_pack   || 1);
+  const estIso      = Number(r.est_iso_qty   || 0);   // formula field (read-only)
+  const estIsoInput = Number(r.est_iso_input || 0);   // planner-entered ISO qty (FID 1606)
+  const initUpspw   = Number(r.init_upspw   || 0);    // planner-entered initial UPSPW (FID 1607)
   // ALWAYS render the block  -  planners need the editable inputs even when
   // QB has no POG/Store data yet (e.g. a new item being set up).
 
