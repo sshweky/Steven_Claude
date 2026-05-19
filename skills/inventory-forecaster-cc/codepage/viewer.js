@@ -5161,8 +5161,6 @@ function applyFilters() {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
     if (FLAGGED_ONLY       && !r.flagged)               return false;
     if (SHOW_REPLY_ONLY    && !r.planner_reply_pending) return false;
-    if (SHOW_OFF_PLAN_ONLY && r.fcst_status !== 'Over-Projected' && r.fcst_status !== 'Under-Projected') return false;
-    if (SHOW_MY_RECORDS_ONLY && CURRENT_USER.name && (r.inv_manager || '').toLowerCase() !== CURRENT_USER.name.toLowerCase()) return false;
     if (SHOW_FOR_ME_ONLY) {
       const _needsMyAtt = _USER_IS_PLANNER ? r.manager_reply_pending : r.planner_reply_pending;
       if (!_needsMyAtt) return false;
