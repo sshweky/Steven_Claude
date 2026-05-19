@@ -1150,7 +1150,7 @@ function renderDetail(r) {
       +kvBox('New Order Required',
         kvRow('Recommended Qty','<b style="font-size:16px;color:#1a237e;">'+fmtInt(r.purchase_rec)+'</b> units')
         +kvRow('Required ETD',r.purchase_rec_etd?'<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b>':'&#8212;')
-        +kvRow('6-Run Min',fmtInt(6*r.moq)+' units (6 x '+fmtInt(r.moq)+' MOQ)'),
+        +kvRow('MOQ (floor)',fmtInt(r.moq)+' units'),
         '#fff3e0','1')
       +kvBox('Calculation',
         kvRow('Receipt Week','Wk '+purRcptWk+' (ceil('+r.lt_trans_days+'d / 7))')
