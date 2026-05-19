@@ -4233,21 +4233,42 @@ async function loadCommentHistory(key, force) {
           // Strip [ai-intent ...] machine tag from display
           const noteDisplay = note.replace(/\s*\[ai-intent[^\]]*\]/g, '').trim();
           // x Ignore on active entries; Restore on ignored entries
+          const safeKey = key.replace(/'/g, "&#39;");
           const ignoreBtn = (!ignored && rid)
-            ? `<button onclick="ignoreAiComment(${rid}, '${key.replace(/'/g, "&#39;")}')"
+            ? `<button onclick="ignoreAiComment(${rid}, '${safeKey}')"
                        title="Stop applying this adjustment on future forecaster runs (audit trail preserved)"
-                       style="float:right;font-size:9px;padding:1px 6px;border:1px solid #c62828;background:#fff;color:#c62828;border-radius:3px;cursor:pointer;font-weight:600;margin-left:6px;">x Ignore</button>`
+                       style="font-size:9px;padding:1px 6px;border:1px solid #c62828;background:#fff;color:#c62828;border-radius:3px;cursor:pointer;font-weight:600;">x Ignore</button>`
             : (ignored && rid)
-              ? `<button onclick="restoreAiComment(${rid}, '${key.replace(/'/g, "&#39;")}')"
+              ? `<button onclick="restoreAiComment(${rid}, '${safeKey}')"
                          title="Re-activate this adjustment so F58 applies it on future forecaster runs"
-                         style="float:right;font-size:9px;padding:1px 6px;border:1px solid #2e7d32;background:#fff;color:#2e7d32;border-radius:3px;cursor:pointer;font-weight:600;margin-left:6px;">Restore</button>`
+                         style="font-size:9px;padding:1px 6px;border:1px solid #2e7d32;background:#fff;color:#2e7d32;border-radius:3px;cursor:pointer;font-weight:600;">Restore</button>`
               : '';
+          const editBtn = rid
+            ? `<button onclick="editAiComment(${rid})"
+                       title="Edit comment text"
+                       style="font-size:9px;padding:1px 6px;border:1px solid #888;background:#fff;color:#555;border-radius:3px;cursor:pointer;font-weight:600;">Edit</button>`
+            : '';
           // Greyed-out style for ignored rows
           const rowStyle = ignored ? 'padding:5px 0;border-bottom:1px solid #f0f0f0;opacity:0.5;' : 'padding:5px 0;border-bottom:1px solid #f0f0f0;';
+          // Escape full note for data attribute (preserves [ai-intent] tag for save)
+          const noteDataAttr = note.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
           return `
-            <div style="${rowStyle}">
-              <div style="font-size:10px;color:#888;font-weight:600;">${escHtml(fmtTs(ts))}${authorBadge}${ignoredBadge}${ignoreBtn}</div>
-              <div style="font-size:11px;color:#333;white-space:pre-wrap;line-height:1.35;margin-top:2px;">${escHtml(noteDisplay)}</div>
+            <div style="${rowStyle}" id="ai-comment-row-${rid}" data-full-note="${noteDataAttr}">
+              <div style="font-size:10px;color:#888;font-weight:600;display:flex;justify-content:space-between;align-items:center;">
+                <span>${escHtml(fmtTs(ts))}${authorBadge}${ignoredBadge}</span>
+                <span style="display:flex;gap:4px;">${editBtn}${ignoreBtn}</span>
+              </div>
+              <div id="ai-note-display-${rid}" style="font-size:11px;color:#333;white-space:pre-wrap;line-height:1.35;margin-top:2px;">${escHtml(noteDisplay)}</div>
+              <div id="ai-note-edit-${rid}" style="display:none;margin-top:4px;">
+                <textarea id="ai-note-ta-${rid}" rows="3"
+                  style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #1565c0;border-radius:3px;font-family:inherit;resize:vertical;box-sizing:border-box;">${escHtml(noteDisplay)}</textarea>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                  <button onclick="saveAiCommentEdit(${rid},'${safeKey}')"
+                          style="font-size:10px;padding:3px 10px;background:#1565c0;color:#fff;border:none;border-radius:3px;cursor:pointer;font-weight:600;">Save</button>
+                  <button onclick="cancelAiCommentEdit(${rid})"
+                          style="font-size:10px;padding:3px 10px;background:#fff;color:#555;border:1px solid #ccc;border-radius:3px;cursor:pointer;">Cancel</button>
+                </div>
+              </div>
             </div>`;
         }).join('');
         aiCont.scrollTop = aiCont.scrollHeight;
