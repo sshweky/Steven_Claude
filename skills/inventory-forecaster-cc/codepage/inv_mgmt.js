@@ -724,8 +724,9 @@ function computeDerived(rec, today) {
         // Receipt needed by: start of last-above week (one week before trigger)
         var _rcptDate = wkSunday(today, _lastAbove);
         rec.purchase_rec_receipt_date = _rcptDate;
-        // Required ETD = receipt date minus full LT_Trans_Days (always show formula result)
-        var _reqETD = addDays(_rcptDate, -rec.lt_trans_days);
+        // Required ETD = receipt date minus ocean transit only
+        // (ETD = goods depart origin; transit brings them to US; LT is separate production time)
+        var _reqETD = addDays(_rcptDate, -rec.transit_days);
         rec.purchase_rec_etd = _reqETD;
         // Push supplier flag: supplier's next avail ETD is later than what we need
         var _nxtETD = rec.nxt_avl_etd ? new Date(rec.nxt_avl_etd) : null;
