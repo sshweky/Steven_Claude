@@ -2260,7 +2260,7 @@ async function toggleAutoProject(key) {
   try {
     const fields = {};
     fields[CFG.FID.KEY]          = { value: key };
-    fields[F.AUTO_PROJECT]       = { value: newVal };
+    fields[CFG.FID.AUTO_PROJECT]  = { value: newVal };
     await qb('/records', {
       to: CFG.PROJECTIONS_TID,
       data: [fields],
