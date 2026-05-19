@@ -5645,6 +5645,28 @@ async function ignoreAiComment(rid, key) {
   }
 }
 
+// Restore an ignored AI adjustment  -  flips [Ignored]=false so F58 resumes
+// applying it on future forecaster runs.  Mirrors ignoreAiComment exactly.
+async function restoreAiComment(rid, key) {
+  if (!rid) return;
+  if (!confirm('Re-activate this adjustment? F58 will apply it again on the next forecaster run.')) return;
+  try {
+    const A = CFG.AI_COMMENT_FID;
+    const fields = {};
+    fields[A.RECORD_ID] = { value: rid };
+    fields[A.IGNORED]   = { value: false };
+    await qb('/records', {
+      to: CFG.AI_COMMENTS_TID,
+      data: [fields],
+      mergeFieldId: A.RECORD_ID,
+    });
+    if (typeof loadCommentHistory === 'function') loadCommentHistory(key, true);
+  } catch (e) {
+    alert('Could not restore: ' + (e.message || e));
+  }
+}
+window.restoreAiComment = restoreAiComment;
+
 async function saveAiCommentOnly(key) {
   // Couldn't parse  -  save the planner's text as an AI Comment anyway, for
   // the audit trail (someone may pick up the thread later).  Writes to
