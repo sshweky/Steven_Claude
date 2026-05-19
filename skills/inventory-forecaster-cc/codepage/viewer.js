@@ -5167,6 +5167,35 @@ function _parseAiAdjustment(text, currentForecast) {
     };
   }
 
+  // Pattern: +/-N units in/for W{a}[-W{b}]  (one-time absolute add/remove for specific week(s))
+  // e.g. "+4385 units in w13",  "-500 units w5-w7",  "add 200 units for w8",
+  //      "additional 4385u w13",  "+4385 units w13-w14 for PDQ secondary placement"
+  {
+    // Sign-prefix form:  "+4385 units in w13"
+    let _wkM = lo.match(/([+-])\s*(\d+(?:,\d{3})*)\s*(?:units?|u)\s*(?:in|for|at|on|to)?\s*w(?:k|eek)?\s*(\d{1,2})(?:\s*[-–]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
+    // Verb form: "add 200 units for w8", "additional 4385 units w13"
+    if (!_wkM) {
+      const _v = lo.match(/(?:add(?:ing|ed)?|additional|extra)\s*(?:by\s+)?(\d+(?:,\d{3})*)\s*(?:units?|u)\s*(?:in|for|at|on|to)?\s*w(?:k|eek)?\s*(\d{1,2})(?:\s*[-–]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
+      if (_v) _wkM = [null, '+', _v[1], _v[2], _v[3]];
+    }
+    if (_wkM) {
+      const sign  = _wkM[1] === '-' ? -1 : 1;
+      const delta = parseInt((_wkM[2] || '').replace(/,/g, ''), 10) * sign;
+      const a = _clamp(parseInt(_wkM[3], 10));
+      const b = _wkM[4] ? _clamp(parseInt(_wkM[4], 10)) : a;
+      if (delta !== 0 && !isNaN(a)) {
+        for (let i = a; i <= b; i++) out[i] = Math.max(0, cur[i] + delta);
+        const beforeTot = cur.slice(a, b + 1).reduce((s, v) => s + v, 0);
+        const afterTot  = out.slice(a, b + 1).reduce((s, v) => s + v, 0);
+        return {
+          parsed: true, newForecast: out, type: 'absolute_units_week',
+          summary: `${sign > 0 ? '+' : ''}${delta.toLocaleString()} units in W${a + 1}${b !== a ? `-W${b + 1}` : ''} (${beforeTot.toLocaleString()}u -> ${afterTot.toLocaleString()}u).`,
+          deltaTotal: out.reduce((s, v) => s + v, 0) - cur.reduce((s, v) => s + v, 0),
+        };
+      }
+    }
+  }
+
   // Pattern: +/-X% lift|cut|boost in W{a}[-W{b}] (or "starting W{a}" -> W26)
   // Catches: "+25% W8-W12", "lift 30% from W10", "cut 15% W22-W26",
   //          "distribution gain 25% starting W8", etc.
