@@ -1148,7 +1148,7 @@ function renderDetail(r) {
       +'<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">'
       +kvBox('New Order Required',
         kvRow('Recommended Qty','<b style="font-size:16px;color:#1a237e;">'+fmtInt(r.purchase_rec)+'</b> units')
-        +kvRow('Required ETD',r.purchase_rec_etd?'<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b>':'&#8212;')
+        +kvRow('Nxt Avl ETD',r.purchase_rec_etd?'<b style="color:#e65100;">'+fmtDate(r.purchase_rec_etd)+'</b>':'&#8212;')
         +kvRow('MOQ (floor)',fmtInt(r.moq)+' units'),
         '#fff3e0','1')
       +kvBox('Calculation',
