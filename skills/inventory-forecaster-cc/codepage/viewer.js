@@ -2128,6 +2128,7 @@ function refreshHeaderBadges() {
 
 // -- Display helpers --------------------------------------------------------
 function fmtN(n) { return n == null ? '-' : Number(n).toLocaleString(); }
+function escHtml(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]); }
 function priLabel(p) {
   if (p === 'CRITICAL') return '<span class="pri-crit">CRITICAL</span>';
   if (p === 'MEDIUM')   return '<span class="pri-med">MEDIUM</span>';
