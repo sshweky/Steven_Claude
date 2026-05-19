@@ -3029,7 +3029,7 @@ async function toggleDetail(key) {
     }
   }
 
-  // Build the three rows.  Reuse the projection table's header (W1..W26) so
+  // Build the four rows.  Reuse the projection table's header (W1..W26) so
   // weeks line up vertically with the projection rows above.
   let invFlowSectionHtml = '';
   {
