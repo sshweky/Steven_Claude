@@ -1247,7 +1247,7 @@ function renderDetail(r) {
         +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Required ETD</div>'
         +'<div style="font-size:18px;font-weight:700;color:'+etdColor+';">'+etdDisplay+pushBadge+'</div>'
         +nxtAvlNote
-        +'<div style="font-size:10px;color:#888;margin-top:1px;">Receipt - '+r.lt_trans_days+'d LT</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">Receipt - '+r.transit_days+'d transit</div>'
       +'</div>'
       // Receipt Needed By
       +'<div style="flex:0 0 auto;padding:12px 20px;">'
