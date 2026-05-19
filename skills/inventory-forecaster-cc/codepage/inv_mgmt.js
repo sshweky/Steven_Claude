@@ -682,7 +682,8 @@ function computeDerived(rec, today) {
     var _trigIdx = (_lastAbove >= 0 && _lastAbove < 25) ? _lastAbove + 1 : -1;
     if (_trigIdx >= 1 && _trigIdx <= 25) {
       var _trigInv = rec.beg_inv[_trigIdx] || 0;
-      var _purGap = Math.max(0, rec.opt_oh - _trigInv);
+      var _purTarget = rec.opt_oh + PUR_REC_BUFFER_WKS * rec.prj_wk;
+      var _purGap = Math.max(0, _purTarget - _trigInv);
       if (_purGap > 0) {
         rec.purchase_rec = Math.max(_purGap, rec.moq);
         rec.purchase_rec_trigger_idx = _trigIdx;
