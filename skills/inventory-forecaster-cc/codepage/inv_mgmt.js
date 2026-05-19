@@ -1136,6 +1136,7 @@ function applyFilters() {
     var chain=DEFAULT_SORT_CHAIN.map(function(id){return COLS.find(function(c){return c.id===id;});}).filter(Boolean);
     FILTERED.sort(function(a,b){for(var i=0;i<chain.length;i++){var r2=cmpCol(chain[i],a,b,1);if(r2!==0)return r2;}return 0;});
   }
+  currentPage=0;
   renderStats();renderTable();
 }
 
