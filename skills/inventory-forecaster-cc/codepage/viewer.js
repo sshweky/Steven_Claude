@@ -2764,8 +2764,8 @@ async function toggleDetail(key) {
     const _cardOhWos  = (_beg && _prj) ? _wosForward(_beg[0], _prj, 0) : 0;
     const _cardOoQty  = _cardQtyIw + _cardQtyIt;
     const _cardOoWos  = _cardPrjAvg > 0 ? (_cardQtyOh + _cardOoQty) / _cardPrjAvg : 0;
-    const _cardNextRcpt = _gap.nextRcptDate
-      ? _gap.nextRcptDate.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+    const _cardNextRcpt = r.next_rcpt_dt
+      ? new Date(r.next_rcpt_dt + 'T12:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
       : '';
     const _cwc = w => w === 0 ? '#bbb' : w < 3 ? '#c62828' : w < 8 ? '#e65100' : w < 16 ? '#1b5e20' : '#f57f17';
     const _cwt = w => w === 0 ? '0' : w.toFixed(1) + ' wks';
