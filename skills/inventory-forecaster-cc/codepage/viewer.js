@@ -2296,26 +2296,13 @@ function _updateAttnBanner() {
   const btnEl   = document.getElementById('attnBannerViewBtn');
   if (!banner) return;
 
-  let n, icon, msg, btnLabel, action;
-  if (_USER_IS_PLANNER) {
-    const myName = CURRENT_USER.name ? CURRENT_USER.name.toLowerCase() : '';
-    n = myName
-      ? ALL_RECORDS.filter(r => r.manager_reply_pending && (r.inv_manager || '').toLowerCase() === myName).length
-      : ALL_RECORDS.filter(r => r.manager_reply_pending).length;
-    icon     = '';
-    msg      = n === 1 ? 'item needs your attention' : 'items need your attention';
-    btnLabel = 'View Items';
-    action   = toggleForMe;
-  } else {
-    n        = ALL_RECORDS.filter(r => r.planner_reply_pending).length;
-    icon     = '';
-    msg      = n === 1 ? 'planner reply awaiting your review' : 'planner replies awaiting your review';
-    btnLabel = 'View Replies';
-    action   = toggleReplyOnly;
-  }
+  // Count only loaded records where an active comment is addressed to me by name —
+  // the same set that drives the "For Me" filter button.
+  const n = ALL_RECORDS.filter(r => _FOR_ME_KEYS.has(r.key)).length;
+  const msg = n === 1 ? 'item needs your attention' : 'items need your attention';
 
-  if (textEl) textEl.textContent = (icon ? icon + ' ' : '') + n + ' ' + msg;
-  if (btnEl)  { btnEl.textContent = btnLabel; window._attnBannerAction = action; }
+  if (textEl) textEl.textContent = n + ' ' + msg;
+  if (btnEl)  { btnEl.textContent = 'View'; window._attnBannerAction = toggleForMe; }
   if (n > 0 && banner.dataset.dismissed !== '1') banner.style.display = 'flex';
   else if (n === 0) { banner.style.display = 'none'; delete banner.dataset.dismissed; }
 }
