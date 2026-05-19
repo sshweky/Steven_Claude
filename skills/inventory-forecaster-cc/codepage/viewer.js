@@ -2333,6 +2333,44 @@ function _updateAttnBanner() {
 //
 // Both are built after ALL_RECORDS loads and rebuilt on forceRefresh.
 
+// Analyzes 26-week order history for a seasonal customer to find order events,
+// average gap between events, and when the next order window is likely due.
+// histOrd: array of 26 weekly order quantities, oldest first (index 0 = LW-25).
+function _analyzeSeasonalPattern(histOrd) {
+  const h = (histOrd || []).map(v => v || 0);
+  // Identify distinct "order events" = runs of consecutive non-zero weeks
+  const events = [];
+  let inRun = false, runStart = 0, runTotal = 0;
+  for (let i = 0; i < h.length; i++) {
+    if (h[i] > 0) {
+      if (!inRun) { inRun = true; runStart = i; runTotal = 0; }
+      runTotal += h[i];
+    } else if (inRun) {
+      events.push({ start: runStart, end: i - 1, total: runTotal });
+      inRun = false;
+    }
+  }
+  if (inRun) events.push({ start: runStart, end: h.length - 1, total: runTotal });
+
+  if (!events.length) return { events: [], avgGapWks: null, nextExpectedWk: null, avgOrderTotal: 0, wksSinceLast: null };
+
+  // Gaps between event ends and the following event's start
+  const gaps = [];
+  for (let i = 1; i < events.length; i++) {
+    gaps.push(events[i].start - events[i - 1].end - 1);
+  }
+  const avgGapWks = gaps.length > 0
+    ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length)
+    : null;
+
+  const lastEvent    = events[events.length - 1];
+  const wksSinceLast = h.length - 1 - lastEvent.end;  // 0 = last week had orders
+  const nextExpectedWk = avgGapWks !== null ? avgGapWks - wksSinceLast : null;
+  const avgOrderTotal  = Math.round(events.reduce((s, e) => s + e.total, 0) / events.length);
+
+  return { events, avgGapWks, nextExpectedWk, avgOrderTotal, wksSinceLast };
+}
+
 const SWITCHOVER_MAP            = new Map();  // COS/EC auto-detected
 const MANUAL_SWITCHOVER_MAP     = new Map();  // planner-configured base → new
 const MANUAL_SWITCHOVER_REVERSE = new Map();  // planner-configured new  → base
