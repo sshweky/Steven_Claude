@@ -1560,7 +1560,7 @@ function renderDetail(r) {
   function ageCard(lbl,val,pct,bg,valColor){
     return '<div class="age-card" style="background:'+bg+';">'
       +'<div class="age-card-lbl">'+lbl+'</div>'
-      +'<div class="age-card-val" style="color:'+valColor+'">'+fmt(val)+'</div>'
+      +'<div class="age-card-val" style="color:'+valColor+'">'+fmtInt(val)+'</div>'
       +'<div class="age-card-pct">'+pct+' of total</div>'
       +'</div>';
   }
