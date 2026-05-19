@@ -1656,7 +1656,7 @@ function renderDetail(r) {
       +'</div>';
   }
 
-  return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+stockStatusBox+'</div></div><div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">- hover Expected Receipts cells for PO detail / hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div><div class="section"><h3>&#127919; Recommended Actions</h3><div class="recs-wrap">'+recs+'</div></div>'+purRecSection+'</div>';
+  return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+stockStatusBox+'</div></div><div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">- hover Expected Receipts cells for PO detail / hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+invGapBanner+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div><div class="section"><h3>&#127919; Recommended Actions</h3><div class="recs-wrap">'+recs+'</div></div>'+purRecSection+'</div>';
 }
 
 // -- Reco spreadsheet ----------------------------------------------------------
