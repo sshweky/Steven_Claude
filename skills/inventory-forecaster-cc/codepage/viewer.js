@@ -5564,6 +5564,7 @@ async function bootstrap() {
       _setDetail(`${rawRows.length.toLocaleString()} records received | adapting to UI shape`);
       await new Promise(r => setTimeout(r, 16));
       ALL_RECORDS = rawRows.map(adaptRow);
+      buildSwitchoverMap();
       await _savePrjCache(ALL_RECORDS);
       console.info(`[Prj] saved ${ALL_RECORDS.length.toLocaleString()} records to IndexedDB cache`);
     }
