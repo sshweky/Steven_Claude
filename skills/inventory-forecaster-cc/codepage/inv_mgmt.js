@@ -437,7 +437,8 @@ async function loadData() {
 
     var optWOS = toNum(g(IF_F.OptWOSFinal)) || toNum(g(IF_F.OptWOS)) || OPT_WOS_DEFAULT;
     var beg_inv = IF_BEG.map(function(fid){return Math.round(toNum(g(fid)));});
-    var rcv     = IF_RCV.map(function(fid){return Math.round(toNum(g(fid)));});
+    // rcv and ATS default to zeros; phase 2 (attachDetailData) fills in real values
+    var rcv     = IF_RCV.map(function(){return 0;});
     var prj     = IF_PRJ.map(function(fid){return Math.round(toNum(g(fid)));});
 
     var custDemand = (pi.custs||[]).sort(function(a,b){return b.total-a.total;});
