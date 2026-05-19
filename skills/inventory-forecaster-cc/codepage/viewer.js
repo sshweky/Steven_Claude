@@ -2629,11 +2629,29 @@ async function toggleDetail(key) {
   const safeIdForTotal = r.key.replace(/[^a-zA-Z0-9]/g, '_');
   // Detect Amazon record so we can fetch DC inventory health live.
   const isAmazonRec = /amazon/i.test(r.cust || '');
+
+  // -- Manual switchover: determine which weeks are locked for this row -----
+  // Base style (in MANUAL_SWITCHOVER_MAP): weeks >= cutoff belong to new style → locked
+  // New style  (in MANUAL_SWITCHOVER_REVERSE): weeks < cutoff belong to base  → locked
+  const _weekDates      = _getWeekDates();
+  const _swIdxBase      = _switchoverWeekIndex(r.key, _weekDates); // -1 if not a base
+  const _revEntry       = MANUAL_SWITCHOVER_REVERSE.get(r.key);
+  const _swIdxNew       = _revEntry ? _switchoverWeekIndex(_revEntry.fromKey, _weekDates) : -1;
+  // isLockedWeek(i): true when week i is out of this style's territory
+  const _isBaseSide     = MANUAL_SWITCHOVER_MAP.has(r.key);
+  const _isNewSide      = !!_revEntry;
+  const isLockedWeek    = (i) => {
+    if (_isBaseSide && _swIdxBase >= 0) return i >= _swIdxBase;   // base: lock post-cutoff
+    if (_isNewSide  && _swIdxNew  >= 0) return i <  _swIdxNew;    // new:  lock pre-cutoff
+    return false;
+  };
+
   let liveProjTotal = 0;
   for (let i = 0; i < wks.length; i++) {
-    const w = wks[i];
-    const lbl = weekLabel(i);
-    hdrCells  += `<th>W${w.week}<br><span style="font-weight:normal;font-size:10px">${lbl}</span></th>`;
+    const w      = wks[i];
+    const lbl    = weekLabel(i);
+    const locked = isLockedWeek(i);
+    hdrCells  += `<th${locked ? ' style="opacity:0.4"' : ''}>W${w.week}<br><span style="font-weight:normal;font-size:10px">${lbl}</span></th>`;
     const cls = weekCellClass(w.severity);
     // -- Editable MAN projection cell ------------------------------------
     // Show the unsaved value (from DIRTY_EDITS) if one exists, otherwise the
@@ -2643,15 +2661,25 @@ async function toggleDetail(key) {
     const dirtyEdit  = DIRTY_EDITS.get(dirtyKey);
     const cellVal    = (dirtyEdit !== undefined) ? dirtyEdit.newVal : Math.round(w.projection || 0);
     const dirtyAttr  = (dirtyEdit !== undefined) ? ' dirty' : '';
-    liveProjTotal   += cellVal;
-    projCells += `<td class="${cls}"><input type="number" min="0" step="1" `
-              +  `class="man-edit${dirtyAttr}" `
-              +  `data-key="${r.key.replace(/"/g,'&quot;')}" data-week="${i}" `
-              +  `data-orig="${Math.round(w.projection || 0)}" `
-              +  `value="${cellVal}" oninput="onManEdit(this)" `
-              +  `onfocus="markLastEdit(this); this.select();" `
-              +  `onpaste="smartPaste(this, event)" `
-              +  `onkeydown="manEditKey(this, event)"></td>`;
+    if (!locked) liveProjTotal += cellVal;
+    // Locked weeks: show a read-only grayed cell with a tooltip explaining why
+    const lockedTitle = locked
+      ? (_isBaseSide
+          ? `title="Week transferred to ${(MANUAL_SWITCHOVER_MAP.get(r.key)||{}).toMstyle||'new style'} — edit there"`
+          : `title="Week owned by ${_revEntry.fromMstyle||'base style'} — edit there"`)
+      : '';
+    projCells += locked
+      ? `<td class="${cls}" style="background:#f5f5f5;opacity:0.55;" ${lockedTitle}>`
+        + `<input type="number" min="0" step="1" class="man-edit" disabled `
+        + `value="${cellVal}" style="background:transparent;color:#aaa;border:none;width:52px;text-align:right;"></td>`
+      : `<td class="${cls}"><input type="number" min="0" step="1" `
+        +  `class="man-edit${dirtyAttr}" `
+        +  `data-key="${r.key.replace(/"/g,'&quot;')}" data-week="${i}" `
+        +  `data-orig="${Math.round(w.projection || 0)}" `
+        +  `value="${cellVal}" oninput="onManEdit(this)" `
+        +  `onfocus="markLastEdit(this); this.select();" `
+        +  `onpaste="smartPaste(this, event)" `
+        +  `onkeydown="manEditKey(this, event)"></td>`;
     const aiVal  = aiFcst[i] || 0;
     const aiDiff = aiVal - w.projection;
     const aiCls  = aiDiff > 0 ? 'color:#2e7d32' : aiDiff < 0 ? 'color:#c62828' : 'color:#888';
