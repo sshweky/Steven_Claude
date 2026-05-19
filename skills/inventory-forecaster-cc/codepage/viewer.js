@@ -3458,6 +3458,7 @@ async function toggleDetail(key) {
           <label style="font-size:11px;color:#555;">Status:
             <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
               <option value="Needs Action" ${!_USER_IS_PLANNER ? 'selected' : ''} style="color:#1565c0;font-weight:600;">Needs Action</option>
+              <option value="Manager Response" style="color:#e65100;font-weight:600;">Manager Response</option>
               <option value="Planner Response" ${_USER_IS_PLANNER ? 'selected' : ''} style="color:#00695c;font-weight:600;">Planner Response</option>
               <option value="FYI" style="color:#616161;">FYI</option>
               <option value="Resolved">Resolved</option>
