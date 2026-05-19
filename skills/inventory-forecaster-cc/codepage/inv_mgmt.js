@@ -1156,7 +1156,7 @@ function renderDetail(r) {
       +kvBox('Calculation',
         kvRow('Receipt Week','Wk '+purRcptWk+' (ceil('+r.lt_trans_days+'d / 7))')
         +kvRow('Prj Inv at Wk '+purRcptWk,fmtInt(purPrjAtRcpt)+' units')
-        +kvRow('Target (Opt OH + 2wk)',fmtInt(purTarget)+' = '+fmtInt(r.opt_oh)+' + '+fmtInt(2*r.prj_wk))
+        +kvRow('Target (Opt OH)',fmtInt(purTarget)+' units')
         +kvRow('Gap to Target',fmtInt(purGap)+' units'),
         '#f3e5f5','1')
       +'</div></div>';
