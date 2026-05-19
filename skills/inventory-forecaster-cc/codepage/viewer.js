@@ -3303,15 +3303,19 @@ async function toggleDetail(key) {
   // Comment block  -  Flag/Mgr conversation thread (planner <-> inventory mgr).
   // 25% Add-a-Comment input | 75% Comment History (filtered to NON-AI
   // comments only).  Tell-AI dialogue lives in its own block above.
+  const autoProjectBtn = CFG.FID.AUTO_PROJECT ? `
+  <div style="margin:6px 12px 0 12px;">
+    <button id="autoproj-${safeId}" onclick="toggleAutoProject('${safeKey}')"
+      title="Auto Project: when ON, manual projections are automatically replaced with AI projections every time a forecast is run"
+      style="padding:5px 12px;border:1px solid ${r.auto_project ? '#1b5e20' : '#bbb'};border-radius:4px;background:${r.auto_project ? '#e8f5e9' : '#f5f5f5'};color:${r.auto_project ? '#1b5e20' : '#555'};font-size:11px;font-weight:${r.auto_project ? '700' : '400'};cursor:pointer;">
+      &#x1F504; Auto Project${r.auto_project ? ': ON' : ': OFF'}
+    </button>
+  </div>` : '';
+
   const commentBlock = `
   <div style="margin:10px 12px 12px 12px;padding:12px;background:#f7f9fc;border:1px solid #d8dce3;border-radius:6px;">
     <div style="margin-bottom:8px;">
       <button id="flg-${safeId}" class="${flagCls2}" onclick="toggleFlag('${safeKey}')" title="Toggle the QB Flagged boolean for this projection">&#x2691; Flag Projection</button>
-      <button id="autoproj-${safeId}" onclick="toggleAutoProject('${safeKey}')"
-        title="Auto Project: when ON, manual projections are automatically replaced with AI projections every time a forecast is run"
-        style="margin-left:8px;padding:5px 12px;border:1px solid ${r.auto_project ? '#1b5e20' : '#bbb'};border-radius:4px;background:${r.auto_project ? '#e8f5e9' : '#f5f5f5'};color:${r.auto_project ? '#1b5e20' : '#555'};font-size:11px;font-weight:${r.auto_project ? '700' : '400'};cursor:pointer;">
-        &#x1F504; Auto Project${r.auto_project ? ': ON' : ': OFF'}
-      </button>
     </div>
     <div style="display:flex;gap:14px;align-items:flex-start;">
       <!-- LEFT: Add a Comment (25%)  -  for planner <-> mgr dialogue -->
