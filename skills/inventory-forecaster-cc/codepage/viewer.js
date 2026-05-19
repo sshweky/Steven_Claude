@@ -2389,6 +2389,57 @@ function _getWeekDates() {
   return _weekDateCache;
 }
 
+// Saves a single switchover field change (active / mstyle / date) to QB,
+// updates the in-memory record, and rebuilds the switchover map so the
+// projection week locking and badges refresh without a full page reload.
+async function saveSwitchoverField(key, field, value) {
+  const safeId  = key.replace(/[^a-zA-Z0-9]/g, '_');
+  const statusEl = document.getElementById('sw-status-' + safeId);
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (!rec) return;
+  if (statusEl) statusEl.textContent = 'Saving...';
+  const fields = {};
+  fields[CFG.FID.KEY] = { value: key };
+  if (field === 'active') {
+    rec.switchover_active = !!value;
+    fields[CFG.FID.SWITCHOVER_ACTIVE] = { value: !!value };
+  } else if (field === 'mstyle') {
+    rec.switchover_to_mstyle = value.trim().toUpperCase();
+    fields[CFG.FID.SWITCHOVER_TO_MSTYLE] = { value: rec.switchover_to_mstyle };
+    // Normalise the input to uppercase in the UI
+    const inp = document.getElementById('sw-mstyle-' + safeId);
+    if (inp) inp.value = rec.switchover_to_mstyle;
+  } else if (field === 'date') {
+    rec.switchover_date = value;   // ISO date string "YYYY-MM-DD" or ''
+    fields[CFG.FID.SWITCHOVER_DATE] = { value: value || null };
+  }
+  try {
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
+    if (statusEl) { statusEl.style.color = '#2e7d32'; statusEl.textContent = '✓ Saved'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2500); }
+    // Rebuild the switchover map so week locking reflects the change immediately.
+    // Invalidate the week-date cache in case date changed.
+    if (field === 'date') _weekDateCache = null;
+    buildSwitchoverMap();
+    // Refresh the row badge
+    const badgeCell = document.getElementById('row-badges-' + safeId);
+    if (badgeCell) {
+      const sb = badgeCell.querySelector('.switchover-badge');
+      const hasSw = MANUAL_SWITCHOVER_MAP.has(key);
+      if (!sb && hasSw)  badgeCell.insertAdjacentHTML('beforeend', '<span class="switchover-badge" title="Manual switchover configured">&#x21C4;</span>');
+      if (sb  && !hasSw && !SWITCHOVER_MAP.has(key)) sb.remove();
+    }
+    // Collapse and re-expand to re-render locked weeks and card status line
+    const tr = document.getElementById('detail-' + safeId);
+    if (tr) { tr.dataset.loaded = ''; }   // force re-render on next open
+  } catch (e) {
+    if (statusEl) { statusEl.style.color = '#c62828'; statusEl.textContent = 'Save failed: ' + (e.message || 'error'); }
+    // Roll back in-memory
+    if (field === 'active')  rec.switchover_active      = !value;
+    if (field === 'mstyle') rec.switchover_to_mstyle = '';
+    if (field === 'date')   rec.switchover_date      = '';
+  }
+}
+
 // Writes Status_Cust = 'CLOSED' on the base style after planner confirms.
 async function closeBaseStyle(key) {
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
