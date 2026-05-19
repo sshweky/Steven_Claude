@@ -4965,7 +4965,7 @@ function _parseAiAdjustment(text, currentForecast) {
     };
   }
   // Fall back to the original percent-first pattern
-  m = lo.match(/([+-]?)\s*(\d+(?:\.\d+)?)\s*%\s*(?:lift|boost|bump|gain|increase|cut|drop|decrease|reduction|down|up)?[^\dwW]*(?:starting|from|in|on|for|across)?[^\dwW]*w?(\d{1,2})(?:\s*[--]\s*w?(\d{1,2}))?/);
+  m = lo.match(/([+-]?)\s*(\d+(?:\.\d+)?)\s*%\s*(?:lift|boost|bump|gain|increase|cut|drop|decrease|reduction|down|up)?[^\dwW]*(?:starting|from|in|on|for|across)?[^\dwW]*w(?:k|eek)?\s*(\d{1,2})(?:\s*[--]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
   // Also handle "distribution gain 25% starting W8" where number comes after a word
   if (!m) {
     m = lo.match(/(?:gain(?:ed|ing)?|adding|losing|loss(?:ed|ing)?|drop(?:ped)?)[^\d%]*(\d+(?:\.\d+)?)\s*%[^\dwW]*(?:starting|from|in|on|for)?[^\dwW]*w?(\d{1,2})(?:\s*[--]\s*w?(\d{1,2}))?/);
