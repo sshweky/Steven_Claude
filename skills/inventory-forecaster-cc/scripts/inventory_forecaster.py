@@ -5733,17 +5733,38 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         biweekly = False
 
     elif not is_croston:
-        # Truly sparse buyer (< 25% non-zero = typically every 6–12 weeks).
-        # Mimic the historical batch cadence, anchored to account-level cadence.
-        _is_offprice_s1 = _is_offprice_cust(cust_name)
-        fcst, cap, meta = sparse_intermittent_forecast(hist_for_model, mp,
-                                                       account_interval=account_interval,
-                                                       is_offprice=_is_offprice_s1)
-        model    = "Sparse Intermittent"
-        biweekly = False   # sparse items never get biweekly enforcement
-        _cadence_gap_si = detect_biweekly(hist_for_model)
-        biweekly = bool(_cadence_gap_si)
-        fcst = apply_ordering_pattern(fcst, hist_for_model, mp)
+        # FXX — Amazon Replenishment items order in pallet/MOQ batches, creating
+        # a sparse appearance in the order history.  This is NOT true intermittent
+        # demand — it's continuous demand expressed in bulk purchases.  Sparse
+        # Intermittent uses non-zero event averages which massively overstates
+        # the forward rate.  Route to Heuristic (L13W non-zero baseline) instead.
+        _is_amz_replen = is_amazon and "replen" in (row.get("PT_Item_Status") or "").lower()
+        if _is_amz_replen:
+            fcst, cap, meta = heuristic(hist_for_model, mp, l13w, is_amazon=is_amazon,
+                                        description=description,
+                                        product_category=product_category,
+                                        product_subcategory=product_subcategory,
+                                        brand=brand, brand_pt=brand_pt,
+                                        pos_data=pos_data, season=season,
+                                        is_new_launch=_f34_is_new_launch)
+            model    = "Heuristic"
+            biweekly = False
+            meta.setdefault("drivers", []).append(
+                "FXX Amazon-Replen rerouted from Sparse Intermittent: "
+                "batch ordering is MOQ/pallet-driven, not true intermittent demand"
+            )
+        else:
+            # Truly sparse buyer (< 25% non-zero = typically every 6–12 weeks).
+            # Mimic the historical batch cadence, anchored to account-level cadence.
+            _is_offprice_s1 = _is_offprice_cust(cust_name)
+            fcst, cap, meta = sparse_intermittent_forecast(hist_for_model, mp,
+                                                           account_interval=account_interval,
+                                                           is_offprice=_is_offprice_s1)
+            model    = "Sparse Intermittent"
+            biweekly = False   # sparse items never get biweekly enforcement
+            _cadence_gap_si = detect_biweekly(hist_for_model)
+            biweekly = bool(_cadence_gap_si)
+            fcst = apply_ordering_pattern(fcst, hist_for_model, mp)
 
     elif not is_dense:
         # Intermittent buyer (25–50% non-zero = every 2–5 weeks).
