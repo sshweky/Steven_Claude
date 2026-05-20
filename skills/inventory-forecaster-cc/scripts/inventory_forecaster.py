@@ -7562,6 +7562,51 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"to consumer demand anchor."
                         )
 
+        # ── F59k — Amazon L4W=0 + POS also declining: EOL wind-down correction ──
+        # When Amazon L4W orders have gone completely to zero AND consumer POS
+        # also shows material decline (L4W POS < 40% of L13W POS), this is a
+        # genuine EOL or channel wind-down scenario -- NOT a stockout recovery.
+        # The F50 stockout guard (at the baseline level) may have preserved the
+        # full L13W order baseline; this rule corrects the forward forecast here.
+        #
+        # Key discriminators vs stockout (F50):
+        #   - Genuine OOS: L4W orders=0 because DC ran out; POS may also be 0
+        #     but oos_days >= 14 signals the inventory gap.  F59k skips.
+        #   - EOL/wind-down: L4W orders=0 AND consumer POS L4W < 40% of L13W POS.
+        #     Both the DC and end consumer have stopped/slowed.  F59k fires.
+        #
+        # Anchor: MAX(pos_l4w, pos_l13w * 0.50) as target weekly rate.
+        # Planners historically project 40-55% of L13W when facing this pattern
+        # (observed: FF9298EC, FF9297/24, FF8649/24 in 2026-05-20 gap analysis).
+        # Scale floor = 0.25 to avoid over-correction if POS data is stale.
+        if (pos_data and isinstance(fcst, list) and len(fcst) >= 4
+                and _f59_l4w_avg == 0           # no orders at all in L4W
+                and _f59_oos_days < 14          # not a genuine OOS situation
+                and _f59_l13w_avg >= 200):      # item had real order history
+            _f59k_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+            _f59k_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+            if (_f59k_pos_l13 >= 100                         # credible POS signal
+                    and _f59k_pos_l4 < _f59k_pos_l13 * 0.40):  # consumer also declining
+                _f59k_target  = max(_f59k_pos_l4, _f59k_pos_l13 * 0.50)
+                _f59k_nz      = [v for v in fcst if v > 0]
+                _f59k_avg     = sum(_f59k_nz) / max(len(_f59k_nz), 1)
+                if _f59k_avg > _f59k_target * 1.10:  # only correct if AI materially above target
+                    _f59k_scale = max(0.25, _f59k_target / max(_f59k_avg, 1))
+                    for _wi in range(len(fcst)):
+                        fcst[_wi] = snap(fcst[_wi] * _f59k_scale, mp)
+                    _fire("F59k")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F59k EOL/wind-down: L4W orders=0 (OOS days="
+                            f"{_f59_oos_days:.0f}), POS L4W={_f59k_pos_l4:.0f}/wk "
+                            f"({_f59k_pos_l4/max(_f59k_pos_l13,1)*100:.0f}% of "
+                            f"POS L13W={_f59k_pos_l13:.0f}/wk) -- consumer demand "
+                            f"declining, not stockout. Anchored to "
+                            f"MAX(POS_L4W, POS_L13W*0.50)={_f59k_target:.0f}/wk; "
+                            f"scaled x{_f59k_scale:.2f} (L13W orders were "
+                            f"{_f59_l13w_avg:.0f}/wk)."
+                        )
+
         # ── F60 — EC-transition narrative ────────────────────────────────────
         # History was inherited from parent mstyle in the pre-pass.  Log the
         # driver text now that `meta` is available.
