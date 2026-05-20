@@ -379,7 +379,7 @@ def build_report(enriched, man_labels, ai_labels, n_fetched):
     pr("|---|---|---|---|---|")
     for bs in brand_stats[:10]:
         pr(f"| {bs['brand']} | {bs['n']} | {bs['up']} | {bs['dn']} | {bs['agg']:+.1f}% |")
-    pr("| … | | | | |")
+    pr("| ... | | | | |")
     for bs in reversed(brand_stats[-8:]):
         pr(f"| {bs['brand']} | {bs['n']} | {bs['up']} | {bs['dn']} | {bs['agg']:+.1f}% |")
     pr()
