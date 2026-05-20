@@ -3546,6 +3546,7 @@ async function toggleDetail(key) {
   // The forecaster inherits the parent's history internally (F60), but never
   // writes it back to QB.  Mirror that here so the detail panel shows the
   // same demand signal the AI used rather than a misleading wall of zeros.
+  let _ecHistNote = '';   // set below if backfill fires; used in history header
   if (!histOrd.some(v => v > 0) && /EC$/i.test(r.mstyle || '')) {
     const _ecBase    = r.mstyle.replace(/EC$/i, '');
     const _ecBaseKey = r.key.replace(r.mstyle, _ecBase);
@@ -3553,12 +3554,10 @@ async function toggleDetail(key) {
     if (_ecBaseRec) {
       if (_ecBaseRec.hist_ord && _ecBaseRec.hist_ord.some(v => v > 0)) {
         histOrd = _ecBaseRec.hist_ord.slice();
+        _ecHistNote = _ecBase;
       }
       // Backfill shipments too if the EC variant has none
       if (!histShp.some(v => v > 0) && _ecBaseRec.hist_shp && _ecBaseRec.hist_shp.some(v => v > 0)) {
-        // histShp is const so we work around it with a local shadow
-        // (histShp is used below — replace via the table cells directly is
-        //  cleaner than re-declaring; patch the array in-place instead)
         _ecBaseRec.hist_shp.forEach((v, i) => { histShp[i] = v; });
       }
     }
