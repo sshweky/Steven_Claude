@@ -117,15 +117,13 @@ async function fetchCurrentUser() {
       try {
         const uiResp = await fetch(`https://${CFG.REALM}/db/main?a=API_GetUserInfo`, { credentials: 'include' });
         const uiXml  = await uiResp.text();
-        console.log('[Auth] API_GetUserInfo raw XML:', uiXml);
         const _uid   = uiXml.match(/<user[^>]+id="([^"]+)"/);
-        const _nm    = uiXml.match(/<name>(.*?)<\/name>/);
-        const _sn    = uiXml.match(/<screenName>(.*?)<\/screenName>/);
+        const _fn    = uiXml.match(/<firstName>(.*?)<\/firstName>/);
+        const _ln    = uiXml.match(/<lastName>(.*?)<\/lastName>/);
         const _em    = uiXml.match(/<email>(.*?)<\/email>/);
         if (_uid && _uid[1].trim()) qbUserId = _uid[1].trim();
-        // Prefer <name> (full display name) over <screenName> (often the login handle)
-        const _candidate = (_nm && _nm[1].trim()) || (_sn && _sn[1].trim()) || '';
-        if (_candidate) name = _candidate;
+        const _fullName = [(_fn && _fn[1].trim()) || '', (_ln && _ln[1].trim()) || ''].filter(Boolean).join(' ');
+        if (_fullName) name = _fullName;
         if (_em && _em[1].trim()) email = email || _em[1].trim();
       } catch (_) { /* non-fatal */ }
     }
