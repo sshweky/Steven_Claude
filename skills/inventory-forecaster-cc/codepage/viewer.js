@@ -108,37 +108,46 @@ async function fetchCurrentUser() {
     let email = (p.email || '').trim();
 
     // Primary: QB legacy API_GetUserInfo — works in codepage context via session
-    // cookie; returns the logged-in user's screenName and email directly with no
-    // record ownership requirement.  Works for planners, directors, and admins.
+    // cookie; returns the logged-in user's info directly with no record ownership
+    // requirement.  We extract the QB user ID from the <user id="..."> attribute
+    // (correct format for EX filters) and prefer <name> over <screenName> since
+    // screenName often holds the login handle rather than the display name.
+    let qbUserId = id;  // may be overwritten with the correct QB ID below
     if (!name) {
       try {
         const uiResp = await fetch(`https://${CFG.REALM}/db/main?a=API_GetUserInfo`, { credentials: 'include' });
         const uiXml  = await uiResp.text();
-        const _nm    = uiXml.match(/<screenName>(.*?)<\/screenName>/);
+        const _uid   = uiXml.match(/<user[^>]+id="([^"]+)"/);
+        const _nm    = uiXml.match(/<name>(.*?)<\/name>/);
+        const _sn    = uiXml.match(/<screenName>(.*?)<\/screenName>/);
         const _em    = uiXml.match(/<email>(.*?)<\/email>/);
-        if (_nm && _nm[1].trim()) name  = _nm[1].trim();
+        if (_uid && _uid[1].trim()) qbUserId = _uid[1].trim();
+        // Prefer <name> (full display name) over <screenName> (often the login handle)
+        const _candidate = (_nm && _nm[1].trim()) || (_sn && _sn[1].trim()) || '';
+        if (_candidate) name = _candidate;
         if (_em && _em[1].trim()) email = email || _em[1].trim();
       } catch (_) { /* non-fatal */ }
     }
 
-    // Fallback: scan tables for a record this user owns (resolved via FID 4 user field).
-    // Catches cases where API_GetUserInfo is blocked or returns empty.
-    if (!name && id) {
+    // Secondary: scan tables for a record owned by this user (Record Owner = FID 4).
+    // Use the QB user ID obtained from API_GetUserInfo (correct EX filter format).
+    // This resolves the full display name even when API_GetUserInfo returns only
+    // the login handle as screenName and <name> is absent.
+    if ((!name || name === (p.sub || '').trim()) && qbUserId) {
       for (const _tid of [CFG.PROJECTIONS_TID, CFG.COMMENTS_TID, 'bv2jirwts']) {
-        if (name) break;
+        if (name && name !== (p.sub || '').trim()) break;
         try {
           const r = await qb('/records/query', {
             from:    _tid,
             select:  [4],
-            where:   `{4.EX.'${id}'}`,
+            where:   `{4.EX.'${qbUserId}'}`,
             options: { top: 1 },
           });
           const row   = (r.data || [])[0];
           const owner = row && row[4] && row[4].value;
           if (owner) {
             const _n = (owner.name && owner.name !== 'Unknown' ? owner.name : '') || owner.userName || '';
-            name  = name  || _n.trim();
-            email = email || (owner.email || '').trim();
+            if (_n.trim()) { name = _n.trim(); email = email || (owner.email || '').trim(); }
           }
         } catch (_) { /* non-fatal */ }
       }
