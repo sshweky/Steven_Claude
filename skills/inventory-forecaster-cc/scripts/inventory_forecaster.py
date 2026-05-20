@@ -7546,8 +7546,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     if _f59i_price_recovery:
                         if isinstance(meta, dict):
                             _f59i_aur_note = (
-                                f"AUR {_f59i_aur:.2f} >= MAP {_f59i_map:.2f} * 85%"
-                                f" -- retail corrected. "
+                                f"AUR {_f59i_aur:.2f} >= MAP {_f59i_map:.2f} * 75%"
+                                f" -- retail largely corrected. "
                                 if _f59i_map > 0 else ""
                             )
                             meta.setdefault("drivers", []).append(
