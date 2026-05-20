@@ -1,5 +1,5 @@
 # setup_task.ps1 - Run this ONCE (as Administrator) to register the scheduled task.
-# After that, the forecaster runs automatically every 2 hours Mon-Fri, 6 AM to 8 PM.
+# After that, the forecaster runs every 2 hours Mon-Fri, 6 AM to 8 PM.
 #
 # Usage:
 #   Right-click PowerShell -> "Run as administrator"
@@ -19,58 +19,82 @@ else            { Write-Error "PowerShell not found. Aborting."; exit 1 }
 Write-Host "PowerShell : $PwshPath"
 Write-Host "Launcher   : $Launcher"
 
-# -- Action -------------------------------------------------------------------
-$Action = New-ScheduledTaskAction `
-    -Execute          $PwshPath `
-    -Argument         "-NonInteractive -ExecutionPolicy Bypass -File `"$Launcher`"" `
-    -WorkingDirectory $ScriptDir
+# Task XML - repetition must be set here; PowerShell CIM objects don't expose it
+# Runs Mon-Fri at 6 AM, repeats every 2 hours, stops after 14 hours (last run 8 PM)
+$TaskXml = @"
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>Pets+People inventory forecaster - runs every 2 hours Mon-Fri</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <CalendarTrigger>
+      <Repetition>
+        <Interval>PT2H</Interval>
+        <Duration>PT14H</Duration>
+        <StopAtDurationEnd>false</StopAtDurationEnd>
+      </Repetition>
+      <StartBoundary>2026-05-25T06:00:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByWeek>
+        <WeeksInterval>1</WeeksInterval>
+        <DaysOfWeek>
+          <Monday />
+          <Tuesday />
+          <Wednesday />
+          <Thursday />
+          <Friday />
+        </DaysOfWeek>
+      </ScheduleByWeek>
+    </CalendarTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <ExecutionTimeLimit>PT3H</ExecutionTimeLimit>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <WakeToRun>true</WakeToRun>
+    <Enabled>true</Enabled>
+  </Settings>
+  <Actions>
+    <Exec>
+      <Command>$PwshPath</Command>
+      <Arguments>-NonInteractive -ExecutionPolicy Bypass -File "$Launcher"</Arguments>
+      <WorkingDirectory>$ScriptDir</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>
+"@
 
-# -- Trigger: Mon-Fri at 6 AM, repeat every 2 h for 14 h (last run 8 PM) -----
-$Trigger = New-ScheduledTaskTrigger `
-    -Weekly `
-    -DaysOfWeek Monday, Tuesday, Wednesday, Thursday, Friday `
-    -At "6:00 AM"
-
-# ISO 8601 duration strings: PT2H = 2 hours, PT14H = 14 hours
-$Trigger.Repetition.Interval         = "PT2H"
-$Trigger.Repetition.Duration         = "PT14H"
-$Trigger.Repetition.StopAtDurationEnd = $false
-
-# -- Settings -----------------------------------------------------------------
-$Settings = New-ScheduledTaskSettingsSet `
-    -ExecutionTimeLimit (New-TimeSpan -Hours 3) `
-    -MultipleInstances  IgnoreNew `
-    -StartWhenAvailable `
-    -WakeToRun
-
-# -- Remove existing task if present ------------------------------------------
+# Remove existing task if present
 $Existing = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
 if ($Existing) {
     Write-Host "Task '$TaskName' already exists - replacing it."
     Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
 }
 
-# -- Prompt for password (needed to run while screen is locked) ---------------
+# Register - password needed to run while screen is locked
 $User     = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 $Password = Read-Host "Enter your Windows login password (required to run when locked)" -AsSecureString
 $PlainPw  = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
                 [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password))
 
 Register-ScheduledTask `
-    -TaskName  $TaskName `
-    -Action    $Action `
-    -Trigger   $Trigger `
-    -Settings  $Settings `
-    -RunLevel  Highest `
-    -User      $User `
-    -Password  $PlainPw `
+    -TaskName $TaskName `
+    -Xml      $TaskXml `
+    -User     $User `
+    -Password $PlainPw `
     -Force
 
 $PlainPw = $null
 
 Write-Host ""
 Write-Host "Done. Task '$TaskName' registered."
-Write-Host "Schedule : Mon-Fri, every 2 hours from 6 AM to 8 PM (8 runs per day)"
+Write-Host "Schedule : Mon-Fri, every 2 hours from 6 AM to 8 PM"
 Write-Host "Logs     : $ScriptDir\logs\"
 Write-Host ""
 Write-Host "To test right now:"
