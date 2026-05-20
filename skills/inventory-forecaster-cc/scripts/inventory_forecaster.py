@@ -7509,38 +7509,88 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _f59i_ratio    = (_f59i_w1_4_avg / _f59i_pos_l4
                                   if _f59i_pos_l4 > 0 else 0)
                 if _f59i_ratio > 1.15:
-                    if _f59i_ratio > 1.40:
-                        # Severe: anchor to POS L4W (floor 0.60 guards against
-                        # temporarily-depressed POS reading)
-                        _f59i_anchor = max(0.60, _f59i_pos_l4 / _f59i_w1_4_avg)
-                        _f59i_mode   = "strong"
+                    # ── Price-recovery bypass (2026-05-20) ───────────────────
+                    # When AUR was recently corrected and POS is rapidly
+                    # accelerating back toward the pre-problem run rate,
+                    # anchoring to the depressed L4W POS would suppress the
+                    # forecast to the mid-recovery level and under-project
+                    # true forward demand.
+                    #
+                    # Pattern: AUR too low -> Amazon stops ordering (L13W/L26W
+                    # goes dark). AUR corrected -> orders resume and POS
+                    # snaps back.  L4W POS reflects partial recovery only;
+                    # L52W POS is the pre-problem baseline.
+                    #
+                    # Detection (all must hold):
+                    #   L4W POS > L13W POS * 2.0 -- rapid recent acceleration
+                    #   L52W POS > L13W POS * 3.0 -- L13W was anomalously
+                    #                                 depressed (dark period)
+                    #   AUR >= MAP * 0.85          -- retail now correctly priced
+                    #                                 (or no MAP data available)
+                    #
+                    # Action: skip F59i suppression entirely.  The order-history
+                    # baseline reflects genuine reactivation demand, not
+                    # inventory management noise.
+                    _f59i_aur = float((amz_catalog or {}).get("AUR_L4w")  or 0)
+                    _f59i_map = float((amz_catalog or {}).get("MAP_Price") or 0)
+                    _f59i_price_recovery = (
+                        _f59i_pos_l13 > 0
+                        and _f59i_pos_l4  > _f59i_pos_l13 * 2.0
+                        and _f59i_pos_l52 > _f59i_pos_l13 * 3.0
+                        and (_f59i_map == 0 or _f59i_aur >= _f59i_map * 0.85)
+                    )
+                    if _f59i_price_recovery:
+                        if isinstance(meta, dict):
+                            _f59i_aur_note = (
+                                f"AUR {_f59i_aur:.2f} >= MAP {_f59i_map:.2f} * 85%"
+                                f" -- retail corrected. "
+                                if _f59i_map > 0 else ""
+                            )
+                            meta.setdefault("drivers", []).append(
+                                f"F59i price-recovery bypass: POS L4W "
+                                f"{_f59i_pos_l4:.0f}/wk is "
+                                f"{_f59i_pos_l4/max(_f59i_pos_l13,1):.1f}x L13W "
+                                f"{_f59i_pos_l13:.0f}/wk (rapid acceleration). "
+                                f"L52W {_f59i_pos_l52:.0f}/wk shows healthy "
+                                f"pre-problem run rate vs depressed L13W dark "
+                                f"period. {_f59i_aur_note}"
+                                f"Skipping POS suppression -- order-history "
+                                f"baseline reflects reactivation demand, not "
+                                f"inventory noise. Model: {model}."
+                            )
                     else:
-                        # Moderate: soft blend toward POS L13W
-                        _f59i_anchor = (
-                            (_f59i_pos_l13 * 0.50 + _f59i_w1_4_avg * 0.50)
-                            / _f59i_w1_4_avg
-                        )
-                        _f59i_mode   = "blend"
-                    _f59i_anchor = min(_f59i_anchor, 1.0)  # never inflate
-                    for _wi in range(len(fcst)):
-                        fcst[_wi] = snap(fcst[_wi] * _f59i_anchor, mp)
-                    _fire("F59i")
-                    if isinstance(meta, dict):
-                        _f59i_desc = (
-                            f"direct POS L4W anchor (floor 60%)"
-                            if _f59i_mode == "strong"
-                            else f"50% blend toward POS L13W {_f59i_pos_l13:.0f}/wk"
-                        )
-                        meta.setdefault("drivers", []).append(
-                            f"F59i POS anchor ({_f59i_mode}): AI W1-W4 avg "
-                            f"{_f59i_w1_4_avg:.0f}/wk is "
-                            f"{(_f59i_ratio - 1) * 100:.0f}% above consumer "
-                            f"POS L4W {_f59i_pos_l4:.0f}/wk with DC WOS "
-                            f"{_f59i_wos:.1f}wks (healthy) -- order history "
-                            f"inflated by DC inventory management, not demand "
-                            f"growth. Rescaled x{_f59i_anchor:.3f} via "
-                            f"{_f59i_desc}. Model: {model}."
-                        )
+                        if _f59i_ratio > 1.40:
+                            # Severe: anchor to POS L4W (floor 0.60 guards against
+                            # temporarily-depressed POS reading)
+                            _f59i_anchor = max(0.60, _f59i_pos_l4 / _f59i_w1_4_avg)
+                            _f59i_mode   = "strong"
+                        else:
+                            # Moderate: soft blend toward POS L13W
+                            _f59i_anchor = (
+                                (_f59i_pos_l13 * 0.50 + _f59i_w1_4_avg * 0.50)
+                                / _f59i_w1_4_avg
+                            )
+                            _f59i_mode   = "blend"
+                        _f59i_anchor = min(_f59i_anchor, 1.0)  # never inflate
+                        for _wi in range(len(fcst)):
+                            fcst[_wi] = snap(fcst[_wi] * _f59i_anchor, mp)
+                        _fire("F59i")
+                        if isinstance(meta, dict):
+                            _f59i_desc = (
+                                f"direct POS L4W anchor (floor 60%)"
+                                if _f59i_mode == "strong"
+                                else f"50% blend toward POS L13W {_f59i_pos_l13:.0f}/wk"
+                            )
+                            meta.setdefault("drivers", []).append(
+                                f"F59i POS anchor ({_f59i_mode}): AI W1-W4 avg "
+                                f"{_f59i_w1_4_avg:.0f}/wk is "
+                                f"{(_f59i_ratio - 1) * 100:.0f}% above consumer "
+                                f"POS L4W {_f59i_pos_l4:.0f}/wk with DC WOS "
+                                f"{_f59i_wos:.1f}wks (healthy) -- order history "
+                                f"inflated by DC inventory management, not demand "
+                                f"growth. Rescaled x{_f59i_anchor:.3f} via "
+                                f"{_f59i_desc}. Model: {model}."
+                            )
 
         # ── F59j — Amazon low-DC restock false-acceleration correction ──────
         # When the DC is undersupplied (WOS < 8wks) Amazon places large
