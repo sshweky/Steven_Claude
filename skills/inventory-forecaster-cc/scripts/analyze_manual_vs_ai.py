@@ -141,7 +141,7 @@ def fetch_projections(man_fids, limit=None):
     # Status_Cust LIKE 'A%'  →  QB starts-with operator
     where = f"{{{F_STATUS}.SW.'A'}}"
 
-    print(f"Fetching active projections (Status @ Cust starts with 'A')…")
+    print(f"Fetching active projections (Status @ Cust starts with 'A')...")
     all_rows = []
     skip = 0
     batch = 2000
