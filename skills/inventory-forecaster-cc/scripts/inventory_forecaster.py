@@ -6900,6 +6900,34 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             meta["po_total_qty"]      = _po_total_qty
             meta["po_total_removed"]  = _po_total_removed
 
+    # VP-OP (2026-05-20) — Off-price PO buffer zone.
+    # Off-price accounts buy in large, infrequent batches — once a PO is confirmed
+    # they will not reorder within 4 weeks on either side of it.  Zero out AI
+    # forecast in that ±4-week window unless a separate PO already exists in the
+    # specific week (those are already handled by VP-Q4 above and represent a
+    # distinct, independent order event).
+    if _effective_po_wk and _is_offprice_cust(cust_name):
+        _op_po_weeks = {i for i, qty in enumerate(_effective_po_wk[:26]) if qty > 0}
+        _op_buf_zeroed = []
+        for _po_idx in sorted(_op_po_weeks):
+            for _offset in range(-4, 5):
+                if _offset == 0:
+                    continue  # PO week itself already handled by VP-Q4
+                _tgt = _po_idx + _offset
+                if 0 <= _tgt < 26 and _tgt not in _op_po_weeks and fcst[_tgt] > 0:
+                    _op_buf_zeroed.append((_tgt + 1, fcst[_tgt]))
+                    fcst[_tgt] = 0
+        if _op_buf_zeroed and isinstance(meta, dict):
+            _op_removed = sum(z[1] for z in _op_buf_zeroed)
+            _op_wks_str = ",".join(f"W{z[0]}" for z in sorted(_op_buf_zeroed, key=lambda x: x[0])[:6])
+            if len(_op_buf_zeroed) > 6:
+                _op_wks_str += f"+{len(_op_buf_zeroed)-6}"
+            meta.setdefault("drivers", []).append(
+                f"VP-OP zeroed AI in {len(_op_buf_zeroed)} buffer wks around off-price POs "
+                f"({_op_wks_str}; removed {_op_removed:,.0f} units)"
+            )
+            _fire("VP-OP")
+
     # VP-FL (2026-05-17) — Frontload dampening.
     # When a customer places a significantly above-normal order (W1 open PO or
     # last-week actual orders >= 2.5x the L13W average), they're pulling forward
