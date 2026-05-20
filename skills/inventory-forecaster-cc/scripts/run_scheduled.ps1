@@ -1,4 +1,4 @@
-# run_scheduled.ps1 — launched by Windows Task Scheduler every 2 hours Mon-Fri
+# run_scheduled.ps1 - launched by Windows Task Scheduler every 2 hours Mon-Fri
 # Runs the inventory forecaster and logs all output with a timestamped log file.
 # Keeps the 20 most recent log files; older ones are deleted automatically.
 
