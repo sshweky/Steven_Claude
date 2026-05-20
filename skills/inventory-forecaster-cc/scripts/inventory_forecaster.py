@@ -7459,6 +7459,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 and pos_data):
             _f59i_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
             _f59i_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+            _f59i_pos_l52 = float(pos_data.get("Avg_Units_Wk_L52w") or 0)
             _f59i_wos     = _f59h_wos   # reuse WOS computed in F59h block above
 
             if _f59i_is_ec and _f59i_pos_l4 > 0 and _f59i_pos_l13 > 0:

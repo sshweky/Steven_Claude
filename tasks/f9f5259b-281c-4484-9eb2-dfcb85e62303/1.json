@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Run Amazon forecast + validate + push",
+  "description": "Run run_forecast.py --customer \"AMAZON.COM.KYDC\" --validate, then push_validation_qb.py, then open viewer",
+  "activeForm": "Running Amazon forecast + validate",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
