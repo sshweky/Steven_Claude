@@ -4494,6 +4494,9 @@ async function addComment(key) {
           const ownerEmail = (owner.email || '').trim();
           CURRENT_USER.name  = rawName.trim() || (ownerEmail ? ownerEmail.split('@')[0].replace(/[._]/g, ' ') : '');
           CURRENT_USER.email = CURRENT_USER.email || ownerEmail;
+          // Also update the header freshness badge now that we have a name
+          const _ub2 = document.getElementById('current-user-badge');
+          if (_ub2 && CURRENT_USER.name) _ub2.textContent = CURRENT_USER.name;
         }
         if (CURRENT_USER.name && CFG.COMMENT_FID.AUTHOR) {
           const upd = {};
