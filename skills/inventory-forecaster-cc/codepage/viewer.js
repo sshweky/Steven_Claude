@@ -3540,6 +3540,30 @@ async function toggleDetail(key) {
       }
     }
   }
+  // -- F60 EC-variant history backfill ---------------------------------------
+  // EC variant rows have all-zero QB order history because Amazon orders
+  // against the parent style (e.g. FF35147), not the EC variant (FF35147EC).
+  // The forecaster inherits the parent's history internally (F60), but never
+  // writes it back to QB.  Mirror that here so the detail panel shows the
+  // same demand signal the AI used rather than a misleading wall of zeros.
+  if (!histOrd.some(v => v > 0) && /EC$/i.test(r.mstyle || '')) {
+    const _ecBase    = r.mstyle.replace(/EC$/i, '');
+    const _ecBaseKey = r.key.replace(r.mstyle, _ecBase);
+    const _ecBaseRec = ALL_RECORDS.find(b => b.key === _ecBaseKey);
+    if (_ecBaseRec) {
+      if (_ecBaseRec.hist_ord && _ecBaseRec.hist_ord.some(v => v > 0)) {
+        histOrd = _ecBaseRec.hist_ord.slice();
+      }
+      // Backfill shipments too if the EC variant has none
+      if (!histShp.some(v => v > 0) && _ecBaseRec.hist_shp && _ecBaseRec.hist_shp.some(v => v > 0)) {
+        // histShp is const so we work around it with a local shadow
+        // (histShp is used below — replace via the table cells directly is
+        //  cleaner than re-declaring; patch the array in-place instead)
+        _ecBaseRec.hist_shp.forEach((v, i) => { histShp[i] = v; });
+      }
+    }
+  }
+
   const atsHist = r.ats_hist || [];
   // If ATS is still loading and detail is open, re-render once it resolves
   if (!r.ats_hist && _atsHistPromise) {
