@@ -7540,7 +7540,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         and (_f59i_map == 0 or _f59i_aur >= _f59i_map * 0.85)
                     )
                     # DEBUG: expose gate values for FF28459 diagnosis (file-based)
-                    _f59i_dbg_mstyle = (row.get("mstyle") or "").upper()
+                    _f59i_dbg_mstyle = (row.get("Mstyle") or row.get("mstyle") or "").upper()
                     if _f59i_dbg_mstyle == "FF28459":
                         import os as _os
                         _dbg_path = _os.path.join(
