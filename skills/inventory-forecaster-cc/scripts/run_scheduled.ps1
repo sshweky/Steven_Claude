@@ -2,7 +2,7 @@
 # Runs the inventory forecaster and logs all output with a timestamped log file.
 # Keeps the 20 most recent log files; older ones are deleted automatically.
 
-$Python    = "C:\Python314\python.exe"
+$Python = "C:\Python314\python.exe"
 $ScriptDir = "C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts"
 $LogDir    = "$ScriptDir\logs"
 

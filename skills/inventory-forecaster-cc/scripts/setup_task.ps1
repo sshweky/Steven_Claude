@@ -9,12 +9,13 @@ $TaskName  = "PP Inventory Forecaster"
 $ScriptDir = "C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts"
 $Launcher  = "$ScriptDir\run_scheduled.ps1"
 
-# Detect pwsh (PS7) or fall back to Windows PowerShell 5
-$_pwsh = Get-Command pwsh       -ErrorAction SilentlyContinue
-$_ps5  = Get-Command powershell -ErrorAction SilentlyContinue
-if     ($_pwsh) { $PwshPath = $_pwsh.Source }
-elseif ($_ps5)  { $PwshPath = $_ps5.Source  }
-else            { Write-Error "PowerShell not found. Aborting."; exit 1 }
+# Prefer real on-disk executables over WindowsApps stubs (stubs fail in Task Scheduler)
+$_candidates = @(
+    "C:\Program Files\PowerShell\7\pwsh.exe",
+    "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+)
+$PwshPath = $_candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+if (-not $PwshPath) { Write-Error "PowerShell executable not found. Aborting."; exit 1 }
 
 Write-Host "PowerShell : $PwshPath"
 Write-Host "Launcher   : $Launcher"
