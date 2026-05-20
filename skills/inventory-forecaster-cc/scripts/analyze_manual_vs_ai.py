@@ -651,7 +651,7 @@ def main():
     md_path = os.path.join(ANALYSIS_DIR, "manual_vs_ai_analysis.md")
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(report_md)
-    print(f"Report saved → {md_path}")
+    print(f"Report saved -> {md_path}")
 
     save_csv(enriched, man_labels, ai_labels, ord_labels)
 
