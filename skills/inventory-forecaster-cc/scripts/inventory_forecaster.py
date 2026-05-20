@@ -7253,7 +7253,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f59d_floor = _f59_l13w_avg * _f59d_mult
             _f59d_fired = 0
             for _i in range(len(fcst)):
-                if fcst[_i] == 0:
+                if fcst[_i] == 0 and _i not in _vp_q4_zeroed_idx:
                     fcst[_i] = snap(_f59d_floor, mp)
                     _f59d_fired += 1
             if _f59d_fired > 0 and isinstance(meta, dict):
