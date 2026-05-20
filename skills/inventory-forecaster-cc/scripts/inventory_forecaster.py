@@ -7327,7 +7327,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         if is_amazon and amz_catalog and _f59h_wos > 0:
             _f59h_vel     = _f59_l13w_avg if _f59_l13w_avg > 0 else max(sum(fcst) / 26, 1)
             _f59h_opo_wos = _f59h_opo / max(_f59h_vel, 1)
-            _f59h_is_replen = "replen" in (row.get("PT_Item_Status") or "").lower()
+            # F59h replen gate: use order BEHAVIOR (model classification) as the
+            # primary signal, not just the QB PT_Item_Status label.  Seasonal
+            # Baseline = ≥50% non-zero weeks = orders most weeks = replenishment
+            # behavior regardless of how the item is tagged in QB.  Heuristic
+            # items also order regularly enough to warrant the power curve.
+            # Croston's and Sparse Intermittent keep the mild taper — lumpy
+            # demand makes WOS a less reliable overstock signal (2026-05-20).
+            _f59h_is_replen = (
+                "replen" in (row.get("PT_Item_Status") or "").lower()
+                or model in ("Seasonal Baseline", "Heuristic")
+            )
 
             if _f59h_wos > 12:
                 if _f59h_is_replen:
