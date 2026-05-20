@@ -109,12 +109,19 @@ async function fetchCurrentUser() {
 
     // QB temp tokens do not include name/email in the JWT payload.
     // Resolve display name from the Record Owner (FID 4, user type) of any
-    // Projections record owned by this user — QB auto-stamps user-type fields
-    // reliably.  We query with the QB user ID from the JWT sub claim.
-    if (!name && id) {
+    // record owned by this user — QB auto-stamps user-type fields reliably.
+    // We try three tables in order: Projections, Flag/Mgr Comments, AI Comments.
+    // Directors/admins who own no Projections records are covered by the fallbacks.
+    const _ownerTables = [
+      CFG.PROJECTIONS_TID,
+      CFG.COMMENTS_TID,
+      'bv2jirwts',  // AI Comments
+    ];
+    for (const _tid of _ownerTables) {
+      if (name || !id) break;
       try {
         const r = await qb('/records/query', {
-          from:    CFG.PROJECTIONS_TID,
+          from:    _tid,
           select:  [4],
           where:   `{4.EX.'${id}'}`,
           options: { top: 1 },
@@ -122,7 +129,8 @@ async function fetchCurrentUser() {
         const row   = (r.data || [])[0];
         const owner = row && row[4] && row[4].value;
         if (owner) {
-          name  = name  || (owner.name  || owner.userName || '').trim();
+          const _n = (owner.name && owner.name !== 'Unknown' ? owner.name : '') || owner.userName || '';
+          name  = name  || _n.trim();
           email = email || (owner.email || '').trim();
         }
       } catch (_) { /* non-fatal */ }
