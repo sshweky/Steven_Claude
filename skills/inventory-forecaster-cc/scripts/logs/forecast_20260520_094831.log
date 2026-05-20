@@ -29,3 +29,86 @@
   [watchdog] still running ù 957s since last output | last: 
   [watchdog] still running ù 1017s since last output | last: 
   [watchdog] still running ù 1077s since last output | last: 
+  [watchdog] still running ù 1137s since last output | last: 
+  [watchdog] still running ù 1197s since last output | last: 
+
+  [watchdog] !! NO OUTPUT FOR 1207s ù process appears hung.
+  [watchdog] Last line: 
+  [watchdog] Killing PID 81196 and restarting ...
+
+  Enter choice [1]: 
+============================================================
+  [watchdog] Starting forecaster (attempt 2/3)
+============================================================
+  [auto-throttle] --all detected ΓåÆ workers=2, rate_limit_ms=150, bulk_writeback=on, lean_pull=off
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+  Select mode:
+    1) Forecast               ΓÇö run AI projections and write back
+    2) Validate Projections   ΓÇö check manual projections for anomalies
+    3) Analyze Only           ΓÇö run EDA report, no forecasting
+
+  [watchdog] still running ù 60s since last output | last: 
+  [watchdog] still running ù 120s since last output | last: 
+  [watchdog] still running ù 180s since last output | last: 
+  [watchdog] still running ù 240s since last output | last: 
+  [watchdog] still running ù 300s since last output | last: 
+  [watchdog] still running ù 360s since last output | last: 
+  [watchdog] still running ù 420s since last output | last: 
+  [watchdog] still running ù 480s since last output | last: 
+  [watchdog] still running ù 540s since last output | last: 
+  [watchdog] still running ù 600s since last output | last: 
+  [watchdog] still running ù 660s since last output | last: 
+  [watchdog] still running ù 720s since last output | last: 
+  [watchdog] still running ù 780s since last output | last: 
+  [watchdog] still running ù 840s since last output | last: 
+  [watchdog] still running ù 900s since last output | last: 
+  [watchdog] still running ù 960s since last output | last: 
+  [watchdog] still running ù 1020s since last output | last: 
+  [watchdog] still running ù 1080s since last output | last: 
+  [watchdog] still running ù 1140s since last output | last: 
+  [watchdog] still running ù 1200s since last output | last: 
+
+  [watchdog] !! NO OUTPUT FOR 1200s ù process appears hung.
+  [watchdog] Last line: 
+  [watchdog] Killing PID 97092 and restarting ...
+
+  Enter choice [1]: 
+============================================================
+  [watchdog] Starting forecaster (attempt 3/3)
+============================================================
+  [auto-throttle] --all detected ΓåÆ workers=2, rate_limit_ms=150, bulk_writeback=on, lean_pull=off
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+  Select mode:
+    1) Forecast               ΓÇö run AI projections and write back
+    2) Validate Projections   ΓÇö check manual projections for anomalies
+    3) Analyze Only           ΓÇö run EDA report, no forecasting
+
+  [watchdog] still running ù 60s since last output | last: 
+  [watchdog] still running ù 120s since last output | last: 
+  [watchdog] still running ù 180s since last output | last: 
+  [watchdog] still running ù 240s since last output | last: 
+  [watchdog] still running ù 300s since last output | last: 
+  [watchdog] still running ù 360s since last output | last: 
+  [watchdog] still running ù 420s since last output | last: 
+  [watchdog] still running ù 480s since last output | last: 
+  [watchdog] still running ù 540s since last output | last: 
+  [watchdog] still running ù 600s since last output | last: 
+  [watchdog] still running ù 660s since last output | last: 
+  [watchdog] still running ù 720s since last output | last: 
+  [watchdog] still running ù 780s since last output | last: 
+  [watchdog] still running ù 840s since last output | last: 
+  [watchdog] still running ù 900s since last output | last: 
+  [watchdog] still running ù 960s since last output | last: 
+  [watchdog] still running ù 1020s since last output | last: 
+  [watchdog] still running ù 1080s since last output | last: 
+  [watchdog] still running ù 1140s since last output | last: 
+  [watchdog] still running ù 1200s since last output | last: 
+
+  [watchdog] !! NO OUTPUT FOR 1200s ù process appears hung.
+  [watchdog] Last line: 
+  [watchdog] Killing PID 115400 and restarting ...
+
+  Enter choice [1]:   [watchdog] Reached max restarts (3). Giving up.
+[2026-05-20 10:48:42] Finished. Exit code: 1
