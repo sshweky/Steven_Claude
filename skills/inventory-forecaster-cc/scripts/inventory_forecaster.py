@@ -7468,7 +7468,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _f59i_is_ec = _f59i_ms.endswith("EC") or _f59i_ms.endswith("COS")
         if (is_amazon
                 and model not in ("Inactive", "OTB (zero)",
-                                  "Pre-launch NEW (manual passthrough)")
+                                  "Pre-launch NEW (manual passthrough)",
+                                  "Sparse Intermittent", "Croston's")
                 and not row.get("_di_blend")
                 and isinstance(fcst, list) and len(fcst) >= 26
                 and pos_data):
