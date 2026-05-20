@@ -435,7 +435,7 @@ def run_analysis(results_path, top_n, out_path):
     print(f"  Gap Analysis — top {len(top)} records by manual volume")
     print("=" * 70)
     print(f"  Manual total:   {tot_m:,}")
-    print(f"  AI total:       {tot_a:,}  ({(tot_a-tot_m)/tot_m*100:+.1f}%)")
+    print(f"  AI total:       {tot_a:,}  ({(tot_a-tot_m)/tot_m*100:+.1f}%)" if tot_m else f"  AI total:       {tot_a:,}  (n/a)")
     print(f"  Unit gap:       {abs(tot_a-tot_m):,}")
     print()
     print(f"  Root-cause buckets (by absolute unit gap):")
