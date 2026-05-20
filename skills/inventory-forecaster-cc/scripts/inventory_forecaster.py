@@ -9684,12 +9684,14 @@ def main():
         _raw_ord = _oh.get("raw_ord", [0.0] * 52)   # 52 floats oldest→newest
         _sib_ms  = _sib_key.split("-", 1)[1] if "-" in _sib_key else _sib_key
         _sib_l13 = sum(_raw_ord[-13:])
+        _sib_l4  = sum(_raw_ord[-4:])   # F69-shift: track L4W DI separately
         # ORD_COLS[i] aligns with raw_ord[i]: index 0 = oldest, 51 = newest
         for _ci, _c in enumerate(ORD_COLS):
             _base_row[_c] = float(_base_row.get(_c) or 0) + _raw_ord[_ci]
         # Accumulate metadata for driver annotation
         _base_row["_di_blend"]    = True
         _base_row["_di_l13_add"]  = float(_base_row.get("_di_l13_add", 0)) + _sib_l13
+        _base_row["_di_l4_add"]   = float(_base_row.get("_di_l4_add",  0)) + _sib_l4
         _base_row.setdefault("_di_sib_labels", []).append(f"{_sib_ms}(+{_sib_l13:.0f} L13)")
 
         # ── DI cadence-pause detection ──────────────────────────────────────
