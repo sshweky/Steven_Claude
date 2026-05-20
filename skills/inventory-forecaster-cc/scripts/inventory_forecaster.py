@@ -7369,19 +7369,53 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"(floor 10%); SOH={_f59h_soh:,.0f}u OPO={_f59h_opo:,.0f}u"
                         )
                 else:
-                    # Above target range — soft taper.  1.5% per week above 12, cap 20%.
-                    # Mild by design: DC-level ordering continues even in an overstocked
-                    # network; we don't want to cut projections aggressively.
-                    _f59h_trim = min(0.20, (_f59h_wos - 12) * 0.015)
-                    for i in range(min(8, len(fcst))):
-                        fcst[i] = snap(max(0, fcst[i] * (1 - _f59h_trim)), mp)
-                    _fire("F59h")
-                    if isinstance(meta, dict):
-                        meta.setdefault("drivers", []).append(
-                            f"F59h DC above target range: WOS={_f59h_wos:.1f}wks "
-                            f"(target 8–12wks), SOH={_f59h_soh:,.0f}u, "
-                            f"OPO={_f59h_opo:,.0f}u — W1-W8 -{_f59h_trim*100:.0f}% soft taper"
-                        )
+                    if _f59h_wos > 20:
+                        # Extreme overstock: hard burn-down zero for near-term weeks,
+                        # then anchor post-burn period to POS rate.
+                        #
+                        # At WOS > 20 the DC is so overstocked that orders stop
+                        # entirely until inventory burns down to target.  The mild
+                        # 1.5%/wk taper is not meaningful at this level.
+                        #
+                        # Burn-down weeks = round(WOS - 12), capped at 16 so stale
+                        # WOS data does not zero out more than 60% of the horizon.
+                        # Amazon's target range is 8-12 wks; after burn-down,
+                        # anchor remaining weeks to POS L13W (true consumer velocity).
+                        _f59h_burn = min(int(round(_f59h_wos - 12)), 16)
+                        _f59h_pv   = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+                        for i in range(min(_f59h_burn, len(fcst))):
+                            fcst[i] = 0
+                        if _f59h_pv >= 50:
+                            for i in range(_f59h_burn, len(fcst)):
+                                fcst[i] = snap(_f59h_pv, mp)
+                        _fire("F59h")
+                        if isinstance(meta, dict):
+                            _f59h_post = (
+                                f"W{_f59h_burn + 1}-W26 anchored to POS L13W {_f59h_pv:.0f}/wk"
+                                if _f59h_pv >= 50 else "post-burn held at model baseline"
+                            )
+                            meta.setdefault("drivers", []).append(
+                                f"F59h extreme overstock: WOS={_f59h_wos:.1f}wks "
+                                f"(target 12wks) -- W1-W{_f59h_burn} zeroed (burn-down); "
+                                f"{_f59h_post}. "
+                                f"SOH={_f59h_soh:,.0f}u OPO={_f59h_opo:,.0f}u"
+                            )
+                    else:
+                        # Moderately above target range (12 < WOS <= 20): soft taper.
+                        # 1.5% per week above 12, cap 20%.
+                        # Mild by design: DC-level ordering from individual DCs
+                        # continues even when the aggregate network WOS is above
+                        # target, so we do not cut projections aggressively.
+                        _f59h_trim = min(0.20, (_f59h_wos - 12) * 0.015)
+                        for i in range(min(8, len(fcst))):
+                            fcst[i] = snap(max(0, fcst[i] * (1 - _f59h_trim)), mp)
+                        _fire("F59h")
+                        if isinstance(meta, dict):
+                            meta.setdefault("drivers", []).append(
+                                f"F59h DC above target range: WOS={_f59h_wos:.1f}wks "
+                                f"(target 8-12wks), SOH={_f59h_soh:,.0f}u, "
+                                f"OPO={_f59h_opo:,.0f}u -- W1-W8 -{_f59h_trim*100:.0f}% soft taper"
+                            )
             elif _f59h_wos < 3 and _f59h_opo == 0:
                 _fire("F59h")
                 if isinstance(meta, dict):
