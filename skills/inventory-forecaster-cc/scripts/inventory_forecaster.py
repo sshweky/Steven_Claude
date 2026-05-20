@@ -7537,7 +7537,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         _f59i_pos_l13 > 0
                         and _f59i_pos_l4  > _f59i_pos_l13 * 2.0
                         and _f59i_pos_l52 > _f59i_pos_l13 * 3.0
-                        and (_f59i_map == 0 or _f59i_aur >= _f59i_map * 0.85)
+                        and (_f59i_map == 0 or _f59i_aur >= _f59i_map * 0.75)
                     )
                     # DEBUG: expose gate values for FF28459 diagnosis (file-based)
                     _f59i_dbg_mstyle = (row.get("Mstyle") or row.get("mstyle") or "").upper()
