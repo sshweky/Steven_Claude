@@ -10208,11 +10208,24 @@ def main():
         # records that happen to share the same mstyle.
         _cust_name = (row.get("Customr_Name") or r.get("cust") or "")
         _is_amazon_rec = AMAZON_CUST_SUBSTR in _cust_name.upper()
-        _pos_for_rec = (amazon_pos or {}).get(r.get("mstyle", "")) if _is_amazon_rec else None
-        _amz_cat_for_rec = (
-            (amazon_catalog_us or {}).get(r.get("mstyle", ""))
-            if _is_amazon_rec else None
-        )
+        # EC items (e.g. "FF12302/24EC") have POS and DC Inv stored under
+        # the parent mstyle ("FF12302/24") in the Amazon catalog tables.
+        # Try the literal mstyle first; fall back to parent if not found.
+        def _ec_parent(ms):
+            msu = ms.upper()
+            if msu.endswith("EC"):
+                return ms[:-2]
+            if msu.endswith("COS"):
+                return ms[:-3]
+            return ms
+        _pos_for_rec    = None
+        _amz_cat_for_rec = None
+        if _is_amazon_rec:
+            _ms_key = r.get("mstyle", "")
+            _pos_for_rec    = (amazon_pos or {}).get(_ms_key) \
+                              or (amazon_pos or {}).get(_ec_parent(_ms_key))
+            _amz_cat_for_rec = (amazon_catalog_us or {}).get(_ms_key) \
+                               or (amazon_catalog_us or {}).get(_ec_parent(_ms_key))
         try:
             r["ai_analysis"] = build_ai_analysis(
                 r, row,

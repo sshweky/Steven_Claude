@@ -105,3 +105,4 @@
 [4/4] Writing 1844 records to Quickbase ...
       1844 records  |  6 parallel workers
   [  50/1844]   2.7%  ok=50  fail=0
+  [watchdog] still running — 13s since last output | last:   [  50/1844]   2.7%  ok=50  fail=0
