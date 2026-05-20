@@ -7525,8 +7525,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     #   L4W POS > L13W POS * 2.0 -- rapid recent acceleration
                     #   L52W POS > L13W POS * 3.0 -- L13W was anomalously
                     #                                 depressed (dark period)
-                    #   AUR >= MAP * 0.85          -- retail now correctly priced
+                    #   AUR >= MAP * 0.75          -- retail largely corrected
                     #                                 (or no MAP data available)
+                    #                                 75% threshold: price was
+                    #                                 corrected but may still be
+                    #                                 slightly below MAP during
+                    #                                 the recovery ramp
                     #
                     # Action: skip F59i suppression entirely.  The order-history
                     # baseline reflects genuine reactivation demand, not
