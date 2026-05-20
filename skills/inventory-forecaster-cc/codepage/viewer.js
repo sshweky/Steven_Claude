@@ -131,11 +131,10 @@ async function fetchCurrentUser() {
 
     // Secondary: scan tables for a record owned by this user (Record Owner = FID 4).
     // Use the QB user ID obtained from API_GetUserInfo (correct EX filter format).
-    // This resolves the full display name even when API_GetUserInfo returns only
-    // the login handle as screenName and <name> is absent.
-    if ((!name || name === (p.sub || '').trim()) && qbUserId) {
+    // Runs when name is absent OR looks like a login handle (no space = not "First Last").
+    if ((!name || !name.includes(' ')) && qbUserId) {
       for (const _tid of [CFG.PROJECTIONS_TID, CFG.COMMENTS_TID, 'bv2jirwts']) {
-        if (name && name !== (p.sub || '').trim()) break;
+        if (name && name.includes(' ')) break;
         try {
           const r = await qb('/records/query', {
             from:    _tid,
