@@ -306,8 +306,10 @@ def run_analysis(results_path, top_n, out_path):
     lines.append(f"| Metric | Value |")
     lines.append(f"|---|---|")
     lines.append(f"| Total manual projection | {tot_m:,} |")
-    lines.append(f"| Total AI projection | {tot_a:,} ({(tot_a-tot_m)/tot_m*100:+.1f}%) |")
-    lines.append(f"| Total expected (baseline × profile) | {int(tot_e):,} ({(tot_e-tot_m)/tot_m*100:+.1f}%) |")
+    _ai_pct  = f"{(tot_a-tot_m)/tot_m*100:+.1f}%" if tot_m else "n/a"
+    _exp_pct = f"{(tot_e-tot_m)/tot_m*100:+.1f}%" if tot_m else "n/a"
+    lines.append(f"| Total AI projection | {tot_a:,} ({_ai_pct}) |")
+    lines.append(f"| Total expected (baseline × profile) | {int(tot_e):,} ({_exp_pct}) |")
     lines.append(f"| Absolute unit gap | {abs(tot_a-tot_m):,} |")
     lines.append("")
 
