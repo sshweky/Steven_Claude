@@ -13,11 +13,11 @@ if (-not (Test-Path $LogDir)) {
 $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $LogFile   = "$LogDir\forecast_$Timestamp.log"
 
-"[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Starting scheduled forecast run (--all)" |
+"[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Starting scheduled forecast run (--all --validate)" |
     Out-File $LogFile -Encoding UTF8
 
 try {
-    & $Python "$ScriptDir\run_forecast.py" "--all" 2>&1 |
+    & $Python "$ScriptDir\run_forecast.py" "--all" "--validate" 2>&1 |
         Out-File $LogFile -Append -Encoding UTF8
     "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Finished. Exit code: $LASTEXITCODE" |
         Out-File $LogFile -Append -Encoding UTF8
