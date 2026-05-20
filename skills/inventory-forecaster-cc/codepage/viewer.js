@@ -117,6 +117,7 @@ async function fetchCurrentUser() {
       try {
         const uiResp = await fetch(`https://${CFG.REALM}/db/main?a=API_GetUserInfo`, { credentials: 'include' });
         const uiXml  = await uiResp.text();
+        console.log('[Auth] API_GetUserInfo raw XML:', uiXml);
         const _uid   = uiXml.match(/<user[^>]+id="([^"]+)"/);
         const _nm    = uiXml.match(/<name>(.*?)<\/name>/);
         const _sn    = uiXml.match(/<screenName>(.*?)<\/screenName>/);
