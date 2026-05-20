@@ -9963,12 +9963,15 @@ def main():
                 for wk, fid in _man_prj_fids.items():
                     idx = wk - 1
                     row[fid] = int(round(rec["forecast"][idx])) if idx < len(rec["forecast"]) else 0
-            # W1 PO zero-out: if there is an open customer PO in W1, set MAN PRJ W1 = 0.
-            # The customer has already committed — the manual projection is redundant
-            # and causes double-counting in inventory planning.  W2-W26 are untouched.
+            # W1-W2 PO zero-out: if a confirmed customer PO exists in W1 or W2, zero
+            # out the corresponding manual projection.  The customer has already committed
+            # — the manual projection on top is redundant and causes double-counting in
+            # inventory planning.  W3-W26 are untouched.
             _opn_w = rec.get("opn_w") or []
             if _man_w1_fid and _opn_w and _opn_w[0] > 0:
                 row[_man_w1_fid] = 0
+            if _man_w2_fid and len(_opn_w) > 1 and _opn_w[1] > 0:
+                row[_man_w2_fid] = 0
             payload.append(row)
         n_ok, n_fail, errors = qb_bulk_update(QB_PROJ_TABLE, payload, merge_fid)
         # Track completed keys: assume in-order success for the batches that returned OK.
