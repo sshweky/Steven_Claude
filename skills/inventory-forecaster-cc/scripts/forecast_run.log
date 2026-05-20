@@ -106,3 +106,11 @@
       1844 records  |  6 parallel workers
   [  50/1844]   2.7%  ok=50  fail=0
   [watchdog] still running — 13s since last output | last:   [  50/1844]   2.7%  ok=50  fail=0
+  [ 100/1844]   5.4%  ok=100  fail=0
+  [ 150/1844]   8.1%  ok=150  fail=0
+  [ 200/1844]  10.8%  ok=200  fail=0
+  [ 250/1844]  13.6%  ok=250  fail=0
+  [watchdog] still running — 34s since last output | last:   [ 250/1844]  13.6%  ok=250  fail=0
+  [ 300/1844]  16.3%  ok=300  fail=0
+  [watchdog] still running — 37s since last output | last:   [ 300/1844]  16.3%  ok=300  fail=0
+  [watchdog] still running — 97s since last output | last:   [ 300/1844]  16.3%  ok=300  fail=0
