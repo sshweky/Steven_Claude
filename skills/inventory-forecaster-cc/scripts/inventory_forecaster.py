@@ -7641,6 +7641,61 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"{_f59_l13w_avg:.0f}/wk)."
                         )
 
+        # ── F59l — Sparse/intermittent Amazon: POS floor when DC is healthy ──
+        # When Croston's or Heuristic projects less than 70% of consumer POS
+        # L13W rate AND the Amazon DC is in the healthy steady-state range
+        # (8-20 WOS), the shortfall is caused by lumpy order history
+        # understating true consumer demand -- NOT by soft demand.
+        #
+        # Root cause: Amazon orders in large periodic batches (once every 4-5
+        # weeks for intermittent items).  Croston's inter-order interval math
+        # divides the per-order qty by the interval, yielding a low projected
+        # weekly rate even when consumers are buying ~1,000/wk at retail.
+        # Heuristic items have the same problem: sparse order history produces
+        # a conservative baseline that misses the steady consumer pull.
+        #
+        # When DC WOS is at Amazon's 8-12wk steady-state target, orders will
+        # continue matching consumer sell-through.  POS L13W is the correct
+        # forward demand signal -- not the sparse order history average.
+        #
+        # Correction: scale the full 26-week forecast so the average weekly
+        # rate equals POS L13W.  Preserves the lumpy shape (big/quiet weeks)
+        # while anchoring total demand to consumer velocity.
+        #
+        # Guards:
+        #   POS L13W >= 200:  credible consumer signal (not noise)
+        #   POS L4W >= POS L13W * 0.40:  POS not in sharp recent decline
+        #   DC WOS 8-20:  healthy steady-state (F59h handles extreme cases)
+        #   AI avg < POS L13W * 0.70:  meaningful gap (30%+ below consumer)
+        #   Scale cap 5.0:  guard against runaway uplift on very sparse history
+        #   Not EC/COS:  EC items are anchored to POS separately via F59i Path A
+        if (is_amazon and pos_data and amz_catalog
+                and model in ("Croston's", "Heuristic")
+                and not _f59i_is_ec
+                and isinstance(fcst, list) and sum(fcst) > 0):
+            _f59l_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+            _f59l_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+            _f59l_wos     = _f59h_wos
+            _f59l_ai_avg  = sum(fcst) / 26.0
+            if (_f59l_pos_l13 >= 200
+                    and _f59l_pos_l4 >= _f59l_pos_l13 * 0.40
+                    and 8.0 <= _f59l_wos <= 20.0
+                    and _f59l_ai_avg < _f59l_pos_l13 * 0.70):
+                _f59l_target_total = _f59l_pos_l13 * 26.0
+                _f59l_scale = min(5.0, _f59l_target_total / max(sum(fcst), 1))
+                if _f59l_scale > 1.01:
+                    fcst = [snap(v * _f59l_scale, mp) for v in fcst]
+                    _fire("F59l")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F59l sparse POS anchor: {model} avg {_f59l_ai_avg:.0f}/wk "
+                            f"< POS L13W {_f59l_pos_l13:.0f}/wk (70% floor) with "
+                            f"DC WOS {_f59l_wos:.1f}wks (healthy 8-20wk range) -- "
+                            f"lumpy order history understates consumer demand. "
+                            f"Scaled x{_f59l_scale:.2f} to POS L13W rate "
+                            f"(POS L4W={_f59l_pos_l4:.0f}/wk). Model: {model}."
+                        )
+
         # ── F60 — EC-transition narrative ────────────────────────────────────
         # History was inherited from parent mstyle in the pre-pass.  Log the
         # driver text now that `meta` is available.
