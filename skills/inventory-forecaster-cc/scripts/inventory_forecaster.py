@@ -6896,6 +6896,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _effective_po_wk = list(open_po_wk)     # fall back to fetched PO report
     else:
         _effective_po_wk = []
+    _vp_q4_zeroed_idx = set()   # 0-based indexes VP-Q4 set to 0 — F59d/F59a must skip
     if _effective_po_wk:
         _po_zeroed = []
         for _i in range(min(26, len(fcst))):
@@ -6903,6 +6904,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             if _po_qty > 0 and fcst[_i] > 0:
                 _po_zeroed.append((_i + 1, fcst[_i], _po_qty))
                 fcst[_i] = 0
+                _vp_q4_zeroed_idx.add(_i)   # guard: F59d must not restore these
         if _po_zeroed and isinstance(meta, dict):
             _po_total_removed = sum(z[1] for z in _po_zeroed)
             _po_total_qty     = sum(z[2] for z in _po_zeroed)
