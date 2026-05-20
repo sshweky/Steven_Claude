@@ -33,12 +33,19 @@ if ($Existing) {
     Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
 }
 
-# -- Register via schtasks.exe (most reliable for repetition + SYSTEM acct) ---
-# SYSTEM account: runs whether locked or not, no password prompt needed.
+# -- Register via schtasks.exe ------------------------------------------------
+# Runs as current user (not SYSTEM) so all installed Python packages are available.
 # /sc WEEKLY /d MON-FRI /st 06:00 : starts 6 AM on weekdays
-# /ri 120 : repeat every 120 minutes
+# /ri 120 : repeat every 120 minutes (2 hours)
 # /du 0014:00 : for 14 hours (last run 8 PM)
 # /rl HIGHEST : run with highest available privileges
+$User    = $env:USERNAME
+$Domain  = $env:USERDOMAIN
+$RunAs   = "$Domain\$User"
+$Password = Read-Host "Enter your Windows login password (needed to run when screen is locked)" -AsSecureString
+$PlainPw  = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+                [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password))
+
 $result = & schtasks /create `
     /tn $TaskName `
     /tr "`"$WrapperBat`"" `
@@ -48,8 +55,11 @@ $result = & schtasks /create `
     /ri 120 `
     /du 0014:00 `
     /rl HIGHEST `
-    /ru SYSTEM `
+    /ru $RunAs `
+    /rp $PlainPw `
     /f 2>&1
+
+$PlainPw = $null
 
 Write-Host $result
 
