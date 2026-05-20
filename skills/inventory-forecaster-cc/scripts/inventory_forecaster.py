@@ -1109,7 +1109,14 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if len(l13_nz) >= 3:
         _sorted_nz = sorted(l13_nz)
         _median_nz = _sorted_nz[len(_sorted_nz) // 2]
-        _spike_cap = 3.0 * _median_nz
+        # F38-pre (2026-05-20): tighten spike cap to 2.0x when Amazon buy-box
+        # price is below MAP — buy-box event drove a temporary order spike that
+        # should not anchor the 26-week baseline.  3.0x applies otherwise.
+        _f38pre_aur = float((amz_catalog or {}).get("AUR_L4w") or 0)
+        _f38pre_map = float((amz_catalog or {}).get("MAP_Price") or 0)
+        _bb_event   = (is_amazon and _f38pre_aur > 0 and _f38pre_map > 0
+                       and _f38pre_aur < _f38pre_map)
+        _spike_cap = (2.0 if _bb_event else 3.0) * _median_nz
         if max(l13_nz) > _spike_cap:
             l13_nz = [min(v, _spike_cap) for v in l13_nz]
     if len(l26_nz) >= 5:
