@@ -7530,8 +7530,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f59j_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
             _f59j_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
             _f59j_wos     = _f59h_wos  # reuse WOS computed in F59h block
-            _f59j_l2w_avg = (sum(float(v) for v in (history[-2:] if len(history) >= 2 else history))
-                             / max(len(history[-2:]), 1)) if history else 0
+            _f59j_l2w_avg = (sum(float(v) for v in (hist[-2:] if len(hist) >= 2 else hist))
+                             / max(len(hist[-2:]), 1)) if hist else 0
             if (_f59j_pos_l4 >= 100
                     and _f59j_pos_l13 > 0
                     and 0 < _f59j_wos < 8
