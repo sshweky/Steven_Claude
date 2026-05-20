@@ -7539,6 +7539,18 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         and _f59i_pos_l52 > _f59i_pos_l13 * 3.0
                         and (_f59i_map == 0 or _f59i_aur >= _f59i_map * 0.85)
                     )
+                    # DEBUG: expose gate values for FF28459 diagnosis
+                    _f59i_dbg_mstyle = (row.get("mstyle") or "").upper()
+                    if _f59i_dbg_mstyle == "FF28459":
+                        print(f"[F59i-DEBUG FF28459] ratio={_f59i_ratio:.3f} "
+                              f"pos_l4={_f59i_pos_l4:.1f} pos_l13={_f59i_pos_l13:.1f} "
+                              f"pos_l52={_f59i_pos_l52:.1f} "
+                              f"aur={_f59i_aur:.2f} map={_f59i_map:.2f} "
+                              f"wos={_f59i_wos:.1f} "
+                              f"gate_l4_2x={_f59i_pos_l4 > _f59i_pos_l13 * 2.0} "
+                              f"gate_l52_3x={_f59i_pos_l52 > _f59i_pos_l13 * 3.0} "
+                              f"gate_aur={_f59i_map == 0 or _f59i_aur >= _f59i_map * 0.85} "
+                              f"price_recovery={_f59i_price_recovery}")
                     if _f59i_price_recovery:
                         if isinstance(meta, dict):
                             _f59i_aur_note = (
