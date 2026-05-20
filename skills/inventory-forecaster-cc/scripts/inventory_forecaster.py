@@ -4662,6 +4662,21 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     is_amazon = AMAZON_CUST_SUBSTR in cust_name.upper()
     is_international = _is_international_cust(cust_name)
     pos_data  = (amazon_pos or {}).get(row.get("Mstyle", "")) if is_amazon else None
+    # F59i-EC POS inheritance: EC/COS drop-ship variants have no own ASIN in
+    # Amazon's catalog POS feed (they ship direct-to-consumer, not via DC).
+    # When pos_data is missing for an EC/COS mstyle, fall back to the parent
+    # mstyle's POS as a consumer-demand proxy.  This feeds the F59i-EC anchor
+    # (which otherwise fails silently on pos_data=None) so EC items get the
+    # same AI-vs-consumer-demand correction as their base style siblings.
+    if is_amazon and pos_data is None:
+        _pos_ms = (row.get("Mstyle") or "").upper()
+        if _pos_ms.endswith("EC") or _pos_ms.endswith("COS"):
+            import re as _re
+            _parent_ms = _re.sub(r'(?:EC|COS)$', '', row.get("Mstyle", ""),
+                                  flags=_re.IGNORECASE)
+            _parent_pos = (amazon_pos or {}).get(_parent_ms)
+            if _parent_pos and float(_parent_pos.get("Avg_Units_Wk_L13w") or 0) > 0:
+                pos_data = _parent_pos
     # F38 — Amazon Catalog US signals (buybox, MAP, AUR, OOS days, sellable
     # inventory, buyability flag).  Keyed by Mstyle (matches Mstyle_model_).
     amz_catalog = (amazon_catalog_us or {}).get(row.get("Mstyle", "")) if is_amazon else None
