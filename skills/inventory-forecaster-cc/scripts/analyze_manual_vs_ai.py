@@ -155,7 +155,7 @@ def fetch_projections(man_fids, limit=None):
         resp = _qb_post("/records/query", body)
         rows = resp.get("data", [])
         all_rows.extend(rows)
-        print(f"  … {len(all_rows)} records")
+        print(f"  ... {len(all_rows)} records")
         if len(rows) < batch:
             break
         skip += batch
