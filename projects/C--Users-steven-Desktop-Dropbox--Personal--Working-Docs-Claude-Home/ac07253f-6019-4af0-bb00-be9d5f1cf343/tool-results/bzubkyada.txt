@@ -1,0 +1,1019 @@
+      Validation complete in 2.6s
+      Croston's: 1217  Heuristic: 396  Inactive: 1217  Inactive (zero order history): 98  OTB (zero): 386  Pre-launch NEW (manual passthrough): 57  Reactivating: 6  Seasonal Baseline: 843  Sparse Intermittent: 1320  Bi-weekly enforced: 275  Alerts (>5%): 3890
+      Bulk upsert: 5,540 OK · 0 failed · 12.7s (436 rec/s)
+  Models — HW: 0  Croston's: 1217  Heuristic: 396  Inactive: 1217  Bi-weekly: 275
+  1003-BB35041                       +24.0%  Sparse Intermittent              114         150
+  1003-BB35094                        +8.0%  Sparse Intermittent              138         150
+  1003-BB35095                       +56.0%  Sparse Intermittent              156         100
+  1003-BB35096                       +53.8%  Sparse Intermittent            4,920       3,200
+  1003-BB35097                       +11.5%  Sparse Intermittent            1,449       1,300
+  1003-BB35098                       +35.3%  Sparse Intermittent              582         900
+  1047-FF4775                        +60.3%  Sparse Intermittent              186         468
+  1047-FF7258                        +10.4%  Sparse Intermittent [BW]         660         598
+  1047-FF7266                        +61.9%  Sparse Intermittent              228         598
+  11145-BB35039                      +38.3%  Sparse Intermittent            1,992       1,440
+  11145-BB35043                      +36.7%  Sparse Intermittent            3,444       2,520
+  11145-BB35093                       +7.8%  Sparse Intermittent            1,992       2,160
+  11145-BB35094                      +18.1%  Sparse Intermittent [BW]       2,064       2,520
+  11145-BB35095                      +18.3%  Sparse Intermittent            2,058       2,520
+  11145-BB35096                       +7.8%  Sparse Intermittent [BW]       2,214       2,400
+  11145-BB35098                      +18.1%  Sparse Intermittent [BW]       2,064       2,520
+  11169-FF22323                      +94.3%  Sparse Intermittent               48         840
+  11169-FF25667KL                  +3450.0%  Sparse Intermittent            1,704          48
+  11169-FF25701KL                    +40.0%  Sparse Intermittent [BW]         144         240
+  11169-FF28400KL                    +33.3%  Sparse Intermittent               96          72
+  11169-FF30361KL                   +100.0%  Sparse Intermittent                0         720
+  11169-FF30363KL                   +100.0%  Sparse Intermittent [BW]           0         648
+  11169-FF33555KL                   +283.3%  Sparse Intermittent [BW]         552         144
+  11169-FF33559KL                   +100.0%  Sparse Intermittent                0         576
+  11393-BB35032                      +11.2%  Sparse Intermittent            1,776       2,000
+  11393-BB35043                      +78.8%  Sparse Intermittent            1,788       1,000
+  11393-BB35093                      +96.8%  Sparse Intermittent            3,444       1,750
+  11393-BB35094                      +18.2%  Sparse Intermittent            4,434       3,750
+  11393-BB35095                      +70.0%  Sparse Intermittent            5,100       3,000
+  11393-BB35096                      +75.2%  Sparse Intermittent            5,082       2,900
+  11393-BB35098                      +75.7%  Sparse Intermittent            4,392       2,500
+  11393-BB35100                      +18.3%  Sparse Intermittent            2,070       1,750
+  12002-FF10159                     +100.8%  Sparse Intermittent              522         260
+  12002-FF10475                     +118.5%  Sparse Intermittent              852         390
+  12002-FF10479                      +17.6%  Sparse Intermittent [BW]         618         750
+  12002-FF10530                     +610.4%  Sparse Intermittent [BW]         888         125
+  12002-FF11899/24                   +20.0%  Sparse Intermittent              240         300
+  12002-FF12655                      +89.2%  Sparse Intermittent [BW]         492         260
+  12002-FF20206                       +5.6%  Sparse Intermittent              792         750
+  12002-FF20210                      +12.3%  Sparse Intermittent              114         130
+  12002-FF26777                     +260.0%  Sparse Intermittent              468         130
+  12002-FF31061                      +56.9%  Sparse Intermittent              336         780
+  12002-FF31062                     +301.5%  Sparse Intermittent              522         130
+  12002-FF31324                      +57.7%  Sparse Intermittent              330         780
+  12002-FF31325                     +245.6%  Sparse Intermittent [BW]         432         125
+  12002-FF33872                     +158.5%  Sparse Intermittent [BW]         672         260
+  12002-FF5716                       +38.5%  Sparse Intermittent            1,800       1,300
+  12002-FF5952                      +306.2%  Sparse Intermittent              528         130
+  12002-FF6989                       +61.6%  Sparse Intermittent              576       1,500
+  12002-FF8287                       +28.0%  Sparse Intermittent [BW]         900       1,250
+  12002-FF9297PDQ                   +143.7%  Sparse Intermittent            1,584         650
+  12002-FF9298                       +23.1%  Sparse Intermittent              600         780
+  12002-SF8168                       +15.4%  Sparse Intermittent            1,200       1,040
+  12002-SF8170                       +61.6%  Sparse Intermittent              576       1,500
+  12002-SF8170PS                     +26.2%  Sparse Intermittent              960       1,300
+  12428-FF10465                      +38.5%  Sparse Intermittent               36          26
+  12428-FF11899/24                   +55.7%  Sparse Intermittent              288         650
+  12428-FF12887                      +41.5%  Sparse Intermittent              552         390
+  12428-FF13874                      +58.5%  Sparse Intermittent               54         130
+  12428-FF16705                      +44.6%  Sparse Intermittent               72         130
+  12428-FF19341                      +49.2%  Sparse Intermittent               66         130
+  12428-FF33449                      +38.5%  Sparse Intermittent               36          26
+  12428-FF4517PS                     +16.9%  Sparse Intermittent              456         390
+  12428-FF4577                       +58.2%  Sparse Intermittent              288         182
+  12428-FF5715                       +10.8%  Sparse Intermittent              864         780
+  12428-FF5807                      +169.2%  Sparse Intermittent              210          78
+  12428-FF7618                       +38.5%  Sparse Intermittent              180         130
+  12428-FF7619                       +84.6%  Sparse Intermittent              240         130
+  12428-FF8287                       +84.6%  Sparse Intermittent              240         130
+  12428-FF8298                       +30.9%  Sparse Intermittent              144         110
+  12428-FF9297/24                    +52.3%  Sparse Intermittent              792         520
+  12428-SF8167                       +10.8%  Sparse Intermittent              864         780
+  12428-SF8168                       +47.7%  Sparse Intermittent              384         260
+  12428-SF8169                      +121.5%  Sparse Intermittent              576         260
+  12428-SF8170                       +47.7%  Sparse Intermittent              384         260
+  12835-BB0712                       +94.5%  Sparse Intermittent              294       5,388
+  12835-BB12022/12                  +333.1%  Sparse Intermittent           49,992      11,544
+  12835-BB16316                     +100.0%  Sparse Intermittent [BW]          30          15
+  12835-BB21058/6                    +48.7%  Sparse Intermittent              240         468
+  12835-BB22092                     +166.7%  Sparse Intermittent               24           9
+  12835-BB22093                      +61.6%  Sparse Intermittent               96         250
+  12835-BB38261                      +71.5%  Sparse Intermittent           17,580      10,248
+  13032-BB0102                       +86.9%  Sparse Intermittent [BW]         492       3,750
+  13032-BB0150                       +40.0%  Sparse Intermittent              624       1,040
+  13032-BB0234                       +81.8%  Sparse Intermittent [BW]         228       1,250
+  13032-BB0332                       +63.6%  Sparse Intermittent              455       1,250
+  13032-BB0492                       +23.1%  Sparse Intermittent              384         312
+  13032-BB11981                      +53.8%  Sparse Intermittent              144         312
+  13032-BB12022                      +34.3%  Sparse Intermittent              222         338
+  13032-BB12383                     +121.5%  Sparse Intermittent              576         260
+  13032-BB12479                      +41.2%  Sparse Intermittent              306         520
+  13032-BB16316                      +21.5%  Sparse Intermittent              408         520
+  13032-BB16534                      +70.0%  Sparse Intermittent              312       1,040
+  13032-BB16535                      +70.0%  Sparse Intermittent              312       1,040
+  13032-BB16537                      +56.2%  Sparse Intermittent              456       1,040
+  13032-BB18835                      +40.0%  Sparse Intermittent              624       1,040
+  13032-BB21641                      +40.0%  Sparse Intermittent              624       1,040
+  13032-BB38261                      +47.8%  Sparse Intermittent            1,356       2,600
+  13149-FF31196                      +46.3%  Sparse Intermittent [BW]         978       1,820
+  13149-FF4775                       +42.5%  Sparse Intermittent [BW]       2,034       3,536
+  13149-FF7258                       +46.2%  Sparse Intermittent [BW]       2,706       5,033
+  13149-FF7261                       +32.2%  Sparse Intermittent            1,764       2,600
+  13149-FF7266                       +54.8%  Sparse Intermittent            1,176       2,600
+  13149-FF7372                       +48.4%  Sparse Intermittent            2,310       4,481
+  13177-FF11353                      +30.8%  Sparse Intermittent [BW]          36          52
+  13177-FF15588                      +92.3%  Sparse Intermittent [BW]          24         312
+  13177-FF15589                      +65.4%  Sparse Intermittent              108         312
+  13177-FF31287                      +79.5%  Sparse Intermittent               48         234
+  13177-FF7260                       +38.5%  Sparse Intermittent [BW]          72          52
+  13177-FF7261                       +38.5%  Sparse Intermittent               72          52
+  13177-FF8423                       +30.8%  Sparse Intermittent              108         156
+  13177-FF8652                       +72.3%  Sparse Intermittent               72         260
+  13177-FF8653                       +50.8%  Sparse Intermittent [BW]          64         130
+  13640-BB0009                       +68.7%  Sparse Intermittent              846       2,700
+  13640-BB0012                       +57.7%  Sparse Intermittent              846       2,000
+  13640-BB0015                       +61.1%  Sparse Intermittent              816       2,100
+  13640-BB0018                       +64.8%  Sparse Intermittent              846       2,400
+  13640-BB0216                       +55.0%  Sparse Intermittent            1,080       2,400
+  13640-BB0217                       +14.7%  Sparse Intermittent            6,144       7,200
+  13640-BB0409                       +75.1%  Sparse Intermittent              996       4,000
+  13640-BB0473                       +70.9%  Sparse Intermittent            1,164       4,000
+  13640-BB0760                       +86.8%  Sparse Intermittent              318       2,400
+  13640-BB16534                      +19.4%  Sparse Intermittent            1,008       1,250
+  13640-BB16537                      +54.3%  Sparse Intermittent              960       2,100
+  13640-BB21626                     +100.0%  Sparse Intermittent                0       8,400
+  13640-BB22025                     +100.0%  Sparse Intermittent                0       3,600
+  13640-BB22094                      +29.6%  Sparse Intermittent            5,184       4,000
+  13640-BB22095                      +17.5%  Sparse Intermittent [BW]       8,910      10,800
+  13640-BB22116                      +70.0%  Sparse Intermittent              360       1,200
+  13640-BB22117                      +59.9%  Sparse Intermittent            3,606       9,000
+  13640-BB22118                      +39.0%  Sparse Intermittent              756       1,240
+  13640-BB26923                      +77.2%  Sparse Intermittent            1,368       6,000
+  13640-BB26924                      +29.6%  Sparse Intermittent            2,112       3,000
+  13640-BB29122                     +100.0%  Sparse Intermittent                0       1,200
+  13640-BB30279                     +300.0%  Sparse Intermittent            1,440         360
+  13640-BB33528                      +73.5%  Sparse Intermittent              636       2,400
+  13640-BB33532                      +26.3%  Sparse Intermittent            2,322       3,150
+  13640-BB34389                      +60.9%  Sparse Intermittent            3,516       9,000
+  13640-BB34390                      +56.5%  Sparse Intermittent            5,214      12,000
+  13640-BB34751                      +66.2%  Sparse Intermittent              846       2,500
+  13640-FF10159                      +12.6%  Sparse Intermittent [BW]       6,552       7,500
+  13640-FF10162                      +66.7%  Sparse Intermittent            2,994       9,000
+  13640-FF10475                      +45.9%  Sparse Intermittent [BW]       3,246       6,000
+  13640-FF10477                      +53.8%  Sparse Intermittent            3,462       7,500
+  13640-FF10530                      +19.3%  Sparse Intermittent            7,260       9,000
+  13640-FF12649                      +56.9%  Sparse Intermittent            3,102       7,200
+  13640-FF12653                       +5.5%  Sparse Intermittent            5,064       4,800
+  13640-FF20208                      +71.0%  Sparse Intermittent            8,208       4,800
+  13640-FF20209                      +57.6%  Sparse Intermittent            3,432       8,100
+  13640-FF20210                      +88.2%  Sparse Intermittent              636       5,400
+  13640-FF26777                      +34.0%  Sparse Intermittent            4,752       7,200
+  13640-FF28036                       +6.7%  Sparse Intermittent            3,360       3,600
+  13640-FF30755                      +24.8%  Sparse Intermittent            1,806       2,400
+  13640-FF31061                     +100.0%  Sparse Intermittent [BW]           0       3,600
+  13640-FF31062                      +50.2%  Sparse Intermittent            3,588       7,200
+  13640-FF31068                       +9.9%  Sparse Intermittent            4,752       5,272
+  13640-FF33495                      +63.1%  Sparse Intermittent            2,216       6,000
+  13640-FF33637                      +47.4%  Sparse Intermittent            2,838       5,400
+  13640-FF33638                      +41.6%  Sparse Intermittent            4,206       7,200
+  13640-FF33641                      +12.2%  Sparse Intermittent            2,106       2,400
+  13640-FF33877                      +50.6%  Sparse Intermittent            1,482       3,000
+  13640-FF37778                      +20.2%  Sparse Intermittent            3,828       4,800
+  13640-FF37780                       +9.0%  Sparse Intermittent [BW]       2,184       2,400
+  13640-FF38488                      +15.3%  Sparse Intermittent            4,152       3,600
+  13640-FF7110                       +64.0%  Sparse Intermittent            3,936       2,400
+  13640-FF7115                       +20.0%  Sparse Intermittent            1,920       2,400
+  13646-FF7112                       +36.8%  Sparse Intermittent            3,420       2,500
+  13646-SF8168                       +25.7%  Sparse Intermittent            3,744       5,040
+  13646-SF8170                       +19.6%  Sparse Intermittent            3,936       4,896
+  13825-BB0094                      +110.0%  Sparse Intermittent            1,260         600
+  13825-BB0096                      +305.3%  Sparse Intermittent            1,848         456
+  13825-BB0102                       +44.5%  Sparse Intermittent              624       1,125
+  13825-BB0131                       +84.5%  Sparse Intermittent [BW]         738         400
+  13825-BB0332                       +12.0%  Sparse Intermittent [BW]         770         875
+  13825-BB0466                       +20.7%  Sparse Intermittent [BW]       1,056         875
+  13825-BB0490                       +21.3%  Sparse Intermittent [BW]         492         625
+  13825-BB0496                      +100.0%  Sparse Intermittent [BW]           0         875
+  13825-BB12022                     +100.0%  Sparse Intermittent [BW]           0         100
+  13825-BB35032                      +10.4%  Sparse Intermittent [BW]         276         250
+  13825-BB35041                      +44.8%  Sparse Intermittent              138         250
+  13825-BB35094                      +24.0%  Sparse Intermittent [BW]         372         300
+  13825-BB35096                      +17.6%  Sparse Intermittent [BW]         588         500
+  13825-BB35097                      +95.6%  Sparse Intermittent              489         250
+  13825-BB35098                      +25.6%  Sparse Intermittent [BW]         372         500
+  13825-BB38261                      +29.6%  Sparse Intermittent            2,592       2,000
+  13825-FF10475                      +14.6%  Sparse Intermittent [BW]         666         780
+  13825-FF10477                      +14.9%  Sparse Intermittent [BW]         774         910
+  13825-FF12300/24                  +121.5%  Sparse Intermittent [BW]         864         390
+  13825-FF12302/24                  +121.5%  Sparse Intermittent [BW]         288         130
+  13825-FF12837                      +29.2%  Sparse Intermittent [BW]         168         130
+  13825-FF4771                       +16.9%  Sparse Intermittent [BW]         432         520
+  13825-FF7258                       +14.2%  Sparse Intermittent [BW]         558         650
+  13825-FF7260                       +33.1%  Sparse Intermittent [BW]         348         520
+  13825-FF7261                       +33.1%  Sparse Intermittent [BW]         348         520
+  13825-FF7263                       +27.1%  Sparse Intermittent [BW]         474         650
+  13825-FF7267                       +33.1%  Sparse Intermittent [BW]         348         520
+  13825-FF7297                       +35.4%  Sparse Intermittent [BW]         336         520
+  13825-FF7372                       +43.5%  Sparse Intermittent [BW]         294         520
+  13825-FF8424                       +66.2%  Sparse Intermittent [BW]         216         130
+  13825-FF8425                       +44.6%  Sparse Intermittent              432         780
+  13825-FF8649/24                    +10.8%  Sparse Intermittent [BW]       1,392       1,560
+  13825-FF8654                       +36.5%  Sparse Intermittent [BW]         330         520
+  13825-FF8990                       +20.5%  Sparse Intermittent [BW]       1,116       1,404
+  13825-FF8991                       +55.2%  Sparse Intermittent [BW]         408         910
+  13825-FF9297/24                    +58.8%  Sparse Intermittent [BW]       1,032         650
+  13825-FF9298                      +176.9%  Sparse Intermittent              432         156
+  13872-BB16854                      +81.5%  Sparse Intermittent               24         130
+  13872-BB35094                      +50.0%  Sparse Intermittent               12          24
+  13872-BB35098                      +25.0%  Sparse Intermittent               18          24
+  13872-FF5773                       +29.2%  Sparse Intermittent              552         780
+  13872-FF7297                       +46.2%  Sparse Intermittent              420         780
+  13894-BB13457CAN                   +21.4%  Sparse Intermittent            5,658       7,200
+  13894-BB35094CAN                   +48.3%  Sparse Intermittent              930       1,800
+  14023-FF9297/24                    +52.3%  Sparse Intermittent              792         520
+  14182-BB0083                       +12.8%  Sparse Intermittent [BW]       1,320       1,170
+  14182-BB15065                       +9.3%  Sparse Intermittent [BW]       1,176       1,296
+  14182-FF28457                      +14.6%  Sparse Intermittent [BW]         888       1,040
+  14182-FF28459                      +38.8%  Sparse Intermittent [BW]         636       1,040
+  14182-FF29833                      +23.8%  Sparse Intermittent [BW]         792       1,040
+  14182-FF29834                      +23.8%  Sparse Intermittent [BW]         792       1,040
+  14224-BB17006                     +100.0%  Sparse Intermittent                0          40
+  14719-SF8168                       +60.5%  Sparse Intermittent            2,352       5,952
+  14719-SF8170                        +5.1%  Sparse Intermittent            7,104       7,488
+  14721-FF28036AU                    +13.8%  Sparse Intermittent              672         780
+  14721-FF4933AU                     +55.7%  Sparse Intermittent              288         650
+  14721-FF7488AU                      +5.4%  Sparse Intermittent              738         780
+  15339-BB0018                       +88.5%  Sparse Intermittent               60         520
+  15339-BB0080                       +76.0%  Sparse Intermittent               24         100
+  15339-BB0096                       +52.0%  Sparse Intermittent [BW]         144         300
+  15339-BB0236                      +126.5%  Sparse Intermittent              906         400
+  15339-BB0409                       +18.2%  Sparse Intermittent               36          44
+  15339-BB0496                      +100.0%  Sparse Intermittent                0         260
+  15339-BB19242                      +50.0%  Sparse Intermittent              175         350
+  15339-BB19935                      +46.5%  Sparse Intermittent              696       1,300
+  15339-BB35043                      +33.8%  Sparse Intermittent              348         260
+  15339-BB35093                      +84.6%  Sparse Intermittent              384         208
+  15339-BB35094                     +202.3%  Sparse Intermittent              786         260
+  15339-BB35095                      +80.8%  Sparse Intermittent               24         125
+  15339-BB35096                      +40.0%  Sparse Intermittent              150         250
+  15339-BB35098                      +56.2%  Sparse Intermittent              114         260
+  1587-BB35041                       +33.1%  Sparse Intermittent              468         700
+  1587-BB35101                       +71.5%  Sparse Intermittent              114         400
+  1587-FF15718                       +40.9%  Sparse Intermittent [BW]         384         650
+  1587-FF22070                       +44.6%  Sparse Intermittent              144         260
+  1587-FF22323                       +44.6%  Sparse Intermittent              216         390
+  1587-FF33568                       +58.5%  Sparse Intermittent            2,472       1,560
+  1587-FF4849                        +30.8%  Sparse Intermittent              270         390
+  1587-FF7260                        +48.1%  Sparse Intermittent              270         520
+  1587-FF7266                        +18.8%  Sparse Intermittent            1,584       1,950
+  1587-FF7372                        +58.1%  Sparse Intermittent            1,644       1,040
+  1587-FF7488                        +29.2%  Sparse Intermittent              276         390
+  1587-FF9297PDQ                     +26.2%  Sparse Intermittent [BW]         576         780
+  16014-BB0094                       +31.5%  Sparse Intermittent            3,156       2,400
+  16014-BB0098                       +51.4%  Sparse Intermittent           10,080       6,660
+  16014-BB0234                        +8.9%  Sparse Intermittent            2,496       2,292
+  16014-BB0235                       +29.7%  Sparse Intermittent            2,646       2,040
+  16415-FF12301/24                   +16.9%  Sparse Intermittent              216         260
+  16415-FF9297/24                   +158.5%  Sparse Intermittent            1,008         390
+  16415-FF9757                       +23.1%  Sparse Intermittent              192         156
+  16415-SF8169                       +47.7%  Sparse Intermittent            1,152         780
+  16553-FF15584                     +300.0%  Sparse Intermittent               96          24
+  16553-FF15585                     +100.0%  Sparse Intermittent               48          24
+  16553-FF15589                     +100.0%  Sparse Intermittent               48          24
+  16553-FF31063                     +300.0%  Sparse Intermittent               96          24
+  16553-FF31064                     +300.0%  Sparse Intermittent               96          24
+  16553-FF31289                      +73.6%  Sparse Intermittent               66         250
+  16553-FF31292                      +90.4%  Sparse Intermittent               24         250
+  16553-FF33546                      +53.8%  Sparse Intermittent [BW]          12          26
+  16553-FF34428                     +100.0%  Sparse Intermittent               48          24
+  16553-FF8652                       +56.8%  Sparse Intermittent              108         250
+  16554-FF33573                      +33.8%  Sparse Intermittent            1,740       1,300
+  16554-FF33872                      +26.2%  Sparse Intermittent            1,920       2,600
+  16554-FF5715                       +51.2%  Sparse Intermittent            7,560       5,000
+  16579-BB0152                       +38.5%  Sparse Intermittent               72          52
+  16579-FF10465                      +69.2%  Sparse Intermittent               24          78
+  16579-FF13877                      +65.4%  Sparse Intermittent               18          52
+  16579-FF13879                      +53.8%  Sparse Intermittent [BW]          24          52
+  16579-FF13880                      +30.8%  Sparse Intermittent               36          52
+  16579-FF13881                      +30.8%  Sparse Intermittent [BW]          36          52
+  16579-FF32652                      +58.3%  Sparse Intermittent            5,004       3,162
+  16579-FF32653                      +53.2%  Sparse Intermittent            5,064       3,306
+  16579-FF32656                      +63.1%  Sparse Intermittent            5,064       3,105
+  16579-FF32657                      +62.1%  Sparse Intermittent            5,004       3,087
+  16579-FF34466                      +59.5%  Sparse Intermittent [BW]       7,920       4,966
+  16579-FF8423                      +100.0%  Sparse Intermittent              288         144
+  16579-FF8424                       +44.6%  Sparse Intermittent              144         260
+  16579-FF8425                       +97.8%  Sparse Intermittent              360         182
+  16579-FF8652                       +38.5%  Sparse Intermittent               72          52
+  16645-FF12301/24                   +10.8%  Sparse Intermittent              288         260
+  16645-FF12837                      +22.3%  Sparse Intermittent              318         260
+  16645-FF18958                       +7.7%  Sparse Intermittent               72          78
+  16645-FF18959                       +7.7%  Sparse Intermittent               72          78
+  16645-FF22317                      +44.6%  Sparse Intermittent               72         130
+  16645-FF22318                      +44.6%  Sparse Intermittent               72         130
+  16645-FF22321                      +81.5%  Sparse Intermittent               24         130
+  16645-FF22323                      +10.8%  Sparse Intermittent              144         130
+  16645-FF26777                      +22.3%  Sparse Intermittent              318         260
+  16645-FF31062                      +42.3%  Sparse Intermittent              150         260
+  16645-FF33567                      +16.9%  Sparse Intermittent              108         130
+  16645-FF33568                       +7.7%  Sparse Intermittent               72          78
+  16645-FF33569                       +7.7%  Sparse Intermittent               72          78
+  16645-FF33570                      +44.6%  Sparse Intermittent               72         130
+  16645-FF33572                      +16.9%  Sparse Intermittent              108         130
+  16645-FF33573                       +7.7%  Sparse Intermittent               72          78
+  16645-FF4577                       +75.4%  Sparse Intermittent              456         260
+  16645-FF5715                       +16.9%  Sparse Intermittent              216         260
+  16645-FF5716                       +66.2%  Sparse Intermittent              432         260
+  16645-FF5952                       +35.4%  Sparse Intermittent              672       1,040
+  16645-FF6989                      +232.3%  Sparse Intermittent              864         260
+  16645-FF8287                       +38.5%  Sparse Intermittent              360         260
+  16645-FF9290/24                    +10.8%  Sparse Intermittent              288         260
+  16645-FF9291PDQ                    +10.8%  Sparse Intermittent              288         260
+  16645-FF9297PDQ                   +121.5%  Sparse Intermittent              576         260
+  16645-FF9298                       +72.3%  Sparse Intermittent              672         390
+  16645-SF8167                       +16.9%  Sparse Intermittent              216         260
+  16645-SF8168                      +232.3%  Sparse Intermittent              864         260
+  16645-SF8169                       +66.2%  Sparse Intermittent              864         520
+  16645-SF8170                      +232.3%  Sparse Intermittent              864         260
+  16645-SF8173                       +10.8%  Sparse Intermittent              144         130
+  16645-SF8174                       +16.9%  Sparse Intermittent              216         260
+  16648-FF4577AU                    +100.0%  Sparse Intermittent                0         130
+  16648-FF7258AU                     +35.4%  Sparse Intermittent              168         260
+  16648-FF8433AU                    +100.0%  Sparse Intermittent                0         130
+  16651-FF18959AU                   +100.0%  Sparse Intermittent                0         130
+  16651-FF8431AU                    +100.0%  Sparse Intermittent                0         130
+  16651-FF8433AU                    +100.0%  Sparse Intermittent                0         130
+  16651-FF9291/24                   +174.1%  Sparse Intermittent            1,776         648
+  16651-FF9297/24                    +12.6%  Sparse Intermittent            2,352       2,088
+  16820-FF16704                      +32.4%  Sparse Intermittent            2,988       4,420
+  16820-FF25895                      +33.7%  Sparse Intermittent            3,360       5,070
+  16820-FF27260                      +30.4%  Sparse Intermittent            3,390       2,600
+  16820-FF7258                       +36.0%  Sparse Intermittent [BW]       9,156      14,300
+  16851-FF10475                      +12.3%  Sparse Intermittent              114         130
+  16851-FF10479                     +153.8%  Sparse Intermittent              330         130
+  16851-FF12300/24                   +39.1%  Sparse Intermittent               96          69
+  16851-FF12301/24                   +10.8%  Sparse Intermittent              144         130
+  16851-FF12302/24                  +176.9%  Sparse Intermittent              360         130
+  16851-FF12655                      +53.8%  Sparse Intermittent              240         520
+  16851-FF31324                      +43.1%  Sparse Intermittent              222         390
+  16851-FF33689PS                    +44.6%  Sparse Intermittent              144         260
+  16851-FF5716                       +44.6%  Sparse Intermittent              216         390
+  16851-FF8287                      +176.9%  Sparse Intermittent              360         130
+  16851-FF9298                      +109.2%  Sparse Intermittent              816         390
+  16851-SF8168                       +10.8%  Sparse Intermittent              288         260
+  16851-SF8170                       +26.2%  Sparse Intermittent              576         780
+  16851-SF8174                      +232.3%  Sparse Intermittent              432         130
+  16852-FF5807                       +25.9%  Sparse Intermittent [BW]       5,664       4,500
+  16852-FF7267                        +5.5%  Sparse Intermittent            1,266       1,200
+  1745-FF15718                       +70.5%  Sparse Intermittent              192         650
+  1745-FF9291PDQ                     +47.7%  Sparse Intermittent              192         130
+  1768-FF13874                       +20.0%  Sparse Intermittent               24          30
+  1770-FF10479                       +65.6%  Sparse Intermittent            3,312       2,000
+  1770-FF4577PS                      +34.7%  Sparse Intermittent            1,176       1,800
+  1770-FF5952                       +286.0%  Sparse Intermittent            4,632       1,200
+  1770-SF8173                       +230.7%  Sparse Intermittent           11,904       3,600
+  18109-BB0235CAN                    +52.3%  Sparse Intermittent            2,742       1,800
+  18109-BB0761CAN                    +72.5%  Sparse Intermittent            4,968       2,880
+  18109-BB26437CAN                  +116.5%  Sparse Intermittent            5,628       2,600
+  18360-BB31256                      +21.1%  Sparse Intermittent            6,942       8,800
+  18360-BB32329                      +68.7%  Sparse Intermittent            2,508       8,000
+  18360-BB34390                      +66.6%  Sparse Intermittent            8,616      25,800
+  18360-BB36796                      +30.6%  Sparse Intermittent            6,942      10,000
+  18360-FF10159                      +40.3%  Sparse Intermittent            8,958      15,000
+  18360-FF10162                      +44.0%  Sparse Intermittent            8,406      15,000
+  18360-FF10475                      +63.3%  Sparse Intermittent            3,672      10,000
+  18360-FF10477                      +11.6%  Sparse Intermittent           11,046      12,500
+  18360-FF10479                      +69.0%  Sparse Intermittent            4,656      15,000
+  18360-FF10530                       +8.8%  Sparse Intermittent            8,208       9,000
+  18360-FF12375                     +331.5%  Sparse Intermittent            5,178       1,200
+  18360-FF12376                      +62.3%  Sparse Intermittent            3,768      10,000
+  18360-FF12378                       +8.3%  Sparse Intermittent            3,666       4,000
+  18360-FF12843                      +29.5%  Sparse Intermittent            6,216       4,800
+  18360-FF14364                      +15.5%  Sparse Intermittent            5,544       4,800
+  18360-FF20207                      +50.8%  Sparse Intermittent            7,374      15,000
+  18360-FF20208                      +29.9%  Sparse Intermittent            7,356      10,500
+  18360-FF20209                      +21.6%  Sparse Intermittent            3,918       5,000
+  18360-FF30755                      +59.7%  Sparse Intermittent            3,024       7,500
+  18360-FF31061                      +42.9%  Sparse Intermittent            1,428       2,500
+  18360-FF31062                      +62.0%  Sparse Intermittent            1,902       5,000
+  18360-FF33637                      +62.6%  Sparse Intermittent            3,366       9,000
+  18360-FF33638                      +30.9%  Sparse Intermittent            6,630       9,600
+  18360-FF33641                      +44.8%  Sparse Intermittent            6,894      12,500
+  18360-FF33876                      +11.7%  Sparse Intermittent            5,298       6,000
+  18360-FF33877                      +76.3%  Sparse Intermittent            2,838      12,000
+  18360-FF37780                      +39.9%  Sparse Intermittent            6,312      10,500
+  18360-FF5716PS                     +77.0%  Sparse Intermittent            4,032      17,500
+  18360-FF6989                       +69.3%  Sparse Intermittent            3,072      10,000
+  18360-FF7110                       +44.7%  Sparse Intermittent            5,532      10,000
+  18360-FF7112                       +53.6%  Sparse Intermittent            4,644      10,000
+  18360-FF7115                       +36.4%  Sparse Intermittent            5,454       4,000
+  18360-FF7118                       +41.0%  Sparse Intermittent            2,820       2,000
+  18360-FF7120                       +41.0%  Sparse Intermittent            1,692       1,200
+  18360-FF7218                      +100.0%  Sparse Intermittent                0       7,200
+  18360-FF7221                       +91.2%  Sparse Intermittent              840       9,600
+  18360-FF7541                       +91.0%  Sparse Intermittent              432       4,800
+  18360-SF8168                       +23.6%  Sparse Intermittent            9,168      12,000
+  18504-BB16997                      +77.8%  Sparse Intermittent               24         108
+  18504-BB16998                      +77.8%  Sparse Intermittent [BW]          24         108
+  18504-BB17000                      +73.3%  Sparse Intermittent               72         270
+  1864-BB27969                       +97.4%  Sparse Intermittent               20         780
+  1864-BB28396                       +95.1%  Sparse Intermittent [BW]          24         494
+  1864-BB31165                       +51.8%  Sparse Intermittent            1,926       3,995
+  1864-BB38924                      +100.0%  Sparse Intermittent                0          40
+  1864-BB38925                     +4220.0%  Sparse Intermittent            1,728          40
+  1864-BB38937                      +320.0%  Sparse Intermittent              168          40
+  1864-BB38938                      +100.0%  Sparse Intermittent                0          40
+  1864-FF11453                       +38.5%  Sparse Intermittent              240         390
+  1864-FF15134                       +72.8%  Sparse Intermittent            1,296         750
+  1864-FF15740                       +88.3%  Sparse Intermittent              768       6,575
+  1864-FF19536                       +44.6%  Sparse Intermittent [BW]         144         260
+  1864-FF19993                     +2484.6%  Sparse Intermittent            2,688         104
+  1864-FF31065                       +26.2%  Sparse Intermittent              192         260
+  1885-FF17562                     +1040.0%  Sparse Intermittent            2,736         240
+  19054-FF31606/6                   +512.1%  Sparse Intermittent            5,142         840
+  19054-FF31608/6                   +512.1%  Sparse Intermittent            5,142         840
+  19054-FF36726                      +93.5%  Sparse Intermittent               13         200
+  19054-FF36727                      +56.0%  Sparse Intermittent               88         200
+  19054-FF6553KIT                    +64.6%  Sparse Intermittent              310         875
+  19645-SF8168                      +112.3%  Sparse Intermittent            3,312       1,560
+  19645-SF8170                       +68.5%  Sparse Intermittent            3,504       2,080
+  19718-FF28459                      +53.8%  Sparse Intermittent              720       1,560
+  19718-FF29833                      +40.0%  Sparse Intermittent              780       1,300
+  19718-FF8990                       +10.5%  Sparse Intermittent [BW]       1,416       1,582
+  19718-FF8991                       +65.2%  Sparse Intermittent              438       1,260
+  19726-FF7258                       +44.6%  Sparse Intermittent            1,128         780
+  19726-FF7266                        +5.4%  Sparse Intermittent              492         520
+  19726-FF7297                       +53.2%  Sparse Intermittent              996         650
+  19790-FF28226                      +72.3%  Sparse Intermittent               36         130
+  19790-FF28227                      +70.0%  Sparse Intermittent               78         260
+  19790-FF4923                       +24.6%  Sparse Intermittent              324         260
+  19790-FF4935                       +10.8%  Sparse Intermittent [BW]         432         390
+  19790-FF4936                       +16.9%  Sparse Intermittent [BW]         648         780
+  19790-FF5766                       +73.8%  Sparse Intermittent [BW]         102         390
+  19790-FF5777                       +76.9%  Sparse Intermittent               60         260
+  19790-FF6637                       +29.2%  Sparse Intermittent              276         390
+  19790-FF7263                       +56.9%  Sparse Intermittent              408         260
+  19790-FF7297                       +72.3%  Sparse Intermittent [BW]         108         390
+  19790-SF8167                       +38.5%  Sparse Intermittent              720         520
+  19790-SF8169                      +149.2%  Sparse Intermittent [BW]       1,296         520
+  19790-SF8170                       +10.8%  Sparse Intermittent [BW]         576         520
+  20227-BB0080                       +85.6%  Sparse Intermittent               36         250
+  20474-FF9291PDQ                    +64.6%  Sparse Intermittent              576       1,625
+  20595-FF10479                       +7.8%  Sparse Intermittent [BW]       1,614       1,750
+  20595-FF15482                      +18.4%  Sparse Intermittent [BW]         408         500
+  20595-FF18958                      +66.4%  Sparse Intermittent [BW]       1,008       3,000
+  20595-FF18959                      +62.4%  Sparse Intermittent [BW]       1,128       3,000
+  20595-FF19341                      +40.8%  Sparse Intermittent [BW]         222         375
+  20595-FF4923                        +9.3%  Sparse Intermittent [BW]         408         450
+  20595-FF8256                       +35.4%  Sparse Intermittent [BW]         252         390
+  20595-FF8258                       +56.8%  Sparse Intermittent              108         250
+  20595-FF8423                       +42.4%  Sparse Intermittent [BW]         288         500
+  20595-FF8651/8                     +17.5%  Sparse Intermittent [BW]       1,184       1,435
+  20595-FF8990/6                     +44.0%  Sparse Intermittent [BW]         420         750
+  20595-FF8991                       +49.7%  Sparse Intermittent [BW]         312         620
+  21023-FF16704                      +53.8%  Sparse Intermittent               24          52
+  21023-FF19341                       +7.7%  Sparse Intermittent               24          26
+  21023-FF8652                       +42.3%  Sparse Intermittent              150         260
+  21025-FF10159                      +47.9%  Sparse Intermittent            3,048       5,850
+  21025-FF10162                      +56.9%  Sparse Intermittent            1,488       3,450
+  21025-FF10475                      +49.2%  Sparse Intermittent            1,830       3,600
+  21025-FF10479                      +26.5%  Sparse Intermittent [BW]       2,976       4,050
+  21025-FF12655                      +69.5%  Sparse Intermittent              732       2,400
+  21025-FF12843                      +15.1%  Sparse Intermittent            2,208       2,600
+  21025-FF12852                      +63.1%  Sparse Intermittent              636         390
+  21025-FF14364                       +8.6%  Sparse Intermittent            2,376       2,600
+  21025-FF20206                      +61.5%  Sparse Intermittent              924       2,400
+  21025-FF20207                      +46.9%  Sparse Intermittent              510         960
+  21025-FF20208                      +15.7%  Sparse Intermittent            1,164       1,380
+  21025-FF31455                      +92.0%  Sparse Intermittent [BW]         768       9,600
+  21025-FF31456                      +85.0%  Sparse Intermittent [BW]       1,440       9,600
+  21025-FF33567                      +30.6%  Sparse Intermittent            2,508       1,920
+  21025-FF33570                      +47.8%  Sparse Intermittent            2,508       4,800
+  21025-FF33571                      +47.8%  Sparse Intermittent            2,508       4,800
+  21025-FF33573                     +134.0%  Sparse Intermittent            2,808       1,200
+  21025-FF34468                      +20.0%  Sparse Intermittent              576         720
+  21025-FF36212                      +40.0%  Sparse Intermittent            1,440       2,400
+  21025-FF36213                      +40.0%  Sparse Intermittent            1,440       2,400
+  21025-FF36214                      +41.5%  Sparse Intermittent            2,340       4,000
+  21025-FF37259                      +28.0%  Sparse Intermittent            1,080       1,500
+  21025-FF37636                      +79.0%  Sparse Intermittent              504       2,400
+  21025-FF4517PS                     +41.5%  Sparse Intermittent            2,808       4,800
+  21025-FF7612                       +16.7%  Sparse Intermittent              600         720
+  21025-FF8423                       +55.7%  Sparse Intermittent [BW]         576       1,300
+  21025-FF8991                       +34.3%  Sparse Intermittent [BW]       1,314       2,000
+  21025-FF9297/24                    +55.6%  Sparse Intermittent [BW]         960       2,160
+  21152-BB0083                       +15.4%  Sparse Intermittent              150         130
+  21152-BB0096                       +16.9%  Sparse Intermittent              108         130
+  21152-BB0098                       +44.6%  Sparse Intermittent               72         130
+  21152-BB0100                       +23.1%  Sparse Intermittent              300         390
+  21152-BB0131                       +33.8%  Sparse Intermittent              348         260
+  21152-BB0149                        +6.6%  Sparse Intermittent              648         608
+  21152-BB0235                       +28.5%  Sparse Intermittent              186         260
+  21152-BB0237                       +84.6%  Sparse Intermittent               12          78
+  21152-BB11483                      +93.8%  Sparse Intermittent               24         390
+  21152-BB15073                      +14.6%  Sparse Intermittent              222         260
+  21152-BB25519                      +44.6%  Sparse Intermittent               72         130
+  21152-BB35032                     +116.0%  Sparse Intermittent               54          25
+  21152-BB35039                     +140.0%  Sparse Intermittent               36          15
+  21152-BB35043                      +80.0%  Sparse Intermittent               72          40
+  21152-BB35093                     +112.3%  Sparse Intermittent              276         130
+  21152-BB35094                     +188.0%  Sparse Intermittent               72          25
+  21152-BB35095                     +188.0%  Sparse Intermittent               72          25
+  21152-BB35096                     +140.0%  Sparse Intermittent               96          40
+  21152-BB35098                      +52.3%  Sparse Intermittent              198         130
+  22008-BB0009                       +39.2%  Sparse Intermittent              912       1,500
+  22008-BB0015                       +68.5%  Sparse Intermittent              378       1,200
+  22008-BB0018                       +49.2%  Sparse Intermittent            3,048       6,000
+  22008-BB0079                       +30.2%  Sparse Intermittent            2,232       3,200
+  22008-BB0081                       +70.6%  Sparse Intermittent              882       3,000
+  22008-BB0082                       +70.2%  Sparse Intermittent            1,074       3,600
+  22008-BB0083                       +27.7%  Sparse Intermittent            1,590       2,200
+  22008-BB0149                       +72.0%  Sparse Intermittent              504       1,800
+  22008-BB0150                       +48.2%  Sparse Intermittent            1,968       3,799
+  22008-BB0152                       +85.0%  Sparse Intermittent              720       4,800
+  22008-BB0191                       +44.0%  Sparse Intermittent            1,008       1,800
+  22008-BB0216                       +72.0%  Sparse Intermittent              840       3,000
+  22008-BB0217                       +71.0%  Sparse Intermittent              870       3,000
+  22008-BB0231                       +67.6%  Sparse Intermittent            5,028       3,000
+  22008-BB0424                       +60.2%  Sparse Intermittent            1,434       3,600
+  22008-BB0435                       +64.0%  Sparse Intermittent            2,592       7,200
+  22008-BB0473                       +71.0%  Sparse Intermittent            1,596       5,500
+  22008-BB0520                       +93.9%  Sparse Intermittent            3,102       1,600
+  22008-BB0578                       +52.8%  Sparse Intermittent            2,832       6,000
+  22008-BB0759                       +48.8%  Sparse Intermittent            3,684       7,200
+  22008-BB0760                       +45.1%  Sparse Intermittent            1,344       2,450
+  22008-BB11603                      +43.0%  Sparse Intermittent              684       1,200
+  22008-BB12028                      +44.0%  Sparse Intermittent            1,008       1,800
+  22008-BB12479                      +53.7%  Sparse Intermittent              834       1,800
+  22008-BB12752                      +44.0%  Sparse Intermittent            1,008       1,800
+  22008-BB15776                      +11.5%  Sparse Intermittent           21,252      24,000
+  22008-BB16534                      +74.6%  Sparse Intermittent            1,524       6,000
+  22008-BB16535                      +49.2%  Sparse Intermittent            3,660       7,200
+  22008-BB16537                      +56.2%  Sparse Intermittent            2,844       6,500
+  22008-BB18835                      +62.3%  Sparse Intermittent            1,584       4,200
+  22008-BB19109                      +64.9%  Sparse Intermittent            1,686       4,800
+  22008-BB19112                      +53.5%  Sparse Intermittent            1,674       3,600
+  22008-BB19113                      +70.0%  Sparse Intermittent              810       2,700
+  22008-BB21235                      +59.5%  Sparse Intermittent            1,824       4,500
+  22008-BB21237                      +63.6%  Sparse Intermittent            2,004       5,500
+  22008-BB21641                      +58.5%  Sparse Intermittent            2,280       5,500
+  22008-BB21643                      +72.0%  Sparse Intermittent              504       1,800
+  22008-BB21644                      +63.2%  Sparse Intermittent            2,208       6,000
+  22008-BB21951                      +55.1%  Sparse Intermittent            3,594       8,000
+  22008-BB22116                      +65.2%  Sparse Intermittent            3,828      11,000
+  22008-BB22272                      +60.0%  Sparse Intermittent            1,440       3,600
+  22008-BB24711                      +48.9%  Sparse Intermittent            1,840       3,600
+  22008-BB26921                      +67.3%  Sparse Intermittent            1,176       3,600
+  22008-BB26922                      +48.1%  Sparse Intermittent            1,038       2,000
+  22008-BB26924                      +60.1%  Sparse Intermittent            2,592       6,500
+  22008-BB27359                      +80.0%  Sparse Intermittent              480       2,400
+  22008-BB28473                      +32.3%  Sparse Intermittent [BW]      30,816      45,492
+  22008-BB28480                      +32.3%  Sparse Intermittent [BW]      47,196      69,672
+  22008-BB28719                      +32.3%  Sparse Intermittent [BW]      44,484      65,664
+  22008-BB28720                      +32.5%  Sparse Intermittent           39,912      59,100
+  22008-BB29477                      +32.3%  Sparse Intermittent [BW]      39,084      57,696
+  22008-BB29712                      +56.6%  Sparse Intermittent            2,820       6,500
+  22008-BB29713                      +35.1%  Sparse Intermittent            1,752       2,700
+  22008-BB29714                      +43.0%  Sparse Intermittent            3,420       6,000
+  22008-BB30176                      +33.3%  Sparse Intermittent            2,400       3,600
+  22008-BB30279                      +23.3%  Sparse Intermittent            1,776       1,440
+  22008-BB30424                      +80.0%  Sparse Intermittent              480       2,400
+  22008-BB30587                      +65.6%  Sparse Intermittent              930       2,700
+  22008-BB32329                      +43.8%  Sparse Intermittent            1,686       3,000
+  22008-BB32892                      +81.5%  Sparse Intermittent            3,888      21,000
+  22008-BB34751                      +50.0%  Sparse Intermittent              900       1,800
+  22008-BB35032                     +316.0%  Sparse Intermittent            2,496         600
+  22008-BB35041                      +27.2%  Sparse Intermittent            1,092       1,500
+  22008-BB35095                      +30.7%  Sparse Intermittent            2,496       3,600
+  22008-BB35098                     +236.0%  Sparse Intermittent            2,016         600
+  22008-BB35237                      +57.5%  Sparse Intermittent              510       1,200
+  22008-BB36670                       +7.8%  Sparse Intermittent            1,941       1,800
+  22008-BB36671                      +67.0%  Sparse Intermittent              396       1,200
+  22008-BB38466                     +100.0%  Sparse Intermittent                0      31,050
+  22008-FF10159                      +54.8%  Sparse Intermittent            2,124       4,700
+  22008-FF10162                      +87.1%  Sparse Intermittent              606       4,700
+  22008-FF10475                      +88.1%  Sparse Intermittent              720       6,050
+  22008-FF10477                      +90.0%  Sparse Intermittent              606       6,050
+  22008-FF14365                      +44.6%  Sparse Intermittent            1,080       1,950
+  22008-FF31324                      +65.5%  Sparse Intermittent            1,656       4,800
+  22020-BB28473                      +42.8%  Sparse Intermittent              372         650
+  22020-BB28480                      +42.8%  Sparse Intermittent              372         650
+  22020-BB28719                      +42.8%  Sparse Intermittent              372         650
+  22020-BB29477                      +42.8%  Sparse Intermittent              372         650
+  22233-FF5715PS                    +176.9%  Sparse Intermittent              216          78
+  22233-FF5716PS                    +232.3%  Sparse Intermittent              432         130
+  22233-SF8167PS                     +67.4%  Sparse Intermittent              144         442
+  22233-SF8168                       +60.0%  Sparse Intermittent              624         390
+  22233-SF8169PS                     +51.0%  Sparse Intermittent              432         286
+  22233-SF8170PS                    +176.9%  Sparse Intermittent              144          52
+  22258-BB34751                      +76.9%  Sparse Intermittent               12          52
+  23011-BB0092PCS2                   +30.8%  Sparse Intermittent               90         130
+  23011-BB0098PCS2                   +87.7%  Sparse Intermittent               96         780
+  23011-BB0100PCS2                   +96.7%  Sparse Intermittent               84       2,540
+  23011-BB26413PCS2                  +44.6%  Sparse Intermittent               72         130
+  23011-BB33706PDQ                   +77.0%  Sparse Intermittent           15,054      65,331
+  23011-BB38564PDQ                   +85.3%  Sparse Intermittent           11,280      76,493
+  23011-BB38585PDQ                   +92.3%  Sparse Intermittent            5,940      76,827
+  23011-BB38904PDQ                   +72.3%  Sparse Intermittent           54,192     195,289
+  23011-BB38905PDQ                  +100.0%  Sparse Intermittent                0     246,723
+  23011-FF18956                      +63.1%  Sparse Intermittent               96         260
+  23011-FF22072                      +60.0%  Sparse Intermittent              192         480
+  23011-FF23346                      +21.5%  Sparse Intermittent              204         260
+  23011-FF25689                     +287.7%  Sparse Intermittent              504         130
+  23011-FF27687                      +72.3%  Sparse Intermittent               72         260
+  23011-FF30361                     +103.1%  Sparse Intermittent              264         130
+  23011-FF30364                     +232.3%  Sparse Intermittent              432         130
+  23011-FF30755                      +64.6%  Sparse Intermittent              414       1,170
+  23011-FF31605                      +56.2%  Sparse Intermittent              228         520
+  23011-FF31606                      +70.5%  Sparse Intermittent              180         610
+  23011-FF31607                      +23.1%  Sparse Intermittent              300         390
+  23011-FF32149                      +53.8%  Sparse Intermittent              120         260
+  23011-FF8258                       +53.8%  Sparse Intermittent              180         390
+  23011-FF8991                       +96.7%  Sparse Intermittent               24         728
+  23018-FF5772                       +62.9%  Sparse Intermittent            1,128       3,041
+  23018-FF5773                       +74.5%  Sparse Intermittent              774       3,041
+  23018-FF6560                       +64.5%  Sparse Intermittent              960       2,704
+  23651-FF10159                      +76.7%  Sparse Intermittent               42         180
+  23651-FF10475                     +110.0%  Sparse Intermittent              420         200
+  23651-FF10477                      +35.4%  Sparse Intermittent              468         724
+  23651-FF10479                     +155.0%  Sparse Intermittent              612         240
+  23651-FF10530                      +46.7%  Sparse Intermittent            1,056         720
+  23651-FF12655                      +47.5%  Sparse Intermittent              546       1,040
+  23651-FF12656                     +196.9%  Sparse Intermittent            1,158         390
+  23651-FF15588                      +17.8%  Sparse Intermittent            1,176       1,430
+  23651-FF20206                      +10.4%  Sparse Intermittent            1,242       1,125
+  23651-FF20207                      +20.0%  Sparse Intermittent              600         750
+  23651-FF20210                       +7.7%  Sparse Intermittent              420         390
+  23651-FF26777                      +76.9%  Sparse Intermittent              690         390
+  23651-FF31061                      +13.8%  Sparse Intermittent              444         390
+  23651-FF31062                      +76.9%  Sparse Intermittent              690         390
+  23651-FF31325                     +114.4%  Sparse Intermittent              804         375
+  23651-FF33872                       +5.6%  Sparse Intermittent              816         864
+  23651-FF6989                       +14.3%  Sparse Intermittent              576         672
+  23651-FF8287                      +260.0%  Sparse Intermittent            1,080         300
+  23651-FF9297PDQ                   +340.0%  Sparse Intermittent            1,056         240
+  23651-SF8168                       +23.8%  Sparse Intermittent            1,584       2,080
+  23651-SF8170                       +10.4%  Sparse Intermittent            1,344       1,500
+  23685-BB37431                      +65.9%  Sparse Intermittent            3,984      11,700
+  23685-BB37432                      +54.8%  Sparse Intermittent            6,696      14,820
+  23685-BB37433                      +55.6%  Sparse Intermittent            6,696      15,080
+  23685-FF13154                      +28.4%  Sparse Intermittent [BW]       6,678       5,200
+  23685-FF7258                       +53.7%  Sparse Intermittent            3,996       2,600
+  23685-FF7260                       +40.3%  Sparse Intermittent            1,242       2,080
+  23685-FF7263                       +75.6%  Sparse Intermittent              444       1,820
+  23685-FF7266                      +123.8%  Sparse Intermittent            3,492       1,560
+  23685-FF7267                       +33.1%  Sparse Intermittent              870       1,300
+  23685-FF7297                       +18.1%  Sparse Intermittent [BW]       1,704       2,080
+  23685-FF8256                       +21.2%  Sparse Intermittent [BW]       1,476       1,872
+  23685-FF8258                       +16.9%  Sparse Intermittent            1,944       2,340
+  23685-FF8990                       +49.6%  Sparse Intermittent            3,540       7,020
+  23685-FF9297PDQ                    +52.3%  Sparse Intermittent            3,168       2,080
+  26175-FF4775                       +19.7%  Sparse Intermittent [BW]         522         650
+  26175-FF7266                       +28.5%  Sparse Intermittent [BW]         372         520
+  2659-BB0424                        +85.1%  Sparse Intermittent              504       3,380
+  2659-BB16316                       +34.1%  Sparse Intermittent            1,320       2,002
+  2659-BB16534                       +97.2%  Sparse Intermittent               96       3,380
+  2659-BB21058/6                     +78.5%  Sparse Intermittent              558       2,600
+  2659-BB26924                       +40.7%  Sparse Intermittent [BW]       1,280       2,160
+  2659-BB28720                       +96.3%  Sparse Intermittent              144       3,900
+  2659-BB30424                       +87.4%  Sparse Intermittent              132       1,050
+  2659-BB34389                       +85.8%  Sparse Intermittent              552       3,900
+  2659-BB34390                       +21.5%  Sparse Intermittent            2,448       3,120
+  2953-FF8287                         +7.7%  Sparse Intermittent [BW]         360         390
+  2953-FF9290/24                     +26.2%  Sparse Intermittent               96         130
+  2953-FF9291/24                     +47.7%  Sparse Intermittent              192         130
+  2953-SF8167                        +10.8%  Sparse Intermittent [BW]         432         390
+  2973-FF12842                       +52.0%  Sparse Intermittent              456         950
+  2973-FF12853                       +49.5%  Sparse Intermittent              480         950
+  2973-FF20206                       +43.2%  Sparse Intermittent              384         676
+  2973-FF20210                       +43.2%  Sparse Intermittent              384         676
+  2973-FF31324                       +25.4%  Sparse Intermittent              504         676
+  2973-FF31326                       +14.8%  Sparse Intermittent              576         676
+  2973-FF31327                       +14.8%  Sparse Intermittent              576         676
+  2973-FF33413                       +14.8%  Sparse Intermittent              576         676
+  2973-FF4775                        +14.8%  Sparse Intermittent              576         676
+  2973-FF4930                        +46.7%  Sparse Intermittent              360         676
+  2973-FF4936                        +26.9%  Sparse Intermittent            1,008       1,378
+  2973-FF7258                        +26.9%  Sparse Intermittent            1,008       1,378
+  2973-FF7266                        +20.1%  Sparse Intermittent              540         676
+  2973-FF7267                        +14.8%  Sparse Intermittent              576         676
+  3080-FF11899CA                     +61.6%  Sparse Intermittent              672       1,750
+  3080-FF6634                       +103.0%  Sparse Intermittent [BW]       2,826       1,392
+  3080-FF6636                        +18.6%  Sparse Intermittent [BW]       3,150       3,870
+  3080-FF6637                        +13.9%  Sparse Intermittent [BW]       3,276       3,804
+  3080-FF6638                        +42.0%  Sparse Intermittent [BW]       4,848       3,414
+  3080-FF6639                        +22.4%  Sparse Intermittent [BW]       3,804       3,108
+  3080-FF9290CA                      +59.7%  Sparse Intermittent [BW]         504       1,250
+  3080-FF9291CA                      +48.4%  Sparse Intermittent [BW]       1,032       2,000
+  3102-FF11349                       +92.3%  Sparse Intermittent               12         156
+  3102-FF11964                       +47.7%  Sparse Intermittent              192         130
+  3102-FF12354                       +61.5%  Sparse Intermittent [BW]          30          78
+  3102-FF12824                        +7.7%  Sparse Intermittent               84          78
+  3102-FF15718                       +70.5%  Sparse Intermittent [BW]         384       1,300
+  3102-FF16341                       +15.4%  Sparse Intermittent               66          78
+  3102-FF18913                        +7.7%  Sparse Intermittent [BW]         144         156
+  3102-FF25708                       +26.2%  Sparse Intermittent              192         260
+  3102-FF27260                       +53.8%  Sparse Intermittent               36          78
+  3102-FF28400                      +100.0%  Sparse Intermittent                0         130
+  3102-FF30364                       +20.0%  Sparse Intermittent [BW]         312         260
+  3102-FF31196                       +30.8%  Sparse Intermittent [BW]          54          78
+  3102-FF32654                       +63.1%  Sparse Intermittent [BW]          96         260
+  3102-FF32824                       +50.8%  Sparse Intermittent              192         390
+  3102-FF33542                       +94.2%  Sparse Intermittent              144       2,496
+  3102-FF33876                       +84.6%  Sparse Intermittent               12          78
+  3102-FF34466                      +976.9%  Sparse Intermittent              840          78
+  3102-FF36250                       +53.8%  Sparse Intermittent              120          78
+  3102-FF36291                       +38.5%  Sparse Intermittent              144         104
+  3102-FF36294                       +61.5%  Sparse Intermittent [BW]          60         156
+  3102-FF36295                       +69.2%  Sparse Intermittent [BW]          48         156
+  3102-FF36326                       +62.2%  Sparse Intermittent              246         650
+  3102-FF36327                       +74.2%  Sparse Intermittent              168         650
+  3102-FF36328                       +63.1%  Sparse Intermittent               96         260
+  3102-FF36329                       +63.1%  Sparse Intermittent               96         260
+  3102-FF36663                       +23.1%  Sparse Intermittent [BW]          96          78
+  3102-FF37636                       +53.8%  Sparse Intermittent              120          78
+  3102-FF37638                       +38.5%  Sparse Intermittent               48          78
+  3102-FF37780                       +84.6%  Sparse Intermittent              144          78
+  3102-FF38327                       +84.6%  Sparse Intermittent              192       1,250
+  3102-FF38368                      +515.4%  Sparse Intermittent              480          78
+  3102-FF5716                        +44.6%  Sparse Intermittent              216         390
+  3102-FF6639                        +30.8%  Sparse Intermittent               18          26
+  3102-FF7260                        +30.8%  Sparse Intermittent               72         104
+  3102-FF7542                       +100.0%  Sparse Intermittent                0         156
+  3102-FF7549                        +44.6%  Sparse Intermittent              144         260
+  3102-FF8287                        +53.8%  Sparse Intermittent              600         390
+  3102-FF8433                         +7.7%  Sparse Intermittent              192         208
+  3102-FF9362                        +84.6%  Sparse Intermittent               48         312
+  33011-BB26413                      +63.1%  Sparse Intermittent               48         130
+  33011-BB26587                     +124.0%  Sparse Intermittent              560         250
+  33011-BB26737                      +30.8%  Sparse Intermittent              180         260
+  33011-BB26739                      +20.0%  Sparse Intermittent              208         260
+  33011-BB28361                      +84.6%  Sparse Intermittent [BW]         100         650
+  33011-BB35522                       +8.8%  Sparse Intermittent              474         520
+  33011-FF30399                      +23.8%  Sparse Intermittent              396         520
+  33011-FF31823                      +71.3%  Sparse Intermittent              390       1,360
+  33011-FF32365                      +23.1%  Sparse Intermittent [BW]         400         520
+  3340-BB0759                       +100.0%  Sparse Intermittent            2,400       1,200
+  3460-BB35032                       +11.4%  Sparse Intermittent              186         210
+  3460-BB35039                       +12.0%  Sparse Intermittent              168         150
+  3460-BB35043                       +25.0%  Sparse Intermittent              180         240
+  3460-BB35093                       +40.0%  Sparse Intermittent              336         240
+  3460-BB35094                       +81.7%  Sparse Intermittent              516         284
+  3460-BB35095                       +11.4%  Sparse Intermittent              468         420
+  3460-BB35096                      +105.8%  Sparse Intermittent              708         344
+  3460-BB35098                       +21.5%  Sparse Intermittent              270         344
+  3466-BB35043                       +68.9%  Sparse Intermittent [BW]       2,232       7,180
+  3466-BB35097                       +79.9%  Sparse Intermittent              330       1,642
+  3466-BB35098                       +92.6%  Sparse Intermittent              114       1,550
+  3466-FF10159                       +70.0%  Sparse Intermittent              540       1,800
+  3466-FF10475                       +54.7%  Sparse Intermittent [BW]       1,044       2,304
+  3466-FF10477                       +57.1%  Sparse Intermittent            2,556       5,956
+  3466-FF18958                       +52.0%  Sparse Intermittent [BW]         288         600
+  3466-FF22323                       +73.3%  Sparse Intermittent              240         900
+  3466-FF7488                        +46.9%  Sparse Intermittent [BW]       2,676       5,035
+  3466-FF7612                        +84.6%  Sparse Intermittent              480         260
+  3466-FF7613                        +44.6%  Sparse Intermittent               72         130
+  3466-FF8258                        +63.1%  Sparse Intermittent              144         390
+  3466-FF8423                        +86.2%  Sparse Intermittent              108         780
+  3466-FF8425                        +65.4%  Sparse Intermittent              180         520
+  3466-FF8991                        +80.9%  Sparse Intermittent              348       1,820
+  3700-BB0083                        +29.1%  Sparse Intermittent              258         364
+  3700-BB0235                        +26.2%  Sparse Intermittent [BW]         192         260
+  3700-BB13435CLR                    +70.8%  Sparse Intermittent              114         390
+  3700-BB13436CLR                    +44.6%  Sparse Intermittent               72         130
+  3700-BB13437CLR                    +83.1%  Sparse Intermittent               66         390
+  3700-BB22272                       +17.4%  Sparse Intermittent            2,136       1,820
+  3700-BB31704                      +174.9%  Sparse Intermittent            7,506       2,730
+  3700-BB35093                       +36.9%  Sparse Intermittent              246         390
+  3700-BB35095                       +35.4%  Sparse Intermittent              336         520
+  3700-BB35096                       +26.9%  Sparse Intermittent              660         520
+  3700-BB38466                       +46.8%  Sparse Intermittent            4,008       2,730
+  3837-FF10477MX                     +49.5%  Sparse Intermittent            7,470       4,996
+  3837-FF10479MX                     +28.6%  Sparse Intermittent            9,012       7,006
+  3837-FF12659MX                     +12.8%  Sparse Intermittent            3,948       4,528
+  3837-FF12858MX                     +32.9%  Sparse Intermittent            7,804       5,872
+  3837-FF14468MX                     +23.2%  Sparse Intermittent            2,982       2,420
+  3837-FF15718MX                     +47.4%  Sparse Intermittent            6,192       4,200
+  3837-FF19592MX                      +5.2%  Sparse Intermittent            1,578       1,500
+  3837-FF20001MX                    +151.8%  Sparse Intermittent            7,056       2,802
+  3837-FF4933MX                     +115.0%  Sparse Intermittent            2,580       1,200
+  3837-FF4934MX                      +78.8%  Sparse Intermittent            1,788       1,000
+  3837-FF4935MX                     +206.0%  Sparse Intermittent            2,142         700
+  3837-FF8258MX                      +16.2%  Sparse Intermittent            2,790       2,400
+  3837-FF8301MX                      +87.0%  Sparse Intermittent               78         600
+  3837-FF8423MX                       +6.5%  Sparse Intermittent            5,610       6,000
+  3837-FF9290MX                      +11.7%  Sparse Intermittent            4,422       5,010
+  3837-FF9291MX                      +62.4%  Sparse Intermittent            9,240       5,688
+  3837-FF9297MX                     +114.5%  Sparse Intermittent           19,950       9,300
+  3837-FF9298MX                      +88.8%  Sparse Intermittent            3,624       1,920
+  3882-FF7258                        +74.2%  Sparse Intermittent              906         520
+  3882-FF7260                        +38.5%  Sparse Intermittent              540         390
+  3882-FF7266                         +5.4%  Sparse Intermittent              492         520
+  3892-BB0082                        +63.1%  Sparse Intermittent              192         520
+  3892-BB0092                        +47.5%  Sparse Intermittent              252         480
+  3892-BB0098                        +10.8%  Sparse Intermittent            1,284       1,440
+  3892-BB0102                        +18.0%  Sparse Intermittent [BW]       1,476       1,800
+  3892-BB11417                      +197.2%  Sparse Intermittent            2,568         864
+  3892-BB28473                       +74.0%  Sparse Intermittent              744       2,860
+  3892-BB28480                       +47.4%  Sparse Intermittent [BW]         984       1,872
+  3892-BB28719                       +28.8%  Sparse Intermittent            1,296       1,820
+  3892-BB28720                       +62.2%  Sparse Intermittent              492       1,300
+  3892-BB29477                       +42.8%  Sparse Intermittent              744       1,300
+  3892-BB35032                       +81.1%  Sparse Intermittent              720       3,816
+  3892-BB35041                       +27.0%  Sparse Intermittent [BW]         858       1,176
+  3892-BB35043                       +45.0%  Sparse Intermittent            1,320       2,400
+  3892-BB35094                       +81.7%  Sparse Intermittent              750       4,100
+  3892-BB35101                       +41.7%  Sparse Intermittent [BW]         504         864
+  3892-FF4776                         +6.7%  Sparse Intermittent              222         208
+  3892-FF5776                        +27.5%  Sparse Intermittent              132         182
+  3892-FF7258                        +81.5%  Sparse Intermittent              708         390
+  3892-FF7263                       +278.5%  Sparse Intermittent              492         130
+  3892-FF7266                       +107.7%  Sparse Intermittent              270         130
+  4524-BB0012                        +56.8%  Sparse Intermittent            1,554       3,600
+  4524-BB0018                        +56.8%  Sparse Intermittent            1,554       3,600
+  4524-BB0079                        +29.5%  Sparse Intermittent            1,692       2,400
+  4524-BB0081                        +30.0%  Sparse Intermittent              672         960
+  4524-BB0083                        +29.5%  Sparse Intermittent            1,692       2,400
+  4524-BB0149                        +64.0%  Sparse Intermittent              864       2,400
+  4524-BB0150                        +56.0%  Sparse Intermittent            1,056       2,400
+  4524-BB0151                        +30.0%  Sparse Intermittent            1,680       2,400
+  4524-BB0152                        +64.0%  Sparse Intermittent              864       2,400
+  4524-BB0191                        +59.0%  Sparse Intermittent            1,968       4,800
+  4524-BB0216                        +29.4%  Sparse Intermittent            1,356       1,920
+  4524-BB0217                        +24.7%  Sparse Intermittent            2,394       1,920
+  4524-BB0409                        +64.7%  Sparse Intermittent              678       1,920
+  4524-BB0722                        +30.0%  Sparse Intermittent            1,344       1,920
+  4524-BB11603                       +30.0%  Sparse Intermittent            2,016       2,880
+  4524-BB12019                       +60.0%  Sparse Intermittent              960       2,400
+  4524-BB12479                       +65.0%  Sparse Intermittent              336         960
+  4524-BB16450                       +64.0%  Sparse Intermittent              864       2,400
+  4524-BB16534                       +70.8%  Sparse Intermittent            1,404       4,800
+  4524-BB16535                       +47.2%  Sparse Intermittent            2,532       4,800
+  4524-BB16537                       +88.0%  Sparse Intermittent              288       2,400
+  4524-BB19110                       +50.2%  Sparse Intermittent              498       1,000
+  4524-BB19112                       +73.6%  Sparse Intermittent              264       1,000
+  4524-BB19113                       +50.2%  Sparse Intermittent              498       1,000
+  4524-BB21038                       +60.0%  Sparse Intermittent              360         900
+  4524-BB21235                       +56.0%  Sparse Intermittent            1,584       3,600
+  4524-BB21237                       +41.3%  Sparse Intermittent            2,112       3,600
+  4524-BB21626                       +12.0%  Sparse Intermittent            5,040       4,500
+  4524-BB21641                       +30.0%  Sparse Intermittent            1,680       2,400
+  4524-BB21642                       +64.0%  Sparse Intermittent              864       2,400
+  4524-BB21644                       +70.5%  Sparse Intermittent              708       2,400
+  4524-BB22025                       +15.2%  Sparse Intermittent            5,184       4,500
+  4524-BB22094                       +15.2%  Sparse Intermittent            5,184       4,500
+  4524-BB22095                       +12.0%  Sparse Intermittent            5,040       4,500
+  4524-BB22272                       +13.3%  Sparse Intermittent            3,120       3,600
+  4524-BB23576                       +64.0%  Sparse Intermittent              864       2,400
+  4524-BB24711                       +53.3%  Sparse Intermittent            1,680       3,600
+  4524-BB26922                       +73.6%  Sparse Intermittent              264       1,000
+  4524-BB26924                       +71.1%  Sparse Intermittent              416       1,440
+  4524-BB28163                       +46.7%  Sparse Intermittent              960       1,800
+  4524-BB29561                       +70.5%  Sparse Intermittent              708       2,400
+  4524-BB29713                        +6.4%  Sparse Intermittent            4,494       4,800
+  4524-BB29714                       +64.8%  Sparse Intermittent            1,014       2,880
+  4524-BB30279                       +47.0%  Sparse Intermittent            1,272       2,400
+  4524-BB30930                       +30.0%  Sparse Intermittent            1,680       2,400
+  4524-BB34403                       +53.3%  Sparse Intermittent              840       1,800
+  4524-BB34751                        +6.7%  Sparse Intermittent            1,680       1,800
+  4524-FF10530                       +80.0%  Sparse Intermittent              480       2,400
+  4524-FF12843                        +9.5%  Sparse Intermittent            2,172       2,400
+  4524-FF20208                       +82.0%  Sparse Intermittent              432       2,400
+  4524-FF5716                        +61.6%  Sparse Intermittent              576       1,500
+  4524-FF5952                        +52.0%  Sparse Intermittent              912         600
+  4524-FF9298                        +20.0%  Sparse Intermittent              480         600
+  4524-SF8168                        +60.7%  Sparse Intermittent              864       2,200
+  4524-SF8170                        +70.5%  Sparse Intermittent              384       1,300
+  4651-BB0131                        +95.9%  Sparse Intermittent               36         885
+  4651-BB12021                       +42.3%  Sparse Intermittent               30          52
+  4651-BB16532                      +100.0%  Sparse Intermittent                0         130
+  4651-BB19242                       +64.1%  Sparse Intermittent [BW]         140         390
+  5330-FF7215                        +31.6%  Sparse Intermittent            1,956       2,860
+  5330-FF7541                        +39.1%  Sparse Intermittent              792       1,300
+  5330-FF9060                        +59.7%  Sparse Intermittent            1,572       3,900
+  6111-FF10159                       +86.2%  Sparse Intermittent [BW]         726         390
+  6111-FF10475                       +87.7%  Sparse Intermittent [BW]         732         390
+  6111-FF10477                       +68.5%  Sparse Intermittent              438         260
+  6111-FF11348/6                     +48.0%  Sparse Intermittent            2,370       4,560
+  6111-FF11899/24                    +44.0%  Sparse Intermittent              864         600
+  6111-FF12300/24                   +100.0%  Sparse Intermittent            1,560         780
+  6111-FF12301/24                    +50.8%  Sparse Intermittent            1,176         780
+  6111-FF12302/24                    +69.8%  Sparse Intermittent [BW]       1,104         650
+  6111-FF16704                       +60.8%  Sparse Intermittent              408       1,040
+  6111-FF27258                       +34.2%  Sparse Intermittent            1,074         800
+  6111-FF27261                       +74.0%  Sparse Intermittent [BW]       1,044         600
+  6111-FF27263                       +16.0%  Sparse Intermittent              336         400
+  6111-FF27265                      +126.5%  Sparse Intermittent              906         400
+  6111-FF27266                       +65.0%  Sparse Intermittent              660         400
+  6111-FF33868                       +34.5%  Sparse Intermittent [BW]       1,224         910
+  6111-FF5952                       +202.8%  Sparse Intermittent            1,968         650
+  6111-FF9290/24                     +23.8%  Sparse Intermittent              792       1,040
+  6111-FF9291/24                      +6.2%  Sparse Intermittent            1,656       1,560
+  6111-SF8169                        +77.2%  Sparse Intermittent            1,152         650
+  6111-SF8173                       +140.0%  Sparse Intermittent              384         160
+  6386-FF12300/24                    +66.2%  Sparse Intermittent              216         130
+  6386-FF12302/24                   +453.8%  Sparse Intermittent              144          26
+  6386-FF15588                       +53.8%  Sparse Intermittent               72         156
+  6386-FF7613                        +66.2%  Sparse Intermittent              216         130
+  6386-FF7619                        +38.5%  Sparse Intermittent              180         130
+  6579-FF22077                       +52.2%  Sparse Intermittent            1,368       2,860
+  6579-FF33567                       +17.8%  Sparse Intermittent            1,368       1,664
+  6579-FF33568                       +40.1%  Sparse Intermittent              996       1,664
+  6579-FF33569                       +22.1%  Sparse Intermittent            1,296       1,664
+  6579-FF33571                       +58.9%  Sparse Intermittent              684       1,664
+  6579-FF33572                       +40.1%  Sparse Intermittent              996       1,664
+  6579-FF33573                       +40.1%  Sparse Intermittent              996       1,664
+  6579-FF7540                       +194.6%  Sparse Intermittent            1,320         448
+  6579-FF7541                       +130.4%  Sparse Intermittent            1,032         448
+  6579-FF9256                       +264.3%  Sparse Intermittent            1,632         448
+  7199-BB0080                        +59.2%  Sparse Intermittent              978       2,400
+  7199-BB0081                        +59.1%  Sparse Intermittent              786       1,920
+  7199-BB0082                        +59.4%  Sparse Intermittent              390         960
+  7199-BB0473                        +59.2%  Sparse Intermittent              588       1,440
+  7199-BB0760                        +59.2%  Sparse Intermittent              588       1,440
+  7199-BB16534                       +70.0%  Sparse Intermittent              432       1,440
+  7199-BB16535                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB16537                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB16702                       +93.3%  Sparse Intermittent              108       1,608
+  7199-BB19109                       +59.4%  Sparse Intermittent              390         960
+  7199-BB19110                       +59.4%  Sparse Intermittent              390         960
+  7199-BB19112                       +59.4%  Sparse Intermittent              390         960
+  7199-BB22118                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB26921                       +59.2%  Sparse Intermittent              294         720
+  7199-BB26922                       +59.2%  Sparse Intermittent              294         720
+  7199-BB26923                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB26924                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB29122                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB30279                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB33528                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB33534                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB34389                       +59.2%  Sparse Intermittent              588       1,440
+  7199-BB34751                       +59.2%  Sparse Intermittent            1,176       2,880
+  7199-BB35237                       +59.2%  Sparse Intermittent              783       1,920
+  7199-BB36558                       +70.0%  Sparse Intermittent              576       1,920
+  7291-BB0018                        +21.0%  Sparse Intermittent            1,992       2,520
+  7291-BB0216                        +40.0%  Sparse Intermittent            1,512       2,520
+  7291-BB0409                        +24.7%  Sparse Intermittent            1,356       1,800
+  7291-BB0424                         +8.0%  Sparse Intermittent            1,656       1,800
+  7291-BB16853                       +15.3%  Sparse Intermittent            2,076       1,800
+  7291-BB16854                       +15.3%  Sparse Intermittent            2,076       1,800
+  7291-BB28473                       +25.5%  Sparse Intermittent            8,808       7,020
+  7291-BB28480                       +12.9%  Sparse Intermittent            8,808       7,800
+  7291-BB29477                       +11.4%  Sparse Intermittent [BW]       8,688       7,800
+  7291-BB35032                       +30.8%  Sparse Intermittent            1,860       2,688
+  7291-BB35039                       +25.0%  Sparse Intermittent            1,800       2,400
+  7291-BB35043                       +20.7%  Sparse Intermittent            1,332       1,680
+  7291-BB35093                       +27.0%  Sparse Intermittent            2,628       3,600
+  7291-BB35094                        +7.1%  Sparse Intermittent            2,340       2,520
+  7291-BB35095                        +6.6%  Sparse Intermittent            3,732       3,500
+  7291-BB35096                       +27.3%  Sparse Intermittent            2,442       3,360
+  7291-BB35098                       +34.2%  Sparse Intermittent            1,326       2,016
+  8055-BB35039                       +41.4%  Sparse Intermittent            1,188         840
+  8055-BB35093                       +70.3%  Sparse Intermittent              564       1,900
+  8055-BB35094                       +43.9%  Sparse Intermittent              786       1,400
+  8055-BB35095                       +52.9%  Sparse Intermittent              876       1,860
+  8055-BB35096                       +79.2%  Sparse Intermittent              498       2,400
+  8423-FF4775HL                     +127.1%  Sparse Intermittent [BW]       2,226         980
+  8423-FF7258HL                     +130.8%  Sparse Intermittent [BW]       2,262         980
+  8423-FF7267HL                      +45.3%  Sparse Intermittent            2,034       1,400
+  8423-FF7488HL                      +89.9%  Sparse Intermittent [BW]       1,614         850
+  8692-FF8423                        +38.5%  Sparse Intermittent              108          78
+  8919-FF7110                        +42.0%  Sparse Intermittent            1,704       1,200
+  8919-FF7112                        +49.7%  Sparse Intermittent            1,392         930
+  8919-SF8168                        +61.6%  Sparse Intermittent            2,064       5,376
+  8940-FF10159                       +37.4%  Sparse Intermittent [BW]         474         345
+  8940-FF10162                       +27.0%  Sparse Intermittent [BW]         168         230
+  8940-FF10475                       +35.7%  Sparse Intermittent [BW]         312         230
+  8940-FF33567                       +55.0%  Sparse Intermittent              744         480
+  8940-FF33568                       +55.0%  Sparse Intermittent              744         480
+  8940-FF33569                       +55.0%  Sparse Intermittent              744         480
+  8940-FF33570                       +17.5%  Sparse Intermittent              564         480
+  8940-FF33571                       +17.5%  Sparse Intermittent              564         480
+  8940-FF33572                       +55.0%  Sparse Intermittent              744         480
+  8940-FF33688PS                     +11.3%  Sparse Intermittent [BW]       1,152       1,035
+  8940-FF33689PS                     +76.2%  Sparse Intermittent            1,824       1,035
+  8940-FF4517PS                     +102.2%  Sparse Intermittent [BW]       2,184       1,080
+  8940-FF4577PS                      +20.0%  Sparse Intermittent [BW]         960       1,200
+  8940-FF5715PS                      +44.0%  Sparse Intermittent [BW]       1,152         800
+  8940-FF5716PS                     +100.0%  Sparse Intermittent [BW]         576         288
+  8940-FF5952                        +41.0%  Sparse Intermittent [BW]       3,384       2,400
+  8940-FF8287                        +71.4%  Sparse Intermittent [BW]         960         560
+  8940-SF8167PS                      +38.0%  Sparse Intermittent [BW]       3,312       2,400
+  8940-SF8169PS                      +40.0%  Sparse Intermittent [BW]       4,032       2,880
+  8940-SF8170PS                       +8.0%  Sparse Intermittent [BW]       1,296       1,200
+  8940-SF8173                        +13.0%  Sparse Intermittent              600         690
+  8940-SF8174                        +38.8%  Sparse Intermittent [BW]       4,440       3,200
+  9108-FF12849                       +90.8%  Sparse Intermittent               48         520
+  9108-FF14364                       +72.3%  Sparse Intermittent               72         260
+  9108-FF26385                       +95.4%  Sparse Intermittent               48       1,040
+  9108-FF28459                       +33.3%  Sparse Intermittent               48          72
+  9108-FF30749                       +44.6%  Sparse Intermittent               72         130
+  9108-FF30880                      +200.0%  Sparse Intermittent              120          40
+  9108-FF33413                       +92.7%  Sparse Intermittent               72         988
+  9108-FF33546                       +80.8%  Sparse Intermittent               24         125
+  9108-FF4776                        +72.3%  Sparse Intermittent               36         130
+  9108-FF4930                        +86.2%  Sparse Intermittent               18         130
+  9108-FF4935                        +13.6%  Sparse Intermittent              216         250
+  9108-FF4936                         +7.7%  Sparse Intermittent              240         260
+  9108-FF5766                        +44.6%  Sparse Intermittent               72         130
+  9108-FF7215                        +93.1%  Sparse Intermittent               72       1,040
+  9108-FF7217                        +96.5%  Sparse Intermittent               36       1,040
+  9278-FF10159                       +71.6%  Sparse Intermittent              516       1,820
+  9278-FF12842                       +29.2%  Sparse Intermittent [BW]         672         520
+  9278-FF13154                       +86.2%  Sparse Intermittent               36         260
+  9278-FF22070                       +50.8%  Sparse Intermittent [BW]         192         390
+  9278-FF22071                       +53.8%  Sparse Intermittent [BW]         240         520
+  9278-FF4771                        +10.8%  Sparse Intermittent [BW]         432         390
+  9278-FF5766                        +61.0%  Sparse Intermittent [BW]       1,674       1,040
+  9278-FF7258                        +13.5%  Sparse Intermittent              450         520
+  9278-FF7263                        +42.3%  Sparse Intermittent              150         260
+  9278-FF8298                       +100.0%  Sparse Intermittent                0         260
+  9278-FF8425                        +58.5%  Sparse Intermittent              108         260
+  9278-FF8990                        +51.5%  Sparse Intermittent [BW]         252         520
+  9278-FF9297PDQ                     +40.9%  Sparse Intermittent [BW]         768       1,300
+  [watchdog] Forecaster completed successfully.
