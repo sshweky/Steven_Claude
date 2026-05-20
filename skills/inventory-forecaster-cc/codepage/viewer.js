@@ -6547,8 +6547,13 @@ async function bootstrap() {
       // When the visitor's identity is known, try a manager-filtered fetch first.
       // Planners typically own 400–500 records; this cuts load time proportionally.
       // If 0 records come back the visitor is a director/VP — fall back to full load.
+      // Directors/VPs in DIRECTOR_EMAILS always get the full dataset even when
+      // they also have brands assigned to them as inv_manager.
       let rawRows;
-      if (CURRENT_USER.name) {
+      if (_isDirector()) {
+        _setDetail('Director/VP — loading full dataset');
+        rawRows = await fetchAllRecords();
+      } else if (CURRENT_USER.name) {
         _setDetail(`Querying QB for "${CURRENT_USER.name}" records...`);
         rawRows = await fetchAllRecords(CURRENT_USER.name);
         if (rawRows.length === 0) {
