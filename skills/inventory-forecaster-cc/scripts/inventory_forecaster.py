@@ -7413,7 +7413,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _f59i_ms = (row.get("mstyle") or "").upper()
         _f59i_is_ec = _f59i_ms.endswith("EC") or _f59i_ms.endswith("COS")
         if (is_amazon
-                and (_f59i_is_ec or model == "Seasonal Baseline")
                 and model not in ("Inactive", "OTB (zero)",
                                   "Pre-launch NEW (manual passthrough)")
                 and not row.get("_di_blend")
@@ -7425,6 +7424,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
             if _f59i_is_ec and _f59i_pos_l4 > 0 and _f59i_pos_l13 > 0:
                 # ── Path A: EC/COS drop-ship — anchor fully to POS ───────────
+                # EC items ship direct-to-consumer; inherited parent DC-replen
+                # history is irrelevant for drop-ship demand. DC WOS bypassed.
                 _f59i_26w_avg = sum(fcst) / max(len(fcst), 1)
                 if _f59i_26w_avg > _f59i_pos_l4 * 1.10 and _f59i_26w_avg > 0:
                     _f59i_ec_anchor = min(1.0, _f59i_pos_l13 / _f59i_26w_avg)
@@ -7435,41 +7436,70 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     if isinstance(meta, dict):
                         meta.setdefault("drivers", []).append(
                             f"F59i-EC POS anchor: AI avg was {_f59i_old_avg:.0f}/wk "
-                            f"— inflated by F60 parent DC-replenishment history "
+                            f"-- inflated by F60 parent DC-replenishment history "
                             f"(irrelevant for EC drop-ship demand). Anchored 100% "
                             f"to consumer POS L13W {_f59i_pos_l13:.0f}/wk "
                             f"(rescale x{_f59i_ec_anchor:.3f}). DC WOS bypassed "
-                            f"— EC fulfillment is direct-to-consumer, not "
+                            f"-- EC fulfillment is direct-to-consumer, not "
                             f"DC-dependent."
                         )
 
             elif (not _f59i_is_ec
-                    and _f59i_pos_l4 > 0 and _f59i_pos_l13 > 0
+                    and _f59i_pos_l4 >= 100 and _f59i_pos_l13 > 0
                     and amz_catalog and _f59i_wos >= 6):
-                # ── Path B: standard Seasonal Baseline — 50/50 blend ─────────
+                # ── Path B: all non-EC Amazon models — tiered POS correction ──
+                # Amazon orders include DC inventory management (restock, safety-
+                # stock builds, catch-up after short-ship) on top of consumer
+                # demand.  When DC WOS is healthy (>= 6) and the forecast
+                # materially exceeds POS L4W, the excess is almost certainly
+                # inventory management noise, not real demand growth.
+                #
+                # Applies to ALL non-EC models (Seasonal Baseline, Heuristic,
+                # Croston's, etc.) -- a flat Heuristic forecast at 1.7x POS
+                # with a healthy DC is just as wrong as an inflated Seasonal one.
+                #
+                # Two-tier correction by severity:
+                #   Moderate (1.15x-1.40x): 50/50 blend toward POS L13W
+                #     -- gentle pull-back, preserves some model signal
+                #   Severe (> 1.40x): direct POS L4W anchor (floor 0.60)
+                #     -- at 40%+ above consumer demand with a healthy DC the
+                #        excess is overwhelmingly inventory noise, not growth
                 _f59i_w1_4_nz  = [v for v in fcst[:4] if v > 0]
                 _f59i_w1_4_avg = sum(_f59i_w1_4_nz) / max(len(_f59i_w1_4_nz), 1)
-                if _f59i_w1_4_avg > _f59i_pos_l4 * 1.15:
-                    # 50/50 blend of current near-term avg and POS L13W, then
-                    # rescale the full 26-week forecast proportionally
-                    _f59i_anchor = (
-                        (_f59i_pos_l13 * 0.50 + _f59i_w1_4_avg * 0.50)
-                        / _f59i_w1_4_avg
-                    )
+                _f59i_ratio    = (_f59i_w1_4_avg / _f59i_pos_l4
+                                  if _f59i_pos_l4 > 0 else 0)
+                if _f59i_ratio > 1.15:
+                    if _f59i_ratio > 1.40:
+                        # Severe: anchor to POS L4W (floor 0.60 guards against
+                        # temporarily-depressed POS reading)
+                        _f59i_anchor = max(0.60, _f59i_pos_l4 / _f59i_w1_4_avg)
+                        _f59i_mode   = "strong"
+                    else:
+                        # Moderate: soft blend toward POS L13W
+                        _f59i_anchor = (
+                            (_f59i_pos_l13 * 0.50 + _f59i_w1_4_avg * 0.50)
+                            / _f59i_w1_4_avg
+                        )
+                        _f59i_mode   = "blend"
                     _f59i_anchor = min(_f59i_anchor, 1.0)  # never inflate
                     for _wi in range(len(fcst)):
                         fcst[_wi] = snap(fcst[_wi] * _f59i_anchor, mp)
                     _fire("F59i")
                     if isinstance(meta, dict):
+                        _f59i_desc = (
+                            f"direct POS L4W anchor (floor 60%)"
+                            if _f59i_mode == "strong"
+                            else f"50% blend toward POS L13W {_f59i_pos_l13:.0f}/wk"
+                        )
                         meta.setdefault("drivers", []).append(
-                            f"F59i POS anchor: near-term AI avg was "
-                            f"{_f59i_w1_4_avg:.0f}/wk vs consumer POS L4W "
-                            f"{_f59i_pos_l4:.0f}/wk "
-                            f"(+{(_f59i_w1_4_avg / _f59i_pos_l4 - 1) * 100:.0f}%) "
-                            f"with DC WOS {_f59i_wos:.1f}wks. Order history likely "
-                            f"inflated by inventory build. Forecast rescaled "
-                            f"x{_f59i_anchor:.3f} (50% POS L13W anchor "
-                            f"{_f59i_pos_l13:.0f}/wk)."
+                            f"F59i POS anchor ({_f59i_mode}): AI W1-W4 avg "
+                            f"{_f59i_w1_4_avg:.0f}/wk is "
+                            f"{(_f59i_ratio - 1) * 100:.0f}% above consumer "
+                            f"POS L4W {_f59i_pos_l4:.0f}/wk with DC WOS "
+                            f"{_f59i_wos:.1f}wks (healthy) -- order history "
+                            f"inflated by DC inventory management, not demand "
+                            f"growth. Rescaled x{_f59i_anchor:.3f} via "
+                            f"{_f59i_desc}. Model: {model}."
                         )
 
         # ── F59j — Amazon low-DC restock false-acceleration correction ──────
