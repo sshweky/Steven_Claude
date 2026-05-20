@@ -124,9 +124,9 @@ def discover_man_fids():
                 if wk not in fid_map or f["id"] > fid_map[wk]:
                     fid_map[wk] = f["id"]
     man_fids = [fid_map[w] for w in range(1, 27) if w in fid_map]
-    print(f"  Found {len(man_fids)} MAN PRJ fields (W1–W{len(man_fids)})")
+    print(f"  Found {len(man_fids)} MAN PRJ fields (W1-W{len(man_fids)})")
     if len(man_fids) != 26:
-        print(f"  WARNING: expected 26, got {len(man_fids)} — some weeks may be missing")
+        print(f"  WARNING: expected 26, got {len(man_fids)} -- some weeks may be missing")
     return man_fids
 
 # ---------------------------------------------------------------------------
