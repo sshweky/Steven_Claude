@@ -628,7 +628,7 @@ def save_json(data, name):
     path = os.path.join(ANALYSIS_DIR, name)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, default=str)
-    print(f"JSON saved → {path}")
+    print(f"JSON saved -> {path}")
 
 # ---------------------------------------------------------------------------
 # Main
