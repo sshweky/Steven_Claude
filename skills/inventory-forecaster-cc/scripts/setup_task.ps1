@@ -1,103 +1,64 @@
 # setup_task.ps1 - Run this ONCE (as Administrator) to register the scheduled task.
-# After that, the forecaster runs every 2 hours Mon-Fri, 6 AM to 8 PM.
+# Creates a wrapper batch file at a simple path (no special chars) and registers
+# a Task Scheduler job pointing to it.
 #
 # Usage:
 #   Right-click PowerShell -> "Run as administrator"
 #   cd to this scripts folder, then: .\setup_task.ps1
 
-$TaskName  = "PP Inventory Forecaster"
-$ScriptDir = "C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts"
-$Launcher  = "$ScriptDir\run_scheduled.ps1"
+$TaskName   = "PP Inventory Forecaster"
+$PS1Script  = 'C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\run_scheduled.ps1'
+$WrapperDir = "C:\ProgramData\PPForecast"
+$WrapperBat = "$WrapperDir\run.bat"
+$Python     = "C:\Python314\python.exe"
+$RunForecast = 'C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\run_forecast.py'
+$LogDir     = 'C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\logs'
 
-# Prefer real on-disk executables over WindowsApps stubs (stubs fail in Task Scheduler)
-$_candidates = @(
-    "C:\Program Files\PowerShell\7\pwsh.exe",
-    "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-)
-$PwshPath = $_candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
-if (-not $PwshPath) { Write-Error "PowerShell executable not found. Aborting."; exit 1 }
+# -- Create wrapper directory and batch file ----------------------------------
+if (-not (Test-Path $WrapperDir)) {
+    New-Item -ItemType Directory -Path $WrapperDir | Out-Null
+    Write-Host "Created $WrapperDir"
+}
 
-Write-Host "PowerShell : $PwshPath"
-Write-Host "Launcher   : $Launcher"
+# The batch file lives at a path with no special characters.
+# Inside the batch file the path is quoted, so & and ( are handled fine.
+$BatContent = "@echo off`r`npowershell.exe -NonInteractive -ExecutionPolicy Bypass -File `"$PS1Script`"`r`n"
+[System.IO.File]::WriteAllText($WrapperBat, $BatContent, [System.Text.Encoding]::ASCII)
+Write-Host "Wrapper : $WrapperBat"
 
-# Task XML - repetition must be set here; PowerShell CIM objects don't expose it
-# Runs Mon-Fri at 6 AM, repeats every 2 hours, stops after 14 hours (last run 8 PM)
-$TaskXml = @"
-<?xml version="1.0" encoding="UTF-16"?>
-<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
-  <RegistrationInfo>
-    <Description>Pets+People inventory forecaster - runs every 2 hours Mon-Fri</Description>
-  </RegistrationInfo>
-  <Triggers>
-    <CalendarTrigger>
-      <Repetition>
-        <Interval>PT2H</Interval>
-        <Duration>PT14H</Duration>
-        <StopAtDurationEnd>false</StopAtDurationEnd>
-      </Repetition>
-      <StartBoundary>2026-05-25T06:00:00</StartBoundary>
-      <Enabled>true</Enabled>
-      <ScheduleByWeek>
-        <WeeksInterval>1</WeeksInterval>
-        <DaysOfWeek>
-          <Monday />
-          <Tuesday />
-          <Wednesday />
-          <Thursday />
-          <Friday />
-        </DaysOfWeek>
-      </ScheduleByWeek>
-    </CalendarTrigger>
-  </Triggers>
-  <Principals>
-    <Principal id="Author">
-      <RunLevel>HighestAvailable</RunLevel>
-    </Principal>
-  </Principals>
-  <Settings>
-    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
-    <ExecutionTimeLimit>PT3H</ExecutionTimeLimit>
-    <StartWhenAvailable>true</StartWhenAvailable>
-    <WakeToRun>true</WakeToRun>
-    <Enabled>true</Enabled>
-  </Settings>
-  <Actions>
-    <Exec>
-      <Command>$PwshPath</Command>
-      <Arguments>-NonInteractive -ExecutionPolicy Bypass -File "$Launcher"</Arguments>
-      <WorkingDirectory>$ScriptDir</WorkingDirectory>
-    </Exec>
-  </Actions>
-</Task>
-"@
-
-# Remove existing task if present
+# -- Remove existing task if present ------------------------------------------
 $Existing = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
 if ($Existing) {
     Write-Host "Task '$TaskName' already exists - replacing it."
     Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
 }
 
-# Register - password needed to run while screen is locked
-$User     = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-$Password = Read-Host "Enter your Windows login password (required to run when locked)" -AsSecureString
-$PlainPw  = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-                [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password))
+# -- Register via schtasks.exe (most reliable for repetition + SYSTEM acct) ---
+# SYSTEM account: runs whether locked or not, no password prompt needed.
+# /sc WEEKLY /d MON-FRI /st 06:00 : starts 6 AM on weekdays
+# /ri 120 : repeat every 120 minutes
+# /du 0014:00 : for 14 hours (last run 8 PM)
+# /rl HIGHEST : run with highest available privileges
+$result = & schtasks /create `
+    /tn $TaskName `
+    /tr "`"$WrapperBat`"" `
+    /sc WEEKLY `
+    /d  MON,TUE,WED,THU,FRI `
+    /st 06:00 `
+    /ri 120 `
+    /du 0014:00 `
+    /rl HIGHEST `
+    /ru SYSTEM `
+    /f 2>&1
 
-Register-ScheduledTask `
-    -TaskName $TaskName `
-    -Xml      $TaskXml `
-    -User     $User `
-    -Password $PlainPw `
-    -Force
-
-$PlainPw = $null
+Write-Host $result
 
 Write-Host ""
 Write-Host "Done. Task '$TaskName' registered."
-Write-Host "Schedule : Mon-Fri, every 2 hours from 6 AM to 8 PM"
-Write-Host "Logs     : $ScriptDir\logs\"
+Write-Host "Schedule : Mon-Fri every 2 hours, 6 AM to 8 PM"
+Write-Host "Wrapper  : $WrapperBat"
+Write-Host "Logs     : $LogDir\"
 Write-Host ""
-Write-Host "To test right now:"
-Write-Host "  Start-ScheduledTask -TaskName 'PP Inventory Forecaster'"
-Write-Host "  Then check $ScriptDir\logs\ for the output file."
+Write-Host "To test right now (run as admin):"
+Write-Host "  schtasks /run /tn `"$TaskName`""
+Write-Host "  Then check $LogDir\ for the output file."
