@@ -4162,11 +4162,20 @@ async function _loadAmzDcInv(r, safeId) {
                         AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO,
                         AF.POS_L4W, AF.POS_L13W, AF.POS_L26W, AF.POS_L52W, AF.POS_LW,
                        ].filter(v => v != null);
-    // Try exact mstyle first; if no row found, retry without /N pack-size suffix
-    // (catalog table sometimes stores bare mstyle without the case-size qualifier).
+    // Try exact mstyle first, then fallbacks in priority order:
+    //   1. Strip /N pack-size suffix  (catalog may store bare mstyle without case-size)
+    //   2. Strip EC/COS variant suffix so EC and COS styles inherit catalog data from
+    //      the base mstyle  (e.g. FF12302/24EC -> FF12302/24 -> FF12302)
     const tryMstyles = [mstyle];
     const stripped = mstyle.replace(/\/\d+$/, '');
     if (stripped !== mstyle) tryMstyles.push(stripped);
+    // EC/COS base fallback
+    const baseMstyle = mstyle.replace(/(COS|EC)$/i, '');
+    if (baseMstyle !== mstyle) {
+      if (!tryMstyles.includes(baseMstyle)) tryMstyles.push(baseMstyle);
+      const bareBase = baseMstyle.replace(/\/\d+$/, '');
+      if (bareBase !== baseMstyle && !tryMstyles.includes(bareBase)) tryMstyles.push(bareBase);
+    }
 
     let row = null;
     for (const ms of tryMstyles) {
