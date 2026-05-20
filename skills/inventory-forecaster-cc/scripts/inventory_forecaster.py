@@ -249,19 +249,24 @@ CATEGORY_PROFILES = {
     "wooden fire":   [0.50, 1.20, 1.90, 2.10, 1.70, 1.30, 0.70, 0.26, 0.25, 0.22, 0.22, 0.35],
     "kingsford":     [0.50, 1.20, 1.90, 2.10, 1.70, 1.30, 0.70, 0.26, 0.25, 0.22, 0.22, 0.35],
 
-    # ── Paper-goods / outdoor entertaining — peak Apr–Aug ────────────────────
-    # Glad/disposable plates, bowls, cups for cookouts/picnics.
-    "snack bowl":    [0.55, 0.60, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.05, 0.75, 0.55, 0.45],
-    "paper bowl":    [0.55, 0.60, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.05, 0.75, 0.55, 0.45],
-    "paper plate":   [0.55, 0.60, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.05, 0.75, 0.55, 0.45],
-    "paper cup":     [0.55, 0.60, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.05, 0.75, 0.55, 0.45],
+    # ── Paper-goods / outdoor entertaining — dual peak: summer + holiday ────────
+    # Everyday use year-round with two clear seasonal lifts:
+    #   Summer (consumer May-Aug): retailers order Apr-Jul for cookouts/picnics
+    #   Holiday (consumer Nov-Dec): retailers order Oct-Nov for Thanksgiving/Christmas
+    #   Sep is early holiday ramp.  Updated 2026-05-20 per planner feedback
+    #   (previous profile was summer-only; Thanksgiving/Christmas are also peaks).
+    "snack bowl":    [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "paper bowl":    [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "paper plate":   [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "paper cup":     [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
 
-    # ── Home fragrance / air-care — broad lift Apr–Aug ───────────────────────
-    # Fraganzia (P+P air-care brand) and odor-control adjacencies.
+    # ── Home fragrance / air-care — mild broad lift Apr–Aug ──────────────────
+    # air freshener and scent booster have mild warm-weather lift.
+    # fraganzia removed 2026-05-20 (planner feedback: no significant seasonality;
+    #   gap cases addressed by sparse MAX-baseline fix instead).
+    # deodorizing ball removed 2026-05-20 (planner feedback: everyday flat use).
     "air freshener":      [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
-    "deodorizing ball":   [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
     "scent booster":      [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
-    "fraganzia":          [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
 
     # ── Holiday / gifting — peak Sep–Nov retailer orders for Q4 sell-through ─
     # Retailer orders Aug–Nov so consumers can buy through Dec.
