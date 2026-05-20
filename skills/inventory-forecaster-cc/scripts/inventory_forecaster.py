@@ -1316,11 +1316,16 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             ord_baseline = (_t4_l4_avg * 0.50 + _t4_l13_nz_avg * 0.35 +
                             _t4_l26_nz_avg * 0.15)
             _t4_applied = "accelerating"
-        elif _t4_ratio >= 0.85:
+        elif _t4_ratio >= 0.80:
             # Stable — blend L13 + L4 to capture late signal
             ord_baseline = _t4_l13_nz_avg * 0.60 + _t4_l4_avg * 0.40
             _t4_applied = "stable"
-        # else: decelerating — keep existing L13 baseline (no lift)
+        else:
+            # Decelerating (< 0.80) — blend down so baseline tracks demand
+            # softening; same 60/40 formula avoids overcorrecting on a single
+            # bad week (2026-05-20, Issue 2 — symmetric T4 response).
+            ord_baseline = _t4_l13_nz_avg * 0.60 + _t4_l4_avg * 0.40
+            _t4_applied = "decelerating"
 
     # R8 — Burst-interleaved-with-zeros median anchor (2026-04-22).
     # For items like FF4934AMZ2 / BB31553 where L13W has many non-zero weeks
