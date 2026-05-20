@@ -7420,6 +7420,37 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"target {_f69w_target:,.0f}/wk (warehouse + DI combined demand)"
                     )
 
+        # ── F69-shift — DI channel declining → boost domestic projection ──────
+        # When DI (MPP/ADF sibling) orders are meaningfully lower in L4W vs L13W
+        # (< 70% of historical avg), Amazon is likely shifting volume back to
+        # domestic warehouse sourcing.  The blended order history already captures
+        # total combined demand, so the model will naturally project the decline
+        # forward — but domestic orders may not yet show the compensating uptick.
+        # Correct by adding the per-week shortfall to all 26 forecast weeks.
+        # Only fires when F69-WOS POS anchor did NOT run (no POS L13 data) —
+        # if POS data is available, consumer demand governs and the channel-shift
+        # correction is redundant (2026-05-20).
+        _f69s_pos_l13 = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+        _f69s_l13_wk  = row.get("_di_l13_add", 0) / 13.0
+        _f69s_l4_wk   = row.get("_di_l4_add",  0) / 4.0
+        if (not (_f69s_pos_l13 > 0)
+                and _f69s_l13_wk > 0
+                and _f69s_l4_wk < _f69s_l13_wk * 0.70
+                and isinstance(fcst, list) and len(fcst) >= 26
+                and model not in ("Inactive",)):
+            _f69s_delta = _f69s_l13_wk - _f69s_l4_wk
+            for _wi in range(len(fcst)):
+                fcst[_wi] = snap(max(0, fcst[_wi] + _f69s_delta), mp)
+            _fire("F69-shift")
+            if isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F69-shift: DI channel ({row.get('_di_label','?')}) orders "
+                    f"declining — L4W avg {_f69s_l4_wk:.0f}/wk vs L13W avg "
+                    f"{_f69s_l13_wk:.0f}/wk. Domestic forecast increased "
+                    f"+{_f69s_delta:.0f}/wk across W1-W26 to compensate for "
+                    f"expected DI-to-domestic channel shift."
+                )
+
     # F58 — Tell-AI comment replay (2026-05-08 → option B).
     # Apply the planner's most-recent "AI Adjusted" comment from QB Projection
     # Comments table as an override on top of the model's forecast.  Same
