@@ -2114,17 +2114,30 @@ window.addEventListener('DOMContentLoaded', loadData);
 
 // &#9472;&#9472; Excel Export &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
 
+function loadExcelJS() {
+  if (typeof ExcelJS !== 'undefined') return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Failed to load Excel library — check your internet connection.'));
+    document.head.appendChild(s);
+  });
+}
+
 async function exportExcel() {
 
   if (!window._exportData) { alert('Data not loaded yet — please wait for the dashboard to finish loading.'); return; }
-
-  if (typeof ExcelJS === 'undefined') { alert('Excel library not loaded — check your internet connection and try again.'); return; }
 
   const btn = document.querySelector('.export-btn');
 
   const origText = btn.textContent;
 
-  btn.textContent = '&#9203; Generating…'; btn.disabled = true;
+  btn.textContent = '&#9203; Loading…'; btn.disabled = true;
+
+  try { await loadExcelJS(); } catch(e) { alert(e.message); btn.textContent = origText; btn.disabled = false; return; }
+
+  btn.textContent = '&#9203; Generating…';
 
   try {
 

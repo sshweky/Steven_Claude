@@ -239,6 +239,21 @@ function _setFreshness(field, ts) {
   if (bar) bar.style.display = '';
 }
 
+// -- Director / VP bypass ---------------------------------------------------
+// Users in this set always receive the full dataset regardless of whether
+// they have records assigned to them as inv_manager.  Without this, anyone
+// who directly manages a brand AND holds a director/VP role would be
+// mis-classified as a planner and only see their own brands.
+const DIRECTOR_EMAILS = new Set([
+  's.shweky@petspeople.com',    // Steven Shweky
+  'm.scott@petspeople.com',     // Mikey Scott - Director of Inventory Management
+  'nancyl@fetch4pets.com',      // Nancy Lee - VP Supply Chain
+]);
+function _isDirector() {
+  const em = (CURRENT_USER.email || '').toLowerCase().trim();
+  return em && DIRECTOR_EMAILS.has(em);
+}
+
 // -- State ------------------------------------------------------------------
 let ALL_RECORDS      = [];
 let FILTERED_RECORDS = [];
