@@ -565,7 +565,7 @@ def build_report(enriched, man_labels, ai_labels, n_fetched):
 
     # Kill / channel
     if killed_lst:
-        top_kill_cust = sorted(defaultdict(int).__class__(
+        top_kill_cust = sorted(dict(
             (c, sum(1 for r in killed_lst if r["customer"] == c))
             for c in {r["customer"] for r in killed_lst}
         ).items(), key=lambda x: x[1], reverse=True)[:3]
