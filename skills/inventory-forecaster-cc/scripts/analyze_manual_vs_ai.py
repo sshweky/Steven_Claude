@@ -111,7 +111,7 @@ def avg(lst):
 # Step 1 — Discover rolling MAN PRJ FIDs from field labels
 # ---------------------------------------------------------------------------
 def discover_man_fids():
-    print("Discovering MAN PRJ FIDs from field list…")
+    print("Discovering MAN PRJ FIDs from field list...")
     fields = _qb_get("/fields", {"tableId": PROJ_TID})
     man_re = re.compile(r'^\d{2} \d{2} W(\d+)$')
     fid_map = {}
