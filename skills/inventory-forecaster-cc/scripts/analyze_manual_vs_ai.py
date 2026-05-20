@@ -409,7 +409,7 @@ def build_report(enriched, man_labels, ai_labels, n_fetched):
         vol_grps[r["vol_tier"]].append(r)
     pr("| Tier | Threshold | N | UP% | DN% | Avg Δ% | Agg Bias% |")
     pr("|---|---|---|---|---|---|---|")
-    for tier, thresh in [("HIGH","≥500/wk"),("MED","100-499/wk"),("LOW","1-99/wk"),("ZERO","0/wk")]:
+    for tier, thresh in [("HIGH",">=500/wk"),("MED","100-499/wk"),("LOW","1-99/wk"),("ZERO","0/wk")]:
         recs = vol_grps.get(tier, [])
         if not recs: continue
         up = sum(1 for r in recs if r["direction"] == "UP")
