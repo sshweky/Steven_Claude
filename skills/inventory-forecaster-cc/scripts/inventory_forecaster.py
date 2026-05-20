@@ -7449,7 +7449,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #   demand growth.  Blend the forecast 50% toward POS L13W.
         #
         # Common gates: is_amazon, POS data present, not DI-blended.
-        _f59i_ms = (row.get("mstyle") or "").upper()
+        _f59i_ms = (row.get("Mstyle") or row.get("mstyle") or "").upper()
         _f59i_is_ec = _f59i_ms.endswith("EC") or _f59i_ms.endswith("COS")
         if (is_amazon
                 and model not in ("Inactive", "OTB (zero)",
