@@ -115,10 +115,10 @@ async function fetchCurrentUser() {
     let qbUserId = id;  // may be overwritten with the correct QB ID below
     if (!name) {
       try {
-        const _uiCtrl = new AbortController();
-        const _uiTimer = setTimeout(() => _uiCtrl.abort(), 5000);
-        const uiResp = await fetch(`https://${CFG.REALM}/db/main?a=API_GetUserInfo`, { credentials: 'include', signal: _uiCtrl.signal });
-        clearTimeout(_uiTimer);
+        const uiResp = await Promise.race([
+          fetch(`https://${CFG.REALM}/db/main?a=API_GetUserInfo`, { credentials: 'include' }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000)),
+        ]);
         const uiXml  = await uiResp.text();
         const _uid   = uiXml.match(/<user[^>]+id="([^"]+)"/);
         const _fn    = uiXml.match(/<firstName>(.*?)<\/firstName>/);
