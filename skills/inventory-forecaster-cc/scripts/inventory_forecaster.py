@@ -7323,6 +7323,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _f59h_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
         _f59h_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
         _f59h_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
+        # Fallback: if Inv_WOS not populated (ASIN lookup miss or field absent)
+        # but SOH/OPO are present, derive WOS from position / POS velocity.
+        # Mirrors the same fallback already used in F69-WOS (2026-05-20).
+        if _f59h_wos <= 0 and (_f59h_soh > 0 or _f59h_opo > 0):
+            _f59h_pos_fb = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+            if _f59h_pos_fb > 0:
+                _f59h_wos = (_f59h_soh + _f59h_opo) / _f59h_pos_fb
 
         if is_amazon and amz_catalog and _f59h_wos > 0:
             _f59h_vel     = _f59_l13w_avg if _f59_l13w_avg > 0 else max(sum(fcst) / 26, 1)
