@@ -38,7 +38,9 @@ Get-ChildItem "$LogDir\forecast_*.log" |
     Select-Object -Skip 20 |
     Remove-Item -Force
 
-# Send email if mail_config.txt exists
+# Send email via Microsoft Graph API if mail_config.txt exists.
+# Required keys: GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, MAIL_FROM, MAIL_TO
+# One-time setup: register an Azure AD app with Mail.Send application permission.
 if (Test-Path $MailCfg) {
     try {
         $cfg = @{}
@@ -51,19 +53,37 @@ if (Test-Path $MailCfg) {
         $Subject  = "[$Status] PP Forecast run $($StartTime.ToString('MM/dd HH:mm'))"
         $LogText  = Get-Content $LogFile -Raw -Encoding UTF8
 
-        $SmtpClient = New-Object System.Net.Mail.SmtpClient($cfg['SMTP_SERVER'], 587)
-        $SmtpClient.EnableSsl   = $true
-        $SmtpClient.Credentials = New-Object System.Net.NetworkCredential($cfg['SMTP_USER'], $cfg['SMTP_PASS'])
+        # Step 1 — Get OAuth2 access token via client credentials flow
+        $TokenUrl  = "https://login.microsoftonline.com/$($cfg['GRAPH_TENANT_ID'])/oauth2/v2.0/token"
+        $TokenBody = @{
+            grant_type    = "client_credentials"
+            client_id     = $cfg['GRAPH_CLIENT_ID']
+            client_secret = $cfg['GRAPH_CLIENT_SECRET']
+            scope         = "https://graph.microsoft.com/.default"
+        }
+        $TokenResp   = Invoke-RestMethod -Method Post -Uri $TokenUrl -Body $TokenBody
+        $AccessToken = $TokenResp.access_token
 
-        $Msg             = New-Object System.Net.Mail.MailMessage
-        $Msg.From        = $cfg['SMTP_FROM']
-        $Msg.To.Add($cfg['SMTP_TO'])
-        $Msg.Subject     = $Subject
-        $Msg.Body        = "Run completed in $Duration min.`n`n$LogText"
-        $Msg.IsBodyHtml  = $false
+        # Step 2 — Send via Graph sendMail endpoint
+        # Truncate log body to 1 MB to stay within Graph message size limits
+        $MaxBody  = 1048576
+        $BodyText = "Run completed in $Duration min.`n`n" +
+                    $(if ($LogText.Length -gt $MaxBody) { $LogText.Substring(0, $MaxBody) + "`n...[truncated]" } else { $LogText })
 
-        $SmtpClient.Send($Msg)
-        $Msg.Dispose()
+        $MailPayload = @{
+            message = @{
+                subject = $Subject
+                body    = @{ contentType = "Text"; content = $BodyText }
+                toRecipients = @( @{ emailAddress = @{ address = $cfg['MAIL_TO'] } } )
+            }
+        } | ConvertTo-Json -Depth 6
+
+        $GraphUrl = "https://graph.microsoft.com/v1.0/users/$($cfg['MAIL_FROM'])/sendMail"
+        Invoke-RestMethod -Method Post -Uri $GraphUrl -Body $MailPayload `
+            -Headers @{ Authorization = "Bearer $AccessToken"; "Content-Type" = "application/json" }
+
+        "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email sent to $($cfg['MAIL_TO'])" |
+            Out-File $LogFile -Append -Encoding UTF8
     } catch {
         "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email send failed: $_" |
             Out-File $LogFile -Append -Encoding UTF8
