@@ -107,33 +107,41 @@ async function fetchCurrentUser() {
     let name  = (p.name || p.fullName || p.display_name || '').trim();
     let email = (p.email || '').trim();
 
-    // QB temp tokens do not include name/email in the JWT payload.
-    // Resolve display name from the Record Owner (FID 4, user type) of any
-    // record owned by this user — QB auto-stamps user-type fields reliably.
-    // We try three tables in order: Projections, Flag/Mgr Comments, AI Comments.
-    // Directors/admins who own no Projections records are covered by the fallbacks.
-    const _ownerTables = [
-      CFG.PROJECTIONS_TID,
-      CFG.COMMENTS_TID,
-      'bv2jirwts',  // AI Comments
-    ];
-    for (const _tid of _ownerTables) {
-      if (name || !id) break;
+    // Primary: QB legacy API_GetUserInfo — works in codepage context via session
+    // cookie; returns the logged-in user's screenName and email directly with no
+    // record ownership requirement.  Works for planners, directors, and admins.
+    if (!name) {
       try {
-        const r = await qb('/records/query', {
-          from:    _tid,
-          select:  [4],
-          where:   `{4.EX.'${id}'}`,
-          options: { top: 1 },
-        });
-        const row   = (r.data || [])[0];
-        const owner = row && row[4] && row[4].value;
-        if (owner) {
-          const _n = (owner.name && owner.name !== 'Unknown' ? owner.name : '') || owner.userName || '';
-          name  = name  || _n.trim();
-          email = email || (owner.email || '').trim();
-        }
+        const uiResp = await fetch(`https://${CFG.REALM}/db/main?a=API_GetUserInfo`, { credentials: 'include' });
+        const uiXml  = await uiResp.text();
+        const _nm    = uiXml.match(/<screenName>(.*?)<\/screenName>/);
+        const _em    = uiXml.match(/<email>(.*?)<\/email>/);
+        if (_nm && _nm[1].trim()) name  = _nm[1].trim();
+        if (_em && _em[1].trim()) email = email || _em[1].trim();
       } catch (_) { /* non-fatal */ }
+    }
+
+    // Fallback: scan tables for a record this user owns (resolved via FID 4 user field).
+    // Catches cases where API_GetUserInfo is blocked or returns empty.
+    if (!name && id) {
+      for (const _tid of [CFG.PROJECTIONS_TID, CFG.COMMENTS_TID, 'bv2jirwts']) {
+        if (name) break;
+        try {
+          const r = await qb('/records/query', {
+            from:    _tid,
+            select:  [4],
+            where:   `{4.EX.'${id}'}`,
+            options: { top: 1 },
+          });
+          const row   = (r.data || [])[0];
+          const owner = row && row[4] && row[4].value;
+          if (owner) {
+            const _n = (owner.name && owner.name !== 'Unknown' ? owner.name : '') || owner.userName || '';
+            name  = name  || _n.trim();
+            email = email || (owner.email || '').trim();
+          }
+        } catch (_) { /* non-fatal */ }
+      }
     }
 
     CURRENT_USER = {
