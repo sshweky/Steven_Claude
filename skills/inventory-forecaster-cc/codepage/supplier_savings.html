@@ -1,0 +1,2545 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Supplier Savings Analysis</title>
+
+<style>
+
+/* &#9472;&#9472; Loading overlay &#9472;&#9472; */
+
+#loading-overlay {
+
+  position: fixed; inset: 0; z-index: 9999;
+
+  background: #f0f2f5; display: flex; align-items: center; justify-content: center;
+
+}
+
+.loading-box {
+
+  background: #fff; border-radius: 10px; padding: 40px 52px;
+
+  box-shadow: 0 4px 24px rgba(0,0,0,0.14); text-align: center; min-width: 320px;
+
+}
+
+.spinner {
+
+  width: 44px; height: 44px; border: 4px solid #e0e0e0;
+
+  border-top-color: #0F3460; border-radius: 50%;
+
+  animation: spin 0.8s linear infinite; margin: 0 auto 18px;
+
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#loading-status  { font-size: 15px; font-weight: 600; color: #0F3460; margin-bottom: 6px; }
+
+#loading-detail  { font-size: 12px; color: #888; min-height: 18px; }
+
+#loading-error   { color: #c0392b; font-size: 13px; margin-top: 12px; display: none; }
+
+#retry-btn {
+
+  margin-top: 16px; padding: 9px 22px;
+
+  background: #0F3460; color: #fff; border: none; border-radius: 4px;
+
+  font-size: 13px; cursor: pointer; display: none;
+
+}
+
+
+
+/* &#9472;&#9472; CSS Variables &#9472;&#9472; */
+
+:root {
+
+  --navy:#0F3460; --navy-mid:#16405A; --navy-dark:#0a1f3a;
+
+  --green:#1E8449; --green-dark:#145a32; --green-light:#e9f7ef;
+
+  --red:#C0392B; --red-light:#fdecea;
+
+  --amber:#f39c12; --amber-light:#fff8e1;
+
+  --purple:#7d3c98; --purple-light:#f4ecf7;
+
+  --blue-sub:#d5e8f5; --white:#ffffff;
+
+  --gray-light:#f7f7f7; --gray-mid:#e0e0e0; --gray-dark:#666666;
+
+  --text:#1a1a1a; --border:#cccccc; --even-row:#fafbff;
+
+  --font:'Segoe UI',Arial,sans-serif; --shadow:0 2px 8px rgba(0,0,0,0.10);
+
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+body { font-family:var(--font); font-size:13px; color:var(--text); background:#f0f2f5; }
+
+a { color:var(--navy); }
+
+
+
+/* &#9472;&#9472; Nav &#9472;&#9472; */
+
+.top-nav {
+
+  position:sticky; top:0; z-index:100;
+
+  background:var(--navy); box-shadow:var(--shadow);
+
+  display:flex; align-items:center; padding:0 16px;
+
+}
+
+.top-nav .brand {
+
+  color:var(--white); font-weight:700; font-size:14px;
+
+  padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.2);
+
+  margin-right:8px; white-space:nowrap;
+
+}
+
+.top-nav .brand small { font-weight:400; font-size:11px; opacity:0.75; display:block; }
+
+.tab-btn {
+
+  display:inline-block; padding:14px 18px;
+
+  color:rgba(255,255,255,0.75); font-size:13px; font-weight:500;
+
+  cursor:pointer; border:none; background:none;
+
+  border-bottom:3px solid transparent; transition:all 0.15s; white-space:nowrap;
+
+}
+
+.tab-btn:hover { color:var(--white); background:rgba(255,255,255,0.08); }
+
+.tab-btn.active { color:var(--white); border-bottom-color:#4fc3f7; }
+
+.refresh-btn { margin-left:auto; color:rgba(255,255,255,0.85) !important; font-size:12px !important; }
+
+.refresh-btn:hover { background:rgba(255,255,255,0.15) !important; }
+
+
+
+/* &#9472;&#9472; Tabs &#9472;&#9472; */
+
+.tab-content { display:none; padding:20px; min-height:calc(100vh - 52px); }
+
+.tab-content.active { display:block; }
+
+
+
+/* &#9472;&#9472; KPI Cards &#9472;&#9472; */
+
+.kpi-row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:24px; }
+
+.kpi-card {
+
+  background:var(--white); border-radius:6px; padding:16px 20px;
+
+  flex:1 1 160px; border-left:4px solid var(--green); box-shadow:var(--shadow);
+
+}
+
+.kpi-label { font-size:11px; color:var(--gray-dark); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+
+.kpi-value { font-size:22px; font-weight:700; }
+
+.section-title {
+
+  font-size:15px; font-weight:700; color:var(--navy);
+
+  margin-bottom:10px; padding-bottom:6px; border-bottom:2px solid var(--navy);
+
+}
+
+
+
+/* &#9472;&#9472; Toolbar &#9472;&#9472; */
+
+.tab-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+
+.search-box {
+
+  flex:1 1 300px; max-width:420px; padding:7px 12px;
+
+  border:1px solid var(--border); border-radius:4px; font-size:13px; font-family:var(--font);
+
+}
+
+.search-box:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 2px rgba(15,52,96,0.15); }
+
+.btn-secondary {
+
+  padding:7px 14px; background:var(--white); border:1px solid var(--border);
+
+  border-radius:4px; font-size:12px; cursor:pointer; font-family:var(--font); transition:background 0.1s;
+
+}
+
+.btn-secondary:hover { background:var(--gray-light); }
+
+.btn-clear {
+
+  padding:7px 14px; background:#fdecea; border:1px solid #e74c3c;
+
+  border-radius:4px; font-size:12px; cursor:pointer; color:#c0392b;
+
+  font-family:var(--font); transition:background 0.1s;
+
+}
+
+.btn-clear:hover { background:#f9c0bb; }
+
+.filter-select {
+
+  padding:6px 10px; border:1px solid var(--border); border-radius:4px;
+
+  font-size:12px; font-family:var(--font); background:var(--white); cursor:pointer;
+
+}
+
+.filter-select:focus { outline:none; border-color:var(--navy); }
+
+.filter-label { font-size:11px; color:var(--gray-dark); white-space:nowrap; }
+
+.filter-divider { width:1px; height:22px; background:var(--border); margin:0 4px; }
+
+
+
+/* &#9472;&#9472; Tables &#9472;&#9472; */
+
+.table-wrap { overflow-x:auto; border-radius:4px; box-shadow:var(--shadow); }
+
+table { border-collapse:collapse; width:100%; background:var(--white); font-size:12px; }
+
+th,td { padding:5px 8px; border:1px solid var(--border); white-space:nowrap; }
+
+.detail-scroll-wrap td { overflow:hidden; text-overflow:ellipsis; }
+
+.detail-scroll-wrap td[style*="white-space:normal"],
+
+.detail-scroll-wrap td.rec-cell {
+
+  white-space:normal; word-break:break-word; overflow:hidden; text-overflow:clip;
+
+}
+
+thead th { background:var(--navy); color:var(--white); font-weight:600; font-size:11px; text-align:center; }
+
+#dash-table thead th { position:sticky; top:52px; z-index:5; }
+
+.group-hdr { font-size:11px; font-weight:700; text-align:center; color:var(--white) !important; letter-spacing:0.4px; }
+
+.col-hdr th { background:var(--navy-mid) !important; font-size:11px; }
+
+th.th-info  { background:#2c3e50 !important; }
+
+th.th-core  { background:#1a4f8a !important; }
+
+th.th-alt   { background:#1a5c35 !important; }
+
+th.th-alt2  { background:#512b7a !important; }
+
+th.th-alt3  { background:#3d3d3d !important; }
+
+th.th-ss1   { background:#1a5c35 !important; }
+
+th.th-ss2   { background:#512b7a !important; }
+
+th.th-ss3   { background:#00695C !important; }
+
+tr.alt-row td { background:var(--even-row); }
+
+tr.data-row:hover td { background:#e8f0fe; }
+
+.subtotal-row td { background:var(--blue-sub); font-weight:600; font-size:11px; }
+
+.grand-total td { background:var(--green-light); font-weight:700; border-top:2px solid var(--green); }
+
+td.num { text-align:right; }
+
+td.bold { font-weight:700; }
+
+td.green { color:var(--green); }
+
+td.red { color:var(--red); }
+
+td.purple { color:var(--purple); }
+
+td.navy { color:var(--navy); }
+
+td.small { font-size:10px; }
+
+td.amber { color:#a04000; font-weight:600; }
+
+td.teal  { color:#00695C; }
+
+td.rec-cell { font-size:11px; max-width:220px; white-space:normal; }
+
+#dash-table td,#dash-table th { text-align:right; }
+
+#dash-table td:nth-child(2),#dash-table th:nth-child(2) { text-align:left; }
+
+#dash-table td:first-child,#dash-table th:first-child { text-align:center; }
+
+
+
+/* &#9472;&#9472; Methodology &#9472;&#9472; */
+
+.methodology { max-width:900px; background:var(--white); border-radius:6px; padding:28px 32px; box-shadow:var(--shadow); }
+
+.methodology h2 { font-size:16px; color:var(--navy); margin:20px 0 8px; border-bottom:1px solid var(--border); padding-bottom:4px; }
+
+.methodology h2:first-child { margin-top:0; }
+
+.methodology h3 { font-size:14px; color:var(--navy-mid); margin:14px 0 6px; }
+
+.methodology p,.methodology li { line-height:1.6; margin-bottom:8px; }
+
+.methodology ul { margin-left:20px; }
+
+.formula-box {
+
+  background:var(--gray-light); border-left:4px solid var(--navy);
+
+  border-radius:0 4px 4px 0; padding:12px 16px; margin:10px 0;
+
+}
+
+.formula-box p { margin-bottom:4px; font-family:'Consolas',monospace; font-size:12px; }
+
+.footnote { font-size:11px; color:var(--gray-dark); margin-top:24px; padding-top:12px; border-top:1px solid var(--border); }
+
+
+
+/* &#9472;&#9472; Hidden / collapsed rows &#9472;&#9472; */
+
+tr.hidden-row,tr.collapsed-row { display:none; }
+
+
+
+/* &#9472;&#9472; Detail table scroll wrapper (sticky thead) &#9472;&#9472; */
+
+.detail-scroll-wrap { overflow:auto; height:calc(100vh - 168px); border-radius:4px; box-shadow:var(--shadow); }
+
+.detail-scroll-wrap table { table-layout:fixed; }
+
+.detail-scroll-wrap thead tr:first-child th  { position:sticky; top:0;    z-index:11; }
+
+.detail-scroll-wrap thead tr:last-child  th  { position:sticky; top:27px; z-index:10; }
+
+
+
+/* &#9472;&#9472; Supplier group header row &#9472;&#9472; */
+
+.sup-hdr { cursor:pointer; user-select:none; }
+
+.sup-hdr td {
+
+  background:var(--navy) !important; color:var(--white);
+
+  font-weight:700; font-size:12px; padding:9px 14px;
+
+  border-color:rgba(255,255,255,0.15) !important; white-space:nowrap;
+
+}
+
+.sup-hdr:hover td { background:var(--navy-mid) !important; }
+
+.sup-hdr.grp-collapsed .grp-arrow { transform:rotate(-90deg); }
+
+.grp-arrow { display:inline-block; font-size:11px; transition:transform 0.2s; margin-right:8px; }
+
+.grp-meta  { font-size:11px; font-weight:400; color:rgba(255,255,255,0.8); margin-left:10px; }
+
+.export-btn { background:rgba(46,204,113,0.18) !important; color:#2ecc71 !important; border:1px solid rgba(46,204,113,0.35) !important; border-radius:4px; margin-left:6px; }
+
+.export-btn:hover { background:rgba(46,204,113,0.32) !important; }
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+
+</head>
+
+<body>
+
+
+
+<!-- &#9472;&#9472; Loading overlay &#9472;&#9472; -->
+
+<div id="loading-overlay">
+
+  <div class="loading-box">
+
+    <div class="spinner" id="spinner"></div>
+
+    <div id="loading-status">Connecting to Quickbase…</div>
+
+    <div id="loading-detail"></div>
+
+    <div id="loading-error"></div>
+
+    <button id="retry-btn" onclick="loadData()">Retry</button>
+
+  </div>
+
+</div>
+
+
+
+<!-- &#9472;&#9472; App shell (populated after data loads) &#9472;&#9472; -->
+
+<div id="app" style="display:none">
+
+  <nav class="top-nav" id="top-nav"></nav>
+
+  <div id="tab1" class="tab-content active"></div>
+
+  <div id="tab2" class="tab-content"></div>
+
+  <div id="tab3" class="tab-content"></div>
+
+  <div id="tab4" class="tab-content"></div>
+
+</div>
+
+
+
+<script>
+
+// &#9472;&#9472; QB Config &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+// Table IDs only — no tokens, no credentials.
+
+// This page is hosted on pim.quickbase.com, so requests to /db/{table}?act=API_DoQuery
+
+// are same-origin: the browser sends the QB session cookie automatically.
+
+const STYLES    = 'bn458n7jz';
+
+const FLOW      = 'bpsaju5pm';
+
+const TERMS_TBL = 'bphzqfkev';
+
+const SUPPLIERS = 'bn7g5ebz5';
+
+const BUY_FIELDS = [457,459,460,461,546,547,548,549,550,551,552,553,554,555,
+
+                    556,557,558,559,560,561,562,563,564,565,566,567];
+
+
+
+// &#9472;&#9472; QB fetch helper (legacy XML API — same-origin, session cookie auth) &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+// Uses QB's XML API: /db/{table}?act=API_DoQuery
+
+// No token required — the browser sends the pim.quickbase.com session cookie
+
+// automatically because this page is served from the same domain.
+
+async function fetchAll(table, fields, where) {
+
+  const clist = [...new Set(fields)].join('.');
+
+  let all = [], skip = 0;
+
+  const parser = new DOMParser();
+
+
+
+  while (true) {
+
+    const params = new URLSearchParams({
+
+      act: 'API_DoQuery',
+
+      clist,
+
+      fmt: 'structured',
+
+      includeRids: '1',
+
+      options: `num-500.skp-${skip}`
+
+    });
+
+    if (where) params.set('query', where);
+
+
+
+    const resp = await fetch(`https://pim.quickbase.com/db/${table}?${params}`);
+
+    if (!resp.ok) throw new Error(`QB API HTTP ${resp.status} for table ${table}`);
+
+
+
+    const xml = parser.parseFromString(await resp.text(), 'text/xml');
+
+
+
+    // Check QB-level error (errcode 0 = success)
+
+    const errcode = xml.querySelector('errcode')?.textContent?.trim();
+
+    if (errcode && errcode !== '0') {
+
+      const errtxt = xml.querySelector('errtext')?.textContent || 'Unknown QB error';
+
+      throw new Error(`QB error ${errcode}: ${errtxt}`);
+
+    }
+
+
+
+    const records = Array.from(xml.querySelectorAll('record'));
+
+    if (!records.length) break;
+
+
+
+    // Convert XML records &#8594; { fieldId: { value: string } }
+
+    // This matches the shape expected by v() and fv() helpers below.
+
+    const data = records.map(rec => {
+
+      const obj = {};
+
+      rec.querySelectorAll('f').forEach(f => {
+
+        obj[f.getAttribute('id')] = { value: f.textContent };
+
+      });
+
+      return obj;
+
+    });
+
+
+
+    all = all.concat(data);
+
+    if (data.length < 500) break;
+
+    skip += data.length;
+
+  }
+
+
+
+  return all;
+
+}
+
+
+
+// &#9472;&#9472; Data helpers &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+const v    = (r, id) => r[id]?.value ?? null;
+
+const fv   = (r, id) => { const x = parseFloat(r[id]?.value); return isNaN(x) ? null : x; };
+
+const r2   = n => n != null ? Math.round(n * 100) / 100 : null;
+
+const safe = (x, d = '') => x != null ? x : d;
+
+const resolveFreight = (primary, la, override, fallback = null) => {
+
+  const val = primary ?? la ?? override ?? fallback;
+
+  return { value: r2(val), estimated: val === fallback && fallback != null };
+
+};
+
+const calcMgn = (sell, lc, roy, terms) => {
+
+  if (!sell || !lc || sell === 0) return null;
+
+  return (sell - lc) / sell - (roy || 0) - (terms || 0);
+
+};
+
+
+
+// &#9472;&#9472; Format helpers &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+const fmtUSD = n => (n == null) ? '—' : '$' + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+const fmtPct = (n, dec=1) => (n == null) ? '—' : (n * 100).toFixed(dec) + '%';
+
+const fmtInt = n => (n == null || n === 0) ? '—' : Math.round(n).toLocaleString();
+
+const esc    = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+
+
+// &#9472;&#9472; Loading status helpers &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+function setStatus(msg, detail) {
+
+  document.getElementById('loading-status').textContent = msg;
+
+  document.getElementById('loading-detail').textContent = detail || '';
+
+}
+
+
+
+// &#9472;&#9472; Main data load &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+async function loadData() {
+
+  // Reset UI to loading state
+
+  document.getElementById('loading-overlay').style.display = 'flex';
+
+  document.getElementById('app').style.display = 'none';
+
+  document.getElementById('spinner').style.display = 'block';
+
+  document.getElementById('loading-error').style.display = 'none';
+
+  document.getElementById('retry-btn').style.display = 'none';
+
+
+
+  try {
+
+    // &#9472;&#9472; Styles &#9472;&#9472;
+
+    setStatus('Fetching styles…', 'Active: Replen, international');
+
+    const styleFields = [
+
+      7,275,23,202,205,2109,102,35,36,46,139,206,1344,300,1550,15,104,1555,
+
+      1330,1284,1892,1885,2303,2180,2183,1893,
+
+      1899,1285,1901,1889,2305,2181,2184,1896,
+
+      1900,1286,1902,1890,2306,2182,2185,1898,
+
+    ];
+
+    const styleRowsRaw = await fetchAll(STYLES, styleFields, "{23.EX.'Active: Replen'}AND{205.XCT.'USA'}");
+
+    const styleRows = styleRowsRaw.filter(r => {
+
+      const sn = (v(r, 7) || '').toUpperCase();
+
+      return !sn.startsWith('AU') && !sn.includes('WFS') && !sn.includes('DS');
+
+    });
+
+    setStatus('Fetching forecast…', styleRows.length + ' styles loaded');
+
+
+
+    // &#9472;&#9472; Forecast &#9472;&#9472;
+
+    const fcRows = await fetchAll(FLOW, [20, 294, 133, ...BUY_FIELDS], "{294.EX.'Active: Replen'}AND{133.GT.'0'}");
+
+    const fcMap = {};
+
+    for (const r of fcRows) {
+
+      const ms = v(r, 20); if (!ms) continue;
+
+      const buy = BUY_FIELDS.reduce((s, id) => s + (parseFloat(v(r, id)) || 0), 0);
+
+      if (!fcMap[ms] || buy > fcMap[ms]) fcMap[ms] = buy;
+
+    }
+
+    setStatus('Fetching terms…', fcRows.length + ' forecast records');
+
+
+
+    // &#9472;&#9472; Terms &#9472;&#9472;
+
+    const termsRows = await fetchAll(TERMS_TBL, [6, 379]);
+
+    const termsMap = {};
+
+    for (const r of termsRows) {
+
+      const ms = v(r, 6); if (!ms) continue;
+
+      const t = fv(r, 379);
+
+      if (t != null) termsMap[ms] = t;
+
+    }
+
+    function lookupTerms(mstyle, f1555val) {
+
+      if (termsMap[mstyle] != null) return termsMap[mstyle];
+
+      const base = mstyle ? mstyle.replace(/\/\d+$/, '') : null;
+
+      if (base && base !== mstyle && termsMap[base] != null) return termsMap[base];
+
+      return f1555val ?? null;
+
+    }
+
+    setStatus('Fetching supplier data…', termsRows.length + ' terms records');
+
+
+
+    // &#9472;&#9472; Suppliers &#9472;&#9472;
+
+    const suppRows = await fetchAll(SUPPLIERS, [45, 7]);
+
+    const supCountryMap = {};
+
+    for (const r of suppRows) {
+
+      const name = v(r, 45)?.trim(), cty = v(r, 7);
+
+      if (name && cty) supCountryMap[name] = cty;
+
+    }
+
+    for (const r of styleRows) {
+
+      const sup = v(r, 202), cty = v(r, 205);
+
+      if (sup && cty && !supCountryMap[sup]) supCountryMap[sup] = cty;
+
+    }
+
+    setStatus('Processing data…', 'Computing savings and recommendations');
+
+
+
+    // &#9472;&#9472; Process multi-source styles &#9472;&#9472;
+
+    const ALT_DEFS = [
+
+      [1330,1284,1892,1885,2303,2180,2183],
+
+      [1899,1285,1901,1889,2305,2181,2184],
+
+      [1900,1286,1902,1890,2306,2182,2185],
+
+    ];
+
+    const styleData = [];
+
+    for (const r of styleRows) {
+
+      const styleNum=v(r,7), mstyle=v(r,275), status=v(r,23), coreSupplier=v(r,202);
+
+      const country=v(r,205), desc=v(r,2109), brand=v(r,102), category=v(r,35), subcat=v(r,36);
+
+      const fobCore=r2(fv(r,46)), dutyPct=fv(r,139);
+
+      const dutyDollar=(fobCore!=null&&dutyPct!=null)?r2(fobCore*dutyPct):null;
+
+      const coreFreightVal=fv(r,206)??fv(r,1344)??fv(r,300);
+
+      const freightIn=r2(coreFreightVal), loadDollar=fobCore!=null?r2(fobCore*0.15):null;
+
+      const lcCore=fobCore!=null?r2(fobCore+(dutyDollar||0)+(freightIn||0)+(loadDollar||0)):null;
+
+      const sellPrice=r2(fv(r,1550))||r2(fv(r,15));
+
+      const royaltyPct=fv(r,104), termsPct=lookupTerms(mstyle,fv(r,1555));
+
+      const totalBuy=Math.round(fcMap[mstyle]||0);
+
+      const marginCore=calcMgn(sellPrice,lcCore,royaltyPct,termsPct);
+
+
+
+      const alts=[];
+
+      for (const [supF,fobF,lcF,dutyRF,,frF,frLAF] of ALT_DEFS) {
+
+        const sup=v(r,supF)?.trim(); if (!sup) continue;
+
+        if (coreSupplier&&sup.toLowerCase()===coreSupplier.toLowerCase()) continue;
+
+        const fob=r2(fv(r,fobF)), lcRaw=r2(fv(r,lcF)), altDutyPct=fv(r,dutyRF);
+
+        const altDutyDollar=(fob!=null&&altDutyPct!=null)?r2(fob*altDutyPct):null;
+
+        const {value:altFreight,estimated:freightEst}=resolveFreight(fv(r,frF),fv(r,frLAF),null,coreFreightVal);
+
+        const altLoad=fob!=null?r2(fob*0.15):null;
+
+        const lc=fob!=null?r2(fob+(altDutyDollar||0)+(altFreight||0)+(altLoad||0)):(lcRaw&&lcRaw>0?lcRaw:null);
+
+        const margin=calcMgn(sellPrice,lc,royaltyPct,termsPct);
+
+        const lcSavPerUnit=(lcCore!=null&&lc!=null)?r2(lcCore-lc):null;
+
+        const fobDisc=(fobCore&&fob)?(fobCore-fob)/fobCore:null;
+
+        const marginLift=(margin!=null&&marginCore!=null)?(margin-marginCore)*100:null;
+
+        alts.push({supplier:sup,fob,lc,altDutyPct,altDutyDollar,altFreight,freightEst,altLoad,margin,lcSavPerUnit,fobDisc,marginLift});
+
+      }
+
+      if (!alts.length) continue;
+
+      const savAlts=alts.filter(a=>a.lcSavPerUnit!=null&&a.lcSavPerUnit>0);
+
+      const bestAlt=savAlts.length>0?savAlts.reduce((b,a)=>a.lcSavPerUnit>b.lcSavPerUnit?a:b):null;
+
+      const otherAlts=alts.filter(a=>a!==bestAlt);
+
+      const savingsTotal=bestAlt?r2(bestAlt.lcSavPerUnit*totalBuy):0;
+
+      styleData.push({styleNum,mstyle,status,coreSupplier,country,desc,brand,category,subcat,
+
+        fobCore,lcCore,dutyPct,dutyDollar,freightIn,loadDollar,sellPrice,royaltyPct,termsPct,
+
+        marginCore,totalBuy,bestAlt,otherAlts,savingsTotal});
+
+    }
+
+
+
+    // Sort by savings
+
+    const supMap={};
+
+    for (const s of styleData) {
+
+      const k=s.coreSupplier||'Unknown';
+
+      if (!supMap[k]) supMap[k]=[];
+
+      supMap[k].push(s);
+
+    }
+
+    const supList=Object.entries(supMap)
+
+      .map(([supplier,styles])=>({supplier,styles}))
+
+      .sort((a,b)=>b.styles.reduce((t,s)=>t+s.savingsTotal,0)-a.styles.reduce((t,s)=>t+s.savingsTotal,0));
+
+    supList.forEach(g=>g.styles.sort((a,b)=>b.savingsTotal-a.savingsTotal||(a.styleNum||'').localeCompare(b.styleNum||'')));
+
+
+
+    // &#9472;&#9472; Single-source reference map &#9472;&#9472;
+
+    const refByKey={};
+
+    const altDefsBI=[[1330,1284,1885],[1899,1285,1889],[1900,1286,1890]];
+
+    for (const r of styleRows) {
+
+      const coreSupp=v(r,202),coreFOB=fv(r,46),coreDuty=fv(r,139);
+
+      const category=v(r,35),subcat=v(r,36)||'';
+
+      if (!coreSupp||!coreFOB||!category) continue;
+
+      for (const [supF,fobF,dutyRF] of altDefsBI) {
+
+        const altSup=v(r,supF)?.trim(), altFOB=fv(r,fobF), altDuty=fv(r,dutyRF);
+
+        if (!altSup||altFOB==null) continue;
+
+        if (altSup.toLowerCase()===coreSupp.toLowerCase()) continue;
+
+        const styleNum=v(r,7)||'';
+
+        const addRef=(key,sup,disc,duty)=>{
+
+          if (!refByKey[key]) refByKey[key]={};
+
+          if (!refByKey[key][sup]) refByKey[key][sup]={fobDiscs:[],dutyPcts:[],styleNums:[],count:0,basis:'Dual-Source QB Record'};
+
+          refByKey[key][sup].fobDiscs.push(disc);
+
+          if (duty!=null) refByKey[key][sup].dutyPcts.push(duty);
+
+          if (styleNum&&!refByKey[key][sup].styleNums.includes(styleNum)) refByKey[key][sup].styleNums.push(styleNum);
+
+          refByKey[key][sup].count++;
+
+        };
+
+        if (altFOB<coreFOB) addRef(`${coreSupp}||${category}||${subcat}`,altSup,(coreFOB-altFOB)/coreFOB,altDuty);
+
+        if (altFOB>coreFOB) addRef(`${altSup}||${category}||${subcat}`,coreSupp,(altFOB-coreFOB)/altFOB,coreDuty);
+
+      }
+
+    }
+
+    const refMap={};
+
+    for (const [key,alts] of Object.entries(refByKey)) {
+
+      const candidates=Object.entries(alts)
+
+        .map(([altSup,data])=>({
+
+          altSupplier:altSup,
+
+          avgFobDisc:data.fobDiscs.reduce((a,b)=>a+b,0)/data.fobDiscs.length,
+
+          avgDutyPct:data.dutyPcts.length?data.dutyPcts.reduce((a,b)=>a+b,0)/data.dutyPcts.length:null,
+
+          refCount:data.count, basis:data.basis, refStyleNums:data.styleNums||[]
+
+        }))
+
+        .filter(c=>c.avgFobDisc>0)
+
+        .sort((a,b)=>b.avgFobDisc-a.avgFobDisc);
+
+      if (!candidates.length) continue;
+
+      refMap[key]={...candidates[0],candidates};
+
+    }
+
+
+
+    function calcProjAlt(fobCore,coreDutyPct,freightIn,lcCore,sellPrice,royaltyPct,termsPct,totalBuy,marginCore,cand) {
+
+      if (!cand||fobCore==null) return null;
+
+      const projFOB=r2(fobCore*(1-cand.avgFobDisc));
+
+      const projDutyPct=cand.avgDutyPct??coreDutyPct;
+
+      const projDutyDol=(projFOB!=null&&projDutyPct!=null)?r2(projFOB*projDutyPct):null;
+
+      const projLoad=r2(projFOB*0.15), projFreight=freightIn;
+
+      const projLC=r2(projFOB+(projDutyDol||0)+(projFreight||0)+(projLoad||0));
+
+      const projLCSav=(lcCore!=null&&projLC!=null)?r2(lcCore-projLC):null;
+
+      const projMargin=calcMgn(sellPrice,projLC,royaltyPct,termsPct);
+
+      const projMgnLift=(projMargin!=null&&marginCore!=null)?(projMargin-marginCore)*100:null;
+
+      const projSavTot=projLCSav!=null?r2(projLCSav*totalBuy):null;
+
+      return {projFOB,projDutyPct,projDutyDol,projFreight,projLoad,projLC,projLCSav,projMargin,projMgnLift,projSavTot};
+
+    }
+
+
+
+    // &#9472;&#9472; Single-source opportunities &#9472;&#9472;
+
+    const ssData=[];
+
+    for (const r of styleRows) {
+
+      const mstyle=v(r,275), coreSupp=v(r,202), category=v(r,35), subcat=v(r,36)||'';
+
+      const ref=refMap[`${coreSupp}||${category}||${subcat}`]||(subcat?refMap[`${coreSupp}||${category}||`]:null);
+
+      if (!ref) continue;
+
+      const listed=[v(r,1330),v(r,1899),v(r,1900)].filter(Boolean).map(s=>s.toLowerCase().trim());
+
+      if (listed.some(l=>l===ref.altSupplier.toLowerCase().trim())) continue;
+
+      const fobCore=r2(fv(r,46)), dutyPct=fv(r,139);
+
+      const dutyDollar=(fobCore!=null&&dutyPct!=null)?r2(fobCore*dutyPct):null;
+
+      const cfv=fv(r,206)??fv(r,1344)??fv(r,300);
+
+      const freightIn=r2(cfv), loadDollar=fobCore!=null?r2(fobCore*0.15):null;
+
+      const lcCore=fobCore!=null?r2(fobCore+(dutyDollar||0)+(freightIn||0)+(loadDollar||0)):null;
+
+      const sellPrice=r2(fv(r,1550))||r2(fv(r,15));
+
+      const royaltyPct=fv(r,104), termsPct=lookupTerms(mstyle,fv(r,1555));
+
+      const marginCore=calcMgn(sellPrice,lcCore,royaltyPct,termsPct);
+
+      const totalBuy=Math.round(fcMap[mstyle]||0);
+
+      const p1=calcProjAlt(fobCore,dutyPct,freightIn,lcCore,sellPrice,royaltyPct,termsPct,totalBuy,marginCore,ref.candidates[0]);
+
+      if (!p1||!p1.projLCSav||p1.projLCSav<=0) continue;
+
+      const cand2=ref.candidates[1]||null;
+
+      const cand2Listed=cand2&&listed.some(l=>l===cand2.altSupplier.toLowerCase().trim());
+
+      const p2=(!cand2||cand2Listed)?null:calcProjAlt(fobCore,dutyPct,freightIn,lcCore,sellPrice,royaltyPct,termsPct,totalBuy,marginCore,cand2);
+
+      const has2=p2&&p2.projLCSav!=null&&p2.projLCSav>0;
+
+      const cand3=ref.candidates[2]||null;
+
+      const cand3Listed=cand3&&listed.some(l=>l===cand3.altSupplier.toLowerCase().trim());
+
+      const p3=(!cand3||cand3Listed)?null:calcProjAlt(fobCore,dutyPct,freightIn,lcCore,sellPrice,royaltyPct,termsPct,totalBuy,marginCore,cand3);
+
+      const has3=p3&&p3.projLCSav!=null&&p3.projLCSav>0;
+
+      ssData.push({
+
+        styleNum:v(r,7),mstyle,status:v(r,23),coreSupp,country:v(r,205),
+
+        desc:v(r,2109),brand:v(r,102),category,subcat,
+
+        fobCore,dutyPct,dutyDollar,freightIn,loadDollar,lcCore,
+
+        sellPrice,royaltyPct,termsPct,marginCore,totalBuy,
+
+        refAltSup:ref.candidates[0].altSupplier,
+
+        altCountry:supCountryMap[ref.candidates[0].altSupplier?.trim()]||null,
+
+        refCount:ref.candidates[0].refCount,avgFobDisc:ref.candidates[0].avgFobDisc,
+
+        refStyleNums:ref.candidates[0].refStyleNums||[],basis:ref.candidates[0].basis,
+
+        ...p1,
+
+        ref2AltSup:has2?cand2.altSupplier:null,
+
+        alt2Country:has2?(supCountryMap[cand2.altSupplier?.trim()]||null):null,
+
+        ref2Count:has2?cand2.refCount:null, avg2FobDisc:has2?cand2.avgFobDisc:null,
+
+        ref2StyleNums:has2?(cand2.refStyleNums||[]):[],basis2:has2?cand2.basis:null,
+
+        ...(has2?{proj2FOB:p2.projFOB,proj2DutyPct:p2.projDutyPct,proj2DutyDol:p2.projDutyDol,
+
+                  proj2Freight:p2.projFreight,proj2Load:p2.projLoad,proj2LC:p2.projLC,
+
+                  proj2LCSav:p2.projLCSav,proj2Margin:p2.projMargin,proj2MgnLift:p2.projMgnLift,proj2SavTot:p2.projSavTot}
+
+               :{proj2FOB:null,proj2DutyPct:null,proj2DutyDol:null,proj2Freight:null,proj2Load:null,
+
+                 proj2LC:null,proj2LCSav:null,proj2Margin:null,proj2MgnLift:null,proj2SavTot:null}),
+
+        ref3AltSup:has3?cand3.altSupplier:null,
+
+        alt3Country:has3?(supCountryMap[cand3.altSupplier?.trim()]||null):null,
+
+        ref3Count:has3?cand3.refCount:null, avg3FobDisc:has3?cand3.avgFobDisc:null,
+
+        ref3StyleNums:has3?(cand3.refStyleNums||[]):[],basis3:has3?cand3.basis:null,
+
+        ...(has3?{proj3FOB:p3.projFOB,proj3DutyPct:p3.projDutyPct,proj3DutyDol:p3.projDutyDol,
+
+                  proj3Freight:p3.projFreight,proj3Load:p3.projLoad,proj3LC:p3.projLC,
+
+                  proj3LCSav:p3.projLCSav,proj3Margin:p3.projMargin,proj3MgnLift:p3.projMgnLift,proj3SavTot:p3.projSavTot}
+
+               :{proj3FOB:null,proj3DutyPct:null,proj3DutyDol:null,proj3Freight:null,proj3Load:null,
+
+                 proj3LC:null,proj3LCSav:null,proj3Margin:null,proj3MgnLift:null,proj3SavTot:null})
+
+      });
+
+    }
+
+
+
+    const ssSupMap={};
+
+    for (const s of ssData) {
+
+      if (!ssSupMap[s.coreSupp]) ssSupMap[s.coreSupp]=[];
+
+      ssSupMap[s.coreSupp].push(s);
+
+    }
+
+    const ssSupList=Object.entries(ssSupMap)
+
+      .map(([sup,styles])=>({sup,styles}))
+
+      .sort((a,b)=>b.styles.reduce((t,s)=>t+(s.projSavTot||0),0)-a.styles.reduce((t,s)=>t+(s.projSavTot||0),0));
+
+    ssSupList.forEach(g=>g.styles.sort((a,b)=>(b.projSavTot||0)-(a.projSavTot||0)));
+
+
+
+    const ssBySupplier={};
+
+    for (const g of ssSupList) {
+
+      ssBySupplier[g.sup]={count:g.styles.length,savTot:g.styles.reduce((t,s)=>t+(s.projSavTot||0),0)};
+
+    }
+
+
+
+    // &#9472;&#9472; Render &#9472;&#9472;
+
+    setStatus('Rendering dashboard…', ssData.length + ' SS opportunities found');
+
+    renderApp(supList, ssSupList, ssBySupplier, styleData, ssData);
+
+
+
+  } catch(e) {
+
+    document.getElementById('spinner').style.display = 'none';
+
+    document.getElementById('loading-status').textContent = 'Failed to load data';
+
+    const errEl = document.getElementById('loading-error');
+
+    errEl.textContent = e.message;
+
+    errEl.style.display = 'block';
+
+    document.getElementById('retry-btn').style.display = 'inline-block';
+
+  }
+
+}
+
+
+
+// &#9472;&#9472; Render functions &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+function renderApp(supList, ssSupList, ssBySupplier, styleData, ssData) {
+
+  window._exportData = { supList, ssSupList, ssBySupplier, styleData, ssData };
+
+  const generatedAt = new Date().toLocaleString('en-US', {dateStyle:'long', timeStyle:'short'});
+
+
+
+  // KPIs
+
+  const dsSave100   = styleData.reduce((t,s)=>t+(s.savingsTotal||0),0);
+
+  const dsSavStyles = styleData.filter(s=>s.bestAlt&&s.savingsTotal>0).length;
+
+  const ssSave100   = ssData.reduce((t,s)=>t+(s.projSavTot||0),0);
+
+  const ssOppStyles = ssData.length;
+
+
+
+  // Nav
+
+  document.getElementById('top-nav').innerHTML = `
+
+    <div class="brand">Supplier Savings Analysis<small>Updated ${generatedAt}</small></div>
+
+    <button class="tab-btn active" onclick="showTab('tab1',this)">Dashboard</button>
+
+    <button class="tab-btn" onclick="showTab('tab2',this)">Multi-Source Analysis</button>
+
+    <button class="tab-btn" onclick="showTab('tab3',this)">Single-Source Opportunity</button>
+
+    <button class="tab-btn" onclick="showTab('tab4',this)">Methodology</button>
+
+    <button class="tab-btn refresh-btn" onclick="loadData()">&#128260; Refresh</button>
+
+    <button class="tab-btn export-btn" onclick="exportExcel()">&#128229; Export Excel</button>`;
+
+
+
+  // Tab contents
+
+  document.getElementById('tab1').innerHTML = buildDashboard(supList,ssSupList,ssBySupplier,styleData,ssData,dsSave100,dsSavStyles,ssSave100,ssOppStyles);
+
+  document.getElementById('tab2').innerHTML = buildMultiSource(supList);
+
+  document.getElementById('tab3').innerHTML = buildSingleSource(ssSupList);
+
+  document.getElementById('tab4').innerHTML = buildMethodology(generatedAt);
+
+
+
+  // Show app
+
+  document.getElementById('loading-overlay').style.display = 'none';
+
+  document.getElementById('app').style.display = 'block';
+
+
+
+  // Reset active tab to Dashboard
+
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+
+  document.getElementById('tab1').classList.add('active');
+
+}
+
+
+
+// &#9472;&#9472; TAB 1: Dashboard &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+function buildDashboard(supList,ssSupList,ssBySupplier,styleData,ssData,dsSave100,dsSavStyles,ssSave100,ssOppStyles) {
+
+  const dsSave50=dsSave100*0.5, combSave100=dsSave100+ssSave100;
+
+  const kpis=[
+
+    {label:'DS Styles w/ Savings',value:dsSavStyles.toLocaleString(),color:'#1E8449',border:'#27ae60'},
+
+    {label:'DS Save @ 100%',value:'$'+Math.round(dsSave100).toLocaleString(),color:'#1E8449',border:'#27ae60'},
+
+    {label:'DS Save @ 50%',value:'$'+Math.round(dsSave50).toLocaleString(),color:'#2e86c1',border:'#2e86c1'},
+
+    {label:'SS Opp. Styles',value:ssOppStyles.toLocaleString(),color:'#7d3c98',border:'#7d3c98'},
+
+    {label:'SS Save @ 100%',value:'$'+Math.round(ssSave100).toLocaleString(),color:'#7d3c98',border:'#7d3c98'},
+
+    {label:'Combined Save @ 100%',value:'$'+Math.round(combSave100).toLocaleString(),color:'#0F3460',border:'#0F3460'},
+
+  ];
+
+  const kpiCards=kpis.map(k=>`<div class="kpi-card" style="border-left-color:${k.border}"><div class="kpi-label">${esc(k.label)}</div><div class="kpi-value" style="color:${k.color}">${esc(k.value)}</div></div>`).join('');
+
+
+
+  const allSuppliers=new Set([...supList.map(g=>g.supplier),...ssSupList.map(g=>g.sup)]);
+
+  const sortedSuppliers=[...allSuppliers].sort((a,b)=>{
+
+    const dsA=supList.find(g=>g.supplier===a)?.styles.reduce((t,s)=>t+(s.savingsTotal||0),0)||0;
+
+    const dsB=supList.find(g=>g.supplier===b)?.styles.reduce((t,s)=>t+(s.savingsTotal||0),0)||0;
+
+    return (dsB+(ssBySupplier[b]?.savTot||0))-(dsA+(ssBySupplier[a]?.savTot||0));
+
+  });
+
+
+
+  let gtTotalStyles=0,gtDsSav=0,gtBuy=0,gtDs25=0,gtDs50=0,gtDs100=0,gtSsStyles=0,gtSs25=0,gtSs50=0,gtSs100=0;
+
+  const rows=sortedSuppliers.map((sup,i)=>{
+
+    const grp=supList.find(g=>g.supplier===sup);
+
+    const ss=ssBySupplier[sup]||{count:0,savTot:0};
+
+    const totalStyles=grp?grp.styles.length:0;
+
+    const dsStyles=grp?grp.styles.filter(s=>s.bestAlt&&s.savingsTotal>0).length:0;
+
+    const buy=grp?grp.styles.reduce((t,s)=>t+s.totalBuy,0):0;
+
+    const ds100=grp?grp.styles.reduce((t,s)=>t+(s.savingsTotal||0),0):0;
+
+    const discs=grp?grp.styles.filter(s=>s.bestAlt?.fobDisc).map(s=>s.bestAlt.fobDisc):[];
+
+    const avgDisc=discs.length?discs.reduce((a,b)=>a+b,0)/discs.length:null;
+
+    const comb100=ds100+ss.savTot;
+
+    gtTotalStyles+=totalStyles; gtDsSav+=dsStyles; gtBuy+=buy;
+
+    gtDs25+=ds100*0.25; gtDs50+=ds100*0.5; gtDs100+=ds100;
+
+    gtSsStyles+=ss.count; gtSs25+=ss.savTot*0.25; gtSs50+=ss.savTot*0.5; gtSs100+=ss.savTot;
+
+    return `<tr ${i%2===1?'class="alt-row"':''}>
+
+      <td class="num">${i+1}</td><td class="bold">${esc(sup)}</td>
+
+      <td class="num">${totalStyles||'—'}</td>
+
+      <td class="num ${dsStyles>0?'green':''}">${dsStyles||'—'}</td>
+
+      <td class="num">${fmtInt(buy)}</td>
+
+      <td class="${ds100>0?'green':''}">${ds100>0?fmtUSD(ds100*0.25):'—'}</td>
+
+      <td class="${ds100>0?'green':''}">${ds100>0?fmtUSD(ds100*0.5):'—'}</td>
+
+      <td class="${ds100>0?'green bold':''}">${ds100>0?fmtUSD(ds100):'—'}</td>
+
+      <td class="num">${avgDisc!=null?fmtPct(avgDisc):'—'}</td>
+
+      <td class="num ${ss.count>0?'purple':''}">${ss.count||'—'}</td>
+
+      <td class="${ss.savTot>0?'purple':''}">${ss.savTot>0?fmtUSD(ss.savTot*0.25):'—'}</td>
+
+      <td class="${ss.savTot>0?'purple':''}">${ss.savTot>0?fmtUSD(ss.savTot*0.5):'—'}</td>
+
+      <td class="${ss.savTot>0?'purple bold':''}">${ss.savTot>0?fmtUSD(ss.savTot):'—'}</td>
+
+      <td class="${comb100>0?'navy bold':''}">${comb100>0?fmtUSD((ds100+ss.savTot)*0.25):'—'}</td>
+
+      <td class="${comb100>0?'navy bold':''}">${comb100>0?fmtUSD((ds100+ss.savTot)*0.5):'—'}</td>
+
+      <td class="${comb100>0?'navy bold':''}">${comb100>0?fmtUSD(comb100):'—'}</td></tr>`;
+
+  }).join('');
+
+  const gt100=gtDs100+gtSs100;
+
+  const grandRow=`<tr class="grand-total">
+
+    <td colspan="2" class="bold">GRAND TOTAL</td>
+
+    <td class="num bold">${gtTotalStyles}</td><td class="num bold green">${gtDsSav}</td>
+
+    <td class="num bold">${fmtInt(gtBuy)}</td>
+
+    <td class="green bold">${fmtUSD(gtDs25)}</td><td class="green bold">${fmtUSD(gtDs50)}</td><td class="green bold">${fmtUSD(gtDs100)}</td>
+
+    <td>—</td><td class="num bold purple">${gtSsStyles}</td>
+
+    <td class="purple bold">${fmtUSD(gtSs25)}</td><td class="purple bold">${fmtUSD(gtSs50)}</td><td class="purple bold">${fmtUSD(gtSs100)}</td>
+
+    <td class="navy bold">${fmtUSD(gtDs25+gtSs25)}</td><td class="navy bold">${fmtUSD(gtDs50+gtSs50)}</td><td class="navy bold">${fmtUSD(gt100)}</td></tr>`;
+
+
+
+  return `<div class="kpi-row">${kpiCards}</div>
+
+  <h2 class="section-title">Supplier Summary</h2>
+
+  <div class="tab-toolbar" style="margin-bottom:10px">
+
+    <input type="text" class="search-box" id="dash-search" placeholder="Search suppliers…" oninput="filterDash()">
+
+  </div>
+
+  <div class="table-wrap"><table id="dash-table">
+
+    <thead>
+
+      <tr>
+
+        <th class="group-hdr" colspan="9"  style="background:#1565C0;letter-spacing:.5px">&#128202; DUAL-SOURCE</th>
+
+        <th class="group-hdr" colspan="4"  style="background:#2E7D32;letter-spacing:.5px">&#128269; SINGLE-SOURCE OPPORTUNITY</th>
+
+        <th class="group-hdr" colspan="3"  style="background:#6A1B9A;letter-spacing:.5px">&#9889; COMBINED</th>
+
+      </tr>
+
+      <tr>
+
+        <th style="background:#1E88E5">#</th><th style="background:#1E88E5;text-align:left">Supplier</th>
+
+        <th style="background:#1E88E5">Total Styles</th><th style="background:#1E88E5">DS Styles w/ Savings</th>
+
+        <th style="background:#1E88E5">6-Mo Buy Units</th><th style="background:#1E88E5">DS Save@25%</th>
+
+        <th style="background:#1E88E5">DS Save@50%</th><th style="background:#1E88E5">DS Save@100%</th>
+
+        <th style="background:#1E88E5">Avg FOB Disc%</th>
+
+        <th style="background:#43A047">SS Opp Styles</th><th style="background:#43A047">SS Save@25%</th>
+
+        <th style="background:#43A047">SS Save@50%</th><th style="background:#43A047">SS Save@100%</th>
+
+        <th style="background:#8E24AA">Comb Save@25%</th><th style="background:#8E24AA">Comb Save@50%</th>
+
+        <th style="background:#8E24AA">Comb Save@100%</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="dash-tbody">${rows}${grandRow}</tbody>
+
+  </table></div>`;
+
+}
+
+
+
+// &#9472;&#9472; TAB 2: Multi-Source Analysis &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+function buildMultiSource(supList) {
+
+  const CG=`<colgroup>
+
+    <col style="width:110px"><col style="width:260px"><col style="width:130px"><col style="width:135px">
+
+    <col style="width:185px"><col style="width:70px"><col style="width:72px"><col style="width:70px"><col style="width:82px">
+
+    <col style="width:185px"><col style="width:70px"><col style="width:72px"><col style="width:70px"><col style="width:82px">
+
+    <col style="width:72px"><col style="width:88px"><col style="width:82px">
+
+    <col style="width:84px"><col style="width:84px"><col style="width:84px"><col style="width:200px">
+
+    <col style="width:165px"><col style="width:68px"><col style="width:70px"><col style="width:68px"><col style="width:74px"><col style="width:84px">
+
+    <col style="width:165px"><col style="width:68px"><col style="width:70px"><col style="width:68px"><col style="width:74px"><col style="width:84px">
+
+  </colgroup>`;
+
+
+
+  let tbody='';
+
+  supList.forEach((grp,gi)=>{
+
+    const sup=grp.supplier, styles=grp.styles;
+
+    const grpSav=styles.reduce((t,s)=>t+(s.savingsTotal||0),0);
+
+    const savCnt=styles.filter(s=>s.bestAlt&&s.savingsTotal>0).length;
+
+    const grpCls='grp-ms-'+gi;
+
+    tbody+=`<tr class="sup-hdr" id="ms-grp-${gi}-hdr" data-grp="${grpCls}" data-prefix="ms" onclick="toggleGrp('ms-grp-${gi}-hdr')">
+
+      <td colspan="33"><span class="grp-arrow">&#9660;</span><strong>${esc(sup)}</strong>
+
+        <span class="grp-meta">${styles.length} styles &nbsp;|&nbsp; ${savCnt} w/ savings &nbsp;|&nbsp; Save@100%: <strong>${grpSav>0?fmtUSD(grpSav):'—'}</strong></span>
+
+      </td></tr>`;
+
+    let subBuy=0,subS25=0,subS50=0,subS100=0;
+
+    styles.forEach((s,si)=>{
+
+      const b=s.bestAlt, sav100=b?r2((b.lcSavPerUnit||0)*s.totalBuy):0;
+
+      subBuy+=s.totalBuy; subS25+=sav100*0.25; subS50+=sav100*0.5; subS100+=sav100;
+
+      let rec='—';
+
+      if (b&&sav100>0) rec=`Switch to ${esc(b.supplier)}`;
+
+      else if (b&&s.totalBuy===0) rec=`Switch when next buy occurs — ${esc(b.supplier)}`;
+
+      else if (!b) rec='Keep Core';
+
+      const emptyAlt='<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>';
+
+      const otherCols=(s.otherAlts||[]).slice(0,2).map(a=>`
+
+        <td>${esc(a.supplier||'')}</td><td>${a.fob!=null?fmtUSD(a.fob):'—'}</td>
+
+        <td>${a.altDutyPct!=null?fmtPct(a.altDutyPct):'—'}</td><td>${a.lc!=null?fmtUSD(a.lc):'—'}</td>
+
+        <td class="${a.margin!=null?(a.margin<0?'red':'green'):''}">${a.margin!=null?fmtPct(a.margin):'—'}</td>
+
+        <td class="${(a.lcSavPerUnit||0)>0?'green':((a.lcSavPerUnit||0)<0?'red':'')}">${a.lcSavPerUnit!=null?fmtUSD(a.lcSavPerUnit):'—'}</td>`
+
+      ).join('')+emptyAlt.repeat(2-Math.min((s.otherAlts||[]).length,2));
+
+      tbody+=`<tr class="data-row ${grpCls} ${si%2===0?'':'alt-row'}"
+
+        data-searchable="${esc(s.styleNum)} ${esc(s.desc)} ${esc(s.brand)} ${esc(s.category)} ${esc(s.coreSupplier)} ${esc(b?.supplier||'')}"
+
+        data-rec="${sav100>0?'switch':b&&s.totalBuy===0?'next-buy':'keep'}"
+
+        data-core-margin="${s.marginCore!=null?s.marginCore.toFixed(4):''}"
+
+        data-buy="${s.totalBuy}" data-sav100="${sav100}">
+
+        <td>${esc(s.styleNum||'')}</td>
+
+        <td style="white-space:normal">${esc(s.desc||'')}</td>
+
+        <td style="white-space:normal">${esc(s.brand||'')}</td>
+
+        <td style="white-space:normal">${esc(s.category||'')}</td>
+
+        <td style="background:#EBF5FB;white-space:normal">${esc(s.coreSupplier||'')}</td>
+
+        <td style="background:#EBF5FB">${s.fobCore!=null?fmtUSD(s.fobCore):'—'}</td>
+
+        <td style="background:#EBF5FB">${s.dutyPct!=null?fmtPct(s.dutyPct):'—'}</td>
+
+        <td style="background:#EBF5FB">${s.lcCore!=null?fmtUSD(s.lcCore):'—'}</td>
+
+        <td style="background:#EBF5FB" class="${s.marginCore!=null?(s.marginCore<0?'red bold':(s.marginCore<0.27?'amber':'green')):''}">
+
+          ${s.marginCore!=null?fmtPct(s.marginCore):'—'}</td>
+
+        <td style="background:#EAFAF1;white-space:normal" class="${b?'bold':''}">${b?esc(b.supplier):'—'}</td>
+
+        <td style="background:#EAFAF1">${b?.fob!=null?fmtUSD(b.fob):'—'}</td>
+
+        <td style="background:#EAFAF1">${b?.altDutyPct!=null?fmtPct(b.altDutyPct):'—'}</td>
+
+        <td style="background:#EAFAF1">${b?.lc!=null?fmtUSD(b.lc):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${b?.margin!=null?(b.margin<0?'red':'green'):''}">
+
+          ${b?.margin!=null?fmtPct(b.margin):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${(b?.fobDisc||0)>0?'green':''}">${b?.fobDisc!=null?fmtPct(b.fobDisc):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${(b?.lcSavPerUnit||0)>0?'green bold':((b?.lcSavPerUnit||0)<0?'red':'')}">
+
+          ${b?.lcSavPerUnit!=null?fmtUSD(b.lcSavPerUnit):'—'}</td>
+
+        <td style="background:#EAFAF1" class="num">${fmtInt(s.totalBuy)}</td>
+
+        <td style="background:#EAFAF1" class="${sav100>0?'green':''}">${sav100>0?fmtUSD(sav100*0.25):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${sav100>0?'green':''}">${sav100>0?fmtUSD(sav100*0.5):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${sav100>0?'green bold':''}">${sav100>0?fmtUSD(sav100):'—'}</td>
+
+        <td style="background:#EAFAF1" class="rec-cell">${rec}</td>
+
+        ${otherCols}</tr>`;
+
+    });
+
+    tbody+=`<tr class="subtotal-row ${grpCls}">
+
+      <td colspan="16" class="bold">Subtotal — ${esc(sup)}</td>
+
+      <td class="num bold sub-buy">${fmtInt(subBuy)}</td>
+
+      <td class="${subS25>0?'green bold':''} sub-s25">${subS25>0?fmtUSD(subS25):'—'}</td>
+
+      <td class="${subS50>0?'green bold':''} sub-s50">${subS50>0?fmtUSD(subS50):'—'}</td>
+
+      <td class="${subS100>0?'green bold':''} sub-s100">${subS100>0?fmtUSD(subS100):'—'}</td>
+
+      <td colspan="13"></td></tr>`;
+
+  });
+
+
+
+  return `<div class="tab-toolbar">
+
+    <input type="text" class="search-box" id="ms-search" placeholder="Search style#, description, brand, category, supplier…" oninput="filterTab('ms')">
+
+    <div class="filter-divider"></div>
+
+    <span class="filter-label">Recommendation:</span>
+
+    <select class="filter-select" id="ms-rec-filter" onchange="filterTab('ms')">
+
+      <option value="">All</option><option value="switch">Switch (w/ Savings)</option><option value="next-buy">Switch (no current buy)</option><option value="keep">Keep Core</option>
+
+    </select>
+
+    <div class="filter-divider"></div>
+
+    <span class="filter-label">Core Margin:</span>
+
+    <select class="filter-select" id="ms-margin-filter" onchange="filterTab('ms')">
+
+      <option value="">All</option><option value="low">Under 27%</option><option value="neg">Negative</option>
+
+    </select>
+
+    <div class="filter-divider"></div>
+
+    <button class="btn-secondary" onclick="expandAll('ms')">Expand All</button>
+
+    <button class="btn-secondary" onclick="collapseAll('ms')">Collapse All</button>
+
+    <div class="filter-divider"></div>
+
+    <button class="btn-clear" onclick="clearFilters('ms')">&#10005; Clear</button>
+
+  </div>
+
+  <div class="detail-scroll-wrap">
+
+    <table id="ms-table" class="detail-table">${CG}
+
+      <thead>
+
+        <tr>
+
+          <th colspan="4"  style="background:#2c3e50" class="group-hdr">STYLE INFO</th>
+
+          <th colspan="5"  style="background:#1a4f8a" class="group-hdr">CORE SUPPLIER</th>
+
+          <th colspan="12" style="background:#1a5c35" class="group-hdr">&#9733; BEST ALT SUPPLIER</th>
+
+          <th colspan="6"  style="background:#512b7a" class="group-hdr">ALT 2 (comparison)</th>
+
+          <th colspan="6"  style="background:#3d3d3d" class="group-hdr">ALT 3 (comparison)</th>
+
+        </tr>
+
+        <tr class="col-hdr">
+
+          <th class="th-info">Style#</th><th class="th-info">Description</th><th class="th-info">Brand</th><th class="th-info">Category</th>
+
+          <th class="th-core">Core Supplier</th><th class="th-core">Core FOB</th><th class="th-core">Core Duty%</th><th class="th-core">Core LC</th><th class="th-core">Core Margin%</th>
+
+          <th class="th-alt">Best ALT Supplier</th><th class="th-alt">ALT FOB</th><th class="th-alt">ALT Duty%</th><th class="th-alt">ALT LC</th><th class="th-alt">ALT Margin%</th>
+
+          <th class="th-alt">FOB Disc%</th><th class="th-alt">LC Save/Unit</th><th class="th-alt">Buy Units</th>
+
+          <th class="th-alt">Save@25%</th><th class="th-alt">Save@50%</th><th class="th-alt">Save@100%</th><th class="th-alt">Recommendation</th>
+
+          <th class="th-alt2">ALT Sup 2</th><th class="th-alt2">FOB</th><th class="th-alt2">Duty%</th><th class="th-alt2">LC</th><th class="th-alt2">Margin%</th><th class="th-alt2">Save/Unit</th>
+
+          <th class="th-alt3">ALT Sup 3</th><th class="th-alt3">FOB</th><th class="th-alt3">Duty%</th><th class="th-alt3">LC</th><th class="th-alt3">Margin%</th><th class="th-alt3">Save/Unit</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>${tbody}</tbody>
+
+    </table>
+
+  </div>`;
+
+}
+
+
+
+// &#9472;&#9472; TAB 3: Single-Source Opportunity &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+function buildSingleSource(ssSupList) {
+
+  const CG=`<colgroup>
+
+    <col style="width:110px"><col style="width:260px"><col style="width:130px"><col style="width:130px"><col style="width:130px">
+
+    <col style="width:70px"><col style="width:70px"><col style="width:82px">
+
+    <col style="width:185px"><col style="width:104px"><col style="width:140px"><col style="width:165px">
+
+    <col style="width:84px"><col style="width:70px"><col style="width:70px"><col style="width:82px">
+
+    <col style="width:88px"><col style="width:80px">
+
+    <col style="width:84px"><col style="width:84px"><col style="width:84px">
+
+    <col style="width:175px"><col style="width:104px"><col style="width:80px"><col style="width:88px">
+
+    <col style="width:175px"><col style="width:104px"><col style="width:80px"><col style="width:88px">
+
+  </colgroup>`;
+
+
+
+  let tbody='';
+
+  ssSupList.forEach((grp,gi)=>{
+
+    const sup=grp.sup, styles=grp.styles;
+
+    const grpSav=styles.reduce((t,s)=>t+(s.projSavTot||0),0);
+
+    const grpCls='grp-ss-'+gi;
+
+    tbody+=`<tr class="sup-hdr" id="ss-grp-${gi}-hdr" data-grp="${grpCls}" data-prefix="ss" onclick="toggleGrp('ss-grp-${gi}-hdr')">
+
+      <td colspan="29"><span class="grp-arrow">&#9660;</span><strong>${esc(sup)}</strong>
+
+        <span class="grp-meta">${styles.length} styles &nbsp;|&nbsp; Proj. Save@100%: <strong>${fmtUSD(grpSav)}</strong></span>
+
+      </td></tr>`;
+
+    let subBuy=0,subS100=0,sub2S100=0,sub3S100=0;
+
+    styles.forEach((s,si)=>{
+
+      subBuy+=s.totalBuy; subS100+=s.projSavTot||0; sub2S100+=s.proj2SavTot||0; sub3S100+=s.proj3SavTot||0;
+
+      const a2=s.ref2AltSup?`<td style="background:#F4ECF7;white-space:normal" class="bold purple">${esc(s.ref2AltSup)}</td>
+
+        <td style="background:#F4ECF7">${esc(s.alt2Country||'')}</td>
+
+        <td style="background:#F4ECF7" class="${s.avg2FobDisc>0?'green':''}">${s.avg2FobDisc!=null?fmtPct(s.avg2FobDisc):'—'}</td>
+
+        <td style="background:#F4ECF7" class="${(s.proj2SavTot||0)>0?'purple bold':''}">${s.proj2SavTot?fmtUSD(s.proj2SavTot):'—'}</td>`
+
+        :'<td>—</td><td>—</td><td>—</td><td>—</td>';
+
+      const a3=s.ref3AltSup?`<td style="background:#E0F7FA;white-space:normal" class="bold teal">${esc(s.ref3AltSup)}</td>
+
+        <td style="background:#E0F7FA">${esc(s.alt3Country||'')}</td>
+
+        <td style="background:#E0F7FA" class="${s.avg3FobDisc>0?'green':''}">${s.avg3FobDisc!=null?fmtPct(s.avg3FobDisc):'—'}</td>
+
+        <td style="background:#E0F7FA" class="${(s.proj3SavTot||0)>0?'teal bold':''}">${s.proj3SavTot?fmtUSD(s.proj3SavTot):'—'}</td>`
+
+        :'<td>—</td><td>—</td><td>—</td><td>—</td>';
+
+      tbody+=`<tr class="data-row ${grpCls} ${si%2===0?'':'alt-row'}"
+
+        data-searchable="${esc(s.styleNum)} ${esc(s.desc)} ${esc(s.brand)} ${esc(s.category)} ${esc(s.coreSupp)} ${esc(s.refAltSup||'')}"
+
+        data-core-margin="${s.marginCore!=null?s.marginCore.toFixed(4):''}"
+
+        data-buy="${s.totalBuy}" data-sav100="${s.projSavTot||0}" data-sav2-100="${s.proj2SavTot||0}" data-sav3-100="${s.proj3SavTot||0}">
+
+        <td>${esc(s.styleNum||'')}</td>
+
+        <td style="white-space:normal">${esc(s.desc||'')}</td>
+
+        <td style="white-space:normal">${esc(s.brand||'')}</td>
+
+        <td style="white-space:normal">${esc(s.category||'')}</td>
+
+        <td style="white-space:normal">${esc(s.subcat||'')}</td>
+
+        <td style="background:#EBF5FB">${s.fobCore!=null?fmtUSD(s.fobCore):'—'}</td>
+
+        <td style="background:#EBF5FB">${s.lcCore!=null?fmtUSD(s.lcCore):'—'}</td>
+
+        <td style="background:#EBF5FB" class="${s.marginCore!=null?(s.marginCore<0?'red bold':(s.marginCore<0.27?'amber':'green')):''}">
+
+          ${s.marginCore!=null?fmtPct(s.marginCore):'—'}</td>
+
+        <td style="background:#EAFAF1;white-space:normal" class="bold green">${esc(s.refAltSup||'')}</td>
+
+        <td style="background:#EAFAF1">${esc(s.altCountry||'')}</td>
+
+        <td style="background:#EAFAF1">${esc(s.basis||'')}</td>
+
+        <td style="background:#EAFAF1" class="small">${(s.refStyleNums||[]).slice(0,3).join(', ')}</td>
+
+        <td style="background:#EAFAF1" class="${s.avgFobDisc>0?'green':''}">${s.avgFobDisc!=null?fmtPct(s.avgFobDisc):'—'}</td>
+
+        <td style="background:#EAFAF1">${s.projFOB!=null?fmtUSD(s.projFOB):'—'}</td>
+
+        <td style="background:#EAFAF1">${s.projLC!=null?fmtUSD(s.projLC):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${s.projMargin!=null?(s.projMargin<0?'red':'green'):''}">
+
+          ${s.projMargin!=null?fmtPct(s.projMargin):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${(s.projLCSav||0)>0?'green bold':''}">${s.projLCSav!=null?fmtUSD(s.projLCSav):'—'}</td>
+
+        <td style="background:#EAFAF1" class="num">${fmtInt(s.totalBuy)}</td>
+
+        <td style="background:#EAFAF1" class="${(s.projSavTot||0)>0?'green':''}">${s.projSavTot?fmtUSD(s.projSavTot*0.25):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${(s.projSavTot||0)>0?'green':''}">${s.projSavTot?fmtUSD(s.projSavTot*0.5):'—'}</td>
+
+        <td style="background:#EAFAF1" class="${(s.projSavTot||0)>0?'green bold':''}">${s.projSavTot?fmtUSD(s.projSavTot):'—'}</td>
+
+        ${a2}${a3}</tr>`;
+
+    });
+
+    tbody+=`<tr class="subtotal-row ${grpCls}">
+
+      <td colspan="17" class="bold">Subtotal — ${esc(sup)}</td>
+
+      <td class="num bold sub-buy">${fmtInt(subBuy)}</td>
+
+      <td class="green bold sub-s25">${fmtUSD(subS100*0.25)}</td>
+
+      <td class="green bold sub-s50">${fmtUSD(subS100*0.5)}</td>
+
+      <td class="green bold sub-s100">${fmtUSD(subS100)}</td>
+
+      <td colspan="3"></td>
+
+      <td class="${sub2S100>0?'purple bold':''} sub2-s100">${sub2S100>0?fmtUSD(sub2S100):'—'}</td>
+
+      <td colspan="3"></td>
+
+      <td class="${sub3S100>0?'teal bold':''} sub3-s100">${sub3S100>0?fmtUSD(sub3S100):'—'}</td></tr>`;
+
+  });
+
+
+
+  return `<div class="tab-toolbar">
+
+    <input type="text" class="search-box" id="ss-search" placeholder="Search style#, description, brand, category, supplier…" oninput="filterTab('ss')">
+
+    <div class="filter-divider"></div>
+
+    <span class="filter-label">Core Margin:</span>
+
+    <select class="filter-select" id="ss-margin-filter" onchange="filterTab('ss')">
+
+      <option value="">All</option><option value="low">Under 27%</option><option value="neg">Negative</option>
+
+    </select>
+
+    <div class="filter-divider"></div>
+
+    <button class="btn-secondary" onclick="expandAll('ss')">Expand All</button>
+
+    <button class="btn-secondary" onclick="collapseAll('ss')">Collapse All</button>
+
+    <div class="filter-divider"></div>
+
+    <button class="btn-clear" onclick="clearFilters('ss')">&#10005; Clear</button>
+
+  </div>
+
+  <div class="detail-scroll-wrap">
+
+    <table id="ss-table" class="detail-table">${CG}
+
+      <thead>
+
+        <tr>
+
+          <th colspan="5"  style="background:#2c3e50" class="group-hdr">STYLE INFO</th>
+
+          <th colspan="3"  style="background:#1a4f8a" class="group-hdr">CORE COSTS</th>
+
+          <th colspan="13" style="background:#1a5c35" class="group-hdr">&#9733; #1 RECOMMENDED ALT</th>
+
+          <th colspan="4"  style="background:#512b7a" class="group-hdr">&#9733;&#9733; #2 RECOMMENDED ALT</th>
+
+          <th colspan="4"  style="background:#00695C" class="group-hdr">&#9733;&#9733;&#9733; #3 RECOMMENDED ALT</th>
+
+        </tr>
+
+        <tr class="col-hdr">
+
+          <th class="th-ss1">Style#</th><th class="th-info">Description</th><th class="th-info">Brand</th><th class="th-info">Category</th><th class="th-info">Subcat</th>
+
+          <th class="th-core">Core FOB</th><th class="th-core">Core LC</th><th class="th-core">Core Margin%</th>
+
+          <th class="th-ss1">#1 Rec ALT Supplier</th><th class="th-ss1">ALT Country</th><th class="th-ss1">Basis</th><th class="th-ss1">Ref Style#s</th>
+
+          <th class="th-ss1">Avg FOB Disc%</th><th class="th-ss1">Proj FOB</th><th class="th-ss1">Proj LC</th><th class="th-ss1">Proj Margin%</th>
+
+          <th class="th-ss1">LC Save/Unit</th><th class="th-ss1">Buy Units</th>
+
+          <th class="th-ss1">Save@25%</th><th class="th-ss1">Save@50%</th><th class="th-ss1">Save@100%</th>
+
+          <th class="th-ss2">#2 Alt Supplier</th><th class="th-ss2">#2 Country</th><th class="th-ss2">#2 Disc%</th><th class="th-ss2">#2 Save@100%</th>
+
+          <th class="th-ss3">#3 Alt Supplier</th><th class="th-ss3">#3 Country</th><th class="th-ss3">#3 Disc%</th><th class="th-ss3">#3 Save@100%</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>${tbody}</tbody>
+
+    </table>
+
+  </div>`;
+
+}
+
+
+
+// &#9472;&#9472; TAB 4: Methodology &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+function buildMethodology(generatedAt) {
+
+  return `<div class="methodology">
+
+    <h2>What This Dashboard Shows</h2>
+
+    <p>This report analyzes <strong>Active: Replen</strong> styles from international suppliers (non-USA). AU, WFS, and DS prefix styles are excluded. Data is pulled <strong>live from Quickbase</strong> each time this page loads or Refresh is clicked.</p>
+
+    <h3>Tab 1 — Dashboard</h3>
+
+    <p>KPI cards and a supplier summary table showing dual-source (DS) savings and single-source opportunity (SS) savings side by side.</p>
+
+    <h3>Tab 2 — Multi-Source Analysis</h3>
+
+    <p>For each style with at least one ALT supplier in QB (fields 1330, 1899, 1900), all ALTs are evaluated and the one delivering the greatest LC save per unit is the "Best ALT". Grouped by core supplier, collapsible.</p>
+
+    <h3>Tab 3 — Single-Source Opportunity</h3>
+
+    <p>Uses the bidirectional dual-source methodology to identify styles with no ALT in QB but where a proven cheaper alternative exists from other dual-sourced records in the same supplier/category/subcategory. Up to 3 ranked ALT options shown.</p>
+
+    <h2>Cost Calculation Formulas</h2>
+
+    <div class="formula-box">
+
+      <p>Duty $ = FOB × Duty Rate % (field 139)</p>
+
+      <p>Load $ = FOB × 15%</p>
+
+      <p>Landed Cost = FOB + Duty$ + Freight + Load$</p>
+
+      <p>Margin = (Sell Price &#8722; LC) / Sell Price &#8722; Royalty% &#8722; Avg Terms%</p>
+
+      <p>LC Save/Unit = Core LC &#8722; ALT LC</p>
+
+      <p>Save @ X% = LC Save/Unit × 6-Mo Buy Units × X%</p>
+
+      <p>Freight: field 206 &#8594; field 1344 (LA) &#8594; field 300 (override). If no ALT freight, core freight used as proxy.</p>
+
+      <p>Terms %: bphzqfkev table field 379 (primary) &#8594; strip /N pack suffix fallback &#8594; field 1555 last resort.</p>
+
+    </div>
+
+    <h2>Bidirectional Single-Source Logic</h2>
+
+    <p>For every dual-sourced style, FOB comparisons are recorded in both directions. If ALT FOB &lt; Core FOB, the ALT is proven cheaper for that core supplier/category. If ALT FOB &gt; Core FOB, the Core is cheaper — making it a candidate ALT for styles where that ALT is the core.</p>
+
+    <p><em>Example:</em> FFP10159 has Core = Huiji @ $0.54, ALT = H&amp;O @ $0.58 &#8594; Huiji is cheaper &#8594; for H&amp;O single-source styles in that category, Huiji is the recommended ALT.</p>
+
+    <h2>Data Sources</h2>
+
+    <div class="formula-box">
+
+      <p>Styles (bn458n7jz): style#, mstyle, supplier, country, FOB (46), duty% (139), freight (206/1344/300), sell (1550/15), royalty% (104), terms% (1555), ALT fields (1330/1899/1900 + FOB/duty/freight)</p>
+
+      <p>Forecast (bpsaju5pm): mstyle (20), buy units W1–W26 (457, 459–461, 546–567)</p>
+
+      <p>Terms (bphzqfkev): mstyle (6), Avg Terms% (379)</p>
+
+      <p>Suppliers (bn7g5ebz5): name (45), country (7)</p>
+
+    </div>
+
+    <p class="footnote">Updated: ${generatedAt} &nbsp;|&nbsp; Source: Quickbase (pim.quickbase.com) &nbsp;|&nbsp; App: bn458t5nz</p>
+
+  </div>`;
+
+}
+
+
+
+// &#9472;&#9472; UI Interaction &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+function showTab(id, btn) {
+
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+
+  document.getElementById(id).classList.add('active');
+
+  btn.classList.add('active');
+
+}
+
+function toggleGrp(hdrid) {
+
+  const hdr=document.getElementById(hdrid);
+
+  const grpCls=hdr.getAttribute('data-grp');
+
+  const isNowCollapsed=hdr.classList.toggle('grp-collapsed');
+
+  document.querySelectorAll('tr.'+grpCls).forEach(r=>r.classList.toggle('collapsed-row',isNowCollapsed));
+
+}
+
+function expandAll(prefix) {
+
+  document.querySelectorAll('tr.sup-hdr[data-prefix="'+prefix+'"]').forEach(hdr=>{
+
+    hdr.classList.remove('grp-collapsed');
+
+    document.querySelectorAll('tr.'+hdr.getAttribute('data-grp')).forEach(r=>r.classList.remove('collapsed-row'));
+
+  });
+
+}
+
+function collapseAll(prefix) {
+
+  document.querySelectorAll('tr.sup-hdr[data-prefix="'+prefix+'"]').forEach(hdr=>{
+
+    hdr.classList.add('grp-collapsed');
+
+    document.querySelectorAll('tr.'+hdr.getAttribute('data-grp')).forEach(r=>r.classList.add('collapsed-row'));
+
+  });
+
+}
+
+function clearFilters(prefix) {
+
+  const s=document.getElementById(prefix+'-search'); if (s) s.value='';
+
+  ['rec','margin'].forEach(f=>{const el=document.getElementById(prefix+'-'+f+'-filter');if(el)el.value='';});
+
+  filterTab(prefix);
+
+}
+
+function fmtUSDjs(n){if(n==null)return '—';return '$'+Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+
+function recalcSubtotals(prefix) {
+
+  document.querySelectorAll('tr.sup-hdr[data-prefix="'+prefix+'"]').forEach(hdr=>{
+
+    const grpCls=hdr.getAttribute('data-grp');
+
+    const subRow=document.querySelector('tr.subtotal-row.'+grpCls);
+
+    if (!subRow) return;
+
+    const visRows=Array.from(document.querySelectorAll('tr.data-row.'+grpCls)).filter(r=>!r.classList.contains('hidden-row'));
+
+    const buy=visRows.reduce((t,r)=>t+(parseFloat(r.getAttribute('data-buy'))||0),0);
+
+    const sav100=visRows.reduce((t,r)=>t+(parseFloat(r.getAttribute('data-sav100'))||0),0);
+
+    const buyCell=subRow.querySelector('.sub-buy'),s25=subRow.querySelector('.sub-s25'),s50=subRow.querySelector('.sub-s50'),s100=subRow.querySelector('.sub-s100');
+
+    if(buyCell)buyCell.textContent=buy>0?Math.round(buy).toLocaleString():'—';
+
+    if(s25){s25.className=(sav100>0?'green bold ':'')+'sub-s25';s25.textContent=sav100>0?fmtUSDjs(sav100*0.25):'—';}
+
+    if(s50){s50.className=(sav100>0?'green bold ':'')+'sub-s50';s50.textContent=sav100>0?fmtUSDjs(sav100*0.5):'—';}
+
+    if(s100){s100.className=(sav100>0?'green bold ':'')+'sub-s100';s100.textContent=sav100>0?fmtUSDjs(sav100):'—';}
+
+    if(prefix==='ss'){
+
+      const sav2=visRows.reduce((t,r)=>t+(parseFloat(r.getAttribute('data-sav2-100'))||0),0);
+
+      const c2=subRow.querySelector('.sub2-s100');
+
+      if(c2){c2.className=(sav2>0?'purple bold ':'')+'sub2-s100';c2.textContent=sav2>0?fmtUSDjs(sav2):'—';}
+
+      const sav3=visRows.reduce((t,r)=>t+(parseFloat(r.getAttribute('data-sav3-100'))||0),0);
+
+      const c3=subRow.querySelector('.sub3-s100');
+
+      if(c3){c3.className=(sav3>0?'teal bold ':'')+'sub3-s100';c3.textContent=sav3>0?fmtUSDjs(sav3):'—';}
+
+    }
+
+  });
+
+}
+
+function filterDash() {
+
+  const q=(document.getElementById('dash-search')?.value||'').toLowerCase().trim();
+
+  document.querySelectorAll('#dash-tbody tr:not(.grand-total)').forEach(row=>{
+
+    const name=(row.querySelector('td:nth-child(2)')?.textContent||'').toLowerCase();
+
+    row.classList.toggle('hidden-row',q.length>0&&!name.includes(q));
+
+  });
+
+}
+
+function filterTab(prefix) {
+
+  const q=(document.getElementById(prefix+'-search')?.value||'').toLowerCase().trim();
+
+  const recVal=(document.getElementById(prefix+'-rec-filter')?.value||'');
+
+  const margVal=(document.getElementById(prefix+'-margin-filter')?.value||'');
+
+  const hasFilter=!!(q||recVal||margVal);
+
+  document.querySelectorAll('tr.sup-hdr[data-prefix="'+prefix+'"]').forEach(hdr=>{
+
+    const grpCls=hdr.getAttribute('data-grp');
+
+    const dataRows=document.querySelectorAll('tr.data-row.'+grpCls);
+
+    let anyVisible=false;
+
+    dataRows.forEach(row=>{
+
+      let show=true;
+
+      if(q&&!(row.getAttribute('data-searchable')||'').toLowerCase().includes(q))show=false;
+
+      if(recVal==='switch'&&row.getAttribute('data-rec')!=='switch')show=false;
+
+      if(recVal==='next-buy'&&row.getAttribute('data-rec')!=='next-buy')show=false;
+
+      if(recVal==='keep'&&row.getAttribute('data-rec')!=='keep')show=false;
+
+      const m=parseFloat(row.getAttribute('data-core-margin'));
+
+      if(margVal==='low'&&!(m<0.27))show=false;
+
+      if(margVal==='neg'&&!(m<0))show=false;
+
+      row.classList.toggle('hidden-row',!show);
+
+      if(show)anyVisible=true;
+
+    });
+
+    const hideGrp=hasFilter&&!anyVisible;
+
+    hdr.classList.toggle('hidden-row',hideGrp);
+
+    document.querySelectorAll('tr.subtotal-row.'+grpCls).forEach(r=>r.classList.toggle('hidden-row',hideGrp));
+
+    if(hasFilter&&anyVisible){
+
+      hdr.classList.remove('grp-collapsed');
+
+      dataRows.forEach(r=>r.classList.remove('collapsed-row'));
+
+      document.querySelectorAll('tr.subtotal-row.'+grpCls).forEach(r=>r.classList.remove('collapsed-row'));
+
+    }
+
+  });
+
+  recalcSubtotals(prefix);
+
+}
+
+
+
+// &#9472;&#9472; Kick off on load &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+window.addEventListener('DOMContentLoaded', loadData);
+
+
+
+// &#9472;&#9472; Excel Export &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+async function exportExcel() {
+
+  if (!window._exportData) { alert('Data not loaded yet — please wait for the dashboard to finish loading.'); return; }
+
+  if (typeof ExcelJS === 'undefined') { alert('Excel library not loaded — check your internet connection and try again.'); return; }
+
+  const btn = document.querySelector('.export-btn');
+
+  const origText = btn.textContent;
+
+  btn.textContent = '&#9203; Generating…'; btn.disabled = true;
+
+  try {
+
+  const { supList, ssSupList, ssBySupplier, ssData } = window._exportData;
+
+  const wb = new ExcelJS.Workbook();
+
+  wb.creator = 'Pets & People Supplier Savings Analysis'; wb.created = new Date();
+
+
+
+  // &#9472;&#9472; Helpers &#9472;&#9472;
+
+  const fl  = a => ({ type:'pattern', pattern:'solid', fgColor:{argb:a} });
+
+  const fn  = (bold,sz,a) => ({ name:'Calibri', bold:!!bold, size:sz||9, ...(a?{color:{argb:a}}:{}) });
+
+  const al  = (h,wrap) => ({ horizontal:h||'left', vertical:'middle', wrapText:!!wrap });
+
+  const usd = v => v!=null ? Math.round(v*100)/100 : null;
+
+  const r2x = v => v!=null ? Math.round(v*100)/100 : null;
+
+  const FMT = { usd:'$#,##0.00', pct:'0.00%', int:'#,##0' };
+
+  const C = {
+
+    navy:'0F3460', blue:'1A5276', blueBg:'EBF5FB',
+
+    green:'1E8449', greenBg:'EAFAF1',
+
+    purple:'7D3C98', purpleBg:'F4ECF7',
+
+    teal:'00695C', tealBg:'E0F7FA',
+
+    sub:'D5E8F5', gray:'F5F5F5', white:'FFFFFF',
+
+    red:'C0392B', amber:'F39C12'
+
+  };
+
+  const hdr = (cell,val,bg,bold,sz) => {
+
+    cell.value=val; cell.fill=fl(bg); cell.font=fn(bold,sz||9,'FFFFFF'); cell.alignment=al('center',true);
+
+  };
+
+
+
+  // &#9472;&#9472; Sheet 1: Supplier Summary &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+  const ws1 = wb.addWorksheet('Supplier Summary');
+
+  [5,30,10,14,10,12,14,14,14,14,12,14,14,14,14,14,14].forEach((w,i)=>{ ws1.getColumn(i+1).width=w; });
+
+  ws1.mergeCells(1,1,1,17); hdr(ws1.getRow(1).getCell(1),'SUPPLIER SAVINGS ANALYSIS — Supplier Summary',C.navy,true,12);
+
+  ws1.getRow(1).height=22;
+
+  ws1.mergeCells(2,7,2,10);  hdr(ws1.getRow(2).getCell(7), 'DUAL-SOURCE ANALYSIS',       C.blue,true);
+
+  ws1.mergeCells(2,11,2,14); hdr(ws1.getRow(2).getCell(11),'SINGLE-SOURCE OPPORTUNITY',   C.green,true);
+
+  ws1.mergeCells(2,15,2,17); hdr(ws1.getRow(2).getCell(15),'COMBINED',                    C.purple,true);
+
+  ws1.getRow(2).height=15;
+
+  const h1=ws1.addRow(['#','Supplier','Total Styles','DS Styles w/Savings','Keep Core','Buy Units',
+
+    'DS Save@25%','DS Save@50%','DS Save@100%','Avg FOB Disc%',
+
+    'SS Opp Styles','SS Save@25%','SS Save@50%','SS Save@100%',
+
+    'Combined Save@25%','Combined Save@50%','Combined Save@100%']);
+
+  h1.eachCell({includeEmpty:true},c=>{ c.fill=fl(C.navy); c.font=fn(true,9,'FFFFFF'); c.alignment=al('center'); });
+
+  ws1.getRow(3).height=18; ws1.views=[{state:'frozen',ySplit:3}];
+
+  let r1i=1, totDs=0, totSs=0;
+
+  for (const g of supList) {
+
+    const sav=g.styles.filter(s=>s.bestAlt&&s.savingsTotal>0).length;
+
+    const kc =g.styles.filter(s=>!s.bestAlt||s.savingsTotal<=0).length;
+
+    const bu =g.styles.reduce((t,s)=>t+(s.totalBuy||0),0);
+
+    const dd =g.styles.filter(s=>s.bestAlt?.fobDisc!=null).map(s=>s.bestAlt.fobDisc);
+
+    const ad =dd.length?dd.reduce((a,b)=>a+b,0)/dd.length:null;
+
+    const ds =g.styles.reduce((t,s)=>t+(s.savingsTotal||0),0);
+
+    const ss =ssBySupplier[g.supplier]||{};
+
+    const sv =ss.savTot||0;
+
+    totDs+=ds; totSs+=sv;
+
+    const row=ws1.addRow([r1i++,g.supplier,g.styles.length,sav,kc,bu,
+
+      usd(ds*.25),usd(ds*.5),usd(ds),ad,ss.count||0,
+
+      usd(sv*.25),usd(sv*.5),usd(sv),
+
+      usd((ds+sv)*.25),usd((ds+sv)*.5),usd(ds+sv)]);
+
+    const bg=(r1i%2===0)?C.gray:C.white;
+
+    row.eachCell({includeEmpty:true},c=>{ c.fill=fl(bg); });
+
+    [7,8,9,12,13,14,15,16,17].forEach(c=>row.getCell(c).numFmt=FMT.usd);
+
+    row.getCell(10).numFmt=FMT.pct;
+
+    [3,4,5,6,11].forEach(c=>row.getCell(c).numFmt=FMT.int);
+
+    if(ds>0)    row.getCell(9).font=fn(true,9,C.green);
+
+    if(sv>0)    row.getCell(14).font=fn(true,9,C.green);
+
+    if(ds+sv>0) row.getCell(17).font=fn(true,9,C.purple);
+
+  }
+
+  const gt1=ws1.addRow(['','Grand Total','','','','',usd(totDs*.25),usd(totDs*.5),usd(totDs),'','',usd(totSs*.25),usd(totSs*.5),usd(totSs),usd((totDs+totSs)*.25),usd((totDs+totSs)*.5),usd(totDs+totSs)]);
+
+  gt1.eachCell({includeEmpty:true},c=>{ c.fill=fl(C.sub); c.font=fn(true,10); });
+
+  [7,8,9,12,13,14,15,16,17].forEach(c=>gt1.getCell(c).numFmt=FMT.usd);
+
+  gt1.getCell(9).font=fn(true,10,C.green); gt1.getCell(14).font=fn(true,10,C.green); gt1.getCell(17).font=fn(true,10,C.purple);
+
+  gt1.height=20;
+
+
+
+  // &#9472;&#9472; Sheet 2: Multi-Source Analysis &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+  const ws2=wb.addWorksheet('Multi-Source Analysis');
+
+  const S={RW:1,ST:2,MS:3,STS:4,DE:5,BR:6,CA:7,CS:8,CF:9,CD:10,CDD:11,CFR:12,CL:13,CLC:14,CM:15,SP:16,RY:17,TR:18,AS:19,AF:20,AD:21,ADD:22,AFR:23,AL:24,ALC:25,AM:26,DI:27,LS:28,ML:29,BU:30,S25:31,S50:32,S100:33,RC:34};
+
+  const L2=34;
+
+  [5,12,14,14,30,14,18,28,10,10,10,10,10,12,10,10,10,10,28,10,10,10,10,10,12,10,10,12,12,12,12,12,12,24].forEach((w,i)=>ws2.getColumn(i+1).width=w);
+
+  ws2.mergeCells(1,1,1,L2); hdr(ws2.getRow(1).getCell(1),'SUPPLIER SAVINGS ANALYSIS — Multi-Source Analysis',C.navy,true,12);
+
+  ws2.getRow(1).height=22;
+
+  ws2.mergeCells(2,S.CS,2,S.TR); hdr(ws2.getRow(2).getCell(S.CS),'CORE SUPPLIER',       C.blue,true);
+
+  ws2.mergeCells(2,S.AS,2,S.RC); hdr(ws2.getRow(2).getCell(S.AS),'&#9733; BEST ALT SUPPLIER', C.green,true);
+
+  ws2.getRow(2).height=15;
+
+  const h2=ws2.addRow(['#','Style#','Mstyle','Status','Description','Brand','Category',
+
+    'Core Supplier','FOB','Duty%','Duty$','Freight','Load$','LC','Margin%','Sell Price','Royalty%','Terms%',
+
+    '&#9733; Best ALT','ALT FOB','ALT Duty%','ALT Duty$','ALT Freight','ALT Load$','ALT LC','ALT Margin%',
+
+    'FOB Disc%','LC Save/Unit','Margin Lift (pp)','Buy Units','Save@25%','Save@50%','Save@100%','Recommendation']);
+
+  h2.eachCell({includeEmpty:true},c=>{ c.fill=fl(C.navy); c.font=fn(true,9,'FFFFFF'); c.alignment=al('center',true); });
+
+  ws2.getRow(3).height=30; ws2.views=[{state:'frozen',ySplit:3}];
+
+  let r2i=1, totDs2=0;
+
+  for (const g of supList) {
+
+    const gDs=g.styles.reduce((t,s)=>t+(s.savingsTotal||0),0); totDs2+=gDs;
+
+    const gr=ws2.addRow([]);
+
+    ws2.mergeCells(gr.number,1,gr.number,L2);
+
+    gr.getCell(1).value=`  ${g.supplier}   (${g.styles.length} styles)   Save@100%: $${gDs.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+
+    gr.getCell(1).fill=fl(C.navy); gr.getCell(1).font=fn(true,10,'FFFFFF'); gr.height=18;
+
+    for (const s of g.styles) {
+
+      const b=s.bestAlt;
+
+      const row=ws2.addRow([r2i++,s.styleNum,s.mstyle,s.status,s.desc,s.brand,s.category,
+
+        s.coreSupplier,usd(s.fobCore),s.dutyPct,usd(s.dutyDollar),usd(s.freightIn),usd(s.loadDollar),usd(s.lcCore),s.marginCore,usd(s.sellPrice),s.royaltyPct,s.termsPct,
+
+        b?.supplier||'',usd(b?.fob),b?.altDutyPct,usd(b?.altDutyDollar),usd(b?.altFreight),usd(b?.altLoad),usd(b?.lc),b?.margin,
+
+        b?.fobDisc,usd(b?.lcSavPerUnit),b?.marginLift!=null?r2x(b.marginLift):null,s.totalBuy,
+
+        b&&s.savingsTotal>0?usd(s.savingsTotal*.25):null,
+
+        b&&s.savingsTotal>0?usd(s.savingsTotal*.5):null,
+
+        b&&s.savingsTotal>0?usd(s.savingsTotal):null,
+
+        b&&s.savingsTotal>0?`Switch to ${b.supplier}`:b&&s.totalBuy===0?`Switch when next buy occurs — ${b.supplier}`:'Keep Core']);
+
+      for(let c=S.CS;c<=S.TR;c++) row.getCell(c).fill=fl(C.blueBg);
+
+      if(b) for(let c=S.AS;c<=S.RC;c++) row.getCell(c).fill=fl(C.greenBg);
+
+      [S.CF,S.CDD,S.CFR,S.CL,S.CLC,S.SP,S.LS,S.S25,S.S50,S.S100].forEach(c=>row.getCell(c).numFmt=FMT.usd);
+
+      [S.CD,S.CM,S.RY,S.TR,S.AD,S.AM,S.DI].forEach(c=>row.getCell(c).numFmt=FMT.pct);
+
+      if(b) [S.AF,S.ADD,S.AFR,S.AL,S.ALC].forEach(c=>row.getCell(c).numFmt=FMT.usd);
+
+      row.getCell(S.BU).numFmt=FMT.int;
+
+      if(s.savingsTotal>0) row.getCell(S.S100).font=fn(true,9,C.green);
+
+      if(s.marginCore!=null){ if(s.marginCore<0) row.getCell(S.CM).font=fn(true,9,C.red); else if(s.marginCore<0.27) row.getCell(S.CM).font=fn(false,9,C.amber); }
+
+    }
+
+  }
+
+  const gt2=ws2.addRow([]); gt2.height=20;
+
+  for(let c=1;c<=L2;c++) gt2.getCell(c).fill=fl(C.sub);
+
+  gt2.getCell(1).value='  Grand Total'; gt2.getCell(1).font=fn(true,10);
+
+  [S.S25,S.S50,S.S100].forEach((c,i)=>{ const v=usd(totDs2*(i===0?.25:i===1?.5:1)); gt2.getCell(c).value=v; gt2.getCell(c).numFmt=FMT.usd; gt2.getCell(c).font=fn(true,10,C.green); });
+
+
+
+  // &#9472;&#9472; Sheet 3: Single-Source Opportunity &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+
+  const ws3=wb.addWorksheet('Single-Source Opportunity');
+
+  const B3=20, A3=19, L3=B3+A3*3; // 77 cols
+
+  [5,12,14,14,30,14,18,18,28,14,10,10,10,10,10,12,10,10,10,10,
+
+   28,14,18,8,24,10,10,10,10,10,10,12,10,12,12,12,12,12,12,
+
+   28,14,18,8,24,10,10,10,10,10,10,12,10,12,12,12,12,12,12,
+
+   28,14,18,8,24,10,10,10,10,10,10,12,10,12,12,12,12,12,12].forEach((w,i)=>ws3.getColumn(i+1).width=w);
+
+  ws3.mergeCells(1,1,1,L3); hdr(ws3.getRow(1).getCell(1),'SUPPLIER SAVINGS ANALYSIS — Single-Source Opportunity',C.navy,true,12);
+
+  ws3.getRow(1).height=22;
+
+  ws3.mergeCells(2,1,2,L3);
+
+  const mn=ws3.getRow(2).getCell(1);
+
+  mn.value='Projected savings for single-source styles where a proven cheaper alternate supplier exists. ALT must not already be in QB ALT slots. Only positive projected LC savings shown.';
+
+  mn.fill=fl('FFF8E1'); mn.font={name:'Calibri',size:8,italic:true,color:{argb:'996600'}}; mn.alignment={horizontal:'left',vertical:'middle',wrapText:true};
+
+  ws3.getRow(2).height=22;
+
+  ws3.mergeCells(3,1,3,B3);         hdr(ws3.getRow(3).getCell(1),       'CORE SUPPLIER DATA',              C.blue,true);
+
+  ws3.mergeCells(3,B3+1,3,B3+A3);   hdr(ws3.getRow(3).getCell(B3+1),   '&#9733; #1 RECOMMENDED ALT SUPPLIER',   C.green,true);
+
+  ws3.mergeCells(3,B3+A3+1,3,B3+A3*2); hdr(ws3.getRow(3).getCell(B3+A3+1),'&#9733;&#9733; #2 RECOMMENDED ALT SUPPLIER', C.purple,true);
+
+  ws3.mergeCells(3,B3+A3*2+1,3,L3); hdr(ws3.getRow(3).getCell(B3+A3*2+1),'&#9733;&#9733;&#9733; #3 RECOMMENDED ALT SUPPLIER',C.teal,true);
+
+  ws3.getRow(3).height=15;
+
+  const h3=ws3.addRow([
+
+    '#','Style#','Mstyle','Status','Description','Brand','Category','Subcategory','Core Supplier','Country',
+
+    'FOB','Duty%','Duty$','Freight','Load$','LC','Margin%','Sell Price','Royalty%','Terms%',
+
+    '#1 ALT Supplier','#1 Country','#1 Basis','#1 Ref#','#1 Ref Styles','#1 Disc%','#1 Proj FOB','#1 Proj Duty%','#1 Proj Duty$','#1 Proj Freight','#1 Proj Load$','#1 Proj LC','#1 Proj Margin%','#1 LC Save/Unit','#1 Margin Lift','#1 Buy Units','#1 Save@25%','#1 Save@50%','#1 Save@100%',
+
+    '#2 ALT Supplier','#2 Country','#2 Basis','#2 Ref#','#2 Ref Styles','#2 Disc%','#2 Proj FOB','#2 Proj Duty%','#2 Proj Duty$','#2 Proj Freight','#2 Proj Load$','#2 Proj LC','#2 Proj Margin%','#2 LC Save/Unit','#2 Margin Lift','#2 Buy Units','#2 Save@25%','#2 Save@50%','#2 Save@100%',
+
+    '#3 ALT Supplier','#3 Country','#3 Basis','#3 Ref#','#3 Ref Styles','#3 Disc%','#3 Proj FOB','#3 Proj Duty%','#3 Proj Duty$','#3 Proj Freight','#3 Proj Load$','#3 Proj LC','#3 Proj Margin%','#3 LC Save/Unit','#3 Margin Lift','#3 Buy Units','#3 Save@25%','#3 Save@50%','#3 Save@100%']);
+
+  h3.eachCell({includeEmpty:true},(c,ci)=>{
+
+    c.font=fn(true,8,'FFFFFF'); c.alignment=al('center',true);
+
+    c.fill=fl(ci<=B3?C.blue:ci<=B3+A3?C.green:ci<=B3+A3*2?C.purple:C.teal);
+
+  });
+
+  ws3.getRow(4).height=30; ws3.views=[{state:'frozen',ySplit:4}];
+
+
+
+  let r3i=1, totS1=0, totS2=0, totS3=0;
+
+  const fa=(row,o)=>{  // apply num formats for one ALT block starting at col o+1
+
+    [o+7,o+9,o+10,o+11,o+12,o+14,o+17,o+18,o+19].forEach(c=>row.getCell(c).numFmt=FMT.usd);
+
+    [o+6,o+8,o+13].forEach(c=>row.getCell(c).numFmt=FMT.pct);
+
+    row.getCell(o+16).numFmt=FMT.int;
+
+  };
+
+  for (const g of ssSupList) {
+
+    const g1=g.styles.reduce((t,s)=>t+(s.projSavTot||0),0);
+
+    const g2=g.styles.reduce((t,s)=>t+(s.proj2SavTot||0),0);
+
+    const g3=g.styles.reduce((t,s)=>t+(s.proj3SavTot||0),0);
+
+    totS1+=g1; totS2+=g2; totS3+=g3;
+
+    const gr=ws3.addRow([]);
+
+    ws3.mergeCells(gr.number,1,gr.number,L3);
+
+    gr.getCell(1).value=`  ${g.sup}   (${g.styles.length} styles)   #1 Save@100%: $${g1.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+
+    gr.getCell(1).fill=fl(C.navy); gr.getCell(1).font=fn(true,10,'FFFFFF'); gr.height=18;
+
+    for (const s of g.styles) {
+
+      const row=ws3.addRow([r3i++,
+
+        s.styleNum,s.mstyle,s.status,s.desc,s.brand,s.category,s.subcat,s.coreSupp,s.country,
+
+        usd(s.fobCore),s.dutyPct,usd(s.dutyDollar),usd(s.freightIn),usd(s.loadDollar),usd(s.lcCore),s.marginCore,usd(s.sellPrice),s.royaltyPct,s.termsPct,
+
+        s.refAltSup,s.altCountry,s.basis,s.refCount,(s.refStyleNums||[]).join(', '),s.avgFobDisc,
+
+        usd(s.projFOB),s.projDutyPct,usd(s.projDutyDol),usd(s.projFreight),usd(s.projLoad),usd(s.projLC),s.projMargin,usd(s.projLCSav),s.projMgnLift!=null?r2x(s.projMgnLift):null,s.totalBuy,usd((s.projSavTot||0)*.25),usd((s.projSavTot||0)*.5),usd(s.projSavTot||0),
+
+        s.ref2AltSup||'',s.alt2Country||'',s.basis2||'',s.ref2Count||'',(s.ref2StyleNums||[]).join(', '),s.avg2FobDisc,
+
+        usd(s.proj2FOB),s.proj2DutyPct,usd(s.proj2DutyDol),usd(s.proj2Freight),usd(s.proj2Load),usd(s.proj2LC),s.proj2Margin,usd(s.proj2LCSav),s.proj2MgnLift!=null?r2x(s.proj2MgnLift):null,s.ref2AltSup?s.totalBuy:null,s.proj2SavTot?usd(s.proj2SavTot*.25):null,s.proj2SavTot?usd(s.proj2SavTot*.5):null,s.proj2SavTot?usd(s.proj2SavTot):null,
+
+        s.ref3AltSup||'',s.alt3Country||'',s.basis3||'',s.ref3Count||'',(s.ref3StyleNums||[]).join(', '),s.avg3FobDisc,
+
+        usd(s.proj3FOB),s.proj3DutyPct,usd(s.proj3DutyDol),usd(s.proj3Freight),usd(s.proj3Load),usd(s.proj3LC),s.proj3Margin,usd(s.proj3LCSav),s.proj3MgnLift!=null?r2x(s.proj3MgnLift):null,s.ref3AltSup?s.totalBuy:null,s.proj3SavTot?usd(s.proj3SavTot*.25):null,s.proj3SavTot?usd(s.proj3SavTot*.5):null,s.proj3SavTot?usd(s.proj3SavTot):null]);
+
+      for(let c=1;c<=B3;c++) row.getCell(c).fill=fl(C.blueBg);
+
+      for(let c=B3+1;c<=B3+A3;c++) row.getCell(c).fill=fl(C.greenBg);
+
+      if(s.ref2AltSup) for(let c=B3+A3+1;c<=B3+A3*2;c++) row.getCell(c).fill=fl(C.purpleBg);
+
+      if(s.ref3AltSup) for(let c=B3+A3*2+1;c<=L3;c++) row.getCell(c).fill=fl(C.tealBg);
+
+      [11,13,14,15,16,18].forEach(c=>row.getCell(c).numFmt=FMT.usd);
+
+      [12,17,19,20].forEach(c=>row.getCell(c).numFmt=FMT.pct);
+
+      fa(row,B3); fa(row,B3+A3); fa(row,B3+A3*2);
+
+      if(s.marginCore!=null){ if(s.marginCore<0) row.getCell(17).font=fn(true,9,C.red); else if(s.marginCore<0.27) row.getCell(17).font=fn(false,9,C.amber); }
+
+      if((s.projSavTot||0)>0)  row.getCell(B3+A3).font=fn(true,9,C.green);
+
+      if((s.proj2SavTot||0)>0) row.getCell(B3+A3*2).font=fn(true,9,C.purple);
+
+      if((s.proj3SavTot||0)>0) row.getCell(L3).font=fn(true,9,C.teal);
+
+    }
+
+  }
+
+  const gt3=ws3.addRow([]); gt3.height=20;
+
+  for(let c=1;c<=L3;c++) gt3.getCell(c).fill=fl(C.sub);
+
+  gt3.getCell(1).value='  Grand Total'; gt3.getCell(1).font=fn(true,10);
+
+  const sg=(c,v,col)=>{ gt3.getCell(c).value=usd(v); gt3.getCell(c).numFmt=FMT.usd; gt3.getCell(c).font=fn(true,10,col); };
+
+  sg(B3+A3,totS1,C.green);
+
+  if(totS2>0) sg(B3+A3*2,totS2,C.purple);
+
+  if(totS3>0) sg(L3,totS3,C.teal);
+
+
+
+  // &#9472;&#9472; Download &#9472;&#9472;
+
+  const buffer=await wb.xlsx.writeBuffer();
+
+  const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement('a');
+
+  a.href=url; a.download=`Multi_Source_Analysis_${new Date().toISOString().slice(0,10)}.xlsx`; a.click();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+  } catch(err) { alert('Export failed: '+err.message); console.error(err); }
+
+  finally { btn.textContent=origText; btn.disabled=false; }
+
+}
+
+</script>
+
+</body>
+
+</html>
+
+
+	

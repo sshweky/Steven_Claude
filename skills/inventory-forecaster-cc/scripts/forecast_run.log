@@ -16,31 +16,31 @@
       5540 records retrieved
 
 [2/4] Pulling master pack + Season from Styles ...
-  [watchdog] still running � 11s since last output | last: [2/4] Pulling master pack + Season from Styles ...
+  [watchdog] still running � 7s since last output | last: [2/4] Pulling master pack + Season from Styles ...
       2278 master pack records loaded (164 with Season tag)
 
 [2.5] Pulling Amazon catalog POS for 1899 mstyles ...
-  [watchdog] still running � 17s since last output | last: [2.5] Pulling Amazon catalog POS for 1899 mstyles ...
+  [watchdog] still running � 18s since last output | last: [2.5] Pulling Amazon catalog POS for 1899 mstyles ...
       1661 mstyles with POS data loaded
       viewer_pos_cache.json refreshed (1661 mstyles)
 
 [2.6] Pulling Amazon Catalog US (F38 signals) for 1899 mstyles ...
-  [watchdog] still running � 26s since last output | last: [2.6] Pulling Amazon Catalog US (F38 signals) for 1899 mstyles ...
       1661 mstyles with Amazon Catalog US signals loaded
 
 [2.6b] Pulling Amazon Inventory Health for 1661 ASINs ...
+  [watchdog] still running � 5s since last output | last: [2.6b] Pulling Amazon Inventory Health for 1661 ASINs ...
       1545 mstyles enriched with DC inventory health data
 
 [2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 5540 keys (w1_date=2026-05-17) ...
       [vp-q4] BULK fetch: running QB report #27 on table bp8r4dejr (replaces per-account loop) ...
-      [vp-q4] 10,656 rows in 3.4s (1 API call vs ~137 per-account calls)
+      [vp-q4] 10,656 rows in 11.6s (1 API call vs ~137 per-account calls)
       [vp-q4] cached → open_pos_report.json (reused for 0h)
       [vp-q4] bucketed 8,140 in-scope rows across 1,843 keys (skipped: 2,323 out-of-scope · 0 zero-qty · 0 no-date · 193 outside-26w)
       1843 keys have confirmed forward POs (total open qty: 1,408,240 units)
 
 [2.9] VP-ATS: fetching ATS L26W history for 2282 mstyles ...
       [vp-ats] fetching ATS L26W history from bv2sxg2ji (2282 mstyles) ...
-  [watchdog] still running � 5s since last output | last:       [vp-ats] fetching ATS L26W history from bv2sxg2ji (2282 mstyles) ...
+  [watchdog] still running � 9s since last output | last:       [vp-ats] fetching ATS L26W history from bv2sxg2ji (2282 mstyles) ...
       [vp-ats] 265 mstyles with ATS history loaded  (735 filtered out)
       265 mstyles loaded, 182 with at least one non-zero ATS week
 
@@ -100,7 +100,7 @@
       5300/5540 validated ...
       5400/5540 validated ...
       5500/5540 validated ...
-      Validation complete in 3.5s
+      Validation complete in 6.9s
       Saved → validation_results.json
 
   ── Validation Summary ──
@@ -108,7 +108,7 @@
   CRITICAL:        2499
   WARNING:         1492
   Clean:           1549
-  Total flags:     52370
+  Total flags:     52371
 
   Top flagged records:
     ☢ 12446-BB0234CAN                 CRITICAL  26 flags  Proj:   66,000  Exp:   47,846  Δ +37.9%
@@ -136,25 +136,25 @@
   [CData] session ready.
       43 DI sibling variant(s) blended into 43 base record(s)
   [F58] Loaded 13 active AI adjustments (last 60 days)
-      5540 forecasts complete in 24.3s
-      Croston's: 1217  Heuristic: 397  Inactive: 1216  Inactive (zero order history): 98  OTB (zero): 386  Pre-launch NEW (manual passthrough): 57  Reactivating: 6  Seasonal Baseline: 843  Sparse Intermittent: 1320  Bi-weekly enforced: 275  Alerts (>5%): 3881
+      5540 forecasts complete in 23.5s
+      Croston's: 1217  Heuristic: 397  Inactive: 1216  Inactive (zero order history): 98  OTB (zero): 386  Pre-launch NEW (manual passthrough): 57  Reactivating: 6  Seasonal Baseline: 843  Sparse Intermittent: 1320  Bi-weekly enforced: 275  Alerts (>5%): 3880
       Saved → forecast_results.json
       Open viewer: python scripts/viewer.py --results forecast_results.json
 
 [4/4] Writing 5540 records to Quickbase ...
       5540 records  |  bulk REST → pim.quickbase.com/v1/records, batch=500
       Auto Project: 6 records will have manual projections replaced with AI values
-      W1 PO zero-out: 1100 records have an open PO in W1 — MAN PRJ W1 will be set to 0
-      W2 PO zero-out: 761 records have an open PO in W2 — MAN PRJ W2 will be set to 0
-  [watchdog] still running � 9s since last output | last:       W2 PO zero-out: 761 records have an open PO in W2 — MAN PRJ W2 will be s
-      Bulk upsert: 5,540 OK · 0 failed · 15.6s (355 rec/s)
+      W1 PO zero-out: 1086 records have an open PO in W1 — MAN PRJ W1 will be set to 0
+      W2 PO zero-out: 852 records have an open PO in W2 — MAN PRJ W2 will be set to 0
+  [watchdog] still running � 5s since last output | last:       W2 PO zero-out: 852 records have an open PO in W2 — MAN PRJ W2 will be s
+      Bulk upsert: 5,540 OK · 0 failed · 22.0s (252 rec/s)
 
 ==================================================================
-  COMPLETE  |  5540 records  |  Total 26w demand: 16,374,793
+  COMPLETE  |  5540 records  |  Total 26w demand: 16,317,281
   Models — HW: 0  Croston's: 1217  Heuristic: 397  Inactive: 1216  Bi-weekly: 275
-  Write-back: 0.3 min  |  ok=0  fail=0
+  Write-back: 0.4 min  |  ok=0  fail=0
 
-  ALERTS (3881 records — >5% variance or inactive):
+  ALERTS (3880 records — >5% variance or inactive):
   Key                                   Δ%  Model               AI 26w      Manual
   --------------------------------------------------------------------------------
   1003-BB35039                      +100.0%  Inactive                      0         160
@@ -700,7 +700,7 @@
   1420-BB35098                       +27.1%  Croston's                 3,720       5,100
   14224-BB16997                     +100.0%  Inactive                      0          46
   14224-BB16998                      +13.7%  Croston's                   528         612
-  14224-BB16999                     +100.0%  Croston's                     0         120
+  14224-BB16999                      +60.0%  Croston's                    48         120
   14224-BB17003                       +7.4%  Croston's                   528         570
   14224-BB17004                      +73.3%  Croston's                    48         180
   14224-BB17006                     +100.0%  Sparse Intermittent                0          40
@@ -735,7 +735,7 @@
   15339-BB0094                       +38.4%  Croston's                   924       1,500
   15339-BB0096                       +52.0%  Sparse Intermittent [BW]         144         300
   15339-BB0102                       +90.4%  Croston's                 1,428         750
-  15339-BB0131                       +31.6%  Croston's                 1,026       1,500
+  15339-BB0131                       +25.2%  Croston's                 1,122       1,500
   15339-BB0234                       +41.5%  Croston's                 1,170       2,000
   15339-BB0236                      +126.5%  Sparse Intermittent              906         400
   15339-BB0237                       +61.6%  Croston's                   606         375
@@ -1311,7 +1311,7 @@
   1864-BB0131PCS2                    +80.4%  Seasonal Baseline              453       2,315
   1864-BB0149                        +12.9%  Heuristic                 7,428       8,525
   1864-BB0149PCS12                   +80.3%  Seasonal Baseline              155         785
-  1864-BB0149PCS2                  +1716.7%  Croston's                 7,176         395
+  1864-BB0149PCS2                    +97.5%  Croston's                   780         395
   1864-BB0149PCS6                   +100.0%  Croston's                     0       1,815
   1864-BB0150                        +35.1%  Seasonal Baseline           25,968      19,220
   1864-BB0150PCS12                  +217.8%  Seasonal Baseline            1,430         450
@@ -1463,7 +1463,7 @@
   1864-BB16854PCS2                   +92.4%  Seasonal Baseline               96       1,265
   1864-BB16998                      +100.0%  Croston's                     0         165
   1864-BB17000                       +86.9%  Croston's                    36         275
-  1864-BB17003                      +187.0%  Seasonal Baseline            1,320         460
+  1864-BB17003                      +197.4%  Seasonal Baseline            1,368         460
   1864-BB18835                       +65.3%  Croston's                 1,140       3,285
   1864-BB18835PCS12                  +70.0%  Croston's                   187         110
   1864-BB18890                      +408.0%  Seasonal Baseline            9,906       1,950
@@ -1522,7 +1522,7 @@
   1864-BB23576PCS6                   +99.2%  Croston's                     2         245
   1864-BB23577/12                    +28.7%  Croston's                 1,284       1,800
   1864-BB24711                       +74.6%  Croston's                   220         865
-  1864-BB24877                       +78.0%  Seasonal Baseline           49,944      28,055
+  1864-BB24877                       +80.2%  Seasonal Baseline           50,552      28,055
   1864-BB24877PX8                   +100.0%  Inactive                      0         260
   1864-BB25518                       +82.0%  Croston's                   708       3,940
   1864-BB25518PCS6                   +97.6%  Seasonal Baseline                3         125
@@ -1580,7 +1580,7 @@
   1864-BB29477                       +80.5%  Seasonal Baseline              936       4,795
   1864-BB29477PCS12                  +12.1%  Seasonal Baseline              457         520
   1864-BB29486                       +28.0%  Seasonal Baseline              960         750
-  1864-BB29489/12                   +190.5%  Seasonal Baseline              552         190
+  1864-BB29489/12                    +38.9%  Seasonal Baseline              264         190
   1864-BB29489PCS2                  +234.6%  Heuristic                 1,044         312
   1864-BB29561                        +9.3%  Croston's                14,040      12,840
   1864-BB29561PCS12                  +89.4%  Croston's                    22         208
@@ -1653,7 +1653,7 @@
   1864-BB33708                      +115.6%  Croston's                99,936      46,350
   1864-BB33721                       +80.0%  Seasonal Baseline               48         240
   1864-BB33722                      +100.0%  Seasonal Baseline                0         475
-  1864-BB33723                       +75.0%  Seasonal Baseline              504         288
+  1864-BB33723                      +100.0%  Seasonal Baseline                0         288
   1864-BB34389                       +39.6%  Croston's                   264         437
   1864-BB34390                       +24.2%  Croston's                   360         475
   1864-BB34403                       +58.6%  Croston's                   240         580
@@ -1814,7 +1814,7 @@
   1864-FF12302/24PCS2               +100.0%  Inactive                      0       1,190
   1864-FF12302PCS2                  +308.0%  Seasonal Baseline            2,448         600
   1864-FF12353AMZ                    +85.2%  Heuristic                 6,018       3,250
-  1864-FF12353PCS2                   +66.9%  Heuristic                    81         245
+  1864-FF12353PCS2                  +100.0%  Heuristic                     0         245
   1864-FF12354                       +76.0%  Croston's                   156         650
   1864-FF12355                      +110.4%  Croston's                 1,410         670
   1864-FF12375                       +60.6%  Heuristic                   930       2,360
@@ -2270,7 +2270,7 @@
   1864-FF6639PCS2                   +100.0%  Heuristic                     0         245
   1864-FF6989                        +55.1%  Croston's                10,080       6,500
   1864-FF6989PCS2                     +6.4%  Croston's                 1,272       1,195
-  1864-FF6989PCS48                   +50.0%  Croston's                    25          50
+  1864-FF6989PCS48                  +100.0%  Croston's                     0          50
   1864-FF7110                       +100.0%  Heuristic                     0       2,610
   1864-FF7110AU                     +100.0%  Inactive                      0          70
   1864-FF7110PX2                     +20.0%  Heuristic                   312         390
@@ -2782,12 +2782,12 @@
   23011-BB0098PCS2                   +87.2%  Sparse Intermittent               96         750
   23011-BB0100PCS2                   +96.7%  Sparse Intermittent               84       2,540
   23011-BB0102PCS2                   +41.5%  Seasonal Baseline              720       1,230
-  23011-BB0237                       +26.1%  Seasonal Baseline            6,306       5,000
+  23011-BB0237                       +22.9%  Seasonal Baseline            6,144       5,000
   23011-BB12479                     +100.0%  Inactive                      0          18
   23011-BB13435CLR/12                +36.3%  Seasonal Baseline           90,756      66,597
-  23011-BB13436CLR/12                +61.7%  Croston's               161,760     100,068
+  23011-BB13436CLR/12                +54.1%  Croston's               154,212     100,068
   23011-BB13437CLR/12               +833.0%  Croston's                69,972       7,500
-  23011-BB13447CLR/12               +450.4%  Croston's                41,280       7,500
+  23011-BB13447CLR/12               +423.7%  Croston's                39,276       7,500
   23011-BB13448CLR/12                +42.4%  Heuristic                 2,880       5,000
   23011-BB14500CLR/9                 +33.2%  Heuristic                13,320      10,000
   23011-BB20227                      +80.4%  Croston's                   408       2,080
@@ -2795,23 +2795,23 @@
   23011-BB21058/6                    +30.8%  Seasonal Baseline           14,120      20,400
   23011-BB26413PCS2                  +44.6%  Sparse Intermittent               72         130
   23011-BB29490                      +84.3%  Seasonal Baseline              844       5,376
-  23011-BB31552CLR/9                +288.4%  Seasonal Baseline           29,133       7,500
+  23011-BB31552CLR/9                +272.8%  Seasonal Baseline           27,963       7,500
   23011-BB31553CLR/9                  +8.4%  Seasonal Baseline            8,127       7,500
   23011-BB31553PCS3                  +88.0%  Seasonal Baseline               72         600
   23011-BB33706                      +20.3%  Croston's                   510         640
   23011-BB33706PDQ                   +77.0%  Sparse Intermittent           15,054      65,331
-  23011-BB33708PDQ                   +42.8%  Seasonal Baseline           25,854      45,179
+  23011-BB33708PDQ                   +44.4%  Seasonal Baseline           25,110      45,179
   23011-BB35904                     +100.0%  Inactive                      0       3,900
   23011-BB35916                     +100.0%  Inactive                      0       1,040
-  23011-BB36058CLR/12               +147.2%  Heuristic                18,540       7,500
-  23011-BB38480PDQ                   +47.4%  Croston's                92,508     175,809
-  23011-BB38504PDQ                   +55.5%  Croston's                66,294     148,930
+  23011-BB36058CLR/12               +135.8%  Heuristic                17,688       7,500
+  23011-BB38480PDQ                   +51.4%  Croston's                85,380     175,809
+  23011-BB38504PDQ                   +58.4%  Croston's                61,983     148,930
   23011-BB38564PDQ                   +85.3%  Sparse Intermittent           11,280      76,493
-  23011-BB38579PDQ                   +22.7%  Croston's                 9,840      12,724
+  23011-BB38579PDQ                   +25.5%  Croston's                 9,480      12,724
   23011-BB38585PDQ                   +92.3%  Sparse Intermittent            5,940      76,827
   23011-BB38904PDQ                   +72.3%  Sparse Intermittent           54,192     195,289
   23011-BB38905PDQ                  +100.0%  Sparse Intermittent                0     246,723
-  23011-BB38906PDQ                   +41.8%  Croston's               111,681     191,921
+  23011-BB38906PDQ                   +44.9%  Croston's               105,759     191,921
   23011-FF10556                      +65.6%  Croston's                   268         780
   23011-FF11353                      +33.8%  Seasonal Baseline              348         260
   23011-FF11926                     +100.0%  Croston's                     0         130
@@ -2823,8 +2823,8 @@
   23011-FF12659                      +46.7%  Seasonal Baseline           35,280      24,057
   23011-FF12689                      +63.1%  Croston's                 1,200       3,250
   23011-FF12837                      +23.1%  Seasonal Baseline              900       1,170
-  23011-FF12858                      +17.6%  Seasonal Baseline           66,564      56,623
-  23011-FF12859                      +30.7%  Seasonal Baseline           53,472      77,214
+  23011-FF12858                      +10.8%  Seasonal Baseline           62,736      56,623
+  23011-FF12859                      +34.1%  Seasonal Baseline           50,856      77,214
   23011-FF12887                      +64.3%  Seasonal Baseline            1,068         650
   23011-FF13154                      +28.5%  Croston's                 1,002         780
   23011-FF13198                     +100.0%  Croston's                     0         125
@@ -2849,10 +2849,9 @@
   23011-FF18956                      +63.1%  Sparse Intermittent               96         260
   23011-FF19341                     +135.6%  Croston's                 2,898       1,230
   23011-FF19546                     +100.0%  Croston's                     0         520
-  23011-FF19592                      +11.6%  Seasonal Baseline           29,028      32,851
+  23011-FF19592                      +13.5%  Seasonal Baseline           28,404      32,851
   23011-FF19598                      +40.3%  Croston's                 3,411       2,431
-  23011-FF19998                       +8.0%  Seasonal Baseline           57,312      53,074
-  23011-FF20001                      +12.0%  Seasonal Baseline           94,536     107,428
+  23011-FF20001                      +15.4%  Seasonal Baseline           90,912     107,428
   23011-FF22070                     +100.0%  Inactive                      0         260
   23011-FF22071                     +100.0%  Inactive                      0         130
   23011-FF22072                      +60.0%  Sparse Intermittent              192         480
@@ -2894,7 +2893,7 @@
   23011-FF32840                      +42.9%  Croston's                   416         728
   23011-FF34936                      +71.2%  Seasonal Baseline            3,828      13,311
   23011-FF34937                      +32.8%  Seasonal Baseline           10,464      15,566
-  23011-FF34938                      +12.3%  Seasonal Baseline           51,896      59,208
+  23011-FF34938                      +15.6%  Seasonal Baseline           49,960      59,208
   23011-FF38640                      +23.1%  Seasonal Baseline          160,236     208,500
   23011-FF38641                      +53.4%  Seasonal Baseline           34,800      74,700
   23011-FF38642                       +8.8%  Seasonal Baseline           75,264      82,500
@@ -2950,7 +2949,7 @@
   23011-FF9757                       +54.9%  Seasonal Baseline            1,812       1,170
   23011-SF8169                      +246.2%  Croston's                 3,600       1,040
   23011-SF8173                      +100.0%  Inactive (zero order history)                0         520
-  23011-SF8174                       +15.0%  Seasonal Baseline            1,488       1,750
+  23011-SF8174                       +17.7%  Seasonal Baseline            1,440       1,750
   23018-FF5772                       +62.9%  Sparse Intermittent            1,128       3,041
   23018-FF5773                       +74.5%  Sparse Intermittent              774       3,041
   23018-FF5807                       +26.6%  Seasonal Baseline            2,604       3,550
@@ -3168,11 +3167,11 @@
   3080-FF9291CA                      +48.4%  Sparse Intermittent [BW]       1,032       2,000
   3080-FF9297CA                      +13.6%  Croston's                 2,160       2,500
   3080-FF9298CA                      +18.4%  Croston's                 2,040       2,500
-  3102-FF10159                       +29.9%  Seasonal Baseline            1,536       2,190
+  3102-FF10159                       +35.3%  Seasonal Baseline            1,416       2,190
   3102-FF10465                       +53.2%  Seasonal Baseline            5,844      12,500
   3102-FF10475                       +83.8%  Croston's                   252       1,560
   3102-FF10477                       +20.5%  Seasonal Baseline              930       1,170
-  3102-FF10479                       +78.2%  Seasonal Baseline            1,092       5,000
+  3102-FF10479                       +80.4%  Seasonal Baseline              978       5,000
   3102-FF10530                       +29.0%  Croston's                   444         625
   3102-FF10556                       +39.3%  Croston's                 1,365       2,250
   3102-FF11348                      +100.0%  Inactive                      0         156
@@ -3180,19 +3179,19 @@
   3102-FF11926                       +25.0%  Croston's                   624         832
   3102-FF11964                       +47.7%  Sparse Intermittent              192         130
   3102-FF12279                        +6.9%  Seasonal Baseline            1,668       1,560
-  3102-FF12283                       +28.0%  Croston's                   450         625
-  3102-FF12300/24                    +19.6%  Seasonal Baseline            7,176       6,000
-  3102-FF12302/24                    +95.2%  Seasonal Baseline            1,464         750
+  3102-FF12283                       +30.9%  Croston's                   432         625
+  3102-FF12300/24                    +17.2%  Seasonal Baseline            7,032       6,000
+  3102-FF12302/24                    +88.8%  Seasonal Baseline            1,416         750
   3102-FF12353                       +25.0%  Croston's                   150         200
   3102-FF12354                       +61.5%  Sparse Intermittent [BW]          30          78
-  3102-FF12355                      +140.0%  Seasonal Baseline              300         125
+  3102-FF12355                      +130.4%  Seasonal Baseline              288         125
   3102-FF12375                       +55.0%  Croston's                   234         520
   3102-FF12376                       +31.4%  Seasonal Baseline            1,200       1,750
-  3102-FF12378                       +54.4%  Seasonal Baseline              456       1,000
+  3102-FF12378                       +58.0%  Seasonal Baseline              420       1,000
   3102-FF12379/6                     +81.5%  Croston's                    72         390
   3102-FF12380/6                     +56.6%  Seasonal Baseline            1,062       2,445
-  3102-FF12649                       +61.6%  Croston's                   288         750
-  3102-FF12653                       +20.0%  Seasonal Baseline              300         375
+  3102-FF12649                       +64.0%  Croston's                   270         750
+  3102-FF12653                       +23.2%  Seasonal Baseline              288         375
   3102-FF12655                       +37.4%  Seasonal Baseline            2,346       3,750
   3102-FF12656                       +76.0%  Seasonal Baseline              150         625
   3102-FF12717                      +100.0%  Inactive                      0         260
@@ -3202,31 +3201,31 @@
   3102-FF12825                      +100.0%  Croston's      [BW]           0         208
   3102-FF12842                       +38.5%  Croston's                   480         780
   3102-FF12843                       +42.9%  Seasonal Baseline            3,120       5,460
-  3102-FF12846                       +59.8%  Seasonal Baseline            9,192      22,850
+  3102-FF12846                       +63.0%  Seasonal Baseline            8,448      22,850
   3102-FF12849                       +20.0%  Seasonal Baseline              600         750
   3102-FF12850                       +20.0%  Croston's                   624         780
-  3102-FF12852                        +8.8%  Seasonal Baseline            1,140       1,250
+  3102-FF12852                       +15.5%  Seasonal Baseline            1,056       1,250
   3102-FF12853                       +34.9%  Seasonal Baseline            2,424       3,725
   3102-FF13116                      +100.0%  Inactive                      0          78
-  3102-FF13154                       +34.4%  Seasonal Baseline              738       1,125
-  3102-FF13875                       +58.4%  Seasonal Baseline              594         375
-  3102-FF13876                        +8.8%  Seasonal Baseline              342         375
+  3102-FF13154                       +36.5%  Seasonal Baseline              714       1,125
+  3102-FF13875                       +52.0%  Seasonal Baseline              570         375
+  3102-FF13876                       +12.0%  Seasonal Baseline              330         375
   3102-FF13878                       +16.9%  Seasonal Baseline              582         700
   3102-FF13879                        +7.2%  Seasonal Baseline              402         375
   3102-FF13880                       +46.2%  Croston's                   228         156
-  3102-FF13881                       +57.8%  Croston's                   264         625
+  3102-FF13881                       +61.6%  Croston's                   240         625
   3102-FF13885                       +29.6%  Seasonal Baseline            1,584       2,250
   3102-FF14364                       +42.9%  Seasonal Baseline            2,592       4,540
   3102-FF14365                       +36.0%  Seasonal Baseline            2,040       1,500
   3102-FF14584                       +42.3%  Seasonal Baseline            2,164       3,750
   3102-FF15584                       +48.7%  Croston's                   600       1,170
-  3102-FF15585                        +8.1%  Seasonal Baseline              804         875
+  3102-FF15585                       +12.2%  Seasonal Baseline              768         875
   3102-FF15588                       +40.0%  Croston's                   300         500
-  3102-FF15589                       +13.0%  Seasonal Baseline            4,584       5,270
-  3102-FF15592                       +10.4%  Seasonal Baseline            1,008       1,125
+  3102-FF15589                       +20.8%  Seasonal Baseline            4,176       5,270
+  3102-FF15592                       +13.6%  Seasonal Baseline              972       1,125
   3102-FF15595                       +36.3%  Seasonal Baseline              852         625
   3102-FF15718                       +70.5%  Sparse Intermittent [BW]         384       1,300
-  3102-FF15747                       +72.8%  Seasonal Baseline              648         375
+  3102-FF15747                       +66.4%  Seasonal Baseline              624         375
   3102-FF16341                       +15.4%  Sparse Intermittent               66          78
   3102-FF16342                       +61.6%  Croston's                    48         125
   3102-FF16704                       +38.9%  Seasonal Baseline            3,972       6,500
@@ -3235,11 +3234,11 @@
   3102-FF18913                        +7.7%  Sparse Intermittent [BW]         144         156
   3102-FF18959                       +65.4%  Croston's                   360       1,040
   3102-FF19341                       +14.7%  Seasonal Baseline            2,628       3,080
-  3102-FF20206                       +70.0%  Seasonal Baseline              750       2,500
+  3102-FF20206                       +72.9%  Seasonal Baseline              678       2,500
   3102-FF20207                      +130.8%  Croston's                   300         130
   3102-FF20208                       +27.7%  Seasonal Baseline            2,892       4,000
   3102-FF20209                       +61.6%  Croston's                    96         250
-  3102-FF20210                       +36.0%  Croston's                   240         375
+  3102-FF20210                       +39.2%  Croston's                   228         375
   3102-FF20868                      +100.0%  Heuristic                     0         156
   3102-FF22187                       +43.7%  Seasonal Baseline            1,830       3,250
   3102-FF22317                       +16.8%  Croston's                   312         375
@@ -3256,13 +3255,13 @@
   3102-FF27258                       +31.2%  Croston's                   492         375
   3102-FF27259                        +7.2%  Seasonal Baseline              402         375
   3102-FF27260                       +53.8%  Sparse Intermittent               36          78
-  3102-FF27261                       +16.0%  Seasonal Baseline              336         400
+  3102-FF27261                       +19.0%  Seasonal Baseline              324         400
   3102-FF27263                       +60.8%  Croston's                   102         260
   3102-FF27264                       +52.0%  Croston's                   120         250
   3102-FF27265                       +22.2%  Seasonal Baseline            3,054       2,500
-  3102-FF27266                       +69.6%  Croston's                   636         375
+  3102-FF27266                       +56.8%  Croston's                   588         375
   3102-FF27332                      +269.2%  Heuristic                   576         156
-  3102-FF27687                       +55.0%  Seasonal Baseline              450       1,000
+  3102-FF27687                       +56.8%  Seasonal Baseline              432       1,000
   3102-FF27997                       +45.3%  Seasonal Baseline              410         750
   3102-FF28229                       +46.2%  Pre-launch NEW (manual passthrough)              672       1,248
   3102-FF28400                      +100.0%  Sparse Intermittent                0         125
@@ -3273,8 +3272,8 @@
   3102-FF28716                      +100.0%  Croston's                     0         208
   3102-FF29045                      +100.0%  Seasonal Baseline                0         175
   3102-FF29046                      +100.0%  Croston's                     0         150
-  3102-FF29220                       +23.4%  Seasonal Baseline            1,570       2,050
-  3102-FF29319                       +61.6%  Croston's                   336         875
+  3102-FF29220                       +26.7%  Seasonal Baseline            1,502       2,050
+  3102-FF29319                       +63.0%  Croston's                   324         875
   3102-FF30114                       +42.3%  Croston's                   300         520
   3102-FF30361                        +5.8%  Croston's                 1,224       1,300
   3102-FF30363                       +13.6%  Croston's                   216         250
@@ -3291,12 +3290,12 @@
   3102-FF31075                       +76.6%  Croston's                   456       1,950
   3102-FF31186                       +76.0%  Croston's                   312       1,300
   3102-FF31196                       +30.8%  Sparse Intermittent [BW]          54          78
-  3102-FF31198                       +20.0%  Croston's                   150         125
+  3102-FF31198                       +15.2%  Croston's                   144         125
   3102-FF31287                       +33.4%  Seasonal Baseline              416         625
   3102-FF31289                       +29.8%  Seasonal Baseline              456         650
   3102-FF31293                       +15.4%  Croston's                    90          78
   3102-FF31295                       +30.8%  Croston's                    54          78
-  3102-FF31325                       +17.6%  Seasonal Baseline            1,236       1,500
+  3102-FF31325                       +20.8%  Seasonal Baseline            1,188       1,500
   3102-FF31327                       +18.4%  Croston's                   444         375
   3102-FF31451                        +0.0%  OTB (zero)                    0         0.0
   3102-FF31452                      +100.0%  OTB (zero)                    0       875.0
@@ -3308,9 +3307,9 @@
   3102-FF31606                       +10.9%  Seasonal Baseline              780         875
   3102-FF31607                       +38.5%  Seasonal Baseline              288         468
   3102-FF31608                       +53.8%  Seasonal Baseline              480       1,040
-  3102-FF31823                       +23.9%  Seasonal Baseline              666         875
-  3102-FF32148                       +31.5%  Seasonal Baseline            1,644       2,400
-  3102-FF32363                        +8.1%  Seasonal Baseline            5,920       6,440
+  3102-FF31823                       +26.6%  Seasonal Baseline              642         875
+  3102-FF32148                       +33.0%  Seasonal Baseline            1,608       2,400
+  3102-FF32363                       +11.3%  Seasonal Baseline            5,710       6,440
   3102-FF32365                        +7.4%  Seasonal Baseline              810         875
   3102-FF32654                       +63.1%  Sparse Intermittent [BW]          96         260
   3102-FF32655                       +56.8%  Croston's                   108         250
@@ -3318,7 +3317,7 @@
   3102-FF32657                      +100.0%  Heuristic                     0         500
   3102-FF32824                       +48.8%  Sparse Intermittent              192         375
   3102-FF33413                       +31.4%  Seasonal Baseline            2,628       2,000
-  3102-FF33449                       +23.6%  Seasonal Baseline            1,236       1,000
+  3102-FF33449                       +18.8%  Seasonal Baseline            1,188       1,000
   3102-FF33495                      +115.4%  Heuristic                   168          78
   3102-FF33541                      +100.0%  OTB (zero)                    0       130.0
   3102-FF33542                       +94.2%  Sparse Intermittent              144       2,496
@@ -3360,11 +3359,12 @@
   3102-FF4776                        +34.3%  Seasonal Baseline            1,962       2,987
   3102-FF4849                        +23.7%  Seasonal Baseline              858       1,125
   3102-FF4923                        +44.2%  Croston's                   150         104
-  3102-FF4930                        +13.6%  Croston's                   108         125
+  3102-FF4930                        +18.4%  Croston's                   102         125
   3102-FF4936                       +108.0%  Croston's                   624         300
   3102-FF5715                        +65.6%  Seasonal Baseline            6,624       4,000
   3102-FF5716                        +44.6%  Sparse Intermittent              216         390
   3102-FF5766                        +23.8%  Seasonal Baseline            4,002       3,232
+  3102-FF5769                         +7.8%  Croston's                   576         625
   3102-FF5772                        +41.9%  Seasonal Baseline              726       1,250
   3102-FF5773                        +24.6%  Seasonal Baseline              660         875
   3102-FF5776                       +103.1%  Seasonal Baseline              264         130
@@ -3378,19 +3378,18 @@
   3102-FF6989                        +60.0%  Croston's                 1,248         780
   3102-FF7110                        +40.8%  Seasonal Baseline              222         375
   3102-FF7112                         +9.2%  Seasonal Baseline            1,062       1,170
-  3102-FF7115                        +28.0%  Seasonal Baseline              720       1,000
+  3102-FF7115                        +31.0%  Seasonal Baseline              690       1,000
   3102-FF7118                        +40.5%  Seasonal Baseline              744       1,250
   3102-FF7120                         +5.6%  Seasonal Baseline            2,850       3,020
-  3102-FF7210                         +7.8%  Seasonal Baseline            1,152       1,250
-  3102-FF7216                         +8.0%  Seasonal Baseline            2,700       2,500
-  3102-FF7217                         +6.1%  Seasonal Baseline            1,056       1,125
+  3102-FF7210                        +10.7%  Seasonal Baseline            1,116       1,250
+  3102-FF7217                         +9.3%  Seasonal Baseline            1,020       1,125
   3102-FF7218                        +44.0%  Croston's                   180         125
-  3102-FF7221                        +32.5%  Seasonal Baseline            3,684       2,780
+  3102-FF7221                        +28.6%  Seasonal Baseline            3,576       2,780
   3102-FF7228                        +17.4%  Seasonal Baseline            1,032       1,250
   3102-FF7258                        +70.5%  Seasonal Baseline            3,048      10,347
   3102-FF7260                        +28.0%  Sparse Intermittent               72         100
   3102-FF7261                        +28.0%  Croston's                   288         400
-  3102-FF7263                        +30.9%  Seasonal Baseline            1,800       1,375
+  3102-FF7263                        +24.4%  Seasonal Baseline            1,710       1,375
   3102-FF7266                       +111.2%  Seasonal Baseline              792         375
   3102-FF7297                        +46.3%  Seasonal Baseline            8,166       5,583
   3102-FF7372                        +13.1%  Seasonal Baseline            8,616       9,919
@@ -3400,13 +3399,13 @@
   3102-FF7541                       +100.0%  OTB (zero)                    0        52.0
   3102-FF7542                       +100.0%  Sparse Intermittent                0         156
   3102-FF7549                        +42.4%  Sparse Intermittent              144         250
-  3102-FF7612                        +12.2%  Croston's                 1,536       1,750
+  3102-FF7612                        +16.3%  Croston's                 1,464       1,750
   3102-FF7613                        +53.6%  Seasonal Baseline            2,304       1,500
-  3102-FF7618                        +24.2%  Seasonal Baseline            5,280       4,250
-  3102-FF7619                        +10.4%  Seasonal Baseline            2,760       2,500
+  3102-FF7618                        +20.0%  Seasonal Baseline            5,100       4,250
+  3102-FF7619                         +5.6%  Seasonal Baseline            2,640       2,500
   3102-FF7639                       +100.0%  Inactive                      0         130
-  3102-FF7716                        +21.6%  Seasonal Baseline              392         500
-  3102-FF7717                        +36.0%  Seasonal Baseline              240         375
+  3102-FF7716                        +26.4%  Seasonal Baseline              368         500
+  3102-FF7717                        +39.2%  Seasonal Baseline              228         375
   3102-FF8256                        +80.0%  Croston's                   936         520
   3102-FF8258                        +10.0%  Croston's                   450         500
   3102-FF8287                        +60.0%  Sparse Intermittent              600         375
@@ -3417,21 +3416,21 @@
   3102-FF8431                        +18.4%  Seasonal Baseline              888         750
   3102-FF8433                         +7.7%  Sparse Intermittent              192         208
   3102-FF8649/24                     +19.5%  Seasonal Baseline            5,376       4,500
-  3102-FF8653                        +26.4%  Seasonal Baseline              644         875
+  3102-FF8653                        +30.5%  Seasonal Baseline              608         875
   3102-FF8654                        +27.3%  Seasonal Baseline            6,238       8,580
-  3102-FF8831                        +41.9%  Seasonal Baseline            1,452       2,500
-  3102-FF8832                        +18.4%  Seasonal Baseline              612         750
-  3102-FF8882                        +32.5%  Seasonal Baseline            1,518       2,250
+  3102-FF8831                        +45.8%  Seasonal Baseline            1,356       2,500
+  3102-FF8832                        +23.2%  Seasonal Baseline              576         750
+  3102-FF8882                        +35.7%  Seasonal Baseline            1,446       2,250
   3102-FF8991                        +73.3%  Seasonal Baseline            1,872       7,000
   3102-FF9059                         +8.0%  Croston's                   216         200
   3102-FF9060                        +19.4%  Seasonal Baseline            4,296       5,330
   3102-FF9291/24                     +15.4%  Croston's                   600         520
   3102-FF9297/24                     +28.0%  Croston's                   480         375
-  3102-FF9298                        +36.5%  Seasonal Baseline            3,072       2,250
+  3102-FF9298                        +30.1%  Seasonal Baseline            2,928       2,250
   3102-FF9362                        +84.6%  Sparse Intermittent               48         312
   3102-FF9720                        +26.2%  Croston's      [BW]         384         520
   3102-FF9756                        +20.0%  Croston's                   300         250
-  3102-FF9757                        +12.0%  Seasonal Baseline              660         750
+  3102-FF9757                        +15.2%  Seasonal Baseline              636         750
   3102-SF8167                        +52.3%  Seasonal Baseline            4,752       3,120
   3102-SF8168PS                      +40.0%  Croston's                   624       1,040
   3102-SF8170                        +10.8%  Croston's                   864         780
@@ -6101,7 +6100,7 @@
   AI  14224-BB16998             204  156  108   60    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0      20  +13.7% 
   Man 14224-BB16998               0    0    0  612    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0      24
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  14224-BB16999               0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
+  AI  14224-BB16999              48    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       2  +60.0% 
   Man 14224-BB16999               0    0    0  120    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       5
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  14224-BB17001               0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% [BW]
@@ -6281,7 +6280,7 @@
   AI  15339-BB0102                0   60   60   72   72   72   72   60   60   60   60   60   60   60   60   60   48   48   48   48   48   48   48   48   48   48      55  +90.4% 
   Man 15339-BB0102                0   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30      29
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  15339-BB0131                0    0  120    0   96    0    0    0    0  198   84    0   84    0   72    0   78    0   72    0   78    0   72    0   72    0      39  +31.6% 
+  AI  15339-BB0131               96    0  120    0   96    0    0    0    0  198   84    0   84    0   72    0   78    0   72    0   78    0   72    0   72    0      43  +25.2% 
   Man 15339-BB0131                0    0    0    0  500    0    0    0  250    0    0    0  250    0    0    0  250    0    0    0  250    0    0    0    0    0      58
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  15339-BB0234                0    0  156    0  168    0  168    0  156    0  156    0  138    0  120    0  108    0    0    0    0    0    0    0    0    0      45  +41.5% 
@@ -8810,7 +8809,7 @@
   AI  1864-BB0149PCS12            0    0    0    5    0    0    0    0   20   20   20   20   20   20   20   10    0    0    0    0    0    0    0    0    0    0       6  +80.3% 
   Man 1864-BB0149PCS12            0    0    0   35   35   35   35   30   30   30   30   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35      30
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-BB0149PCS2           276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276  276     276  +1716.7% 
+  AI  1864-BB0149PCS2            30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30      30  +97.5% 
   Man 1864-BB0149PCS2             0    0   10   25   25   25   25   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      15
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-BB0149PCS6             0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
@@ -9584,7 +9583,7 @@
   AI  1864-BB17000                0   12   12   12    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       1  +86.9% 
   Man 1864-BB17000                0   55   55   55   55   55    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0      11
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-BB17003               48   48   72   72   72   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48      51  +187.0% 
+  AI  1864-BB17003               72   72   72   72   72   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48      53  +197.4% 
   Man 1864-BB17003                0    0  115  115  115  115    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0      18
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-BB17003PCS12           0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -9896,7 +9895,7 @@
   AI  1864-BB24711PCS2            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 1864-BB24711PCS2            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-BB24877             1336 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1952 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944   1,921  +78.0% 
+  AI  1864-BB24877             1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944 1952 1944 1944 1944 1944 1944 1944 1944 1944 1944 1944   1,944  +80.2% 
   Man 1864-BB24877                0 1370 1370 1365 1365 1365 1365 1275 1275 1275 1275 1055 1055 1055 1055 1055  955  955  955  955 1000 1000 1000 1000  830  830   1,079
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-BB24877PCS2            0   60   68   76   88   92  100   88   88   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60      65  +2.3% 
@@ -10229,7 +10228,7 @@
   AI  1864-BB29489              144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144  144     144  +0.0% 
   Man 1864-BB29489                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-BB29489/12             0    0    0    0   60    0   24   24   24   24   24   24   24   24   24   24   24   36   24   24   24   24   24   24   24   24      21  +190.5% 
+  AI  1864-BB29489/12             0    0    0    0   24    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      10  +38.9% 
   Man 1864-BB29489/12             0    0    0   25    0    0    0   25    0    0    0   25    0    0    0    0   25   10   10   10   10   10   10   10   10   10       7
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-BB29489PCS2           36   36   36   36   36   36   72   36   36   36   36   36   72   36   36   36   36   36   36   36   36   36   36   36   72   36      40  +234.6% 
@@ -10247,7 +10246,7 @@
   AI  1864-BB29712                6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6  +92.0% 
   Man 1864-BB29712               75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75   75      75
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-BB29712PCS6            1    1    0    1    2    2    2    2    2    2    2    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1       1  +84.6% 
+  AI  1864-BB29712PCS6            1    0    1    1    2    2    2    2    2    2    2    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1       1  +84.6% 
   Man 1864-BB29712PCS6            8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8       8
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-BB29713                0    0    0    0  120    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       5  +95.0% 
@@ -10580,7 +10579,7 @@
   AI  1864-BB33722                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 1864-BB33722                0   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19   19      18
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-BB33723                0    0    0    0   24    0   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24      19  +75.0% 
+  AI  1864-BB33723                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 1864-BB33723                0    0    5    5    5    5    5    5    5    5    5    5    5    5   19   19   19   19   19   19   19   19   19   19   19   19      11
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-BB34389               24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0    0    0    0    0      10  +39.6% 
@@ -11237,7 +11236,7 @@
   AI  1864-FF12353COS             0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 1864-FF12353COS             0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-FF12353PCS2            0    0    3    3    9    3    6    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3       3  +66.9% 
+  AI  1864-FF12353PCS2            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 1864-FF12353PCS2            5    5    5   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10       9
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-FF12354                6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6  +76.0% 
@@ -12053,7 +12052,7 @@
   AI  1864-FF21709                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 1864-FF21709                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-FF21789               72    0    0    0    0    0    0    0   72    0    0    0    0    0    0    0   72    0    0    0    0    0    0    0   72    0      11  +0.0% 
+  AI  1864-FF21789               48    0    0    0    0    0    0    0   72    0    0    0    0    0    0    0   72    0    0    0    0    0    0    0   72    0      10  +0.0% 
   Man 1864-FF21789                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-FF21817               48   48   48   48  240   48   48   48   96   48   48   48   48   48   48   48   48   48   96   48   48   48   48   48   48   48      59  +0.0% 
@@ -12929,8 +12928,8 @@
   AI  1864-FF33868                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 1864-FF33868               10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10      10
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-FF33871               48   48   72   48   72   48   96   48   96   48   72   48   72   48   72   48   72   48   72   48   72   48   72   48   72   48      61  +0.0% 
-  Man 1864-FF33871               48   48   72   48   72   48   96   48   96   48   72   48   72   48   72   48   72   48   72   48   72   48   72   48   72   48      61
+  AI  1864-FF33871               48   48   72   48   72   48   96   48   96   48   72   48   72   48   72   48   72   48   72   48   72   48   72   48   72   48      61  +3.1% 
+  Man 1864-FF33871                0   48   72   48   72   48   96   48   96   48   72   48   72   48   72   48   72   48   72   48   72   48   72   48   72   48      59
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-FF33872              120  216  216  216  216  216  216  216  120  120  216  216  216  216  216  216  216  216  120  120  120  120  120  120  120  120     175  +18.1% 
   Man 1864-FF33872                0  130  130  140  130  500  500  500  130  130  130  245  245  245  245  245  150  150  150  150  220  220  220  220  220  220     214
@@ -13478,7 +13477,7 @@
   AI  1864-FF6989PCS2            48   48   48   48   48   48   72   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48   48      49  +6.4% 
   Man 1864-FF6989PCS2             0   65   65   40   40   65   65   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45      46
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-FF6989PCS48            0    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1    1       1  +50.0% 
+  AI  1864-FF6989PCS48            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 1864-FF6989PCS48            0    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2       2
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-FF7110                 0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
@@ -13964,7 +13963,7 @@
   AI  1864-FF8831PCS3             0    0    0    0    4    0    0    0    4    0    0    0    4    0    0    0    4    0    0    0    4    0    0    0    4    0       1  +90.2% 
   Man 1864-FF8831PCS3             5    5    5   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10       9
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-FF8832               156  156  156  156   48   48   48   48   48   36   36   36   48   48   48   48   48   48   48   48   48   48   48   48   48   24      62  +0.0% 
+  AI  1864-FF8832                84   84   84   84   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   12      33  +0.0% 
   Man 1864-FF8832                 0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-FF8832PCS12            2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2    2       2  +0.0% 
@@ -15506,7 +15505,7 @@
   AI  23011-BB0102PCS2           36    0   30   36   36   36   36   36   36   36   30   30   30   24   24   24   24   24   24   24   24   24   24   24   24   24      28  +41.5% 
   Man 23011-BB0102PCS2           40    0   40   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50      47
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB0237                0  162  162  162  162  186  234  360  432  402  324  324  570  570  576  498  216  150  138  156  186  192  144    0    0    0     243  +26.1% 
+  AI  23011-BB0237                0    0  162  162  162  186  234  360  432  402  324  324  570  570  576  498  216  150  138  156  186  192  144    0    0    0     236  +22.9% 
   Man 23011-BB0237                0  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200     192
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-BB12479               0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
@@ -15521,7 +15520,7 @@
   AI  23011-BB13436CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 23011-BB13436CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB13436CLR/12         0 7548 7548 8028 8028 8028 8028 7548 7548 7548 7548 6576 6576 6576 6576 6576 5628 5628 5112 5112 5256 5256 4872 4872 4872 4872   6,222  +61.7% 
+  AI  23011-BB13436CLR/12         0    0 7548 8028 8028 8028 8028 7548 7548 7548 7548 6576 6576 6576 6576 6576 5628 5628 5112 5112 5256 5256 4872 4872 4872 4872   5,931  +54.1% 
   Man 23011-BB13436CLR/12         0 5641 4420 4870 4792 4645 4629 4577 4335 4089 3975 3664 3754 3592 3672 3691 3663 3632 4049 3272 3276 3566 3566 3566 3566 3566   3,849
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-BB13437CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -15533,7 +15532,7 @@
   AI  23011-BB13447CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 23011-BB13447CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB13447CLR/12         0 2004 2004 2136 1968 1740 1740 2664 1656 3252 2004 1752 1752 1752 1752 1752 1500 1500 1356 1356 1392 1392 1104  840  588  324   1,588  +450.4% 
+  AI  23011-BB13447CLR/12         0    0 2004 2136 1968 1740 1740 2664 1656 3252 2004 1752 1752 1752 1752 1752 1500 1500 1356 1356 1392 1392 1104  840  588  324   1,511  +423.7% 
   Man 23011-BB13447CLR/12         0  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300     288
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-BB13448CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -15566,7 +15565,7 @@
   AI  23011-BB29490/6             0    0    0 5202 5202 5202 3150 4568 4568 4568 4568 4568 4568 4568 4568 4568 5029 5029 4568 4568  644  365    0    0    0    0   3,080  +1.9% 
   Man 23011-BB29490/6             0    0    0 5200 5200 5200 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150 3150   3,023
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB31552CLR/9          0 1170 1170 1224 1233 1233 1314 1692 1305 1557 1827 1674 1503 1611 1566 1350 1035 1089  954  909  936  909  738  549  378  207   1,120  +288.4% 
+  AI  23011-BB31552CLR/9          0    0 1170 1224 1233 1233 1314 1692 1305 1557 1827 1674 1503 1611 1566 1350 1035 1089  954  909  936  909  738  549  378  207   1,076  +272.8% 
   Man 23011-BB31552CLR/9          0  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300     288
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-BB31553CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -15587,7 +15586,7 @@
   AI  23011-BB33708              30   30   30    0    0    0    0    0    0    0    0  378   30   24   24    0    0    0    0    0    0    0    0    0    0    0      21  +0.0% 
   Man 23011-BB33708               0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB33708PDQ            0  744  744  744  744  744  744  774  936  816  864  882  858 1296  888 1068  990  978  768 1116 2472 2472 1932 1686  594    0     994  +42.8% 
+  AI  23011-BB33708PDQ            0    0  744  744  744  744  744  774  936  816  864  882  858 1296  888 1068  990  978  768 1116 2472 2472 1932 1686  594    0     966  +44.4% 
   Man 23011-BB33708PDQ            0 1863 1954 1975 2418 1894 2087 2054 1991 1984 1962 1858 1753 1704 1570 1609 1540 1574 1582 1570 1557 1736 1736 1736 1736 1736   1,738
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-BB34403               0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -15602,19 +15601,19 @@
   AI  23011-BB36058CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 23011-BB36058CLR            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB36058CLR/12         0  852  852  888  888  888  888  852  852  852  852  768  768  768  768  768 1140  816  672  660  684  672  540  408  288  156     713  +147.2% 
+  AI  23011-BB36058CLR/12         0    0  852  888  888  888  888  852  852  852  852  768  768  768  768  768 1140  816  672  660  684  672  540  408  288  156     680  +135.8% 
   Man 23011-BB36058CLR/12         0  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300  300     288
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB38480PDQ            0 7128 1788    0 4464    0 21528 5796 5796 5796 5796 5796 5796 5796 5796 5796 5208  228    0    0    0    0    0    0    0    0   3,558  +47.4% 
+  AI  23011-BB38480PDQ            0    0 1788    0 4464    0 21528 5796 5796 5796 5796 5796 5796 5796 5796 5796 5208  228    0    0    0    0    0    0    0    0   3,284  +51.4% 
   Man 23011-BB38480PDQ            0 7625 7707 9435 7393 8147 8016 7769 7742 7656 7252 6840 6649 6128 6279 6009 6143 6174 6126 6075 6774 6774 6774 6774 6774 6774   6,762
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB38504PDQ            0 4311 4311 4599 4599 4599 4599 4311 4311 4311 4311 3762 3762 3762 3762 3762 3222    0    0    0    0    0    0    0    0    0   2,550  +55.5% 
+  AI  23011-BB38504PDQ            0    0 4311 4599 4599 4599 4599 4311 4311 4311 4311 3762 3762 3762 3762 3762 3222    0    0    0    0    0    0    0    0    0   2,384  +58.4% 
   Man 23011-BB38504PDQ            0 6459 6529 7993 6263 6901 6791 6581 6559 6486 6143 5794 5633 5191 5319 5090 5204 5230 5190 5146 5738 5738 5738 5738 5738 5738   5,728
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-BB38564PDQ            0    0    0    0    0    0    0    0    0    0    0    0    0    0 11280    0    0    0    0    0    0    0    0    0    0    0     434  +85.3% 
   Man 23011-BB38564PDQ            0 3318 3354 4105 3217 3545 3488 3380 3369 3331 3155 2976 2893 2666 2732 2614 2673 2686 2666 2643 2947 2947 2947 2947 2947 2947   2,942
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB38579PDQ            0  360  360  360  360  360  360  360  360  360  360  360  360  360  360  360  395  395  360  360  470  470  435  435  560  560     378  +22.7% 
+  AI  23011-BB38579PDQ            0    0  360  360  360  360  360  360  360  360  360  360  360  360  360  360  395  395  360  360  470  470  435  435  560  560     365  +25.5% 
   Man 23011-BB38579PDQ            0  552  558  683  535  590  580  562  560  554  525  495  481  444  455  435  445  447  443  440  490  490  490  490  490  490     489
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-BB38585PDQ            0    0    0    0    0    0    0    0    0    0    0    0    0    0 5940    0    0    0    0    0    0    0    0    0    0    0     228  +92.3% 
@@ -15626,7 +15625,7 @@
   AI  23011-BB38905PDQ            0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 23011-BB38905PDQ            0 10700 10816 13241 10375 11433 11249 10903 10865 10744 10177 9599 9331 8600 8812 8433 8621 8665 8598 8525 9506 9506 9506 9506 9506 9506   9,489
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-BB38906PDQ            0 5922 5922 6309 6309 6309 6309 5922 5922 5922 5922 5157 5157 5157 5157 5157 4419 4419 4014 4014 4131 4131    0    0    0    0   4,295  +41.8% 
+  AI  23011-BB38906PDQ            0    0 5922 6309 6309 6309 6309 5922 5922 5922 5922 5157 5157 5157 5157 5157 4419 4419 4014 4014 4131 4131    0    0    0    0   4,068  +44.9% 
   Man 23011-BB38906PDQ            0 7914 8300 8390 10271 8048 8868 8726 8457 8428 8334 7894 7446 7238 6671 6835 6541 6687 6721 6669 6613 7374 7374 7374 7374 7374   7,382
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-FF10159            11244    0 6240 11286 5076 7140 9174 8574 10554 6654 9402 5820 8826 8310 8862 10728 12342 13314 16524 6570 12312 9756 10080 10422 7290    0   8,712  +1.1% 
@@ -15674,10 +15673,10 @@
   AI  23011-FF12837              42    0   36   42   30   30   30   30   30   30   30   30   30   36   30   36   60   48   54   36   36   36   36   36   36   30      35  +23.1% 
   Man 23011-FF12837              45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45      45
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-FF12858               0 3828 4236 6312 3792 4920 5904 3216 4992 5628 2076 1248 1668 2316 1776 2244 2532 3168 2508 1632 1644    0   24    0  900    0   2,560  +17.6% 
+  AI  23011-FF12858               0    0 4236 6312 3792 4920 5904 3216 4992 5628 2076 1248 1668 2316 1776 2244 2532 3168 2508 1632 1644    0   24    0  900    0   2,413  +10.8% 
   Man 23011-FF12858               0 2420 1936 1936 1936 1936 1936 2420 2420 2420 2420 2541 2541 2541 2541 2033 2033 2033 2033 2033 2419 2419 2419 2419 2419 2419   2,178
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-FF12859               0 2616 2568 2640 2412 2532 2436 2160 2172 2244 2388 2784 3024 2292 2580 2076 2004 2796 2304 1908 3048 2304 2184    0    0    0   2,057  +30.7% 
+  AI  23011-FF12859               0    0 2568 2640 2412 2532 2436 2160 2172 2244 2388 2784 3024 2292 2580 2076 2004 2796 2304 1908 3048 2304 2184    0    0    0   1,956  +34.1% 
   Man 23011-FF12859               0 3300 2640 2640 2640 2640 2640 3300 3300 3300 3300 3465 3465 3465 3465 2772 2772 2772 2772 2772 3299 3299 3299 3299 3299 3299   2,970
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-FF12887              48    0   60   36   24   24   24   36   48   36   36   72   36   48   36   48  108   48   60   36   96  108    0    0    0    0      41  +64.3% 
@@ -15716,7 +15715,7 @@
   AI  23011-FF13885              54    0   54   54   54   54   54   54   54   54   54   54   54   54   54   54   60   60   54   54   60   60   54    0    0    0      47  +6.8% 
   Man 23011-FF13885              50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50      50
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-FF14468               0  675   69   21    0 1284  744  855  900 1026  927  930  738  870 1149  957 1032  993  924  621 1284  552  210  495  543    0     685  +1.2% 
+  AI  23011-FF14468               0    0   69   21    0 1284  744  855  900 1026  927  930  738  870 1149  957 1032  993  924  621 1284  552  210  495  543    0     659  +5.0% 
   Man 23011-FF14468               0  770  616  616  616  616  616  770  770  770  770  809  809  809  809  647  647  647  647  647  770  770  770  770  770  770     693
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-FF14469               0    0  717 1725  810 2382  213 1779 1185  969 1245 1032 1014 1149 1338 1266 1368 2382 1089    0  474    0    0    0    0    0     851  +32.7% 
@@ -15770,7 +15769,7 @@
   AI  23011-FF19569               0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 23011-FF19569               0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-FF19592               0  624  840  888  744 1812 1212 1380 1536 1248 1302  882  984 1254 1434 1212 1500 1818 1722  858 1374 1182 1188 1386  648    0   1,116  +11.6% 
+  AI  23011-FF19592               0    0  840  888  744 1812 1212 1380 1536 1248 1302  882  984 1254 1434 1212 1500 1818 1722  858 1374 1182 1188 1386  648    0   1,092  +13.5% 
   Man 23011-FF19592               0 1300 1170 1170 1170 1170 1170 1404 1404 1404 1404 1460 1460 1460 1460 1197 1197 1197 1197 1197 1424 1424 1424 1424 1282 1282   1,264
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-FF19598             153    0  153  153  153  153  153  153  153  153  135    0    0    9  153  153  168  168  153  153  165  165  153  153  153  153     131  +40.3% 
@@ -15779,10 +15778,10 @@
   AI  23011-FF19598/12            0    0    0    0    0    0    0    0    0    0    0    0  231  231  231  185  204  204  185  185  240  240  220  220  220  220     116  +2.7% 
   Man 23011-FF19598/12            0    0    0    0    0    0    0    0    0    0    0    0  231  231  231  185  185  185  185  185  220  220  220  220  220  220     113
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-FF19998               0 2736 2724 2820 2496 2748 2808 2424 2484 2544 2496 2304 2268 2064 2688 2304 2544 2292 2436 1896 2364 2160 2040 2256 1416    0   2,204  +8.0% 
+  AI  23011-FF19998               0    0 2724 2820 2496 2748 2808 2424 2484 2544 2496 2304 2268 2064 2688 2304 2544 2292 2436 1896 2364 2160 2040 2256 1416    0   2,099  +2.8% 
   Man 23011-FF19998               0 2100 1890 1890 1890 1890 1890 2268 2268 2268 2268 2359 2359 2359 2359 1934 1934 1934 1934 1934 2301 2301 2301 2301 2071 2071   2,041
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-FF20001               0 3624 2484 5748 3516 4908 4212 4164 4740 4164 4116 3012 3504 4236 5340 4488 5196 6300 4740 2484 4536 3744 3732 1548    0    0   3,636  +12.0% 
+  AI  23011-FF20001               0    0 2484 5748 3516 4908 4212 4164 4740 4164 4116 3012 3504 4236 5340 4488 5196 6300 4740 2484 4536 3744 3732 1548    0    0   3,497  +15.4% 
   Man 23011-FF20001               0 5040 5040 3780 5040 3780 5040 3780 3780 4400 4400 4620 4620 4620 4620 3696 3696 3696 3696 3696 4398 4398 4398 4398 4398 4398   4,132
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-FF20122               0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -15944,7 +15943,7 @@
   AI  23011-FF34937             408    0  402  402  228  417  483  342  480  375  495  279  477  480  522  399  504  507  501  567  675  411  324  513  273    0     402  +32.8% 
   Man 23011-FF34937             638  638  510  510  510  510  510  638  638  638  638  670  670  670  670  536  536  536  536  536  638  638  638  638  638  638     599
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-FF34938               0 1936 1712 3620 1460 1808 2548 2580 2504 2008 2936 2104 2440 2176 2376 2612 2740 3212 3292 1660 3196 1216  256  712   80  712   1,996  +12.3% 
+  AI  23011-FF34938               0    0 1712 3620 1460 1808 2548 2580 2504 2008 2936 2104 2440 2176 2376 2612 2740 3212 3292 1660 3196 1216  256  712   80  712   1,922  +15.6% 
   Man 23011-FF34938               0 2530 2024 2024 2024 2024 2024 2530 2530 2530 2530 2657 2657 2657 2657 2126 2126 2126 2126 2126 2530 2530 2530 2530 2530 2530   2,277
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23011-FF35059               0    0 12714 5679 1875 6546 4455 4374 4572 8685 3585 4989 8376 4530 7989 4365 10953 7890 10239 3951 6522 6732 5676 6738 5142 4314   5,804  +1.3% 
@@ -16139,7 +16138,7 @@
   AI  23011-SF8173                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 23011-SF8173               20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20      20
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  23011-SF8174                0   48   48   48   48   72   72   48   96   48   96   48   72   48   72   72   72   72   72   24   72   24   24   72   48   72      57  +15.0% 
+  AI  23011-SF8174                0    0   48   48   48   72   72   48   96   48   96   48   72   48   72   72   72   72   72   24   72   24   24   72   48   72      55  +17.7% 
   Man 23011-SF8174                0   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70      67
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  23018-BB13435CAN            0    0    0    0    0    0    0    0 2688    0    0  392  392  392  392  392  432  432  392  392  420  420  392  392  392  392     335  +1.6% 
@@ -17000,7 +16999,7 @@
   AI  3080-FF9398                 0    0    0    0  552    0    0    0    0  480    0    0    0    0  480    0    0    0    0  480    0    0    0    0  480    0      95  +3.0% 
   Man 3080-FF9398                 0  672    0    0    0    0  648    0    0    0    0  456    0    0    0    0  624    0    0    0    0    0    0    0    0    0      92
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF10159               60    0  120   78   78   60   48   48   60   60   72   72   60   48   54   60   66   78   72   72   54   72   48   48   48    0      59  +29.9% 
+  AI  3102-FF10159               60    0    0   78   78   60   48   48   60   60   72   72   60   48   54   60   66   78   72   72   54   72   48   48   48    0      54  +35.3% 
   Man 3102-FF10159               90    0   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   80   80   80   80   80   80      84
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF10162               12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12    0    0    0    0    0       9  +4.0% 
@@ -17015,7 +17014,7 @@
   AI  3102-FF10477               42   30    0   36   42   30   30   36   36   36   36   42   30   30   42   48   48   60   36   42   30   36   36   36   30   30      36  +20.5% 
   Man 3102-FF10477               45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45      45
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF10479               84    0  114  108   36   36   36   60   54   36   36   54   60   60   72   36   24   24   36   90   36    0    0    0    0    0      42  +78.2% 
+  AI  3102-FF10479               84    0    0  108   36   36   36   60   54   36   36   54   60   60   72   36   24   24   36   90   36    0    0    0    0    0      38  +80.4% 
   Man 3102-FF10479              200    0  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200     192
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF10530               36    0   36   24   24   24   24   24   24   24   24   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      17  +29.0% 
@@ -17039,13 +17038,13 @@
   AI  3102-FF12279               60   54    0   66   66   54   54   72   66   60   60   72   66   72   90   78   84   78   66   60   60   78   60   66   66   60      64  +6.9% 
   Man 3102-FF12279               60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60      60
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12283               18    0   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18      17  +28.0% 
+  AI  3102-FF12283               18    0    0   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18      17  +30.9% 
   Man 3102-FF12283               25    0   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25      24
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12300/24           216    0  144  192  312  144  120  192  312  288  264  216  288  264  408  456  432  456  360  312  144  192  408  264  384  408     276  +19.6% 
+  AI  3102-FF12300/24           216    0    0  192  312  144  120  192  312  288  264  216  288  264  408  456  432  456  360  312  144  192  408  264  384  408     270  +17.2% 
   Man 3102-FF12300/24           240    0  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240  240     231
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12302/24            72    0   48   72   72   48   48   48   48   48   48   48   48   72   72   72   48   72   48   48   48   72   72   72   72   48      56  +95.2% 
+  AI  3102-FF12302/24            72    0    0   72   72   48   48   48   48   48   48   48   48   72   72   72   48   72   48   48   48   72   72   72   72   48      54  +88.8% 
   Man 3102-FF12302/24            30    0   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30      29
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF12353                6    0    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6  +25.0% 
@@ -17054,7 +17053,7 @@
   AI  3102-FF12354                0    6    0    0    0    0    0    6    0    0    0    0    0    6    0    0    0    0    0    6    0    0    0    0    0    6       1  +61.5% [BW]
   Man 3102-FF12354                3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3       3
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12355               12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      12  +140.0% 
+  AI  3102-FF12355               12    0    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      11  +130.4% 
   Man 3102-FF12355                5    0    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5       5
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF12375               18   18    0   12   12   12   12   12   12   12   12   12   12    6    6    6    6    6    6    6    6    6    6    6    6    6       9  +55.0% 
@@ -17066,7 +17065,7 @@
   AI  3102-FF12377               24   24    0   24   24   24   24   24   24   24   24   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18      20  +1.9% 
   Man 3102-FF12377               20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20      20
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12378               36    0   36   30   30   30   30   24   24   24   24   24   24   24   24   24   24   24    0    0    0    0    0    0    0    0      18  +54.4% 
+  AI  3102-FF12378               36    0    0   30   30   30   30   24   24   24   24   24   24   24   24   24   24   24    0    0    0    0    0    0    0    0      16  +58.0% 
   Man 3102-FF12378               40    0   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40      38
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF12379/6             12   12    0    6    6    6    6    6    6    6    6    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       3  +81.5% 
@@ -17075,10 +17074,10 @@
   AI  3102-FF12380/6             48    0   54   54   60   48   42   48   54   48   48   48   48   42   42   42   42   42   36   30   30   30   30   36   30   30      41  +56.6% 
   Man 3102-FF12380/6             80    0   80  110  110  110  110   95   95   95   95   85   85   85   85   85   95   95   95   95  110  110  110  110  110  110      94
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12649               18    0   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18    0    0    0    0    0    0    0    0    0      11  +61.6% 
+  AI  3102-FF12649               18    0    0   18   18   18   18   18   18   18   18   18   18   18   18   18   18    0    0    0    0    0    0    0    0    0      10  +64.0% 
   Man 3102-FF12649               30    0   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30      29
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12653               12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      12  +20.0% 
+  AI  3102-FF12653               12    0    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      11  +23.2% 
   Man 3102-FF12653               15    0   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      14
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF12655              204    0    0  204  336  132  102  168    0    0  222  444  120   66   78  120  150    0    0    0    0    0    0    0    0    0      90  +37.4% 
@@ -17108,7 +17107,7 @@
   AI  3102-FF12843              144    0    0    0    0  396   96    0  396   72   60   84   96  108  204  312  108   72   60   72  108  312  228  192    0    0     120  +42.9% 
   Man 3102-FF12843              200    0  200  225  225  225  225  220  220  220  220  200  200  200  200  200  210  210  210  210  240  240  240  240  240  240     210
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12846              408    0  744  288  216  216  216  288  744  312  264  360  480  240  360  240  336  768  624  240  264  696  360  192  168  168     354  +59.8% 
+  AI  3102-FF12846              408    0    0  288  216  216  216  288  744  312  264  360  480  240  360  240  336  768  624  240  264  696  360  192  168  168     325  +63.0% 
   Man 3102-FF12846              800    0  800 1000 1000 1000 1000  900  900  900  900  850  850  850  850  850  925  925  925  925  950  950  950  950  950  950     879
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF12849               24    0   24   24   24   24   24   36   24   24   12   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24      23  +20.0% 
@@ -17117,7 +17116,7 @@
   AI  3102-FF12850               24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24      24  +20.0% 
   Man 3102-FF12850               30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30      30
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF12852               96    0   84   72   24   24   36   24   36   36   24   36   24   60  120   60   36   96   72   24   24   36   48   48    0    0      44  +8.8% 
+  AI  3102-FF12852               96    0    0   72   24   24   36   24   36   36   24   36   24   60  120   60   36   96   72   24   24   36   48   48    0    0      41  +15.5% 
   Man 3102-FF12852               50    0   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50      48
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF12853              192    0    0  216  276   96   72   72   60   60   84  168  180  132  168  156  120  168   84   60   60    0    0    0    0    0      93  +34.9% 
@@ -17126,16 +17125,16 @@
   AI  3102-FF13116                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 3102-FF13116                3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3       3
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF13154               30    0   24   24   24   24   24   24   30   36   36   42   30   36   42   36   36   36   24   24   24   24   24   24   24   36      28  +34.4% 
+  AI  3102-FF13154               30    0    0   24   24   24   24   24   30   36   36   42   30   36   42   36   36   36   24   24   24   24   24   24   24   36      27  +36.5% 
   Man 3102-FF13154               45    0   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45      43
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF13874               42    0    0    0   66    0   66    0   66    0   66    0   66    0   66    0   72    0   66    0   72    0    0    0    0    0      25  +3.7% 
   Man 3102-FF13874               25    0   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25      24
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF13875               24    0   24   30   30   24   24   30   30   24   24   30   30   24   30   36   24   24   24   24   24   36   24    0    0    0      23  +58.4% 
+  AI  3102-FF13875               24    0    0   30   30   24   24   30   30   24   24   30   30   24   30   36   24   24   24   24   24   36   24    0    0    0      22  +52.0% 
   Man 3102-FF13875               15    0   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      14
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF13876               18    0   12   18   18   12   12   18   24   18   18   18   18   24   24   18   12   18   12   18   12    0    0    0    0    0      13  +8.8% 
+  AI  3102-FF13876               18    0    0   18   18   12   12   18   24   18   18   18   18   24   24   18   12   18   12   18   12    0    0    0    0    0      13  +12.0% 
   Man 3102-FF13876               15    0   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      14
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF13877               18    0    0    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0    0    0       8  +1.0% 
@@ -17150,7 +17149,7 @@
   AI  3102-FF13880               12    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0   18    0       9  +46.2% 
   Man 3102-FF13880                6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF13881               24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0    0    0    0    0      10  +57.8% 
+  AI  3102-FF13881               24    0    0    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0   24    0    0    0    0    0       9  +61.6% 
   Man 3102-FF13881               25    0   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25      24
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF13885               78    0    0   78   78   66   60   78   78   66   72   78   66   78   78   72   84   84   72   72   78   90   78    0    0    0      61  +29.6% 
@@ -17168,16 +17167,16 @@
   AI  3102-FF15584               24   24    0   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24      23  +48.7% 
   Man 3102-FF15584               45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45      45
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF15585               36    0   36   24   48   24   24   24   24   24   24   24   36   36   36   36   36   48   36   36   24   36   36   36   24   36      31  +8.1% 
+  AI  3102-FF15585               36    0    0   24   48   24   24   24   24   24   24   24   36   36   36   36   36   48   36   36   24   36   36   36   24   36      30  +12.2% 
   Man 3102-FF15585               35    0   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35      34
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF15588               12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      12  +40.0% 
   Man 3102-FF15588               20    0   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20      19
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF15589              228    0  408  204  300  180  144  252  240  180  192  228  216  144  336  216  216  108   84   72   72   96  144  120   84  120     176  +13.0% 
+  AI  3102-FF15589              228    0    0  204  300  180  144  252  240  180  192  228  216  144  336  216  216  108   84   72   72   96  144  120   84  120     161  +20.8% 
   Man 3102-FF15589              215    0  215  230  230  230  230  250  250  250  250  200  200  200  200  200  210  210  210  210  180  180  180  180  180  180     203
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF15592               36    0   36   36   48   36   36   48   48   48   36   48   36   48   48   48   48   48   36   36   36   36   36   48   48    0      39  +10.4% 
+  AI  3102-FF15592               36    0    0   36   48   36   36   48   48   48   36   48   36   48   48   48   48   48   36   36   36   36   36   48   48    0      37  +13.6% 
   Man 3102-FF15592               45    0   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45      43
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF15595               48    0    0   36   36   36   36   36   36   36   24   24   36   36   36   48   36   36   36   36   24   36   36   36   36   36      33  +36.3% 
@@ -17189,7 +17188,7 @@
   AI  3102-FF15746                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 3102-FF15746                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF15747               24    0   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   48   48      25  +72.8% 
+  AI  3102-FF15747               24    0    0   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   48   48      24  +66.4% 
   Man 3102-FF15747               15    0   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      14
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF16341                0    0   18    0    0    0    0    0    0   18    0    0    0    0    0    0   18    0    0    0    0    0    0   12    0    0       3  +15.4% 
@@ -17219,7 +17218,7 @@
   AI  3102-FF19341              150    0    0  126  144  114  102   96   96   96  102  114  114   96  114  102  108  120   96   96  102  138  108  102  102   90     101  +14.7% 
   Man 3102-FF19341              160    0  160  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120  120     118
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF20206               72    0   72   54   36   48   30   48   30   18   18   18   18   18   24   30   24   18   24   24   54   72    0    0    0    0      29  +70.0% 
+  AI  3102-FF20206               72    0    0   54   36   48   30   48   30   18   18   18   18   18   24   30   24   18   24   24   54   72    0    0    0    0      26  +72.9% 
   Man 3102-FF20206              100    0  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100      96
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF20207               12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12    0      12  +130.8% 
@@ -17231,7 +17230,7 @@
   AI  3102-FF20209                6    0    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    0    0    0    0    0    0    0    0    0       4  +61.6% 
   Man 3102-FF20209               10    0   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10      10
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF20210               12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12    0    0    0    0    0       9  +36.0% 
+  AI  3102-FF20210               12    0    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12    0    0    0    0    0       9  +39.2% 
   Man 3102-FF20210               15    0   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      14
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF20868                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
@@ -17288,7 +17287,7 @@
   AI  3102-FF27260               12    0    0    0    0    0    0    0    0    0   12    0    0    0    0    0    0    0    0    0   12    0    0    0    0    0       1  +53.8% 
   Man 3102-FF27260                3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3       3
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF27261               12    0   12   12   18   12   12   12   12   12   12   12   12   12   12   12   12   18   18   18   12   18   18   12   12   12      13  +16.0% 
+  AI  3102-FF27261               12    0    0   12   18   12   12   12   12   12   12   12   12   12   12   12   12   18   18   18   12   18   18   12   12   12      12  +19.0% 
   Man 3102-FF27261               16    0   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16      15
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF27262                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -17303,13 +17302,13 @@
   AI  3102-FF27265              126    0    0  114  210   90   66  144  144   90   96  114  108  120  192  126  102  126  102   96   78  186  168  168  174  114     117  +22.2% 
   Man 3102-FF27265              100    0  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100      96
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF27266               48    0   48    0   48    0   48    0   48    0   48    0   48    0   48    0   54    0   48    0   54    0   48    0   48    0      24  +69.6% 
+  AI  3102-FF27266               48    0    0    0   48    0   48    0   48    0   48    0   48    0   48    0   54    0   48    0   54    0   48    0   48    0      23  +56.8% 
   Man 3102-FF27266               15    0   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      14
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF27332               24   24   24   24   24   24   24   24   24   24   24   24   24   24   24    0    0   24   24   24   24   24   24   24   24   24      22  +269.2% 
   Man 3102-FF27332                6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF27687               18    0   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18      17  +55.0% 
+  AI  3102-FF27687               18    0    0   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18   18      17  +56.8% 
   Man 3102-FF27687               40    0   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40      38
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF27997               14    0   14   14   16   14   14   16   16   16   16   16   16   16   18   16   18   18   14   16   18   20   16   18   20   20      16  +45.3% 
@@ -17342,10 +17341,10 @@
   AI  3102-FF29046                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 3102-FF29046                6    0    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF29220               72    0   68   74   88   60   56   68   70   66   64   74   70   78   76   68   80   84   64   60   72   86   72    0    0    0      60  +23.4% 
+  AI  3102-FF29220               72    0    0   74   88   60   56   68   70   66   64   74   70   78   76   68   80   84   64   60   72   86   72    0    0    0      58  +26.7% 
   Man 3102-FF29220               90    0   90   90   90   90   90   70   70   70   70   70   70   70   70   70   70   90   90   90   90   90   90   90   90   90      79
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF29319               12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   18   18   18   18   18   18      13  +61.6% 
+  AI  3102-FF29319               12    0    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   18   18   18   18   18   18      12  +63.0% 
   Man 3102-FF29319               35    0   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35      34
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF30114               12   12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      12  +42.3% 
@@ -17399,7 +17398,7 @@
   AI  3102-FF31076               24    0    0   72  108   36   24   24   24   24   36   60   72   72   84   48   24   24   24   36   36   48   36   48   84   60      43  +4.1% 
   Man 3102-FF31076                0    0   72   72  108   36   24   24   24   24   36   60   72   72   84   48   24   24   24   36   36   48   36   48   84   60      45
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF31184               18    0   24   18   24   15   15   18   18   21   21   21   18   27   30   24   21   18   18   18   15   24   21   18   21   18      19  +0.8% 
+  AI  3102-FF31184               18    0    0   18   24   15   15   18   18   21   21   21   18   27   30   24   21   18   18   18   15   24   21   18   21   18      18  +4.0% 
   Man 3102-FF31184               20    0   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20      19
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF31186               12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      12  +76.0% 
@@ -17408,7 +17407,7 @@
   AI  3102-FF31196                0    0    0    0    0   18    0    0    0    0    0    0    0    0   18    0    0    0    0    0    0    0    0   18    0    0       2  +30.8% [BW]
   Man 3102-FF31196                3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3       3
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF31198                6    0    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6  +20.0% 
+  AI  3102-FF31198                6    0    0    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6  +15.2% 
   Man 3102-FF31198                5    0    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5       5
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF31287               16    0   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   24   24      16  +33.4% 
@@ -17423,7 +17422,7 @@
   AI  3102-FF31295                6    0    0    6    0    0    6    0    0    6    0    0    6    0    0    6    0    0    6    0    0    6    0    0    6    0       2  +30.8% 
   Man 3102-FF31295                3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3    3       3
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF31325               84    0   48   60  120   36   24   36   36   24   48   60   60   48   60   60   72   84   60   96   60   60    0    0    0    0      48  +17.6% 
+  AI  3102-FF31325               84    0    0   60  120   36   24   36   36   24   48   60   60   48   60   60   72   84   60   96   60   60    0    0    0    0      46  +20.8% 
   Man 3102-FF31325               60    0   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60      58
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF31327               24    0   24   24   24   24   24   24   24   24   24   24   24   12   12   12   12   12   12   12   12   12   12   12   12   12      17  +18.4% 
@@ -17465,16 +17464,16 @@
   AI  3102-FF31608               24   24   24   24   24   24   24   24   24   24   24   24   24   12   12   24   12   12   12   12   12   12   12   12   12   12      18  +53.8% 
   Man 3102-FF31608               40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40      40
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF31823               30    0   24   24   36   24   24   24   24   24   24   30   24   24   30   30   24   36   30   24   24   30   24   24   30   24      26  +23.9% 
+  AI  3102-FF31823               30    0    0   24   36   24   24   24   24   24   24   30   24   24   30   30   24   36   30   24   24   30   24   24   30   24      25  +26.6% 
   Man 3102-FF31823               35    0   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35      34
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF32148               96    0   36   36    0    0    0    0  228   72   84  108   84   72   96   48   72  120   84  132   60   36   48   36   48   48      63  +31.5% 
+  AI  3102-FF32148               96    0    0   36    0    0    0    0  228   72   84  108   84   72   96   48   72  120   84  132   60   36   48   36   48   48      62  +33.0% 
   Man 3102-FF32148                0    0  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100      92
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF32149               48    0   24   48  108   36   36   36   60   48   36   72   84   84  120   60   36   96   36   48   48   48   72   72   84   36      57  +3.4% 
+  AI  3102-FF32149               48    0    0   48  108   36   36   36   60   48   36   72   84   84  120   60   36   96   36   48   48   48   72   72   84   36      56  +1.7% 
   Man 3102-FF32149                0    0   24   48  108   36   36   36   60   48   36   72   84   84  120   60   36   96   36   48   48   48   72   72   84   36      55
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF32363              270    0  210  220  370  140  100  170  210  200  160  160  310  280  260  290  260  410  320  350  250  450  360  170    0    0     228  +8.1% 
+  AI  3102-FF32363              270    0    0  220  370  140  100  170  210  200  160  160  310  280  260  290  260  410  320  350  250  450  360  170    0    0     220  +11.3% 
   Man 3102-FF32363              200    0  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260  260     248
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF32364               90    0    0   50  120   50   40   60   80   60  120  130  110  100  150  130  130  180  130   60   50  140  100   60  130   90      91  +4.9% 
@@ -17513,7 +17512,7 @@
   AI  3102-FF33413              144    0    0  156  216   72   36   36   60   84   72  108  180  132  120  108  108  108   60   84  108  144   96  132  168   96     101  +31.4% 
   Man 3102-FF33413               80    0   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80   80      77
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF33449               60    0   48   60   60   24   24   48   48   36   36   72   48   48   60   60   36   72   72   48   48   48   36   60   48   36      48  +23.6% 
+  AI  3102-FF33449               60    0    0   60   60   24   24   48   48   36   36   72   48   48   60   60   36   72   72   48   48   48   36   60   48   36      46  +18.8% 
   Man 3102-FF33449               40    0   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40      38
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF33495                8    8    0    0   24    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    8    0    0    0    0    0       6  +115.4% 
@@ -17669,7 +17668,7 @@
   AI  3102-FF4923                 6    6    0    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6       6  +44.2% 
   Man 3102-FF4923                 4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4    4       4
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF4930                 6    0    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    0    0    0    0    0    0    0       4  +13.6% 
+  AI  3102-FF4930                 6    0    0    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    6    0    0    0    0    0    0    0       4  +18.4% 
   Man 3102-FF4930                 5    0    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5       5
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF4936                48    0   48    0   48    0   48    0   48    0   48    0   48    0   48    0   48    0   48    0   48    0   48    0   48    0      24  +108.0% 
@@ -17684,7 +17683,7 @@
   AI  3102-FF5766               144    0    0  168  234   84   66  126  222  126  138  258  210  192  240  174  156  210  144  114   90  198  168  180  192  168     154  +23.8% 
   Man 3102-FF5766               134    0  114  114  114  114  114  148  148  148  148  133  133  133  133  126  126  126  126  126  129  129  129  129  129  129     124
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF5769                24    0   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24      23  +4.0% 
+  AI  3102-FF5769                24    0    0   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24   24      22  +7.8% 
   Man 3102-FF5769                25    0   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25   25      24
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF5772                36    0    0   36   36   30   30   36   36   30   30   36   36   30   30   30   24   36   30   24   24   30   24   24   24   24      28  +41.9% 
@@ -17726,7 +17725,7 @@
   AI  3102-FF7112                60   54   54   54   54   54   48   42   48   48   42   36   36   36   42   42   48   48   36   36   36   36   36   36    0    0      41  +9.2% 
   Man 3102-FF7112                45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45      45
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7115                30    0   30   30   30   30   30   30   30   30   30   30   30   30   30   30   36   36   30   30   30   36   36   36    0    0      28  +28.0% 
+  AI  3102-FF7115                30    0    0   30   30   30   30   30   30   30   30   30   30   30   30   30   36   36   30   30   30   36   36   36    0    0      27  +31.0% 
   Man 3102-FF7115                40    0   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40   40      38
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF7118                42    0   42   36   42   36   36   36   36   36   30   30   30   30   30   30   24   24   24   24   24   24   24   24   30    0      29  +40.5% 
@@ -17735,22 +17734,22 @@
   AI  3102-FF7120               132    0    0  132  150  120  114  120  132  126  132  120  120  132  144  114  108  108  102  102   96  126  102  114  114   90     110  +5.6% 
   Man 3102-FF7120               115    0  115  125  125  125  125  120  120  120  120  110  110  110  110  110  120  120  120  120  130  130  130  130  130  130     116
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7210                48    0   36   36   48   24   24   60   48   48   48   48   48   48   72   48   48  108   60   84   36   48   36   48    0    0      44  +7.8% 
+  AI  3102-FF7210                48    0    0   36   48   24   24   60   48   48   48   48   48   48   72   48   48  108   60   84   36   48   36   48    0    0      43  +10.7% 
   Man 3102-FF7210                50    0   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50   50      48
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF7215                48    0    0   60  120   36   24   48   60   48   48   36   48   72   84   96  108   84   36   24   36   96   36   48   84   60      55  +4.0% 
   Man 3102-FF7215                60    0   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60      58
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7216                72    0  192   96   84   72   48  108  144   84   96  108   96  108  192  108   96  132   84   96   60  156  144   96  108  120     104  +8.0% 
+  AI  3102-FF7216                72    0    0   96   84   72   48  108  144   84   96  108   96  108  192  108   96  132   84   96   60  156  144   96  108  120      96  +0.3% 
   Man 3102-FF7216               100    0  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100      96
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7217                48    0   36   36   36   36   36   36   48   48   36   36   36   36   48   36   36   48   36   36   48   48   48   48   60   60      41  +6.1% 
+  AI  3102-FF7217                48    0    0   36   36   36   36   36   48   48   36   36   36   36   48   36   36   48   36   36   48   48   48   48   60   60      39  +9.3% 
   Man 3102-FF7217                45    0   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45   45      43
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF7218                12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12    0    0    0    0    0    0    0    0    0    0       7  +44.0% 
   Man 3102-FF7218                 5    0    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5       5
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7221               168    0  108  156  252   84   60  120  132  120  120  156  156  168  264  192  132  132  120  108   72  168   84  180  228  204     142  +32.5% 
+  AI  3102-FF7221               168    0    0  156  252   84   60  120  132  120  120  156  156  168  264  192  132  132  120  108   72  168   84  180  228  204     138  +28.6% 
   Man 3102-FF7221                90    0   90  115  115  115  115  110  110  110  110  100  100  100  100  100  105  105  105  105  130  130  130  130  130  130     107
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF7228                48    0   48   48   48   48   48   48   48   48   48   36   48   36   36   36   36   36   36   36   36   36   36   36   36   36      40  +17.4% 
@@ -17765,7 +17764,7 @@
   AI  3102-FF7261                12    0    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      11  +28.0% 
   Man 3102-FF7261                16    0   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16   16      15
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7263                60    0   90   72   72   60   54   66   66   60   66   66   72   66   78   78   66   72   60   60   72  102   84   78   90   90      69  +30.9% 
+  AI  3102-FF7263                60    0    0   72   72   60   54   66   66   60   66   66   72   66   78   78   66   72   60   60   72  102   84   78   90   90      66  +24.4% 
   Man 3102-FF7263                55    0   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55   55      53
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF7266                30    0    0   30   36   30   30   30   30   30   30   36   36   36   36   30   36   42   30   30   30   36   36   36   36   30      30  +111.2% 
@@ -17795,25 +17794,25 @@
   AI  3102-FF7549                36    0    0    0    0    0    0    0    0   36    0    0    0    0    0    0    0    0   36   36    0    0    0    0    0    0       6  +42.4% 
   Man 3102-FF7549                10    0   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10      10
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7612                72    0   72   72   72   72   72   72   72   72   72    0    0    0  240   48   48   48   48   48   48   48   48   48   72   72      59  +12.2% 
+  AI  3102-FF7612                72    0    0   72   72   72   72   72   72   72   72    0    0    0  240   48   48   48   48   48   48   48   48   48   72   72      56  +16.3% 
   Man 3102-FF7612                70    0   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70   70      67
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF7613                72    0   72   96  120   72   72   96   96   96   72   72   72   72   72   96  144  144   96  120   96   96   96   72   96   96      89  +53.6% 
   Man 3102-FF7613                60    0   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60   60      58
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7618               300    0  180  240  240  120  120  420  240  180  180  240  240  240  120  180  240  240  120  180  120  300  240  180  240  180     203  +24.2% 
+  AI  3102-FF7618               300    0    0  240  240  120  120  420  240  180  180  240  240  240  120  180  240  240  120  180  120  300  240  180  240  180     196  +20.0% 
   Man 3102-FF7618               170    0  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170  170     163
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7619               120    0  120  120  120   60   60  240   60  120  120  180  120  120  120   60   60  120   60   60  120  120  120  120  120  120     106  +10.4% 
+  AI  3102-FF7619               120    0    0  120  120   60   60  240   60  120  120  180  120  120  120   60   60  120   60   60  120  120  120  120  120  120     102  +5.6% 
   Man 3102-FF7619               100    0  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100      96
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF7639                 0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +100.0% 
   Man 3102-FF7639                 5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5    5       5
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7716                16    0   24   16   16   16   16   16   16   16   16   16   16   16   20   16   16   16   16   12   12   12   12   16   12   16      15  +21.6% 
+  AI  3102-FF7716                16    0    0   16   16   16   16   16   16   16   16   16   16   16   20   16   16   16   16   12   12   12   12   16   12   16      14  +26.4% 
   Man 3102-FF7716                20    0   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20   20      19
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF7717                12    0   12   12   12    8    8   12   12   12    8   12   12    8   12    8    8    8    8    8    8    8    8    8    8    8       9  +36.0% 
+  AI  3102-FF7717                12    0    0   12   12    8    8   12   12   12    8   12   12    8   12    8    8    8    8    8    8    8    8    8    8    8       9  +39.2% 
   Man 3102-FF7717                15    0   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      14
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF8256                36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36   36      36  +80.0% 
@@ -17846,16 +17845,16 @@
   AI  3102-FF8649/24            288    0    0  336  336  168  144  144   96  168  144  192  240  216  192  240  240  264  192  240  192  288  264  264  288  240     207  +19.5% 
   Man 3102-FF8649/24            180    0  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180  180     173
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF8653                36    0   36   36   40   32   32   32   36   32   32   32   32   32   32   32   36   36   32   36    0    0    0    0    0    0      25  +26.4% 
+  AI  3102-FF8653                36    0    0   36   40   32   32   32   36   32   32   32   32   32   32   32   36   36   32   36    0    0    0    0    0    0      23  +30.5% 
   Man 3102-FF8653                35    0   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35   35      34
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF8654               254  280    0  230  268  210  216  248  204  216  222  242  216  258  252  242  288  278  240  246  246  254  268  278  298  284     240  +27.3% 
   Man 3102-FF8654               330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330  330     330
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF8831               120    0   96  120   60   48   48   72   48   48   48   60   60   60   60   48   84   36   36   36   36   36   36   48   60   48      56  +41.9% 
+  AI  3102-FF8831               120    0    0  120   60   48   48   72   48   48   48   60   60   60   60   48   84   36   36   36   36   36   36   48   60   48      52  +45.8% 
   Man 3102-FF8831               100    0  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100  100      96
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF8832                36    0   36   36   36   24   24   24   24   24   24   36   24   24   24   24   12   12   24   12   12   24   24   24   24   24      24  +18.4% 
+  AI  3102-FF8832                36    0    0   36   36   24   24   24   24   24   24   36   24   24   24   24   12   12   24   12   12   24   24   24   24   24      22  +23.2% 
   Man 3102-FF8832                30    0   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30      29
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF8850                 0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -17864,7 +17863,7 @@
   AI  3102-FF8855                 0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
   Man 3102-FF8855                 0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF8882                54    0   72   72   72   54   54   66   54   48   42   48   48   54   60   66   66   78   54   48   60   66   60   66   72   84      58  +32.5% 
+  AI  3102-FF8882                54    0    0   72   72   54   54   66   54   48   42   48   48   54   60   66   66   78   54   48   60   66   60   66   72   84      56  +35.7% 
   Man 3102-FF8882                90    0   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90      87
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF8990              1608    0    0 1404  540  468  528 1092  588  576  984  768 1260 1368 1824 1212 1152  648  540  444  576 1152  600 1116 1692 1188     897  +2.1% 
@@ -17888,7 +17887,7 @@
   AI  3102-FF9297/24             48    0   48    0   48    0   48    0   48    0   48    0   48    0   24    0   24    0   24    0   24    0   24    0   24    0      18  +28.0% 
   Man 3102-FF9297/24             15    0   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15   15      14
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF9298               120    0  144  144  144  120   96  120  120  120  120  120  120  120  120   96  192  144   96  120   96   96  144  120  120  120     118  +36.5% 
+  AI  3102-FF9298               120    0    0  144  144  120   96  120  120  120  120  120  120  120  120   96  192  144   96  120   96   96  144  120  120  120     113  +30.1% 
   Man 3102-FF9298                90    0   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90   90      87
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-FF9321                 0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -17906,7 +17905,7 @@
   AI  3102-FF9756                12    0   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12   12      12  +20.0% 
   Man 3102-FF9756                10    0   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10      10
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  3102-FF9757                24    0   24   24   24   24   24   24   24   24   24   24   24   24   36   36   36   36   36   24   24   24   24   24   24   24      25  +12.0% 
+  AI  3102-FF9757                24    0    0   24   24   24   24   24   24   24   24   24   24   24   36   36   36   36   36   24   24   24   24   24   24   24      24  +15.2% 
   Man 3102-FF9757                30    0   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30      29
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  3102-SF8167               216  144  288  360  360  144  144   72  144  144   72  216  144  216  216  216  288  288  144   72   72   72  144  216  288   72     183  +52.3% 

@@ -1,0 +1,1280 @@
+<?xml version="1.0" ?>
+<qdbapi>
+	<action>API_GetDBPage</action>
+	<errcode>0</errcode>
+	<errtext>No error</errtext>
+	<pagebody>
+&lt;!DOCTYPE html&gt;<BR/>
+&lt;html lang=&quot;en&quot;&gt;<BR/>
+&lt;head&gt;<BR/>
+&lt;meta charset=&quot;UTF-8&quot;&gt;<BR/>
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;<BR/>
+&lt;title&gt;Supplier Savings Analysis&lt;/title&gt;<BR/>
+&lt;style&gt;<BR/>
+/* &amp;#9472;&amp;#9472; Loading overlay &amp;#9472;&amp;#9472; */<BR/>
+#loading-overlay {<BR/>
+  position: fixed; inset: 0; z-index: 9999;<BR/>
+  background: #f0f2f5; display: flex; align-items: center; justify-content: center;<BR/>
+}<BR/>
+.loading-box {<BR/>
+  background: #fff; border-radius: 10px; padding: 40px 52px;<BR/>
+  box-shadow: 0 4px 24px rgba(0,0,0,0.14); text-align: center; min-width: 320px;<BR/>
+}<BR/>
+.spinner {<BR/>
+  width: 44px; height: 44px; border: 4px solid #e0e0e0;<BR/>
+  border-top-color: #0F3460; border-radius: 50%;<BR/>
+  animation: spin 0.8s linear infinite; margin: 0 auto 18px;<BR/>
+}<BR/>
+@keyframes spin { to { transform: rotate(360deg); } }<BR/>
+#loading-status  { font-size: 15px; font-weight: 600; color: #0F3460; margin-bottom: 6px; }<BR/>
+#loading-detail  { font-size: 12px; color: #888; min-height: 18px; }<BR/>
+#loading-error   { color: #c0392b; font-size: 13px; margin-top: 12px; display: none; }<BR/>
+#retry-btn {<BR/>
+  margin-top: 16px; padding: 9px 22px;<BR/>
+  background: #0F3460; color: #fff; border: none; border-radius: 4px;<BR/>
+  font-size: 13px; cursor: pointer; display: none;<BR/>
+}<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; CSS Variables &amp;#9472;&amp;#9472; */<BR/>
+:root {<BR/>
+  --navy:#0F3460; --navy-mid:#16405A; --navy-dark:#0a1f3a;<BR/>
+  --green:#1E8449; --green-dark:#145a32; --green-light:#e9f7ef;<BR/>
+  --red:#C0392B; --red-light:#fdecea;<BR/>
+  --amber:#f39c12; --amber-light:#fff8e1;<BR/>
+  --purple:#7d3c98; --purple-light:#f4ecf7;<BR/>
+  --blue-sub:#d5e8f5; --white:#ffffff;<BR/>
+  --gray-light:#f7f7f7; --gray-mid:#e0e0e0; --gray-dark:#666666;<BR/>
+  --text:#1a1a1a; --border:#cccccc; --even-row:#fafbff;<BR/>
+  --font:&#039;Segoe UI&#039;,Arial,sans-serif; --shadow:0 2px 8px rgba(0,0,0,0.10);<BR/>
+}<BR/>
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }<BR/>
+body { font-family:var(--font); font-size:13px; color:var(--text); background:#f0f2f5; }<BR/>
+a { color:var(--navy); }<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; Nav &amp;#9472;&amp;#9472; */<BR/>
+.top-nav {<BR/>
+  position:sticky; top:0; z-index:100;<BR/>
+  background:var(--navy); box-shadow:var(--shadow);<BR/>
+  display:flex; align-items:center; padding:0 16px;<BR/>
+}<BR/>
+.top-nav .brand {<BR/>
+  color:var(--white); font-weight:700; font-size:14px;<BR/>
+  padding:14px 16px 14px 0; border-right:1px solid rgba(255,255,255,0.2);<BR/>
+  margin-right:8px; white-space:nowrap;<BR/>
+}<BR/>
+.top-nav .brand small { font-weight:400; font-size:11px; opacity:0.75; display:block; }<BR/>
+.tab-btn {<BR/>
+  display:inline-block; padding:14px 18px;<BR/>
+  color:rgba(255,255,255,0.75); font-size:13px; font-weight:500;<BR/>
+  cursor:pointer; border:none; background:none;<BR/>
+  border-bottom:3px solid transparent; transition:all 0.15s; white-space:nowrap;<BR/>
+}<BR/>
+.tab-btn:hover { color:var(--white); background:rgba(255,255,255,0.08); }<BR/>
+.tab-btn.active { color:var(--white); border-bottom-color:#4fc3f7; }<BR/>
+.refresh-btn { margin-left:auto; color:rgba(255,255,255,0.85) !important; font-size:12px !important; }<BR/>
+.refresh-btn:hover { background:rgba(255,255,255,0.15) !important; }<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; Tabs &amp;#9472;&amp;#9472; */<BR/>
+.tab-content { display:none; padding:20px; min-height:calc(100vh - 52px); }<BR/>
+.tab-content.active { display:block; }<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; KPI Cards &amp;#9472;&amp;#9472; */<BR/>
+.kpi-row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:24px; }<BR/>
+.kpi-card {<BR/>
+  background:var(--white); border-radius:6px; padding:16px 20px;<BR/>
+  flex:1 1 160px; border-left:4px solid var(--green); box-shadow:var(--shadow);<BR/>
+}<BR/>
+.kpi-label { font-size:11px; color:var(--gray-dark); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }<BR/>
+.kpi-value { font-size:22px; font-weight:700; }<BR/>
+.section-title {<BR/>
+  font-size:15px; font-weight:700; color:var(--navy);<BR/>
+  margin-bottom:10px; padding-bottom:6px; border-bottom:2px solid var(--navy);<BR/>
+}<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; Toolbar &amp;#9472;&amp;#9472; */<BR/>
+.tab-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }<BR/>
+.search-box {<BR/>
+  flex:1 1 300px; max-width:420px; padding:7px 12px;<BR/>
+  border:1px solid var(--border); border-radius:4px; font-size:13px; font-family:var(--font);<BR/>
+}<BR/>
+.search-box:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 2px rgba(15,52,96,0.15); }<BR/>
+.btn-secondary {<BR/>
+  padding:7px 14px; background:var(--white); border:1px solid var(--border);<BR/>
+  border-radius:4px; font-size:12px; cursor:pointer; font-family:var(--font); transition:background 0.1s;<BR/>
+}<BR/>
+.btn-secondary:hover { background:var(--gray-light); }<BR/>
+.btn-clear {<BR/>
+  padding:7px 14px; background:#fdecea; border:1px solid #e74c3c;<BR/>
+  border-radius:4px; font-size:12px; cursor:pointer; color:#c0392b;<BR/>
+  font-family:var(--font); transition:background 0.1s;<BR/>
+}<BR/>
+.btn-clear:hover { background:#f9c0bb; }<BR/>
+.filter-select {<BR/>
+  padding:6px 10px; border:1px solid var(--border); border-radius:4px;<BR/>
+  font-size:12px; font-family:var(--font); background:var(--white); cursor:pointer;<BR/>
+}<BR/>
+.filter-select:focus { outline:none; border-color:var(--navy); }<BR/>
+.filter-label { font-size:11px; color:var(--gray-dark); white-space:nowrap; }<BR/>
+.filter-divider { width:1px; height:22px; background:var(--border); margin:0 4px; }<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; Tables &amp;#9472;&amp;#9472; */<BR/>
+.table-wrap { overflow-x:auto; border-radius:4px; box-shadow:var(--shadow); }<BR/>
+table { border-collapse:collapse; width:100%; background:var(--white); font-size:12px; }<BR/>
+th,td { padding:5px 8px; border:1px solid var(--border); white-space:nowrap; }<BR/>
+.detail-scroll-wrap td { overflow:hidden; text-overflow:ellipsis; }<BR/>
+.detail-scroll-wrap td[style*=&quot;white-space:normal&quot;],<BR/>
+.detail-scroll-wrap td.rec-cell {<BR/>
+  white-space:normal; word-break:break-word; overflow:hidden; text-overflow:clip;<BR/>
+}<BR/>
+thead th { background:var(--navy); color:var(--white); font-weight:600; font-size:11px; text-align:center; }<BR/>
+#dash-table thead th { position:sticky; top:52px; z-index:5; }<BR/>
+.group-hdr { font-size:11px; font-weight:700; text-align:center; color:var(--white) !important; letter-spacing:0.4px; }<BR/>
+.col-hdr th { background:var(--navy-mid) !important; font-size:11px; }<BR/>
+th.th-info  { background:#2c3e50 !important; }<BR/>
+th.th-core  { background:#1a4f8a !important; }<BR/>
+th.th-alt   { background:#1a5c35 !important; }<BR/>
+th.th-alt2  { background:#512b7a !important; }<BR/>
+th.th-alt3  { background:#3d3d3d !important; }<BR/>
+th.th-ss1   { background:#1a5c35 !important; }<BR/>
+th.th-ss2   { background:#512b7a !important; }<BR/>
+th.th-ss3   { background:#00695C !important; }<BR/>
+tr.alt-row td { background:var(--even-row); }<BR/>
+tr.data-row:hover td { background:#e8f0fe; }<BR/>
+.subtotal-row td { background:var(--blue-sub); font-weight:600; font-size:11px; }<BR/>
+.grand-total td { background:var(--green-light); font-weight:700; border-top:2px solid var(--green); }<BR/>
+td.num { text-align:right; }<BR/>
+td.bold { font-weight:700; }<BR/>
+td.green { color:var(--green); }<BR/>
+td.red { color:var(--red); }<BR/>
+td.purple { color:var(--purple); }<BR/>
+td.navy { color:var(--navy); }<BR/>
+td.small { font-size:10px; }<BR/>
+td.amber { color:#a04000; font-weight:600; }<BR/>
+td.teal  { color:#00695C; }<BR/>
+td.rec-cell { font-size:11px; max-width:220px; white-space:normal; }<BR/>
+#dash-table td,#dash-table th { text-align:right; }<BR/>
+#dash-table td:nth-child(2),#dash-table th:nth-child(2) { text-align:left; }<BR/>
+#dash-table td:first-child,#dash-table th:first-child { text-align:center; }<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; Methodology &amp;#9472;&amp;#9472; */<BR/>
+.methodology { max-width:900px; background:var(--white); border-radius:6px; padding:28px 32px; box-shadow:var(--shadow); }<BR/>
+.methodology h2 { font-size:16px; color:var(--navy); margin:20px 0 8px; border-bottom:1px solid var(--border); padding-bottom:4px; }<BR/>
+.methodology h2:first-child { margin-top:0; }<BR/>
+.methodology h3 { font-size:14px; color:var(--navy-mid); margin:14px 0 6px; }<BR/>
+.methodology p,.methodology li { line-height:1.6; margin-bottom:8px; }<BR/>
+.methodology ul { margin-left:20px; }<BR/>
+.formula-box {<BR/>
+  background:var(--gray-light); border-left:4px solid var(--navy);<BR/>
+  border-radius:0 4px 4px 0; padding:12px 16px; margin:10px 0;<BR/>
+}<BR/>
+.formula-box p { margin-bottom:4px; font-family:&#039;Consolas&#039;,monospace; font-size:12px; }<BR/>
+.footnote { font-size:11px; color:var(--gray-dark); margin-top:24px; padding-top:12px; border-top:1px solid var(--border); }<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; Hidden / collapsed rows &amp;#9472;&amp;#9472; */<BR/>
+tr.hidden-row,tr.collapsed-row { display:none; }<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; Detail table scroll wrapper (sticky thead) &amp;#9472;&amp;#9472; */<BR/>
+.detail-scroll-wrap { overflow:auto; height:calc(100vh - 168px); border-radius:4px; box-shadow:var(--shadow); }<BR/>
+.detail-scroll-wrap table { table-layout:fixed; }<BR/>
+.detail-scroll-wrap thead tr:first-child th  { position:sticky; top:0;    z-index:11; }<BR/>
+.detail-scroll-wrap thead tr:last-child  th  { position:sticky; top:27px; z-index:10; }<BR/>
+<BR/>
+/* &amp;#9472;&amp;#9472; Supplier group header row &amp;#9472;&amp;#9472; */<BR/>
+.sup-hdr { cursor:pointer; user-select:none; }<BR/>
+.sup-hdr td {<BR/>
+  background:var(--navy) !important; color:var(--white);<BR/>
+  font-weight:700; font-size:12px; padding:9px 14px;<BR/>
+  border-color:rgba(255,255,255,0.15) !important; white-space:nowrap;<BR/>
+}<BR/>
+.sup-hdr:hover td { background:var(--navy-mid) !important; }<BR/>
+.sup-hdr.grp-collapsed .grp-arrow { transform:rotate(-90deg); }<BR/>
+.grp-arrow { display:inline-block; font-size:11px; transition:transform 0.2s; margin-right:8px; }<BR/>
+.grp-meta  { font-size:11px; font-weight:400; color:rgba(255,255,255,0.8); margin-left:10px; }<BR/>
+.export-btn { background:rgba(46,204,113,0.18) !important; color:#2ecc71 !important; border:1px solid rgba(46,204,113,0.35) !important; border-radius:4px; margin-left:6px; }<BR/>
+.export-btn:hover { background:rgba(46,204,113,0.32) !important; }<BR/>
+&lt;/style&gt;<BR/>
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js&quot;&gt;&lt;/script&gt;<BR/>
+&lt;/head&gt;<BR/>
+&lt;body&gt;<BR/>
+<BR/>
+&lt;!-- &amp;#9472;&amp;#9472; Loading overlay &amp;#9472;&amp;#9472; --&gt;<BR/>
+&lt;div id=&quot;loading-overlay&quot;&gt;<BR/>
+  &lt;div class=&quot;loading-box&quot;&gt;<BR/>
+    &lt;div class=&quot;spinner&quot; id=&quot;spinner&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;div id=&quot;loading-status&quot;&gt;Connecting to Quickbase&#133;&lt;/div&gt;<BR/>
+    &lt;div id=&quot;loading-detail&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;div id=&quot;loading-error&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;button id=&quot;retry-btn&quot; onclick=&quot;loadData()&quot;&gt;Retry&lt;/button&gt;<BR/>
+  &lt;/div&gt;<BR/>
+&lt;/div&gt;<BR/>
+<BR/>
+&lt;!-- &amp;#9472;&amp;#9472; App shell (populated after data loads) &amp;#9472;&amp;#9472; --&gt;<BR/>
+&lt;div id=&quot;app&quot; style=&quot;display:none&quot;&gt;<BR/>
+  &lt;nav class=&quot;top-nav&quot; id=&quot;top-nav&quot;&gt;&lt;/nav&gt;<BR/>
+  &lt;div id=&quot;tab1&quot; class=&quot;tab-content active&quot;&gt;&lt;/div&gt;<BR/>
+  &lt;div id=&quot;tab2&quot; class=&quot;tab-content&quot;&gt;&lt;/div&gt;<BR/>
+  &lt;div id=&quot;tab3&quot; class=&quot;tab-content&quot;&gt;&lt;/div&gt;<BR/>
+  &lt;div id=&quot;tab4&quot; class=&quot;tab-content&quot;&gt;&lt;/div&gt;<BR/>
+&lt;/div&gt;<BR/>
+<BR/>
+&lt;script&gt;<BR/>
+// &amp;#9472;&amp;#9472; QB Config &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+// Table IDs only &#151; no tokens, no credentials.<BR/>
+// This page is hosted on pim.quickbase.com, so requests to /db/{table}?act=API_DoQuery<BR/>
+// are same-origin: the browser sends the QB session cookie automatically.<BR/>
+const STYLES    = &#039;bn458n7jz&#039;;<BR/>
+const FLOW      = &#039;bpsaju5pm&#039;;<BR/>
+const TERMS_TBL = &#039;bphzqfkev&#039;;<BR/>
+const SUPPLIERS = &#039;bn7g5ebz5&#039;;<BR/>
+const BUY_FIELDS = [457,459,460,461,546,547,548,549,550,551,552,553,554,555,<BR/>
+                    556,557,558,559,560,561,562,563,564,565,566,567];<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; QB fetch helper (legacy XML API &#151; same-origin, session cookie auth) &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+// Uses QB&#039;s XML API: /db/{table}?act=API_DoQuery<BR/>
+// No token required &#151; the browser sends the pim.quickbase.com session cookie<BR/>
+// automatically because this page is served from the same domain.<BR/>
+async function fetchAll(table, fields, where) {<BR/>
+  const clist = [...new Set(fields)].join(&#039;.&#039;);<BR/>
+  let all = [], skip = 0;<BR/>
+  const parser = new DOMParser();<BR/>
+<BR/>
+  while (true) {<BR/>
+    const params = new URLSearchParams({<BR/>
+      act: &#039;API_DoQuery&#039;,<BR/>
+      clist,<BR/>
+      fmt: &#039;structured&#039;,<BR/>
+      includeRids: &#039;1&#039;,<BR/>
+      options: `num-500.skp-${skip}`<BR/>
+    });<BR/>
+    if (where) params.set(&#039;query&#039;, where);<BR/>
+<BR/>
+    const resp = await fetch(`https://pim.quickbase.com/db/${table}?${params}`);<BR/>
+    if (!resp.ok) throw new Error(`QB API HTTP ${resp.status} for table ${table}`);<BR/>
+<BR/>
+    const xml = parser.parseFromString(await resp.text(), &#039;text/xml&#039;);<BR/>
+<BR/>
+    // Check QB-level error (errcode 0 = success)<BR/>
+    const errcode = xml.querySelector(&#039;errcode&#039;)?.textContent?.trim();<BR/>
+    if (errcode &amp;&amp; errcode !== &#039;0&#039;) {<BR/>
+      const errtxt = xml.querySelector(&#039;errtext&#039;)?.textContent || &#039;Unknown QB error&#039;;<BR/>
+      throw new Error(`QB error ${errcode}: ${errtxt}`);<BR/>
+    }<BR/>
+<BR/>
+    const records = Array.from(xml.querySelectorAll(&#039;record&#039;));<BR/>
+    if (!records.length) break;<BR/>
+<BR/>
+    // Convert XML records &amp;#8594; { fieldId: { value: string } }<BR/>
+    // This matches the shape expected by v() and fv() helpers below.<BR/>
+    const data = records.map(rec =&gt; {<BR/>
+      const obj = {};<BR/>
+      rec.querySelectorAll(&#039;f&#039;).forEach(f =&gt; {<BR/>
+        obj[f.getAttribute(&#039;id&#039;)] = { value: f.textContent };<BR/>
+      });<BR/>
+      return obj;<BR/>
+    });<BR/>
+<BR/>
+    all = all.concat(data);<BR/>
+    if (data.length &lt; 500) break;<BR/>
+    skip += data.length;<BR/>
+  }<BR/>
+<BR/>
+  return all;<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; Data helpers &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+const v    = (r, id) =&gt; r[id]?.value ?? null;<BR/>
+const fv   = (r, id) =&gt; { const x = parseFloat(r[id]?.value); return isNaN(x) ? null : x; };<BR/>
+const r2   = n =&gt; n != null ? Math.round(n * 100) / 100 : null;<BR/>
+const safe = (x, d = &#039;&#039;) =&gt; x != null ? x : d;<BR/>
+const resolveFreight = (primary, la, override, fallback = null) =&gt; {<BR/>
+  const val = primary ?? la ?? override ?? fallback;<BR/>
+  return { value: r2(val), estimated: val === fallback &amp;&amp; fallback != null };<BR/>
+};<BR/>
+const calcMgn = (sell, lc, roy, terms) =&gt; {<BR/>
+  if (!sell || !lc || sell === 0) return null;<BR/>
+  return (sell - lc) / sell - (roy || 0) - (terms || 0);<BR/>
+};<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; Format helpers &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+const fmtUSD = n =&gt; (n == null) ? &#039;&#151;&#039; : &#039;$&#039; + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, &#039;,&#039;);<BR/>
+const fmtPct = (n, dec=1) =&gt; (n == null) ? &#039;&#151;&#039; : (n * 100).toFixed(dec) + &#039;%&#039;;<BR/>
+const fmtInt = n =&gt; (n == null || n === 0) ? &#039;&#151;&#039; : Math.round(n).toLocaleString();<BR/>
+const esc    = s =&gt; String(s ?? &#039;&#039;).replace(/&amp;/g,&#039;&amp;amp;&#039;).replace(/&lt;/g,&#039;&amp;lt;&#039;).replace(/&gt;/g,&#039;&amp;gt;&#039;).replace(/&quot;/g,&#039;&amp;quot;&#039;);<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; Loading status helpers &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+function setStatus(msg, detail) {<BR/>
+  document.getElementById(&#039;loading-status&#039;).textContent = msg;<BR/>
+  document.getElementById(&#039;loading-detail&#039;).textContent = detail || &#039;&#039;;<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; Main data load &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+async function loadData() {<BR/>
+  // Reset UI to loading state<BR/>
+  document.getElementById(&#039;loading-overlay&#039;).style.display = &#039;flex&#039;;<BR/>
+  document.getElementById(&#039;app&#039;).style.display = &#039;none&#039;;<BR/>
+  document.getElementById(&#039;spinner&#039;).style.display = &#039;block&#039;;<BR/>
+  document.getElementById(&#039;loading-error&#039;).style.display = &#039;none&#039;;<BR/>
+  document.getElementById(&#039;retry-btn&#039;).style.display = &#039;none&#039;;<BR/>
+<BR/>
+  try {<BR/>
+    // &amp;#9472;&amp;#9472; Styles &amp;#9472;&amp;#9472;<BR/>
+    setStatus(&#039;Fetching styles&#133;&#039;, &#039;Active: Replen, international&#039;);<BR/>
+    const styleFields = [<BR/>
+      7,275,23,202,205,2109,102,35,36,46,139,206,1344,300,1550,15,104,1555,<BR/>
+      1330,1284,1892,1885,2303,2180,2183,1893,<BR/>
+      1899,1285,1901,1889,2305,2181,2184,1896,<BR/>
+      1900,1286,1902,1890,2306,2182,2185,1898,<BR/>
+    ];<BR/>
+    const styleRowsRaw = await fetchAll(STYLES, styleFields, &quot;{23.EX.&#039;Active: Replen&#039;}AND{205.XCT.&#039;USA&#039;}&quot;);<BR/>
+    const styleRows = styleRowsRaw.filter(r =&gt; {<BR/>
+      const sn = (v(r, 7) || &#039;&#039;).toUpperCase();<BR/>
+      return !sn.startsWith(&#039;AU&#039;) &amp;&amp; !sn.includes(&#039;WFS&#039;) &amp;&amp; !sn.includes(&#039;DS&#039;);<BR/>
+    });<BR/>
+    setStatus(&#039;Fetching forecast&#133;&#039;, styleRows.length + &#039; styles loaded&#039;);<BR/>
+<BR/>
+    // &amp;#9472;&amp;#9472; Forecast &amp;#9472;&amp;#9472;<BR/>
+    const fcRows = await fetchAll(FLOW, [20, 294, 133, ...BUY_FIELDS], &quot;{294.EX.&#039;Active: Replen&#039;}AND{133.GT.&#039;0&#039;}&quot;);<BR/>
+    const fcMap = {};<BR/>
+    for (const r of fcRows) {<BR/>
+      const ms = v(r, 20); if (!ms) continue;<BR/>
+      const buy = BUY_FIELDS.reduce((s, id) =&gt; s + (parseFloat(v(r, id)) || 0), 0);<BR/>
+      if (!fcMap[ms] || buy &gt; fcMap[ms]) fcMap[ms] = buy;<BR/>
+    }<BR/>
+    setStatus(&#039;Fetching terms&#133;&#039;, fcRows.length + &#039; forecast records&#039;);<BR/>
+<BR/>
+    // &amp;#9472;&amp;#9472; Terms &amp;#9472;&amp;#9472;<BR/>
+    const termsRows = await fetchAll(TERMS_TBL, [6, 379]);<BR/>
+    const termsMap = {};<BR/>
+    for (const r of termsRows) {<BR/>
+      const ms = v(r, 6); if (!ms) continue;<BR/>
+      const t = fv(r, 379);<BR/>
+      if (t != null) termsMap[ms] = t;<BR/>
+    }<BR/>
+    function lookupTerms(mstyle, f1555val) {<BR/>
+      if (termsMap[mstyle] != null) return termsMap[mstyle];<BR/>
+      const base = mstyle ? mstyle.replace(/\/\d+$/, &#039;&#039;) : null;<BR/>
+      if (base &amp;&amp; base !== mstyle &amp;&amp; termsMap[base] != null) return termsMap[base];<BR/>
+      return f1555val ?? null;<BR/>
+    }<BR/>
+    setStatus(&#039;Fetching supplier data&#133;&#039;, termsRows.length + &#039; terms records&#039;);<BR/>
+<BR/>
+    // &amp;#9472;&amp;#9472; Suppliers &amp;#9472;&amp;#9472;<BR/>
+    const suppRows = await fetchAll(SUPPLIERS, [45, 7]);<BR/>
+    const supCountryMap = {};<BR/>
+    for (const r of suppRows) {<BR/>
+      const name = v(r, 45)?.trim(), cty = v(r, 7);<BR/>
+      if (name &amp;&amp; cty) supCountryMap[name] = cty;<BR/>
+    }<BR/>
+    for (const r of styleRows) {<BR/>
+      const sup = v(r, 202), cty = v(r, 205);<BR/>
+      if (sup &amp;&amp; cty &amp;&amp; !supCountryMap[sup]) supCountryMap[sup] = cty;<BR/>
+    }<BR/>
+    setStatus(&#039;Processing data&#133;&#039;, &#039;Computing savings and recommendations&#039;);<BR/>
+<BR/>
+    // &amp;#9472;&amp;#9472; Process multi-source styles &amp;#9472;&amp;#9472;<BR/>
+    const ALT_DEFS = [<BR/>
+      [1330,1284,1892,1885,2303,2180,2183],<BR/>
+      [1899,1285,1901,1889,2305,2181,2184],<BR/>
+      [1900,1286,1902,1890,2306,2182,2185],<BR/>
+    ];<BR/>
+    const styleData = [];<BR/>
+    for (const r of styleRows) {<BR/>
+      const styleNum=v(r,7), mstyle=v(r,275), status=v(r,23), coreSupplier=v(r,202);<BR/>
+      const country=v(r,205), desc=v(r,2109), brand=v(r,102), category=v(r,35), subcat=v(r,36);<BR/>
+      const fobCore=r2(fv(r,46)), dutyPct=fv(r,139);<BR/>
+      const dutyDollar=(fobCore!=null&amp;&amp;dutyPct!=null)?r2(fobCore*dutyPct):null;<BR/>
+      const coreFreightVal=fv(r,206)??fv(r,1344)??fv(r,300);<BR/>
+      const freightIn=r2(coreFreightVal), loadDollar=fobCore!=null?r2(fobCore*0.15):null;<BR/>
+      const lcCore=fobCore!=null?r2(fobCore+(dutyDollar||0)+(freightIn||0)+(loadDollar||0)):null;<BR/>
+      const sellPrice=r2(fv(r,1550))||r2(fv(r,15));<BR/>
+      const royaltyPct=fv(r,104), termsPct=lookupTerms(mstyle,fv(r,1555));<BR/>
+      const totalBuy=Math.round(fcMap[mstyle]||0);<BR/>
+      const marginCore=calcMgn(sellPrice,lcCore,royaltyPct,termsPct);<BR/>
+<BR/>
+      const alts=[];<BR/>
+      for (const [supF,fobF,lcF,dutyRF,,frF,frLAF] of ALT_DEFS) {<BR/>
+        const sup=v(r,supF)?.trim(); if (!sup) continue;<BR/>
+        if (coreSupplier&amp;&amp;sup.toLowerCase()===coreSupplier.toLowerCase()) continue;<BR/>
+        const fob=r2(fv(r,fobF)), lcRaw=r2(fv(r,lcF)), altDutyPct=fv(r,dutyRF);<BR/>
+        const altDutyDollar=(fob!=null&amp;&amp;altDutyPct!=null)?r2(fob*altDutyPct):null;<BR/>
+        const {value:altFreight,estimated:freightEst}=resolveFreight(fv(r,frF),fv(r,frLAF),null,coreFreightVal);<BR/>
+        const altLoad=fob!=null?r2(fob*0.15):null;<BR/>
+        const lc=fob!=null?r2(fob+(altDutyDollar||0)+(altFreight||0)+(altLoad||0)):(lcRaw&amp;&amp;lcRaw&gt;0?lcRaw:null);<BR/>
+        const margin=calcMgn(sellPrice,lc,royaltyPct,termsPct);<BR/>
+        const lcSavPerUnit=(lcCore!=null&amp;&amp;lc!=null)?r2(lcCore-lc):null;<BR/>
+        const fobDisc=(fobCore&amp;&amp;fob)?(fobCore-fob)/fobCore:null;<BR/>
+        const marginLift=(margin!=null&amp;&amp;marginCore!=null)?(margin-marginCore)*100:null;<BR/>
+        alts.push({supplier:sup,fob,lc,altDutyPct,altDutyDollar,altFreight,freightEst,altLoad,margin,lcSavPerUnit,fobDisc,marginLift});<BR/>
+      }<BR/>
+      if (!alts.length) continue;<BR/>
+      const savAlts=alts.filter(a=&gt;a.lcSavPerUnit!=null&amp;&amp;a.lcSavPerUnit&gt;0);<BR/>
+      const bestAlt=savAlts.length&gt;0?savAlts.reduce((b,a)=&gt;a.lcSavPerUnit&gt;b.lcSavPerUnit?a:b):null;<BR/>
+      const otherAlts=alts.filter(a=&gt;a!==bestAlt);<BR/>
+      const savingsTotal=bestAlt?r2(bestAlt.lcSavPerUnit*totalBuy):0;<BR/>
+      styleData.push({styleNum,mstyle,status,coreSupplier,country,desc,brand,category,subcat,<BR/>
+        fobCore,lcCore,dutyPct,dutyDollar,freightIn,loadDollar,sellPrice,royaltyPct,termsPct,<BR/>
+        marginCore,totalBuy,bestAlt,otherAlts,savingsTotal});<BR/>
+    }<BR/>
+<BR/>
+    // Sort by savings<BR/>
+    const supMap={};<BR/>
+    for (const s of styleData) {<BR/>
+      const k=s.coreSupplier||&#039;Unknown&#039;;<BR/>
+      if (!supMap[k]) supMap[k]=[];<BR/>
+      supMap[k].push(s);<BR/>
+    }<BR/>
+    const supList=Object.entries(supMap)<BR/>
+      .map(([supplier,styles])=&gt;({supplier,styles}))<BR/>
+      .sort((a,b)=&gt;b.styles.reduce((t,s)=&gt;t+s.savingsTotal,0)-a.styles.reduce((t,s)=&gt;t+s.savingsTotal,0));<BR/>
+    supList.forEach(g=&gt;g.styles.sort((a,b)=&gt;b.savingsTotal-a.savingsTotal||(a.styleNum||&#039;&#039;).localeCompare(b.styleNum||&#039;&#039;)));<BR/>
+<BR/>
+    // &amp;#9472;&amp;#9472; Single-source reference map &amp;#9472;&amp;#9472;<BR/>
+    const refByKey={};<BR/>
+    const altDefsBI=[[1330,1284,1885],[1899,1285,1889],[1900,1286,1890]];<BR/>
+    for (const r of styleRows) {<BR/>
+      const coreSupp=v(r,202),coreFOB=fv(r,46),coreDuty=fv(r,139);<BR/>
+      const category=v(r,35),subcat=v(r,36)||&#039;&#039;;<BR/>
+      if (!coreSupp||!coreFOB||!category) continue;<BR/>
+      for (const [supF,fobF,dutyRF] of altDefsBI) {<BR/>
+        const altSup=v(r,supF)?.trim(), altFOB=fv(r,fobF), altDuty=fv(r,dutyRF);<BR/>
+        if (!altSup||altFOB==null) continue;<BR/>
+        if (altSup.toLowerCase()===coreSupp.toLowerCase()) continue;<BR/>
+        const styleNum=v(r,7)||&#039;&#039;;<BR/>
+        const addRef=(key,sup,disc,duty)=&gt;{<BR/>
+          if (!refByKey[key]) refByKey[key]={};<BR/>
+          if (!refByKey[key][sup]) refByKey[key][sup]={fobDiscs:[],dutyPcts:[],styleNums:[],count:0,basis:&#039;Dual-Source QB Record&#039;};<BR/>
+          refByKey[key][sup].fobDiscs.push(disc);<BR/>
+          if (duty!=null) refByKey[key][sup].dutyPcts.push(duty);<BR/>
+          if (styleNum&amp;&amp;!refByKey[key][sup].styleNums.includes(styleNum)) refByKey[key][sup].styleNums.push(styleNum);<BR/>
+          refByKey[key][sup].count++;<BR/>
+        };<BR/>
+        if (altFOB&lt;coreFOB) addRef(`${coreSupp}||${category}||${subcat}`,altSup,(coreFOB-altFOB)/coreFOB,altDuty);<BR/>
+        if (altFOB&gt;coreFOB) addRef(`${altSup}||${category}||${subcat}`,coreSupp,(altFOB-coreFOB)/altFOB,coreDuty);<BR/>
+      }<BR/>
+    }<BR/>
+    const refMap={};<BR/>
+    for (const [key,alts] of Object.entries(refByKey)) {<BR/>
+      const candidates=Object.entries(alts)<BR/>
+        .map(([altSup,data])=&gt;({<BR/>
+          altSupplier:altSup,<BR/>
+          avgFobDisc:data.fobDiscs.reduce((a,b)=&gt;a+b,0)/data.fobDiscs.length,<BR/>
+          avgDutyPct:data.dutyPcts.length?data.dutyPcts.reduce((a,b)=&gt;a+b,0)/data.dutyPcts.length:null,<BR/>
+          refCount:data.count, basis:data.basis, refStyleNums:data.styleNums||[]<BR/>
+        }))<BR/>
+        .filter(c=&gt;c.avgFobDisc&gt;0)<BR/>
+        .sort((a,b)=&gt;b.avgFobDisc-a.avgFobDisc);<BR/>
+      if (!candidates.length) continue;<BR/>
+      refMap[key]={...candidates[0],candidates};<BR/>
+    }<BR/>
+<BR/>
+    function calcProjAlt(fobCore,coreDutyPct,freightIn,lcCore,sellPrice,royaltyPct,termsPct,totalBuy,marginCore,cand) {<BR/>
+      if (!cand||fobCore==null) return null;<BR/>
+      const projFOB=r2(fobCore*(1-cand.avgFobDisc));<BR/>
+      const projDutyPct=cand.avgDutyPct??coreDutyPct;<BR/>
+      const projDutyDol=(projFOB!=null&amp;&amp;projDutyPct!=null)?r2(projFOB*projDutyPct):null;<BR/>
+      const projLoad=r2(projFOB*0.15), projFreight=freightIn;<BR/>
+      const projLC=r2(projFOB+(projDutyDol||0)+(projFreight||0)+(projLoad||0));<BR/>
+      const projLCSav=(lcCore!=null&amp;&amp;projLC!=null)?r2(lcCore-projLC):null;<BR/>
+      const projMargin=calcMgn(sellPrice,projLC,royaltyPct,termsPct);<BR/>
+      const projMgnLift=(projMargin!=null&amp;&amp;marginCore!=null)?(projMargin-marginCore)*100:null;<BR/>
+      const projSavTot=projLCSav!=null?r2(projLCSav*totalBuy):null;<BR/>
+      return {projFOB,projDutyPct,projDutyDol,projFreight,projLoad,projLC,projLCSav,projMargin,projMgnLift,projSavTot};<BR/>
+    }<BR/>
+<BR/>
+    // &amp;#9472;&amp;#9472; Single-source opportunities &amp;#9472;&amp;#9472;<BR/>
+    const ssData=[];<BR/>
+    for (const r of styleRows) {<BR/>
+      const mstyle=v(r,275), coreSupp=v(r,202), category=v(r,35), subcat=v(r,36)||&#039;&#039;;<BR/>
+      const ref=refMap[`${coreSupp}||${category}||${subcat}`]||(subcat?refMap[`${coreSupp}||${category}||`]:null);<BR/>
+      if (!ref) continue;<BR/>
+      const listed=[v(r,1330),v(r,1899),v(r,1900)].filter(Boolean).map(s=&gt;s.toLowerCase().trim());<BR/>
+      if (listed.some(l=&gt;l===ref.altSupplier.toLowerCase().trim())) continue;<BR/>
+      const fobCore=r2(fv(r,46)), dutyPct=fv(r,139);<BR/>
+      const dutyDollar=(fobCore!=null&amp;&amp;dutyPct!=null)?r2(fobCore*dutyPct):null;<BR/>
+      const cfv=fv(r,206)??fv(r,1344)??fv(r,300);<BR/>
+      const freightIn=r2(cfv), loadDollar=fobCore!=null?r2(fobCore*0.15):null;<BR/>
+      const lcCore=fobCore!=null?r2(fobCore+(dutyDollar||0)+(freightIn||0)+(loadDollar||0)):null;<BR/>
+      const sellPrice=r2(fv(r,1550))||r2(fv(r,15));<BR/>
+      const royaltyPct=fv(r,104), termsPct=lookupTerms(mstyle,fv(r,1555));<BR/>
+      const marginCore=calcMgn(sellPrice,lcCore,royaltyPct,termsPct);<BR/>
+      const totalBuy=Math.round(fcMap[mstyle]||0);<BR/>
+      const p1=calcProjAlt(fobCore,dutyPct,freightIn,lcCore,sellPrice,royaltyPct,termsPct,totalBuy,marginCore,ref.candidates[0]);<BR/>
+      if (!p1||!p1.projLCSav||p1.projLCSav&lt;=0) continue;<BR/>
+      const cand2=ref.candidates[1]||null;<BR/>
+      const cand2Listed=cand2&amp;&amp;listed.some(l=&gt;l===cand2.altSupplier.toLowerCase().trim());<BR/>
+      const p2=(!cand2||cand2Listed)?null:calcProjAlt(fobCore,dutyPct,freightIn,lcCore,sellPrice,royaltyPct,termsPct,totalBuy,marginCore,cand2);<BR/>
+      const has2=p2&amp;&amp;p2.projLCSav!=null&amp;&amp;p2.projLCSav&gt;0;<BR/>
+      const cand3=ref.candidates[2]||null;<BR/>
+      const cand3Listed=cand3&amp;&amp;listed.some(l=&gt;l===cand3.altSupplier.toLowerCase().trim());<BR/>
+      const p3=(!cand3||cand3Listed)?null:calcProjAlt(fobCore,dutyPct,freightIn,lcCore,sellPrice,royaltyPct,termsPct,totalBuy,marginCore,cand3);<BR/>
+      const has3=p3&amp;&amp;p3.projLCSav!=null&amp;&amp;p3.projLCSav&gt;0;<BR/>
+      ssData.push({<BR/>
+        styleNum:v(r,7),mstyle,status:v(r,23),coreSupp,country:v(r,205),<BR/>
+        desc:v(r,2109),brand:v(r,102),category,subcat,<BR/>
+        fobCore,dutyPct,dutyDollar,freightIn,loadDollar,lcCore,<BR/>
+        sellPrice,royaltyPct,termsPct,marginCore,totalBuy,<BR/>
+        refAltSup:ref.candidates[0].altSupplier,<BR/>
+        altCountry:supCountryMap[ref.candidates[0].altSupplier?.trim()]||null,<BR/>
+        refCount:ref.candidates[0].refCount,avgFobDisc:ref.candidates[0].avgFobDisc,<BR/>
+        refStyleNums:ref.candidates[0].refStyleNums||[],basis:ref.candidates[0].basis,<BR/>
+        ...p1,<BR/>
+        ref2AltSup:has2?cand2.altSupplier:null,<BR/>
+        alt2Country:has2?(supCountryMap[cand2.altSupplier?.trim()]||null):null,<BR/>
+        ref2Count:has2?cand2.refCount:null, avg2FobDisc:has2?cand2.avgFobDisc:null,<BR/>
+        ref2StyleNums:has2?(cand2.refStyleNums||[]):[],basis2:has2?cand2.basis:null,<BR/>
+        ...(has2?{proj2FOB:p2.projFOB,proj2DutyPct:p2.projDutyPct,proj2DutyDol:p2.projDutyDol,<BR/>
+                  proj2Freight:p2.projFreight,proj2Load:p2.projLoad,proj2LC:p2.projLC,<BR/>
+                  proj2LCSav:p2.projLCSav,proj2Margin:p2.projMargin,proj2MgnLift:p2.projMgnLift,proj2SavTot:p2.projSavTot}<BR/>
+               :{proj2FOB:null,proj2DutyPct:null,proj2DutyDol:null,proj2Freight:null,proj2Load:null,<BR/>
+                 proj2LC:null,proj2LCSav:null,proj2Margin:null,proj2MgnLift:null,proj2SavTot:null}),<BR/>
+        ref3AltSup:has3?cand3.altSupplier:null,<BR/>
+        alt3Country:has3?(supCountryMap[cand3.altSupplier?.trim()]||null):null,<BR/>
+        ref3Count:has3?cand3.refCount:null, avg3FobDisc:has3?cand3.avgFobDisc:null,<BR/>
+        ref3StyleNums:has3?(cand3.refStyleNums||[]):[],basis3:has3?cand3.basis:null,<BR/>
+        ...(has3?{proj3FOB:p3.projFOB,proj3DutyPct:p3.projDutyPct,proj3DutyDol:p3.projDutyDol,<BR/>
+                  proj3Freight:p3.projFreight,proj3Load:p3.projLoad,proj3LC:p3.projLC,<BR/>
+                  proj3LCSav:p3.projLCSav,proj3Margin:p3.projMargin,proj3MgnLift:p3.projMgnLift,proj3SavTot:p3.projSavTot}<BR/>
+               :{proj3FOB:null,proj3DutyPct:null,proj3DutyDol:null,proj3Freight:null,proj3Load:null,<BR/>
+                 proj3LC:null,proj3LCSav:null,proj3Margin:null,proj3MgnLift:null,proj3SavTot:null})<BR/>
+      });<BR/>
+    }<BR/>
+<BR/>
+    const ssSupMap={};<BR/>
+    for (const s of ssData) {<BR/>
+      if (!ssSupMap[s.coreSupp]) ssSupMap[s.coreSupp]=[];<BR/>
+      ssSupMap[s.coreSupp].push(s);<BR/>
+    }<BR/>
+    const ssSupList=Object.entries(ssSupMap)<BR/>
+      .map(([sup,styles])=&gt;({sup,styles}))<BR/>
+      .sort((a,b)=&gt;b.styles.reduce((t,s)=&gt;t+(s.projSavTot||0),0)-a.styles.reduce((t,s)=&gt;t+(s.projSavTot||0),0));<BR/>
+    ssSupList.forEach(g=&gt;g.styles.sort((a,b)=&gt;(b.projSavTot||0)-(a.projSavTot||0)));<BR/>
+<BR/>
+    const ssBySupplier={};<BR/>
+    for (const g of ssSupList) {<BR/>
+      ssBySupplier[g.sup]={count:g.styles.length,savTot:g.styles.reduce((t,s)=&gt;t+(s.projSavTot||0),0)};<BR/>
+    }<BR/>
+<BR/>
+    // &amp;#9472;&amp;#9472; Render &amp;#9472;&amp;#9472;<BR/>
+    setStatus(&#039;Rendering dashboard&#133;&#039;, ssData.length + &#039; SS opportunities found&#039;);<BR/>
+    renderApp(supList, ssSupList, ssBySupplier, styleData, ssData);<BR/>
+<BR/>
+  } catch(e) {<BR/>
+    document.getElementById(&#039;spinner&#039;).style.display = &#039;none&#039;;<BR/>
+    document.getElementById(&#039;loading-status&#039;).textContent = &#039;Failed to load data&#039;;<BR/>
+    const errEl = document.getElementById(&#039;loading-error&#039;);<BR/>
+    errEl.textContent = e.message;<BR/>
+    errEl.style.display = &#039;block&#039;;<BR/>
+    document.getElementById(&#039;retry-btn&#039;).style.display = &#039;inline-block&#039;;<BR/>
+  }<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; Render functions &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+function renderApp(supList, ssSupList, ssBySupplier, styleData, ssData) {<BR/>
+  window._exportData = { supList, ssSupList, ssBySupplier, styleData, ssData };<BR/>
+  const generatedAt = new Date().toLocaleString(&#039;en-US&#039;, {dateStyle:&#039;long&#039;, timeStyle:&#039;short&#039;});<BR/>
+<BR/>
+  // KPIs<BR/>
+  const dsSave100   = styleData.reduce((t,s)=&gt;t+(s.savingsTotal||0),0);<BR/>
+  const dsSavStyles = styleData.filter(s=&gt;s.bestAlt&amp;&amp;s.savingsTotal&gt;0).length;<BR/>
+  const ssSave100   = ssData.reduce((t,s)=&gt;t+(s.projSavTot||0),0);<BR/>
+  const ssOppStyles = ssData.length;<BR/>
+<BR/>
+  // Nav<BR/>
+  document.getElementById(&#039;top-nav&#039;).innerHTML = `<BR/>
+    &lt;div class=&quot;brand&quot;&gt;Supplier Savings Analysis&lt;small&gt;Updated ${generatedAt}&lt;/small&gt;&lt;/div&gt;<BR/>
+    &lt;button class=&quot;tab-btn active&quot; onclick=&quot;showTab(&#039;tab1&#039;,this)&quot;&gt;Dashboard&lt;/button&gt;<BR/>
+    &lt;button class=&quot;tab-btn&quot; onclick=&quot;showTab(&#039;tab2&#039;,this)&quot;&gt;Multi-Source Analysis&lt;/button&gt;<BR/>
+    &lt;button class=&quot;tab-btn&quot; onclick=&quot;showTab(&#039;tab3&#039;,this)&quot;&gt;Single-Source Opportunity&lt;/button&gt;<BR/>
+    &lt;button class=&quot;tab-btn&quot; onclick=&quot;showTab(&#039;tab4&#039;,this)&quot;&gt;Methodology&lt;/button&gt;<BR/>
+    &lt;button class=&quot;tab-btn refresh-btn&quot; onclick=&quot;loadData()&quot;&gt;&amp;#128260; Refresh&lt;/button&gt;<BR/>
+    &lt;button class=&quot;tab-btn export-btn&quot; onclick=&quot;exportExcel()&quot;&gt;&amp;#128229; Export Excel&lt;/button&gt;`;<BR/>
+<BR/>
+  // Tab contents<BR/>
+  document.getElementById(&#039;tab1&#039;).innerHTML = buildDashboard(supList,ssSupList,ssBySupplier,styleData,ssData,dsSave100,dsSavStyles,ssSave100,ssOppStyles);<BR/>
+  document.getElementById(&#039;tab2&#039;).innerHTML = buildMultiSource(supList);<BR/>
+  document.getElementById(&#039;tab3&#039;).innerHTML = buildSingleSource(ssSupList);<BR/>
+  document.getElementById(&#039;tab4&#039;).innerHTML = buildMethodology(generatedAt);<BR/>
+<BR/>
+  // Show app<BR/>
+  document.getElementById(&#039;loading-overlay&#039;).style.display = &#039;none&#039;;<BR/>
+  document.getElementById(&#039;app&#039;).style.display = &#039;block&#039;;<BR/>
+<BR/>
+  // Reset active tab to Dashboard<BR/>
+  document.querySelectorAll(&#039;.tab-content&#039;).forEach(t=&gt;t.classList.remove(&#039;active&#039;));<BR/>
+  document.getElementById(&#039;tab1&#039;).classList.add(&#039;active&#039;);<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; TAB 1: Dashboard &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+function buildDashboard(supList,ssSupList,ssBySupplier,styleData,ssData,dsSave100,dsSavStyles,ssSave100,ssOppStyles) {<BR/>
+  const dsSave50=dsSave100*0.5, combSave100=dsSave100+ssSave100;<BR/>
+  const kpis=[<BR/>
+    {label:&#039;DS Styles w/ Savings&#039;,value:dsSavStyles.toLocaleString(),color:&#039;#1E8449&#039;,border:&#039;#27ae60&#039;},<BR/>
+    {label:&#039;DS Save @ 100%&#039;,value:&#039;$&#039;+Math.round(dsSave100).toLocaleString(),color:&#039;#1E8449&#039;,border:&#039;#27ae60&#039;},<BR/>
+    {label:&#039;DS Save @ 50%&#039;,value:&#039;$&#039;+Math.round(dsSave50).toLocaleString(),color:&#039;#2e86c1&#039;,border:&#039;#2e86c1&#039;},<BR/>
+    {label:&#039;SS Opp. Styles&#039;,value:ssOppStyles.toLocaleString(),color:&#039;#7d3c98&#039;,border:&#039;#7d3c98&#039;},<BR/>
+    {label:&#039;SS Save @ 100%&#039;,value:&#039;$&#039;+Math.round(ssSave100).toLocaleString(),color:&#039;#7d3c98&#039;,border:&#039;#7d3c98&#039;},<BR/>
+    {label:&#039;Combined Save @ 100%&#039;,value:&#039;$&#039;+Math.round(combSave100).toLocaleString(),color:&#039;#0F3460&#039;,border:&#039;#0F3460&#039;},<BR/>
+  ];<BR/>
+  const kpiCards=kpis.map(k=&gt;`&lt;div class=&quot;kpi-card&quot; style=&quot;border-left-color:${k.border}&quot;&gt;&lt;div class=&quot;kpi-label&quot;&gt;${esc(k.label)}&lt;/div&gt;&lt;div class=&quot;kpi-value&quot; style=&quot;color:${k.color}&quot;&gt;${esc(k.value)}&lt;/div&gt;&lt;/div&gt;`).join(&#039;&#039;);<BR/>
+<BR/>
+  const allSuppliers=new Set([...supList.map(g=&gt;g.supplier),...ssSupList.map(g=&gt;g.sup)]);<BR/>
+  const sortedSuppliers=[...allSuppliers].sort((a,b)=&gt;{<BR/>
+    const dsA=supList.find(g=&gt;g.supplier===a)?.styles.reduce((t,s)=&gt;t+(s.savingsTotal||0),0)||0;<BR/>
+    const dsB=supList.find(g=&gt;g.supplier===b)?.styles.reduce((t,s)=&gt;t+(s.savingsTotal||0),0)||0;<BR/>
+    return (dsB+(ssBySupplier[b]?.savTot||0))-(dsA+(ssBySupplier[a]?.savTot||0));<BR/>
+  });<BR/>
+<BR/>
+  let gtTotalStyles=0,gtDsSav=0,gtBuy=0,gtDs25=0,gtDs50=0,gtDs100=0,gtSsStyles=0,gtSs25=0,gtSs50=0,gtSs100=0;<BR/>
+  const rows=sortedSuppliers.map((sup,i)=&gt;{<BR/>
+    const grp=supList.find(g=&gt;g.supplier===sup);<BR/>
+    const ss=ssBySupplier[sup]||{count:0,savTot:0};<BR/>
+    const totalStyles=grp?grp.styles.length:0;<BR/>
+    const dsStyles=grp?grp.styles.filter(s=&gt;s.bestAlt&amp;&amp;s.savingsTotal&gt;0).length:0;<BR/>
+    const buy=grp?grp.styles.reduce((t,s)=&gt;t+s.totalBuy,0):0;<BR/>
+    const ds100=grp?grp.styles.reduce((t,s)=&gt;t+(s.savingsTotal||0),0):0;<BR/>
+    const discs=grp?grp.styles.filter(s=&gt;s.bestAlt?.fobDisc).map(s=&gt;s.bestAlt.fobDisc):[];<BR/>
+    const avgDisc=discs.length?discs.reduce((a,b)=&gt;a+b,0)/discs.length:null;<BR/>
+    const comb100=ds100+ss.savTot;<BR/>
+    gtTotalStyles+=totalStyles; gtDsSav+=dsStyles; gtBuy+=buy;<BR/>
+    gtDs25+=ds100*0.25; gtDs50+=ds100*0.5; gtDs100+=ds100;<BR/>
+    gtSsStyles+=ss.count; gtSs25+=ss.savTot*0.25; gtSs50+=ss.savTot*0.5; gtSs100+=ss.savTot;<BR/>
+    return `&lt;tr ${i%2===1?&#039;class=&quot;alt-row&quot;&#039;:&#039;&#039;}&gt;<BR/>
+      &lt;td class=&quot;num&quot;&gt;${i+1}&lt;/td&gt;&lt;td class=&quot;bold&quot;&gt;${esc(sup)}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;num&quot;&gt;${totalStyles||&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;num ${dsStyles&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${dsStyles||&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;num&quot;&gt;${fmtInt(buy)}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${ds100&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${ds100&gt;0?fmtUSD(ds100*0.25):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${ds100&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${ds100&gt;0?fmtUSD(ds100*0.5):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${ds100&gt;0?&#039;green bold&#039;:&#039;&#039;}&quot;&gt;${ds100&gt;0?fmtUSD(ds100):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;num&quot;&gt;${avgDisc!=null?fmtPct(avgDisc):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;num ${ss.count&gt;0?&#039;purple&#039;:&#039;&#039;}&quot;&gt;${ss.count||&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${ss.savTot&gt;0?&#039;purple&#039;:&#039;&#039;}&quot;&gt;${ss.savTot&gt;0?fmtUSD(ss.savTot*0.25):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${ss.savTot&gt;0?&#039;purple&#039;:&#039;&#039;}&quot;&gt;${ss.savTot&gt;0?fmtUSD(ss.savTot*0.5):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${ss.savTot&gt;0?&#039;purple bold&#039;:&#039;&#039;}&quot;&gt;${ss.savTot&gt;0?fmtUSD(ss.savTot):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${comb100&gt;0?&#039;navy bold&#039;:&#039;&#039;}&quot;&gt;${comb100&gt;0?fmtUSD((ds100+ss.savTot)*0.25):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${comb100&gt;0?&#039;navy bold&#039;:&#039;&#039;}&quot;&gt;${comb100&gt;0?fmtUSD((ds100+ss.savTot)*0.5):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${comb100&gt;0?&#039;navy bold&#039;:&#039;&#039;}&quot;&gt;${comb100&gt;0?fmtUSD(comb100):&#039;&#151;&#039;}&lt;/td&gt;&lt;/tr&gt;`;<BR/>
+  }).join(&#039;&#039;);<BR/>
+  const gt100=gtDs100+gtSs100;<BR/>
+  const grandRow=`&lt;tr class=&quot;grand-total&quot;&gt;<BR/>
+    &lt;td colspan=&quot;2&quot; class=&quot;bold&quot;&gt;GRAND TOTAL&lt;/td&gt;<BR/>
+    &lt;td class=&quot;num bold&quot;&gt;${gtTotalStyles}&lt;/td&gt;&lt;td class=&quot;num bold green&quot;&gt;${gtDsSav}&lt;/td&gt;<BR/>
+    &lt;td class=&quot;num bold&quot;&gt;${fmtInt(gtBuy)}&lt;/td&gt;<BR/>
+    &lt;td class=&quot;green bold&quot;&gt;${fmtUSD(gtDs25)}&lt;/td&gt;&lt;td class=&quot;green bold&quot;&gt;${fmtUSD(gtDs50)}&lt;/td&gt;&lt;td class=&quot;green bold&quot;&gt;${fmtUSD(gtDs100)}&lt;/td&gt;<BR/>
+    &lt;td&gt;&#151;&lt;/td&gt;&lt;td class=&quot;num bold purple&quot;&gt;${gtSsStyles}&lt;/td&gt;<BR/>
+    &lt;td class=&quot;purple bold&quot;&gt;${fmtUSD(gtSs25)}&lt;/td&gt;&lt;td class=&quot;purple bold&quot;&gt;${fmtUSD(gtSs50)}&lt;/td&gt;&lt;td class=&quot;purple bold&quot;&gt;${fmtUSD(gtSs100)}&lt;/td&gt;<BR/>
+    &lt;td class=&quot;navy bold&quot;&gt;${fmtUSD(gtDs25+gtSs25)}&lt;/td&gt;&lt;td class=&quot;navy bold&quot;&gt;${fmtUSD(gtDs50+gtSs50)}&lt;/td&gt;&lt;td class=&quot;navy bold&quot;&gt;${fmtUSD(gt100)}&lt;/td&gt;&lt;/tr&gt;`;<BR/>
+<BR/>
+  return `&lt;div class=&quot;kpi-row&quot;&gt;${kpiCards}&lt;/div&gt;<BR/>
+  &lt;h2 class=&quot;section-title&quot;&gt;Supplier Summary&lt;/h2&gt;<BR/>
+  &lt;div class=&quot;tab-toolbar&quot; style=&quot;margin-bottom:10px&quot;&gt;<BR/>
+    &lt;input type=&quot;text&quot; class=&quot;search-box&quot; id=&quot;dash-search&quot; placeholder=&quot;Search suppliers&#133;&quot; oninput=&quot;filterDash()&quot;&gt;<BR/>
+  &lt;/div&gt;<BR/>
+  &lt;div class=&quot;table-wrap&quot;&gt;&lt;table id=&quot;dash-table&quot;&gt;<BR/>
+    &lt;thead&gt;<BR/>
+      &lt;tr&gt;<BR/>
+        &lt;th class=&quot;group-hdr&quot; colspan=&quot;9&quot;  style=&quot;background:#1565C0;letter-spacing:.5px&quot;&gt;&amp;#128202; DUAL-SOURCE&lt;/th&gt;<BR/>
+        &lt;th class=&quot;group-hdr&quot; colspan=&quot;4&quot;  style=&quot;background:#2E7D32;letter-spacing:.5px&quot;&gt;&amp;#128269; SINGLE-SOURCE OPPORTUNITY&lt;/th&gt;<BR/>
+        &lt;th class=&quot;group-hdr&quot; colspan=&quot;3&quot;  style=&quot;background:#6A1B9A;letter-spacing:.5px&quot;&gt;&amp;#9889; COMBINED&lt;/th&gt;<BR/>
+      &lt;/tr&gt;<BR/>
+      &lt;tr&gt;<BR/>
+        &lt;th style=&quot;background:#1E88E5&quot;&gt;#&lt;/th&gt;&lt;th style=&quot;background:#1E88E5;text-align:left&quot;&gt;Supplier&lt;/th&gt;<BR/>
+        &lt;th style=&quot;background:#1E88E5&quot;&gt;Total Styles&lt;/th&gt;&lt;th style=&quot;background:#1E88E5&quot;&gt;DS Styles w/ Savings&lt;/th&gt;<BR/>
+        &lt;th style=&quot;background:#1E88E5&quot;&gt;6-Mo Buy Units&lt;/th&gt;&lt;th style=&quot;background:#1E88E5&quot;&gt;DS Save@25%&lt;/th&gt;<BR/>
+        &lt;th style=&quot;background:#1E88E5&quot;&gt;DS Save@50%&lt;/th&gt;&lt;th style=&quot;background:#1E88E5&quot;&gt;DS Save@100%&lt;/th&gt;<BR/>
+        &lt;th style=&quot;background:#1E88E5&quot;&gt;Avg FOB Disc%&lt;/th&gt;<BR/>
+        &lt;th style=&quot;background:#43A047&quot;&gt;SS Opp Styles&lt;/th&gt;&lt;th style=&quot;background:#43A047&quot;&gt;SS Save@25%&lt;/th&gt;<BR/>
+        &lt;th style=&quot;background:#43A047&quot;&gt;SS Save@50%&lt;/th&gt;&lt;th style=&quot;background:#43A047&quot;&gt;SS Save@100%&lt;/th&gt;<BR/>
+        &lt;th style=&quot;background:#8E24AA&quot;&gt;Comb Save@25%&lt;/th&gt;&lt;th style=&quot;background:#8E24AA&quot;&gt;Comb Save@50%&lt;/th&gt;<BR/>
+        &lt;th style=&quot;background:#8E24AA&quot;&gt;Comb Save@100%&lt;/th&gt;<BR/>
+      &lt;/tr&gt;<BR/>
+    &lt;/thead&gt;<BR/>
+    &lt;tbody id=&quot;dash-tbody&quot;&gt;${rows}${grandRow}&lt;/tbody&gt;<BR/>
+  &lt;/table&gt;&lt;/div&gt;`;<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; TAB 2: Multi-Source Analysis &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+function buildMultiSource(supList) {<BR/>
+  const CG=`&lt;colgroup&gt;<BR/>
+    &lt;col style=&quot;width:110px&quot;&gt;&lt;col style=&quot;width:260px&quot;&gt;&lt;col style=&quot;width:130px&quot;&gt;&lt;col style=&quot;width:135px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:185px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:72px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:82px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:185px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:72px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:82px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:72px&quot;&gt;&lt;col style=&quot;width:88px&quot;&gt;&lt;col style=&quot;width:82px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:84px&quot;&gt;&lt;col style=&quot;width:84px&quot;&gt;&lt;col style=&quot;width:84px&quot;&gt;&lt;col style=&quot;width:200px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:165px&quot;&gt;&lt;col style=&quot;width:68px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:68px&quot;&gt;&lt;col style=&quot;width:74px&quot;&gt;&lt;col style=&quot;width:84px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:165px&quot;&gt;&lt;col style=&quot;width:68px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:68px&quot;&gt;&lt;col style=&quot;width:74px&quot;&gt;&lt;col style=&quot;width:84px&quot;&gt;<BR/>
+  &lt;/colgroup&gt;`;<BR/>
+<BR/>
+  let tbody=&#039;&#039;;<BR/>
+  supList.forEach((grp,gi)=&gt;{<BR/>
+    const sup=grp.supplier, styles=grp.styles;<BR/>
+    const grpSav=styles.reduce((t,s)=&gt;t+(s.savingsTotal||0),0);<BR/>
+    const savCnt=styles.filter(s=&gt;s.bestAlt&amp;&amp;s.savingsTotal&gt;0).length;<BR/>
+    const grpCls=&#039;grp-ms-&#039;+gi;<BR/>
+    tbody+=`&lt;tr class=&quot;sup-hdr&quot; id=&quot;ms-grp-${gi}-hdr&quot; data-grp=&quot;${grpCls}&quot; data-prefix=&quot;ms&quot; onclick=&quot;toggleGrp(&#039;ms-grp-${gi}-hdr&#039;)&quot;&gt;<BR/>
+      &lt;td colspan=&quot;33&quot;&gt;&lt;span class=&quot;grp-arrow&quot;&gt;&amp;#9660;&lt;/span&gt;&lt;strong&gt;${esc(sup)}&lt;/strong&gt;<BR/>
+        &lt;span class=&quot;grp-meta&quot;&gt;${styles.length} styles &amp;nbsp;|&amp;nbsp; ${savCnt} w/ savings &amp;nbsp;|&amp;nbsp; Save@100%: &lt;strong&gt;${grpSav&gt;0?fmtUSD(grpSav):&#039;&#151;&#039;}&lt;/strong&gt;&lt;/span&gt;<BR/>
+      &lt;/td&gt;&lt;/tr&gt;`;<BR/>
+    let subBuy=0,subS25=0,subS50=0,subS100=0;<BR/>
+    styles.forEach((s,si)=&gt;{<BR/>
+      const b=s.bestAlt, sav100=b?r2((b.lcSavPerUnit||0)*s.totalBuy):0;<BR/>
+      subBuy+=s.totalBuy; subS25+=sav100*0.25; subS50+=sav100*0.5; subS100+=sav100;<BR/>
+      let rec=&#039;&#151;&#039;;<BR/>
+      if (b&amp;&amp;sav100&gt;0) rec=`Switch to ${esc(b.supplier)}`;<BR/>
+      else if (b&amp;&amp;s.totalBuy===0) rec=`Switch when next buy occurs &#151; ${esc(b.supplier)}`;<BR/>
+      else if (!b) rec=&#039;Keep Core&#039;;<BR/>
+      const emptyAlt=&#039;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&#039;;<BR/>
+      const otherCols=(s.otherAlts||[]).slice(0,2).map(a=&gt;`<BR/>
+        &lt;td&gt;${esc(a.supplier||&#039;&#039;)}&lt;/td&gt;&lt;td&gt;${a.fob!=null?fmtUSD(a.fob):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td&gt;${a.altDutyPct!=null?fmtPct(a.altDutyPct):&#039;&#151;&#039;}&lt;/td&gt;&lt;td&gt;${a.lc!=null?fmtUSD(a.lc):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td class=&quot;${a.margin!=null?(a.margin&lt;0?&#039;red&#039;:&#039;green&#039;):&#039;&#039;}&quot;&gt;${a.margin!=null?fmtPct(a.margin):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td class=&quot;${(a.lcSavPerUnit||0)&gt;0?&#039;green&#039;:((a.lcSavPerUnit||0)&lt;0?&#039;red&#039;:&#039;&#039;)}&quot;&gt;${a.lcSavPerUnit!=null?fmtUSD(a.lcSavPerUnit):&#039;&#151;&#039;}&lt;/td&gt;`<BR/>
+      ).join(&#039;&#039;)+emptyAlt.repeat(2-Math.min((s.otherAlts||[]).length,2));<BR/>
+      tbody+=`&lt;tr class=&quot;data-row ${grpCls} ${si%2===0?&#039;&#039;:&#039;alt-row&#039;}&quot;<BR/>
+        data-searchable=&quot;${esc(s.styleNum)} ${esc(s.desc)} ${esc(s.brand)} ${esc(s.category)} ${esc(s.coreSupplier)} ${esc(b?.supplier||&#039;&#039;)}&quot;<BR/>
+        data-rec=&quot;${sav100&gt;0?&#039;switch&#039;:b&amp;&amp;s.totalBuy===0?&#039;next-buy&#039;:&#039;keep&#039;}&quot;<BR/>
+        data-core-margin=&quot;${s.marginCore!=null?s.marginCore.toFixed(4):&#039;&#039;}&quot;<BR/>
+        data-buy=&quot;${s.totalBuy}&quot; data-sav100=&quot;${sav100}&quot;&gt;<BR/>
+        &lt;td&gt;${esc(s.styleNum||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;white-space:normal&quot;&gt;${esc(s.desc||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;white-space:normal&quot;&gt;${esc(s.brand||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;white-space:normal&quot;&gt;${esc(s.category||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EBF5FB;white-space:normal&quot;&gt;${esc(s.coreSupplier||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EBF5FB&quot;&gt;${s.fobCore!=null?fmtUSD(s.fobCore):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EBF5FB&quot;&gt;${s.dutyPct!=null?fmtPct(s.dutyPct):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EBF5FB&quot;&gt;${s.lcCore!=null?fmtUSD(s.lcCore):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EBF5FB&quot; class=&quot;${s.marginCore!=null?(s.marginCore&lt;0?&#039;red bold&#039;:(s.marginCore&lt;0.27?&#039;amber&#039;:&#039;green&#039;)):&#039;&#039;}&quot;&gt;<BR/>
+          ${s.marginCore!=null?fmtPct(s.marginCore):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1;white-space:normal&quot; class=&quot;${b?&#039;bold&#039;:&#039;&#039;}&quot;&gt;${b?esc(b.supplier):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot;&gt;${b?.fob!=null?fmtUSD(b.fob):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot;&gt;${b?.altDutyPct!=null?fmtPct(b.altDutyPct):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot;&gt;${b?.lc!=null?fmtUSD(b.lc):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${b?.margin!=null?(b.margin&lt;0?&#039;red&#039;:&#039;green&#039;):&#039;&#039;}&quot;&gt;<BR/>
+          ${b?.margin!=null?fmtPct(b.margin):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${(b?.fobDisc||0)&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${b?.fobDisc!=null?fmtPct(b.fobDisc):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${(b?.lcSavPerUnit||0)&gt;0?&#039;green bold&#039;:((b?.lcSavPerUnit||0)&lt;0?&#039;red&#039;:&#039;&#039;)}&quot;&gt;<BR/>
+          ${b?.lcSavPerUnit!=null?fmtUSD(b.lcSavPerUnit):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;num&quot;&gt;${fmtInt(s.totalBuy)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${sav100&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${sav100&gt;0?fmtUSD(sav100*0.25):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${sav100&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${sav100&gt;0?fmtUSD(sav100*0.5):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${sav100&gt;0?&#039;green bold&#039;:&#039;&#039;}&quot;&gt;${sav100&gt;0?fmtUSD(sav100):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;rec-cell&quot;&gt;${rec}&lt;/td&gt;<BR/>
+        ${otherCols}&lt;/tr&gt;`;<BR/>
+    });<BR/>
+    tbody+=`&lt;tr class=&quot;subtotal-row ${grpCls}&quot;&gt;<BR/>
+      &lt;td colspan=&quot;16&quot; class=&quot;bold&quot;&gt;Subtotal &#151; ${esc(sup)}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;num bold sub-buy&quot;&gt;${fmtInt(subBuy)}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${subS25&gt;0?&#039;green bold&#039;:&#039;&#039;} sub-s25&quot;&gt;${subS25&gt;0?fmtUSD(subS25):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${subS50&gt;0?&#039;green bold&#039;:&#039;&#039;} sub-s50&quot;&gt;${subS50&gt;0?fmtUSD(subS50):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${subS100&gt;0?&#039;green bold&#039;:&#039;&#039;} sub-s100&quot;&gt;${subS100&gt;0?fmtUSD(subS100):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td colspan=&quot;13&quot;&gt;&lt;/td&gt;&lt;/tr&gt;`;<BR/>
+  });<BR/>
+<BR/>
+  return `&lt;div class=&quot;tab-toolbar&quot;&gt;<BR/>
+    &lt;input type=&quot;text&quot; class=&quot;search-box&quot; id=&quot;ms-search&quot; placeholder=&quot;Search style#, description, brand, category, supplier&#133;&quot; oninput=&quot;filterTab(&#039;ms&#039;)&quot;&gt;<BR/>
+    &lt;div class=&quot;filter-divider&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;span class=&quot;filter-label&quot;&gt;Recommendation:&lt;/span&gt;<BR/>
+    &lt;select class=&quot;filter-select&quot; id=&quot;ms-rec-filter&quot; onchange=&quot;filterTab(&#039;ms&#039;)&quot;&gt;<BR/>
+      &lt;option value=&quot;&quot;&gt;All&lt;/option&gt;&lt;option value=&quot;switch&quot;&gt;Switch (w/ Savings)&lt;/option&gt;&lt;option value=&quot;next-buy&quot;&gt;Switch (no current buy)&lt;/option&gt;&lt;option value=&quot;keep&quot;&gt;Keep Core&lt;/option&gt;<BR/>
+    &lt;/select&gt;<BR/>
+    &lt;div class=&quot;filter-divider&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;span class=&quot;filter-label&quot;&gt;Core Margin:&lt;/span&gt;<BR/>
+    &lt;select class=&quot;filter-select&quot; id=&quot;ms-margin-filter&quot; onchange=&quot;filterTab(&#039;ms&#039;)&quot;&gt;<BR/>
+      &lt;option value=&quot;&quot;&gt;All&lt;/option&gt;&lt;option value=&quot;low&quot;&gt;Under 27%&lt;/option&gt;&lt;option value=&quot;neg&quot;&gt;Negative&lt;/option&gt;<BR/>
+    &lt;/select&gt;<BR/>
+    &lt;div class=&quot;filter-divider&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;button class=&quot;btn-secondary&quot; onclick=&quot;expandAll(&#039;ms&#039;)&quot;&gt;Expand All&lt;/button&gt;<BR/>
+    &lt;button class=&quot;btn-secondary&quot; onclick=&quot;collapseAll(&#039;ms&#039;)&quot;&gt;Collapse All&lt;/button&gt;<BR/>
+    &lt;div class=&quot;filter-divider&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;button class=&quot;btn-clear&quot; onclick=&quot;clearFilters(&#039;ms&#039;)&quot;&gt;&amp;#10005; Clear&lt;/button&gt;<BR/>
+  &lt;/div&gt;<BR/>
+  &lt;div class=&quot;detail-scroll-wrap&quot;&gt;<BR/>
+    &lt;table id=&quot;ms-table&quot; class=&quot;detail-table&quot;&gt;${CG}<BR/>
+      &lt;thead&gt;<BR/>
+        &lt;tr&gt;<BR/>
+          &lt;th colspan=&quot;4&quot;  style=&quot;background:#2c3e50&quot; class=&quot;group-hdr&quot;&gt;STYLE INFO&lt;/th&gt;<BR/>
+          &lt;th colspan=&quot;5&quot;  style=&quot;background:#1a4f8a&quot; class=&quot;group-hdr&quot;&gt;CORE SUPPLIER&lt;/th&gt;<BR/>
+          &lt;th colspan=&quot;12&quot; style=&quot;background:#1a5c35&quot; class=&quot;group-hdr&quot;&gt;&amp;#9733; BEST ALT SUPPLIER&lt;/th&gt;<BR/>
+          &lt;th colspan=&quot;6&quot;  style=&quot;background:#512b7a&quot; class=&quot;group-hdr&quot;&gt;ALT 2 (comparison)&lt;/th&gt;<BR/>
+          &lt;th colspan=&quot;6&quot;  style=&quot;background:#3d3d3d&quot; class=&quot;group-hdr&quot;&gt;ALT 3 (comparison)&lt;/th&gt;<BR/>
+        &lt;/tr&gt;<BR/>
+        &lt;tr class=&quot;col-hdr&quot;&gt;<BR/>
+          &lt;th class=&quot;th-info&quot;&gt;Style#&lt;/th&gt;&lt;th class=&quot;th-info&quot;&gt;Description&lt;/th&gt;&lt;th class=&quot;th-info&quot;&gt;Brand&lt;/th&gt;&lt;th class=&quot;th-info&quot;&gt;Category&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-core&quot;&gt;Core Supplier&lt;/th&gt;&lt;th class=&quot;th-core&quot;&gt;Core FOB&lt;/th&gt;&lt;th class=&quot;th-core&quot;&gt;Core Duty%&lt;/th&gt;&lt;th class=&quot;th-core&quot;&gt;Core LC&lt;/th&gt;&lt;th class=&quot;th-core&quot;&gt;Core Margin%&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-alt&quot;&gt;Best ALT Supplier&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;ALT FOB&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;ALT Duty%&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;ALT LC&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;ALT Margin%&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-alt&quot;&gt;FOB Disc%&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;LC Save/Unit&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;Buy Units&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-alt&quot;&gt;Save@25%&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;Save@50%&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;Save@100%&lt;/th&gt;&lt;th class=&quot;th-alt&quot;&gt;Recommendation&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-alt2&quot;&gt;ALT Sup 2&lt;/th&gt;&lt;th class=&quot;th-alt2&quot;&gt;FOB&lt;/th&gt;&lt;th class=&quot;th-alt2&quot;&gt;Duty%&lt;/th&gt;&lt;th class=&quot;th-alt2&quot;&gt;LC&lt;/th&gt;&lt;th class=&quot;th-alt2&quot;&gt;Margin%&lt;/th&gt;&lt;th class=&quot;th-alt2&quot;&gt;Save/Unit&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-alt3&quot;&gt;ALT Sup 3&lt;/th&gt;&lt;th class=&quot;th-alt3&quot;&gt;FOB&lt;/th&gt;&lt;th class=&quot;th-alt3&quot;&gt;Duty%&lt;/th&gt;&lt;th class=&quot;th-alt3&quot;&gt;LC&lt;/th&gt;&lt;th class=&quot;th-alt3&quot;&gt;Margin%&lt;/th&gt;&lt;th class=&quot;th-alt3&quot;&gt;Save/Unit&lt;/th&gt;<BR/>
+        &lt;/tr&gt;<BR/>
+      &lt;/thead&gt;<BR/>
+      &lt;tbody&gt;${tbody}&lt;/tbody&gt;<BR/>
+    &lt;/table&gt;<BR/>
+  &lt;/div&gt;`;<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; TAB 3: Single-Source Opportunity &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+function buildSingleSource(ssSupList) {<BR/>
+  const CG=`&lt;colgroup&gt;<BR/>
+    &lt;col style=&quot;width:110px&quot;&gt;&lt;col style=&quot;width:260px&quot;&gt;&lt;col style=&quot;width:130px&quot;&gt;&lt;col style=&quot;width:130px&quot;&gt;&lt;col style=&quot;width:130px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:82px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:185px&quot;&gt;&lt;col style=&quot;width:104px&quot;&gt;&lt;col style=&quot;width:140px&quot;&gt;&lt;col style=&quot;width:165px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:84px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:70px&quot;&gt;&lt;col style=&quot;width:82px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:88px&quot;&gt;&lt;col style=&quot;width:80px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:84px&quot;&gt;&lt;col style=&quot;width:84px&quot;&gt;&lt;col style=&quot;width:84px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:175px&quot;&gt;&lt;col style=&quot;width:104px&quot;&gt;&lt;col style=&quot;width:80px&quot;&gt;&lt;col style=&quot;width:88px&quot;&gt;<BR/>
+    &lt;col style=&quot;width:175px&quot;&gt;&lt;col style=&quot;width:104px&quot;&gt;&lt;col style=&quot;width:80px&quot;&gt;&lt;col style=&quot;width:88px&quot;&gt;<BR/>
+  &lt;/colgroup&gt;`;<BR/>
+<BR/>
+  let tbody=&#039;&#039;;<BR/>
+  ssSupList.forEach((grp,gi)=&gt;{<BR/>
+    const sup=grp.sup, styles=grp.styles;<BR/>
+    const grpSav=styles.reduce((t,s)=&gt;t+(s.projSavTot||0),0);<BR/>
+    const grpCls=&#039;grp-ss-&#039;+gi;<BR/>
+    tbody+=`&lt;tr class=&quot;sup-hdr&quot; id=&quot;ss-grp-${gi}-hdr&quot; data-grp=&quot;${grpCls}&quot; data-prefix=&quot;ss&quot; onclick=&quot;toggleGrp(&#039;ss-grp-${gi}-hdr&#039;)&quot;&gt;<BR/>
+      &lt;td colspan=&quot;29&quot;&gt;&lt;span class=&quot;grp-arrow&quot;&gt;&amp;#9660;&lt;/span&gt;&lt;strong&gt;${esc(sup)}&lt;/strong&gt;<BR/>
+        &lt;span class=&quot;grp-meta&quot;&gt;${styles.length} styles &amp;nbsp;|&amp;nbsp; Proj. Save@100%: &lt;strong&gt;${fmtUSD(grpSav)}&lt;/strong&gt;&lt;/span&gt;<BR/>
+      &lt;/td&gt;&lt;/tr&gt;`;<BR/>
+    let subBuy=0,subS100=0,sub2S100=0,sub3S100=0;<BR/>
+    styles.forEach((s,si)=&gt;{<BR/>
+      subBuy+=s.totalBuy; subS100+=s.projSavTot||0; sub2S100+=s.proj2SavTot||0; sub3S100+=s.proj3SavTot||0;<BR/>
+      const a2=s.ref2AltSup?`&lt;td style=&quot;background:#F4ECF7;white-space:normal&quot; class=&quot;bold purple&quot;&gt;${esc(s.ref2AltSup)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#F4ECF7&quot;&gt;${esc(s.alt2Country||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#F4ECF7&quot; class=&quot;${s.avg2FobDisc&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${s.avg2FobDisc!=null?fmtPct(s.avg2FobDisc):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#F4ECF7&quot; class=&quot;${(s.proj2SavTot||0)&gt;0?&#039;purple bold&#039;:&#039;&#039;}&quot;&gt;${s.proj2SavTot?fmtUSD(s.proj2SavTot):&#039;&#151;&#039;}&lt;/td&gt;`<BR/>
+        :&#039;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&#039;;<BR/>
+      const a3=s.ref3AltSup?`&lt;td style=&quot;background:#E0F7FA;white-space:normal&quot; class=&quot;bold teal&quot;&gt;${esc(s.ref3AltSup)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#E0F7FA&quot;&gt;${esc(s.alt3Country||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#E0F7FA&quot; class=&quot;${s.avg3FobDisc&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${s.avg3FobDisc!=null?fmtPct(s.avg3FobDisc):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#E0F7FA&quot; class=&quot;${(s.proj3SavTot||0)&gt;0?&#039;teal bold&#039;:&#039;&#039;}&quot;&gt;${s.proj3SavTot?fmtUSD(s.proj3SavTot):&#039;&#151;&#039;}&lt;/td&gt;`<BR/>
+        :&#039;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&lt;td&gt;&#151;&lt;/td&gt;&#039;;<BR/>
+      tbody+=`&lt;tr class=&quot;data-row ${grpCls} ${si%2===0?&#039;&#039;:&#039;alt-row&#039;}&quot;<BR/>
+        data-searchable=&quot;${esc(s.styleNum)} ${esc(s.desc)} ${esc(s.brand)} ${esc(s.category)} ${esc(s.coreSupp)} ${esc(s.refAltSup||&#039;&#039;)}&quot;<BR/>
+        data-core-margin=&quot;${s.marginCore!=null?s.marginCore.toFixed(4):&#039;&#039;}&quot;<BR/>
+        data-buy=&quot;${s.totalBuy}&quot; data-sav100=&quot;${s.projSavTot||0}&quot; data-sav2-100=&quot;${s.proj2SavTot||0}&quot; data-sav3-100=&quot;${s.proj3SavTot||0}&quot;&gt;<BR/>
+        &lt;td&gt;${esc(s.styleNum||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;white-space:normal&quot;&gt;${esc(s.desc||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;white-space:normal&quot;&gt;${esc(s.brand||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;white-space:normal&quot;&gt;${esc(s.category||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;white-space:normal&quot;&gt;${esc(s.subcat||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EBF5FB&quot;&gt;${s.fobCore!=null?fmtUSD(s.fobCore):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EBF5FB&quot;&gt;${s.lcCore!=null?fmtUSD(s.lcCore):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EBF5FB&quot; class=&quot;${s.marginCore!=null?(s.marginCore&lt;0?&#039;red bold&#039;:(s.marginCore&lt;0.27?&#039;amber&#039;:&#039;green&#039;)):&#039;&#039;}&quot;&gt;<BR/>
+          ${s.marginCore!=null?fmtPct(s.marginCore):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1;white-space:normal&quot; class=&quot;bold green&quot;&gt;${esc(s.refAltSup||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot;&gt;${esc(s.altCountry||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot;&gt;${esc(s.basis||&#039;&#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;small&quot;&gt;${(s.refStyleNums||[]).slice(0,3).join(&#039;, &#039;)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${s.avgFobDisc&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${s.avgFobDisc!=null?fmtPct(s.avgFobDisc):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot;&gt;${s.projFOB!=null?fmtUSD(s.projFOB):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot;&gt;${s.projLC!=null?fmtUSD(s.projLC):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${s.projMargin!=null?(s.projMargin&lt;0?&#039;red&#039;:&#039;green&#039;):&#039;&#039;}&quot;&gt;<BR/>
+          ${s.projMargin!=null?fmtPct(s.projMargin):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${(s.projLCSav||0)&gt;0?&#039;green bold&#039;:&#039;&#039;}&quot;&gt;${s.projLCSav!=null?fmtUSD(s.projLCSav):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;num&quot;&gt;${fmtInt(s.totalBuy)}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${(s.projSavTot||0)&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${s.projSavTot?fmtUSD(s.projSavTot*0.25):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${(s.projSavTot||0)&gt;0?&#039;green&#039;:&#039;&#039;}&quot;&gt;${s.projSavTot?fmtUSD(s.projSavTot*0.5):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        &lt;td style=&quot;background:#EAFAF1&quot; class=&quot;${(s.projSavTot||0)&gt;0?&#039;green bold&#039;:&#039;&#039;}&quot;&gt;${s.projSavTot?fmtUSD(s.projSavTot):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+        ${a2}${a3}&lt;/tr&gt;`;<BR/>
+    });<BR/>
+    tbody+=`&lt;tr class=&quot;subtotal-row ${grpCls}&quot;&gt;<BR/>
+      &lt;td colspan=&quot;17&quot; class=&quot;bold&quot;&gt;Subtotal &#151; ${esc(sup)}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;num bold sub-buy&quot;&gt;${fmtInt(subBuy)}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;green bold sub-s25&quot;&gt;${fmtUSD(subS100*0.25)}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;green bold sub-s50&quot;&gt;${fmtUSD(subS100*0.5)}&lt;/td&gt;<BR/>
+      &lt;td class=&quot;green bold sub-s100&quot;&gt;${fmtUSD(subS100)}&lt;/td&gt;<BR/>
+      &lt;td colspan=&quot;3&quot;&gt;&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${sub2S100&gt;0?&#039;purple bold&#039;:&#039;&#039;} sub2-s100&quot;&gt;${sub2S100&gt;0?fmtUSD(sub2S100):&#039;&#151;&#039;}&lt;/td&gt;<BR/>
+      &lt;td colspan=&quot;3&quot;&gt;&lt;/td&gt;<BR/>
+      &lt;td class=&quot;${sub3S100&gt;0?&#039;teal bold&#039;:&#039;&#039;} sub3-s100&quot;&gt;${sub3S100&gt;0?fmtUSD(sub3S100):&#039;&#151;&#039;}&lt;/td&gt;&lt;/tr&gt;`;<BR/>
+  });<BR/>
+<BR/>
+  return `&lt;div class=&quot;tab-toolbar&quot;&gt;<BR/>
+    &lt;input type=&quot;text&quot; class=&quot;search-box&quot; id=&quot;ss-search&quot; placeholder=&quot;Search style#, description, brand, category, supplier&#133;&quot; oninput=&quot;filterTab(&#039;ss&#039;)&quot;&gt;<BR/>
+    &lt;div class=&quot;filter-divider&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;span class=&quot;filter-label&quot;&gt;Core Margin:&lt;/span&gt;<BR/>
+    &lt;select class=&quot;filter-select&quot; id=&quot;ss-margin-filter&quot; onchange=&quot;filterTab(&#039;ss&#039;)&quot;&gt;<BR/>
+      &lt;option value=&quot;&quot;&gt;All&lt;/option&gt;&lt;option value=&quot;low&quot;&gt;Under 27%&lt;/option&gt;&lt;option value=&quot;neg&quot;&gt;Negative&lt;/option&gt;<BR/>
+    &lt;/select&gt;<BR/>
+    &lt;div class=&quot;filter-divider&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;button class=&quot;btn-secondary&quot; onclick=&quot;expandAll(&#039;ss&#039;)&quot;&gt;Expand All&lt;/button&gt;<BR/>
+    &lt;button class=&quot;btn-secondary&quot; onclick=&quot;collapseAll(&#039;ss&#039;)&quot;&gt;Collapse All&lt;/button&gt;<BR/>
+    &lt;div class=&quot;filter-divider&quot;&gt;&lt;/div&gt;<BR/>
+    &lt;button class=&quot;btn-clear&quot; onclick=&quot;clearFilters(&#039;ss&#039;)&quot;&gt;&amp;#10005; Clear&lt;/button&gt;<BR/>
+  &lt;/div&gt;<BR/>
+  &lt;div class=&quot;detail-scroll-wrap&quot;&gt;<BR/>
+    &lt;table id=&quot;ss-table&quot; class=&quot;detail-table&quot;&gt;${CG}<BR/>
+      &lt;thead&gt;<BR/>
+        &lt;tr&gt;<BR/>
+          &lt;th colspan=&quot;5&quot;  style=&quot;background:#2c3e50&quot; class=&quot;group-hdr&quot;&gt;STYLE INFO&lt;/th&gt;<BR/>
+          &lt;th colspan=&quot;3&quot;  style=&quot;background:#1a4f8a&quot; class=&quot;group-hdr&quot;&gt;CORE COSTS&lt;/th&gt;<BR/>
+          &lt;th colspan=&quot;13&quot; style=&quot;background:#1a5c35&quot; class=&quot;group-hdr&quot;&gt;&amp;#9733; #1 RECOMMENDED ALT&lt;/th&gt;<BR/>
+          &lt;th colspan=&quot;4&quot;  style=&quot;background:#512b7a&quot; class=&quot;group-hdr&quot;&gt;&amp;#9733;&amp;#9733; #2 RECOMMENDED ALT&lt;/th&gt;<BR/>
+          &lt;th colspan=&quot;4&quot;  style=&quot;background:#00695C&quot; class=&quot;group-hdr&quot;&gt;&amp;#9733;&amp;#9733;&amp;#9733; #3 RECOMMENDED ALT&lt;/th&gt;<BR/>
+        &lt;/tr&gt;<BR/>
+        &lt;tr class=&quot;col-hdr&quot;&gt;<BR/>
+          &lt;th class=&quot;th-ss1&quot;&gt;Style#&lt;/th&gt;&lt;th class=&quot;th-info&quot;&gt;Description&lt;/th&gt;&lt;th class=&quot;th-info&quot;&gt;Brand&lt;/th&gt;&lt;th class=&quot;th-info&quot;&gt;Category&lt;/th&gt;&lt;th class=&quot;th-info&quot;&gt;Subcat&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-core&quot;&gt;Core FOB&lt;/th&gt;&lt;th class=&quot;th-core&quot;&gt;Core LC&lt;/th&gt;&lt;th class=&quot;th-core&quot;&gt;Core Margin%&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-ss1&quot;&gt;#1 Rec ALT Supplier&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;ALT Country&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;Basis&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;Ref Style#s&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-ss1&quot;&gt;Avg FOB Disc%&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;Proj FOB&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;Proj LC&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;Proj Margin%&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-ss1&quot;&gt;LC Save/Unit&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;Buy Units&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-ss1&quot;&gt;Save@25%&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;Save@50%&lt;/th&gt;&lt;th class=&quot;th-ss1&quot;&gt;Save@100%&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-ss2&quot;&gt;#2 Alt Supplier&lt;/th&gt;&lt;th class=&quot;th-ss2&quot;&gt;#2 Country&lt;/th&gt;&lt;th class=&quot;th-ss2&quot;&gt;#2 Disc%&lt;/th&gt;&lt;th class=&quot;th-ss2&quot;&gt;#2 Save@100%&lt;/th&gt;<BR/>
+          &lt;th class=&quot;th-ss3&quot;&gt;#3 Alt Supplier&lt;/th&gt;&lt;th class=&quot;th-ss3&quot;&gt;#3 Country&lt;/th&gt;&lt;th class=&quot;th-ss3&quot;&gt;#3 Disc%&lt;/th&gt;&lt;th class=&quot;th-ss3&quot;&gt;#3 Save@100%&lt;/th&gt;<BR/>
+        &lt;/tr&gt;<BR/>
+      &lt;/thead&gt;<BR/>
+      &lt;tbody&gt;${tbody}&lt;/tbody&gt;<BR/>
+    &lt;/table&gt;<BR/>
+  &lt;/div&gt;`;<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; TAB 4: Methodology &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+function buildMethodology(generatedAt) {<BR/>
+  return `&lt;div class=&quot;methodology&quot;&gt;<BR/>
+    &lt;h2&gt;What This Dashboard Shows&lt;/h2&gt;<BR/>
+    &lt;p&gt;This report analyzes &lt;strong&gt;Active: Replen&lt;/strong&gt; styles from international suppliers (non-USA). AU, WFS, and DS prefix styles are excluded. Data is pulled &lt;strong&gt;live from Quickbase&lt;/strong&gt; each time this page loads or Refresh is clicked.&lt;/p&gt;<BR/>
+    &lt;h3&gt;Tab 1 &#151; Dashboard&lt;/h3&gt;<BR/>
+    &lt;p&gt;KPI cards and a supplier summary table showing dual-source (DS) savings and single-source opportunity (SS) savings side by side.&lt;/p&gt;<BR/>
+    &lt;h3&gt;Tab 2 &#151; Multi-Source Analysis&lt;/h3&gt;<BR/>
+    &lt;p&gt;For each style with at least one ALT supplier in QB (fields 1330, 1899, 1900), all ALTs are evaluated and the one delivering the greatest LC save per unit is the &quot;Best ALT&quot;. Grouped by core supplier, collapsible.&lt;/p&gt;<BR/>
+    &lt;h3&gt;Tab 3 &#151; Single-Source Opportunity&lt;/h3&gt;<BR/>
+    &lt;p&gt;Uses the bidirectional dual-source methodology to identify styles with no ALT in QB but where a proven cheaper alternative exists from other dual-sourced records in the same supplier/category/subcategory. Up to 3 ranked ALT options shown.&lt;/p&gt;<BR/>
+    &lt;h2&gt;Cost Calculation Formulas&lt;/h2&gt;<BR/>
+    &lt;div class=&quot;formula-box&quot;&gt;<BR/>
+      &lt;p&gt;Duty $ = FOB &#215; Duty Rate % (field 139)&lt;/p&gt;<BR/>
+      &lt;p&gt;Load $ = FOB &#215; 15%&lt;/p&gt;<BR/>
+      &lt;p&gt;Landed Cost = FOB + Duty$ + Freight + Load$&lt;/p&gt;<BR/>
+      &lt;p&gt;Margin = (Sell Price &amp;#8722; LC) / Sell Price &amp;#8722; Royalty% &amp;#8722; Avg Terms%&lt;/p&gt;<BR/>
+      &lt;p&gt;LC Save/Unit = Core LC &amp;#8722; ALT LC&lt;/p&gt;<BR/>
+      &lt;p&gt;Save @ X% = LC Save/Unit &#215; 6-Mo Buy Units &#215; X%&lt;/p&gt;<BR/>
+      &lt;p&gt;Freight: field 206 &amp;#8594; field 1344 (LA) &amp;#8594; field 300 (override). If no ALT freight, core freight used as proxy.&lt;/p&gt;<BR/>
+      &lt;p&gt;Terms %: bphzqfkev table field 379 (primary) &amp;#8594; strip /N pack suffix fallback &amp;#8594; field 1555 last resort.&lt;/p&gt;<BR/>
+    &lt;/div&gt;<BR/>
+    &lt;h2&gt;Bidirectional Single-Source Logic&lt;/h2&gt;<BR/>
+    &lt;p&gt;For every dual-sourced style, FOB comparisons are recorded in both directions. If ALT FOB &amp;lt; Core FOB, the ALT is proven cheaper for that core supplier/category. If ALT FOB &amp;gt; Core FOB, the Core is cheaper &#151; making it a candidate ALT for styles where that ALT is the core.&lt;/p&gt;<BR/>
+    &lt;p&gt;&lt;em&gt;Example:&lt;/em&gt; FFP10159 has Core = Huiji @ $0.54, ALT = H&amp;amp;O @ $0.58 &amp;#8594; Huiji is cheaper &amp;#8594; for H&amp;amp;O single-source styles in that category, Huiji is the recommended ALT.&lt;/p&gt;<BR/>
+    &lt;h2&gt;Data Sources&lt;/h2&gt;<BR/>
+    &lt;div class=&quot;formula-box&quot;&gt;<BR/>
+      &lt;p&gt;Styles (bn458n7jz): style#, mstyle, supplier, country, FOB (46), duty% (139), freight (206/1344/300), sell (1550/15), royalty% (104), terms% (1555), ALT fields (1330/1899/1900 + FOB/duty/freight)&lt;/p&gt;<BR/>
+      &lt;p&gt;Forecast (bpsaju5pm): mstyle (20), buy units W1&#150;W26 (457, 459&#150;461, 546&#150;567)&lt;/p&gt;<BR/>
+      &lt;p&gt;Terms (bphzqfkev): mstyle (6), Avg Terms% (379)&lt;/p&gt;<BR/>
+      &lt;p&gt;Suppliers (bn7g5ebz5): name (45), country (7)&lt;/p&gt;<BR/>
+    &lt;/div&gt;<BR/>
+    &lt;p class=&quot;footnote&quot;&gt;Updated: ${generatedAt} &amp;nbsp;|&amp;nbsp; Source: Quickbase (pim.quickbase.com) &amp;nbsp;|&amp;nbsp; App: bn458t5nz&lt;/p&gt;<BR/>
+  &lt;/div&gt;`;<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; UI Interaction &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+function showTab(id, btn) {<BR/>
+  document.querySelectorAll(&#039;.tab-content&#039;).forEach(t=&gt;t.classList.remove(&#039;active&#039;));<BR/>
+  document.querySelectorAll(&#039;.tab-btn&#039;).forEach(b=&gt;b.classList.remove(&#039;active&#039;));<BR/>
+  document.getElementById(id).classList.add(&#039;active&#039;);<BR/>
+  btn.classList.add(&#039;active&#039;);<BR/>
+}<BR/>
+function toggleGrp(hdrid) {<BR/>
+  const hdr=document.getElementById(hdrid);<BR/>
+  const grpCls=hdr.getAttribute(&#039;data-grp&#039;);<BR/>
+  const isNowCollapsed=hdr.classList.toggle(&#039;grp-collapsed&#039;);<BR/>
+  document.querySelectorAll(&#039;tr.&#039;+grpCls).forEach(r=&gt;r.classList.toggle(&#039;collapsed-row&#039;,isNowCollapsed));<BR/>
+}<BR/>
+function expandAll(prefix) {<BR/>
+  document.querySelectorAll(&#039;tr.sup-hdr[data-prefix=&quot;&#039;+prefix+&#039;&quot;]&#039;).forEach(hdr=&gt;{<BR/>
+    hdr.classList.remove(&#039;grp-collapsed&#039;);<BR/>
+    document.querySelectorAll(&#039;tr.&#039;+hdr.getAttribute(&#039;data-grp&#039;)).forEach(r=&gt;r.classList.remove(&#039;collapsed-row&#039;));<BR/>
+  });<BR/>
+}<BR/>
+function collapseAll(prefix) {<BR/>
+  document.querySelectorAll(&#039;tr.sup-hdr[data-prefix=&quot;&#039;+prefix+&#039;&quot;]&#039;).forEach(hdr=&gt;{<BR/>
+    hdr.classList.add(&#039;grp-collapsed&#039;);<BR/>
+    document.querySelectorAll(&#039;tr.&#039;+hdr.getAttribute(&#039;data-grp&#039;)).forEach(r=&gt;r.classList.add(&#039;collapsed-row&#039;));<BR/>
+  });<BR/>
+}<BR/>
+function clearFilters(prefix) {<BR/>
+  const s=document.getElementById(prefix+&#039;-search&#039;); if (s) s.value=&#039;&#039;;<BR/>
+  [&#039;rec&#039;,&#039;margin&#039;].forEach(f=&gt;{const el=document.getElementById(prefix+&#039;-&#039;+f+&#039;-filter&#039;);if(el)el.value=&#039;&#039;;});<BR/>
+  filterTab(prefix);<BR/>
+}<BR/>
+function fmtUSDjs(n){if(n==null)return &#039;&#151;&#039;;return &#039;$&#039;+Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,&#039;,&#039;);}<BR/>
+function recalcSubtotals(prefix) {<BR/>
+  document.querySelectorAll(&#039;tr.sup-hdr[data-prefix=&quot;&#039;+prefix+&#039;&quot;]&#039;).forEach(hdr=&gt;{<BR/>
+    const grpCls=hdr.getAttribute(&#039;data-grp&#039;);<BR/>
+    const subRow=document.querySelector(&#039;tr.subtotal-row.&#039;+grpCls);<BR/>
+    if (!subRow) return;<BR/>
+    const visRows=Array.from(document.querySelectorAll(&#039;tr.data-row.&#039;+grpCls)).filter(r=&gt;!r.classList.contains(&#039;hidden-row&#039;));<BR/>
+    const buy=visRows.reduce((t,r)=&gt;t+(parseFloat(r.getAttribute(&#039;data-buy&#039;))||0),0);<BR/>
+    const sav100=visRows.reduce((t,r)=&gt;t+(parseFloat(r.getAttribute(&#039;data-sav100&#039;))||0),0);<BR/>
+    const buyCell=subRow.querySelector(&#039;.sub-buy&#039;),s25=subRow.querySelector(&#039;.sub-s25&#039;),s50=subRow.querySelector(&#039;.sub-s50&#039;),s100=subRow.querySelector(&#039;.sub-s100&#039;);<BR/>
+    if(buyCell)buyCell.textContent=buy&gt;0?Math.round(buy).toLocaleString():&#039;&#151;&#039;;<BR/>
+    if(s25){s25.className=(sav100&gt;0?&#039;green bold &#039;:&#039;&#039;)+&#039;sub-s25&#039;;s25.textContent=sav100&gt;0?fmtUSDjs(sav100*0.25):&#039;&#151;&#039;;}<BR/>
+    if(s50){s50.className=(sav100&gt;0?&#039;green bold &#039;:&#039;&#039;)+&#039;sub-s50&#039;;s50.textContent=sav100&gt;0?fmtUSDjs(sav100*0.5):&#039;&#151;&#039;;}<BR/>
+    if(s100){s100.className=(sav100&gt;0?&#039;green bold &#039;:&#039;&#039;)+&#039;sub-s100&#039;;s100.textContent=sav100&gt;0?fmtUSDjs(sav100):&#039;&#151;&#039;;}<BR/>
+    if(prefix===&#039;ss&#039;){<BR/>
+      const sav2=visRows.reduce((t,r)=&gt;t+(parseFloat(r.getAttribute(&#039;data-sav2-100&#039;))||0),0);<BR/>
+      const c2=subRow.querySelector(&#039;.sub2-s100&#039;);<BR/>
+      if(c2){c2.className=(sav2&gt;0?&#039;purple bold &#039;:&#039;&#039;)+&#039;sub2-s100&#039;;c2.textContent=sav2&gt;0?fmtUSDjs(sav2):&#039;&#151;&#039;;}<BR/>
+      const sav3=visRows.reduce((t,r)=&gt;t+(parseFloat(r.getAttribute(&#039;data-sav3-100&#039;))||0),0);<BR/>
+      const c3=subRow.querySelector(&#039;.sub3-s100&#039;);<BR/>
+      if(c3){c3.className=(sav3&gt;0?&#039;teal bold &#039;:&#039;&#039;)+&#039;sub3-s100&#039;;c3.textContent=sav3&gt;0?fmtUSDjs(sav3):&#039;&#151;&#039;;}<BR/>
+    }<BR/>
+  });<BR/>
+}<BR/>
+function filterDash() {<BR/>
+  const q=(document.getElementById(&#039;dash-search&#039;)?.value||&#039;&#039;).toLowerCase().trim();<BR/>
+  document.querySelectorAll(&#039;#dash-tbody tr:not(.grand-total)&#039;).forEach(row=&gt;{<BR/>
+    const name=(row.querySelector(&#039;td:nth-child(2)&#039;)?.textContent||&#039;&#039;).toLowerCase();<BR/>
+    row.classList.toggle(&#039;hidden-row&#039;,q.length&gt;0&amp;&amp;!name.includes(q));<BR/>
+  });<BR/>
+}<BR/>
+function filterTab(prefix) {<BR/>
+  const q=(document.getElementById(prefix+&#039;-search&#039;)?.value||&#039;&#039;).toLowerCase().trim();<BR/>
+  const recVal=(document.getElementById(prefix+&#039;-rec-filter&#039;)?.value||&#039;&#039;);<BR/>
+  const margVal=(document.getElementById(prefix+&#039;-margin-filter&#039;)?.value||&#039;&#039;);<BR/>
+  const hasFilter=!!(q||recVal||margVal);<BR/>
+  document.querySelectorAll(&#039;tr.sup-hdr[data-prefix=&quot;&#039;+prefix+&#039;&quot;]&#039;).forEach(hdr=&gt;{<BR/>
+    const grpCls=hdr.getAttribute(&#039;data-grp&#039;);<BR/>
+    const dataRows=document.querySelectorAll(&#039;tr.data-row.&#039;+grpCls);<BR/>
+    let anyVisible=false;<BR/>
+    dataRows.forEach(row=&gt;{<BR/>
+      let show=true;<BR/>
+      if(q&amp;&amp;!(row.getAttribute(&#039;data-searchable&#039;)||&#039;&#039;).toLowerCase().includes(q))show=false;<BR/>
+      if(recVal===&#039;switch&#039;&amp;&amp;row.getAttribute(&#039;data-rec&#039;)!==&#039;switch&#039;)show=false;<BR/>
+      if(recVal===&#039;next-buy&#039;&amp;&amp;row.getAttribute(&#039;data-rec&#039;)!==&#039;next-buy&#039;)show=false;<BR/>
+      if(recVal===&#039;keep&#039;&amp;&amp;row.getAttribute(&#039;data-rec&#039;)!==&#039;keep&#039;)show=false;<BR/>
+      const m=parseFloat(row.getAttribute(&#039;data-core-margin&#039;));<BR/>
+      if(margVal===&#039;low&#039;&amp;&amp;!(m&lt;0.27))show=false;<BR/>
+      if(margVal===&#039;neg&#039;&amp;&amp;!(m&lt;0))show=false;<BR/>
+      row.classList.toggle(&#039;hidden-row&#039;,!show);<BR/>
+      if(show)anyVisible=true;<BR/>
+    });<BR/>
+    const hideGrp=hasFilter&amp;&amp;!anyVisible;<BR/>
+    hdr.classList.toggle(&#039;hidden-row&#039;,hideGrp);<BR/>
+    document.querySelectorAll(&#039;tr.subtotal-row.&#039;+grpCls).forEach(r=&gt;r.classList.toggle(&#039;hidden-row&#039;,hideGrp));<BR/>
+    if(hasFilter&amp;&amp;anyVisible){<BR/>
+      hdr.classList.remove(&#039;grp-collapsed&#039;);<BR/>
+      dataRows.forEach(r=&gt;r.classList.remove(&#039;collapsed-row&#039;));<BR/>
+      document.querySelectorAll(&#039;tr.subtotal-row.&#039;+grpCls).forEach(r=&gt;r.classList.remove(&#039;collapsed-row&#039;));<BR/>
+    }<BR/>
+  });<BR/>
+  recalcSubtotals(prefix);<BR/>
+}<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; Kick off on load &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+window.addEventListener(&#039;DOMContentLoaded&#039;, loadData);<BR/>
+<BR/>
+// &amp;#9472;&amp;#9472; Excel Export &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+async function exportExcel() {<BR/>
+  if (!window._exportData) { alert(&#039;Data not loaded yet &#151; please wait for the dashboard to finish loading.&#039;); return; }<BR/>
+  if (typeof ExcelJS === &#039;undefined&#039;) { alert(&#039;Excel library not loaded &#151; check your internet connection and try again.&#039;); return; }<BR/>
+  const btn = document.querySelector(&#039;.export-btn&#039;);<BR/>
+  const origText = btn.textContent;<BR/>
+  btn.textContent = &#039;&amp;#9203; Generating&#133;&#039;; btn.disabled = true;<BR/>
+  try {<BR/>
+  const { supList, ssSupList, ssBySupplier, ssData } = window._exportData;<BR/>
+  const wb = new ExcelJS.Workbook();<BR/>
+  wb.creator = &#039;Pets &amp; People Supplier Savings Analysis&#039;; wb.created = new Date();<BR/>
+<BR/>
+  // &amp;#9472;&amp;#9472; Helpers &amp;#9472;&amp;#9472;<BR/>
+  const fl  = a =&gt; ({ type:&#039;pattern&#039;, pattern:&#039;solid&#039;, fgColor:{argb:a} });<BR/>
+  const fn  = (bold,sz,a) =&gt; ({ name:&#039;Calibri&#039;, bold:!!bold, size:sz||9, ...(a?{color:{argb:a}}:{}) });<BR/>
+  const al  = (h,wrap) =&gt; ({ horizontal:h||&#039;left&#039;, vertical:&#039;middle&#039;, wrapText:!!wrap });<BR/>
+  const usd = v =&gt; v!=null ? Math.round(v*100)/100 : null;<BR/>
+  const r2x = v =&gt; v!=null ? Math.round(v*100)/100 : null;<BR/>
+  const FMT = { usd:&#039;$#,##0.00&#039;, pct:&#039;0.00%&#039;, int:&#039;#,##0&#039; };<BR/>
+  const C = {<BR/>
+    navy:&#039;0F3460&#039;, blue:&#039;1A5276&#039;, blueBg:&#039;EBF5FB&#039;,<BR/>
+    green:&#039;1E8449&#039;, greenBg:&#039;EAFAF1&#039;,<BR/>
+    purple:&#039;7D3C98&#039;, purpleBg:&#039;F4ECF7&#039;,<BR/>
+    teal:&#039;00695C&#039;, tealBg:&#039;E0F7FA&#039;,<BR/>
+    sub:&#039;D5E8F5&#039;, gray:&#039;F5F5F5&#039;, white:&#039;FFFFFF&#039;,<BR/>
+    red:&#039;C0392B&#039;, amber:&#039;F39C12&#039;<BR/>
+  };<BR/>
+  const hdr = (cell,val,bg,bold,sz) =&gt; {<BR/>
+    cell.value=val; cell.fill=fl(bg); cell.font=fn(bold,sz||9,&#039;FFFFFF&#039;); cell.alignment=al(&#039;center&#039;,true);<BR/>
+  };<BR/>
+<BR/>
+  // &amp;#9472;&amp;#9472; Sheet 1: Supplier Summary &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+  const ws1 = wb.addWorksheet(&#039;Supplier Summary&#039;);<BR/>
+  [5,30,10,14,10,12,14,14,14,14,12,14,14,14,14,14,14].forEach((w,i)=&gt;{ ws1.getColumn(i+1).width=w; });<BR/>
+  ws1.mergeCells(1,1,1,17); hdr(ws1.getRow(1).getCell(1),&#039;SUPPLIER SAVINGS ANALYSIS &#151; Supplier Summary&#039;,C.navy,true,12);<BR/>
+  ws1.getRow(1).height=22;<BR/>
+  ws1.mergeCells(2,7,2,10);  hdr(ws1.getRow(2).getCell(7), &#039;DUAL-SOURCE ANALYSIS&#039;,       C.blue,true);<BR/>
+  ws1.mergeCells(2,11,2,14); hdr(ws1.getRow(2).getCell(11),&#039;SINGLE-SOURCE OPPORTUNITY&#039;,   C.green,true);<BR/>
+  ws1.mergeCells(2,15,2,17); hdr(ws1.getRow(2).getCell(15),&#039;COMBINED&#039;,                    C.purple,true);<BR/>
+  ws1.getRow(2).height=15;<BR/>
+  const h1=ws1.addRow([&#039;#&#039;,&#039;Supplier&#039;,&#039;Total Styles&#039;,&#039;DS Styles w/Savings&#039;,&#039;Keep Core&#039;,&#039;Buy Units&#039;,<BR/>
+    &#039;DS Save@25%&#039;,&#039;DS Save@50%&#039;,&#039;DS Save@100%&#039;,&#039;Avg FOB Disc%&#039;,<BR/>
+    &#039;SS Opp Styles&#039;,&#039;SS Save@25%&#039;,&#039;SS Save@50%&#039;,&#039;SS Save@100%&#039;,<BR/>
+    &#039;Combined Save@25%&#039;,&#039;Combined Save@50%&#039;,&#039;Combined Save@100%&#039;]);<BR/>
+  h1.eachCell({includeEmpty:true},c=&gt;{ c.fill=fl(C.navy); c.font=fn(true,9,&#039;FFFFFF&#039;); c.alignment=al(&#039;center&#039;); });<BR/>
+  ws1.getRow(3).height=18; ws1.views=[{state:&#039;frozen&#039;,ySplit:3}];<BR/>
+  let r1i=1, totDs=0, totSs=0;<BR/>
+  for (const g of supList) {<BR/>
+    const sav=g.styles.filter(s=&gt;s.bestAlt&amp;&amp;s.savingsTotal&gt;0).length;<BR/>
+    const kc =g.styles.filter(s=&gt;!s.bestAlt||s.savingsTotal&lt;=0).length;<BR/>
+    const bu =g.styles.reduce((t,s)=&gt;t+(s.totalBuy||0),0);<BR/>
+    const dd =g.styles.filter(s=&gt;s.bestAlt?.fobDisc!=null).map(s=&gt;s.bestAlt.fobDisc);<BR/>
+    const ad =dd.length?dd.reduce((a,b)=&gt;a+b,0)/dd.length:null;<BR/>
+    const ds =g.styles.reduce((t,s)=&gt;t+(s.savingsTotal||0),0);<BR/>
+    const ss =ssBySupplier[g.supplier]||{};<BR/>
+    const sv =ss.savTot||0;<BR/>
+    totDs+=ds; totSs+=sv;<BR/>
+    const row=ws1.addRow([r1i++,g.supplier,g.styles.length,sav,kc,bu,<BR/>
+      usd(ds*.25),usd(ds*.5),usd(ds),ad,ss.count||0,<BR/>
+      usd(sv*.25),usd(sv*.5),usd(sv),<BR/>
+      usd((ds+sv)*.25),usd((ds+sv)*.5),usd(ds+sv)]);<BR/>
+    const bg=(r1i%2===0)?C.gray:C.white;<BR/>
+    row.eachCell({includeEmpty:true},c=&gt;{ c.fill=fl(bg); });<BR/>
+    [7,8,9,12,13,14,15,16,17].forEach(c=&gt;row.getCell(c).numFmt=FMT.usd);<BR/>
+    row.getCell(10).numFmt=FMT.pct;<BR/>
+    [3,4,5,6,11].forEach(c=&gt;row.getCell(c).numFmt=FMT.int);<BR/>
+    if(ds&gt;0)    row.getCell(9).font=fn(true,9,C.green);<BR/>
+    if(sv&gt;0)    row.getCell(14).font=fn(true,9,C.green);<BR/>
+    if(ds+sv&gt;0) row.getCell(17).font=fn(true,9,C.purple);<BR/>
+  }<BR/>
+  const gt1=ws1.addRow([&#039;&#039;,&#039;Grand Total&#039;,&#039;&#039;,&#039;&#039;,&#039;&#039;,&#039;&#039;,usd(totDs*.25),usd(totDs*.5),usd(totDs),&#039;&#039;,&#039;&#039;,usd(totSs*.25),usd(totSs*.5),usd(totSs),usd((totDs+totSs)*.25),usd((totDs+totSs)*.5),usd(totDs+totSs)]);<BR/>
+  gt1.eachCell({includeEmpty:true},c=&gt;{ c.fill=fl(C.sub); c.font=fn(true,10); });<BR/>
+  [7,8,9,12,13,14,15,16,17].forEach(c=&gt;gt1.getCell(c).numFmt=FMT.usd);<BR/>
+  gt1.getCell(9).font=fn(true,10,C.green); gt1.getCell(14).font=fn(true,10,C.green); gt1.getCell(17).font=fn(true,10,C.purple);<BR/>
+  gt1.height=20;<BR/>
+<BR/>
+  // &amp;#9472;&amp;#9472; Sheet 2: Multi-Source Analysis &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+  const ws2=wb.addWorksheet(&#039;Multi-Source Analysis&#039;);<BR/>
+  const S={RW:1,ST:2,MS:3,STS:4,DE:5,BR:6,CA:7,CS:8,CF:9,CD:10,CDD:11,CFR:12,CL:13,CLC:14,CM:15,SP:16,RY:17,TR:18,AS:19,AF:20,AD:21,ADD:22,AFR:23,AL:24,ALC:25,AM:26,DI:27,LS:28,ML:29,BU:30,S25:31,S50:32,S100:33,RC:34};<BR/>
+  const L2=34;<BR/>
+  [5,12,14,14,30,14,18,28,10,10,10,10,10,12,10,10,10,10,28,10,10,10,10,10,12,10,10,12,12,12,12,12,12,24].forEach((w,i)=&gt;ws2.getColumn(i+1).width=w);<BR/>
+  ws2.mergeCells(1,1,1,L2); hdr(ws2.getRow(1).getCell(1),&#039;SUPPLIER SAVINGS ANALYSIS &#151; Multi-Source Analysis&#039;,C.navy,true,12);<BR/>
+  ws2.getRow(1).height=22;<BR/>
+  ws2.mergeCells(2,S.CS,2,S.TR); hdr(ws2.getRow(2).getCell(S.CS),&#039;CORE SUPPLIER&#039;,       C.blue,true);<BR/>
+  ws2.mergeCells(2,S.AS,2,S.RC); hdr(ws2.getRow(2).getCell(S.AS),&#039;&amp;#9733; BEST ALT SUPPLIER&#039;, C.green,true);<BR/>
+  ws2.getRow(2).height=15;<BR/>
+  const h2=ws2.addRow([&#039;#&#039;,&#039;Style#&#039;,&#039;Mstyle&#039;,&#039;Status&#039;,&#039;Description&#039;,&#039;Brand&#039;,&#039;Category&#039;,<BR/>
+    &#039;Core Supplier&#039;,&#039;FOB&#039;,&#039;Duty%&#039;,&#039;Duty$&#039;,&#039;Freight&#039;,&#039;Load$&#039;,&#039;LC&#039;,&#039;Margin%&#039;,&#039;Sell Price&#039;,&#039;Royalty%&#039;,&#039;Terms%&#039;,<BR/>
+    &#039;&amp;#9733; Best ALT&#039;,&#039;ALT FOB&#039;,&#039;ALT Duty%&#039;,&#039;ALT Duty$&#039;,&#039;ALT Freight&#039;,&#039;ALT Load$&#039;,&#039;ALT LC&#039;,&#039;ALT Margin%&#039;,<BR/>
+    &#039;FOB Disc%&#039;,&#039;LC Save/Unit&#039;,&#039;Margin Lift (pp)&#039;,&#039;Buy Units&#039;,&#039;Save@25%&#039;,&#039;Save@50%&#039;,&#039;Save@100%&#039;,&#039;Recommendation&#039;]);<BR/>
+  h2.eachCell({includeEmpty:true},c=&gt;{ c.fill=fl(C.navy); c.font=fn(true,9,&#039;FFFFFF&#039;); c.alignment=al(&#039;center&#039;,true); });<BR/>
+  ws2.getRow(3).height=30; ws2.views=[{state:&#039;frozen&#039;,ySplit:3}];<BR/>
+  let r2i=1, totDs2=0;<BR/>
+  for (const g of supList) {<BR/>
+    const gDs=g.styles.reduce((t,s)=&gt;t+(s.savingsTotal||0),0); totDs2+=gDs;<BR/>
+    const gr=ws2.addRow([]);<BR/>
+    ws2.mergeCells(gr.number,1,gr.number,L2);<BR/>
+    gr.getCell(1).value=`  ${g.supplier}   (${g.styles.length} styles)   Save@100%: $${gDs.toLocaleString(&#039;en-US&#039;,{minimumFractionDigits:2,maximumFractionDigits:2})}`;<BR/>
+    gr.getCell(1).fill=fl(C.navy); gr.getCell(1).font=fn(true,10,&#039;FFFFFF&#039;); gr.height=18;<BR/>
+    for (const s of g.styles) {<BR/>
+      const b=s.bestAlt;<BR/>
+      const row=ws2.addRow([r2i++,s.styleNum,s.mstyle,s.status,s.desc,s.brand,s.category,<BR/>
+        s.coreSupplier,usd(s.fobCore),s.dutyPct,usd(s.dutyDollar),usd(s.freightIn),usd(s.loadDollar),usd(s.lcCore),s.marginCore,usd(s.sellPrice),s.royaltyPct,s.termsPct,<BR/>
+        b?.supplier||&#039;&#039;,usd(b?.fob),b?.altDutyPct,usd(b?.altDutyDollar),usd(b?.altFreight),usd(b?.altLoad),usd(b?.lc),b?.margin,<BR/>
+        b?.fobDisc,usd(b?.lcSavPerUnit),b?.marginLift!=null?r2x(b.marginLift):null,s.totalBuy,<BR/>
+        b&amp;&amp;s.savingsTotal&gt;0?usd(s.savingsTotal*.25):null,<BR/>
+        b&amp;&amp;s.savingsTotal&gt;0?usd(s.savingsTotal*.5):null,<BR/>
+        b&amp;&amp;s.savingsTotal&gt;0?usd(s.savingsTotal):null,<BR/>
+        b&amp;&amp;s.savingsTotal&gt;0?`Switch to ${b.supplier}`:b&amp;&amp;s.totalBuy===0?`Switch when next buy occurs &#151; ${b.supplier}`:&#039;Keep Core&#039;]);<BR/>
+      for(let c=S.CS;c&lt;=S.TR;c++) row.getCell(c).fill=fl(C.blueBg);<BR/>
+      if(b) for(let c=S.AS;c&lt;=S.RC;c++) row.getCell(c).fill=fl(C.greenBg);<BR/>
+      [S.CF,S.CDD,S.CFR,S.CL,S.CLC,S.SP,S.LS,S.S25,S.S50,S.S100].forEach(c=&gt;row.getCell(c).numFmt=FMT.usd);<BR/>
+      [S.CD,S.CM,S.RY,S.TR,S.AD,S.AM,S.DI].forEach(c=&gt;row.getCell(c).numFmt=FMT.pct);<BR/>
+      if(b) [S.AF,S.ADD,S.AFR,S.AL,S.ALC].forEach(c=&gt;row.getCell(c).numFmt=FMT.usd);<BR/>
+      row.getCell(S.BU).numFmt=FMT.int;<BR/>
+      if(s.savingsTotal&gt;0) row.getCell(S.S100).font=fn(true,9,C.green);<BR/>
+      if(s.marginCore!=null){ if(s.marginCore&lt;0) row.getCell(S.CM).font=fn(true,9,C.red); else if(s.marginCore&lt;0.27) row.getCell(S.CM).font=fn(false,9,C.amber); }<BR/>
+    }<BR/>
+  }<BR/>
+  const gt2=ws2.addRow([]); gt2.height=20;<BR/>
+  for(let c=1;c&lt;=L2;c++) gt2.getCell(c).fill=fl(C.sub);<BR/>
+  gt2.getCell(1).value=&#039;  Grand Total&#039;; gt2.getCell(1).font=fn(true,10);<BR/>
+  [S.S25,S.S50,S.S100].forEach((c,i)=&gt;{ const v=usd(totDs2*(i===0?.25:i===1?.5:1)); gt2.getCell(c).value=v; gt2.getCell(c).numFmt=FMT.usd; gt2.getCell(c).font=fn(true,10,C.green); });<BR/>
+<BR/>
+  // &amp;#9472;&amp;#9472; Sheet 3: Single-Source Opportunity &amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;&amp;#9472;<BR/>
+  const ws3=wb.addWorksheet(&#039;Single-Source Opportunity&#039;);<BR/>
+  const B3=20, A3=19, L3=B3+A3*3; // 77 cols<BR/>
+  [5,12,14,14,30,14,18,18,28,14,10,10,10,10,10,12,10,10,10,10,<BR/>
+   28,14,18,8,24,10,10,10,10,10,10,12,10,12,12,12,12,12,12,<BR/>
+   28,14,18,8,24,10,10,10,10,10,10,12,10,12,12,12,12,12,12,<BR/>
+   28,14,18,8,24,10,10,10,10,10,10,12,10,12,12,12,12,12,12].forEach((w,i)=&gt;ws3.getColumn(i+1).width=w);<BR/>
+  ws3.mergeCells(1,1,1,L3); hdr(ws3.getRow(1).getCell(1),&#039;SUPPLIER SAVINGS ANALYSIS &#151; Single-Source Opportunity&#039;,C.navy,true,12);<BR/>
+  ws3.getRow(1).height=22;<BR/>
+  ws3.mergeCells(2,1,2,L3);<BR/>
+  const mn=ws3.getRow(2).getCell(1);<BR/>
+  mn.value=&#039;Projected savings for single-source styles where a proven cheaper alternate supplier exists. ALT must not already be in QB ALT slots. Only positive projected LC savings shown.&#039;;<BR/>
+  mn.fill=fl(&#039;FFF8E1&#039;); mn.font={name:&#039;Calibri&#039;,size:8,italic:true,color:{argb:&#039;996600&#039;}}; mn.alignment={horizontal:&#039;left&#039;,vertical:&#039;middle&#039;,wrapText:true};<BR/>
+  ws3.getRow(2).height=22;<BR/>
+  ws3.mergeCells(3,1,3,B3);         hdr(ws3.getRow(3).getCell(1),       &#039;CORE SUPPLIER DATA&#039;,              C.blue,true);<BR/>
+  ws3.mergeCells(3,B3+1,3,B3+A3);   hdr(ws3.getRow(3).getCell(B3+1),   &#039;&amp;#9733; #1 RECOMMENDED ALT SUPPLIER&#039;,   C.green,true);<BR/>
+  ws3.mergeCells(3,B3+A3+1,3,B3+A3*2); hdr(ws3.getRow(3).getCell(B3+A3+1),&#039;&amp;#9733;&amp;#9733; #2 RECOMMENDED ALT SUPPLIER&#039;, C.purple,true);<BR/>
+  ws3.mergeCells(3,B3+A3*2+1,3,L3); hdr(ws3.getRow(3).getCell(B3+A3*2+1),&#039;&amp;#9733;&amp;#9733;&amp;#9733; #3 RECOMMENDED ALT SUPPLIER&#039;,C.teal,true);<BR/>
+  ws3.getRow(3).height=15;<BR/>
+  const h3=ws3.addRow([<BR/>
+    &#039;#&#039;,&#039;Style#&#039;,&#039;Mstyle&#039;,&#039;Status&#039;,&#039;Description&#039;,&#039;Brand&#039;,&#039;Category&#039;,&#039;Subcategory&#039;,&#039;Core Supplier&#039;,&#039;Country&#039;,<BR/>
+    &#039;FOB&#039;,&#039;Duty%&#039;,&#039;Duty$&#039;,&#039;Freight&#039;,&#039;Load$&#039;,&#039;LC&#039;,&#039;Margin%&#039;,&#039;Sell Price&#039;,&#039;Royalty%&#039;,&#039;Terms%&#039;,<BR/>
+    &#039;#1 ALT Supplier&#039;,&#039;#1 Country&#039;,&#039;#1 Basis&#039;,&#039;#1 Ref#&#039;,&#039;#1 Ref Styles&#039;,&#039;#1 Disc%&#039;,&#039;#1 Proj FOB&#039;,&#039;#1 Proj Duty%&#039;,&#039;#1 Proj Duty$&#039;,&#039;#1 Proj Freight&#039;,&#039;#1 Proj Load$&#039;,&#039;#1 Proj LC&#039;,&#039;#1 Proj Margin%&#039;,&#039;#1 LC Save/Unit&#039;,&#039;#1 Margin Lift&#039;,&#039;#1 Buy Units&#039;,&#039;#1 Save@25%&#039;,&#039;#1 Save@50%&#039;,&#039;#1 Save@100%&#039;,<BR/>
+    &#039;#2 ALT Supplier&#039;,&#039;#2 Country&#039;,&#039;#2 Basis&#039;,&#039;#2 Ref#&#039;,&#039;#2 Ref Styles&#039;,&#039;#2 Disc%&#039;,&#039;#2 Proj FOB&#039;,&#039;#2 Proj Duty%&#039;,&#039;#2 Proj Duty$&#039;,&#039;#2 Proj Freight&#039;,&#039;#2 Proj Load$&#039;,&#039;#2 Proj LC&#039;,&#039;#2 Proj Margin%&#039;,&#039;#2 LC Save/Unit&#039;,&#039;#2 Margin Lift&#039;,&#039;#2 Buy Units&#039;,&#039;#2 Save@25%&#039;,&#039;#2 Save@50%&#039;,&#039;#2 Save@100%&#039;,<BR/>
+    &#039;#3 ALT Supplier&#039;,&#039;#3 Country&#039;,&#039;#3 Basis&#039;,&#039;#3 Ref#&#039;,&#039;#3 Ref Styles&#039;,&#039;#3 Disc%&#039;,&#039;#3 Proj FOB&#039;,&#039;#3 Proj Duty%&#039;,&#039;#3 Proj Duty$&#039;,&#039;#3 Proj Freight&#039;,&#039;#3 Proj Load$&#039;,&#039;#3 Proj LC&#039;,&#039;#3 Proj Margin%&#039;,&#039;#3 LC Save/Unit&#039;,&#039;#3 Margin Lift&#039;,&#039;#3 Buy Units&#039;,&#039;#3 Save@25%&#039;,&#039;#3 Save@50%&#039;,&#039;#3 Save@100%&#039;]);<BR/>
+  h3.eachCell({includeEmpty:true},(c,ci)=&gt;{<BR/>
+    c.font=fn(true,8,&#039;FFFFFF&#039;); c.alignment=al(&#039;center&#039;,true);<BR/>
+    c.fill=fl(ci&lt;=B3?C.blue:ci&lt;=B3+A3?C.green:ci&lt;=B3+A3*2?C.purple:C.teal);<BR/>
+  });<BR/>
+  ws3.getRow(4).height=30; ws3.views=[{state:&#039;frozen&#039;,ySplit:4}];<BR/>
+<BR/>
+  let r3i=1, totS1=0, totS2=0, totS3=0;<BR/>
+  const fa=(row,o)=&gt;{  // apply num formats for one ALT block starting at col o+1<BR/>
+    [o+7,o+9,o+10,o+11,o+12,o+14,o+17,o+18,o+19].forEach(c=&gt;row.getCell(c).numFmt=FMT.usd);<BR/>
+    [o+6,o+8,o+13].forEach(c=&gt;row.getCell(c).numFmt=FMT.pct);<BR/>
+    row.getCell(o+16).numFmt=FMT.int;<BR/>
+  };<BR/>
+  for (const g of ssSupList) {<BR/>
+    const g1=g.styles.reduce((t,s)=&gt;t+(s.projSavTot||0),0);<BR/>
+    const g2=g.styles.reduce((t,s)=&gt;t+(s.proj2SavTot||0),0);<BR/>
+    const g3=g.styles.reduce((t,s)=&gt;t+(s.proj3SavTot||0),0);<BR/>
+    totS1+=g1; totS2+=g2; totS3+=g3;<BR/>
+    const gr=ws3.addRow([]);<BR/>
+    ws3.mergeCells(gr.number,1,gr.number,L3);<BR/>
+    gr.getCell(1).value=`  ${g.sup}   (${g.styles.length} styles)   #1 Save@100%: $${g1.toLocaleString(&#039;en-US&#039;,{minimumFractionDigits:2,maximumFractionDigits:2})}`;<BR/>
+    gr.getCell(1).fill=fl(C.navy); gr.getCell(1).font=fn(true,10,&#039;FFFFFF&#039;); gr.height=18;<BR/>
+    for (const s of g.styles) {<BR/>
+      const row=ws3.addRow([r3i++,<BR/>
+        s.styleNum,s.mstyle,s.status,s.desc,s.brand,s.category,s.subcat,s.coreSupp,s.country,<BR/>
+        usd(s.fobCore),s.dutyPct,usd(s.dutyDollar),usd(s.freightIn),usd(s.loadDollar),usd(s.lcCore),s.marginCore,usd(s.sellPrice),s.royaltyPct,s.termsPct,<BR/>
+        s.refAltSup,s.altCountry,s.basis,s.refCount,(s.refStyleNums||[]).join(&#039;, &#039;),s.avgFobDisc,<BR/>
+        usd(s.projFOB),s.projDutyPct,usd(s.projDutyDol),usd(s.projFreight),usd(s.projLoad),usd(s.projLC),s.projMargin,usd(s.projLCSav),s.projMgnLift!=null?r2x(s.projMgnLift):null,s.totalBuy,usd((s.projSavTot||0)*.25),usd((s.projSavTot||0)*.5),usd(s.projSavTot||0),<BR/>
+        s.ref2AltSup||&#039;&#039;,s.alt2Country||&#039;&#039;,s.basis2||&#039;&#039;,s.ref2Count||&#039;&#039;,(s.ref2StyleNums||[]).join(&#039;, &#039;),s.avg2FobDisc,<BR/>
+        usd(s.proj2FOB),s.proj2DutyPct,usd(s.proj2DutyDol),usd(s.proj2Freight),usd(s.proj2Load),usd(s.proj2LC),s.proj2Margin,usd(s.proj2LCSav),s.proj2MgnLift!=null?r2x(s.proj2MgnLift):null,s.ref2AltSup?s.totalBuy:null,s.proj2SavTot?usd(s.proj2SavTot*.25):null,s.proj2SavTot?usd(s.proj2SavTot*.5):null,s.proj2SavTot?usd(s.proj2SavTot):null,<BR/>
+        s.ref3AltSup||&#039;&#039;,s.alt3Country||&#039;&#039;,s.basis3||&#039;&#039;,s.ref3Count||&#039;&#039;,(s.ref3StyleNums||[]).join(&#039;, &#039;),s.avg3FobDisc,<BR/>
+        usd(s.proj3FOB),s.proj3DutyPct,usd(s.proj3DutyDol),usd(s.proj3Freight),usd(s.proj3Load),usd(s.proj3LC),s.proj3Margin,usd(s.proj3LCSav),s.proj3MgnLift!=null?r2x(s.proj3MgnLift):null,s.ref3AltSup?s.totalBuy:null,s.proj3SavTot?usd(s.proj3SavTot*.25):null,s.proj3SavTot?usd(s.proj3SavTot*.5):null,s.proj3SavTot?usd(s.proj3SavTot):null]);<BR/>
+      for(let c=1;c&lt;=B3;c++) row.getCell(c).fill=fl(C.blueBg);<BR/>
+      for(let c=B3+1;c&lt;=B3+A3;c++) row.getCell(c).fill=fl(C.greenBg);<BR/>
+      if(s.ref2AltSup) for(let c=B3+A3+1;c&lt;=B3+A3*2;c++) row.getCell(c).fill=fl(C.purpleBg);<BR/>
+      if(s.ref3AltSup) for(let c=B3+A3*2+1;c&lt;=L3;c++) row.getCell(c).fill=fl(C.tealBg);<BR/>
+      [11,13,14,15,16,18].forEach(c=&gt;row.getCell(c).numFmt=FMT.usd);<BR/>
+      [12,17,19,20].forEach(c=&gt;row.getCell(c).numFmt=FMT.pct);<BR/>
+      fa(row,B3); fa(row,B3+A3); fa(row,B3+A3*2);<BR/>
+      if(s.marginCore!=null){ if(s.marginCore&lt;0) row.getCell(17).font=fn(true,9,C.red); else if(s.marginCore&lt;0.27) row.getCell(17).font=fn(false,9,C.amber); }<BR/>
+      if((s.projSavTot||0)&gt;0)  row.getCell(B3+A3).font=fn(true,9,C.green);<BR/>
+      if((s.proj2SavTot||0)&gt;0) row.getCell(B3+A3*2).font=fn(true,9,C.purple);<BR/>
+      if((s.proj3SavTot||0)&gt;0) row.getCell(L3).font=fn(true,9,C.teal);<BR/>
+    }<BR/>
+  }<BR/>
+  const gt3=ws3.addRow([]); gt3.height=20;<BR/>
+  for(let c=1;c&lt;=L3;c++) gt3.getCell(c).fill=fl(C.sub);<BR/>
+  gt3.getCell(1).value=&#039;  Grand Total&#039;; gt3.getCell(1).font=fn(true,10);<BR/>
+  const sg=(c,v,col)=&gt;{ gt3.getCell(c).value=usd(v); gt3.getCell(c).numFmt=FMT.usd; gt3.getCell(c).font=fn(true,10,col); };<BR/>
+  sg(B3+A3,totS1,C.green);<BR/>
+  if(totS2&gt;0) sg(B3+A3*2,totS2,C.purple);<BR/>
+  if(totS3&gt;0) sg(L3,totS3,C.teal);<BR/>
+<BR/>
+  // &amp;#9472;&amp;#9472; Download &amp;#9472;&amp;#9472;<BR/>
+  const buffer=await wb.xlsx.writeBuffer();<BR/>
+  const blob=new Blob([buffer],{type:&#039;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#039;});<BR/>
+  const url=URL.createObjectURL(blob);<BR/>
+  const a=document.createElement(&#039;a&#039;);<BR/>
+  a.href=url; a.download=`Multi_Source_Analysis_${new Date().toISOString().slice(0,10)}.xlsx`; a.click();<BR/>
+  setTimeout(()=&gt;URL.revokeObjectURL(url),1000);<BR/>
+  } catch(err) { alert(&#039;Export failed: &#039;+err.message); console.error(err); }<BR/>
+  finally { btn.textContent=origText; btn.disabled=false; }<BR/>
+}<BR/>
+&lt;/script&gt;<BR/>
+&lt;/body&gt;<BR/>
+&lt;/html&gt;<BR/>
+
+	</pagebody>
+</qdbapi>

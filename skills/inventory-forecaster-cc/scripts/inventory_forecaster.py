@@ -7390,6 +7390,56 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"forward supply — near-term gap pre-covered"
                 )
 
+        # ── F59i — POS anchor for Amazon Seasonal Baseline items ─────────────
+        # When the near-term forecast (W1-W4 non-zero avg) runs >15% above POS
+        # L4W and the DC has adequate coverage (WOS >= 6), the order-history
+        # baseline is likely inflated by inventory build rather than genuine
+        # demand growth (e.g. short-ship catch-up orders inflating L13W).
+        # Blend the forecast 50% toward POS L13W (stable demand proxy) and
+        # apply that rescale proportionally to all 26 weeks, preserving the
+        # model's seasonal shape (2026-05-20).
+        #
+        # Fires when ALL of:
+        #   is_amazon + Seasonal Baseline (dense-ordering items where POS is
+        #     a meaningful comparison)
+        #   POS L4W and L13W both > 0
+        #   DC WOS >= 6 (not depleted -- inventory build, not shortage recovery)
+        #   W1-W4 non-zero avg of AI forecast > POS L4W * 1.15
+        #   Not a DI-blended record (F69-WOS handles those)
+        if (is_amazon
+                and model == "Seasonal Baseline"
+                and not row.get("_di_blend")
+                and isinstance(fcst, list) and len(fcst) >= 26
+                and pos_data and amz_catalog):
+            _f59i_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+            _f59i_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+            _f59i_wos     = _f59h_wos   # reuse WOS computed in F59h block above
+            if _f59i_pos_l4 > 0 and _f59i_pos_l13 > 0 and _f59i_wos >= 6:
+                _f59i_w1_4_nz  = [v for v in fcst[:4] if v > 0]
+                _f59i_w1_4_avg = sum(_f59i_w1_4_nz) / max(len(_f59i_w1_4_nz), 1)
+                if _f59i_w1_4_avg > _f59i_pos_l4 * 1.15:
+                    # 50/50 blend of current near-term avg and POS L13W, then
+                    # rescale the full 26-week forecast proportionally
+                    _f59i_anchor = (
+                        (_f59i_pos_l13 * 0.50 + _f59i_w1_4_avg * 0.50)
+                        / _f59i_w1_4_avg
+                    )
+                    _f59i_anchor = min(_f59i_anchor, 1.0)  # never inflate
+                    for _wi in range(len(fcst)):
+                        fcst[_wi] = snap(fcst[_wi] * _f59i_anchor, mp)
+                    _fire("F59i")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F59i POS anchor: near-term AI avg was "
+                            f"{_f59i_w1_4_avg:.0f}/wk vs consumer POS L4W "
+                            f"{_f59i_pos_l4:.0f}/wk "
+                            f"(+{(_f59i_w1_4_avg / _f59i_pos_l4 - 1) * 100:.0f}%) "
+                            f"with DC WOS {_f59i_wos:.1f}wks. Order history likely "
+                            f"inflated by inventory build. Forecast rescaled "
+                            f"x{_f59i_anchor:.3f} (50% POS L13W anchor "
+                            f"{_f59i_pos_l13:.0f}/wk)."
+                        )
+
         # ── F60 — EC-transition narrative ────────────────────────────────────
         # History was inherited from parent mstyle in the pre-pass.  Log the
         # driver text now that `meta` is available.
