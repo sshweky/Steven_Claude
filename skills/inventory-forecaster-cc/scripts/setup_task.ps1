@@ -10,11 +10,11 @@ $ScriptDir = "C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-
 $Launcher  = "$ScriptDir\run_scheduled.ps1"
 
 # Detect pwsh (PS7) or fall back to Windows PowerShell 5
-$PwshPath = (Get-Command pwsh        -ErrorAction SilentlyContinue)?.Source
-if (-not $PwshPath) {
-    $PwshPath = (Get-Command powershell -ErrorAction SilentlyContinue)?.Source
-}
-if (-not $PwshPath) { Write-Error "PowerShell not found. Aborting."; exit 1 }
+$_pwsh = Get-Command pwsh        -ErrorAction SilentlyContinue
+$_ps5  = Get-Command powershell  -ErrorAction SilentlyContinue
+if     ($_pwsh) { $PwshPath = $_pwsh.Source }
+elseif ($_ps5)  { $PwshPath = $_ps5.Source  }
+else            { Write-Error "PowerShell not found. Aborting."; exit 1 }
 
 Write-Host "PowerShell : $PwshPath"
 Write-Host "Launcher   : $Launcher"
@@ -69,7 +69,7 @@ $PlainPw = $null  # clear from memory
 
 Write-Host ""
 Write-Host "Done. Task '$TaskName' registered."
-Write-Host "Schedule : Mon-Fri, every 2 hours from 6 AM to 8 PM (8 runs/day)"
+Write-Host "Schedule : Mon-Fri, every 2 hours from 6 AM to 8 PM - 8 runs per day"
 Write-Host "Logs     : $ScriptDir\logs\"
 Write-Host ""
 Write-Host "To test immediately:"
