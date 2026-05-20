@@ -9875,18 +9875,28 @@ def main():
         n_with_any_po = sum(1 for v in open_pos_data.values() if any(q > 0 for q in v))
         print(f"      {n_with_any_po} keys have confirmed forward POs "
               f"(total open qty: {total_open_qty:,.0f} units)")
-        # Guard: abort if VP-Q4 is enabled but the pull came back empty.
-        # Without this we would forecast as if there were no confirmed POs
-        # at all and double-count every front-week order.  Use --no-po-zero
-        # to opt out intentionally.
+        # Guard: abort if VP-Q4 is enabled but the underlying PO report
+        # returned 0 rows (indicating a CData transient failure).
+        # IMPORTANT: do NOT abort just because 0 of our specific keys matched --
+        # that is a legitimate result for single-item runs or items with no POs.
+        # Check the bulk report cache: if it has rows, the pull itself succeeded.
         if len(open_pos_data) == 0:
-            sys.exit(
-                "\n[ABORT] VP-Q4 PO zero-out is enabled but open-PO pull "
-                "returned 0 keys.\n         Likely transient CData failure "
-                "(check Phase 2.8 [FAIL] lines).\n         Refusing to "
-                "forecast — re-run the command, or pass --no-po-zero "
-                "to skip VP-Q4 intentionally."
-            )
+            try:
+                from oos_history import _open_pos_cache_path as _po_cache_fn
+                _po_cache = _po_cache_fn()
+                import json as _json2
+                _po_raw = _json2.load(open(_po_cache)) if _po_cache.exists() else []
+                _po_report_ok = len(_po_raw) > 0
+            except Exception:
+                _po_report_ok = False
+            if not _po_report_ok:
+                sys.exit(
+                    "\n[ABORT] VP-Q4 PO zero-out is enabled but open-PO pull "
+                    "returned 0 rows.\n         Likely transient CData failure "
+                    "(check Phase 2.8 [FAIL] lines).\n         Refusing to "
+                    "forecast -- re-run the command, or pass --no-po-zero "
+                    "to skip VP-Q4 intentionally."
+                )
 
     # ── Phase 2.9: VP-ATS ATS inventory history ─────────────────────
     # Fetch Available-to-Sell (ATS) L26W data so the engine can distinguish
