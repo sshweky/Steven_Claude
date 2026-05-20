@@ -22,7 +22,8 @@ if (-not (Test-Path $WrapperDir)) {
 
 # The batch file lives at a path with no special characters.
 # Inside the batch file the path is quoted, so & and ( are handled fine.
-$BatContent = "@echo off`r`npowershell.exe -NonInteractive -ExecutionPolicy Bypass -File `"$PS1Script`"`r`n"
+# Set PYTHONPATH so the SYSTEM account finds the right site-packages
+$BatContent = "@echo off`r`nset PYTHONPATH=C:\Python314\Lib\site-packages`r`nset PYTHONHOME=C:\Python314`r`npowershell.exe -NonInteractive -ExecutionPolicy Bypass -File `"$PS1Script`"`r`n"
 [System.IO.File]::WriteAllText($WrapperBat, $BatContent, [System.Text.Encoding]::ASCII)
 Write-Host "Wrapper : $WrapperBat"
 
@@ -33,19 +34,12 @@ if ($Existing) {
     Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
 }
 
-# -- Register via schtasks.exe ------------------------------------------------
-# Runs as current user (not SYSTEM) so all installed Python packages are available.
+# -- Register via schtasks.exe (SYSTEM account - no password needed) -----------
+# PYTHONPATH is set in run.bat so SYSTEM finds the right site-packages.
 # /sc WEEKLY /d MON-FRI /st 06:00 : starts 6 AM on weekdays
 # /ri 120 : repeat every 120 minutes (2 hours)
 # /du 0014:00 : for 14 hours (last run 8 PM)
 # /rl HIGHEST : run with highest available privileges
-$User    = $env:USERNAME
-$Domain  = $env:USERDOMAIN
-$RunAs   = "$Domain\$User"
-$Password = Read-Host "Enter your Windows login password (needed to run when screen is locked)" -AsSecureString
-$PlainPw  = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-                [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password))
-
 $result = & schtasks /create `
     /tn $TaskName `
     /tr "`"$WrapperBat`"" `
@@ -55,11 +49,8 @@ $result = & schtasks /create `
     /ri 120 `
     /du 0014:00 `
     /rl HIGHEST `
-    /ru $RunAs `
-    /rp $PlainPw `
+    /ru SYSTEM `
     /f 2>&1
-
-$PlainPw = $null
 
 Write-Host $result
 
