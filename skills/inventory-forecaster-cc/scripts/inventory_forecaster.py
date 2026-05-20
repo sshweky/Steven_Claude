@@ -9685,9 +9685,23 @@ def main():
 
     # ── Phase 2.5: Pull Amazon Catalog POS data (Amazon items only) ──
     amazon_pos = {}
-    amazon_mstyles = list({r["Mstyle"] for r in rows
-                           if AMAZON_CUST_SUBSTR in (r.get("Customr_Name") or "").upper()
-                           and r.get("Mstyle")})
+    # EC/COS items (e.g. "FF12302/24EC") have POS data stored under the parent
+    # mstyle ("FF12302/24") in the Amazon Catalog table.  Build a query set that
+    # includes both the raw mstyle AND its parent variant so the WHERE IN clause
+    # covers both cases.  The downstream fallback lookup (_ec_parent) then finds
+    # the data via the parent key.
+    def _ec_parent_for_query(ms):
+        msu = ms.upper()
+        if msu.endswith("EC"):
+            return ms[:-2]
+        if msu.endswith("COS"):
+            return ms[:-3]
+        return ms
+
+    _amz_raw = {r["Mstyle"] for r in rows
+                if AMAZON_CUST_SUBSTR in (r.get("Customr_Name") or "").upper()
+                and r.get("Mstyle")}
+    amazon_mstyles = list(_amz_raw | {_ec_parent_for_query(m) for m in _amz_raw})
     if amazon_mstyles:
         print(f"\n[2.5] Pulling Amazon catalog POS for {len(amazon_mstyles)} mstyles ...", flush=True)
         POS_COLS = ["Mstyle", "Ordered_Units_LW", "Ordered_Units_Prior_Wk",

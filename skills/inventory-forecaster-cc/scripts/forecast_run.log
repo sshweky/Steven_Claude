@@ -114,3 +114,37 @@
   [ 300/1844]  16.3%  ok=300  fail=0
   [watchdog] still running — 37s since last output | last:   [ 300/1844]  16.3%  ok=300  fail=0
   [watchdog] still running — 97s since last output | last:   [ 300/1844]  16.3%  ok=300  fail=0
+  [ 350/1844]  19.0%  ok=350  fail=0
+  [ 400/1844]  21.7%  ok=400  fail=0
+  [watchdog] still running — 22s since last output | last:   [ 400/1844]  21.7%  ok=400  fail=0
+  [ 450/1844]  24.4%  ok=450  fail=0
+  [watchdog] still running — 18s since last output | last:   [ 450/1844]  24.4%  ok=450  fail=0
+  [ 500/1844]  27.1%  ok=500  fail=0
+  [ 550/1844]  29.8%  ok=550  fail=0
+  [watchdog] still running — 16s since last output | last:   [ 550/1844]  29.8%  ok=550  fail=0
+  [ 600/1844]  32.5%  ok=600  fail=0
+  [ 650/1844]  35.2%  ok=650  fail=0
+  [ 700/1844]  38.0%  ok=700  fail=0
+  [ 750/1844]  40.7%  ok=750  fail=0
+  [ 800/1844]  43.4%  ok=800  fail=0
+  [ 850/1844]  46.1%  ok=850  fail=0
+  [watchdog] still running — 14s since last output | last:   [ 850/1844]  46.1%  ok=850  fail=0
+  [ 900/1844]  48.8%  ok=900  fail=0
+  [ 950/1844]  51.5%  ok=950  fail=0
+  [1000/1844]  54.2%  ok=1000  fail=0
+  [1050/1844]  56.9%  ok=1050  fail=0
+  [1100/1844]  59.7%  ok=1100  fail=0
+  [1150/1844]  62.4%  ok=1150  fail=0
+  [1200/1844]  65.1%  ok=1200  fail=0
+  [watchdog] still running — 23s since last output | last:   [1200/1844]  65.1%  ok=1200  fail=0
+  [1250/1844]  67.8%  ok=1250  fail=0
+  [1300/1844]  70.5%  ok=1300  fail=0
+  [1350/1844]  73.2%  ok=1350  fail=0
+  [1400/1844]  75.9%  ok=1400  fail=0
+  [1450/1844]  78.6%  ok=1450  fail=0
+  [1500/1844]  81.3%  ok=1500  fail=0
+  [watchdog] still running — 2s since last output | last:   [1500/1844]  81.3%  ok=1500  fail=0
+  [1550/1844]  84.1%  ok=1550  fail=0
+  [1600/1844]  86.8%  ok=1600  fail=0
+  [1650/1844]  89.5%  ok=1650  fail=0
+  [1700/1844]  92.2%  ok=1700  fail=0
