@@ -6656,10 +6656,11 @@ async function bootstrap() {
 
     // -- Role detection: planner vs director/VP ---------------------------------
     // A planner is anyone whose display name appears as an inv_manager in the data.
-    // Directors/VPs typically don't own records, so they see everything by default.
+    // Directors/VPs in DIRECTOR_EMAILS are never treated as planners even when
+    // they also manage brands directly.
     {
       const _mgrs = new Set(ALL_RECORDS.map(r => (r.inv_manager || '').toLowerCase()).filter(Boolean));
-      _USER_IS_PLANNER = Boolean(CURRENT_USER.name && _mgrs.has(CURRENT_USER.name.toLowerCase()));
+      _USER_IS_PLANNER = Boolean(CURRENT_USER.name && _mgrs.has(CURRENT_USER.name.toLowerCase()) && !_isDirector());
       if (_USER_IS_PLANNER) {
         console.info(`[Auth] Planner identified: "${CURRENT_USER.name}"`);
       }
