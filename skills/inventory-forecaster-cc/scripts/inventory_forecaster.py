@@ -7440,6 +7440,61 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"{_f59i_pos_l13:.0f}/wk)."
                         )
 
+        # ── F59j — Amazon low-DC restock false-acceleration correction ──────
+        # When the DC is undersupplied (WOS < 8wks) Amazon places large
+        # catch-up orders to restock toward their 8-12wk target.  These 1-2
+        # week spikes inflate the recency-weighted baseline (T4 acceleration
+        # blend, L8W overlay) and push the AI forecast well above the
+        # underlying consumer POS run rate.
+        #
+        # Key insight: high recent orders relative to POS + low DC WOS is a
+        # restock surge pattern, NOT demand acceleration.  The forward
+        # projection should reflect consumer velocity (POS L4W), not the
+        # temporary fill-in demand.
+        #
+        # Fires when ALL of:
+        #   is_amazon, pos_data, amz_catalog present
+        #   DC WOS < 8 (understocked -- restock in progress)
+        #   L2W order avg > POS L4W * 1.5 (recent orders >> consumer demand)
+        #   W1-W4 AI forecast avg > POS L4W * 1.2 (forecast inflated by surge)
+        #   POS L4W >= 100 (credible POS signal)
+        #
+        # Correction: rescale full 26W forecast so W1-W4 avg = POS L4W,
+        # preserving seasonal shape.  Scale floor = 0.60 to avoid
+        # over-correction if POS data is temporarily depressed.
+        if (is_amazon
+                and pos_data and amz_catalog
+                and isinstance(fcst, list) and len(fcst) >= 4):
+            _f59j_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+            _f59j_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+            _f59j_wos     = _f59h_wos  # reuse WOS computed in F59h block
+            _f59j_l2w_avg = (sum(float(v) for v in (history[-2:] if len(history) >= 2 else history))
+                             / max(len(history[-2:]), 1)) if history else 0
+            if (_f59j_pos_l4 >= 100
+                    and _f59j_pos_l13 > 0
+                    and 0 < _f59j_wos < 8
+                    and _f59j_l2w_avg > _f59j_pos_l4 * 1.5):
+                _f59j_w14_nz  = [v for v in fcst[:4] if v > 0]
+                _f59j_w14_avg = sum(_f59j_w14_nz) / max(len(_f59j_w14_nz), 1)
+                if _f59j_w14_avg > _f59j_pos_l4 * 1.2:
+                    # Scale so W1-W4 avg aligns with POS L4W; apply to all
+                    # 26 weeks proportionally to keep the seasonal shape intact.
+                    _f59j_scale = max(0.60, _f59j_pos_l4 / _f59j_w14_avg)
+                    for _wi in range(len(fcst)):
+                        fcst[_wi] = snap(fcst[_wi] * _f59j_scale, mp)
+                    _fire("F59j")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F59j DC restock correction: L2W orders avg "
+                            f"{_f59j_l2w_avg:.0f}/wk "
+                            f"({_f59j_l2w_avg / max(_f59j_pos_l4, 1):.1f}x consumer POS) "
+                            f"while DC WOS={_f59j_wos:.1f}wks (under 8wk target) -- "
+                            f"restock surge inflated baseline, not demand growth. "
+                            f"AI W1-W4 was {_f59j_w14_avg:.0f}/wk vs POS L4W "
+                            f"{_f59j_pos_l4:.0f}/wk; rescaled x{_f59j_scale:.2f} "
+                            f"to consumer demand anchor."
+                        )
+
         # ── F60 — EC-transition narrative ────────────────────────────────────
         # History was inherited from parent mstyle in the pre-pass.  Log the
         # driver text now that `meta` is available.
