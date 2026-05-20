@@ -37,6 +37,7 @@ def run_with_watchdog(args, attempt=1):
         [sys.executable, SCRIPT] + args,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
+        stdin=subprocess.DEVNULL,
         text=True,
         bufsize=1,
         env=env,
