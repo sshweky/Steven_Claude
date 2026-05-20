@@ -3600,7 +3600,7 @@ async function toggleDetail(key) {
     atsCells += `<td style="font-weight:700;color:#00695c">${fmtN(Math.round(atsTot / 26))}</td>`;
     histHtml = `
     <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:2px solid #ede7f6;">
-      <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">L26W History</div>
+      <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">L26W History${_ecHistNote ? ` <span style="font-weight:400;color:#1565c0;">(inherited from parent style ${_ecHistNote.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])})</span>` : ''}</div>
       <table class="dtbl">
         <tr>${histHdrCells}</tr>
         <tr>${ordCells}</tr>
