@@ -621,7 +621,7 @@ def save_csv(enriched, man_labels, ai_labels, ord_labels):
             out["front_load_score"] = f"{r['front_load_score']:.4f}" if r.get("front_load_score") else ""
             out["spike_weeks_str"]  = "|".join(str(w) for w in r.get("spike_weeks", []))
             w.writerow(out)
-    print(f"CSV saved → {path}")
+    print(f"CSV saved -> {path}")
     return path
 
 def save_json(data, name):
