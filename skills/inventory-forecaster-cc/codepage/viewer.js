@@ -6612,8 +6612,10 @@ async function bootstrap() {
 
     _atsHistPromise = attachAtsHistory(ALL_RECORDS).then(() => {
       _setFreshness('atshist-loaded-at', Date.now());
+      _atsHistPromise = null;  // clear so detail panels don't loop for mstyles with no ATS data
     }).catch(e => {
       console.warn('ATS History load failed (non-fatal):', e);
+      _atsHistPromise = null;
     });
 
     _setBoot('Sorting projections...');
