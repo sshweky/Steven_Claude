@@ -8098,28 +8098,28 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _po_cutoff_zero_w1 = True
             _fire("F_PO_CUTOFF")
 
-    # ── F61 — Switchover variant conflict (2026-05-21) ───────────────────────────
+    # ── F69 — Switchover variant conflict (2026-05-21) ───────────────────────────
     # When a variant style (e.g. FF8654EC/COS/AMZ) at the same account has
     # manual projections > 0 or open customer POs in a given week, the retailer
     # is already planning to order the variant -- not the base.  Zero those weeks
     # in the base style AI forecast so we don't double-count demand.
     # The validation pass (validate_record) issues a CRITICAL flag on the same
     # weeks prompting the planner to mark the base style as CLOSED.
-    _f61_week_map = {}   # week_idx -> [variant_mstyle, ...]
+    _f69_week_map = {}   # week_idx -> [variant_mstyle, ...]
     if switchover_weeks:
         _sw_entry = switchover_weeks.get(row.get("Acct_MStyle_Key_", ""))
         if _sw_entry:
             for _wi, _variants in _sw_entry.items():
                 if 0 <= _wi < 26 and fcst[_wi] != 0:
                     fcst[_wi] = 0
-                    _f61_week_map[_wi] = _variants
-            if _f61_week_map:
-                _fire("F61")
-                _zeroed_wks = ", ".join(f"W{wi+1}" for wi in sorted(_f61_week_map))
-                _var_names  = sorted({v for vl in _f61_week_map.values() for v in vl})
+                    _f69_week_map[_wi] = _variants
+            if _f69_week_map:
+                _fire("F69")
+                _zeroed_wks = ", ".join(f"W{wi+1}" for wi in sorted(_f69_week_map))
+                _var_names  = sorted({v for vl in _f69_week_map.values() for v in vl})
                 if isinstance(meta, dict):
                     meta.setdefault("drivers", []).append(
-                        f"F61 Switchover conflict: variant style(s) "
+                        f"F69 Switchover conflict: variant style(s) "
                         f"{', '.join(_var_names)} have active projections/orders in "
                         f"{_zeroed_wks} -- AI zeroed those weeks on base style. "
                         f"Planner should mark base style CLOSED for those weeks."
