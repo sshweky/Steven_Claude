@@ -1091,11 +1091,15 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     Amazon Catalog.  This pulls the baseline toward actual consumer demand velocity,
     adjusting for acceleration/deceleration detected from L4W vs L13W trends.
 
-    Shape — heavily damped seasonal profile (DAMP=0.1: 10% historical, 90% flat).
-    The position-based profile maps "26 weeks ago" to W1, so any large historical
-    event buy (holiday, prior Prime Day) that happened to fall 26-21 weeks ago
-    inflates W1-W5 regardless of the actual forecast season.  DAMP=0.1 collapses
-    those distortions to ±20% while still preserving genuine gradual slopes.
+    Shape -- damped seasonal profile.  Base DAMP=0.30 (30% historical / 70%
+    flat), relief DAMP=0.85 when F16 detects strong-signal Halloween/Easter/
+    July4 patterns the planner doesn't want flattened.  The position-based
+    profile maps "26 weeks ago" to W1, so any large historical event buy
+    (holiday, prior Prime Day) that happened to fall 26-21 weeks ago would
+    inflate W1-W5 regardless of the actual forecast season.  Damping
+    collapses those distortions while still preserving genuine slopes.
+    (Docstring updated 2026-05-21 -- previously documented DAMP=0.1 which
+    was the original value before F16 was added.)
 
     Events — explicit Prime Day (Amazon only, W7-W9) and Fall Deal (W23-W25) lifts
     applied AFTER the damped profile, so the event weeks always stand out above the
