@@ -10556,25 +10556,30 @@ def main():
             m = _re.match(r'^\d{2} \d{2} W(\d+)$', label)
             if m:
                 _man_prj_fids[int(m.group(1))] = fid
-        _auto_proj_count = sum(1 for r in to_write if r.get("auto_project"))
-        _w1_po_count     = sum(1 for r in to_write
-                               if (r.get("opn_w") or [0])[0] > 0)
-        _w2_po_count     = sum(1 for r in to_write
-                               if len(r.get("opn_w") or []) > 1 and (r.get("opn_w") or [])[1] > 0)
+        _auto_proj_count    = sum(1 for r in to_write if r.get("auto_project"))
+        _w1_po_count        = sum(1 for r in to_write
+                                  if (r.get("opn_w") or [0])[0] > 0)
+        _w2_po_count        = sum(1 for r in to_write
+                                  if len(r.get("opn_w") or []) > 1 and (r.get("opn_w") or [])[1] > 0)
+        _po_cutoff_w1_count = sum(1 for r in to_write if r.get("zero_man_w1_cutoff"))
         if _auto_proj_count:
             print(f"      Auto Project: {_auto_proj_count} records will have manual projections replaced with AI values")
             if len(_man_prj_fids) < 26:
-                print(f"      [WARN] Auto Project: only {len(_man_prj_fids)} MAN PRJ week FIDs found (expected 26) — partial copy")
+                print(f"      [WARN] Auto Project: only {len(_man_prj_fids)} MAN PRJ week FIDs found (expected 26) -- partial copy")
         if _w1_po_count:
-            print(f"      W1 PO zero-out: {_w1_po_count} records have an open PO in W1 — MAN PRJ W1 will be set to 0")
+            print(f"      W1 PO zero-out: {_w1_po_count} records have an open PO in W1 -- MAN PRJ W1 will be set to 0")
         if _w2_po_count:
-            print(f"      W2 PO zero-out: {_w2_po_count} records have an open PO in W2 — MAN PRJ W2 will be set to 0")
+            print(f"      W2 PO zero-out: {_w2_po_count} records have an open PO in W2 -- MAN PRJ W2 will be set to 0")
+        if _po_cutoff_w1_count:
+            print(f"      F_PO_CUTOFF W1: {_po_cutoff_w1_count} Fetch/BrandBuzz records past PO cutoff -- AI+MAN PRJ W1 zeroed")
         _man_w1_fid = _man_prj_fids.get(1)   # FID for the current MAN PRJ W1 column
         _man_w2_fid = _man_prj_fids.get(2)   # FID for the current MAN PRJ W2 column
         if _w1_po_count and not _man_w1_fid:
-            print(f"      [WARN] W1 PO zero-out: MAN PRJ W1 FID not found in field map — skipping")
+            print(f"      [WARN] W1 PO zero-out: MAN PRJ W1 FID not found in field map -- skipping")
         if _w2_po_count and not _man_w2_fid:
-            print(f"      [WARN] W2 PO zero-out: MAN PRJ W2 FID not found in field map — skipping")
+            print(f"      [WARN] W2 PO zero-out: MAN PRJ W2 FID not found in field map -- skipping")
+        if _po_cutoff_w1_count and not _man_w1_fid:
+            print(f"      [WARN] F_PO_CUTOFF: MAN PRJ W1 FID not found in field map -- manual W1 not zeroed in QB")
         payload = []
         for rec in to_write:
             row = {merge_fid: rec["key"], ai_alert_fid: _sanitize_for_qb(rec.get("alert", ""))}

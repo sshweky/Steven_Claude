@@ -82,3 +82,18 @@ NameError: name '_f59i_is_ec' is not defined. Did you mean: '_f59i_pos_l4'?
 
   [watchdog] Process exited with code 1.
   [watchdog] Restarting (attempt 2/3) ...
+
+============================================================
+  [watchdog] Starting forecaster (attempt 2/3)
+============================================================
+  [auto-throttle] --all detected → workers=2, rate_limit_ms=150, bulk_writeback=on, lean_pull=off
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_17_W1 → 11_08_W26
+
+[1/4] Pulling projections from Quickbase ...
