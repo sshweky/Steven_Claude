@@ -8292,11 +8292,14 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
     pct_diff   = ((proj_total - exp_total) / exp_total * 100) if exp_total > 0 else 0
 
     # Volume-based priority: how critical is it to fix this record?
-    # Based on the weekly baseline volume for this item+customer.
+    # On-Plan override (AI vs Man <= 5%, plan entered) is applied at the
+    # call site after the AI forecast is available -- not computable here.
     if baseline >= 1000:
         priority = "CRITICAL"
+    elif baseline >= 500:
+        priority = "HIGH"
     elif baseline >= 200:
-        priority = "MEDIUM"
+        priority = "MID"
     else:
         priority = "LOW"
 
