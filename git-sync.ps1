@@ -8,7 +8,7 @@ function Log($msg) {
 
 Set-Location $claude
 
-# Stage any uncommitted changes
+# Stage and commit any local changes
 $status = git -C $claude status --porcelain 2>&1
 if ($status) {
     git -C $claude add -A 2>&1 | Out-Null
@@ -19,15 +19,26 @@ if ($status) {
     Log "No local changes to commit"
 }
 
-# Pull remote changes (rebase) then push
+# Stash any remaining unstaged changes (e.g. log file written during this script)
+# so that pull --rebase does not get blocked
+$stashOut = git -C $claude stash 2>&1
+$stashed = $stashOut -notmatch "No local changes"
+
+# Pull remote changes with rebase
 $pullOut = git -C $claude pull --rebase origin master 2>&1
 Log "Pull: $($pullOut -join ' | ')"
 
+# Restore stash if we stashed anything
+if ($stashed) {
+    git -C $claude stash pop 2>&1 | Out-Null
+}
+
+# Push to GitHub
 $pushOut = git -C $claude push origin master 2>&1
 Log "Push: $($pushOut -join ' | ')"
 
-# Trim log to last 500 lines
+# Trim log to last 500 lines to prevent unbounded growth
 $lines = Get-Content $logFile -ErrorAction SilentlyContinue
-if ($lines.Count -gt 500) {
+if ($lines -and $lines.Count -gt 500) {
     $lines | Select-Object -Last 500 | Set-Content $logFile -Encoding utf8
 }
