@@ -9487,12 +9487,10 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
     elif (short_pct < 0 and per_l13 > 0 and per_l4 > 0 and
           per_l4 / per_l13 <= 0.80 and
           abs(freq_l4 - freq_l13) / max(freq_l13, 0.01) < 0.30):
-        expl = (f"Per-order qty dropped from ~{per_l13:.0f}u (L13W) to "
-                f"~{per_l4:.0f}u (L4W) while reorder cadence held steady. "
-                f"Smaller POs at the same frequency usually means {cl} "
-                f"trimmed distribution (lost a few stores), shifted to "
-                f"tighter JIT, or downsized the per-store build — worth a "
-                f"quick sales-rep check.")
+        expl = (f"Per-order qty dropped from ~{per_l13:.0f}u (L13W avg) to "
+                f"~{per_l4:.0f}u (L4W avg) while reorder cadence held steady "
+                f"({len(l4_nz)}/L4W vs {len(l13_nz)}/L13W). Smaller builds "
+                f"at same frequency -- confirm with sales rep what changed.")
     # 3) Cadence drop (qty stable, fewer orders).
     elif (short_pct < 0 and per_l13 > 0 and per_l4 > 0 and
           0.85 <= per_l4 / per_l13 <= 1.20 and
