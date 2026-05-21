@@ -2130,12 +2130,14 @@ function populateFilters() {
     LOW:    'LOW: AI forecast < 200 units / week',
   };
   const PRI_TIPS = {
-    CRITICAL: 'CRITICAL: HIGH volume AND |AI vs Proj| > 10%',
-    MEDIUM:   'MEDIUM: MEDIUM volume AND |AI vs Proj| > 10%',
-    LOW:      'LOW: everything else',
+    CRITICAL:  'CRITICAL: >= 1,000/wk AND AI vs Plan gap > 5%',
+    HIGH:      'HIGH: 500-999/wk AND AI vs Plan gap > 5%',
+    MID:       'MID: 200-499/wk AND AI vs Plan gap > 5%',
+    LOW:       'LOW: < 200/wk AND AI vs Plan gap > 5%',
+    'On-Plan': 'On-Plan: AI vs Plan within 5% (any volume)',
   };
   const volRank = ['HIGH','MEDIUM','LOW'];
-  const priRank = ['CRITICAL','MEDIUM','LOW'];
+  const priRank = ['CRITICAL','HIGH','MID','LOW','On-Plan'];
   const volOpts = [...sets.vol].map(v => ({ value: v, label: v, tooltip: VOL_TIPS[v] || '' }));
   const priOpts = [...sets.pri].map(v => ({ value: v, label: v, tooltip: PRI_TIPS[v] || '' }));
   const orderBy = ranks => (a, b) => ranks.indexOf(a.value) - ranks.indexOf(b.value);
