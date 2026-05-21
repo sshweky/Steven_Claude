@@ -5962,8 +5962,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             if _reason == "sustained_acceleration":
                 meta.setdefault("drivers", []).append(
                     f"F49 F43-skip sustained acceleration: {_first['spike_count']}/4 "
-                    f"recent weeks all > 2.5× L26-prior nz median "
-                    f"({_first['median_pre']:.0f}/wk) → real run-rate shift, not "
+                    f"recent weeks all > 2.5x L26-prior nz median "
+                    f"({_first['median_pre']:.0f}/wk) -> real run-rate shift, not "
                     f"a 1-off spike; preserved signal"
                 )
             elif _reason == "pos_confirmed_acceleration":
@@ -5971,16 +5971,27 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"F49 F43-skip POS-confirmed acceleration: "
                     f"{_first['spike_count']}/4 recent weeks > cap_threshold AND "
                     f"Amazon POS L4 {_first['l4_pos']:.0f}/wk vs L13 "
-                    f"{_first['l13_pos']:.0f}/wk = {_first['ratio']:.2f}× "
-                    f"(≥1.20) → preserved signal"
+                    f"{_first['l13_pos']:.0f}/wk = {_first['ratio']:.2f}x "
+                    f"(>=1.20) -> preserved signal"
+                )
+        elif _first.get("f49b_internal"):
+            # F49b (2026-05-21): internal spike within F49 sustained-acceleration
+            # window — cap just the outlier, leave the acceleration signal intact.
+            meta["recent_spike_caps"] = _f43_corrections
+            for _c in _f43_corrections:
+                meta.setdefault("drivers", []).append(
+                    f"F49b Internal-spike cap: hist[{_c['idx']}]={_c['original']:.0f} "
+                    f"({_c['ratio']:.1f}x L4W inner-median {_c['median_pre']:.0f}/wk) "
+                    f"-> {_c['capped']:.0f} (2.0x inner-median); "
+                    f"F49 sustained-acceleration but one week was outlier vs its peers"
                 )
         else:
             meta["recent_spike_caps"] = _f43_corrections
             for _c in _f43_corrections:
                 meta.setdefault("drivers", []).append(
                     f"F43 Recent-spike capped: hist[{_c['idx']}]={_c['original']:.0f} "
-                    f"({_c['ratio']:.1f}× L26-prior nz median {_c['median_pre']:.0f}) "
-                    f"→ {_c['capped']:.0f} (2.0× median); prevents Croston's mis-classify "
+                    f"({_c['ratio']:.1f}x L26-prior nz median {_c['median_pre']:.0f}) "
+                    f"-> {_c['capped']:.0f} (2.0x median); prevents Croston's mis-classify "
                     f"of one-time spike as recurring lumpy event"
                 )
     # F44 — annotate meta when recent-spike-aware re-classification fired,
