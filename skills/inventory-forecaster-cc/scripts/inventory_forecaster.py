@@ -9504,10 +9504,9 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
           l26_avg < l52_avg * 0.85):
         yoy_pct = (l26_avg / l52_avg - 1.0) * 100
         expl = (f"L26W ({l26_avg:.0f}/wk) is {yoy_pct:+.0f}% vs L52W "
-                f"({l52_avg:.0f}/wk) — this isn't a 4-week dip, it's been "
-                f"cooling across multiple quarters at {cl}. Pattern usually "
-                f"means real demand softening (category contraction, "
-                f"distribution loss) rather than seasonal.")
+                f"({l52_avg:.0f}/wk) -- below the same period last year and "
+                f"below the L26W window. Multi-quarter pattern at {cl}; "
+                f"investigate with the sales team.")
     # 5) YoY momentum (up direction confirmed by L26 > L52).
     elif (short_pct > 0 and l52_avg and l52_avg > 0 and
           l26_avg > l52_avg * 1.10):
