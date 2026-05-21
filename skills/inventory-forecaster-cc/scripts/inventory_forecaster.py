@@ -7458,26 +7458,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"forward supply — near-term gap pre-covered"
                 )
 
-        # ── F59i — POS anchor for Amazon Seasonal Baseline items ─────────────
-        # Two paths share this block:
+        # ── F59i — POS anchor for non-EC Amazon items ────────────────────────
+        # EC/COS/AMZ variants inherit parent DC-replenishment order history via
+        # F60.  That history is real demand signal -- planners project at or
+        # above that rate because Amazon orders to maintain DC inventory, not
+        # just to match consumer POS.  Anchoring EC items to POS would suppress
+        # legitimate replenishment demand.  EC items are EXCLUDED from F59i.
         #
-        # Path A — EC/COS drop-ship variants (2026-05-20):
-        #   EC items ship direct-to-consumer; they have no own order history so
-        #   F60 inherits the PARENT's lumpy DC-replenishment orders, which are
-        #   completely irrelevant for drop-ship demand.  VP-Q2 then inflates the
-        #   baseline further by treating the parent's normal inventory-draw gaps
-        #   as OOS weeks.  DC WOS is also irrelevant for EC fulfillment.
-        #   Correct by anchoring 100% to POS L13W (the true consumer signal),
-        #   bypassing the WOS gate entirely.  Fires when the 26w forecast avg
-        #   is >10% above POS L4W.
+        # For non-EC items: when the near-term forecast (W1-W4 non-zero avg)
+        # runs >15% above POS L4W and the DC has adequate coverage (WOS >= 6),
+        # the order-history baseline is likely inflated by inventory build rather
+        # than genuine demand growth.  Blend toward POS L13W.
         #
-        # Path B — Standard Seasonal Baseline items (2026-05-20):
-        #   When the near-term forecast (W1-W4 non-zero avg) runs >15% above POS
-        #   L4W and the DC has adequate coverage (WOS >= 6), the order-history
-        #   baseline is likely inflated by inventory build rather than genuine
-        #   demand growth.  Blend the forecast 50% toward POS L13W.
-        #
-        # Common gates: is_amazon, POS data present, not DI-blended.
+        # Gates: is_amazon, non-EC, POS data present, not DI-blended.
         _f59i_ms = (row.get("Mstyle") or row.get("mstyle") or "").upper()
         _f59i_is_ec = (_f59i_ms.endswith("EC") or _f59i_ms.endswith("COS")
                        or _f59i_ms.endswith("AMZ"))
@@ -7492,46 +7485,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f59i_pos_l52 = float(pos_data.get("Avg_Units_Wk_L52w") or 0)
             _f59i_wos     = _f59h_wos   # reuse WOS computed in F59h block above
 
-            if _f59i_is_ec and _f59i_pos_l4 > 0 and _f59i_pos_l13 > 0:
-                # ── Path A: EC/COS drop-ship — anchor fully to POS ───────────
-                # EC items ship direct-to-consumer; inherited parent DC-replen
-                # history is irrelevant for drop-ship demand. DC WOS bypassed.
-                _f59i_26w_avg = sum(fcst) / max(len(fcst), 1)
-                if _f59i_26w_avg > _f59i_pos_l4 * 1.10 and _f59i_26w_avg > 0:
-                    # Anchor target = max(L13W, L4W): if current consumer demand
-                    # (L4W) exceeds the 13-week average (acceleration), anchor to
-                    # the CURRENT rate, not the older lower average.  Anchoring to
-                    # L13W alone under-projects when the item is accelerating.
-                    _f59i_ec_target = max(_f59i_pos_l13, _f59i_pos_l4)
-                    _f59i_ec_which  = "L4W" if _f59i_pos_l4 > _f59i_pos_l13 else "L13W"
-                    _f59i_ec_anchor = min(1.0, _f59i_ec_target / _f59i_26w_avg)
-                    _f59i_old_avg   = _f59i_26w_avg
-                    _f59i_ec_floor  = snap(_f59i_ec_target, mp)
-                    for _wi in range(len(fcst)):
-                        # Proportionally rescale (brings 26W avg to ec_target)
-                        # then floor each non-zero week at ec_target so that the
-                        # inherited DC-seasonal trough never drops below consumer
-                        # demand.  EC drop-ship tracks consumer sell-through, not
-                        # DC inventory cycles -- demand is materially steadier than
-                        # the parent's lumpy replenishment pattern implies.
-                        if fcst[_wi] > 0:
-                            fcst[_wi] = snap(
-                                max(fcst[_wi] * _f59i_ec_anchor, _f59i_ec_floor), mp)
-                    _fire("F59i")
-                    if isinstance(meta, dict):
-                        meta.setdefault("drivers", []).append(
-                            f"F59i-EC POS anchor: AI avg was {_f59i_old_avg:.0f}/wk "
-                            f"-- inflated by F60 parent DC-replenishment history "
-                            f"(irrelevant for EC drop-ship demand). Anchored to "
-                            f"consumer POS {_f59i_ec_which} "
-                            f"{_f59i_ec_target:.0f}/wk = max(L13W {_f59i_pos_l13:.0f}, "
-                            f"L4W {_f59i_pos_l4:.0f}); "
-                            f"(rescale x{_f59i_ec_anchor:.3f}). DC WOS bypassed "
-                            f"-- EC fulfillment is direct-to-consumer, not "
-                            f"DC-dependent."
-                        )
-
-            elif (not _f59i_is_ec
+            if (not _f59i_is_ec
                     and _f59i_pos_l4 >= 100 and _f59i_pos_l13 > 0
                     and amz_catalog
                     and (_f59h_wos >= 6 or _f59h_wos == 0)):
