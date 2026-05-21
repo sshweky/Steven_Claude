@@ -6261,7 +6261,8 @@ const _PRI_ORDINAL = { CRITICAL: 3, MEDIUM: 2, LOW: 1 };
 // ai_vs_proj is computed on the fly (not stored on the record), so the sorter
 // + column filter need to compute it on demand.
 function _aiVsProjPct(r) {
-  return r.proj_total > 0 ? ((r.ai_total - r.proj_total) / r.proj_total * 100) : 0;
+  if (r.proj_total > 0) return (r.ai_total - r.proj_total) / r.proj_total * 100;
+  return r.ai_total > 0 ? null : 0;  // null = no plan entered (sorts last); 0 = both zero
 }
 
 // Pull a value out of a record by data-sort-key.  Handles the synthetic
