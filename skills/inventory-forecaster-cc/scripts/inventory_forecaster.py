@@ -9492,6 +9492,32 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
     specific = []   # Non-obvious specific callouts (alert sentences, PO context, smart trend)
     gap_pill = []   # Plan vs AI gap summary — only if >= 15% gap; lowest priority
 
+    # ── Critical: F70 Switchover variant conflict ─────────────────────────────
+    # When a variant style (EC/COS/AMZ/...) at the same account has demand in
+    # specific weeks, prepend a top-of-analysis bullet explaining the switchover
+    # so the planner understands why those weeks show 0 in the AI forecast.
+    _f70 = rec.get("f70_switchover") or {}
+    if _f70:
+        _f70_variants = sorted({v for vl in _f70.values() for v in vl})
+        _f70_weeks    = sorted(_f70.keys())
+        _f70_first_wk = _f70_weeks[0] + 1   # 1-indexed
+        _f70_var_str  = ", ".join(_f70_variants)
+        # Describe the week span concisely
+        if len(_f70_weeks) == 1:
+            _f70_wk_desc = f"W{_f70_first_wk}"
+        elif _f70_weeks == list(range(_f70_weeks[0], _f70_weeks[-1] + 1)):
+            # Contiguous block
+            _f70_wk_desc = f"W{_f70_first_wk}-W{_f70_weeks[-1]+1}"
+        else:
+            _f70_wk_desc = ", ".join(f"W{w+1}" for w in _f70_weeks[:6])
+            if len(_f70_weeks) > 6:
+                _f70_wk_desc += f" (+{len(_f70_weeks)-6} more)"
+        critical.insert(0,
+            f"<b>Demand switched to {_e(_f70_var_str)}</b> as of W{_f70_first_wk} -- "
+            f"AI projections zeroed for {_f70_wk_desc} on this base style. "
+            f"Consider marking those weeks CLOSED."
+        )
+
     # ── Critical: EC supersession warning ────────────────────────────────────
     if ec_superseded:
         critical.append(
