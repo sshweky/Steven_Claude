@@ -1,0 +1,9 @@
+{
+  "id": "5",
+  "subject": "Run forecast --all --validate + push validation to QB",
+  "description": "Run run_forecast.py --all --validate, then push_validation_qb.py when complete",
+  "activeForm": "Running forecast --all --validate",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
