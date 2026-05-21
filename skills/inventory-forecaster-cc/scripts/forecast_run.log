@@ -26,4 +26,7 @@
   [watchdog] still running — 100s since last output | last:   [CData] session ready.
       2280 master pack records loaded (164 with Season tag)
 
-[2.5] Pulling Amazon cat      2280 master pack records   [watchdog] still running — 5s since last output | last: [2.5] Pulling Amazon catalog   [watchdog] still running  [watchdog] still running — 65s since last output | last: [2.5] Pulling Amazon catalog   [watchdog] still running  [watchdog] still running — 125s since last output | last: [2.5] Pulling Amazon catalog POS for 1900 mstyles ...
+[2.5] Pulling Amazon cat      2280 master pack records   [watchdog] still running — 5s since last output | last: [2.5] Pulling Amazon catalog   [watchdog] still running  [watchdog] still running — 65s since last output | last: [2.5] Pulling Amazon catalog   [watchdog] still running  [watchdog] still running — 125s since last output | last: [2.5] Pulling Amazon catalog   [watchdog] still running  [watchdog] still running — 185s since last output | last: [2.5] Pulling Amazon catalog       1661 mstyles with PO      1661 mstyles with POS data loaded
+      viewer_pos_cache.json refreshed (1661 mstyles)
+
+[2.6] Pulling Amazon Catalog US (F38 signa  [watchdog] still running  [watchdog] still running — 39s since last output | last: [2.6] Pulling Amazon Catalog US (F38 signa  [watchdog] still running  [watchdog] still running — 99s since last output | last: [2.6] Pulling Amazon Catalog US (F38 signa  [watchdog] still running  [watchdog] still running — 159s since last output | last: [2.6] Pulling Amazon Catalog US (F38 signals) fo

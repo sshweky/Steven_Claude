@@ -1630,24 +1630,23 @@ async function lookupInvRequest(key, requestIdStr) {
 
   setMsg('Looking up...', '#888');
   try {
-    const F = CFG.INV_REQ_FID;
+    const F       = CFG.INV_REQ_FID;
+    const safeQbKey = key.replace(/'/g, "\\'");
     const resp = await qb('/records/query', {
       from:    CFG.INV_REQ_DETAIL_TID,
       select:  [F.RELATED_REQ_ID, F.ACCT_MSTYLE, F.POG_SET_DATE, F.POG_END_DATE,
                 F.ISO_UNITS, F.ISO_PIPELINE, F.STORES, F.UPSPW],
-      where:   `{${F.RELATED_REQ_ID}.EX.${rid}}`,
+      where:   `{${F.RELATED_REQ_ID}.EX.${rid}}AND{${F.ACCT_MSTYLE}.EX.'${safeQbKey}'}`,
       options: { top: 1 },
     });
 
     const rows = resp?.data || [];
-    if (!rows.length) { setMsg(`No request found with ID ${rid}.`, '#c00'); return; }
-
-    const row    = rows[0];
-    const rowKey = (row[F.ACCT_MSTYLE]?.value  || '').trim();
-    if (rowKey !== key) {
-      setMsg(`Request ${rid} belongs to "${rowKey}", not this item.`, '#c00');
+    if (!rows.length) {
+      setMsg(`No record found for Request #${rid} with item ${key}.`, '#c00');
       return;
     }
+
+    const row = rows[0];
 
     // Strip timestamps -- QB dates arrive as "YYYY-MM-DDT..." or plain "YYYY-MM-DD"
     const toIso = v => { if (!v) return ''; const m = String(v).match(/^(\d{4}-\d{2}-\d{2})/); return m ? m[1] : ''; };
