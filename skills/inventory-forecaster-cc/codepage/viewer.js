@@ -1643,7 +1643,7 @@ async function lookupInvRequest(key, requestIdStr) {
     if (!rows.length) { setMsg(`No request found with ID ${rid}.`, '#c00'); return; }
 
     const row    = rows[0];
-    const rowKey = (row[F.ACCT_MSTYLE]?.value || '').trim();
+    const rowKey = (row[F.ACCT_MSTYLE]?.value  || '').trim();
     if (rowKey !== key) {
       setMsg(`Request ${rid} belongs to "${rowKey}", not this item.`, '#c00');
       return;
