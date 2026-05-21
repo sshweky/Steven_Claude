@@ -8611,17 +8611,23 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
     else:
         priority = "LOW"
 
-    # Map to QB Validation Pattern dropdown values — mirrors forecast_record() 3-tier routing
-    if pattern == "inactive":
+    # Map to QB Validation Pattern dropdown values -- mirrors forecast_record() 3-tier routing.
+    # M4 (2026-05-21): When F70 switchover conflicts cover >= 50% of weeks,
+    # surface "switchover_closed" so planners see a single record-level
+    # explanation (matches the per-week CRITICAL switchover_conflict flags).
+    _f70_wk_count = sum(1 for w in weeks_out if w.get("flag") == "switchover_conflict")
+    if _f70_wk_count >= 13:
+        qb_pattern = "switchover_closed"
+    elif pattern == "inactive":
         qb_pattern = "inactive"
     elif iso["is_iso"]:
         qb_pattern = "new_item"            # ISO = first time this retailer carries the item
     elif not is_croston:
-        qb_pattern = "sparse_intermittent" # < 25% non-zero: truly lumpy (every 6–12 wks)
+        qb_pattern = "sparse_intermittent" # < 25% non-zero: truly lumpy (every 6-12 wks)
     elif not is_dense:
-        qb_pattern = "intermittent"        # 25–50% non-zero: Croston's (every 2–5 wks)
+        qb_pattern = "intermittent"        # 25-50% non-zero: Croston's (every 2-5 wks)
     else:
-        qb_pattern = "steady"              # ≥ 50% non-zero: Seasonal Baseline
+        qb_pattern = "steady"              # >= 50% non-zero: Seasonal Baseline
 
     return {
         "key":              row["Acct_MStyle_Key_"],
