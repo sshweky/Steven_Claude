@@ -10202,8 +10202,11 @@ def main():
         acct_mstyles.setdefault(_acct, set()).add(_ms)
     for _acct, _mss in acct_mstyles.items():
         for _ms in _mss:
-            if _ms.endswith("EC") and _ms[:-2] in _mss:
-                ec_parents.add(f"{_acct}-{_ms[:-2]}")
+            _ds_sfx = (2 if _ms.endswith("EC")
+                       else 3 if (_ms.endswith("COS") or _ms.endswith("AMZ"))
+                       else 0)
+            if _ds_sfx and _ms[:-_ds_sfx] in _mss:
+                ec_parents.add(f"{_acct}-{_ms[:-_ds_sfx]}")
 
     # F60 — EC-transition history inheritance (2026-05-15).
     # When an EC variant ({mstyle}EC) exists for the same account as the
