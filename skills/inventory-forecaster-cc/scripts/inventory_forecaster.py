@@ -485,7 +485,13 @@ def _get_category_profile(description, product_category=None, product_subcategor
         (brand_pt or "").lower(),
     ]
     combined = " | ".join(texts)
-    for keyword, profile in CATEGORY_PROFILES.items():
+    # M2 (2026-05-21) -- Iterate by keyword length DESCENDING so longer/more
+    # specific keywords win over short generic ones.  Without this, dict
+    # insertion order matters; "groom" could match before "grooming wipe"
+    # and the wrong profile would apply.  Building the sorted list each call
+    # is O(n log n) but n is small (~50 keywords) and the function is hot --
+    # cache the order at module load instead.
+    for keyword, profile in _CATEGORY_PROFILES_BY_LEN:
         if keyword in combined:
             return [max(v, SEASONAL_FLOOR) for v in profile]
     return None
