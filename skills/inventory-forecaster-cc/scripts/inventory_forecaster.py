@@ -8252,6 +8252,11 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
     # Read manual projections
     manual = [float(row.get(c) or 0) for c in ORIG_PRJ_COLS]
 
+    # F61 -- resolve switchover conflict weeks for this base style (if any)
+    _f61_sw_entry = {}
+    if switchover_weeks:
+        _f61_sw_entry = switchover_weeks.get(row.get("Acct_MStyle_Key_", ""), {})
+
     weeks_out = []
     flags_total   = 0
     max_severity  = "OK"
@@ -8262,7 +8267,7 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         sf   = season[w]
         wnum = w + 1   # 1-indexed week number
 
-        # Event lift for this week — both Prime Day AND Fall Deal are Amazon-only
+        # Event lift for this week -- both Prime Day AND Fall Deal are Amazon-only
         if is_amazon and wnum in PRIME_DAY_WEEKS:
             ev_lift = PRIME_DAY_LIFT
         elif is_amazon and wnum in FALL_DEAL_WEEKS:
@@ -8278,7 +8283,7 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         severity = None
         reason   = None
 
-        # Event context for messages — both events are Amazon-only
+        # Event context for messages -- both events are Amazon-only
         ev_note = ""
         if is_amazon and wnum in PRIME_DAY_WEEKS:
             ev_note = " This is a Prime Day pre-order week (Amazon only)."
@@ -8287,10 +8292,27 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
 
         # ISO settle-period: retailer just took the item; low/zero projections
         # are expected while product ships to stores and sales develop.
-        # Suppress undershoot and sudden_stop flags — they are false positives.
+        # Suppress undershoot and sudden_stop flags -- they are false positives.
         iso_settling = iso["is_iso"] and iso.get("in_settle", False)
 
-        if pattern == "inactive" and proj > 0:
+        # F61 -- Switchover conflict check (highest priority; overrides other flags).
+        # The retailer orders either the base style or the variant -- not both.
+        # If the variant has demand in this week, any projection on the base is
+        # double-counting.  Alert the planner to mark the base as CLOSED.
+        if w in _f61_sw_entry:
+            _sw_variants = _f61_sw_entry[w]
+            flag     = "switchover_conflict"
+            severity = "CRITICAL"
+            _var_str = ", ".join(sorted(set(_sw_variants)))
+            reason   = (
+                f"Switchover conflict: variant style(s) {_var_str} already "
+                f"have projections or open orders in W{wnum} -- the customer "
+                f"will order one or the other, not both. Remove the projection "
+                f"from this base style for W{wnum} and consider marking this "
+                f"record CLOSED."
+            )
+
+        elif pattern == "inactive" and proj > 0:
             flag     = "inactive_with_demand"
             severity = "CRITICAL"
             reason   = (f"This account hasn't ordered in 13 weeks — they've "
