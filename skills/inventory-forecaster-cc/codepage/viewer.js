@@ -1236,7 +1236,9 @@ function _fcstStatus(ai_model, ai_total, proj_total) {
   const maxVal = Math.max(ai_total, proj_total);
   const gap    = Math.abs(ai_total - proj_total);
   if (maxVal < 1000 || gap < 500) return '';
-  const pct = proj_total > 0 ? (ai_total - proj_total) / proj_total * 100 : 0;
+  // No plan entered but AI has demand: manual is Under-Projected (can't compute a %).
+  if (proj_total === 0 && ai_total > 0) return 'Under-Projected';
+  const pct = (ai_total - proj_total) / proj_total * 100;
   if (pct <= -5) return 'Over-Projected';
   if (pct >=  5) return 'Under-Projected';
   return 'On Plan';
