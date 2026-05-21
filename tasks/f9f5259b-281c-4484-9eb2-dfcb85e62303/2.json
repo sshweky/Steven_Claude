@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Run full Amazon re-forecast + validate + push",
+  "description": "Run run_forecast.py --all --validate for all Amazon records with the three new fixes (F59i Path A max anchor + EC floor, EC amz_catalog parent fallback, F59m low-DC restock uplift), then push validation results.",
+  "activeForm": "Running full Amazon re-forecast",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

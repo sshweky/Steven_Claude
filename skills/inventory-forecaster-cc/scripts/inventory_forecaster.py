@@ -10084,8 +10084,10 @@ def main():
         warning_ct  = sum(1 for r in val_results if r["max_severity"] == "WARNING")
         clean_ct    = sum(1 for r in val_results if r["max_severity"] == "OK")
         pri_crit    = sum(1 for r in val_results if r["priority"] == "CRITICAL")
-        pri_med     = sum(1 for r in val_results if r["priority"] == "MEDIUM")
+        pri_high    = sum(1 for r in val_results if r["priority"] == "HIGH")
+        pri_mid     = sum(1 for r in val_results if r["priority"] == "MID")
         pri_low     = sum(1 for r in val_results if r["priority"] == "LOW")
+        pri_onplan  = sum(1 for r in val_results if r["priority"] == "On-Plan")
         val_output = {
             "meta": {
                 "generated_at": datetime.now().isoformat(timespec="seconds"),
@@ -10105,8 +10107,10 @@ def main():
                 "clean_records":     clean_ct,
                 "total_flags":       sum(r["n_flags"] for r in val_results),
                 "priority_critical": pri_crit,
-                "priority_medium":   pri_med,
+                "priority_high":     pri_high,
+                "priority_mid":      pri_mid,
                 "priority_low":      pri_low,
+                "priority_on_plan":  pri_onplan,
             },
             "records": val_results,
         }
