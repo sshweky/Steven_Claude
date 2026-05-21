@@ -1612,8 +1612,8 @@ window.saveInitUpspw = saveInitUpspw;
 // POG fields on the Projections table.
 //
 // Fields read from Inventory Request Detail (btjf9wtis):
-//   fid 3  = Record ID#        (lookup key)
-//   fid 36 = Acct#-Mstyle      (verified against current key)
+//   fid 16 = Related Request ID# (lookup key the planner types in)
+//   fid 36 = Acct#-Mstyle        (verified against current key)
 //   fid 43 = POG Set Date      -> POG Launch (fid 1594 on Projections)
 //   fid 44 = POG End Date      -> POG End (fid 1595 on Projections)
 //   fid 22 = ISO Units         -> Est ISO Input (fid 1606 on Projections)
