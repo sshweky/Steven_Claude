@@ -500,9 +500,11 @@ def _adapt_forecast_to_validation(rec):
     ai_vs_man_pct = (abs(ai_total - manual_total) / manual_total * 100
                      if manual_total > 0 else 999.0)
 
-    # Priority: On-Plan wins at any volume when gap <= 5% and plan exists.
+    # Priority: On-Plan wins when AI and Man are aligned.
+    # Two cases: (1) both zero -- nothing to review; (2) plan entered and gap <= 5%.
     # Otherwise tier by AI weekly rate.
-    if manual_total > 0 and ai_vs_man_pct <= 5:
+    _both_zero = manual_total == 0 and ai_total == 0
+    if _both_zero or (manual_total > 0 and ai_vs_man_pct <= 5):
         priority = "On-Plan"
     elif ai_per_wk >= 1000:
         priority = "CRITICAL"
