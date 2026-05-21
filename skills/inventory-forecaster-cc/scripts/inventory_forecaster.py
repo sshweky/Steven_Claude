@@ -2014,7 +2014,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         meta.setdefault("drivers", []).append(
             f"F50 stockout-pattern skip: L4 has {_l4_zeros_f50} zero week(s) but "
             f"L13 has {_l13_active_f50}/13 active weeks → likely stockout, not "
-            f"decay; F6/F26 cuts skipped to preserve L13 baseline"
+            f"decay; F6b/F26 cuts skipped to preserve L13 baseline"
         )
     if _f51_applied:
         meta.setdefault("drivers", []).append(
