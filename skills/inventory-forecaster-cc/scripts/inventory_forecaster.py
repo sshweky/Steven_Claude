@@ -6762,12 +6762,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # would run short, cap the AI projection to what we can ship and roll
     # the unmet portion forward as a backlog cohort that decays 25% per
     # week of non-shipment (matches F34/F35 schedule; fully lost at age 4+).
+    # B9 fix (2026-05-21): apply_oh_shortfall_adjustment already snaps each
+    # output value to MP, so the previous re-snap caused silent integer
+    # drift on non-MP values.  Trust the returned list directly.
     if model not in ("Inactive",):
         _adjusted_f37, _f37_adjustments = apply_oh_shortfall_adjustment(row, fcst)
         if _f37_adjustments:
-            # Snap to master pack to keep ship qty consistent with cadence
-            fcst = [int(round(v / mp)) * int(mp) if v > 0 and mp > 0 else int(v)
-                    for v in _adjusted_f37]
+            fcst = list(_adjusted_f37)
             if isinstance(meta, dict):
                 meta["oh_shortfall_adjustments"] = _f37_adjustments
                 _changed_weeks = sorted({a["week"] for a in _f37_adjustments})
