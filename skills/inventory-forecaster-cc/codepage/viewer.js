@@ -2938,7 +2938,8 @@ function renderPage(page) {
       + (r.manager_reply_pending ? ' row-mgr-pending'    : '');
     tr.dataset.key = r.key;
 
-    const aiVsProj = r.proj_total > 0 ? ((r.ai_total - r.proj_total) / r.proj_total * 100) : 0;
+    const aiVsProj = r.proj_total > 0 ? ((r.ai_total - r.proj_total) / r.proj_total * 100)
+                   : (r.ai_total > 0 ? null : 0);  // null = no plan entered; 0 = both zero
     const aiVsL13  = (r.ai_vs_l13  == null ? 0 : r.ai_vs_l13);
     const manVsL13 = (r.man_vs_l13 == null ? 0 : r.man_vs_l13);
     const l13Avail = r.shp_wk > 0;
