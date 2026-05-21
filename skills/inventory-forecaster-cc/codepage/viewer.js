@@ -6420,7 +6420,9 @@ function applyFilters() {
     if (custSet.size       && !custSet.has(r.cust))                    return false;
     if (fcstStatusSet.size && !fcstStatusSet.has(r.fcst_status))       return false;
     if (aiDiffMin > 0) {
-      const aiVsProj = r.proj_total > 0 ? Math.abs((r.ai_total - r.proj_total) / r.proj_total * 100) : 0;
+      // No-plan + AI has demand = infinite divergence, always passes the filter.
+      const aiVsProj = r.proj_total > 0 ? Math.abs((r.ai_total - r.proj_total) / r.proj_total * 100)
+                     : (r.ai_total > 0 ? Infinity : 0);
       if (aiVsProj < aiDiffMin) return false;
     }
     // Per-column quick filters (AND with everything above)
