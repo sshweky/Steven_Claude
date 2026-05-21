@@ -501,7 +501,7 @@ def _adapt_forecast_to_validation(rec):
                      if manual_total > 0 else 999.0)
 
     # Priority: On-Plan wins when AI and Man are aligned.
-    # Two cases: (1) both zero -- nothing to review; (2) plan entered and gap <= 5%.
+    # Two cases: (1) both zero -- nothing to review; (2) plan entered and gap <= 7.5%.
     # Otherwise tier by AI weekly rate.
     _both_zero = manual_total == 0 and ai_total == 0
     if _both_zero or (manual_total > 0 and ai_vs_man_pct <= 5):
