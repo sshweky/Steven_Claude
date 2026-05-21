@@ -3635,14 +3635,14 @@ def classify(history):
     The Seasonal Baseline model handles all active items regardless of
     how many weeks they've been ordering or how variable the sizes are.
 
-    F6 — Inactive-with-Activity reclassification. Before declaring an item
-    "inactive" (L13W all zeros), look further back. If the item has meaningful
-    L26W or L52W order activity, re-route it to a heuristic path instead of
-    zeroing its forecast.
+    F6a (renamed from F6 2026-05-21 to break tag collision) -- Inactive-with-
+    Activity reclassification. Before declaring an item "inactive" (L13W all
+    zeros), look further back. If the item has meaningful L26W or L52W order
+    activity, re-route it to a heuristic path instead of zeroing its forecast.
     """
     l13 = history[-13:]
     if sum(l13) == 0:
-        # F6 — check further-back windows before giving up on the item.
+        # F6a -- check further-back windows before giving up on the item.
         l26 = history[-26:]
         l52 = history[-52:] if len(history) >= 52 else history
         l26_nz_cnt = sum(1 for v in l26 if v > 0)
