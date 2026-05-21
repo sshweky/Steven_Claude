@@ -62,7 +62,8 @@ QB_OPEN_POS_REPORT = int(os.environ.get("QB_OPEN_POS_REPORT", "27"))
 QB_OPEN_POS_CACHE_HOURS = int(os.environ.get("QB_OPEN_POS_CACHE_HOURS", "24"))
 ALERT_THRESHOLD = 0.05   # 5% variance vs prior triggers AI_ALERT write
 
-# Smoothing parameters (Holt-Winters)
+# Smoothing parameters (legacy -- holt_winters() removed 2026-05-21;
+# constants retained as documentation of original level/trend smoothing intent)
 HW_ALPHA = 0.3   # level
 HW_BETA  = 0.1   # trend
 CR_ALPHA = 0.3   # Croston's demand + interval
