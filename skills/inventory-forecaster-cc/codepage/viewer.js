@@ -1883,7 +1883,7 @@ function adaptRow(row) {
   // When manual=0 and AI>0, pct_diff is null (no plan entered) -- tier by AI volume, NOT On-Plan.
   const _both_zero = manual_total === 0 && ai_total === 0;
   let priority;
-  if (_both_zero || (pct_diff !== null && pct_abs <= 5)) {
+  if (_both_zero || (pct_diff !== null && pct_abs <= 7.5)) {
     priority = 'On-Plan';
   } else if (ai_per_wk >= 1000) {
     priority = 'CRITICAL';
