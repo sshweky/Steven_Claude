@@ -7670,7 +7670,21 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 f"inventory noise. Model: {model}."
                             )
                     else:
-                        if _f59i_ratio > 1.40 and not _f59i_wos_capped:
+                        if _f59i_ratio > 1.40 and _f59i_ec_override:
+                            # EC-transition anchor: inherited parent history
+                            # over-represents forward demand for the new EC ASIN.
+                            # Use max(POS_LW, POS_L4W) as the direct anchor --
+                            # no 0.60 floor, because we have a confirmed genuine
+                            # demand signal (AUR >= MAP checked in override gate).
+                            # F59m will add gap-fill uplift on top.
+                            _f59i_pos_lw_ec = float(
+                                (pos_data or {}).get("Ordered_Units_LW") or 0)
+                            _f59i_anchor = (
+                                max(_f59i_pos_lw_ec, _f59i_pos_l4)
+                                / max(_f59i_w1_4_avg, 1)
+                            )
+                            _f59i_mode   = "EC-anchor"
+                        elif _f59i_ratio > 1.40 and not _f59i_wos_capped:
                             # Severe: anchor to POS L4W (floor 0.60 guards against
                             # temporarily-depressed POS reading).
                             # Only fires when WOS is confirmed >= 6 (known healthy).
