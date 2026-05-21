@@ -2187,7 +2187,9 @@ function fmtN(n) { return n == null ? '-' : Number(n).toLocaleString(); }
 function escHtml(s) { return String(s == null ? '' : s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]); }
 function priLabel(p) {
   if (p === 'CRITICAL') return '<span class="pri-crit">CRITICAL</span>';
-  if (p === 'MEDIUM')   return '<span class="pri-med">MEDIUM</span>';
+  if (p === 'HIGH')     return '<span class="pri-med">HIGH</span>';
+  if (p === 'MID')      return '<span class="pri-med">MID</span>';
+  if (p === 'On-Plan')  return '<span class="pri-low" style="color:#2e7d32">On-Plan</span>';
   return '<span class="pri-low">LOW</span>';
 }
 
