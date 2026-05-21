@@ -1258,17 +1258,19 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     else:
         _f4_applied = False
 
-    # F6 — L4/L13 decay dampener.  Persistent recent softening is a history-
-    # only signal that recent demand is dropping off.  When the L4 non-zero
-    # avg is <= 50% of L13 non-zero avg AND there are >=2 active weeks in L4
-    # (so this isn't one zero week driving the signal), scale the baseline
-    # down by 0.65x — a gentle one-tier step-down.  Complements M2 EOL logic
-    # which requires status-token evidence; F6 uses pure data.
+    # F6b (renamed from F6 2026-05-21 to break tag collision with F6a in
+    # classify() and F6c in forecast_record sparse branch) -- L4/L13 decay
+    # dampener.  Persistent recent softening is a history-only signal that
+    # recent demand is dropping off.  When the L4 non-zero avg is <= 50% of
+    # L13 non-zero avg AND there are >=2 active weeks in L4 (so this isn't
+    # one zero week driving the signal), scale the baseline down by 0.65x --
+    # a gentle one-tier step-down.  Complements M2 EOL logic which requires
+    # status-token evidence; F6b uses pure data.
     _l4_nz_f6  = [v for v in history[-4:]  if v > 0]
     _l13_nz_f6 = l13_nz
     _f6_applied = False
-    # F50 — Stockout-pattern guard (2026-05-08, planner callout).
-    # F6's hard 0.65× cut and F26's 0.85× cut both trigger when L4 nz-avg is
+    # F50 -- Stockout-pattern guard (2026-05-08, planner callout).
+    # F6b's hard 0.65x cut and F26's 0.85x cut both trigger when L4 nz-avg is
     # much lower than L13 nz-avg.  But that ratio doesn't distinguish
     # legitimate demand decay (item is going away) from a stockout (item is
     # temporarily unavailable, demand still exists).  When the L4 window has
