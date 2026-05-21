@@ -2511,7 +2511,7 @@ function editCustSku(key, cellEl) {
   const inp = document.createElement('input');
   inp.type = 'text';
   inp.value = current;
-  inp.style.cssText = 'font-size:11px;padding:1px 4px;border:1px solid #1565c0;border-radius:3px;width:120px;';
+  inp.style.cssText = 'font-size:11px;padding:1px 4px;border:1px solid #1565c0;border-radius:3px;min-width:180px;width:max-content;max-width:320px;position:relative;z-index:10;';
   cellEl.innerHTML = '';
   cellEl.appendChild(inp);
   inp.focus();
