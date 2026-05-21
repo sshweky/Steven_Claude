@@ -34,8 +34,21 @@ window.QB_CONFIG = {
   PROJECTIONS_TID: "bpd237tvm",   // InventoryTrack > Projections
   COMMENTS_TID:    "bpt35zccg",   // InventoryTrack > Projection Comments (mgr <-> planner thread)
   AI_COMMENTS_TID: "bv2jirwts",   // AI Comments table  -  separate from Projection Comments; stores AI Event adjustments
-  INV_FLOW_TID:    "bpsaju5pm",   // InventoryTrack > Inventory Flow (warehouse projected balances by week)
-  ORDER_HIST_TID:  "bpe4maa4c",   // InventoryTrack > Order History (cancellation detail)
+  INV_FLOW_TID:       "bpsaju5pm",   // InventoryTrack > Inventory Flow (warehouse projected balances by week)
+  ORDER_HIST_TID:     "bpe4maa4c",   // InventoryTrack > Order History (cancellation detail)
+  INV_REQ_DETAIL_TID: "btjf9wtis",   // InventoryTrack > Inventory Request Detail (sales request POG data)
+
+  // Field IDs on Inventory Request Detail (btjf9wtis)
+  INV_REQ_FID: {
+    RECORD_ID:    3,   // QB Record ID# -- the lookup key the planner types in
+    ACCT_MSTYLE: 36,   // Acct#-Mstyle  -- verified against current projection key
+    POG_SET_DATE:43,   // POG Set Date
+    POG_END_DATE:44,   // POG End Date
+    ISO_UNITS:   22,   // ISO Units (initial stocking qty)
+    ISO_PIPELINE:14,   // ISO Pipeline Qty (read-only display only)
+    STORES:      11,   // # Stores
+    UPSPW:       12,   // Units Per Store Per Week
+  },
 
   // -- Field IDs on Projections (bpd237tvm) --------------------------------
   FID: {
