@@ -9304,9 +9304,10 @@ historical data shows materially different values.</em></p>
 
 <h2>8. Forecasting Roadmap</h2>
 <ul>
-  <li><strong>Holt-Winters:</strong> Recursive α={HW_ALPHA}/β={HW_BETA} over 78-obs 3x-weighted series.
+  <li><strong>Seasonal Baseline:</strong> L13W non-zero avg with VP-Q1 baseline-mode
+      gating, position-based seasonal profile damped to flat (DAMP=0.1).
       Bi-weekly cadence enforcement applied post-forecast for steady items.</li>
-  <li><strong>Croston's:</strong> α={CR_ALPHA}, demand/interval refined 70% L13W / 30% smoothed.
+  <li><strong>Croston's:</strong> a={CR_ALPHA}, demand/interval refined 70% L13W / 30% smoothed.
       Event calendar insertions applied at Prime Day and Fall Deal windows.</li>
   <li><strong>Heuristic:</strong> Ramp weeks 1-6 post-launch excluded. Post-ramp avg → L13W → L52W fallback chain.</li>
   <li><strong>Inactive:</strong> Zero forecast. Alert written if prior projection &gt; 0.</li>
