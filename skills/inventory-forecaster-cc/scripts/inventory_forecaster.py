@@ -2036,7 +2036,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         )
     if _f16_relief:
         meta.setdefault("drivers", []).append(
-            f"F16 seasonal damping relief: DAMP=0.4 "
+            f"F16 seasonal damping relief: DAMP=0.85 "
             f"(category={'yes' if _seasonal_cat else 'no'}, "
             f"raw peak/trough={_raw_peak_trough:.2f}, "
             f"ord_base={ord_baseline:.0f}/wk, pos_L13={_pos_l13_f16:.0f}/wk)"
