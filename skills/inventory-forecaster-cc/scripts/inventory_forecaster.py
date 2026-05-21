@@ -9729,26 +9729,41 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
     # When a variant style (EC/COS/AMZ/...) at the same account has demand in
     # specific weeks, prepend a top-of-analysis bullet explaining the switchover
     # so the planner understands why those weeks show 0 in the AI forecast.
+    # Uses f70_switchover (all conflict weeks) for the "as of" week, and
+    # f70_zeroed_weeks (only weeks actually zeroed) for the action statement.
     _f70 = rec.get("f70_switchover") or {}
+    _f70_zeroed = rec.get("f70_zeroed_weeks") or {}
+    _f70_protected = rec.get("f70_planner_protected", False)
     if _f70:
         _f70_variants = sorted({v for vl in _f70.values() for v in vl})
         _f70_weeks    = sorted(_f70.keys())
         _f70_first_wk = _f70_weeks[0] + 1   # 1-indexed
         _f70_var_str  = ", ".join(_f70_variants)
-        # Describe the week span concisely
-        if len(_f70_weeks) == 1:
-            _f70_wk_desc = f"W{_f70_first_wk}"
-        elif _f70_weeks == list(range(_f70_weeks[0], _f70_weeks[-1] + 1)):
-            # Contiguous block
-            _f70_wk_desc = f"W{_f70_first_wk}-W{_f70_weeks[-1]+1}"
+        # Action statement reflects what actually changed in the AI
+        if _f70_protected:
+            _f70_action = (
+                "AI was NOT auto-zeroed because the model is Pre-launch passthrough "
+                "(planner manual is the only signal for unlaunched items)."
+            )
+        elif _f70_zeroed:
+            _zw = sorted(_f70_zeroed.keys())
+            if len(_zw) == 1:
+                _zw_desc = f"W{_zw[0]+1}"
+            elif _zw == list(range(_zw[0], _zw[-1] + 1)):
+                _zw_desc = f"W{_zw[0]+1}-W{_zw[-1]+1}"
+            else:
+                _zw_desc = ", ".join(f"W{w+1}" for w in _zw[:6])
+                if len(_zw) > 6:
+                    _zw_desc += f" (+{len(_zw)-6} more)"
+            _f70_action = f"AI projections zeroed for {_zw_desc} on this base style."
         else:
-            _f70_wk_desc = ", ".join(f"W{w+1}" for w in _f70_weeks[:6])
-            if len(_f70_weeks) > 6:
-                _f70_wk_desc += f" (+{len(_f70_weeks)-6} more)"
+            _f70_action = (
+                "AI was not changed because all conflict weeks were already 0 "
+                "or protected by explicit Tell-AI override."
+            )
         critical.insert(0,
             f"<b>Demand switched to {_e(_f70_var_str)}</b> as of W{_f70_first_wk} -- "
-            f"AI projections zeroed for {_f70_wk_desc} on this base style. "
-            f"Consider marking those weeks CLOSED."
+            f"{_f70_action} Consider marking those weeks CLOSED."
         )
 
     # ── Critical: EC supersession warning ────────────────────────────────────
