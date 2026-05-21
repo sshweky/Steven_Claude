@@ -471,11 +471,11 @@ def _adapt_forecast_to_validation(rec):
                         priority, max_severity, ai_total, ai_per_wk, ...}
 
     Priority logic (2026-05-21 revised):
-      - On-Plan: both zero (nothing to review) OR (Man > 0 AND AI vs Man gap <= 5%)
-      - CRITICAL: baseline >= 1,000/wk AND gap > 5%
-      - HIGH:     baseline 500-999/wk  AND gap > 5%
-      - MID:      baseline 200-499/wk  AND gap > 5%
-      - LOW:      baseline < 200/wk    AND gap > 5%
+      - On-Plan: both zero (nothing to review) OR (Man > 0 AND AI vs Man gap <= 7.5%)
+      - CRITICAL: baseline >= 1,000/wk AND gap > 7.5%
+      - HIGH:     baseline 500-999/wk  AND gap > 7.5%
+      - MID:      baseline 200-499/wk  AND gap > 7.5%
+      - LOW:      baseline < 200/wk    AND gap > 7.5%
     """
     forecast = list(rec.get("forecast") or [])
     manual   = list(rec.get("manual")   or [])
