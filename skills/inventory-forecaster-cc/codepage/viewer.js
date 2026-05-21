@@ -3051,6 +3051,12 @@ function renderPage(page) {
       <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.brand||'').replace(/"/g,'&quot;')}">${r.brand||''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.cust}</td>
       <td>${r.mstyle}</td>
+      <td class="cust-sku-cell" data-key="${r.key.replace(/"/g,'&quot;')}"
+          onclick="editCustSku('${r.key.replace(/'/g,"\\'")}', this)"
+          title="Click to edit Cust SKU#"
+          style="font-size:11px;white-space:nowrap;cursor:pointer;padding:2px 6px;border-bottom:1px dashed transparent;"
+          onmouseover="this.style.borderBottomColor='#1565c0'"
+          onmouseout="this.style.borderBottomColor='transparent'">${r.cust_sku || ''}</td>
       <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.desc||'').replace(/"/g,'&quot;')}">${r.desc||''}</td>
       ${_renderStatusCell(r.asin_status, r.key)}
       <td style="font-size:11px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.item_status||'').replace(/"/g,'&quot;')}">${r.item_status||''}</td>
