@@ -9715,10 +9715,11 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
 
     import re as _re
 
-    # Three priority buckets — filled in order until MAX_BULLETS is reached.
-    critical = []   # EC supersession, zero-history — always show regardless of count
-    specific = []   # Non-obvious specific callouts (alert sentences, PO context, smart trend)
-    gap_pill = []   # Plan vs AI gap summary — only if >= 15% gap; lowest priority
+    # Four priority buckets — filled in order until MAX_BULLETS is reached.
+    critical    = []   # critical flags (G2, F70, EC, truncation) — always shown first
+    specific    = []   # Non-obvious specific callouts (alert sentences, PO context, smart trend)
+    gap_pill    = []   # Plan vs AI gap summary — only if >= 15% gap; lowest priority
+    pinned_last = []   # Amazon POS Sales + DC Inv — always the final 2 bullets (Amazon only)
 
     # ── Critical: F70 Switchover variant conflict ─────────────────────────────
     # When a variant style (EC/COS/AMZ/...) at the same account has demand in
