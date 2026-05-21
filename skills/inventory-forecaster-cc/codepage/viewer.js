@@ -1239,8 +1239,8 @@ function _fcstStatus(ai_model, ai_total, proj_total) {
   // No plan entered but AI has demand: manual is Under-Projected (can't compute a %).
   if (proj_total === 0 && ai_total > 0) return 'Under-Projected';
   const pct = (ai_total - proj_total) / proj_total * 100;
-  if (pct <= -5) return 'Over-Projected';
-  if (pct >=  5) return 'Under-Projected';
+  if (pct <= -7.5) return 'Over-Projected';
+  if (pct >=  7.5) return 'Under-Projected';
   return 'On Plan';
 }
 
