@@ -5882,9 +5882,9 @@ function _parseAiAdjustment(text, currentForecast) {
   return {
     parsed: false,
     summary: "I couldn't translate that into a specific 26-week diff. Examples I can handle: " +
-             "\"boost June by 30%\", \"+25% in May for grooming season\", \"EOL by Aug 14\", " +
-             "\"double W14\", \"add 200 units/wk through October\", \"ramp up starting July\", " +
-             "\"-15% across the board\". Save as plain comment instead?",
+             "\"+912 pcs OTB in W22\", \"add 200 units/wk through October\", \"boost June by 30%\", " +
+             "\"+25% in May for grooming season\", \"EOL by Aug 14\", \"double W14\", " +
+             "\"ramp up starting July\", \"-15% across the board\". Save as plain comment instead?",
   };
 }
 
