@@ -4670,9 +4670,9 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     # same AI-vs-consumer-demand correction as their base style siblings.
     if is_amazon and pos_data is None:
         _pos_ms = (row.get("Mstyle") or "").upper()
-        if _pos_ms.endswith("EC") or _pos_ms.endswith("COS"):
+        if _pos_ms.endswith("EC") or _pos_ms.endswith("COS") or _pos_ms.endswith("AMZ"):
             import re as _re
-            _parent_ms = _re.sub(r'(?:EC|COS)$', '', row.get("Mstyle", ""),
+            _parent_ms = _re.sub(r'(?:EC|COS|AMZ)$', '', row.get("Mstyle", ""),
                                   flags=_re.IGNORECASE)
             _parent_pos = (amazon_pos or {}).get(_parent_ms)
             if _parent_pos and float(_parent_pos.get("Avg_Units_Wk_L13w") or 0) > 0:
