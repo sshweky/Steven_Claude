@@ -11101,7 +11101,7 @@ def _print_week_detail(results):
 def _print_summary(results, elapsed_wb, failed):
     total_26w   = sum(r["new_total"] for r in results)
     alerts      = [r for r in results if r["alert"]]
-    pat_counts  = {"Holt-Winters": 0, "Croston's": 0, "Heuristic": 0, "Inactive": 0}
+    pat_counts  = {"Seasonal Baseline": 0, "Croston's": 0, "Heuristic": 0, "Inactive": 0}
     biweekly_ct = 0
     for r in results:
         pat_counts[r["model"]] = pat_counts.get(r["model"], 0) + 1
@@ -11110,7 +11110,7 @@ def _print_summary(results, elapsed_wb, failed):
     crostons_n = pat_counts["Croston's"]
     print(f"\n{'='*66}")
     print(f"  COMPLETE  |  {len(results)} records  |  Total 26w demand: {total_26w:,}")
-    print(f"  Models — HW: {pat_counts['Holt-Winters']}  "
+    print(f"  Models -- Seasonal: {pat_counts['Seasonal Baseline']}  "
           f"Croston's: {crostons_n}  "
           f"Heuristic: {pat_counts['Heuristic']}  "
           f"Inactive: {pat_counts['Inactive']}  "
