@@ -9245,8 +9245,8 @@ def build_html_report(findings, scope_desc, results=None):
 <h3>Intermittency Summary (ADI/CV²)</h3>
 <table style="width:auto">
   <tr>{tbl_row("Class","Records","Recommended Model", header=True)}</tr>
-  {tbl_row("Smooth",      imm_sum.get("Smooth",0),      "Holt-Winters")}
-  {tbl_row("Erratic",     imm_sum.get("Erratic",0),     "Holt-Winters (with caution)")}
+  {tbl_row("Smooth",      imm_sum.get("Smooth",0),      "Seasonal Baseline")}
+  {tbl_row("Erratic",     imm_sum.get("Erratic",0),     "Seasonal Baseline (with caution)")}
   {tbl_row("Intermittent",imm_sum.get("Intermittent",0),"Croston's")}
   {tbl_row("Lumpy",       imm_sum.get("Lumpy",0),       "Croston's")}
 </table>
