@@ -8003,6 +8003,33 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"({_f58_summary}); planner's MAN override still in effect"
                 )
 
+    # ── F_PO_CUTOFF (2026-05-21) — Amazon Fetch / Brand Buzz W1 zero-out ───────
+    # If no confirmed open PO exists for W1 AND today is past the division-specific
+    # cutoff, zero both AI and manual projections for W1.  Past the cutoff there
+    # is no time to receive and ship in the current week; any remaining projection
+    # would inflate reorder signals and create phantom demand.
+    _po_cutoff_zero_w1 = False
+    _div_code = (row.get("Div") or "").upper().strip()
+    if is_amazon and _div_code in AMZ_DIV_PO_CUTOFF:
+        _today_wd  = datetime.now().weekday()   # Mon=0 ... Sun=6
+        _cutoff_wd = AMZ_DIV_PO_CUTOFF[_div_code]
+        _w1_po_qty = float(_effective_po_wk[0]) if _effective_po_wk else 0.0
+        if _today_wd >= _cutoff_wd and _w1_po_qty == 0:
+            _div_name   = "Fetch" if _div_code == "FF" else "Brand Buzz"
+            _cutoff_day = "Tue" if _div_code == "FF" else "Wed"
+            if isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F_PO_CUTOFF: {_div_name} (Div={_div_code}) -- "
+                    f"no confirmed W1 PO by {_cutoff_day} night "
+                    f"(today weekday={_today_wd}); zeroing AI W1={fcst[0]:.0f} "
+                    f"MAN W1={manual_wks[0]:.0f} -> 0"
+                )
+            fcst[0] = 0
+            if isinstance(manual_wks, list):
+                manual_wks[0] = 0
+            _po_cutoff_zero_w1 = True
+            _fire("F_PO_CUTOFF")
+
     prior = sum(manual_wks)
     new   = sum(fcst)
     pct   = abs(new - prior) / prior if prior > 0 else 0
