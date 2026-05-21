@@ -7181,6 +7181,69 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"4-week taper applied; total {_f52_pre_total:,} → {_f52_post_total:,}"
             )
 
+    # ── F59o — Amazon seasonal overlay for Heuristic / Croston's (2026-05-21) ──
+    # Heuristic and Croston's blend the category profile normalized to mean=1.0,
+    # which pulls off-month weeks BELOW the flat baseline to make room for peaks.
+    # Per planner request (Option A), apply the category profile as an ADDITIVE
+    # FLOOR instead: off-months stay at the flat rate, peak months get lifted.
+    # Total 26w demand can only increase vs the flat model output.
+    #
+    # Algorithm:
+    #   1. flat_ref = mean of non-zero fcst weeks (model's implied weekly rate).
+    #   2. Get category profile via _get_category_profile() (already floored at
+    #      SEASONAL_FLOOR=1.0 per month -- no month multiplier < 1.0).
+    #   3. Damp the raw per-month uplift by DAMP_O=0.50.  Balances seasonal
+    #      signal strength against model uncertainty on sparse histories.
+    #   4. Per week: fcst[w] = max(fcst[w], snap(flat_ref * damped_mult, mp)).
+    #      VP-Q4-zeroed weeks are never raised.
+    #
+    # Fires before F59a-F59n so those corrections work on the shaped forecast.
+    if (is_amazon
+            and model in ("Heuristic", "Croston's")
+            and isinstance(fcst, list) and len(fcst) >= 26):
+        _f59o_profile = _get_category_profile(
+            description, product_category, product_subcategory,
+            brand, brand_pt, season=season
+        )
+        if _f59o_profile is not None:
+            _f59o_nz   = [v for v in fcst if v > 0]
+            _f59o_flat = (sum(_f59o_nz) / len(_f59o_nz)) if _f59o_nz else 0.0
+            if _f59o_flat > 0:
+                from datetime import date as _dt59o, timedelta as _td59o
+                _f59o_col   = ORIG_PRJ_COLS[0]        # e.g. "05_17_W1"
+                _f59o_mo    = int(_f59o_col[0:2])
+                _f59o_dy    = int(_f59o_col[3:5])
+                _f59o_today = _dt59o.today()
+                _f59o_start = _dt59o(_f59o_today.year, _f59o_mo, _f59o_dy)
+                if (_f59o_start - _f59o_today).days < -180:
+                    _f59o_start = _dt59o(_f59o_today.year + 1, _f59o_mo, _f59o_dy)
+                DAMP_O        = 0.50
+                _f59o_changed = False
+                for _wi in range(26):
+                    if _wi in _vp_q4_zeroed_idx:
+                        continue        # VP-Q4 zeroed -- never restore
+                    _wk_month  = (_f59o_start + _td59o(weeks=_wi)).month
+                    _raw_mult  = float(_f59o_profile[_wk_month - 1])
+                    _d_mult    = max(1.0, 1.0 + (_raw_mult - 1.0) * DAMP_O)
+                    _f59o_fl   = snap(_f59o_flat * _d_mult, mp)
+                    if fcst[_wi] < _f59o_fl:
+                        fcst[_wi]     = _f59o_fl
+                        _f59o_changed = True
+                if _f59o_changed:
+                    _fire("F59o")
+                    if isinstance(meta, dict):
+                        _f59o_pk_raw = max(_f59o_profile)
+                        _f59o_pk_mo  = _f59o_profile.index(_f59o_pk_raw) + 1
+                        _f59o_pk_d   = max(1.0, 1.0 + (_f59o_pk_raw - 1.0) * DAMP_O)
+                        meta.setdefault("drivers", []).append(
+                            f"F59o seasonal overlay ({model}): category profile "
+                            f"applied as uplift floor (DAMP={DAMP_O}); "
+                            f"flat ref {_f59o_flat:.0f}/wk; "
+                            f"peak month {_f59o_pk_mo} raw {_f59o_pk_raw:.2f}x "
+                            f"-> damped {_f59o_pk_d:.2f}x "
+                            f"({snap(_f59o_flat * _f59o_pk_d, mp):.0f}/wk)"
+                        )
+
     # ── F59/F60 — Amazon demand-signal corrections (2026-05-15) ───────────────
     # F59: Synthesized from planner review of 13 account-1864 items (10/13
     #      under-projected, 1 over).  Sub-rules:
