@@ -10581,11 +10581,14 @@ def main():
     # Built here (before both validate and forecast) so both passes can use it.
     # Identifies weeks where a variant style (EC/COS/AMZ/...) already has demand,
     # meaning the base style should not also have projections in those weeks.
-    switchover_index = _build_switchover_index(rows)
+    switchover_index, variant_zero_index = _build_switchover_index(rows)
     _sw_conflict_ct  = len(switchover_index)
     if _sw_conflict_ct:
         print(f"\n[F70] Switchover index: {_sw_conflict_ct} base style(s) "
               f"have active variant conflicts", flush=True)
+    if variant_zero_index:
+        print(f"         {len(variant_zero_index)} variant style(s) have base-territory "
+              f"pre-switchover weeks to zero (F70b)", flush=True)
 
     # B8/S5 fix (2026-05-21) -- Pre-build mstyle-family, customer-baseline,
     # and account-cadence indexes BEFORE validation.  Previously these were
