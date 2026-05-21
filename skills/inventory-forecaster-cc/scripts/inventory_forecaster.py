@@ -9761,6 +9761,35 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             f"{_f70_action} Consider marking those weeks CLOSED."
         )
 
+    # ── Critical: G2 demotion -- active item zeroed by guards ────────────────
+    # When G2 demotes a record to "Inactive (zeroed by guards)" every forecast
+    # week is already covered by confirmed POs or buffers -- but if Status @ Cust
+    # is still Active or orders landed this week, the planner needs to review
+    # whether their manual plan and item status reflect reality.
+    if rec.get("model") == "Inactive (zeroed by guards)":
+        _g2_sc     = (rec.get("status_cust") or row.get("Status_Cust") or "").upper().strip()
+        _g2_active = _g2_sc.startswith("A") and not _g2_sc.startswith("FD")
+        _g2_man_zero = sum(manual) == 0
+        _g2_ord_lw   = float(row.get("Ord_LW") or 0)
+        _g2_parts    = []
+        if _g2_active and _g2_man_zero:
+            _g2_parts.append(
+                "Manual PRJs are all zero but Status @ Cust is still Active -- "
+                "no manual demand is on file for this item."
+            )
+        if _g2_ord_lw > 0:
+            _g2_parts.append(
+                f"Orders came in on this item this week ({_g2_ord_lw:,.0f} units) -- "
+                f"this item is actively shipping."
+            )
+        if _g2_parts:
+            _g2_body = " ".join(_g2_parts)
+            critical.insert(0,
+                f"<b>ACTION REQUIRED -- AI zeroed all 26 weeks (confirmed POs or "
+                f"guards cover demand):</b> {_g2_body} "
+                f"Please validate item status and manual projections."
+            )
+
     # ── Critical: EC supersession warning ────────────────────────────────────
     if ec_superseded:
         critical.append(
