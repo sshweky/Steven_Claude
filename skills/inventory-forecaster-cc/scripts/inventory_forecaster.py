@@ -3306,13 +3306,13 @@ def _build_mstyle_family_index(rows):
 
 def _build_switchover_index(rows):
     """
-    F61 -- Switchover variant conflict detection.
+    F69 -- Switchover variant conflict detection.
 
     For every (acct, base_mstyle) pair where a variant suffix style exists in
     the same account (e.g. FF8654 + FF8654EC at account 1864), builds a map of
     which weeks the VARIANT has demand activity -- either manual projections > 0
     OR open customer PO qty > 0.  The base style AI forecast will zero those
-    weeks (F61) because the retailer can only order one or the other in a given
+    weeks (F69) because the retailer can only order one or the other in a given
     week.
 
     Returns:
