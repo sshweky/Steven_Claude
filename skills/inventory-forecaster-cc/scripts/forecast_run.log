@@ -119,3 +119,6 @@
   [ 500/1844]  27.1%  ok=500  fail=0
   [watchdog] still running — 3s since last output | last:   [ 500/1844]  27.1%  ok=500  fail=0
   [ 550/1844]  29.8%  ok=550  fail=0
+  [ 600/1844]  32.5%  ok=600  fail=0
+  [ 650/1844]  35.2%  ok=650  fail=0
+  [watchdog] still running — 4s since last output | last:   [ 650/1844]  35.2%  ok=650  fail=0
