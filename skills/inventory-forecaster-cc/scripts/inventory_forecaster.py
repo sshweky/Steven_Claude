@@ -7559,9 +7559,24 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f59i_pos_l52 = float(pos_data.get("Avg_Units_Wk_L52w") or 0)
             _f59i_wos     = _f59h_wos   # reuse WOS computed in F59h block above
 
+            # F60 EC-transition override: when the EC item inherited parent
+            # order history (F60 fired), the parent's historical order rate is
+            # NOT a reliable forward signal for the EC item.  The parent may
+            # have been ordered at higher rates for the parent ASIN, but the EC
+            # ASIN starts fresh -- POS is the correct demand anchor.
+            # Allow F59i to fire regardless of WOS when F60 is active and the
+            # ratio is above the moderate threshold.  Use moderate blend only
+            # (never severe anchor) for WOS 1-5 so we don't over-correct when
+            # Amazon is also in a brief restock phase for the new EC variant.
+            _f59i_ec_override = (
+                _f60_is_ec_transition
+                and _f59h_wos > 0    # known WOS (not 0 = unknown)
+                and _f59h_wos < 6    # would normally be gated
+            )
             if (_f59i_pos_l4 >= 100 and _f59i_pos_l13 > 0
                     and amz_catalog
-                    and (_f59h_wos >= 6 or _f59h_wos == 0)):
+                    and (_f59h_wos >= 6 or _f59h_wos == 0
+                         or _f59i_ec_override)):
                 # ── F59i: all Amazon models — tiered POS correction ───────────
                 # Amazon orders include DC inventory management (restock, safety-
                 # stock builds, catch-up after short-ship) on top of consumer
@@ -7569,9 +7584,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 # materially exceeds POS L4W, the excess is almost certainly
                 # inventory management noise, not real demand growth.
                 #
-                # WOS gate (2026-05-21): fires when WOS >= 6 (healthy DC) OR
-                # WOS == 0 (unresolvable — Inv_WOS absent and SOH/OPO also
-                # missing, so the F59h fallback could not derive a value).
+                # WOS gate: fires when WOS >= 6 (healthy DC) OR WOS == 0
+                # (unresolvable) OR _f59i_ec_override (F60 EC-transition active
+                # and WOS is explicitly low 1-5 -- inherited parent history
+                # over-represents EC forward demand; POS is the correct anchor).
                 # WOS == 0 means "unknown", not "zero inventory"; we still apply
                 # a correction but cap it at moderate blend (never severe anchor)
                 # because we cannot confirm the DC is actually well-stocked.
