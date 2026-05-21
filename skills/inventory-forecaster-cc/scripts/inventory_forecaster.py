@@ -9274,8 +9274,8 @@ def build_html_report(findings, scope_desc, results=None):
   {tbl_row("Prime Day", prime_weeks_str, f"{cal['prime_day_lift']:.2f}x", f"{PRIME_DAY_LIFT:.2f}x")}
   {tbl_row("Fall Deal", fall_weeks_str,  f"{cal['fall_deal_lift']:.2f}x", f"{FALL_DEAL_LIFT:.2f}x")}
 </table>
-<p><em>Configured lifts are applied as caps (Holt-Winters) or boosts (Croston's, Heuristic).
-Observed lift is informational — update PRIME_DAY_LIFT / FALL_DEAL_LIFT constants if
+<p><em>Configured lifts are applied as caps (Seasonal Baseline) or boosts (Croston's, Heuristic).
+Observed lift is informational -- update PRIME_DAY_LIFT / FALL_DEAL_LIFT constants if
 historical data shows materially different values.</em></p>
 
 <h2>5. Intermittency Analysis (ADI / CV²)</h2>
