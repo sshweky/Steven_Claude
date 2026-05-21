@@ -7710,15 +7710,28 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             fcst[_wi] = snap(fcst[_wi] * _f59i_anchor, mp)
                         _fire("F59i")
                         if isinstance(meta, dict):
+                            _f59i_pos_lw_disp = float(
+                                (pos_data or {}).get("Ordered_Units_LW") or 0)
                             _f59i_desc = (
-                                f"direct POS L4W anchor (floor 60%)"
-                                if _f59i_mode == "strong"
-                                else f"50% blend toward POS L13W {_f59i_pos_l13:.0f}/wk"
+                                f"EC-transition POS anchor "
+                                f"(max(POS_LW {_f59i_pos_lw_disp:.0f}, "
+                                f"L4W {_f59i_pos_l4:.0f})/wk; "
+                                f"parent history discarded as EC demand signal)"
+                                if _f59i_mode == "EC-anchor"
+                                else (
+                                    f"direct POS L4W anchor (floor 60%)"
+                                    if _f59i_mode == "strong"
+                                    else f"50% blend toward POS L13W {_f59i_pos_l13:.0f}/wk"
+                                )
                             )
                             _f59i_wos_label = (
-                                "DC WOS unknown"
-                                if _f59i_wos_capped
-                                else f"DC WOS {_f59h_wos:.1f}wks (healthy)"
+                                f"F60 EC-transition (WOS={_f59h_wos:.1f}wks)"
+                                if _f59i_ec_override
+                                else (
+                                    "DC WOS unknown"
+                                    if _f59i_wos_capped
+                                    else f"DC WOS {_f59h_wos:.1f}wks (healthy)"
+                                )
                             )
                             meta.setdefault("drivers", []).append(
                                 f"F59i POS anchor ({_f59i_mode}): AI W1-W4 avg "
