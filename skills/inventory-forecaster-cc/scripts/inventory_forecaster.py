@@ -10571,18 +10571,9 @@ def main():
     print(f"\n[3/4] Running forecasts ...", flush=True)
     t_fcst = time.time()
 
-    # Pre-compute account-level cadence so sparse items with thin history
-    # are anchored to their customer's known ordering rhythm.
-    acct_cadences = compute_account_cadences(rows)
-
-    # F1/F2 — pre-pass: mstyle-family and customer-baseline indexes, used by
-    # the Inactive/No-History branch to replace zero forecasts with a
-    # data-driven baseline derived from sibling SKUs and customer peers.
-    global MSTYLE_FAMILY_INDEX, CUST_BASELINE_INDEX, GLOBAL_WK_RATE
-    MSTYLE_FAMILY_INDEX = _build_mstyle_family_index(rows)
-    CUST_BASELINE_INDEX, GLOBAL_WK_RATE = _build_cust_baseline_index(rows)
-    print(f"      Mstyle-family index: {len(MSTYLE_FAMILY_INDEX)} mstyles with active siblings")
-    print(f"      Customer-baseline  : {len(CUST_BASELINE_INDEX)} customers  (global median wk-rate: {GLOBAL_WK_RATE:.1f})")
+    # MSTYLE_FAMILY_INDEX, CUST_BASELINE_INDEX, GLOBAL_WK_RATE, acct_cadences
+    # were pre-built ABOVE (before validation) so both passes share the same
+    # references (B8/S5 fix 2026-05-21).  No rebuild here.
 
     # Pre-compute EC-supersession set: for every (acct, mstyle) where an EC
     # variant ({mstyle}EC) exists in the same account, the original parent SKU
