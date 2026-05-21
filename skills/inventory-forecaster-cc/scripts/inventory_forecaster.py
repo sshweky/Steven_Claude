@@ -7254,6 +7254,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #   F59e — Buy-box price-movement velocity buffer
     #   F59f — Deceleration cap (prevents HW trend over-extrapolation)
     #   F59g — High-volume forward buffer (≥500/wk: +8% across full window)
+    #   F59o — Seasonal overlay floor for Heuristic/Croston's (Option A, see above)
     # F60: EC-transition narrative (history inherited in pre-pass above).
     #
     # Velocity tiers (all based on L13W non-zero avg, Amazon only):
