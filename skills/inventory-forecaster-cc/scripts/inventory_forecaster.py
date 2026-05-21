@@ -9495,11 +9495,10 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
     elif (short_pct < 0 and per_l13 > 0 and per_l4 > 0 and
           0.85 <= per_l4 / per_l13 <= 1.20 and
           freq_l4 < freq_l13 * 0.70):
-        expl = (f"Fewer orders at the same per-PO size (~{per_l4:.0f}u). "
-                f"L4 had {len(l4_nz)} order(s) vs the typical "
-                f"{len(l13_nz)}/13W cadence. Slower reorders with stable "
-                f"order qty usually means slower turn at retail — POS "
-                f"softening, or {cl} sitting on inventory longer than usual.")
+        expl = (f"L4W had {len(l4_nz)} order(s) at ~{per_l4:.0f}u vs the "
+                f"L13W pattern of {len(l13_nz)} orders at ~{per_l13:.0f}u -- "
+                f"fewer orders, same per-PO size. No POS data available to "
+                f"confirm retail velocity; verify with sales rep.")
     # 4) Multi-quarter softening (L26 below L52).
     elif (short_pct < 0 and l52_avg and l52_avg > 0 and
           l26_avg < l52_avg * 0.85):
