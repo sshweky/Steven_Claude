@@ -470,13 +470,12 @@ def _adapt_forecast_to_validation(rec):
     Validation schema: {ai_forecast, weeks[{week,projection,severity}],
                         priority, max_severity, ai_total, ai_per_wk, ...}
 
-    Priority logic (2026-04-22 revised):
-      - Volume tier by AI weekly avg (next 26 wk):
-          HIGH >= 1,000 / MEDIUM 200–999 / LOW < 200
-      - Priority is layered:
-          CRITICAL = HIGH volume AND |pct_diff| > 10%
-          MEDIUM   = MEDIUM volume AND |pct_diff| > 10%
-          LOW      = everything else
+    Priority logic (2026-05-21 revised):
+      - On-Plan: AI vs Man <= 5% AND Man > 0 (any volume)
+      - CRITICAL: baseline >= 1,000/wk AND gap > 5%
+      - HIGH:     baseline 500-999/wk  AND gap > 5%
+      - MID:      baseline 200-499/wk  AND gap > 5%
+      - LOW:      baseline < 200/wk    AND gap > 5%
     """
     forecast = list(rec.get("forecast") or [])
     manual   = list(rec.get("manual")   or [])
