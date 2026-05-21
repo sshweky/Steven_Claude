@@ -88,6 +88,14 @@ TRADE_FALL_SEASON2_WEEKS = {21, 22}
 TRADE_FALL_REPLEN_LIFT   = 1.10
 TRADE_FALL_SEASON2_LIFT  = 1.08
 AMAZON_CUST_SUBSTR = "AMAZON"      # substring match on Customr_Name (case-insensitive)
+# F_PO_CUTOFF (2026-05-21) -- Amazon division PO receipt cutoff.
+# If no confirmed W1 open PO is found by the cutoff weekday, zero AI+MAN PRJ W1.
+# Rationale: past the cutoff there is no time to receive and ship in the current week.
+# weekday: Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
+AMZ_DIV_PO_CUTOFF = {
+    "FF": 2,   # Fetch: cutoff = Tuesday night  -- zero W1 on Wed (weekday >= 2)
+    "BB": 3,   # Brand Buzz: cutoff = Wed night -- zero W1 on Thu (weekday >= 3)
+}
 # R4 (Amazon Private Label skip) was removed 2026-05-05 — APL items ARE shipped,
 # so they should go through normal classification like any other Amazon record.
 # R5 — International bulk-buyer retailers (non-US).  These accounts order in
