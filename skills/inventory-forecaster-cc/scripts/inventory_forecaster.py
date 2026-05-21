@@ -3376,7 +3376,8 @@ def _build_switchover_index(rows):
     row_by_key = {r.get("Acct_MStyle_Key_", ""): r for r in rows}
 
     # Step 2 -- for each variant row, find its base key and record active weeks
-    result = {}   # base_key -> {week_idx: [variant_mstyles]}
+    result         = {}   # base_key   -> {week_idx: [variant_mstyles]}
+    variant_result = {}   # variant_key -> {week_idx: [base_mstyle]}
 
     for vrow in rows:
         vkey = vrow.get("Acct_MStyle_Key_", "")
@@ -3409,7 +3410,24 @@ def _build_switchover_index(rows):
             if man_prj[wi] > 0 or opn_w[wi] > 0:
                 result.setdefault(base_key, {}).setdefault(wi, []).append(vms)
 
-    return result
+    # Step 3 -- build reverse map: variant should be zeroed for weeks BEFORE
+    # the switchover (i.e. weeks where the base style is still active).
+    for base_key, week_map in result.items():
+        if not week_map:
+            continue
+        first_sw_week = min(week_map.keys())
+        # Parse variant key from base_key: base_key is "acct-base_ms";
+        # we need to find the corresponding variant key(s) in row_by_key.
+        acct_pfx  = base_key.split("-", 1)[0]
+        base_ms_b = base_key.split("-", 1)[1] if "-" in base_key else ""
+        # Find all variant keys whose base resolves to this base_key
+        for sfx in sorted(SWITCHOVER_SUFFIXES, key=len, reverse=True):
+            variant_key = f"{acct_pfx}-{base_ms_b}{sfx}"
+            if variant_key in row_by_key:
+                for wi in range(first_sw_week):
+                    variant_result.setdefault(variant_key, {}).setdefault(wi, []).append(base_ms_b)
+
+    return result, variant_result
 
 
 def _build_cust_baseline_index(rows):
