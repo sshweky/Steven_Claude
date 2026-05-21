@@ -8599,11 +8599,13 @@ def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
         r["ai_model"]    = fr["model"]
         r["ai_total"]    = fr["new_total"]
         r["ai_per_wk"]   = round(fr["new_total"] / 26, 1) if fr["new_total"] else 0
-        # On-Plan override: AI vs Man within 5% and planner entered a plan.
+        # On-Plan override: AI and Man are aligned -- nothing to review.
+        # Two cases: (1) both zero; (2) plan entered and gap <= 5%.
         # Must run after ai_total is set so both sides are available.
         _man_tot = r.get("projection_total", 0)
         _ai_tot  = r.get("ai_total", 0)
-        if _man_tot > 0 and abs(_ai_tot - _man_tot) / _man_tot <= 0.05:
+        _both_zero = _man_tot == 0 and _ai_tot == 0
+        if _both_zero or (_man_tot > 0 and abs(_ai_tot - _man_tot) / _man_tot <= 0.05):
             r["priority"] = "On-Plan"
         # Build the record-level narrative with both validation + forecast data
         r["narrative"]   = _build_record_narrative(r)
