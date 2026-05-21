@@ -10021,7 +10021,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         # know why the POS bullets are absent.  For non-Amazon fall through to
         # the order-trend bullet (which uses shipment/order history).
         if is_amazon:
-            specific.append(
+            critical.append(
                 "Amazon POS / DC data not available for this mstyle "
                 "(not found in Amazon Catalog). "
                 "Forecast uses order history only -- "
