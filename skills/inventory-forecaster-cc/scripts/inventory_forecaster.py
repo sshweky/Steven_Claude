@@ -9519,11 +9519,11 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
     elif (short_pct > 0 and per_l13 > 0 and per_l4 > 0 and
           per_l4 / per_l13 >= 1.20 and
           abs(freq_l4 - freq_l13) / max(freq_l13, 0.01) < 0.30):
-        expl = (f"Per-order qty grew from ~{per_l13:.0f}u to ~{per_l4:.0f}u "
-                f"while reorder cadence held steady. Bigger POs at the same "
-                f"rate usually means {cl} consolidated touchpoints (multi-"
-                f"store builds, fewer ad-hoc replens) or picked up "
-                f"distribution gains.")
+        expl = (f"Per-order qty grew from ~{per_l13:.0f}u (L13W avg) to "
+                f"~{per_l4:.0f}u (L4W avg) while reorder cadence held steady "
+                f"({len(l4_nz)}/L4W vs {len(l13_nz)}/L13W). Larger builds "
+                f"at same frequency -- confirm with sales rep whether "
+                f"distribution or store count changed.")
     # 7) Burst rebound (LW > 0 after Prior Wk zero).
     elif short_pct > 0 and lw > 0 and pw == 0 and freq_l13 > 0:
         expl = (f"Activity restarting at {cl} — LW {lw:.0f}u after a Prior "
