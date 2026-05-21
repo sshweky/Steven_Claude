@@ -9943,7 +9943,17 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         if _smart:
             specific.append(_smart)
     else:
-        if len(hist) >= 4:
+        # No POS data: for Amazon records surface a plain notice so planners
+        # know why the POS bullets are absent.  For non-Amazon fall through to
+        # the order-trend bullet (which uses shipment/order history).
+        if is_amazon:
+            specific.append(
+                "Amazon POS / DC data not available for this mstyle "
+                "(not found in Amazon Catalog). "
+                "Forecast uses order history only -- "
+                "verify item is set up in the Amazon Catalog table in QB."
+            )
+        elif len(hist) >= 4:
             _ly_hist = rec.get("history_ly_ord") or []
             _smart_ord = _smart_order_trend(hist,
                                             ly_hist_26=_ly_hist if _ly_hist else None,
