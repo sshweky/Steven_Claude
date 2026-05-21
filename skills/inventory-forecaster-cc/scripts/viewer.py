@@ -1261,8 +1261,10 @@ def load_results(path):
     print(f"  Loaded {len(records_by_key)} records  |  columns {prj_cols[0]} → {prj_cols[-1]}")
     if VIEW_MODE == "forecast" and validation_summary.get("priority_critical") is not None:
         print(f"  Priority breakdown: CRITICAL={validation_summary.get('priority_critical', 0)} "
-              f"MEDIUM={validation_summary.get('priority_medium', 0)} "
-              f"LOW={validation_summary.get('priority_low', 0)}")
+              f"HIGH={validation_summary.get('priority_high', 0)} "
+              f"MID={validation_summary.get('priority_mid', 0)} "
+              f"LOW={validation_summary.get('priority_low', 0)} "
+              f"On-Plan={validation_summary.get('priority_on_plan', 0)}")
 
 
 def load_log():
