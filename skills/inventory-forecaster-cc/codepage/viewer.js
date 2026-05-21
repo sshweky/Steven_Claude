@@ -3481,6 +3481,7 @@ async function toggleDetail(key) {
         ${_ccard('Qty I/W',   _cfmt(_cardQtyIw), '#37474f', 'In production / in-work (from open supplier POs)')}
         ${_ccard('Qty I/T',   _cfmt(_cardQtyIt), '#37474f', 'In transit to warehouse (from open supplier POs)')}
         ${_cardNextRcpt ? _ccard('Next Rcpt', _cardNextRcpt, '#c62828', 'Next scheduled supplier receipt date') : ''}
+        ${_cardNextAvlRcpt ? _ccard('Next Avl Rcpt Dt', _cardNextAvlRcpt, '#c62828', 'Next available receipt date (from Inventory Flow)') : ''}
         ${_cdivider}
         ${_ccard('OH WOS',    _cwt(_cardOhWos),  _cwc(_cardOhWos),  'Weeks of supply on-hand only')}
         ${_ccard('OH+OO WOS', _cwt(_cardOoWos),  _cwc(_cardOoWos),  'Weeks of supply: OH + I/T + I/W pipeline')}
