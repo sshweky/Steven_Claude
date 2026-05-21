@@ -8677,12 +8677,13 @@ def _build_record_narrative(r):
 
 def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
                    oos_data=None, open_pos_data=None, amazon_catalog_us=None,
-                   ats_data=None):
+                   ats_data=None, switchover_weeks=None):
     """Run projection validation + AI forecast for each record."""
     high = getattr(args, "threshold", VALID_HIGH_MULT)
-    oos_data      = oos_data      or {}
-    open_pos_data = open_pos_data or {}
-    ats_data      = ats_data      or {}
+    oos_data        = oos_data        or {}
+    open_pos_data   = open_pos_data   or {}
+    ats_data        = ats_data        or {}
+    switchover_weeks = switchover_weeks or {}
 
     # Pre-compute account cadences so sparse items are anchored to their
     # customer's known ordering rhythm, not just their own thin history.
@@ -8696,7 +8697,8 @@ def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
         ats_hist = ats_data.get(row.get("Mstyle", ""))
         r = validate_record(row, master_pack, high_mult=high,
                             oos_entry=oos_ent, open_po_wk=po_wk,
-                            ats_hist=ats_hist)
+                            ats_hist=ats_hist,
+                            switchover_weeks=switchover_weeks)
         # Also run the AI forecast so we can show it in the viewer
         prefix = key.split("-")[0] if "-" in key else key
         acct_iv = acct_cadences.get(prefix)
@@ -8704,7 +8706,8 @@ def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
                              amazon_pos=amazon_pos, season_map=season_map,
                              oos_entry=oos_ent, open_po_wk=po_wk,
                              amazon_catalog_us=amazon_catalog_us,
-                             ats_hist=ats_hist)
+                             ats_hist=ats_hist,
+                             switchover_weeks=switchover_weeks)
         r["ai_forecast"] = fr["forecast"]
         r["ai_model"]    = fr["model"]
         r["ai_total"]    = fr["new_total"]
