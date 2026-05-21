@@ -7598,9 +7598,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 # Croston's, etc.) -- a flat Heuristic forecast at 1.7x POS
                 # with a healthy DC is just as wrong as an inflated Seasonal one.
                 #
-                # _f59i_wos_capped: True when WOS is unknown (0); restricts
-                # any >1.40x severe case to moderate blend instead of anchor.
-                _f59i_wos_capped = (_f59h_wos == 0)
+                # _f59i_wos_capped: True when WOS is unknown (0) OR when the
+                # EC-transition override fired (WOS 1-5 with inherited parent
+                # history) -- in either case, restrict >1.40x cases to moderate
+                # blend instead of severe anchor, since DC may be in a mild
+                # restock phase for the new variant.
+                _f59i_wos_capped = (_f59h_wos == 0 or _f59i_ec_override)
                 #
                 # Two-tier correction by severity:
                 #   Moderate (1.15x-1.40x): 50/50 blend toward POS L13W
