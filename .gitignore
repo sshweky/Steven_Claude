@@ -34,3 +34,4 @@ __pycache__/
 # --- Misc ---
 .DS_Store
 Thumbs.db
+git-sync.log
