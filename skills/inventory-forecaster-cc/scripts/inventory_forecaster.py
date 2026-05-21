@@ -7803,6 +7803,89 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"(POS L4W={_f59l_pos_l4:.0f}/wk). Model: {model}."
                         )
 
+        # ── F59m — Amazon low-DC restock demand uplift ──────────────────────
+        # When Amazon's DC is explicitly undersupplied (DC WOS < 8) and the
+        # combination of on-hand + open POs (already in transit) does not cover
+        # the standard 10-week target, Amazon will place orders ABOVE consumer
+        # POS velocity to rebuild inventory.  These extra restock orders are real
+        # forward demand that the model must project.
+        #
+        # Logic:
+        #   steady_rate   = max(POS_L4W, POS_L13W) -- best estimate of consumer velocity
+        #   total_supply  = (SOH + OPO) / steady_rate -- if SOH known from catalog;
+        #                   else WOS + OPO/steady       -- WOS as SOH proxy
+        #   net_gap_wks   = max(0, 10 - total_supply)  -- weeks still short
+        #   gap_units     = net_gap_wks * steady_rate
+        #   W1-W2         = min(steady * 2.5, steady + gap/2)  spread restock over 2 weeks
+        #   W3-W26        = max(current_forecast, steady)      at least consumer velocity
+        #   VP-Q4-zeroed weeks are left unchanged (those POs already placed).
+        #
+        # Gates:
+        #   0 < DC_WOS < 8  -- explicitly low (WOS=0 = unknown, skip)
+        #   steady_rate >= 100/wk  -- credible consumer signal
+        #   POS_L4W >= POS_L13W * 0.40  -- not in EOL decline (F59k handles that)
+        #   net_gap_wks > 0.5  -- meaningful remaining gap
+        #   Not DI-blended (F69-wos handles that path)
+        #   Not Inactive / OTB
+        if (is_amazon and pos_data
+                and isinstance(fcst, list) and len(fcst) >= 26
+                and model not in ("Inactive", "OTB (zero)",
+                                  "Pre-launch NEW (manual passthrough)")
+                and not row.get("_di_blend")
+                and 0 < _f59h_wos < 8):
+            _f59m_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+            _f59m_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+            _f59m_steady  = max(_f59m_pos_l4, _f59m_pos_l13)
+            if (_f59m_steady >= 100
+                    and _f59m_pos_l13 > 0
+                    and _f59m_pos_l4 >= _f59m_pos_l13 * 0.40):
+                # Compute total supply in weeks.  Use raw SOH when available
+                # (most accurate); fall back to WOS figure as SOH proxy.
+                if _f59h_soh > 0:
+                    _f59m_total_wks = (_f59h_soh + _f59h_opo) / max(_f59m_steady, 1)
+                else:
+                    # WOS from Amazon may already include OPO; add OPO separately
+                    # only when SOH data is absent and WOS looks SOH-only.
+                    _f59m_opo_wks   = _f59h_opo / max(_f59m_steady, 1)
+                    _f59m_total_wks = _f59h_wos + _f59m_opo_wks
+                _f59m_gap_wks = max(0.0, 10.0 - _f59m_total_wks)
+                if _f59m_gap_wks > 0.5:
+                    _f59m_gap_units = _f59m_gap_wks * _f59m_steady
+                    _f59m_wk_uplift = _f59m_gap_units / 2.0  # spread evenly W1+W2
+                    _f59m_w_ramp    = min(_f59m_steady * 2.5,
+                                          _f59m_steady + _f59m_wk_uplift)
+                    _f59m_changed = False
+                    for _wi in range(len(fcst)):
+                        if _wi in _vp_q4_zeroed_idx:
+                            continue   # VP-Q4 already handled this week via open PO
+                        if _wi < 2:
+                            _f59m_val = snap(_f59m_w_ramp, mp)
+                            if _f59m_val > fcst[_wi]:
+                                fcst[_wi] = _f59m_val
+                                _f59m_changed = True
+                        else:
+                            _f59m_floor = snap(_f59m_steady, mp)
+                            if _f59m_floor > fcst[_wi]:
+                                fcst[_wi] = _f59m_floor
+                                _f59m_changed = True
+                    if _f59m_changed:
+                        _fire("F59m")
+                        if isinstance(meta, dict):
+                            _f59m_soh_note = (
+                                f"SOH={_f59h_soh:,.0f}u, OPO={_f59h_opo:,.0f}u"
+                                if _f59h_soh > 0
+                                else f"DC WOS={_f59h_wos:.1f}wks, OPO={_f59h_opo:,.0f}u"
+                            )
+                            meta.setdefault("drivers", []).append(
+                                f"F59m low-DC restock: {_f59m_soh_note} -- "
+                                f"total supply {_f59m_total_wks:.1f}wks vs 10wk target; "
+                                f"net gap {_f59m_gap_wks:.1f}wks = {_f59m_gap_units:,.0f}u "
+                                f"spread over W1-W2 ({_f59m_w_ramp:.0f}/wk each); "
+                                f"W3-W26 floored at steady rate {_f59m_steady:.0f}/wk "
+                                f"(POS L4W={_f59m_pos_l4:.0f}/wk, "
+                                f"L13W={_f59m_pos_l13:.0f}/wk)."
+                            )
+
         # ── F60 — EC-transition narrative ────────────────────────────────────
         # History was inherited from parent mstyle in the pre-pass.  Log the
         # driver text now that `meta` is available.
