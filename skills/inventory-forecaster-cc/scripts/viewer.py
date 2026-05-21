@@ -489,22 +489,27 @@ def _adapt_forecast_to_validation(rec):
     # Volume tier driven by AI weekly avg (forward-looking)
     if ai_per_wk >= 1000:
         vol_tier = "HIGH"
+    elif ai_per_wk >= 500:
+        vol_tier = "HIGH"   # 500-999 collapses into HIGH for vol badges
     elif ai_per_wk >= 200:
         vol_tier = "MEDIUM"
     else:
         vol_tier = "LOW"
 
-    # Difference magnitude
-    try:
-        pct = abs(float(rec.get("pct_diff") or 0))
-    except Exception:
-        pct = 0.0
+    # AI vs Man gap (used for On-Plan and tier thresholds)
+    ai_vs_man_pct = (abs(ai_total - manual_total) / manual_total * 100
+                     if manual_total > 0 else 999.0)
 
-    # Layered priority
-    if vol_tier == "HIGH" and pct > 10:
+    # Priority: On-Plan wins at any volume when gap <= 5% and plan exists.
+    # Otherwise tier by AI weekly rate.
+    if manual_total > 0 and ai_vs_man_pct <= 5:
+        priority = "On-Plan"
+    elif ai_per_wk >= 1000:
         priority = "CRITICAL"
-    elif vol_tier == "MEDIUM" and pct > 10:
-        priority = "MEDIUM"
+    elif ai_per_wk >= 500:
+        priority = "HIGH"
+    elif ai_per_wk >= 200:
+        priority = "MID"
     else:
         priority = "LOW"
 
