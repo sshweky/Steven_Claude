@@ -9996,13 +9996,17 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                 f"AI {ai_wk:,}/wk ({ai_total:,} total 26W) - no manual plan entered."
             )
 
-    # ── Assemble up to MAX_BULLETS in priority order ──────────────────────────
-    parts = critical[:]                                 # critical always shown
-    remaining = MAX_BULLETS - len(parts)
-    parts.extend(specific[:remaining])
-    remaining = MAX_BULLETS - len(parts)
+    # ── Assemble in priority order: critical → specific → gap_pill → pinned ──
+    # pinned_last (Amazon POS Sales then DC Inv) always anchor the last positions
+    # so planners see a consistent layout on every Amazon record.
+    parts = critical[:]                                 # always shown, no cap
+    _pinned_count = len(pinned_last)
+    remaining = MAX_BULLETS - len(parts) - _pinned_count
+    parts.extend(specific[:max(0, remaining)])
+    remaining = MAX_BULLETS - len(parts) - _pinned_count
     if remaining > 0:
         parts.extend(gap_pill[:remaining])
+    parts.extend(pinned_last)                           # always last
 
     if not parts:
         return ""
