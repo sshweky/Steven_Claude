@@ -8318,6 +8318,29 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     new   = sum(fcst)
     pct   = abs(new - prior) / prior if prior > 0 else 0
 
+    # G2 (2026-05-21) -- All-zeroed-by-guards safety demotion.
+    # When the active branch produced a non-zero forecast but downstream guards
+    # (VP-Q4 + VP-OP + F70 + F_PO_CUTOFF + F36 + F38f + ...) zeroed all 26 weeks,
+    # the model label is misleading.  Demote to a clear "Inactive (zeroed by
+    # guards)" label so alert generation, narrative, and viewer display all
+    # surface that the active model was effectively suppressed.  Skip for
+    # records that are already in Inactive/OTB/Pre-launch families.
+    if (new == 0 and model not in ("Inactive",)
+            and not model.startswith("Inactive")
+            and not model.startswith("OTB")
+            and not model.startswith("Pre-launch")
+            and not model.startswith("New/Relaunch")
+            and not model.startswith("Reactivating")):
+        _orig_model = model
+        model = "Inactive (zeroed by guards)"
+        if isinstance(meta, dict):
+            meta.setdefault("drivers", []).append(
+                f"G2 All-zero demotion: model was {_orig_model} but all 26 weeks "
+                f"were zeroed by downstream guards (VP-Q4 PO / VP-OP buffer / "
+                f"F70 switchover / F_PO_CUTOFF / F36 burnoff / F38f offline). "
+                f"Surfaced as Inactive so the narrative reflects reality."
+            )
+
     alert = ""
     if model == "Inactive" and prior > 0:
         alert = _build_alert(model, new, prior, pct, cap, mp, meta,
