@@ -2946,7 +2946,7 @@ function renderPage(page) {
     dtr.className = 'detail-pane';
     dtr.id = 'detail-' + r.key;
     dtr.dataset.loaded = '0';
-    dtr.innerHTML = `<td colspan="24"></td>`;
+    dtr.innerHTML = `<td colspan="25"></td>`;
     tb.appendChild(dtr);
   });
   updatePageNav();
@@ -2987,11 +2987,11 @@ async function toggleDetail(key) {
   // to keep the cache small.  Fetch just this one record's arrays from QB now.
   const _lazyRec = ALL_RECORDS.find(x => x.key === key);
   if (_lazyRec && _lazyRec._needs_detail) {
-    el.innerHTML = `<td colspan="24" style="padding:10px 16px;color:#888;font-style:italic;font-size:12px">Loading detail...</td>`;
+    el.innerHTML = `<td colspan="25" style="padding:10px 16px;color:#888;font-style:italic;font-size:12px">Loading detail...</td>`;
     try {
       await _lazyLoadDetail(_lazyRec);
     } catch (_le) {
-      el.innerHTML = `<td colspan="24" style="padding:12px 16px;background:#fff3e0"><b style="color:#c62828">Could not load detail: ${_le.message}</b> - <a href="?nocache=1" style="color:#1565c0">reload fresh</a></td>`;
+      el.innerHTML = `<td colspan="25" style="padding:12px 16px;background:#fff3e0"><b style="color:#c62828">Could not load detail: ${_le.message}</b> - <a href="?nocache=1" style="color:#1565c0">reload fresh</a></td>`;
       el.dataset.loaded = '1';
       return;
     }
