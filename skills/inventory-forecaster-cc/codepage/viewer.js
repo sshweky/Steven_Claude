@@ -1416,6 +1416,18 @@ function _buildPogBlockHtml(r) {
   return `
     <div style="margin:8px 12px 0 12px;padding:10px 12px;background:#f5fbf3;border:1px solid #c7e2bf;border-radius:6px;font-size:11px;color:#2e4f24;">
       <div style="font-weight:700;margin-bottom:6px;color:#1b5e20;"> POG Information</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #d4ead0;flex-wrap:wrap;">
+        <b style="white-space:nowrap;">Sales Request:</b>
+        <input type="number" min="1" step="1" id="pog-req-id-${safeKey}"
+               placeholder="Request ID #"
+               onkeydown="if(event.key==='Enter'){lookupInvRequest('${safeKey}',this.value);}"
+               style="font-size:11px;padding:2px 6px;border:1px solid #c7e2bf;border-radius:3px;
+                      background:#fff;color:#2e4f24;font-family:inherit;width:110px;">
+        <button onclick="lookupInvRequest('${safeKey}',document.getElementById('pog-req-id-${safeKey}').value)"
+                style="font-size:10px;padding:2px 8px;border:1px solid #a5c99a;border-radius:3px;
+                       background:#e8f5e9;color:#1b5e20;cursor:pointer;white-space:nowrap;">Load</button>
+        <span id="pog-req-msg-${safeKey}" style="font-size:10px;color:#555;flex:1;"></span>
+      </div>
       <div style="display:flex;flex-wrap:wrap;gap:18px 24px;align-items:center;">
         <div>
           <b>POG Launch:</b>
