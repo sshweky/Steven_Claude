@@ -342,6 +342,14 @@ CATEGORY_PROFILES = {
     "chi pet":           [0.65, 1.30, 1.65, 1.75, 1.65, 1.50, 1.30, 1.05, 0.75, 0.55, 0.45, 0.40],
 }
 
+# M2 fix (2026-05-21) -- Pre-sorted iteration order for _get_category_profile().
+# Longest keyword first so "grooming wipe" beats "groom", "puppy pad" beats "puppy", etc.
+# Avoids relying on dict insertion order for correctness.
+_CATEGORY_PROFILES_BY_LEN = sorted(
+    CATEGORY_PROFILES.items(),
+    key=lambda kv: (-len(kv[0]), kv[0])
+)
+
 # ─── Explicit Season field → monthly profile ─────────────────────────────────
 # Quickbase1.ProductTrack.Styles.[Season] contains a planner-curated seasonality
 # tag per SKU.  When present, this takes priority over description/brand keyword
