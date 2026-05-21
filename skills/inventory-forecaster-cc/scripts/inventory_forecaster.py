@@ -7471,8 +7471,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #
         # Gates: is_amazon, POS data present, not DI-blended, WOS >= 6 or unknown.
         _f59i_ms = (row.get("Mstyle") or row.get("mstyle") or "").upper()
-        _f59i_is_ec = (_f59i_ms.endswith("EC") or _f59i_ms.endswith("COS")
-                       or _f59i_ms.endswith("AMZ"))
         if (is_amazon
                 and model not in ("Inactive", "OTB (zero)",
                                   "Pre-launch NEW (manual passthrough)")
