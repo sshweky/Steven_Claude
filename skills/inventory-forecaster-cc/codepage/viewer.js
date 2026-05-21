@@ -4190,9 +4190,11 @@ async function toggleDetail(key) {
 }
 
 // -- L26W Qty Cancelled (Exception Approval only) ----------------------------
-// Queries Order History for rows where Exception_Approval='yes' and Qty_Cxld>0
+// Queries Order History for rows where Exception_Approval=false and Qty_Cxld>0
 // within the L26W window, buckets by Cancel_Date week, then fills the placeholder
 // <tr id="cxld-row-..."> row in the history table.  Row is removed if no data.
+// Orders where Exception_Approval=true are excluded (those are pre-approved exceptions
+// that should not influence the L26W history view).
 async function _loadOrdHistCxld(r, safeId) {
   const rowEl = document.getElementById('cxld-row-' + safeId);
   if (!rowEl || !CFG.ORDER_HIST_TID || !W1_DATE) return;
