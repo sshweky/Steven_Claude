@@ -10418,6 +10418,11 @@ def main():
             try:
                 _v = validate_record(row, master_pack, oos_entry=oos_ent,
                                      open_po_wk=po_wk)
+                # On-Plan override: AI vs Man within 5% and plan is entered.
+                _man_tot = sum(float(row.get(c) or 0) for c in ORIG_PRJ_COLS)
+                _ai_tot  = r.get("new_total", 0)
+                if _man_tot > 0 and abs(_ai_tot - _man_tot) / _man_tot <= 0.05:
+                    _v["priority"] = "On-Plan"
                 # Slim the merge to validation-specific fields — forecast
                 # record already has key/mstyle/cust/mp/biweekly/iso etc.
                 r["validation"] = {
