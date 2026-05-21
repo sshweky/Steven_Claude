@@ -5619,16 +5619,23 @@ function _parseAiAdjustment(text, currentForecast) {
     };
   }
 
-  // Pattern: +/-N units in/for W{a}[-W{b}]  (one-time absolute add/remove for specific week(s))
+  // Pattern: +/-N pcs/units in/for W{a}[-W{b}]  (one-time absolute add/remove for specific week(s))
   // e.g. "+4385 units in w13",  "-500 units w5-w7",  "add 200 units for w8",
-  //      "additional 4385u w13",  "+4385 units w13-w14 for PDQ secondary placement"
+  //      "additional 4385u w13",  "+912 pcs OTB in W22 for holiday",
+  //      "OTB 500 pcs W15",  "912 pcs W22",  "+4385 units w13-w14 for PDQ secondary placement"
   {
-    // Sign-prefix form:  "+4385 units in w13"
-    let _wkM = lo.match(/([+-])\s*(\d+(?:,\d{3})*)\s*(?:units?|u)\s*(?:in|for|at|on|to)?\s*w(?:k|eek)?\s*(\d{1,2})(?:\s*[-–]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
-    // Verb form: "add 200 units for w8", "additional 4385 units w13"
+    // Sign-prefix form: "+4385 units in w13" / "+912 pcs OTB in W22"
+    // Unit keyword optional when sign explicit; allow up to 30 chars context before week.
+    let _wkM = lo.match(/([+-])\s*(\d+(?:,\d{3})*)\s*(?:pcs?|pieces?|units?|u|cases?|cs)?[^%\d]{0,30}w(?:k|eek)?\s*(\d{1,2})(?:\s*[-–]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
+    // Verb / context form: "add 200 units for w8" / "OTB 912 pcs W22" / "additional 4385 units w13"
     if (!_wkM) {
-      const _v = lo.match(/(?:add(?:ing|ed)?|additional|extra)\s*(?:by\s+)?(\d+(?:,\d{3})*)\s*(?:units?|u)\s*(?:in|for|at|on|to)?\s*w(?:k|eek)?\s*(\d{1,2})(?:\s*[-–]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
+      const _v = lo.match(/(?:add(?:ing|ed)?|additional|extra|otb|order(?:ing)?)\s*(?:by\s+)?(\d+(?:,\d{3})*)\s*(?:pcs?|pieces?|units?|u|cases?|cs)?[^%\d]{0,30}w(?:k|eek)?\s*(\d{1,2})(?:\s*[-–]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
       if (_v) _wkM = [null, '+', _v[1], _v[2], _v[3]];
+    }
+    // Bare form: "912 pcs W22" / "912 pcs in W22" (unit keyword required to anchor match)
+    if (!_wkM) {
+      const _b = lo.match(/(?:^|\s)(\d+(?:,\d{3})*)\s*(?:pcs?|pieces?|cases?|cs)[^%\d]{0,20}w(?:k|eek)?\s*(\d{1,2})(?:\s*[-–]\s*w(?:k|eek)?\s*(\d{1,2}))?/);
+      if (_b) _wkM = [null, '+', _b[1], _b[2], _b[3]];
     }
     if (_wkM) {
       const sign  = _wkM[1] === '-' ? -1 : 1;
