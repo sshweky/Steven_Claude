@@ -240,13 +240,17 @@ window.QB_CONFIG = {
   .badge-clean    { background:#2e7d32; color:#fff; cursor:pointer; transition:opacity .15s; }
   .badge-critical:hover, .badge-warning:hover, .badge-clean:hover { opacity:.8; }
   .badge-active   { outline:3px solid #fff; outline-offset:2px; }
-  .badge-pri-crit { border:2px solid #ef9a9a; color:#ef9a9a; background:transparent; cursor:pointer; transition:opacity .15s; }
-  .badge-pri-med  { border:2px solid #ffcc80; color:#ffcc80; background:transparent; cursor:pointer; transition:opacity .15s; }
-  .badge-pri-low  { border:2px solid #bdbdbd; color:#bdbdbd; background:transparent; cursor:pointer; transition:opacity .15s; }
-  .badge-pri-crit:hover, .badge-pri-med:hover, .badge-pri-low:hover { opacity:.75; }
-  .badge-pri-crit.badge-active { background:#c62828; color:#fff; border-color:#c62828; }
-  .badge-pri-med.badge-active  { background:#e65100; color:#fff; border-color:#e65100; }
-  .badge-pri-low.badge-active  { background:#616161; color:#fff; border-color:#616161; }
+  .badge-pri-crit    { border:2px solid #ef9a9a; color:#ef9a9a; background:transparent; cursor:pointer; transition:opacity .15s; }
+  .badge-pri-high    { border:2px solid #ffb74d; color:#ffb74d; background:transparent; cursor:pointer; transition:opacity .15s; }
+  .badge-pri-mid     { border:2px solid #ffcc80; color:#ffcc80; background:transparent; cursor:pointer; transition:opacity .15s; }
+  .badge-pri-low     { border:2px solid #bdbdbd; color:#bdbdbd; background:transparent; cursor:pointer; transition:opacity .15s; }
+  .badge-pri-onplan  { border:2px solid #a5d6a7; color:#a5d6a7; background:transparent; cursor:pointer; transition:opacity .15s; }
+  .badge-pri-crit:hover,.badge-pri-high:hover,.badge-pri-mid:hover,.badge-pri-low:hover,.badge-pri-onplan:hover { opacity:.75; }
+  .badge-pri-crit.badge-active   { background:#c62828; color:#fff; border-color:#c62828; }
+  .badge-pri-high.badge-active   { background:#f57c00; color:#fff; border-color:#f57c00; }
+  .badge-pri-mid.badge-active    { background:#e65100; color:#fff; border-color:#e65100; }
+  .badge-pri-low.badge-active    { background:#616161; color:#fff; border-color:#616161; }
+  .badge-pri-onplan.badge-active { background:#2e7d32; color:#fff; border-color:#2e7d32; }
   .toolbar { background:#fff; border-bottom:1px solid #ddd; padding:6px 12px;
               display:flex; align-items:center; gap:6px; flex-wrap:nowrap;
               overflow-x:auto; }
