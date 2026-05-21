@@ -8321,14 +8321,28 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # in the base style AI forecast so we don't double-count demand.
     # The validation pass (validate_record) issues a CRITICAL flag on the same
     # weeks prompting the planner to mark the base style as CLOSED.
-    _f70_week_map  = {}   # week_idx -> [variant_mstyle, ...] — weeks AI was zeroed
+    _f70_week_map  = {}   # week_idx -> [variant_mstyle, ...] -- weeks AI was zeroed
     _f70_sw_entry  = {}   # full variant-active weeks (man_prj>0 or opn_w>0); used by narrative
-    if switchover_weeks:
+    # F70 skip-list: planner-driven manual passthroughs and explicit overrides
+    # must not be overridden by the switchover heuristic.  Pre-launch items
+    # have no historical signal -- the planner's manual is the only forecast
+    # we have; F58 Tell-AI comments are explicit instructions the planner
+    # typed in the last 60 days.  Both should beat the variant-conflict rule.
+    _f70_planner_protected = model.startswith("Pre-launch")
+    # F58 protection: get the weeks F58 touched so F70 leaves them alone
+    _f58_touched_weeks = set()
+    if isinstance(meta, dict):
+        for _drv in meta.get("drivers", []) or []:
+            if "F58 Tell-AI replay" in str(_drv) and "not auto-applied" not in str(_drv):
+                # Whole record was F58-touched; mark all weeks
+                _f58_touched_weeks = set(range(26))
+                break
+    if switchover_weeks and not _f70_planner_protected:
         _sw_entry = switchover_weeks.get(row.get("Acct_MStyle_Key_", ""))
         if _sw_entry:
             _f70_sw_entry = _sw_entry
             for _wi, _variants in _sw_entry.items():
-                if 0 <= _wi < 26 and fcst[_wi] != 0:
+                if 0 <= _wi < 26 and fcst[_wi] != 0 and _wi not in _f58_touched_weeks:
                     fcst[_wi] = 0
                     _f70_week_map[_wi] = _variants
             if _f70_week_map:
