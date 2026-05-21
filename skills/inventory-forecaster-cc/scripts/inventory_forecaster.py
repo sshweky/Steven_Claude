@@ -9100,18 +9100,25 @@ def run_eda(rows, master_pack):
         "week_lift_profile": week_lift,
     }
 
-    # ── Model recommendation summary ──────────────────────────────
-    recs = {"Holt-Winters": 0, "Croston's": 0, "Heuristic": 0, "Inactive": 0}
+    # Model recommendation summary
+    # classify() emits "inactive" | "sparse_intermittent" | "active"; the
+    # routing in forecast_record() then maps active to either Seasonal Baseline
+    # (dense >=50% nz) or Croston's (intermittent 25-50% nz), and sparse_intermittent
+    # to Heuristic or Sparse Intermittent depending on volume.
+    recs = {"Seasonal Baseline": 0, "Croston's": 0, "Heuristic": 0, "Inactive": 0}
     for row in rows:
         hist = get_history(row)
         pat  = classify(hist)
-        mapping = {
-            "inactive":    "Inactive",
-            "steady":      "Holt-Winters",
-            "intermittent":"Croston's",
-            "new_item":    "Heuristic",
-        }
-        recs[mapping.get(pat, "Heuristic")] += 1
+        if pat == "inactive":
+            recs["Inactive"] += 1
+        elif pat == "sparse_intermittent":
+            recs["Heuristic"] += 1
+        else:
+            # active: Seasonal Baseline vs Croston's based on nz density
+            if nz_rate(hist, window=26) >= DENSE_THRESHOLD:
+                recs["Seasonal Baseline"] += 1
+            else:
+                recs["Croston's"] += 1
     findings["model_recommendations"] = recs
 
     return findings
