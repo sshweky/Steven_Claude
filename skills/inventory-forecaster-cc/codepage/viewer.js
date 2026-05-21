@@ -1228,9 +1228,9 @@ function _computePoPrjConflicts(opnW, manProj, isOffprice) {
 
 // Forecast status flag: 'Over-Projected' | 'Under-Projected' | 'On Plan' | 'Inactive' | ''
 // Noise filter: max(ai, man) < 1,000 OR |ai−man| < 500 → blank (no flag).
-// Threshold: +-5% of manual total (matches Priority On-Plan threshold).
-//   pct > +5% → AI sees more than manual → manual is Under-Projected
-//   pct < -5% → AI sees less than manual → manual is Over-Projected
+// Threshold: +-7.5% of manual total (matches Priority On-Plan threshold).
+//   pct > +7.5% → AI sees more than manual → manual is Under-Projected
+//   pct < -7.5% → AI sees less than manual → manual is Over-Projected
 function _fcstStatus(ai_model, ai_total, proj_total) {
   if (ai_model === 'Inactive') return 'Inactive';
   const maxVal = Math.max(ai_total, proj_total);
