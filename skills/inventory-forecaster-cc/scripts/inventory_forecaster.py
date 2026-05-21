@@ -4363,7 +4363,7 @@ def heuristic(history, mp, l13w, is_amazon=False, description=None,
 
     # T2 — Per-week Heuristic cap (2026-04-22).  Prevents any single forecast
     # week from exceeding max(L4_nz_avg, L13_nz_avg) × 1.5.  Combined with
-    # profile dampening (DAMP=0.1) this double-locks against position-based
+    # profile dampening (DAMP_H=0.3) this double-locks against position-based
     # blow-ups on items where a single historical spike distorts the profile.
     # Observed case: FF7612 Petco Heuristic AI=24K vs manual 4.6K — one
     # forecast week hit 5× the recent non-zero rate.
