@@ -5951,7 +5951,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             f"F44 Dense-override (post-F43): L26-prior nz {_f44_fired_meta['l26_prior_nz']}/"
             f"{_f44_fired_meta['l26_prior_total']} = {_f44_fired_meta['l26_prior_frac']*100:.0f}% "
             f"≥ 60% → forced is_dense=True (override F-B L13-zero rule); "
-            f"steady pre-disruption pattern routes to Holt-Winters smooth path "
+            f"steady pre-disruption pattern routes to Seasonal Baseline smooth path "
             f"instead of Croston's lumpy-event placement"
         )
 
