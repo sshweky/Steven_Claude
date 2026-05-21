@@ -5834,8 +5834,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             )
 
     elif pattern == "sparse_intermittent":
-        # F6 — L13W all zero but meaningful L26/L52 activity → route to Heuristic
-        # so the forecast uses post-ramp / historical avg rather than zero.
+        # F6c (renamed from F6 2026-05-21 to break tag collision with F6a in
+        # classify() and F6b in seasonal_baseline()) -- L13W all zero but
+        # meaningful L26/L52 activity -> route to Heuristic so the forecast
+        # uses post-ramp / historical avg rather than zero.
         fcst, cap, meta = heuristic(hist_for_model, mp, l13w, is_amazon=is_amazon,
                                     description=description,
                                     product_category=product_category,
