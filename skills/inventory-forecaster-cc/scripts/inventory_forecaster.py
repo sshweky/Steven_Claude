@@ -9724,6 +9724,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
     from html import escape as _e
     MAX_BULLETS = 4
     _cust_label = _friendly_cust_name(rec.get("cust") or "")
+    is_amazon   = AMAZON_CUST_SUBSTR in (rec.get("cust") or "").upper()
 
     forecast = list(rec.get("forecast") or [])
     manual   = list(rec.get("manual")   or [])
