@@ -3506,7 +3506,7 @@ async function toggleDetail(key) {
         </div>
         <div style="overflow-x:auto;">
           <table class="dtbl">
-            <tr>${hdrCells}</tr>
+            <tr>${_ifHdrCells}</tr>
             <tr>${begCells}</tr>
             <tr>${prjCells}</tr>
             <tr>${rcvCells}</tr>
