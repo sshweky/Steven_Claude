@@ -1780,13 +1780,12 @@ function adaptRow(row) {
   const pct_diff     = manual_total > 0 ? ((ai_total - manual_total) / manual_total) * 100
                      : (ai_total > 0 ? null : 0);  // null = no plan entered; 0 = both zero
 
-  const pct_abs = Math.abs(pct_diff);
-  // Priority: On-Plan when AI vs Plan gap is within 5% (or both zero).
-  // Uses the same threshold as _fcstStatus so both columns agree.
-  // When manual=0 the pct_diff fallback is 0, so those rows also show On-Plan
-  // (no divergence to flag -- AI plan is the active plan).
+  const pct_abs = pct_diff !== null ? Math.abs(pct_diff) : null;
+  // Priority: On-Plan when both are zero OR when AI vs Plan gap is within 5%.
+  // When manual=0 and AI>0, pct_diff is null (no plan entered) -- tier by AI volume, NOT On-Plan.
+  const _both_zero = manual_total === 0 && ai_total === 0;
   let priority;
-  if (pct_abs <= 5) {
+  if (_both_zero || (pct_diff !== null && pct_abs <= 5)) {
     priority = 'On-Plan';
   } else if (ai_per_wk >= 1000) {
     priority = 'CRITICAL';
