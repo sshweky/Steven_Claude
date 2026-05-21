@@ -10449,6 +10449,19 @@ def main():
         print(f"\n[F70] Switchover index: {_sw_conflict_ct} base style(s) "
               f"have active variant conflicts", flush=True)
 
+    # B8/S5 fix (2026-05-21) -- Pre-build mstyle-family, customer-baseline,
+    # and account-cadence indexes BEFORE validation.  Previously these were
+    # built only in Phase 3 (forecast) which meant validation-pass forecasts
+    # used empty globals -> silently different AI projections vs the forecast
+    # pass.  Built once and shared across both phases.
+    global MSTYLE_FAMILY_INDEX, CUST_BASELINE_INDEX, GLOBAL_WK_RATE
+    MSTYLE_FAMILY_INDEX = _build_mstyle_family_index(rows)
+    CUST_BASELINE_INDEX, GLOBAL_WK_RATE = _build_cust_baseline_index(rows)
+    acct_cadences = compute_account_cadences(rows)
+    print(f"      Mstyle-family index: {len(MSTYLE_FAMILY_INDEX)} mstyles with active siblings")
+    print(f"      Customer-baseline  : {len(CUST_BASELINE_INDEX)} customers  (global median wk-rate: {GLOBAL_WK_RATE:.1f})")
+    print(f"      Account-cadence    : {len(acct_cadences)} accounts indexed")
+
     # ── Validate Projections (if requested) ─────────────────────────
     if args.validate:
         print(f"\n[3/3] Validating manual projections for {len(rows)} records ...", flush=True)
@@ -10458,7 +10471,8 @@ def main():
                                      season_map=season_map, oos_data=oos_data,
                                      open_pos_data=open_pos_data,
                                      ats_data=ats_data,
-                                     switchover_weeks=switchover_index)
+                                     switchover_weeks=switchover_index,
+                                     acct_cadences=acct_cadences)
         elapsed_val = time.time() - t_val
         print(f"      Validation complete in {elapsed_val:.1f}s")
 
