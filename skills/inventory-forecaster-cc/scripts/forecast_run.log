@@ -79,3 +79,6 @@ Traceback (most recent call last):
   File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 7757, in forecast_record
     #   POS L13W >= 200:  credible consumer signal (not noise)
 NameError: name '_f59i_is_ec' is not defined. Did you mean: '_f59i_pos_l4'?
+
+  [watchdog] Process exited with code 1.
+  [watchdog] Restarting (attempt 2/3) ...

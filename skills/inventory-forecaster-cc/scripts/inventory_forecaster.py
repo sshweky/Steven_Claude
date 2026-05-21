@@ -8094,6 +8094,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "opn_w":         [int(float(row.get(c) or 0)) for c in OPN_COLS],
         "status_cust":   (str(row.get("Status_Cust") or "")).strip(),
         "item_status":   (str(row.get("PT_Item_Status") or "")).strip(),
+        # F_PO_CUTOFF: True when W1 was zeroed because no PO received by cutoff day.
+        # Writeback uses this to also zero MAN PRJ W1 in QB.
+        "zero_man_w1_cutoff": _po_cutoff_zero_w1,
     }
 
 
