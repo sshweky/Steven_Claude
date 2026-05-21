@@ -440,6 +440,7 @@ function buildSelectFids() {
     ...(F.EST_ISO_INPUT ? [F.EST_ISO_INPUT] : []),
     ...(F.INIT_UPSPW    ? [F.INIT_UPSPW]    : []),
     F.POG_LAUNCH, F.POG_END, F.ISO_SHIP_DATE, F.NEXT_RCPT_DT,
+    ...(F.SEASON ? [F.SEASON] : []),
     ...(F.AUTO_PROJECT           ? [F.AUTO_PROJECT]           : []),
     ...(F.SWITCHOVER_ACTIVE      ? [F.SWITCHOVER_ACTIVE]      : []),
     ...(F.SWITCHOVER_TO_MSTYLE   ? [F.SWITCHOVER_TO_MSTYLE]   : []),
