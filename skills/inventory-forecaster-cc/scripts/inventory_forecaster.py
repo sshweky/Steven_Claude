@@ -8105,10 +8105,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # in the base style AI forecast so we don't double-count demand.
     # The validation pass (validate_record) issues a CRITICAL flag on the same
     # weeks prompting the planner to mark the base style as CLOSED.
-    _f70_week_map = {}   # week_idx -> [variant_mstyle, ...]
+    _f70_week_map  = {}   # week_idx -> [variant_mstyle, ...] — weeks AI was zeroed
+    _f70_sw_entry  = {}   # full variant-active weeks (man_prj>0 or opn_w>0); used by narrative
     if switchover_weeks:
         _sw_entry = switchover_weeks.get(row.get("Acct_MStyle_Key_", ""))
         if _sw_entry:
+            _f70_sw_entry = _sw_entry
             for _wi, _variants in _sw_entry.items():
                 if 0 <= _wi < 26 and fcst[_wi] != 0:
                     fcst[_wi] = 0
