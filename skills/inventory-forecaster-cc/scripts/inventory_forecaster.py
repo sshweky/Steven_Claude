@@ -4229,8 +4229,12 @@ def crostens(history, mp, is_amazon=False, description=None,
         else:
             _gate_undershoot = 0.15
             _lift_mult       = 0.8
-        # Only lift when BOTH stability ≥ 0.7 AND undershoot exceeds gate.
-        if _stability >= 0.7 and _undershoot > _gate_undershoot and _cr_total > 0:
+        # Only lift when BOTH stability >= 0.7 AND undershoot exceeds gate.
+        # Skip R6 when F18 has intentionally capped z downward (stocked-up /
+        # above-POS blend) — re-lifting toward order-history L13 defeats the
+        # entire point of the POS anchor and would restore the inflated rate.
+        if (_stability >= 0.7 and _undershoot > _gate_undershoot
+                and _cr_total > 0 and not _f18_capped_down):
             _lift_weight = _stability * _undershoot * _lift_mult
             _target = _cr_total * (1 - _lift_weight) + _l13_total * _lift_weight
             _scale = _target / _cr_total
