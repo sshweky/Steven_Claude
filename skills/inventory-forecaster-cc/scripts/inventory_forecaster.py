@@ -3304,6 +3304,65 @@ def _build_mstyle_family_index(rows):
     return idx
 
 
+def _build_switchover_index(rows):
+    """
+    F61 -- Switchover variant conflict detection.
+
+    For every (acct, base_mstyle) pair where a variant suffix style exists in
+    the same account (e.g. FF8654 + FF8654EC at account 1864), builds a map of
+    which weeks the VARIANT has demand activity -- either manual projections > 0
+    OR open customer PO qty > 0.  The base style AI forecast will zero those
+    weeks (F61) because the retailer can only order one or the other in a given
+    week.
+
+    Returns:
+        dict[str, dict[int, list[str]]]
+            base_key (e.g. "1864-FF8654")
+            -> {week_index_0based: [variant_mstyle, ...]}
+
+    Only weeks with actual variant activity (man_prj > 0 or opn_w > 0) appear
+    in the inner dict.  An empty dict for a key means no conflict found.
+    """
+    # Step 1 -- index every row by Acct_MStyle_Key_ for O(1) parent lookup
+    row_by_key = {r.get("Acct_MStyle_Key_", ""): r for r in rows}
+
+    # Step 2 -- for each variant row, find its base key and record active weeks
+    result = {}   # base_key -> {week_idx: [variant_mstyles]}
+
+    for vrow in rows:
+        vkey = vrow.get("Acct_MStyle_Key_", "")
+        vms  = vrow.get("Mstyle", "")
+        if "-" not in vkey or not vms:
+            continue
+
+        # Detect suffix -- longest match wins (COS before C, etc.)
+        sfx_len = 0
+        for sfx in sorted(SWITCHOVER_SUFFIXES, key=len, reverse=True):
+            if vms.upper().endswith(sfx):
+                sfx_len = len(sfx)
+                break
+        if not sfx_len:
+            continue
+
+        base_ms  = vms[:-sfx_len]
+        acct_pfx = vkey.split("-", 1)[0]
+        base_key = f"{acct_pfx}-{base_ms}"
+
+        # Only proceed if the base style is actually in scope this run
+        if base_key not in row_by_key:
+            continue
+
+        # Determine which weeks the variant has demand activity
+        man_prj = [float(vrow.get(c) or 0) for c in ORIG_PRJ_COLS]
+        opn_w   = [float(vrow.get(c) or 0) for c in OPN_COLS]
+
+        for wi in range(26):
+            if man_prj[wi] > 0 or opn_w[wi] > 0:
+                result.setdefault(base_key, {}).setdefault(wi, []).append(vms)
+
+    return result
+
+
 def _build_cust_baseline_index(rows):
     """
     Per-customer median L52 weekly order rate across that customer's active
