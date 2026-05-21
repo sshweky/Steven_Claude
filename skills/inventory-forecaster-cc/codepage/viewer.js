@@ -3073,7 +3073,7 @@ function renderPage(page) {
     dtr.className = 'detail-pane';
     dtr.id = 'detail-' + r.key;
     dtr.dataset.loaded = '0';
-    dtr.innerHTML = `<td colspan="25"></td>`;
+    dtr.innerHTML = `<td colspan="26"></td>`;
     tb.appendChild(dtr);
   });
   updatePageNav();
