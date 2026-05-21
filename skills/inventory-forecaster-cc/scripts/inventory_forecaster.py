@@ -5963,12 +5963,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Croston's handles the gap/quantity pattern better than seasonal baseline,
         # with a post-spike drawdown guard to avoid locking onto a post-spike lull.
         _is_offprice_t1 = _is_offprice_cust(cust_name)
-        # DEBUG-FF7297 (remove after diagnosis)
-        _dbg_key = row.get("Acct_MStyle_Key_", "") or ""
-        if "FF7297" in _dbg_key and "AMZ2" not in _dbg_key and "AMZN" not in _dbg_key:
-            print(f"  [CROST-DBG] {_dbg_key}: pos_data={'SET L13W='+str(float(pos_data.get('Avg_Units_Wk_L13w') or 0)) if pos_data else 'NONE'} "
-                  f"hist[-4:]={[round(float(v or 0)) for v in hist_for_model[-4:]]} "
-                  f"nz26={sum(1 for v in hist_for_model[-26:] if float(v or 0)>0)}", flush=True)
         fcst, cap, meta = crostens(hist_for_model, mp, is_amazon=is_amazon,
                                    description=description,
                                    product_category=product_category,
