@@ -2779,6 +2779,39 @@ def attenuate_recent_spikes(hist, pos_data=None):
     spike_count = sum(1 for i in range(last4_start, n)
                       if float(out[i] or 0) > cap_threshold)
     if spike_count >= 3:
+        # F49b — Internal-spike check within sustained acceleration (2026-05-21).
+        # When F49 fires because all (or most) of L4W is above the near-zero baseline
+        # threshold, it may still contain an internal outlier: one week that is far
+        # above the other three.  This happens when the item was dormant for most of
+        # L26 (baseline median ~7/wk), then recently activated at 2,400/wk, with one
+        # week spiking to 15,000+.  F49 sees "4/4 above 17.5" and calls it sustained
+        # acceleration, but the 15,000 week is 6x the inner median of the other 3.
+        # Without this sub-check, Croston's inherits the spike and over-projects.
+        #
+        # Rule: if max(L4W) > 5x inner-median(other 3), cap just the spike week to
+        # 2x inner-median.  "Inner median" = mean of the 2nd and 3rd values when
+        # the 4 weeks are sorted ascending (i.e., median of L4W excluding max/min).
+        _l4_vals = sorted(float(out[i] or 0) for i in range(last4_start, n))
+        if len(_l4_vals) == 4 and _l4_vals[1] > 0:
+            _inner_med = (_l4_vals[1] + _l4_vals[2]) / 2.0
+            if _inner_med > 0 and _l4_vals[3] > 5.0 * _inner_med:
+                # Internal spike — cap just the outlier week(s) > 2x inner median
+                _int_cap = 2.0 * _inner_med
+                _int_corrections = []
+                for i in range(last4_start, n):
+                    v = float(out[i] or 0)
+                    if v > _int_cap:
+                        _int_corrections.append({
+                            "idx":              i,
+                            "original":         round(v, 1),
+                            "capped":           round(_int_cap, 1),
+                            "median_pre":       round(_inner_med, 1),
+                            "ratio":            round(v / _inner_med, 2),
+                            "f49b_internal":    True,
+                        })
+                        out[i] = int(round(_int_cap))
+                if _int_corrections:
+                    return out, _int_corrections
         return out, [{"f49_skip": "sustained_acceleration",
                       "spike_count": spike_count, "median_pre": round(median_pre, 1)}]
     if spike_count >= 2 and pos_data:
