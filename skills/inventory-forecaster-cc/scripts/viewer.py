@@ -1238,15 +1238,19 @@ def load_results(path):
         n_med_vol = sum(1 for r in recs if r.get("vol_tier") == "MEDIUM")
         n_low_vol = sum(1 for r in recs if r.get("vol_tier") == "LOW")
         n_stale_inactive = sum(1 for r in recs if r.get("inactive_with_stale_plan"))
-        n_crit = sum(1 for r in recs if r.get("priority") == "CRITICAL")
-        n_med  = sum(1 for r in recs if r.get("priority") == "MEDIUM")
-        n_low  = sum(1 for r in recs if r.get("priority") == "LOW")
+        n_crit    = sum(1 for r in recs if r.get("priority") == "CRITICAL")
+        n_high    = sum(1 for r in recs if r.get("priority") == "HIGH")
+        n_mid     = sum(1 for r in recs if r.get("priority") == "MID")
+        n_low     = sum(1 for r in recs if r.get("priority") == "LOW")
+        n_onplan  = sum(1 for r in recs if r.get("priority") == "On-Plan")
         validation_summary = {
             "total_records":     len(recs),
             "critical_records":  n_crit,
             "priority_critical": n_crit,
-            "priority_medium":   n_med,
+            "priority_high":     n_high,
+            "priority_mid":      n_mid,
             "priority_low":      n_low,
+            "priority_on_plan":  n_onplan,
             "vol_high":          n_high,
             "vol_medium":        n_med_vol,
             "vol_low":           n_low_vol,
