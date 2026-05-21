@@ -8028,7 +8028,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 f"net gap {_f59m_gap_wks:.1f}wks = {_f59m_gap_units:,.0f}u "
                                 f"spread over {_f59m_ramp_note} ({_f59m_w_ramp:.0f}/wk each); "
                                 f"W{_f59m_ramp_wks+1}-W26 floored at steady rate {_f59m_steady:.0f}/wk "
-                                f"(POS L4W={_f59m_pos_l4:.0f}/wk, "
+                                f"(POS LW={_f59m_pos_lw:.0f}/wk, "
+                                f"L4W={_f59m_pos_l4:.0f}/wk, "
                                 f"L13W={_f59m_pos_l13:.0f}/wk)."
                             )
 
