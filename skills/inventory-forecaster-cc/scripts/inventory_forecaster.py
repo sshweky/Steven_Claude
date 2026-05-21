@@ -1420,11 +1420,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if detect_biweekly(history) and ord_baseline > l13_avg * 1.05:
         ord_baseline = l13_avg
 
-    # F22b — moved below to cap the FINAL baseline (after POS/F13/F15) rather
-    # than ord_baseline.  Capping ord_baseline triggered an F15 interaction:
-    # when ord_baseline dropped, _ord_cov_ratio fell under the F15 gate, so
-    # F15 stopped dropping the POS blend — which could swing the final
-    # baseline UP instead of down.  See F22c below.
+    # F22b superseded by F22c (see CHANGELOG.md).  F22c caps the FINAL
+    # baseline after the POS/F13/F15 chain to avoid the F15 interaction.
     _l13_nz_count = len(l13_nz)
 
     # For Amazon items: blend order-history baseline with consumer POS demand rate.
