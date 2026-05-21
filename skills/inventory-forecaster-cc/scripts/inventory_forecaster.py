@@ -10402,6 +10402,8 @@ def main():
                 return ms[:-2]
             if msu.endswith("COS"):
                 return ms[:-3]
+            if msu.endswith("AMZ"):
+                return ms[:-3]
             return ms
         _pos_for_rec    = None
         _amz_cat_for_rec = None
