@@ -2235,11 +2235,11 @@ function populateFilters() {
     LOW:    'LOW: AI forecast < 200 units / week',
   };
   const PRI_TIPS = {
-    CRITICAL:  'CRITICAL: >= 1,000/wk AND AI vs Plan gap > 5%',
-    HIGH:      'HIGH: 500-999/wk AND AI vs Plan gap > 5%',
-    MID:       'MID: 200-499/wk AND AI vs Plan gap > 5%',
-    LOW:       'LOW: < 200/wk AND AI vs Plan gap > 5%',
-    'On-Plan': 'On-Plan: AI vs Plan within 5% (any volume)',
+    CRITICAL:  'CRITICAL: >= 1,000/wk AND AI vs Plan gap > 7.5%',
+    HIGH:      'HIGH: 500-999/wk AND AI vs Plan gap > 7.5%',
+    MID:       'MID: 200-499/wk AND AI vs Plan gap > 7.5%',
+    LOW:       'LOW: < 200/wk AND AI vs Plan gap > 7.5%',
+    'On-Plan': 'On-Plan: AI vs Plan within 7.5% (any volume)',
   };
   const volRank = ['HIGH','MEDIUM','LOW'];
   const priRank = ['CRITICAL','HIGH','MID','LOW','On-Plan'];
