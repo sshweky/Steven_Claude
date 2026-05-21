@@ -5493,7 +5493,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             # T3 escape: route to heuristic (its branch runs forecast through
             # heuristic() which will handle the sparse L52 history via post-ramp
             # avg / non-zero fallbacks).  We flag pattern="sparse_intermittent"
-            # which is routed to heuristic() in the F6 branch below.
+            # which is routed to heuristic() in the F6c branch below.
             pattern = "sparse_intermittent"
 
     nz_rate_ = nz_rate(hist_for_model, window=26)   # fraction of non-zero weeks over L26W
