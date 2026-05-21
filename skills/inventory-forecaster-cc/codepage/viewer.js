@@ -1606,7 +1606,7 @@ async function saveInitUpspw(key, rawValue, el) {
 window.saveInitUpspw = saveInitUpspw;
 
 // -- Inventory Request Detail lookup ----------------------------------------
-// Called from the Sales Request row in the POG Info block.  Fetches a record
+// Called from the Inventory Request row in the POG Info block.  Fetches a record
 // from the Inventory Request Detail table (btjf9wtis) by Record ID#, verifies
 // it belongs to the current Acct#-MStyle, then auto-populates and saves the
 // POG fields on the Projections table.
