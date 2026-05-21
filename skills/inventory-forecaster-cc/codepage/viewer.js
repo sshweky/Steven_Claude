@@ -1682,7 +1682,7 @@ async function lookupInvRequest(key, requestIdStr) {
       if (el) { el.value = upspw; await saveInitUpspw(key, upspw, el); filled.push('UPSPW'); }
     }
 
-    let msg = `Loaded from Request #${rid}`;
+    let msg = `Loaded from Inventory Request #${rid}`;
     if (filled.length) { msg += `: ${filled.join(', ')}.`; } else { msg += ' (no POG data found).'; }
     if (isoPipe)       { msg += ` ISO Pipeline: ${Math.round(isoPipe).toLocaleString()} units.`; }
     setMsg(msg, '#1b5e20');
