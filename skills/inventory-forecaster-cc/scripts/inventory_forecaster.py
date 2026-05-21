@@ -8194,6 +8194,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # F_PO_CUTOFF: True when W1 was zeroed because no PO received by cutoff day.
         # Writeback uses this to also zero MAN PRJ W1 in QB.
         "zero_man_w1_cutoff": _po_cutoff_zero_w1,
+        # F70 — Switchover conflict map: {week_idx_0based: [variant_mstyles]}
+        # Contains ALL weeks where any variant had man_prj>0 or opn_w>0, whether or
+        # not the AI forecast for that week was non-zero.  Used by build_ai_analysis()
+        # to prepend the switchover narrative bullet.  Empty dict when no conflict.
+        "f70_switchover": dict(_f70_sw_entry),
     }
 
 
