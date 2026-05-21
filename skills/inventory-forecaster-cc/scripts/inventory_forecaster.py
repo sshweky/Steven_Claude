@@ -97,8 +97,7 @@ AMZ_DIV_PO_CUTOFF = {
     "FF": 2,   # Fetch: cutoff = Tuesday night  -- zero W1 on Wed (weekday >= 2)
     "BB": 3,   # Brand Buzz: cutoff = Wed night -- zero W1 on Thu (weekday >= 3)
 }
-# R4 (Amazon Private Label skip) was removed 2026-05-05 — APL items ARE shipped,
-# so they should go through normal classification like any other Amazon record.
+# R4 removed 2026-05-05 -- see CHANGELOG.md
 # R5 — International bulk-buyer retailers (non-US).  These accounts order in
 # lumps seasonally or quarterly, so L13W=0 is common and misleading; relax the
 # Inactive classification to require L26W=0 instead.
