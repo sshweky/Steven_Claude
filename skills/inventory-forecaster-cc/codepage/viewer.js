@@ -3098,7 +3098,7 @@ function renderPage(page) {
       <td>${r.mstyle}</td>
       <td class="cust-sku-cell" data-key="${r.key.replace(/"/g,'&quot;')}"
           onclick="editCustSku('${r.key.replace(/'/g,"\\'")}', this)"
-          title="Click to edit Cust SKU#"
+          title="${r.cust_sku ? r.cust_sku.replace(/"/g,'&quot;') : 'Click to edit Cust SKU#'}"
           style="font-size:11px;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:2px 6px;border-bottom:1px dashed transparent;"
           onmouseover="this.style.borderBottomColor='#1565c0'"
           onmouseout="this.style.borderBottomColor='transparent'">${r.cust_sku || ''}</td>
