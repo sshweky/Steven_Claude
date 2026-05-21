@@ -2243,6 +2243,8 @@ function _priCell(r) {
     return `<span class="pri-snoozed" title="Snoozed - ${hrsRem}h remaining">SNOOZED</span>`
          + `<button class="snooze-btn" onclick="unsnooze('${safeKey}')" title="Remove snooze and restore original priority immediately" style="color:#1565c0;border-color:#1565c0;">UnSnooze</button>`;
   }
+  // On-Plan records are already aligned -- no need to snooze them.
+  if (r.priority === 'On-Plan') return priLabel(r.priority);
   const safeKey = r.key.replace(/'/g, "\\'");
   return `${priLabel(r.priority)}<button class="snooze-btn" onclick="snooze48('${safeKey}')" title="Snooze this item for 48 hours - priority will be ignored and badge will show as SNOOZED until the period expires">Snooze</button>`;
 }
