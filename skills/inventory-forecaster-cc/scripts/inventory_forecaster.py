@@ -9953,9 +9953,24 @@ _QB_CHAR_MAP = {
     " ": " ",     # non-breaking space
     "•": "*",     # • bullet
     "⚠": "!",     # ⚠ warning sign (keep readable, drop the glyph)
-    "→": "->",    # → arrow
-    "←": "<-",    # ← arrow
-    "±": "+/-",   # ± plus-minus
+    "→": "->",    # right arrow
+    "←": "<-",    # left arrow
+    "±": "+/-",   # plus-minus
+    "×": "x",     # multiplication sign
+    "≥": ">=",    # greater or equal
+    "≤": "<=",    # less or equal
+    "≈": "~",     # approximately equal
+    "·": "-",     # middle dot
+    "′": "'",     # prime
+    "″": '"',     # double prime
+    "≠": "!=",    # not equal
+    "÷": "/",     # division
+    "Δ": "d",     # delta
+    "α": "a",     # alpha
+    "β": "b",     # beta
+    "☢": "!!",    # radioactive (CRITICAL labels)
+    "☑": "[x]",   # checked
+    "☐": "[ ]",   # unchecked
 }
 
 def _sanitize_for_qb(text):
