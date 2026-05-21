@@ -1299,7 +1299,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # would over-fire on legitimate slow weeks.)
     _f50_stockout   = (_l4_zeros_f50 >= 3 and _l13_active_f50 >= 10)
     if _f50_stockout:
-        # Skip both F6 and F26 — let the L13 nz-avg baseline stand;
+        # Skip both F6b and F26 -- let the L13 nz-avg baseline stand;
         # downstream smoothing handles the recovery pace.
         _f6_applied = "F50_stockout_skip"
     elif (len(_l4_nz_f6) >= 2 and len(_l13_nz_f6) >= 3):
