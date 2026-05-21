@@ -10184,14 +10184,14 @@ def main():
         print(f"      [WARN] ATS fetch failed: {_e} — VP-ATS disabled this run",
               flush=True)
 
-    # F61 -- Switchover variant conflict index.
+    # F69 -- Switchover variant conflict index.
     # Built here (before both validate and forecast) so both passes can use it.
     # Identifies weeks where a variant style (EC/COS/AMZ/...) already has demand,
     # meaning the base style should not also have projections in those weeks.
     switchover_index = _build_switchover_index(rows)
     _sw_conflict_ct  = len(switchover_index)
     if _sw_conflict_ct:
-        print(f"\n[F61] Switchover index: {_sw_conflict_ct} base style(s) "
+        print(f"\n[F69] Switchover index: {_sw_conflict_ct} base style(s) "
               f"have active variant conflicts", flush=True)
 
     # ── Validate Projections (if requested) ─────────────────────────
