@@ -1910,6 +1910,7 @@ function adaptRow(row) {
     pog_end:           str(row, F.POG_END),
     iso_ship_date:     str(row, F.ISO_SHIP_DATE),
     next_rcpt_dt:      str(row, F.NEXT_RCPT_DT),  // FID 861 — Next Receipt Date
+    season_tag:        F.SEASON ? str(row, F.SEASON) : '',  // FID 1583 — Season (e.g. "Holiday")
     auto_project:        F.AUTO_PROJECT         ? bool(row, F.AUTO_PROJECT)         : false,
     switchover_active:   F.SWITCHOVER_ACTIVE    ? bool(row, F.SWITCHOVER_ACTIVE)    : false,
     switchover_to_mstyle:F.SWITCHOVER_TO_MSTYLE ? str(row, F.SWITCHOVER_TO_MSTYLE)  : '',
