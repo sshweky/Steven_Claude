@@ -1258,7 +1258,8 @@ function _refreshRowMetrics(key) {
   const projTotal = rec.proj_total || 0;
   const aiWk      = Math.round(((aiTotal   + opnTotal) / 26) * 10) / 10;
   const projWk    = Math.round(((projTotal + opnTotal) / 26) * 10) / 10;
-  const aiVsProj  = projTotal > 0 ? (aiTotal - projTotal) / projTotal * 100 : 0;
+  const aiVsProj  = projTotal > 0 ? (aiTotal - projTotal) / projTotal * 100
+                  : (aiTotal > 0 ? null : 0);  // null = no plan entered; 0 = both zero
   const l13       = rec.shp_wk || 0;
   const l13Avail  = l13 > 0;
   const aiVsL13   = l13Avail ? (aiWk   - l13) / l13 * 100 : 0;
