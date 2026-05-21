@@ -7503,7 +7503,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
             elif (not _f59i_is_ec
                     and _f59i_pos_l4 >= 100 and _f59i_pos_l13 > 0
-                    and amz_catalog and _f59i_wos >= 6):
+                    and amz_catalog
+                    and (_f59h_wos >= 6 or _f59h_wos == 0)):
                 # ── Path B: all non-EC Amazon models — tiered POS correction ──
                 # Amazon orders include DC inventory management (restock, safety-
                 # stock builds, catch-up after short-ship) on top of consumer
@@ -7511,9 +7512,22 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 # materially exceeds POS L4W, the excess is almost certainly
                 # inventory management noise, not real demand growth.
                 #
+                # WOS gate (2026-05-21): fires when WOS >= 6 (healthy DC) OR
+                # WOS == 0 (unresolvable — Inv_WOS absent and SOH/OPO also
+                # missing, so the F59h fallback could not derive a value).
+                # WOS == 0 means "unknown", not "zero inventory"; we still apply
+                # a correction but cap it at moderate blend (never severe anchor)
+                # because we cannot confirm the DC is actually well-stocked.
+                # WOS 1-5 (explicitly low) is skipped: Amazon is actively
+                # restocking and the elevated orders are real fill-in demand.
+                #
                 # Applies to ALL non-EC models (Seasonal Baseline, Heuristic,
                 # Croston's, etc.) -- a flat Heuristic forecast at 1.7x POS
                 # with a healthy DC is just as wrong as an inflated Seasonal one.
+                #
+                # _f59i_wos_capped: True when WOS is unknown (0); restricts
+                # any >1.40x severe case to moderate blend instead of anchor.
+                _f59i_wos_capped = (_f59h_wos == 0)
                 #
                 # Two-tier correction by severity:
                 #   Moderate (1.15x-1.40x): 50/50 blend toward POS L13W
