@@ -8244,34 +8244,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"({_f58_summary}); planner's MAN override still in effect"
                 )
 
-    # ── VP-W1 (2026-05-21) — Universal W1 zero-out (all customers) ──────────────
-    # If today is Wednesday or later AND no order has been received this week
-    # (Ord_LW == 0), zero both AI and manual W1 for any customer.
-    # Rationale: past Wednesday morning there is no realistic path to receiving
-    # and fulfilling an order in the current week; carrying a non-zero W1
-    # inflates reorder signals and creates phantom demand.
-    # Guard: skipped if an order has already arrived this week (Ord_LW > 0).
-    _vpw1_today_wd = datetime.now().weekday()   # Mon=0 ... Sun=6
-    _vpw1_ord_lw   = float(row.get("Ord_LW") or 0)
-    _vpw1_ai_was   = float(fcst[0]) if isinstance(fcst, list) and fcst else 0.0
-    _vpw1_man_was  = float(manual_wks[0]) if isinstance(manual_wks, list) and manual_wks else 0.0
-    if (_vpw1_today_wd >= W1_ORDER_CUTOFF_WEEKDAY
-            and _vpw1_ord_lw == 0
-            and isinstance(fcst, list) and len(fcst) >= 1
-            and (_vpw1_ai_was > 0 or _vpw1_man_was > 0)):
-        fcst[0] = 0
-        _vp_q4_zeroed_idx.add(0)   # guard: F59o / F59d / F59m must not restore W1
-        if isinstance(manual_wks, list) and manual_wks:
-            manual_wks[0] = 0
-        _fire("VP-W1")
-        if isinstance(meta, dict):
-            meta.setdefault("drivers", []).append(
-                f"VP-W1: Wed+ (today weekday={_vpw1_today_wd}), "
-                f"no W1 order received (Ord_LW=0); "
-                f"zeroing AI W1={_vpw1_ai_was:.0f} "
-                f"MAN W1={_vpw1_man_was:.0f} -> 0"
-            )
-
     # ── F_PO_CUTOFF (2026-05-21) — Amazon Fetch / Brand Buzz W1 zero-out ───────
     # If no confirmed open PO exists for W1 AND today is past the division-specific
     # cutoff, zero both AI and manual projections for W1.  Past the cutoff there
