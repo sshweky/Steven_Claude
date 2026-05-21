@@ -3101,7 +3101,7 @@ function renderPage(page) {
       <td class="cust-sku-cell" data-key="${r.key.replace(/"/g,'&quot;')}"
           onclick="editCustSku('${r.key.replace(/'/g,"\\'")}', this)"
           title="${r.cust_sku ? r.cust_sku.replace(/"/g,'&quot;') : 'Click to edit Cust SKU#'}"
-          style="font-size:11px;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:2px 6px;border-bottom:1px dashed transparent;"
+          style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:2px 6px;border-bottom:1px dashed transparent;"
           onmouseover="this.style.borderBottomColor='#1565c0'"
           onmouseout="this.style.borderBottomColor='transparent'">${r.cust_sku || ''}</td>
       <td style="font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.desc||'').replace(/"/g,'&quot;')}">${r.desc||''}</td>
