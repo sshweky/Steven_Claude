@@ -4598,8 +4598,8 @@ def _top_manual_defect(manual, fcst, cust_label="this account"):
         under = sum(av - mv for _, mv, av in dips)
         wks   = ", ".join(f"W{i+1}" for i, _, _ in dips[:3])
         return (f"The plan in {wks} sits ~{under:,} units below {cl}'s recent "
-                f"ordering pace — risk of running short if they keep buying "
-                f"like they have been.")
+                f"ordering pace — verify plan captures full expected demand "
+                f"for those weeks.")
 
     # Blank weeks against an active ordering pattern.
     blanks = [i for i in range(26) if manual[i] == 0 and fcst[i] > 0]
