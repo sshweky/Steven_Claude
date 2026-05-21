@@ -636,8 +636,9 @@ function _fmtCacheAge(ms) {
 // get the full 5 k set).  This prevents cross-contamination on shared machines
 // and avoids a director overwriting a planner's small cache (or vice-versa).
 // Bump the base version any time adaptRow() output shape changes.
-const PRJ_CACHE_KEY_BASE = 'pp_prj_v7';
-const PRJ_CACHE_KEY_ALL  = 'pp_prj_v7_all';   // directors / unknown users
+const PRJ_CACHE_BUILD    = '%%BUILD_TS%%';        // replaced by deploy_pages.py at deploy time
+const PRJ_CACHE_KEY_BASE = `pp_prj_${PRJ_CACHE_BUILD}`;
+const PRJ_CACHE_KEY_ALL  = `pp_prj_${PRJ_CACHE_BUILD}_all`;  // directors / unknown users
 function _prjCacheKey() {
   if (!CURRENT_USER.name) return PRJ_CACHE_KEY_ALL;
   const safe = CURRENT_USER.name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 32);
