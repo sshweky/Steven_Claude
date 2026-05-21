@@ -3643,13 +3643,16 @@ async function toggleDetail(key) {
     .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n')
     .replace(/<br\s*\/?>/gi, '\n')
     .split('\n').filter(s => s.trim());
-  // Off-price accounts (A: OffPrice) order 1-3x per year -- add a compact
-  // cadence bullet to the AI analysis instead of a separate card.
-  // A: Promo and other seasonal-ish statuses are excluded intentionally.
-  if (r.is_offprice) {
-    const _sp2  = _analyzeSeasonalPattern(r.hist_ord || []);
-    const _lyT2 = (r.ly_ord || []).reduce((a, b) => a + (b || 0), 0);
+  // Seasonal / off-price bullet: inject into AI Analysis for any item that is
+  // A: OffPrice OR has a Season tag.  These items have lumpy demand and need
+  // cadence context so planners know when to expect the next buy window.
+  // A: Promo + Season gets an extra note that a manual seasonal buy is likely.
+  const _showSeasonBullet = r.is_offprice || !!r.season_tag;
+  if (_showSeasonBullet) {
+    const _sp2   = _analyzeSeasonalPattern(r.hist_ord || []);
+    const _lyT2  = (r.ly_ord || []).reduce((a, b) => a + (b || 0), 0);
     const _lyWks2 = (r.ly_ord || []).map((v, i) => (v||0) > 0 ? 'W'+(i+1) : null).filter(Boolean);
+    // Next-order urgency
     let _nxt2 = '';
     if (_sp2.nextExpectedWk !== null) {
       if (_sp2.nextExpectedWk <= 0)
@@ -3661,12 +3664,22 @@ async function toggleDetail(key) {
     } else if (_sp2.events.length === 1) {
       _nxt2 = ' -- only 1 event in L26W, need more history';
     }
-    const _ly2 = _lyT2 > 0
-      ? '; LY' + (_lyWks2.length ? ' (' + _lyWks2.join(', ') + ')' : '') + ': ' + _lyT2.toLocaleString() + 'u'
-      : '';
-    const _gap2 = _sp2.avgGapWks !== null ? ', ~' + _sp2.avgGapWks + ' wk avg gap' : '';
+    const _ly2   = _lyT2 > 0 ? '; LY' + (_lyWks2.length ? ' (' + _lyWks2.join(', ') + ')' : '') + ': ' + _lyT2.toLocaleString() + 'u' : '';
+    const _gap2  = _sp2.avgGapWks !== null ? ', ~' + _sp2.avgGapWks + ' wk avg gap' : '';
     const _last2 = _sp2.wksSinceLast !== null ? ', ' + _sp2.wksSinceLast + ' wks since last order' : '';
-    _narParts.push('<b>Off-price account:</b> ' + _sp2.events.length + ' order event' + (_sp2.events.length !== 1 ? 's' : '') + ' L26W' + _gap2 + _last2 + _nxt2 + _ly2 + '.');
+    // Label: surface season name when available
+    let _lbl2;
+    if (r.is_offprice && r.season_tag)
+      _lbl2 = '<b>Off-price / ' + r.season_tag + ':</b>';
+    else if (r.is_offprice)
+      _lbl2 = '<b>Off-price account:</b>';
+    else
+      _lbl2 = '<b>Seasonal item (' + r.season_tag + '):</b>';
+    // A: Promo + Season note -- retailer buys manually to cover the in-season window
+    const _promoNote = (r.is_seasonal && !r.is_offprice && r.season_tag)
+      ? ' A: Promo + ' + r.season_tag + ' season -- retailer will likely place a manual buy to cover the in-season window; project accordingly.'
+      : '';
+    _narParts.push(_lbl2 + ' ' + _sp2.events.length + ' order event' + (_sp2.events.length !== 1 ? 's' : '') + ' L26W' + _gap2 + _last2 + _nxt2 + _ly2 + '.' + _promoNote);
   }
   // _narUlId: stable element id used by _loadAmzDcInv to inject/replace the
   // live DC inventory bullet after the panel renders.
