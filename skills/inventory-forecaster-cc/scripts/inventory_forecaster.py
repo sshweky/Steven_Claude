@@ -887,7 +887,7 @@ def build_prj_select(prj_cols):
     return textwrap.dedent(f"""
         SELECT
           [Acct_MStyle_Key_], [Mstyle], [Customr_Name], [Description], [Status_Cust],
-          [PT_Item_Status],
+          [PT_Item_Status], [Div],
           [Shpd_Wk_L13W_cust_], [Last_Ord_Date], [Last_Shp_Date], [Inventory_Manager],
           [Flagged], [Auto_Project], [POG_Launch_Date], [POG_End_Date], [Store_Count],
           [AI_PRJ_W1],[AI_PRJ_W2],[AI_PRJ_W3],[AI_PRJ_W4],[AI_PRJ_W5],
