@@ -7493,8 +7493,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     _f59i_ec_which  = "L4W" if _f59i_pos_l4 > _f59i_pos_l13 else "L13W"
                     _f59i_ec_anchor = min(1.0, _f59i_ec_target / _f59i_26w_avg)
                     _f59i_old_avg   = _f59i_26w_avg
+                    _f59i_ec_floor  = snap(_f59i_ec_target, mp)
                     for _wi in range(len(fcst)):
-                        fcst[_wi] = snap(fcst[_wi] * _f59i_ec_anchor, mp)
+                        # Proportionally rescale (brings 26W avg to ec_target)
+                        # then floor each non-zero week at ec_target so that the
+                        # inherited DC-seasonal trough never drops below consumer
+                        # demand.  EC drop-ship tracks consumer sell-through, not
+                        # DC inventory cycles -- demand is materially steadier than
+                        # the parent's lumpy replenishment pattern implies.
+                        if fcst[_wi] > 0:
+                            fcst[_wi] = snap(
+                                max(fcst[_wi] * _f59i_ec_anchor, _f59i_ec_floor), mp)
                     _fire("F59i")
                     if isinstance(meta, dict):
                         meta.setdefault("drivers", []).append(
