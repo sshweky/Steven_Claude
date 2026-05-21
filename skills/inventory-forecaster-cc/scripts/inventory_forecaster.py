@@ -4797,6 +4797,14 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
             _parent_cat = (amazon_catalog_us or {}).get(_amzcat_parent)
             if _parent_cat:
                 amz_catalog = _parent_cat
+    # Forward lookup for amz_catalog: base style falls back to variant catalog entry.
+    if is_amazon and amz_catalog is None:
+        _fwd_base_ms2 = row.get("Mstyle", "")
+        for _fwd_sfx2 in ("AMZ", "EC", "COS", "DS"):
+            _fwd_cat = (amazon_catalog_us or {}).get(_fwd_base_ms2 + _fwd_sfx2)
+            if _fwd_cat:
+                amz_catalog = _fwd_cat
+                break
     season    = (season_map or {}).get(row.get("Mstyle", "")) or None
     # F35 — Stockout backlog normalization.  Strip pent-up backlog from
     # post-stockout catch-up weeks so the rest of the pipeline sees real
