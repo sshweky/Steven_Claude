@@ -5727,16 +5727,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _fx_shp_l52  = sum(_fx_shp_hist) if _fx_shp_hist else 0
             _fx_shp_wk   = _fx_shp_l52 / 52.0 if _fx_shp_l52 > 0 else 0
 
-            # Pick base rate, in priority order — all history/cross-record derived:
+            # Pick base rate, in priority order -- all history/cross-record derived:
             #   (1) Sibling-Mstyle median (F1)
             #   (2) Shipment history (F8)
-            #
-            # NOTE: F2 (customer-median × 0.25) was REMOVED 2026-05-04. It was
-            # generating non-zero forecasts on items with zero history just
-            # because the customer had other active SKUs — a known false-
-            # positive source for "Reactivating" classifications. If neither
-            # F1 nor F8 fires, the item legitimately has no demand signal and
-            # should stay Inactive with zero forecast.
+            # (F2 customer-median floor removed 2026-05-04 -- see CHANGELOG.md.
+            # If neither F1 nor F8 fires, the item legitimately has no demand
+            # signal and stays Inactive with zero forecast.)
             _fx_rate   = 0.0
             _fx_src    = ""
             if _fx_family_rate > 0:
