@@ -2500,6 +2500,51 @@ async function _commitStatusEdit(key, newValue, cellEl) {
   }
 }
 
+// -- Cust SKU# inline edit ---------------------------------------------------
+// Click the Cust SKU# cell to swap it for a text input; commit on blur/Enter,
+// cancel on Escape.  Writes FID 821 on Projections via mergeFieldId upsert.
+function editCustSku(key, cellEl) {
+  if (cellEl.querySelector('input')) return;  // already editing
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (!rec) return;
+  const current = rec.cust_sku || '';
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.value = current;
+  inp.style.cssText = 'font-size:11px;padding:1px 4px;border:1px solid #1565c0;border-radius:3px;width:120px;';
+  cellEl.innerHTML = '';
+  cellEl.appendChild(inp);
+  inp.focus();
+  inp.select();
+  const commit = () => _commitCustSkuEdit(key, inp.value.trim(), cellEl);
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter')  { ev.preventDefault(); inp.removeEventListener('blur', commit); commit(); }
+    if (ev.key === 'Escape') { ev.preventDefault(); inp.removeEventListener('blur', commit); cellEl.textContent = current; }
+  });
+}
+
+async function _commitCustSkuEdit(key, newValue, cellEl) {
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (!rec) return;
+  if (newValue === (rec.cust_sku || '')) { cellEl.textContent = newValue || ''; return; }
+  const prev = rec.cust_sku || '';
+  rec.cust_sku = newValue;
+  cellEl.innerHTML = `<span style="color:#1565c0">${newValue || ''}</span>`;
+  try {
+    const fields = {};
+    fields[CFG.FID.KEY]      = { value: key };
+    fields[CFG.FID.CUST_SKU] = { value: newValue || null };
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
+    cellEl.textContent = newValue || '';
+  } catch (e) {
+    console.error('Cust SKU# save failed:', e);
+    rec.cust_sku = prev;
+    cellEl.innerHTML = `<span style="color:#c62828" title="Save failed: ${(e.message||'').replace(/"/g,'&quot;')}">${prev || ''} (!)</span>`;
+  }
+}
+window.editCustSku = editCustSku;
+
 // Fires on the FIRST keystroke in the mgr-comment textarea.  If the row
 // isn't already flagged, auto-flag it so the comment is visible to mgrs
 // in the Show-Flagged-Only view.  Idempotent  -  `_auto_flagged` guard
