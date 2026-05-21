@@ -3748,63 +3748,14 @@ def seasonal_profile(history, n=26):
     return [max(p, 0.25) for p in profile]
 
 
-def holt_winters(history, mp):
-    """
-    Holt-Winters with recursive α/β smoothing over a 78-observation weighted
-    series (3x L13W weighting) per the inventory-forecaster spec.
-    Seasonal factors come from the full L52W profile (26 unique indices).
-    Burst caps: L13W avg ×1.25 normal weeks, ×1.50 event weeks (downward only).
-    """
-    ws = make_weighted_series(history)   # 78 obs: 3x weight on L13W
-
-    # Initialize level from active observations, trend = 0
-    active = [float(v) for v in history if v > 0]
-    L = float(np.mean(active)) if active else 1.0
-    T = 0.0
-
-    # Recursive level + trend update over weighted series
-    for y in ws:
-        y = float(y)
-        L_new = HW_ALPHA * y + (1 - HW_ALPHA) * (L + T)
-        T_new = HW_BETA  * (L_new - L) + (1 - HW_BETA) * T
-        L, T = L_new, T_new
-
-    # Clamp trend: don't let a run of trailing zeros drive the forecast to zero.
-    # The trend should never cause the midpoint forecast (week 13) to go below
-    # 50% of the current level. This prevents catastrophic collapse.
-    if L > 0 and T < 0:
-        # At week 13: forecast_level = L + 13*T
-        # We want: L + 13*T >= 0.5 * L  =>  T >= -0.5*L/13
-        min_T = -0.5 * L / 13
-        T = max(T, min_T)
-
-    # 26 unique seasonal factors from L52W history
-    S = seasonal_profile(history)
-
-    l13_vals = [float(v) for v in history[-13:]]
-    l26_vals = [float(v) for v in history[-26:]]
-    cap_base = float(np.mean(l13_vals)) if any(v > 0 for v in l13_vals) else L
-
-    capped_weeks = []
-    forecast = []
-    for h in range(1, 27):
-        raw = max((L + h * T) * S[h - 1], 0)
-        cap = cap_base * 1.50 if h in EVENT_WEEKS else cap_base * 1.25
-        final = snap(min(raw, cap), mp)
-        if raw > cap:
-            capped_weeks.append({"week": h, "raw": round(raw), "cap": round(cap), "final": final})
-        forecast.append(final)
-
-    meta = {
-        "L": round(L, 1),
-        "T": round(T, 2),
-        "avg_l13": round(float(np.mean(l13_vals)), 1),
-        "avg_l26": round(float(np.mean(l26_vals)), 1),
-        "seas_min": round(min(S), 2),
-        "seas_max": round(max(S), 2),
-        "capped_weeks": capped_weeks,
-    }
-    return forecast, round(cap_base, 1), meta
+# holt_winters() removed 2026-05-21 -- audit confirmed the function was
+# defined but NEVER CALLED anywhere.  Dense buyers route through
+# seasonal_baseline() which applies all the same concepts (level baseline,
+# seasonal profile, caps) plus all the post-2025 calibration rules.
+# HW_ALPHA / HW_BETA constants remain in the config block because they
+# document the original level/trend smoothing intent (not currently wired up).
+# If a true HW trend extrapolator is needed in the future, restore from git:
+# commit before 2026-05-21.
 
 
 def crostens(history, mp, is_amazon=False, description=None,
