@@ -4680,6 +4680,18 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     # F38 — Amazon Catalog US signals (buybox, MAP, AUR, OOS days, sellable
     # inventory, buyability flag).  Keyed by Mstyle (matches Mstyle_model_).
     amz_catalog = (amazon_catalog_us or {}).get(row.get("Mstyle", "")) if is_amazon else None
+    # EC parent fallback for amz_catalog: same pattern as pos_data above.
+    # EC/COS items may not appear in Amazon_Catalog_US under their own mstyle;
+    # fall back to the parent so F59h WOS / F59m restock logic gets DC data.
+    if is_amazon and amz_catalog is None:
+        _amzcat_ms = (row.get("Mstyle") or "").upper()
+        if _amzcat_ms.endswith("EC") or _amzcat_ms.endswith("COS"):
+            import re as _re2
+            _amzcat_parent = _re2.sub(r'(?:EC|COS)$', '', row.get("Mstyle", ""),
+                                       flags=_re2.IGNORECASE)
+            _parent_cat = (amazon_catalog_us or {}).get(_amzcat_parent)
+            if _parent_cat:
+                amz_catalog = _parent_cat
     season    = (season_map or {}).get(row.get("Mstyle", "")) or None
     # F35 — Stockout backlog normalization.  Strip pent-up backlog from
     # post-stockout catch-up weeks so the rest of the pipeline sees real
