@@ -7625,14 +7625,18 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 if _f59i_mode == "strong"
                                 else f"50% blend toward POS L13W {_f59i_pos_l13:.0f}/wk"
                             )
+                            _f59i_wos_label = (
+                                "DC WOS unknown"
+                                if _f59i_wos_capped
+                                else f"DC WOS {_f59h_wos:.1f}wks (healthy)"
+                            )
                             meta.setdefault("drivers", []).append(
                                 f"F59i POS anchor ({_f59i_mode}): AI W1-W4 avg "
                                 f"{_f59i_w1_4_avg:.0f}/wk is "
                                 f"{(_f59i_ratio - 1) * 100:.0f}% above consumer "
-                                f"POS L4W {_f59i_pos_l4:.0f}/wk with DC WOS "
-                                f"{_f59i_wos:.1f}wks (healthy) -- order history "
-                                f"inflated by DC inventory management, not demand "
-                                f"growth. Rescaled x{_f59i_anchor:.3f} via "
+                                f"POS L4W {_f59i_pos_l4:.0f}/wk with {_f59i_wos_label} -- "
+                                f"order history inflated by DC inventory management, "
+                                f"not demand growth. Rescaled x{_f59i_anchor:.3f} via "
                                 f"{_f59i_desc}. Model: {model}."
                             )
 
