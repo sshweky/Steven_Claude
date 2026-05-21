@@ -2537,9 +2537,11 @@ async function _commitCustSkuEdit(key, newValue, cellEl) {
     fields[CFG.FID.CUST_SKU] = { value: newValue || null };
     await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
     cellEl.textContent = newValue || '';
+    cellEl.title = newValue || 'Click to edit Cust SKU#';
   } catch (e) {
     console.error('Cust SKU# save failed:', e);
     rec.cust_sku = prev;
+    cellEl.title = prev || 'Click to edit Cust SKU#';
     cellEl.innerHTML = `<span style="color:#c62828" title="Save failed: ${(e.message||'').replace(/"/g,'&quot;')}">${prev || ''} (!)</span>`;
   }
 }
