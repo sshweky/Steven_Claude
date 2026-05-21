@@ -2166,9 +2166,9 @@ function refreshHeaderBadges() {
     if (r.vol_tier === 'HIGH') high++;
     else if (r.vol_tier === 'MEDIUM') med++;
     else low++;
-    if (r.priority === 'CRITICAL') priCrit++;
-    else if (r.priority === 'MEDIUM') priMed++;
-    else priLow++;
+    if      (r.priority === 'CRITICAL') priCrit++;
+    else if (r.priority === 'HIGH' || r.priority === 'MID') priMed++;
+    else priLow++;   // LOW + On-Plan
   }
   document.getElementById('badge-total-n').textContent = total.toLocaleString();
   document.getElementById('badge-high-n' ).textContent = high.toLocaleString();
