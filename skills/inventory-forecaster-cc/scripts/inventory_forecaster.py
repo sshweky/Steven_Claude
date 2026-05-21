@@ -5702,19 +5702,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         ],
                     }
 
-        # ── F1/F2/F3/F7 — Data-driven Inactive fallback (history-only, no
+        # F1/F3/F7/F8 -- Data-driven Inactive fallback (history-only, no
         # manual-projection input).  Fires when the model is still "Inactive"
         # after earlier R3/S6/F19 passes and the item is NOT flagged EOL via
         # PT_Item_Status / Status_Cust tokens.  Produces a non-zero forecast
-        # anchored on sibling SKUs (same Mstyle) or the customer's own
-        # baseline rate — respects category/season curves when present.
-        #   F3  = No 52-week history          → New/Relaunch label
-        #   F7  = Some L52 signal but L13 = 0 → Reactivating label
-        #   F1  = Sibling-Mstyle fallback rate
-        #   F2  = Customer-median × 0.25 floor
-        #   F5  = PT_Item_Status EOL gate (skip the branch entirely if EOL)
-        #   F8  = Shipment corroboration (use Shp as fallback when Ord silent
-        #         but Shp active — captures stockout-suppressed demand)
+        # anchored on sibling SKUs (same Mstyle) or shipment history -- respects
+        # category/season curves when present.
+        #   F1 = Sibling-Mstyle fallback rate
+        #   F3 = No 52-week history          -> New/Relaunch label
+        #   F5 = PT_Item_Status EOL gate (skip the branch entirely if EOL)
+        #   F7 = Some L52 signal but L13 = 0 -> Reactivating label
+        #   F8 = Shipment corroboration (use Shp as fallback when Ord silent
+        #        but Shp active -- captures stockout-suppressed demand)
+        # (F2 customer-median floor removed 2026-05-04 -- see CHANGELOG.md.)
         if model == "Inactive" and not _is_eol(row) and not _zero_velocity:
             _fx_family_rate, _fx_n_sib = _family_rate_for(row)
             _fx_cust_rate,   _fx_n_cust = _cust_rate_for(row)
