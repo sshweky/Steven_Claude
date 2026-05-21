@@ -1281,7 +1281,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # Empirical callout (planner-flagged 2026-05-08):
     #   1864-FF7120EC (Amazon): L13 hist had 12/13 active wks averaging
     #   1492/wk steadily for months. Last 4 wks = [168, 0, 18, 84] (3 zeros
-    #   or near-zeros) — classic stockout signature. F6 applied 0.65× to a
+    #   or near-zeros) -- classic stockout signature. F6b applied 0.65x to a
     #   1492 baseline, giving 970/wk, which combined with downstream
     #   smoothing/dampening collapsed the 26w forecast to ~553/wk avg vs the
     #   planner's ~1900/wk LY benchmark and ~1492/wk healthy L13 run rate.
