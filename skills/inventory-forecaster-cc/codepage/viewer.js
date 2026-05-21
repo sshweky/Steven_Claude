@@ -6210,7 +6210,7 @@ function resetAllFilters() {
   });
   const ai = document.getElementById('aiDiffFilter');
   if (ai) ai.value = '0';
-  ['btn-high','btn-med','btn-low','btn-pri-crit','btn-pri-med','btn-pri-low'].forEach(id => {
+  ['btn-high','btn-med','btn-low','btn-pri-crit','btn-pri-high','btn-pri-mid','btn-pri-low','btn-pri-onplan'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('badge-active');
   });
