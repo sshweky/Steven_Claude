@@ -97,11 +97,6 @@ AMZ_DIV_PO_CUTOFF = {
     "FF": 2,   # Fetch: cutoff = Tuesday night  -- zero W1 on Wed (weekday >= 2)
     "BB": 3,   # Brand Buzz: cutoff = Wed night -- zero W1 on Thu (weekday >= 3)
 }
-# VP-W1 (2026-05-21) — Universal W1 zero-out for all customers.
-# If today is Wednesday or later AND no order has been received for the current
-# week (Ord_LW == 0), zero both AI and manual W1.
-# weekday: Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
-W1_ORDER_CUTOFF_WEEKDAY = 2   # Wednesday
 # R4 removed 2026-05-05 -- see CHANGELOG.md
 # R5 — International bulk-buyer retailers (non-US).  These accounts order in
 # lumps seasonally or quarterly, so L13W=0 is common and misleading; relax the
