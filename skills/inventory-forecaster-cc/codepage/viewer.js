@@ -1966,6 +1966,7 @@ function adaptRow(row) {
   return {
     key:               str(row, F.KEY),
     mstyle:            str(row, F.MSTYLE),
+    cust_sku:          str(row, F.CUST_SKU),
     cust:              _stripHtml(str(row, F.CUST)),
     desc:              str(row, F.DESCRIPTION),
     asin_status:       str(row, F.STATUS_CUST),
