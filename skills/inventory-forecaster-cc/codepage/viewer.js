@@ -1777,7 +1777,8 @@ function adaptRow(row) {
   // older fid 313 is a rich-text version of the same metric  -  don't use
   // that one, it can't be parsed back into a number reliably.
   const ord_l13      = num(row, F.ORD_WK_L13);
-  const pct_diff     = manual_total > 0 ? ((ai_total - manual_total) / manual_total) * 100 : 0;
+  const pct_diff     = manual_total > 0 ? ((ai_total - manual_total) / manual_total) * 100
+                     : (ai_total > 0 ? null : 0);  // null = no plan entered; 0 = both zero
 
   const pct_abs = Math.abs(pct_diff);
   // Priority: On-Plan when AI vs Plan gap is within 5% (or both zero).
