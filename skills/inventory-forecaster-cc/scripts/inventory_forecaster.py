@@ -4770,6 +4770,18 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
             _parent_pos = (amazon_pos or {}).get(_parent_ms)
             if _parent_pos and float(_parent_pos.get("Avg_Units_Wk_L13w") or 0) > 0:
                 pos_data = _parent_pos
+    # Forward lookup: if BASE style has no catalog entry, try common variant suffixes.
+    # Some base styles (e.g. FF7297) are tracked in Amazon Catalog under a variant
+    # mstyle (e.g. FF7297AMZ).  Share that POS data with the base so F15/F38b/F49
+    # have a consumer-demand anchor to work with.
+    if is_amazon and pos_data is None:
+        _fwd_base_ms = row.get("Mstyle", "")
+        for _fwd_sfx in ("AMZ", "EC", "COS", "DS"):
+            _fwd_data = (amazon_pos or {}).get(_fwd_base_ms + _fwd_sfx)
+            if _fwd_data and float(_fwd_data.get("Avg_Units_Wk_L13w") or
+                                   _fwd_data.get("l13w") or 0) > 0:
+                pos_data = _fwd_data
+                break
     # F38 — Amazon Catalog US signals (buybox, MAP, AUR, OOS days, sellable
     # inventory, buyability flag).  Keyed by Mstyle (matches Mstyle_model_).
     amz_catalog = (amazon_catalog_us or {}).get(row.get("Mstyle", "")) if is_amazon else None
