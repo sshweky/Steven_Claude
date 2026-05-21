@@ -3610,13 +3610,12 @@ async function toggleDetail(key) {
             \u2713 <b>No gaps:</b> all weeks through next receipt ${nextRcptStr} ${nextRcptWk} maintain  ${optWosStr} WOS (Opt WOS).
           </div>`;
       } else {
-        const mstyle = encodeURIComponent(r.mstyle || '');
-        const invMgmtUrl = `https://pim.quickbase.com/db/bpd24h9wy?a=dbpage&pagename=inv_mgmt_app.html&mstyle=${encodeURIComponent(mstyle)}`;
+        const invMgmtUrl = `https://pim.quickbase.com/db/bpd24h9wy?pageid=52&mstyle=${encodeURIComponent(r.mstyle || '')}`;
         gapBannerHtml = `
           <div style="margin-top:6px;padding:6px 10px;background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;font-size:11px;color:#b71c1c;">
             &#x26a0;&#xfe0f; <b>Inventory Gap:</b> ${_gap.weeks.length} week${_gap.weeks.length === 1 ? '' : 's'} below Opt WOS (${optWosStr})
             before next receipt ${nextRcptStr} ${nextRcptWk}.
-            Moving up open POs may close this gap &mdash;
+            Moving up open POs may close this gap --
             <a href="${invMgmtUrl}" target="_blank" style="color:#b71c1c;font-weight:600;">View in Inventory Manager &rarr;</a>
           </div>`;
       }
