@@ -4478,18 +4478,17 @@ def _build_alert(model, new, prior, pct, cap, mp, meta,
 
     # 2) One line on how the account actually buys.
     why = ""
-    if model == "Holt-Winters":
-        avg_l13 = meta.get("avg_l13", 0)
-        avg_l26 = meta.get("avg_l26", 0)
-        trend   = meta.get("T", 0)
-        if trend > 0.5 and avg_l13 > avg_l26 * 1.05:
-            why = (f"Recent ordering has been running ~{avg_l13:,.0f}/wk and "
+    if model == "Seasonal Baseline":
+        l13_avg = meta.get("l13_avg", 0)
+        l26_avg = meta.get("l26_avg", 0)
+        if l13_avg > l26_avg * 1.05:
+            why = (f"Recent ordering has been running ~{l13_avg:,.0f}/wk and "
                    f"the rate is climbing.")
-        elif trend < -0.5 and avg_l13 < avg_l26 * 0.95:
-            why = (f"Recent ordering has been running ~{avg_l13:,.0f}/wk and "
+        elif l13_avg < l26_avg * 0.95:
+            why = (f"Recent ordering has been running ~{l13_avg:,.0f}/wk and "
                    f"the rate is cooling.")
         else:
-            why = f"Steady weekly buyer here — last 13 weeks averaging ~{avg_l13:,.0f}/wk."
+            why = f"Steady weekly buyer here -- last 13 weeks averaging ~{l13_avg:,.0f}/wk."
     elif model == "Croston's":
         n_l13 = meta.get("n_l13", 0)
         z     = meta.get("z", 0)
