@@ -9914,7 +9914,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             if l52 > 0:
                 _pos_parts.append(f"L52W {l52:.0f}/wk")
             if _pos_parts:
-                specific.append(
+                pinned_last.append(
                     f"<b>Amazon POS Sales:</b> "
                     + ", ".join(_pos_parts)
                     + f" ({_trend_lbl})."
