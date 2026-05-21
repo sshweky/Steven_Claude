@@ -4000,14 +4000,13 @@ def crostens(history, mp, is_amazon=False, description=None,
     #            stock burns through → cap z toward POS L13W rate.
     #   Moderate above-POS (POS × 1.0–2.0): blend 75% POS / 25% Croston's.
     # Volume-gated (POS L13 ≥ 50/wk) to avoid tail-item noise.
-    _f18_applied = False
-    _f18_driver  = None
+    _f18_applied     = False
+    _f18_driver      = None
+    _f18_capped_down = False   # True when F18 intentionally caps z DOWN (R6 must not re-lift)
     if pos_data:
         _pos_l4_f18  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
         _pos_l13_f18 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
         _pos_l26_f18 = float(pos_data.get("Avg_Units_Wk_L26w") or 0)
-        # DEBUG-FF7297 (remove after diagnosis)
-        _dbg_7297 = False  # set below if needed
         _pos_healthy_f18 = _pos_l13_f18 >= 50.0 and _pos_l4_f18 >= _pos_l13_f18 * 0.5
         if _pos_healthy_f18 and z > 0:
             _p_use       = max(1.0, p)
@@ -4023,25 +4022,38 @@ def crostens(history, mp, is_amazon=False, description=None,
                                 f"z {z:.0f} → {_z_new:.0f}")
                 z            = _z_new
                 _f18_applied = True
+                # uplift direction — R6 may still apply
             elif _implied_wk > _pos_l13_f18 * 2.0:
                 # Croston's rate heavily above POS — customer stocked up;
-                # recent large orders inflated z.  Cap toward POS L13W rate.
-                _capped_wk   = _pos_l13_f18
+                # recent large orders inflated z.  Cap toward POS rate.
+                # F18b — recovery anchor (2026-05-21): when L4W > L13W × 1.5
+                # AND L26W > L13W × 1.5, L13W is distorted by a dormancy trough
+                # (DC was overstocked and drew down, suppressing both our orders
+                # and Amazon POS).  Use max(L13W, L26W × 0.75) as the cap so we
+                # don't penalise the recovery back to a dormancy-distorted floor.
+                _recovering_f18 = (_pos_l4_f18  > _pos_l13_f18 * 1.5
+                                   and _pos_l26_f18 > _pos_l13_f18 * 1.5
+                                   and _pos_l26_f18 > 0)
+                _capped_wk   = (max(_pos_l13_f18, _pos_l26_f18 * 0.75)
+                                if _recovering_f18 else _pos_l13_f18)
                 _z_new       = _capped_wk * _p_use
                 _f18_driver  = (f"F18 stocked-up: implied {_implied_wk:.0f}/wk "
-                                f"→ 100% POS L13 {_capped_wk:.0f}, "
-                                f"z {z:.0f} → {_z_new:.0f}")
-                z            = _z_new
-                _f18_applied = True
+                                f"-> {'recovery-anchor ' if _recovering_f18 else ''}"
+                                f"POS {_capped_wk:.0f}, "
+                                f"z {z:.0f} -> {_z_new:.0f}")
+                z                = _z_new
+                _f18_applied     = True
+                _f18_capped_down = True   # R6 must not re-lift
             elif _implied_wk > _pos_l13_f18 * 1.0:
                 # Moderately above POS — 75/25 POS/Croston's blend.
                 _blended_wk  = _pos_l13_f18 * 0.75 + _implied_wk * 0.25
                 _z_new       = _blended_wk * _p_use
-                _f18_driver  = (f"F18 above-POS {_implied_wk/_pos_l13_f18:.1f}× "
-                                f"→ 75/25 POS/ord: {_implied_wk:.0f} → {_blended_wk:.0f}, "
-                                f"z {z:.0f} → {_z_new:.0f}")
-                z            = _z_new
-                _f18_applied = True
+                _f18_driver  = (f"F18 above-POS {_implied_wk/_pos_l13_f18:.1f}x "
+                                f"-> 75/25 POS/ord: {_implied_wk:.0f} -> {_blended_wk:.0f}, "
+                                f"z {z:.0f} -> {_z_new:.0f}")
+                z                = _z_new
+                _f18_applied     = True
+                _f18_capped_down = True   # R6 must not re-lift
 
     # Fix 1 — Category seasonality for Croston's: precompute per-week multipliers.
     # Croston's normally uses z directly (no seasonal profile) to avoid noisy
