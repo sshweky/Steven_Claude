@@ -125,6 +125,15 @@ ECOM_CUST_SUBSTRS = [
     "PETSMART.COM",
 ]
 
+# F61 — Switchover variant suffixes.
+# Styles ending in these suffixes (e.g. FF8654EC, FF8654COS, FF8654AMZ) are
+# treated as drop-ship / ecom variants of the base mstyle (FF8654).  Because
+# the retailer orders EITHER the base OR the variant in any given week -- never
+# both -- having projections or open orders on a variant means those weeks
+# should NOT also have demand planned on the base.  Extend this list as new
+# variant types are introduced.
+SWITCHOVER_SUFFIXES = ("EC", "COS", "AMZ", "DS", "DTC")
+
 # F66 — Per-customer bias correction.  Customers where planners override AI
 # in the same direction >75% of the time get a post-model calibration multiplier.
 # Derived from manual-vs-AI analysis (2026-05-17).
