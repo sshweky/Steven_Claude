@@ -3142,7 +3142,7 @@ async function toggleDetail(key) {
     console.warn('[toggleDetail] record not found in ALL_RECORDS for key:', JSON.stringify(key),
                  '| ALL_RECORDS.length:', ALL_RECORDS.length,
                  '| sample keys:', ALL_RECORDS.slice(0,3).map(x => x.key));
-    el.innerHTML = `<td colspan="21" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
+    el.innerHTML = `<td colspan="22" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
       <b style="color:#e65100">&#x26A0; Detail panel could not load for this record.</b><br>
       <span style="font-size:11px;color:#555;">Key: <code>${key || '(empty)'}</code> was not found in the loaded record set (${ALL_RECORDS.length} records loaded).
       Try refreshing with <a href="?nocache=1" style="color:#1565c0">?nocache=1</a> to force a fresh pull from Quickbase.
@@ -4077,7 +4077,7 @@ async function toggleDetail(key) {
       </div>`;
   }
 
-  el.innerHTML = `<td colspan="21" style="padding:0">
+  el.innerHTML = `<td colspan="22" style="padding:0">
     ${poPrjAlertHtml}
     ${autoProjectBtn}
     ${fdStatusHtml}
@@ -4120,7 +4120,7 @@ async function toggleDetail(key) {
     // Something threw while building the detail HTML. Surface the error
     // inside the pane instead of leaving it blank.
     console.error('[toggleDetail] render error for key', JSON.stringify(key), err);
-    el.innerHTML = `<td colspan="21" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
+    el.innerHTML = `<td colspan="22" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
       <b style="color:#e65100">&#x26A0; Detail panel render error</b><br>
       <span style="font-size:11px;color:#555;">Key: <code>${key || '(empty)'}</code><br>
       Error: <code>${(err && err.message) ? err.message.replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]) : String(err)}</code><br>
