@@ -10227,9 +10227,12 @@ def main():
     for _row in rows:
         _k   = _row.get("Acct_MStyle_Key_", "")
         _ms  = _row.get("Mstyle", "")
-        if not _ms.endswith("EC") or "-" not in _k:
+        _f60_sfx = (2 if _ms.endswith("EC")
+                    else 3 if (_ms.endswith("COS") or _ms.endswith("AMZ"))
+                    else 0)
+        if not _f60_sfx or "-" not in _k:
             continue
-        _parent_ms  = _ms[:-2]
+        _parent_ms  = _ms[:-_f60_sfx]
         _acct_pfx   = _k.split("-", 1)[0]
         _parent_key = f"{_acct_pfx}-{_parent_ms}"
         _parent_row = row_by_key.get(_parent_key)
