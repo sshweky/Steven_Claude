@@ -4,7 +4,7 @@
 # Sends the log by email on completion if C:\ProgramData\PPForecast\mail_config.txt exists.
 
 $Python    = "C:\Python314\python.exe"
-$ScriptDir = "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts"
+$ScriptDir = 'C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts'
 $LogDir    = "$ScriptDir\logs"
 $MailCfg   = "C:\ProgramData\PPForecast\mail_config.txt"
 
