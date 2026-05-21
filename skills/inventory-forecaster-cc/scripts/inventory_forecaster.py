@@ -4685,9 +4685,9 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     # fall back to the parent so F59h WOS / F59m restock logic gets DC data.
     if is_amazon and amz_catalog is None:
         _amzcat_ms = (row.get("Mstyle") or "").upper()
-        if _amzcat_ms.endswith("EC") or _amzcat_ms.endswith("COS"):
+        if _amzcat_ms.endswith("EC") or _amzcat_ms.endswith("COS") or _amzcat_ms.endswith("AMZ"):
             import re as _re2
-            _amzcat_parent = _re2.sub(r'(?:EC|COS)$', '', row.get("Mstyle", ""),
+            _amzcat_parent = _re2.sub(r'(?:EC|COS|AMZ)$', '', row.get("Mstyle", ""),
                                        flags=_re2.IGNORECASE)
             _parent_cat = (amazon_catalog_us or {}).get(_amzcat_parent)
             if _parent_cat:
