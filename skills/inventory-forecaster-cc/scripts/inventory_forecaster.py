@@ -9826,6 +9826,38 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
     gap_pill    = []   # Plan vs AI gap summary — only if >= 15% gap; lowest priority
     pinned_last = []   # Amazon POS Sales + DC Inv — always the final 2 bullets (Amazon only)
 
+    # ── Critical: Inactive-looking record warning (2026-05-21) ───────────────
+    # When a record has no manual projections, no recent/future POG launch
+    # date, and no "NEW" in Status_Cust, it is almost certainly an abandoned
+    # distribution slot that should be closed rather than forecasted.  Surface
+    # a red hazard warning at the very top of the analysis so planners don't
+    # overlook it while reviewing the queue.
+    #
+    # "Recent" POG = launched within the last 26 weeks (still ramping up).
+    # "Future" POG = launch date is after today.
+    # Either exempts the record from this warning.
+    _inactive_warn_status = str(rec.get("status_cust") or "").upper()
+    _inactive_warn_pog    = str(rec.get("pog_launch") or "").strip()
+    _pog_recent_or_future = False
+    if _inactive_warn_pog:
+        try:
+            from datetime import date as _dt_iw, timedelta as _td_iw
+            _pog_iw   = _dt_iw.fromisoformat(_inactive_warn_pog[:10])
+            _today_iw = _dt_iw.today()
+            _pog_recent_or_future = _pog_iw >= (_today_iw - _td_iw(weeks=26))
+        except Exception:
+            pass
+    if (manual_total == 0
+            and not _pog_recent_or_future
+            and "NEW" not in _inactive_warn_status):
+        critical.append(
+            '<span style="color:#dc2626;font-weight:700;">&#9888; LOOKS INACTIVE</span>'
+            ' <span style="color:#991b1b;">'
+            'No manual projections entered, no active or upcoming POG, and status '
+            'does not indicate a new item. This record should likely be closed.'
+            '</span>'
+        )
+
     # ── Critical: F70 Switchover variant conflict ─────────────────────────────
     # When a variant style (EC/COS/AMZ/...) at the same account has demand in
     # specific weeks, prepend a top-of-analysis bullet explaining the switchover
