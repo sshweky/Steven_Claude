@@ -7484,11 +7484,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f59i_pos_l52 = float(pos_data.get("Avg_Units_Wk_L52w") or 0)
             _f59i_wos     = _f59h_wos   # reuse WOS computed in F59h block above
 
-            if (not _f59i_is_ec
-                    and _f59i_pos_l4 >= 100 and _f59i_pos_l13 > 0
+            if (_f59i_pos_l4 >= 100 and _f59i_pos_l13 > 0
                     and amz_catalog
                     and (_f59h_wos >= 6 or _f59h_wos == 0)):
-                # ── Path B: all non-EC Amazon models — tiered POS correction ──
+                # ── F59i: all Amazon models — tiered POS correction ───────────
                 # Amazon orders include DC inventory management (restock, safety-
                 # stock builds, catch-up after short-ship) on top of consumer
                 # demand.  When DC WOS is healthy (>= 6) and the forecast
