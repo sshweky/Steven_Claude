@@ -9772,11 +9772,19 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         _g2_man_zero = sum(manual) == 0
         _g2_ord_lw   = float(row.get("Ord_LW") or 0)
         _g2_parts    = []
-        if _g2_active and _g2_man_zero:
-            _g2_parts.append(
-                "Manual PRJs are all zero but Status @ Cust is still Active -- "
-                "no manual demand is on file for this item."
-            )
+        if _g2_active:
+            # Flag regardless of whether manual is zero or not -- any G2 + Active
+            # combination means the AI shows Inactive but the item is still live.
+            if _g2_man_zero:
+                _g2_parts.append(
+                    "Manual PRJs are all zero but Status @ Cust is still Active -- "
+                    "no manual demand is on file for this item."
+                )
+            else:
+                _g2_parts.append(
+                    "AI forecast is all zeros (guards covered demand) but Status @ "
+                    "Cust is still Active -- confirm manual PRJ reflects current demand."
+                )
         if _g2_ord_lw > 0:
             _g2_parts.append(
                 f"Orders came in on this item this week ({_g2_ord_lw:,.0f} units) -- "
