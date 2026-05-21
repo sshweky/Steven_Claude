@@ -8337,7 +8337,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             meta.setdefault("drivers", []).append(
                 f"G2 All-zero demotion: model was {_orig_model} but all 26 weeks "
                 f"were zeroed by downstream guards (VP-Q4 PO / VP-OP buffer / "
-                f"VP-W1 Wed-cutoff / F70 switchover / F_PO_CUTOFF / F36 burnoff / F38f offline). "
+                f"F70 switchover / F_PO_CUTOFF / F36 burnoff / F38f offline). "
                 f"Surfaced as Inactive so the narrative reflects reality."
             )
 
