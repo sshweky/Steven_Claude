@@ -6934,12 +6934,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"distribution ({_new_total_f46:,}) over 26 wks"
             )
 
-    # F33 (2026-04-26, REVERTED) — Model-class global calibration was attempted
-    # but the cap-base interaction clipped Croston DOWN to median -37% (worse
-    # than the original -15% it was meant to fix).  The global-multiplier
-    # approach is too blunt — model-class calibration needs realized-vs-
-    # forecast feedback data to be safe, which we don't have yet.
-    # Reverted to keep the algorithm at its current local optimum.
+    # F33 reverted 2026-04-26 -- see CHANGELOG.md.
 
     # VP-Q4 (2026-05-03) — Don't double-count confirmed customer POs.
     # For any forward week where a confirmed PO already exists, zero out
