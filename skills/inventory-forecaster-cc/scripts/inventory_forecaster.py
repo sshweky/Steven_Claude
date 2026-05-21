@@ -1135,8 +1135,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # Fix 3 — Outlier cap: if a single stocking spike dominates L13W non-zero values
     # (max > 3.0× median), cap it to 3.0× median before averaging. This prevents
     # one large replenishment order from inflating the per-order baseline.
-    # (F12 reverted 2026-04-21: tightening to 2.5× and secondary spike check both
-    # over-corrected — see gap analysis run #2.)
+    # (F12 reverted 2026-04-21 -- see CHANGELOG.md)
     #
     # F25 (2026-04-26) — Extreme-outlier DROP:  when a single value is >5× the
     # median AND there are ≥ 4 other non-zero weeks to lean on, drop it entirely
