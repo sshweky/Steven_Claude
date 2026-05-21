@@ -2508,19 +2508,24 @@ function editCustSku(key, cellEl) {
   const rec = ALL_RECORDS.find(x => x.key === key);
   if (!rec) return;
   const current = rec.cust_sku || '';
+  // Let the input overflow the cell without clipping
+  cellEl.style.overflow  = 'visible';
+  cellEl.style.position  = 'relative';
   const inp = document.createElement('input');
   inp.type = 'text';
   inp.value = current;
-  inp.style.cssText = 'font-size:11px;padding:1px 4px;border:1px solid #1565c0;border-radius:3px;min-width:180px;width:max-content;max-width:320px;position:relative;z-index:10;';
+  inp.style.cssText = 'font-size:11px;padding:1px 4px;border:1px solid #1565c0;border-radius:3px;min-width:200px;max-width:360px;position:absolute;top:0;left:0;z-index:20;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.15);';
   cellEl.innerHTML = '';
   cellEl.appendChild(inp);
   inp.focus();
   inp.select();
-  const commit = () => _commitCustSkuEdit(key, inp.value.trim(), cellEl);
+  const restore = () => { cellEl.style.overflow = 'hidden'; cellEl.style.position = ''; };
+  const commit  = () => { restore(); _commitCustSkuEdit(key, inp.value.trim(), cellEl); };
+  const cancel  = () => { restore(); cellEl.textContent = current; cellEl.title = current || 'Click to edit Cust SKU#'; };
   inp.addEventListener('blur', commit);
   inp.addEventListener('keydown', ev => {
     if (ev.key === 'Enter')  { ev.preventDefault(); inp.removeEventListener('blur', commit); commit(); }
-    if (ev.key === 'Escape') { ev.preventDefault(); inp.removeEventListener('blur', commit); cellEl.textContent = current; }
+    if (ev.key === 'Escape') { ev.preventDefault(); inp.removeEventListener('blur', commit); cancel(); }
   });
 }
 
