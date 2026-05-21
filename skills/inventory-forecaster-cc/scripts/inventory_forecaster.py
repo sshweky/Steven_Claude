@@ -1309,7 +1309,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             ord_baseline *= 0.65
             _f6_applied = True
         elif _l13_avg_f6 > 0 and _l4_avg_f6 / _l13_avg_f6 <= 0.70:
-            # F26 (2026-04-26) — mild-zone decay.  Between F6's hard 0.5× rule
+            # F26 (2026-04-26) -- mild-zone decay.  Between F6b's hard 0.5x rule
             # and "no action" was a gap: items showing 50-70% of L13 in the
             # last 4 weeks are clearly cooling but escaped F6.  Apply a softer
             # 0.85× scale so we lean toward the recent rate without overreacting.
