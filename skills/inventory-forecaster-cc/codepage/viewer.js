@@ -6187,7 +6187,13 @@ function filterPri(pri) {
   const current = sel._getSelected();
   const isOnlyThisOne = current.size === 1 && current.has(pri);
   sel._setSelection(isOnlyThisOne ? [] : [pri]);
-  const btns = {'CRITICAL':'btn-pri-crit','MEDIUM':'btn-pri-med','LOW':'btn-pri-low'};
+  const btns = {
+    'CRITICAL': 'btn-pri-crit',
+    'HIGH':     'btn-pri-high',
+    'MID':      'btn-pri-mid',
+    'LOW':      'btn-pri-low',
+    'On-Plan':  'btn-pri-onplan',
+  };
   Object.entries(btns).forEach(([v, id]) => {
     const b = document.getElementById(id);
     if (b) b.classList.toggle('badge-active', !isOnlyThisOne && v === pri);
