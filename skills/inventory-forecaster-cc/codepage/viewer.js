@@ -1775,11 +1775,22 @@ function adaptRow(row) {
   const ord_l13      = num(row, F.ORD_WK_L13);
   const pct_diff     = manual_total > 0 ? ((ai_total - manual_total) / manual_total) * 100 : 0;
 
-  const vol_tier = ai_per_wk >= 1000 ? 'HIGH' : ai_per_wk >= 200 ? 'MEDIUM' : 'LOW';
   const pct_abs = Math.abs(pct_diff);
-  const priority = (vol_tier === 'HIGH'   && pct_abs > 10) ? 'CRITICAL'
-                 : (vol_tier === 'MEDIUM' && pct_abs > 10) ? 'MEDIUM'
-                 : 'LOW';
+  // Priority: On-Plan wins at any volume when gap <= 5% and plan exists.
+  // Otherwise tier by AI weekly rate (gap > 5% required for each tier).
+  let priority;
+  if (manual_total > 0 && pct_abs <= 5) {
+    priority = 'On-Plan';
+  } else if (ai_per_wk >= 1000) {
+    priority = 'CRITICAL';
+  } else if (ai_per_wk >= 500) {
+    priority = 'HIGH';
+  } else if (ai_per_wk >= 200) {
+    priority = 'MID';
+  } else {
+    priority = 'LOW';
+  }
+  const vol_tier = ai_per_wk >= 1000 ? 'HIGH' : ai_per_wk >= 500 ? 'HIGH' : ai_per_wk >= 200 ? 'MEDIUM' : 'LOW';
 
   // Seasonal customers (A: Promo, A: OffPrice) order 1-3x per year — zero-weeks
   // between order events are normal and must not generate ALERT flags.
