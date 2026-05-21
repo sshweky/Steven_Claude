@@ -1914,9 +1914,17 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
 
     # Raw forecast: damped profile + explicit event lifts
     raw = []
+    _f66_floored = 0
     for i in range(26):
         wnum = i + 1
         s = S[i]
+        # F66 (2026-05-21) — Seasonal floor: the seasonal profile can only
+        # INCREASE demand, never reduce it.  Any week where the multiplier
+        # would fall below 1.0 is held at 1.0 (flat baseline).  A historical
+        # order trough never pulls a forward forecast below the baseline rate.
+        if s < 1.0:
+            s = 1.0
+            _f66_floored += 1
         # F11 — tapered Prime Day lift (Amazon-only) via per-week schedule.
         if is_amazon and wnum in PRIME_DAY_LIFT_SCHEDULE:
             s *= PRIME_DAY_LIFT_SCHEDULE[wnum]
