@@ -6345,7 +6345,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f62_l4_avg  = sum(_f62_l4_nz) / len(_f62_l4_nz)
             _f62_l13_avg = sum(_f62_l13_nz) / len(_f62_l13_nz)
             _f62_ratio   = _f62_l4_avg / _f62_l13_avg if _f62_l13_avg > 0 else 1.0
-            # Mild decline: 0.70 ≤ ratio < 0.88 (F6/F26 already cover < 0.70)
+            # Mild decline: 0.70 <= ratio < 0.88 (F6b/F26 already cover < 0.70)
             if 0.70 <= _f62_ratio < 0.88:
                 # Blend scale: at ratio=0.70 → ×0.82, at ratio=0.88 → ×0.93
                 _f62_scale = 0.6 * _f62_ratio + 0.4
