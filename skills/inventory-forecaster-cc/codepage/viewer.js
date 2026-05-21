@@ -2161,25 +2161,31 @@ function _sortKey(v) {
 function refreshHeaderBadges() {
   const total = ALL_RECORDS.length;
   let high = 0, med = 0, low = 0;
-  let priCrit = 0, priMed = 0, priLow = 0;
+  let priCrit = 0, priHigh = 0, priMid = 0, priLow = 0, priOnPlan = 0;
   for (const r of ALL_RECORDS) {
     if (r.vol_tier === 'HIGH') high++;
     else if (r.vol_tier === 'MEDIUM') med++;
     else low++;
     if      (r.priority === 'CRITICAL') priCrit++;
-    else if (r.priority === 'HIGH' || r.priority === 'MID') priMed++;
-    else priLow++;   // LOW + On-Plan
+    else if (r.priority === 'HIGH')     priHigh++;
+    else if (r.priority === 'MID')      priMid++;
+    else if (r.priority === 'On-Plan')  priOnPlan++;
+    else                                priLow++;
   }
   document.getElementById('badge-total-n').textContent = total.toLocaleString();
   document.getElementById('badge-high-n' ).textContent = high.toLocaleString();
   document.getElementById('badge-med-n'  ).textContent = med.toLocaleString();
   document.getElementById('badge-low-n'  ).textContent = low.toLocaleString();
-  const pc = document.getElementById('badge-pri-crit-n');
-  const pm = document.getElementById('badge-pri-med-n');
-  const pl = document.getElementById('badge-pri-low-n');
-  if (pc) pc.textContent = priCrit.toLocaleString();
-  if (pm) pm.textContent = priMed.toLocaleString();
-  if (pl) pl.textContent = priLow.toLocaleString();
+  const pc  = document.getElementById('badge-pri-crit-n');
+  const ph  = document.getElementById('badge-pri-high-n');
+  const pm  = document.getElementById('badge-pri-mid-n');
+  const pl  = document.getElementById('badge-pri-low-n');
+  const pop = document.getElementById('badge-pri-onplan-n');
+  if (pc)  pc.textContent  = priCrit.toLocaleString();
+  if (ph)  ph.textContent  = priHigh.toLocaleString();
+  if (pm)  pm.textContent  = priMid.toLocaleString();
+  if (pl)  pl.textContent  = priLow.toLocaleString();
+  if (pop) pop.textContent = priOnPlan.toLocaleString();
 }
 
 // -- Display helpers --------------------------------------------------------
