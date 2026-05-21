@@ -1283,8 +1283,8 @@ function _refreshRowMetrics(key) {
 
   const aiProjEl = document.getElementById('metric-aiproj-' + sid);
   if (aiProjEl) {
-    aiProjEl.textContent = (aiVsProj >= 0 ? '+' : '') + aiVsProj.toFixed(1) + '%';
-    aiProjEl.style.color = aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888';
+    aiProjEl.textContent = aiVsProj === null ? '-' : (aiVsProj >= 0 ? '+' : '') + aiVsProj.toFixed(1) + '%';
+    aiProjEl.style.color = aiVsProj === null ? '#888' : aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888';
   }
 
   const fcstEl = document.getElementById('metric-fcst-' + sid);
