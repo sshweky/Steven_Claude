@@ -912,3 +912,27 @@ Description / Status / 52w order history / Manual plan / AI forecast, and
 writes a structured JSON report. Used to drill into methodology gaps on a
 representative sample. Edit the `KEYS` list at the top of the script before
 running. Output: `analysis_36_keys.json`.
+
+---
+
+## Model Fixes (applied 2026-05-21 -- EC parent lookup + VP-Q4 false abort)
+
+| Fix | Rule / Location | Description |
+|---|---|---|
+| **EC parent POS lookup** | Phase 2.5 -- `amazon_mstyles` set construction | EC and COS mstyle variants (e.g. "FF12302/24EC") have their POS and DC inventory data stored in Amazon_Catalog under the parent mstyle ("FF12302/24"). Fix: `amazon_mstyles` query set is expanded to include parent variants before the QB pull -- `amazon_mstyles = list(_amz_raw | {_ec_parent_for_query(m) for m in _amz_raw})` -- so the cache is keyed correctly and F59i / narrative can anchor to real POS data for EC items. |
+| **VP-Q4 false abort on zero open-PO items** | VP-Q4 guard at `len(open_pos_data) == 0` | VP-Q4 zero-out requires open-PO data to be present. When running a single-item scope for an item that genuinely has no open POs the old guard fired the abort incorrectly (treated "no matched keys" same as "CData returned nothing"). Fix: when `len(open_pos_data) == 0`, check `open_pos_report.json` cache for row count. If cache has rows, the pull was healthy -- item just has no POs, no abort needed. Only abort if cache itself is empty (real pull failure). |
+
+---
+
+## Codepage Viewer Fixes (applied 2026-05-21 -- Season column + inv flow header)
+
+Changes to `codepage/viewer.js` and `codepage/viewer.html`:
+
+| Change | Description |
+|---|---|
+| **Season column (viewer.html + viewer.js)** | Added sortable "Season" column to main table header immediately after "Status @ Cust". Cell renders `r.season_tag` (FID 1583, text) in purple. Empty for items with no season tag. colspan updated 24 -> 25. |
+| **[S] badge removed** | Removed the orange `[S]` seasonal badge from the row-badges td. The badge was firing for both A: Promo and A: OffPrice items because `is_seasonal` matches both, causing false positives on A: Promo items like 1025-FF4771. |
+| **Season FID 1583 added** | `F.SEASON = 1583` added to viewer.html FID block. `season_tag` field populated on each record from QB; included in SELECT fids. |
+| **Seasonal bullet (AI analysis)** | Replaced the old full-width yellow "Seasonal/Occasional Account" alert box with a compact bullet in the AI analysis narrative. Bullet fires only when `r.is_offprice || !!r.season_tag`. A: Promo items without a season tag no longer get any seasonal treatment. When both A: Promo status and a season tag are present, the bullet adds a note that "retailer will likely place a manual buy to cover the in-season window." |
+| **Next Avl Rcpt Dt card** | Added "Next Avl Rcpt Dt" info card in the detail pane immediately after the "Next Rcpt" card, showing the date from `r.inv_flow_next_rcpt`. |
+| **Red asterisk on inv flow table** | In the inv flow week-by-week table header, the column corresponding to `inv_flow_next_rcpt` gets a red superscript `*` so planners can immediately spot which week new inventory becomes available. |
