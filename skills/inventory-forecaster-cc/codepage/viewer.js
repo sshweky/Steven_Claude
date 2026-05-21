@@ -1605,6 +1605,93 @@ async function saveInitUpspw(key, rawValue, el) {
 }
 window.saveInitUpspw = saveInitUpspw;
 
+// -- Inventory Request Detail lookup ----------------------------------------
+// Called from the Sales Request row in the POG Info block.  Fetches a record
+// from the Inventory Request Detail table (btjf9wtis) by Record ID#, verifies
+// it belongs to the current Acct#-MStyle, then auto-populates and saves the
+// POG fields on the Projections table.
+//
+// Fields read from Inventory Request Detail (btjf9wtis):
+//   fid 3  = Record ID#        (lookup key)
+//   fid 36 = Acct#-Mstyle      (verified against current key)
+//   fid 43 = POG Set Date      -> POG Launch (fid 1594 on Projections)
+//   fid 44 = POG End Date      -> POG End (fid 1595 on Projections)
+//   fid 22 = ISO Units         -> Est ISO Input (fid 1606 on Projections)
+//   fid 14 = ISO Pipeline Qty  -> displayed in status (no corresponding Projections field)
+//   fid 11 = # Stores          -> Store Count (fid 14 on Projections)
+//   fid 12 = UPSPW             -> Init UPSPW (fid 1607 on Projections)
+async function lookupInvRequest(key, requestIdStr) {
+  const safeKey = key.replace(/'/g, '&#39;');
+  const msgEl   = document.getElementById('pog-req-msg-' + safeKey);
+  const setMsg  = (txt, color) => { if (msgEl) { msgEl.textContent = txt; msgEl.style.color = color || '#555'; } };
+
+  const rid = parseInt(requestIdStr, 10);
+  if (!rid || rid <= 0) { setMsg('Enter a valid Request ID number.', '#c00'); return; }
+
+  setMsg('Looking up...', '#888');
+  try {
+    const F = CFG.INV_REQ_FID;
+    const resp = await qb('/records/query', {
+      from:    CFG.INV_REQ_DETAIL_TID,
+      select:  [F.RECORD_ID, F.ACCT_MSTYLE, F.POG_SET_DATE, F.POG_END_DATE,
+                F.ISO_UNITS, F.ISO_PIPELINE, F.STORES, F.UPSPW],
+      where:   `{${F.RECORD_ID}.EX.${rid}}`,
+      options: { top: 1 },
+    });
+
+    const rows = resp?.data || [];
+    if (!rows.length) { setMsg(`No request found with ID ${rid}.`, '#c00'); return; }
+
+    const row    = rows[0];
+    const rowKey = (row[F.ACCT_MSTYLE]?.value || '').trim();
+    if (rowKey !== key) {
+      setMsg(`Request ${rid} belongs to "${rowKey}", not this item.`, '#c00');
+      return;
+    }
+
+    // Strip timestamps -- QB dates arrive as "YYYY-MM-DDT..." or plain "YYYY-MM-DD"
+    const toIso = v => { if (!v) return ''; const m = String(v).match(/^(\d{4}-\d{2}-\d{2})/); return m ? m[1] : ''; };
+
+    const pogSet   = toIso(row[F.POG_SET_DATE]?.value);
+    const pogEnd   = toIso(row[F.POG_END_DATE]?.value);
+    const isoUnits = Number(row[F.ISO_UNITS]?.value  || 0);
+    const isoPipe  = Number(row[F.ISO_PIPELINE]?.value || 0);
+    const stores   = Number(row[F.STORES]?.value    || 0);
+    const upspw    = Number(row[F.UPSPW]?.value     || 0);
+
+    const filled = [];
+
+    if (pogSet) {
+      const el = document.getElementById('pog-launch-' + safeKey);
+      if (el) { el.value = pogSet; await savePogDate(key, 'launch', pogSet, el); filled.push('POG Set'); }
+    }
+    if (pogEnd) {
+      const el = document.getElementById('pog-end-' + safeKey);
+      if (el) { el.value = pogEnd; await savePogDate(key, 'end', pogEnd, el); filled.push('POG End'); }
+    }
+    if (stores) {
+      const el = document.getElementById('store-count-' + safeKey);
+      if (el) { el.value = stores; await saveStoreCount(key, stores, el); filled.push('Stores'); }
+    }
+    if (isoUnits) {
+      const el = document.getElementById('est-iso-input-' + safeKey);
+      if (el) { el.value = isoUnits; await saveEstIsoInput(key, isoUnits, el); filled.push('ISO Units'); }
+    }
+    if (upspw) {
+      const el = document.getElementById('init-upspw-' + safeKey);
+      if (el) { el.value = upspw; await saveInitUpspw(key, upspw, el); filled.push('UPSPW'); }
+    }
+
+    let msg = `Loaded from Request #${rid}`;
+    if (filled.length) { msg += `: ${filled.join(', ')}.`; } else { msg += ' (no POG data found).'; }
+    if (isoPipe)       { msg += ` ISO Pipeline: ${Math.round(isoPipe).toLocaleString()} units.`; }
+    setMsg(msg, '#1b5e20');
+  } catch (e) {
+    setMsg('Lookup failed: ' + (e.message || e), '#c00');
+  }
+}
+window.lookupInvRequest = lookupInvRequest;
+
 // Client-side ordered-units WoW line for non-POS records.  The multi-window
 // L4/L13/L26/L52 "order rate" panel was REMOVED 2026-05-08 per planner
 // feedback  -  it used non-zero averaging which contradicted the smart Order
