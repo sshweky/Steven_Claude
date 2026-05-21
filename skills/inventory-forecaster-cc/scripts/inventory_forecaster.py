@@ -9512,9 +9512,9 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
           l26_avg > l52_avg * 1.10):
         yoy_pct = (l26_avg / l52_avg - 1.0) * 100
         expl = (f"L26W ({l26_avg:.0f}/wk) is +{yoy_pct:.0f}% vs L52W "
-                f"({l52_avg:.0f}/wk) — momentum has been building at {cl} "
-                f"across multiple quarters, not a 1-off bump. Plan for the "
-                f"pace to hold or build into Q4 unless POS turns.")
+                f"({l52_avg:.0f}/wk) -- above the same period last year and "
+                f"sustained across the L26W window. Multi-quarter positive "
+                f"trend at {cl}.")
     # 6) Per-order qty growth (cadence stable, qty up).
     elif (short_pct > 0 and per_l13 > 0 and per_l4 > 0 and
           per_l4 / per_l13 >= 1.20 and
