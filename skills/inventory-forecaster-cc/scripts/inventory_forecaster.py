@@ -7594,18 +7594,27 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 f"inventory noise. Model: {model}."
                             )
                     else:
-                        if _f59i_ratio > 1.40:
+                        if _f59i_ratio > 1.40 and not _f59i_wos_capped:
                             # Severe: anchor to POS L4W (floor 0.60 guards against
-                            # temporarily-depressed POS reading)
+                            # temporarily-depressed POS reading).
+                            # Only fires when WOS is confirmed >= 6 (known healthy).
+                            # When WOS is unknown (capped), fall through to moderate
+                            # blend -- we cannot confirm DC is well-stocked.
                             _f59i_anchor = max(0.60, _f59i_pos_l4 / _f59i_w1_4_avg)
                             _f59i_mode   = "strong"
                         else:
-                            # Moderate: soft blend toward POS L13W
+                            # Moderate: soft blend toward POS L13W.
+                            # Used for 1.15x-1.40x ratio, OR when ratio > 1.40
+                            # but WOS is unknown (capped) -- conservative action
+                            # on uncertain DC-stock data.
                             _f59i_anchor = (
                                 (_f59i_pos_l13 * 0.50 + _f59i_w1_4_avg * 0.50)
                                 / _f59i_w1_4_avg
                             )
-                            _f59i_mode   = "blend"
+                            _f59i_mode   = (
+                                "blend (WOS unknown)" if _f59i_wos_capped
+                                else "blend"
+                            )
                         _f59i_anchor = min(_f59i_anchor, 1.0)  # never inflate
                         for _wi in range(len(fcst)):
                             fcst[_wi] = snap(fcst[_wi] * _f59i_anchor, mp)
