@@ -3702,56 +3702,6 @@ async function toggleDetail(key) {
     </button>
   </div>` : '';
 
-  // -- Seasonal / occasional order card ----------------------------------------
-  // Shown for A: Promo and A: OffPrice accounts that order 1-3x per year.
-  // Summarises the historical order cadence and gives the planner a starting
-  // point for projections: same-period LY or the rolling gap between events.
-  let seasonalCardHtml = '';
-  if (r.is_seasonal) {
-    const _sp  = _analyzeSeasonalPattern(r.hist_ord || []);
-    const _lyT = (r.ly_ord || []).reduce((a, b) => a + (b || 0), 0);
-
-    // Which LY weeks had orders (1-based week labels)
-    const _lyActiveWks = (r.ly_ord || [])
-      .map((v, i) => (v || 0) > 0 ? 'W' + (i + 1) : null)
-      .filter(Boolean);
-
-    // Next-order estimate line
-    let _nextLine = '';
-    if (_sp.nextExpectedWk !== null) {
-      if (_sp.nextExpectedWk <= 0) {
-        _nextLine = `<span style="color:#c62828;font-weight:700;">Order overdue by ~${Math.abs(_sp.nextExpectedWk)} wk${Math.abs(_sp.nextExpectedWk) !== 1 ? 's' : ''}</span>`;
-      } else if (_sp.nextExpectedWk <= 4) {
-        _nextLine = `<span style="color:#e65100;font-weight:700;">Next order expected in ~${_sp.nextExpectedWk} wk${_sp.nextExpectedWk !== 1 ? 's' : ''}</span>`;
-      } else {
-        _nextLine = `Next order expected in ~${_sp.nextExpectedWk} wks`;
-      }
-    } else if (_sp.events.length === 1) {
-      _nextLine = 'Only 1 order event in L26W &mdash; need more history for gap estimate';
-    } else {
-      _nextLine = 'No orders in L26W';
-    }
-
-    // Suggested projection note
-    const _sugNote = _lyT > 0
-      ? `Plan ~${_lyT.toLocaleString()} units based on same-period LY${_lyActiveWks.length ? ' (active: ' + _lyActiveWks.join(', ') + ')' : ''}.`
-      : (_sp.avgOrderTotal > 0
-          ? `No LY data &mdash; use last order event as reference (~${_sp.avgOrderTotal.toLocaleString()} units avg).`
-          : 'No LY or recent order data available.');
-
-    seasonalCardHtml = `
-    <div style="margin:8px 12px 0 12px;padding:10px 14px;background:#fff8e1;border:1px solid #f9a825;border-radius:6px;font-size:12px;">
-      <div style="font-weight:700;color:#f57f17;margin-bottom:6px;font-size:12px;">&#x1F4C5; Seasonal / Occasional Account</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:4px 20px;font-size:11px;color:#444;">
-        <div><b>Order events L26W:</b> ${_sp.events.length}</div>
-        <div><b>Avg gap between orders:</b> ${_sp.avgGapWks !== null ? '~' + _sp.avgGapWks + ' wks' : 'n/a'}</div>
-        <div><b>Weeks since last order:</b> ${_sp.wksSinceLast !== null ? _sp.wksSinceLast + ' wks' : 'n/a'}</div>
-        <div><b>LY same-period total:</b> ${_lyT > 0 ? _lyT.toLocaleString() + ' units' : ' -'}</div>
-      </div>
-      <div style="margin-top:6px;font-size:11px;color:#555;">${_nextLine}</div>
-      <div style="margin-top:4px;font-size:11px;color:#555;font-style:italic;">${_sugNote}</div>
-    </div>`;
-  }
 
   const commentBlock = `
   <div style="margin:10px 12px 12px 12px;padding:12px;background:#f7f9fc;border:1px solid #d8dce3;border-radius:6px;">
