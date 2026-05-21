@@ -1776,10 +1776,12 @@ function adaptRow(row) {
   const pct_diff     = manual_total > 0 ? ((ai_total - manual_total) / manual_total) * 100 : 0;
 
   const pct_abs = Math.abs(pct_diff);
-  // Priority: On-Plan wins at any volume when gap <= 5% and plan exists.
+  // Priority: On-Plan wins when AI and Man are aligned.
+  // Two cases: (1) both zero -- nothing to review; (2) plan entered and gap <= 5%.
   // Otherwise tier by AI weekly rate (gap > 5% required for each tier).
   let priority;
-  if (manual_total > 0 && pct_abs <= 5) {
+  const _both_zero = manual_total === 0 && ai_total === 0;
+  if (_both_zero || (manual_total > 0 && pct_abs <= 5)) {
     priority = 'On-Plan';
   } else if (ai_per_wk >= 1000) {
     priority = 'CRITICAL';
