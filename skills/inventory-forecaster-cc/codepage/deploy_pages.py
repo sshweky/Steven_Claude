@@ -34,6 +34,13 @@ def upload_page(filename: str):
     path    = HERE / filename
     content = path.read_text(encoding="utf-8")
 
+    # Inject build timestamp into viewer.js cache key so every deploy
+    # automatically busts the IndexedDB projection cache for all browsers.
+    if filename == "viewer.js" and "%%BUILD_TS%%" in content:
+        build_ts = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        content  = content.replace("%%BUILD_TS%%", build_ts)
+        print(f"  [cache-bust] PRJ_CACHE_BUILD = {build_ts}")
+
     FFFF  = "￿"
     FFFD  = "�"
     n_replaced = content.count(FFFF)
