@@ -7620,59 +7620,63 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 f"{_f59i_desc}. Model: {model}."
                             )
 
-        # ── F59j — Amazon low-DC restock false-acceleration correction ──────
-        # When the DC is undersupplied (WOS < 8wks) Amazon places large
-        # catch-up orders to restock toward their 8-12wk target.  These 1-2
-        # week spikes inflate the recency-weighted baseline (T4 acceleration
-        # blend, L8W overlay) and push the AI forecast well above the
-        # underlying consumer POS run rate.
+        # ── F59j — Amazon DC understock: POS floor + early-week restock lift ──
+        # When Amazon DC WOS < 8 (below target range of 8-12 wks), Amazon will
+        # order ABOVE consumer POS rate to rebuild DC inventory.  The AI should:
+        #   1. Floor every non-zero week at POS L4W (never project below
+        #      consumer demand -- that is always the minimum ordering rate)
+        #   2. Add a restock lift to W1-W3 to bring DC back to 8 WOS target,
+        #      accounting for units already in transit (OPO).
         #
-        # Key insight: high recent orders relative to POS + low DC WOS is a
-        # restock surge pattern, NOT demand acceleration.  The forward
-        # projection should reflect consumer velocity (POS L4W), not the
-        # temporary fill-in demand.
+        # Restock deficit = max(0, 8 * demand_rate - (SOH + OPO))
+        # where demand_rate = SOH / WOS (Amazon's internal sell-through rate).
+        # Spread deficit evenly over 3 weeks.
         #
-        # Fires when ALL of:
-        #   is_amazon, pos_data, amz_catalog present
-        #   DC WOS < 8 (understocked -- restock in progress)
-        #   L2W order avg > POS L4W * 1.5 (recent orders >> consumer demand)
-        #   W1-W4 AI forecast avg > POS L4W * 1.2 (forecast inflated by surge)
-        #   POS L4W >= 100 (credible POS signal)
-        #
-        # Correction: rescale full 26W forecast so W1-W4 avg = POS L4W,
-        # preserving seasonal shape.  Scale floor = 0.60 to avoid
-        # over-correction if POS data is temporarily depressed.
+        # This is directionally opposite to what F59i does: F59i reduces when
+        # DC is healthy (WOS >= 6) and AI > POS; F59j lifts when DC is low.
+        # They are mutually exclusive by WOS gate (F59i needs WOS >= 6).
         if (is_amazon
-                and pos_data and amz_catalog
-                and isinstance(fcst, list) and len(fcst) >= 4):
+                and pos_data
+                and model not in ("Inactive", "OTB (zero)",
+                                  "Pre-launch NEW (manual passthrough)")
+                and isinstance(fcst, list) and len(fcst) >= 26
+                and 0 < _f59h_wos < 8):
             _f59j_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
-            _f59j_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-            _f59j_wos     = _f59h_wos  # reuse WOS computed in F59h block
-            _f59j_l2w_avg = (sum(float(v) for v in (hist[-2:] if len(hist) >= 2 else hist))
-                             / max(len(hist[-2:]), 1)) if hist else 0
-            if (_f59j_pos_l4 >= 100
-                    and _f59j_pos_l13 > 0
-                    and 0 < _f59j_wos < 8
-                    and _f59j_l2w_avg > _f59j_pos_l4 * 1.5):
-                _f59j_w14_nz  = [v for v in fcst[:4] if v > 0]
-                _f59j_w14_avg = sum(_f59j_w14_nz) / max(len(_f59j_w14_nz), 1)
-                if _f59j_w14_avg > _f59j_pos_l4 * 1.2:
-                    # Scale so W1-W4 avg aligns with POS L4W; apply to all
-                    # 26 weeks proportionally to keep the seasonal shape intact.
-                    _f59j_scale = max(0.60, _f59j_pos_l4 / _f59j_w14_avg)
-                    for _wi in range(len(fcst)):
-                        fcst[_wi] = snap(fcst[_wi] * _f59j_scale, mp)
+            if _f59j_pos_l4 >= 50:
+                # Amazon's internal demand rate (implied by their own WOS calc)
+                _f59j_demand_rate = _f59h_soh / _f59h_wos if _f59h_wos > 0 else _f59j_pos_l4
+                # How many units does Amazon need to reach 8 WOS?
+                _f59j_target_inv  = 8.0 * _f59j_demand_rate
+                _f59j_pipeline    = _f59h_soh + _f59h_opo   # OH + already-ordered OPO
+                _f59j_deficit     = max(0.0, _f59j_target_inv - _f59j_pipeline)
+                # Spread restock over W1-W3
+                _f59j_restock_wks = 3
+                _f59j_lift        = snap(_f59j_deficit / _f59j_restock_wks, mp) \
+                                    if _f59j_deficit > 0 else 0
+                _f59j_floor       = snap(_f59j_pos_l4, mp)
+                _f59j_changed     = False
+                for _wi in range(len(fcst)):
+                    _orig = fcst[_wi]
+                    if _wi < _f59j_restock_wks and _f59j_lift > 0:
+                        # Restock weeks: base = max(model, POS floor) + lift
+                        fcst[_wi] = snap(max(fcst[_wi], _f59j_floor) + _f59j_lift, mp)
+                    elif fcst[_wi] > 0 and fcst[_wi] < _f59j_floor:
+                        # Sustaining weeks: floor at POS L4W
+                        fcst[_wi] = _f59j_floor
+                    if fcst[_wi] != _orig:
+                        _f59j_changed = True
+                if _f59j_changed:
                     _fire("F59j")
                     if isinstance(meta, dict):
                         meta.setdefault("drivers", []).append(
-                            f"F59j DC restock correction: L2W orders avg "
-                            f"{_f59j_l2w_avg:.0f}/wk "
-                            f"({_f59j_l2w_avg / max(_f59j_pos_l4, 1):.1f}x consumer POS) "
-                            f"while DC WOS={_f59j_wos:.1f}wks (under 8wk target) -- "
-                            f"restock surge inflated baseline, not demand growth. "
-                            f"AI W1-W4 was {_f59j_w14_avg:.0f}/wk vs POS L4W "
-                            f"{_f59j_pos_l4:.0f}/wk; rescaled x{_f59j_scale:.2f} "
-                            f"to consumer demand anchor."
+                            f"F59j DC restock: WOS={_f59h_wos:.1f}wks below 8wk "
+                            f"target. SOH={_f59h_soh:,.0f}u + OPO={_f59h_opo:,.0f}u "
+                            f"pipeline vs target {_f59j_target_inv:,.0f}u "
+                            f"(8wks x {_f59j_demand_rate:,.0f}/wk demand rate). "
+                            + (f"Restock deficit {_f59j_deficit:,.0f}u spread over "
+                               f"W1-W{_f59j_restock_wks} (+{_f59j_lift:,.0f}u/wk lift). "
+                               if _f59j_deficit > 0 else "OPO already covers 8 WOS target. ") +
+                            f"All weeks floored at POS L4W {_f59j_pos_l4:,.0f}/wk."
                         )
 
         # ── F59k — Amazon L4W=0 + POS also declining: EOL wind-down correction ──
