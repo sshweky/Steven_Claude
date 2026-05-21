@@ -3928,7 +3928,6 @@ async function toggleDetail(key) {
   el.innerHTML = `<td colspan="21" style="padding:0">
     ${poPrjAlertHtml}
     ${autoProjectBtn}
-    ${seasonalCardHtml}
     ${fdStatusHtml}
     ${_buildPogBlockHtml(r)}
     ${narrativeHtml}
