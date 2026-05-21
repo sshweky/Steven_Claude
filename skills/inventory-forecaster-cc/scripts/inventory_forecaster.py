@@ -6497,23 +6497,26 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     fcst = [int(round(v * _scale_f29 / mp)) * int(mp) if v > 0 and mp > 0 else int(v * _scale_f29)
                             for v in fcst]
 
-    # F31 (2026-04-26) — Front-week (W1) tail cap.  Deep-deviation analysis
-    # showed W1 mean bias of +177% (median -9%) — the average is dragged by
-    # outliers where Holt-Winters trend extrapolation or post-event rebound
-    # produces a spike in W1.  Cap W1 at 1.3× max(L4 avg, L13 avg, baseline).
-    # Median behavior is preserved; only extreme outliers are clipped.
-    # Skip when F29 manual-deferral fired — the planner's W1 reflects the
+    # F71 (renamed from F31 2026-05-21 to break tag collision with F31
+    # Pre-launch passthrough; original date 2026-04-26) -- Front-week (W1) tail
+    # cap.  Deep-deviation analysis showed W1 mean bias of +177% (median -9%)
+    # -- the average is dragged by outliers where trend extrapolation or
+    # post-event rebound produces a spike in W1.  Cap W1 at 1.3x max(L4 avg,
+    # L13 avg, baseline).  Median behavior is preserved; only extreme outliers
+    # are clipped.
+    # Skip when F29 manual-deferral fired -- the planner's W1 reflects the
     # email-provided customer forecast we just chose to trust over thin
     # history; clipping it against L4/L13 of that thin history would defeat
     # the deferral.
     if len(fcst) >= 1 and fcst[0] > 0 and not _f29_manual_deferred:
-        _l4_f31  = sum(hist[-4:])  / 4 if len(hist) >= 4 else 0
-        _l13_f31 = sum(hist[-13:]) / 13 if len(hist) >= 13 else 0
-        _ref_f31 = max(_l4_f31, _l13_f31, cap or 0)
-        if _ref_f31 > 0:
-            _w1_cap_f31 = _ref_f31 * 1.3
-            if fcst[0] > _w1_cap_f31:
-                fcst[0] = int(round(_w1_cap_f31 / mp)) * int(mp) if mp > 0 else int(_w1_cap_f31)
+        _l4_f71  = sum(hist[-4:])  / 4 if len(hist) >= 4 else 0
+        _l13_f71 = sum(hist[-13:]) / 13 if len(hist) >= 13 else 0
+        _ref_f71 = max(_l4_f71, _l13_f71, cap or 0)
+        if _ref_f71 > 0:
+            _w1_cap_f71 = _ref_f71 * 1.3
+            if fcst[0] > _w1_cap_f71:
+                fcst[0] = int(round(_w1_cap_f71 / mp)) * int(mp) if mp > 0 else int(_w1_cap_f71)
+                _fire("F71")
 
     # F32 (2026-04-26, loosened) — Sparse-intermittent per-week + tiny-signal clamp.
     # First version used a sum-of-26-weeks clamp at 2.5× L13 sum, which rarely
