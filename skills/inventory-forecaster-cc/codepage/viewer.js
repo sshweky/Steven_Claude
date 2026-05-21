@@ -4228,9 +4228,13 @@ async function _loadOrdHistCxld(r, safeId) {
     if (ORD_HIST_EXCEP_NOTES_FID) select.push(ORD_HIST_EXCEP_NOTES_FID);
 
     const escKey = r.key.replace(/'/g, "''");
+    // Only include cancellations where Exception_Approval is false (unchecked).
+    // Exception-approved orders are pre-sanctioned exceptions and must not appear
+    // in the L26W history view per planning policy.
     const where = `{${ORD_HIST_ACCT_MSTYLE_FID}.EX.'${escKey}'}` +
                   `AND{${ORD_HIST_QTY_CXLD_FID}.GT.0}` +
-                  `AND{${ORD_HIST_CANCEL_DATE_FID}.OAF.'${_qbDate(dateFrom)}'}`;
+                  `AND{${ORD_HIST_CANCEL_DATE_FID}.OAF.'${_qbDate(dateFrom)}'}` +
+                  (ORD_HIST_EXCEP_APPR_FID ? `AND{${ORD_HIST_EXCEP_APPR_FID}.EX.'false'}` : '');
 
     const resp = await qb('/records/query', {
       from: CFG.ORDER_HIST_TID,
