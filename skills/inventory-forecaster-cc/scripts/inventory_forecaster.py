@@ -10314,16 +10314,6 @@ def main():
     print(f"      Mstyle-family index: {len(MSTYLE_FAMILY_INDEX)} mstyles with active siblings")
     print(f"      Customer-baseline  : {len(CUST_BASELINE_INDEX)} customers  (global median wk-rate: {GLOBAL_WK_RATE:.1f})")
 
-    # F61 -- Switchover variant conflict index.
-    # Built once here; passed into every forecast_record() and validate_record()
-    # call below so they can zero/flag weeks where a variant style has demand.
-    switchover_index = _build_switchover_index(rows)
-    _sw_conflict_ct  = len(switchover_index)
-    if _sw_conflict_ct:
-        print(f"      F61 Switchover index: {_sw_conflict_ct} base style(s) have active variant conflicts")
-    else:
-        print(f"      F61 Switchover index: no variant conflicts detected")
-
     # Pre-compute EC-supersession set: for every (acct, mstyle) where an EC
     # variant ({mstyle}EC) exists in the same account, the original parent SKU
     # is being phased out.  Used by build_ai_analysis() to surface the warning
