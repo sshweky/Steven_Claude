@@ -1879,7 +1879,7 @@ function adaptRow(row) {
                      : (ai_total > 0 ? null : 0);  // null = no plan entered; 0 = both zero
 
   const pct_abs = pct_diff !== null ? Math.abs(pct_diff) : null;
-  // Priority: On-Plan when both are zero OR when AI vs Plan gap is within 5%.
+  // Priority: On-Plan when both are zero OR when AI vs Plan gap is within 7.5%.
   // When manual=0 and AI>0, pct_diff is null (no plan entered) -- tier by AI volume, NOT On-Plan.
   const _both_zero = manual_total === 0 && ai_total === 0;
   let priority;
