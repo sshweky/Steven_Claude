@@ -7485,7 +7485,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 # history is irrelevant for drop-ship demand. DC WOS bypassed.
                 _f59i_26w_avg = sum(fcst) / max(len(fcst), 1)
                 if _f59i_26w_avg > _f59i_pos_l4 * 1.10 and _f59i_26w_avg > 0:
-                    _f59i_ec_anchor = min(1.0, _f59i_pos_l13 / _f59i_26w_avg)
+                    # Anchor target = max(L13W, L4W): if current consumer demand
+                    # (L4W) exceeds the 13-week average (acceleration), anchor to
+                    # the CURRENT rate, not the older lower average.  Anchoring to
+                    # L13W alone under-projects when the item is accelerating.
+                    _f59i_ec_target = max(_f59i_pos_l13, _f59i_pos_l4)
+                    _f59i_ec_which  = "L4W" if _f59i_pos_l4 > _f59i_pos_l13 else "L13W"
+                    _f59i_ec_anchor = min(1.0, _f59i_ec_target / _f59i_26w_avg)
                     _f59i_old_avg   = _f59i_26w_avg
                     for _wi in range(len(fcst)):
                         fcst[_wi] = snap(fcst[_wi] * _f59i_ec_anchor, mp)
@@ -7494,8 +7500,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         meta.setdefault("drivers", []).append(
                             f"F59i-EC POS anchor: AI avg was {_f59i_old_avg:.0f}/wk "
                             f"-- inflated by F60 parent DC-replenishment history "
-                            f"(irrelevant for EC drop-ship demand). Anchored 100% "
-                            f"to consumer POS L13W {_f59i_pos_l13:.0f}/wk "
+                            f"(irrelevant for EC drop-ship demand). Anchored to "
+                            f"consumer POS {_f59i_ec_which} "
+                            f"{_f59i_ec_target:.0f}/wk = max(L13W {_f59i_pos_l13:.0f}, "
+                            f"L4W {_f59i_pos_l4:.0f}); "
                             f"(rescale x{_f59i_ec_anchor:.3f}). DC WOS bypassed "
                             f"-- EC fulfillment is direct-to-consumer, not "
                             f"DC-dependent."
