@@ -4576,9 +4576,9 @@ def _top_manual_defect(manual, fcst, cust_label="this account"):
         cnt = Counter(nz_m)
         top_val, top_n = cnt.most_common(1)[0]
         if top_n >= 13 and len(cnt) <= 3:
-            return (f"Heads-up: the plan is a flat {int(top_val):,}/wk "
-                    f"placeholder — looks like a copy-paste rather than a "
-                    f"week-by-week build off how {cl} actually orders.")
+            return (f"The plan is a flat {int(top_val):,}/wk across all active "
+                    f"weeks — verify this reflects the intended demand "
+                    f"distribution for {cl}.")
 
     # Unsupported spike weeks (planned >> history).
     spikes = [(i, manual[i], fcst[i]) for i in range(26)
