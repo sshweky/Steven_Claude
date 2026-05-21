@@ -1633,9 +1633,9 @@ async function lookupInvRequest(key, requestIdStr) {
     const F = CFG.INV_REQ_FID;
     const resp = await qb('/records/query', {
       from:    CFG.INV_REQ_DETAIL_TID,
-      select:  [F.RECORD_ID, F.ACCT_MSTYLE, F.POG_SET_DATE, F.POG_END_DATE,
+      select:  [F.RELATED_REQ_ID, F.ACCT_MSTYLE, F.POG_SET_DATE, F.POG_END_DATE,
                 F.ISO_UNITS, F.ISO_PIPELINE, F.STORES, F.UPSPW],
-      where:   `{${F.RECORD_ID}.EX.${rid}}`,
+      where:   `{${F.RELATED_REQ_ID}.EX.${rid}}`,
       options: { top: 1 },
     });
 
