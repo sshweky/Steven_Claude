@@ -125,7 +125,7 @@ ECOM_CUST_SUBSTRS = [
     "PETSMART.COM",
 ]
 
-# F69 — Switchover variant suffixes.
+# F70 — Switchover variant suffixes.
 # Styles ending in these suffixes (e.g. FF8654EC, FF8654COS, FF8654AMZ) are
 # treated as drop-ship / ecom variants of the base mstyle (FF8654).  Because
 # the retailer orders EITHER the base OR the variant in any given week -- never
