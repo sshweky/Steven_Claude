@@ -8252,10 +8252,10 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
     # Read manual projections
     manual = [float(row.get(c) or 0) for c in ORIG_PRJ_COLS]
 
-    # F69 -- resolve switchover conflict weeks for this base style (if any)
-    _f69_sw_entry = {}
+    # F70 -- resolve switchover conflict weeks for this base style (if any)
+    _f70_sw_entry = {}
     if switchover_weeks:
-        _f69_sw_entry = switchover_weeks.get(row.get("Acct_MStyle_Key_", ""), {})
+        _f70_sw_entry = switchover_weeks.get(row.get("Acct_MStyle_Key_", ""), {})
 
     weeks_out = []
     flags_total   = 0
