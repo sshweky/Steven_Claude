@@ -12,7 +12,7 @@ Deploy BOTH viewers to QB InventoryTrack app (bpd24h9wy).
 
 Handles U+FFFF (invalid in XML 1.0) by replacing with U+FFFD before upload.
 """
-import urllib.request, urllib.error, re
+import urllib.request, urllib.error, re, datetime
 from pathlib import Path
 
 TOKEN  = "b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s"
