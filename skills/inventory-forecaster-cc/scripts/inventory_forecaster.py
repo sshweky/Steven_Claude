@@ -7458,19 +7458,18 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"forward supply — near-term gap pre-covered"
                 )
 
-        # ── F59i — POS anchor for non-EC Amazon items ────────────────────────
-        # EC/COS/AMZ variants inherit parent DC-replenishment order history via
-        # F60.  That history is real demand signal -- planners project at or
-        # above that rate because Amazon orders to maintain DC inventory, not
-        # just to match consumer POS.  Anchoring EC items to POS would suppress
-        # legitimate replenishment demand.  EC items are EXCLUDED from F59i.
+        # ── F59i — POS anchor for Amazon items with healthy DC WOS ───────────
+        # EC = "Ecomm Ready" -- standard Amazon DC items in poly-bag packaging.
+        # They have their own ASINs, own order history, own DC inventory.
+        # Treat EC items identically to non-EC items -- the only gates are
+        # WOS (DC coverage) and the AI-vs-POS ratio.
         #
-        # For non-EC items: when the near-term forecast (W1-W4 non-zero avg)
-        # runs >15% above POS L4W and the DC has adequate coverage (WOS >= 6),
-        # the order-history baseline is likely inflated by inventory build rather
-        # than genuine demand growth.  Blend toward POS L13W.
+        # When the near-term forecast (W1-W4 non-zero avg) runs >15% above POS
+        # L4W and the DC has adequate coverage (WOS >= 6), the order-history
+        # baseline is likely inflated by inventory build rather than genuine
+        # demand growth.  Blend toward POS L13W.
         #
-        # Gates: is_amazon, non-EC, POS data present, not DI-blended.
+        # Gates: is_amazon, POS data present, not DI-blended, WOS >= 6 or unknown.
         _f59i_ms = (row.get("Mstyle") or row.get("mstyle") or "").upper()
         _f59i_is_ec = (_f59i_ms.endswith("EC") or _f59i_ms.endswith("COS")
                        or _f59i_ms.endswith("AMZ"))
