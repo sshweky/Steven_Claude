@@ -4005,6 +4005,12 @@ def crostens(history, mp, is_amazon=False, description=None,
     if pos_data:
         _pos_l4_f18  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
         _pos_l13_f18 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _pos_l26_f18 = float(pos_data.get("Avg_Units_Wk_L26w") or 0)
+        # DEBUG-FF7297 (remove after diagnosis)
+        if description and "7297" in str(description):
+            print(f"  [F18-DBG] desc={description!r:.40} z={z:.0f} p={p:.2f} "
+                  f"pos_l4={_pos_l4_f18} pos_l13={_pos_l13_f18} pos_l26={_pos_l26_f18} "
+                  f"pos_data_keys={list(pos_data.keys())[:5]}", flush=True)
         _pos_healthy_f18 = _pos_l13_f18 >= 50.0 and _pos_l4_f18 >= _pos_l13_f18 * 0.5
         if _pos_healthy_f18 and z > 0:
             _p_use       = max(1.0, p)
