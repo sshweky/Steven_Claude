@@ -6460,7 +6460,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # clamps don't claw back the manual we just deferred to.
     _f29_manual_deferred = False
     _total_nz_f29 = sum(1 for v in hist if float(v) > 0)
-    _is_new_or_sparse = pattern in ("new_item", "sparse", "sparse_intermittent")
+    # classify() emits "inactive" | "sparse_intermittent" | "active" -- the
+    # legacy "new_item" / "sparse" values were dead checks (audit 2026-05-21).
+    # ISO-detected items (Initial Stocking Order) also qualify as "new" -- they
+    # have one big spike and need planner manual until trickle pace establishes.
+    _is_new_or_sparse = (pattern == "sparse_intermittent") or iso.get("is_iso", False)
     _manual_tot_f29 = sum(manual_wks)
     if _is_new_or_sparse and _total_nz_f29 < 3 and _manual_tot_f29 > 0:
         # Replace forecast with planner's manual (snapped to master pack).
