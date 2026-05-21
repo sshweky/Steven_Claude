@@ -8295,12 +8295,12 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         # Suppress undershoot and sudden_stop flags -- they are false positives.
         iso_settling = iso["is_iso"] and iso.get("in_settle", False)
 
-        # F61 -- Switchover conflict check (highest priority; overrides other flags).
+        # F69 -- Switchover conflict check (highest priority; overrides other flags).
         # The retailer orders either the base style or the variant -- not both.
         # If the variant has demand in this week, any projection on the base is
         # double-counting.  Alert the planner to mark the base as CLOSED.
-        if w in _f61_sw_entry:
-            _sw_variants = _f61_sw_entry[w]
+        if w in _f69_sw_entry:
+            _sw_variants = _f69_sw_entry[w]
             flag     = "switchover_conflict"
             severity = "CRITICAL"
             _var_str = ", ".join(sorted(set(_sw_variants)))
