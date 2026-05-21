@@ -3297,8 +3297,8 @@ async function toggleDetail(key) {
   // and its corresponding data rows.
   const _wkCount = wks.length || 26;
   const projHdrCells = hdrCells + '<th style="color:#888;font-weight:600">Avg/Wk</th>';
-  projCells += `<td style="font-weight:700;color:#555">${fmtN(Math.round((liveProjTotal + opnTot) / _wkCount))}</td>`;
-  aiCells   += `<td style="font-weight:700;color:#1565c0">${fmtN(Math.round((r.ai_total + opnTot) / _wkCount))}</td>`;
+  projCells += `<td style="font-weight:700;color:#555">${fmtN(Math.round(liveProjTotal / _wkCount))}</td>`;
+  aiCells   += `<td style="font-weight:700;color:#1565c0">${fmtN(Math.round(r.ai_total / _wkCount))}</td>`;
   sugCells  += `<td style="font-weight:700;color:#555">${fmtN(Math.round(sugTot / _wkCount))}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(Math.round(opnTot / _wkCount))}</td>`;
 
