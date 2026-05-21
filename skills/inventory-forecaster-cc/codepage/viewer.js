@@ -3271,7 +3271,26 @@ async function toggleDetail(key) {
   // weeks line up vertically with the projection rows above.
   let invFlowSectionHtml = '';
   {
-    // Reuse hdrCells so the new table shares the same W1..W26 column headers
+    // Build an inv-flow-specific header: same week labels as the projection table
+    // but with a red * on the week where Next Avl Rcpt Dt lands, so planners can
+    // immediately see when they can next receive inventory.
+    let _ifNrWkIdx = -1;
+    if (r.inv_flow_next_rcpt && W1_DATE) {
+      const _nrd = new Date(r.inv_flow_next_rcpt);
+      if (!isNaN(_nrd.getTime())) {
+        _ifNrWkIdx = Math.floor((_nrd.getTime() - W1_DATE.getTime()) / 86400000 / 7);
+      }
+    }
+    let _ifHdrCells = '<th class="row-label"></th>';
+    for (let _hi = 0; _hi < wks.length; _hi++) {
+      const _hw     = wks[_hi];
+      const _hlbl   = weekLabel(_hi);
+      const _locked = isLockedWeek(_hi);
+      const _isNrWk = _ifNrWkIdx >= 0 && _ifNrWkIdx < 26 && _ifNrWkIdx === _hi;
+      _ifHdrCells += `<th${_locked ? ' style="opacity:0.4"' : ''}>${_isNrWk ? '<span style="color:#c62828;font-size:13px;vertical-align:super;line-height:1">*</span>' : ''}W${_hw.week}<br><span style="font-weight:normal;font-size:10px">${_hlbl}</span></th>`;
+    }
+    _ifHdrCells += '<th>Total</th>';
+
     let begCells = `<td class="row-label" style="color:#6d4c00;font-weight:600;background:#fffbea" title="Beginning-of-week projected warehouse inventory (QB Inventory Flow, Wk1..Wk26)">Beg Inv</td>`;
     let prjCells = `<td class="row-label" style="color:#2e7d32;font-weight:600;background:#f1f8e9" title="Projected demand this week (QB Inventory Flow, Prj Wk1..Prj Wk26)">Prj Demand</td>`;
     let rcvCells = `<td class="row-label" style="color:#1565c0;font-weight:600;background:#f0f7ff" title="Expected supplier receipts that week (QB Inventory Flow, RcvWk1..RcvWk26)">Expected Receipts</td>`;
