@@ -10184,6 +10184,16 @@ def main():
         print(f"      [WARN] ATS fetch failed: {_e} — VP-ATS disabled this run",
               flush=True)
 
+    # F61 -- Switchover variant conflict index.
+    # Built here (before both validate and forecast) so both passes can use it.
+    # Identifies weeks where a variant style (EC/COS/AMZ/...) already has demand,
+    # meaning the base style should not also have projections in those weeks.
+    switchover_index = _build_switchover_index(rows)
+    _sw_conflict_ct  = len(switchover_index)
+    if _sw_conflict_ct:
+        print(f"\n[F61] Switchover index: {_sw_conflict_ct} base style(s) "
+              f"have active variant conflicts", flush=True)
+
     # ── Validate Projections (if requested) ─────────────────────────
     if args.validate:
         print(f"\n[3/3] Validating manual projections for {len(rows)} records ...", flush=True)
@@ -10192,7 +10202,8 @@ def main():
                                      amazon_catalog_us=amazon_catalog_us,
                                      season_map=season_map, oos_data=oos_data,
                                      open_pos_data=open_pos_data,
-                                     ats_data=ats_data)
+                                     ats_data=ats_data,
+                                     switchover_weeks=switchover_index)
         elapsed_val = time.time() - t_val
         print(f"      Validation complete in {elapsed_val:.1f}s")
 
