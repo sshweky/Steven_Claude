@@ -1,0 +1,9 @@
+{
+  "id": "4",
+  "subject": "Commit and push AMZ suffix + F59m/F59i fixes to GitHub",
+  "description": "Commit the AMZ suffix additions (7 sites), F59i Path A fix, F59m new rule, EC amz_catalog fallback, and SKILL.md updates to GitHub via git-sync",
+  "activeForm": "Committing and pushing to GitHub",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

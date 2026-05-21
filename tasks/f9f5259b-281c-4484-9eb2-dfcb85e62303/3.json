@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Push validation results to QB",
+  "description": "Run push_validation_qb.py to write Priority/Pattern/Narrative fields to QB",
+  "activeForm": "Pushing validation results to QB",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
