@@ -7759,10 +7759,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #   DC WOS 8-20:  healthy steady-state (F59h handles extreme cases)
         #   AI avg < POS L13W * 0.70:  meaningful gap (30%+ below consumer)
         #   Scale cap 5.0:  guard against runaway uplift on very sparse history
-        #   Not EC/COS:  EC items are anchored to POS separately via F59i Path A
+        #   EC items treated identically to non-EC (both are standard DC replenishment)
         if (is_amazon and pos_data and amz_catalog
                 and model in ("Croston's", "Heuristic")
-                and not _f59i_is_ec
                 and isinstance(fcst, list) and sum(fcst) > 0):
             _f59l_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
             _f59l_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
