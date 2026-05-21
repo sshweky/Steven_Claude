@@ -10984,8 +10984,18 @@ def main():
             _ms_key = r.get("mstyle", "")
             _pos_for_rec    = (amazon_pos or {}).get(_ms_key) \
                               or (amazon_pos or {}).get(_ec_parent(_ms_key))
+            if _pos_for_rec is None:
+                for _sfx in ("AMZ", "EC", "COS", "DS"):
+                    _pos_for_rec = (amazon_pos or {}).get(_ms_key + _sfx)
+                    if _pos_for_rec:
+                        break
             _amz_cat_for_rec = (amazon_catalog_us or {}).get(_ms_key) \
                                or (amazon_catalog_us or {}).get(_ec_parent(_ms_key))
+            if _amz_cat_for_rec is None:
+                for _sfx in ("AMZ", "EC", "COS", "DS"):
+                    _amz_cat_for_rec = (amazon_catalog_us or {}).get(_ms_key + _sfx)
+                    if _amz_cat_for_rec:
+                        break
         try:
             r["ai_analysis"] = build_ai_analysis(
                 r, row,
