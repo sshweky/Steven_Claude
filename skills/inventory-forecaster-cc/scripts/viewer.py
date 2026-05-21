@@ -1220,6 +1220,7 @@ def load_results(path):
             # record could tier HIGH in validation mode (using manual) but
             # LOW in the codepage (using AI), confusing planners.
             if   ai_wk >= 1000: r["vol_tier"] = "HIGH"
+            elif ai_wk >= 500:  r["vol_tier"] = "HIGH"
             elif ai_wk >= 200:  r["vol_tier"] = "MEDIUM"
             else:               r["vol_tier"] = "LOW"
 
