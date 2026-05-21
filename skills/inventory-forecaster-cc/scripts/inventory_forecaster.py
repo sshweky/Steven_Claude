@@ -9526,25 +9526,22 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
                 f"distribution or store count changed.")
     # 7) Burst rebound (LW > 0 after Prior Wk zero).
     elif short_pct > 0 and lw > 0 and pw == 0 and freq_l13 > 0:
-        expl = (f"Activity restarting at {cl} — LW {lw:.0f}u after a Prior "
-                f"Wk zero. Their typical cadence is {len(l13_nz)} orders/"
-                f"13W, so watch the next 2-3 weeks to see whether they're "
-                f"getting back to baseline or this was a one-off catch-up.")
+        expl = (f"LW {lw:.0f}u after a Prior Wk zero at {cl}. L13W cadence "
+                f"was {len(l13_nz)} orders/13W. Monitor next 2-3 weeks to "
+                f"confirm whether this is a sustained return to ordering.")
     # 8) Sustained quiet (both recent weeks zero, declining).
     elif lw == 0 and pw == 0 and short_pct < 0:
-        expl = (f"Two consecutive zero weeks at {cl}. Their L13W cadence ran "
-                f"{len(l13_nz)}/13W active, so two zeros in a row is unusual. "
-                f"Could be a stockout on their end, an EDI hiccup, or a real "
-                f"pause in ordering — worth a quick check before assuming "
-                f"the account has gone quiet.")
+        expl = (f"Two consecutive zero weeks at {cl}. L13W cadence was "
+                f"{len(l13_nz)}/13W active -- two zeros in a row is below "
+                f"the established pattern. Verify order status before "
+                f"treating as a trend change.")
     # 9) Fallback — use medium-term context.
     else:
         if short_pct > 0:
-            expl = (f"L26W ({l26_avg:.0f}/wk) still tracks L13W "
-                    f"({l13_avg:.0f}/wk), so the recent uptick at {cl} is "
-                    f"fresh in the last 4 weeks. Could be a single larger "
-                    f"PO, a feature/end-cap, or a retail promo — watch the "
-                    f"next 2-3 weeks to see whether it sticks.")
+            expl = (f"L26W ({l26_avg:.0f}/wk) tracks L13W ({l13_avg:.0f}/wk) -- "
+                    f"the uptick is concentrated in L4W only ({l4_avg:.0f}/wk). "
+                    f"Monitor next 2-3 weeks for confirmation before treating "
+                    f"as a baseline shift.")
         else:
             if medium_flat:
                 expl = (f"L26W ({l26_avg:.0f}/wk) ≈ L13W ({l13_avg:.0f}/wk), "
@@ -9588,52 +9585,45 @@ def _smart_pos_trend(l4, l13, l26, l52, ord_lw=0, ord_pw=0, l13_anomaly=False,
         ((short_pct > 0 and medium_pct >= 5 and yoy_pct >= 10) or
          (short_pct < 0 and medium_pct <= -5 and yoy_pct <= -10))):
         verb = "growth" if short_pct > 0 else "softening"
-        expl = (f"Consumer demand is moving consistently across windows "
-                f"(L13W {medium_pct:+.0f}% vs L26W, YoY {yoy_pct:+.0f}%) "
-                f"— this is real {verb} at {cl}, not a 1-off blip. "
-                f"Expect ordering pace to track POS unless something "
-                f"changes upstream.")
+        expl = (f"Consumer demand aligned across all windows: L4W "
+                f"{l4:.0f}/wk, L13W {medium_pct:+.0f}% vs L26W, YoY "
+                f"{yoy_pct:+.0f}%. Consistent multi-window {verb} at {cl}.")
     # 2) Recent down with hot medium-term (cooling from peak)
     elif short_pct < 0 and medium_pct is not None and medium_pct >= 10:
-        expl = (f"POS was running hot through L13W (+{medium_pct:.0f}% vs "
-                f"L26W) and has cooled in the last 4 weeks. Looks like "
-                f"settling off a peak — possibly post-promo normalization "
-                f"or a finished consumer event — rather than broad weakness.")
+        expl = (f"POS was +{medium_pct:.0f}% vs L26W through L13W and has "
+                f"cooled to {l4:.0f}/wk in L4W (vs L13W {l13:.0f}/wk). "
+                f"Data does not confirm whether the L4W dip is temporary "
+                f"or a sustained change.")
     # 3) Recent up but flat medium-term (fresh acceleration)
     elif short_pct > 0 and medium_pct is not None and abs(medium_pct) < 5:
-        expl = (f"L13W ({l13:.0f}/wk) still matches L26W ({l26:.0f}/wk), so "
-                f"the recent uptick is fresh in the last 4 weeks only. "
-                f"Could be a feature placement / end-cap, an ad campaign, "
-                f"or seasonal pickup — give it 2-3 more weeks before "
-                f"treating as the new run rate.")
+        expl = (f"L13W ({l13:.0f}/wk) matches L26W ({l26:.0f}/wk) -- the "
+                f"recent uptick is concentrated in L4W ({l4:.0f}/wk) only. "
+                f"Monitor 2-3 more weeks before treating as a rate change.")
     # 4) Recent down but flat medium-term (short-window dip)
     elif short_pct < 0 and medium_pct is not None and abs(medium_pct) < 5:
-        expl = (f"L13W ({l13:.0f}/wk) still matches L26W ({l26:.0f}/wk), so "
-                f"the recent dip is concentrated in the last 4 weeks only. "
-                f"Could be retail-side inventory drawdown, weather, or a "
-                f"competing promo — watch L4 to see if it persists or bounces.")
+        expl = (f"L13W ({l13:.0f}/wk) matches L26W ({l26:.0f}/wk) -- the "
+                f"recent dip is concentrated in L4W ({l4:.0f}/wk) only. "
+                f"Monitor L4 over next 2-3 weeks to determine if trend "
+                f"persists.")
     # 5) Up but YoY negative (rebound from softer year)
     elif short_pct > 0 and yoy_pct is not None and yoy_pct <= -10:
-        expl = (f"L26W ({l26:.0f}/wk) is still {yoy_pct:+.0f}% vs L52W "
-                f"({l52:.0f}/wk), so the recent uptick is recovering "
-                f"from a softer year rather than net new growth. Likely "
-                f"climbing back toward the pre-soft-period baseline, not "
-                f"breaking it.")
+        expl = (f"L26W ({l26:.0f}/wk) is {yoy_pct:+.0f}% vs L52W "
+                f"({l52:.0f}/wk) -- the recent L4W uptick ({l4:.0f}/wk) "
+                f"is set against a softer trailing year. Year-over-year "
+                f"baseline is still negative.")
     # 6) Recent ordered-units context
     elif ord_lw > 0 or ord_pw > 0:
         if ord_pw > 0 and ord_lw > 0:
             wow = (ord_lw / ord_pw - 1.0) * 100
-            expl = (f"Recent ordering — LW {ord_lw:,.0f}u, Prior Wk "
-                    f"{ord_pw:,.0f}u ({wow:+.0f}% WoW). Short-term swing "
-                    f"is in the ordering pattern, not consumer demand — "
-                    f"watch the L4 POS rate over the next month to see "
-                    f"if shoppers follow through.")
+            expl = (f"LW {ord_lw:,.0f}u, Prior Wk {ord_pw:,.0f}u "
+                    f"({wow:+.0f}% WoW). POS L4W {l4:.0f}/wk, L13W "
+                    f"{l13:.0f}/wk. Monitor L4 POS over next 4 weeks "
+                    f"for confirmation.")
         elif ord_lw == 0 and ord_pw > 0:
-            expl = (f"LW=0 after Prior Wk {ord_pw:,.0f}u — {cl} paused "
-                    f"ordering even though POS is still moving "
-                    f"({l4:.0f}/wk L4W). They're likely working through "
-                    f"on-hand inventory; expect a replen order soon if "
-                    f"POS holds.")
+            expl = (f"LW orders=0 after Prior Wk {ord_pw:,.0f}u while POS "
+                    f"is still moving ({l4:.0f}/wk L4W). Ordering paused "
+                    f"with consumer demand active -- verify inventory "
+                    f"position with sales rep.")
         else:
             expl = (f"L4W consumer rate {l4:.0f}/wk vs L13W {l13:.0f}/wk. "
                     f"Watch how L13 and L26 trend over the next 2-3 weeks "
@@ -9642,10 +9632,9 @@ def _smart_pos_trend(l4, l13, l26, l52, ord_lw=0, ord_pw=0, l13_anomaly=False,
     else:
         if l52 > 0:
             anchor_pct = (l4 / l52 - 1.0) * 100
-            expl = (f"Annual baseline at {cl} is {l52:.0f}/wk; current L4W "
-                    f"is {anchor_pct:+.0f}% vs that baseline. Hard to call "
-                    f"direction without medium-term context — give it "
-                    f"another 4 weeks of data.")
+            expl = (f"L4W {l4:.0f}/wk is {anchor_pct:+.0f}% vs L52W baseline "
+                    f"({l52:.0f}/wk). Insufficient medium-term data to "
+                    f"confirm trend direction -- monitor next 4 weeks.")
         else:
             expl = (f"L4W {l4:.0f}/wk vs L13W {l13:.0f}/wk — limited "
                     f"history to read multi-window context. Worth a quick "
