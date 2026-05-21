@@ -9965,7 +9965,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                     _wos_str = f"WOS {_ih_wos:.1f}wks"
                 _ih_parts.append(_wos_str)
             if _ih_parts:
-                specific.append(
+                pinned_last.append(
                     f"<b>Amazon DC inventory:</b> " + " · ".join(_ih_parts) + "."
                 )
 
