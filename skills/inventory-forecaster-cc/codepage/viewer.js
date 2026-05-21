@@ -3637,10 +3637,35 @@ async function toggleDetail(key) {
   // narrative may be \n-joined (viewer.py local) or <br>/<br><br>-joined (QB ai_analysis field).
   // First collapse double-<br> to a single \n, then convert any remaining single <br> to \n
   // so every bullet point becomes its own list item regardless of how QB serialised the text.
-  const _narParts = (r.narrative || '')
+  let _narParts = (r.narrative || '')
     .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n')
     .replace(/<br\s*\/?>/gi, '\n')
     .split('\n').filter(s => s.trim());
+  // Off-price accounts (A: OffPrice) order 1-3x per year -- add a compact
+  // cadence bullet to the AI analysis instead of a separate card.
+  // A: Promo and other seasonal-ish statuses are excluded intentionally.
+  if (r.is_offprice) {
+    const _sp2  = _analyzeSeasonalPattern(r.hist_ord || []);
+    const _lyT2 = (r.ly_ord || []).reduce((a, b) => a + (b || 0), 0);
+    const _lyWks2 = (r.ly_ord || []).map((v, i) => (v||0) > 0 ? 'W'+(i+1) : null).filter(Boolean);
+    let _nxt2 = '';
+    if (_sp2.nextExpectedWk !== null) {
+      if (_sp2.nextExpectedWk <= 0)
+        _nxt2 = ' -- <b style="color:#c62828">order overdue ~' + Math.abs(_sp2.nextExpectedWk) + ' wk</b>';
+      else if (_sp2.nextExpectedWk <= 4)
+        _nxt2 = ' -- <b style="color:#e65100">next order ~' + _sp2.nextExpectedWk + ' wks out</b>';
+      else
+        _nxt2 = ' -- next order ~' + _sp2.nextExpectedWk + ' wks out';
+    } else if (_sp2.events.length === 1) {
+      _nxt2 = ' -- only 1 event in L26W, need more history';
+    }
+    const _ly2 = _lyT2 > 0
+      ? '; LY' + (_lyWks2.length ? ' (' + _lyWks2.join(', ') + ')' : '') + ': ' + _lyT2.toLocaleString() + 'u'
+      : '';
+    const _gap2 = _sp2.avgGapWks !== null ? ', ~' + _sp2.avgGapWks + ' wk avg gap' : '';
+    const _last2 = _sp2.wksSinceLast !== null ? ', ' + _sp2.wksSinceLast + ' wks since last order' : '';
+    _narParts.push('<b>Off-price account:</b> ' + _sp2.events.length + ' order event' + (_sp2.events.length !== 1 ? 's' : '') + ' L26W' + _gap2 + _last2 + _nxt2 + _ly2 + '.');
+  }
   // _narUlId: stable element id used by _loadAmzDcInv to inject/replace the
   // live DC inventory bullet after the panel renders.
   const _narUlId = 'ai-bullets-' + safeIdForTotal;

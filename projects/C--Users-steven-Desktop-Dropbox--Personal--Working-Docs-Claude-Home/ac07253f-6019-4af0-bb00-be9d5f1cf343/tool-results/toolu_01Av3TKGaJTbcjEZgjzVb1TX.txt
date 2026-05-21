@@ -1,0 +1,1146 @@
+166:  1864-BB0009                       +100.0%  Inactive                      0          90
+167:  1864-BB0009AMZ6                   +100.0%  Croston's                     0          48
+168:  1864-BB0012                       +100.0%  Heuristic                     0         104
+169:  1864-BB0012AMZ6                   +100.0%  Croston's                     0          25
+170:  1864-BB0012PCS2                     +8.3%  Croston's                   165         180
+171:  1864-BB0015                        +68.0%  Heuristic                   144         450
+172:  1864-BB0018AMZ6                   +100.0%  Croston's                     0         275
+173:  1864-BB0018EC                      +88.7%  Heuristic                   354       3,120
+174:  1864-BB0018PCS2                   +100.0%  Inactive                      0         397
+175:  1864-BB0079                        +97.0%  Croston's                    30         988
+176:  1864-BB0079AMZ6                    +84.6%  Croston's                     8          52
+177:  1864-BB0080AMZ6                   +100.0%  Inactive                      0          90
+178:  1864-BB0080EC                      +54.7%  Croston's                 1,404       3,100
+179:  1864-BB0080PCS2                    +31.2%  Seasonal Baseline              330         480
+180:  1864-BB0081                       +100.0%  Heuristic                     0         342
+181:  1864-BB0081AMZ6                    +59.6%  Heuristic                    21          52
+182:  1864-BB0082                        +10.6%  Seasonal Baseline              186         208
+183:  1864-BB0082AMZ6                    +99.6%  Croston's                     1         275
+184:  1864-BB0083                        +70.0%  Croston's                   156         520
+185:  1864-BB0083AMZ2                    +94.2%  Heuristic                    15         260
+186:  1864-BB0083AMZ6                    +99.0%  Croston's                     1         100
+187:  1864-BB0092PCS12                  +100.0%  Croston's                     0         125
+188:  1864-BB0092PCS2                    +28.0%  Seasonal Baseline              864       1,200
+189:  1864-BB0094                         +8.7%  Seasonal Baseline            5,988       6,560
+190:  1864-BB0094AMZ12                  +100.0%  Heuristic                     0          20
+191:  1864-BB0094PCS12                  +100.0%  Seasonal Baseline                0         125
+192:  1864-BB0094PCS2                   +100.0%  Seasonal Baseline                0         260
+193:  1864-BB0096                        +56.9%  Seasonal Baseline            5,004      11,605
+194:  1864-BB0096PCS12                  +100.0%  Seasonal Baseline                0         125
+195:  1864-BB0096PCS2                    +70.0%  Seasonal Baseline               78         260
+196:  1864-BB0098                        +20.4%  Croston's                29,904      37,560
+197:  1864-BB0098PCS12                   +90.0%  Croston's                    26         260
+198:  1864-BB0100                        +25.6%  Seasonal Baseline            4,584       6,160
+199:  1864-BB0100PCS12                  +100.0%  Croston's                     0         125
+200:  1864-BB0100PCS2                   +166.4%  Seasonal Baseline              666         250
+201:  1864-BB0102                        +56.7%  Seasonal Baseline            1,248       2,885
+202:  1864-BB0102PCS2                    +95.4%  Heuristic                     6         130
+203:  1864-BB0102PX12                   +100.0%  Heuristic                     0         130
+204:  1864-BB0125PCS6                    +99.2%  Seasonal Baseline                2         250
+205:  1864-BB0126                        +62.3%  Seasonal Baseline            3,198       1,970
+206:  1864-BB0126PCS6                   +100.0%  Croston's                     0         130
+207:  1864-BB0131AMZ6                   +132.9%  Seasonal Baseline              652         280
+208:  1864-BB0131EC                      +48.5%  Croston's                15,432      29,965
+209:  1864-BB0131PCS2                    +80.4%  Seasonal Baseline              453       2,315
+210:  1864-BB0149                        +12.9%  Heuristic                 7,428       8,525
+211:  1864-BB0149PCS12                   +80.3%  Seasonal Baseline              155         785
+212:  1864-BB0149PCS2                    +97.5%  Croston's                   780         395
+213:  1864-BB0149PCS6                   +100.0%  Croston's                     0       1,815
+214:  1864-BB0150                         +9.7%  Seasonal Baseline           17,364      19,220
+215:  1864-BB0150PCS12                  +217.8%  Seasonal Baseline            1,430         450
+216:  1864-BB0151                        +39.3%  Heuristic                 1,668       2,750
+217:  1864-BB0151PCS12                   +84.2%  Seasonal Baseline              221         120
+218:  1864-BB0151PCS6                    +28.5%  Croston's                   186         260
+219:  1864-BB0152                        +33.3%  Seasonal Baseline              660         990
+220:  1864-BB0152PCS12                  +100.0%  Croston's                     0         200
+221:  1864-BB0191PCS2                    +41.5%  Croston's                   234         400
+222:  1864-BB0191PCS6                   +100.0%  Heuristic                     0         208
+223:  1864-BB0216                        +38.8%  Croston's                   606         990
+224:  1864-BB0216PCS6                   +100.0%  Heuristic                     0          50
+225:  1864-BB0217                        +30.8%  Croston's                   414         598
+226:  1864-BB0217PCS2                   +100.0%  Heuristic                     0         470
+227:  1864-BB0217PCS6                    +95.5%  Croston's                    22         490
+228:  1864-BB0231                        +49.8%  Seasonal Baseline            2,724       5,430
+229:  1864-BB0231PCS6                   +100.0%  Croston's                     0         125
+230:  1864-BB0234PCS2                    +68.2%  Seasonal Baseline               78         245
+231:  1864-BB0234PCS6                    +86.5%  Croston's                    28         208
+232:  1864-BB0235                        +61.6%  Heuristic                 1,284       3,345
+233:  1864-BB0235PCS2                    +98.8%  Seasonal Baseline                3         240
+234:  1864-BB0235PCS6                   +160.0%  Seasonal Baseline              208          80
+235:  1864-BB0236                        +38.4%  Croston's                   462         750
+236:  1864-BB0236PCS6                    +72.3%  Heuristic                    36         130
+237:  1864-BB0237PCS6                   +100.0%  Seasonal Baseline                0         125
+238:  1864-BB0332                       +100.0%  Inactive (zero order history)                0       3,355
+239:  1864-BB0409EC                      +36.7%  Seasonal Baseline              942       1,488
+240:  1864-BB0409PCS2                    +52.0%  Croston's                   132         275
+241:  1864-BB0409PCS6                    +97.6%  Heuristic                    15         624
+242:  1864-BB0424EC                      +35.0%  Croston's                 3,582       5,510
+243:  1864-BB0424PCS2                   +722.9%  Seasonal Baseline            2,016         245
+244:  1864-BB0435                        +98.4%  Croston's                    96       5,875
+245:  1864-BB0435PCS6                   +100.0%  Croston's                     0         200
+246:  1864-BB0463                        +30.6%  Seasonal Baseline            1,416       2,040
+247:  1864-BB0466                        +27.6%  Croston's               102,066      80,000
+248:  1864-BB0466PCS6                    +64.9%  Heuristic                    86         245
+249:  1864-BB0473                        +39.9%  Seasonal Baseline            6,450      10,725
+250:  1864-BB0473PCS6                   +178.8%  Seasonal Baseline              145          52
+251:  1864-BB0520                       +122.0%  Croston's                   444         200
+252:  1864-BB0578PCS12                   +56.7%  Seasonal Baseline              156         360
+253:  1864-BB0669                       +100.0%  Croston's                     0         208
+254:  1864-BB0705EC                      +31.3%  Seasonal Baseline           11,604      16,880
+255:  1864-BB0705PCS2                    +16.2%  Seasonal Baseline            2,724       2,345
+256:  1864-BB0705PCS6                   +136.1%  Heuristic                   340         144
+257:  1864-BB0712                        +84.0%  Seasonal Baseline            2,604       1,415
+258:  1864-BB0722                       +100.0%  Croston's                     0       3,075
+259:  1864-BB0759                         +6.8%  Seasonal Baseline            2,982       3,200
+260:  1864-BB0759PCS6                   +100.0%  Heuristic                     0         208
+261:  1864-BB0760                       +100.0%  Heuristic                     0         540
+262:  1864-BB11150                       +19.4%  Seasonal Baseline            4,050       5,025
+263:  1864-BB11150PCS6                   +48.1%  Seasonal Baseline              108         208
+264:  1864-BB11417                       +29.3%  Heuristic                 1,248         965
+265:  1864-BB11417FL/12                  +65.9%  Croston's                   240         704
+266:  1864-BB11417PCS24                 +100.0%  Heuristic                     0          20
+267:  1864-BB11483                       +61.1%  Seasonal Baseline            5,808      14,920
+268:  1864-BB11483PX6                   +100.0%  Inactive                      0         355
+269:  1864-BB11603EC                     +18.8%  Croston's                 1,812       1,525
+270:  1864-BB11917                       +76.6%  Seasonal Baseline           15,096       8,550
+271:  1864-BB11981                       +14.9%  Croston's                   858       1,008
+272:  1864-BB12010                       +85.1%  Croston's                   444       2,988
+273:  1864-BB12019                      +200.0%  Croston's                   576         192
+274:  1864-BB12022/12                   +100.0%  Inactive                      0       7,415
+275:  1864-BB12028                       +31.2%  Seasonal Baseline            2,286       3,325
+276:  1864-BB12028PCS6                   +40.0%  Heuristic                    12          20
+277:  1864-BB12068                       +39.4%  Seasonal Baseline           32,136      23,055
+278:  1864-BB12383                       +33.8%  Croston's                 1,248       1,885
+279:  1864-BB12479                       +81.2%  Seasonal Baseline              948       5,050
+280:  1864-BB12752                       +17.6%  Seasonal Baseline            1,050       1,275
+281:  1864-BB13435                       +41.9%  Seasonal Baseline           42,642      30,050
+282:  1864-BB13435PCS3                  +418.8%  Seasonal Baseline            1,712         330
+283:  1864-BB13435PCS6                  +100.0%  Croston's                     0          45
+284:  1864-BB13435PX3                   +100.0%  Inactive                      0       3,970
+285:  1864-BB13435PX6                   +100.0%  Inactive                      0       1,125
+286:  1864-BB13436                        +9.9%  Seasonal Baseline           13,194      12,005
+287:  1864-BB13436CLR/12                +100.0%  Inactive                      0       7,885
+288:  1864-BB13436PCS6                  +100.0%  Heuristic                     0         130
+289:  1864-BB13436PX3                    +12.8%  Heuristic                   628         720
+290:  1864-BB13437                       +11.3%  Seasonal Baseline           50,580      57,054
+291:  1864-BB13437PCS3                   +12.0%  Seasonal Baseline            2,710       2,420
+292:  1864-BB13437PCS6                  +100.0%  Inactive                      0         990
+293:  1864-BB13439                       +16.8%  Seasonal Baseline            8,220       9,885
+294:  1864-BB13439PCS6                   +79.0%  Croston's                   130         620
+295:  1864-BB13447                      +100.0%  Inactive                      0       1,000
+296:  1864-BB13447CLR/12               +1674.9%  Croston's                 7,632         430
+297:  1864-BB13448                       +32.7%  Seasonal Baseline            6,750      10,025
+298:  1864-BB13448CLR/12                +100.0%  Inactive                      0         685
+299:  1864-BB13448PCS3                   +17.1%  Croston's                 2,002       1,710
+300:  1864-BB13448PCS6                   +70.6%  Seasonal Baseline              139         473
+301:  1864-BB13533                       +12.9%  Croston's                 7,404       8,500
+302:  1864-BB14500PCS6                   +95.4%  Croston's                     6         130
+303:  1864-BB14647                       +59.0%  Croston's                 2,508       6,120
+304:  1864-BB14658                       +13.2%  Seasonal Baseline           14,770      13,050
+305:  1864-BB14658PCS10                   +9.8%  Croston's                    46          51
+306:  1864-BB14812                        +8.5%  Seasonal Baseline           30,400      33,240
+307:  1864-BB14812PCS10                 +100.0%  Heuristic                     0         125
+308:  1864-BB14812PCS5                  +141.1%  Seasonal Baseline            1,302         540
+309:  1864-BB15065                       +35.7%  Seasonal Baseline            4,656       3,430
+310:  1864-BB15065PX12                  +100.0%  Inactive                      0         130
+311:  1864-BB15067                       +60.4%  Seasonal Baseline            1,836       4,635
+312:  1864-BB15067PX12                  +100.0%  Heuristic                     0         260
+313:  1864-BB15068                       +28.4%  Seasonal Baseline            6,084       4,740
+314:  1864-BB15069                       +80.8%  Croston's                    96         500
+315:  1864-BB15069PCS12                 +100.0%  Heuristic                     0         130
+316:  1864-BB15070                       +55.5%  Seasonal Baseline            1,068       2,400
+317:  1864-BB15073                       +41.3%  Seasonal Baseline            1,398       2,380
+318:  1864-BB15073PCS6                  +100.0%  Croston's                     0         230
+319:  1864-BB15075                       +36.1%  Seasonal Baseline            2,160       3,380
+320:  1864-BB15075PX12                  +100.0%  Inactive                      0         130
+321:  1864-BB15075PX2                    +98.7%  Croston's                     6         470
+322:  1864-BB15076                       +15.3%  Seasonal Baseline            2,820       3,330
+323:  1864-BB15076PCS12                 +100.0%  Heuristic                     0         130
+324:  1864-BB15077                       +14.6%  Seasonal Baseline            5,886       6,890
+325:  1864-BB15077PX6                   +100.0%  Heuristic                     0         480
+326:  1864-BB15230PCS10                 +100.0%  Croston's                     0         230
+327:  1864-BB15230PX5                    +95.9%  Heuristic                    24         580
+328:  1864-BB15258                        +5.9%  Croston's                 9,380       9,965
+329:  1864-BB15258PCS10                  +25.0%  Croston's                    90         120
+330:  1864-BB15258PCS5                   +63.2%  Seasonal Baseline              204         125
+331:  1864-BB15775                       +17.4%  Seasonal Baseline           12,828      10,930
+332:  1864-BB15775PCS12                  +75.0%  Croston's                    90         360
+333:  1864-BB15776                       +68.4%  Heuristic                 3,924      12,415
+334:  1864-BB15776PCS12                  +67.2%  Seasonal Baseline              209         125
+335:  1864-BB15839                      +176.8%  Croston's                 8,568       3,095
+336:  1864-BB15841                       +14.4%  Croston's                 4,392       3,840
+337:  1864-BB16137                      +100.0%  Inactive                      0         270
+338:  1864-BB16137PCS2                  +100.0%  Heuristic                     0         245
+339:  1864-BB16179                      +574.7%  Croston's                 3,846         570
+340:  1864-BB16180                      +241.0%  Heuristic                21,588       6,330
+341:  1864-BB16180PCS12                 +100.0%  Heuristic                     0         120
+342:  1864-BB16180PCS2                  +100.0%  Croston's                     0         240
+343:  1864-BB16316                      +100.0%  Heuristic                     0         270
+344:  1864-BB16450                       +45.9%  Seasonal Baseline            3,924       2,690
+345:  1864-BB16450PCS12                  +95.4%  Croston's                    11         240
+346:  1864-BB16534                       +48.8%  Croston's                   384         750
+347:  1864-BB16534PCS12                  +27.2%  Seasonal Baseline              335         460
+348:  1864-BB16534PX12                  +100.0%  Inactive                      0         175
+349:  1864-BB16535                       +71.2%  Croston's                   216         750
+350:  1864-BB16535PCS12                 +290.0%  Heuristic                    78          20
+351:  1864-BB16537                      +100.0%  Croston's                     0         475
+352:  1864-BB16537PCS12                  +99.6%  Croston's                     2         470
+353:  1864-BB16537PCS2                  +100.0%  Heuristic                     0         245
+354:  1864-BB16691                       +24.5%  Seasonal Baseline            9,384       7,540
+355:  1864-BB16691PCS2                   +85.3%  Croston's                    36         245
+356:  1864-BB16853                       +61.3%  Croston's                 1,596       4,125
+357:  1864-BB16853PCS12                  +97.5%  Croston's                     6         240
+358:  1864-BB16853PCS2                   +10.9%  Seasonal Baseline            3,438       3,100
+359:  1864-BB16854                       +48.9%  Croston's                 1,824       1,225
+360:  1864-BB16854PCS12                  +16.7%  Heuristic                    15          18
+361:  1864-BB16854PCS2                   +92.4%  Seasonal Baseline               96       1,265
+362:  1864-BB16998                      +100.0%  Croston's                     0         165
+363:  1864-BB17000                      +100.0%  Croston's                     0         275
+364:  1864-BB17003                      +197.4%  Seasonal Baseline            1,368         460
+365:  1864-BB18835                       +65.3%  Croston's                 1,140       3,285
+366:  1864-BB18835PCS12                  +70.0%  Croston's                   187         110
+367:  1864-BB18890                      +408.0%  Seasonal Baseline            9,906       1,950
+368:  1864-BB19109                      +159.2%  Croston's                   648         250
+369:  1864-BB19109PCS6                   +45.0%  Croston's                    11          20
+370:  1864-BB19110                        +6.3%  Seasonal Baseline            6,618       6,225
+371:  1864-BB19110PCS6                   +25.5%  Heuristic                   364         290
+372:  1864-BB19112                       +20.0%  Seasonal Baseline            5,388       4,490
+373:  1864-BB19154                        +8.5%  Seasonal Baseline            1,020       1,115
+374:  1864-BB19154PCS6                  +100.0%  Heuristic                     0         245
+375:  1864-BB19242                      +100.0%  Inactive                      0         180
+376:  1864-BB19242PCS2                  +100.0%  Inactive                      0         110
+377:  1864-BB19242PCS3                  +100.0%  Seasonal Baseline                0         240
+378:  1864-BB19935                       +62.6%  Croston's                 3,600       9,625
+379:  1864-BB20227                       +37.0%  Seasonal Baseline           16,992      26,977
+380:  1864-BB20227PCS24                 +100.0%  Heuristic                     0          20
+381:  1864-BB20228                       +27.4%  Seasonal Baseline           19,008      26,184
+382:  1864-BB20552                       +13.1%  Seasonal Baseline           74,904      86,232
+383:  1864-BB20552PCS12                  +60.0%  Croston's                    52         130
+384:  1864-BB20777                       +43.3%  Croston's                   560         988
+385:  1864-BB21038                       +22.4%  Croston's                 3,588       4,625
+386:  1864-BB21058/6                     +53.9%  Seasonal Baseline           12,534      27,202
+387:  1864-BB21167                       +75.0%  Seasonal Baseline              774       3,100
+388:  1864-BB21235                      +100.0%  Inactive                      0         192
+389:  1864-BB21235PCS2                  +100.0%  Reactivating                  0         180
+390:  1864-BB21237                       +46.3%  Seasonal Baseline              528         984
+391:  1864-BB21237PCS12                  +95.8%  Heuristic                     6         144
+392:  1864-BB21250                       +23.3%  Seasonal Baseline           55,536      45,050
+393:  1864-BB21626                       +14.2%  Seasonal Baseline            1,296       1,510
+394:  1864-BB21626PCS2                  +100.0%  Heuristic                     0         156
+395:  1864-BB21641                       +19.0%  Seasonal Baseline            8,184      10,105
+396:  1864-BB21641PCS2                   +92.8%  Croston's                   240       3,330
+397:  1864-BB21642                       +60.0%  Heuristic                 1,236       3,090
+398:  1864-BB21642PCS12                 +100.0%  Croston's                     0         325
+399:  1864-BB21642PCS2                  +100.0%  Croston's                     0       1,075
+400:  1864-BB21643                       +94.4%  Croston's                   216       3,870
+401:  1864-BB21643PCS12                 +100.0%  Croston's                     0         345
+402:  1864-BB21643PCS2                  +100.0%  Heuristic                     0         780
+403:  1864-BB21644                       +74.5%  Seasonal Baseline              552       2,161
+404:  1864-BB21644PCS12                  +91.8%  Heuristic                    20         245
+405:  1864-BB21950                       +53.4%  Seasonal Baseline            1,818       3,905
+406:  1864-BB21950PCS2                   +93.5%  Heuristic                    63         965
+407:  1864-BB21950PCS6                   +64.6%  Heuristic                    51         144
+408:  1864-BB21951                       +68.7%  Croston's                 3,900      12,445
+409:  1864-BB21951PCS6                  +100.0%  Heuristic                     0         208
+410:  1864-BB22025PCS2                   +42.4%  Croston's                   144         250
+411:  1864-BB22094                       +95.4%  Seasonal Baseline            4,944       2,530
+412:  1864-BB22095                       +74.7%  Croston's                   216         855
+413:  1864-BB22095PCS2                  +100.0%  Heuristic                     0         250
+414:  1864-BB22118                       +44.3%  Seasonal Baseline            3,372       6,055
+415:  1864-BB22255                      +100.0%  Inactive                      0       1,176
+416:  1864-BB22272                       +44.4%  Seasonal Baseline           43,272      29,965
+417:  1864-BB22272PCS2                  +100.0%  Heuristic                     0         264
+418:  1864-BB23576                      +100.0%  Croston's      [BW]           0         208
+419:  1864-BB23576PCS6                   +99.2%  Croston's                     2         245
+420:  1864-BB23577/12                    +28.7%  Croston's                 1,284       1,800
+421:  1864-BB24711                       +74.6%  Croston's                   220         865
+422:  1864-BB24877                        +8.2%  Seasonal Baseline           30,368      28,055
+423:  1864-BB24877PX8                   +100.0%  Inactive                      0         260
+424:  1864-BB25518                       +82.5%  Croston's                   690       3,940
+425:  1864-BB25518PCS6                   +97.6%  Seasonal Baseline                3         125
+426:  1864-BB25519                       +30.0%  Heuristic                   126         180
+427:  1864-BB25519PCS6                  +100.0%  Heuristic                     0         125
+428:  1864-BB26022                        +5.3%  Croston's                 5,570       5,290
+429:  1864-BB26053PCS8                   +90.0%  Croston's                    26         260
+430:  1864-BB26053PX2                   +293.4%  Seasonal Baseline            4,072       1,035
+431:  1864-BB26159                      +221.5%  Seasonal Baseline            4,260       1,325
+432:  1864-BB26411                       +21.4%  Seasonal Baseline           18,792      15,480
+433:  1864-BB26411PCS2                  +415.1%  Seasonal Baseline            3,132         608
+434:  1864-BB26411PX2                   +100.0%  Inactive                      0       2,384
+435:  1864-BB26413                       +61.6%  Croston's                 1,236         765
+436:  1864-BB26584                        +9.4%  Seasonal Baseline            1,920       2,120
+437:  1864-BB26587PCS10                  +75.6%  Heuristic                    22          90
+438:  1864-BB26612                       +31.5%  Croston's                 2,880       4,205
+439:  1864-BB26612PCS2                  +509.2%  Heuristic                 1,584         260
+440:  1864-BB26613                       +60.8%  Seasonal Baseline            4,220       2,625
+441:  1864-BB26613PCS10                 +100.0%  Heuristic                     0          20
+442:  1864-BB26614                       +14.5%  Seasonal Baseline            1,128       1,320
+443:  1864-BB26614PCS2                  +188.0%  Croston's                   288         100
+444:  1864-BB26737                       +81.7%  Croston's                   460       2,520
+445:  1864-BB26739PCS8                  +100.0%  Croston's                     0         245
+446:  1864-BB26921                       +16.8%  Seasonal Baseline            6,264       5,365
+447:  1864-BB26922                       +93.0%  Croston's                 1,974      28,290
+448:  1864-BB26923                       +19.7%  Seasonal Baseline            1,036       1,290
+449:  1864-BB26924                       +27.6%  Seasonal Baseline            3,152       2,470
+450:  1864-BB27019                       +53.6%  Seasonal Baseline            1,920       4,135
+451:  1864-BB27019PX10                  +100.0%  Inactive                      0         260
+452:  1864-BB27206                       +12.0%  Seasonal Baseline           11,448      10,220
+453:  1864-BB27206PX8                    +90.0%  Heuristic                    13         130
+454:  1864-BB27359                       +41.3%  Croston's                18,336      31,225
+455:  1864-BB27359PCS12                  +83.8%  Croston's                    42         260
+456:  1864-BB27773                       +30.9%  Seasonal Baseline           17,880      25,880
+457:  1864-BB27773PCS10                  +78.4%  Croston's                    27         125
+458:  1864-BB27969                       +97.4%  Sparse Intermittent               20         780
+459:  1864-BB27976                       +60.0%  Croston's                   230         575
+460:  1864-BB28325                       +48.6%  Croston's                 1,430       2,780
+461:  1864-BB28325PCS10                  +82.3%  Heuristic                    23         130
+462:  1864-BB28360                       +29.1%  Seasonal Baseline           15,348      21,635
+463:  1864-BB28360PCS12                  +83.1%  Croston's                    22         130
+464:  1864-BB28360PX2                    +55.6%  Croston's                   426         960
+465:  1864-BB28361                       +39.6%  Seasonal Baseline            3,400       5,625
+466:  1864-BB28396                       +95.1%  Sparse Intermittent [BW]          24         494
+467:  1864-BB28473                       +62.9%  Seasonal Baseline            8,220      22,175
+468:  1864-BB28480                       +58.1%  Croston's                16,272      10,295
+469:  1864-BB28480PCS12                  +35.6%  Seasonal Baseline              696       1,080
+470:  1864-BB28719PCS12                  +23.6%  Seasonal Baseline            1,496       1,210
+471:  1864-BB28720                       +33.3%  Seasonal Baseline            2,064       3,095
+472:  1864-BB28720PCS12                  +30.1%  Seasonal Baseline              200         286
+473:  1864-BB29120                       +17.0%  Seasonal Baseline            3,858       4,650
+474:  1864-BB29120PCS6                   +94.5%  Croston's                    26         470
+475:  1864-BB29122                       +26.6%  Seasonal Baseline            2,382       3,245
+476:  1864-BB29477                       +80.5%  Seasonal Baseline              936       4,795
+477:  1864-BB29477PCS12                  +12.1%  Seasonal Baseline              457         520
+478:  1864-BB29486                       +28.0%  Seasonal Baseline              960         750
+479:  1864-BB29489/12                    +38.9%  Seasonal Baseline              264         190
+480:  1864-BB29489PCS2                  +234.6%  Heuristic                 1,044         312
+481:  1864-BB29561                        +9.3%  Croston's                14,040      12,840
+482:  1864-BB29561PCS12                  +89.4%  Croston's                    22         208
+483:  1864-BB29712                       +92.0%  Croston's                   156       1,950
+484:  1864-BB29712PCS6                   +84.5%  Heuristic                    31         200
+485:  1864-BB29713                       +97.2%  Heuristic                   120       4,240
+486:  1864-BB29713PCS6                  +100.0%  Croston's                     0         260
+487:  1864-BB29714                       +92.0%  Seasonal Baseline              150       1,875
+488:  1864-BB29714PCS6                  +100.0%  Croston's                     0         192
+489:  1864-BB29904                       +84.4%  Croston's                 3,120       1,692
+490:  1864-BB29944                       +75.5%  Croston's                   102         416
+491:  1864-BB30050                      +100.0%  Inactive                      0         180
+492:  1864-BB30139                       +18.0%  Seasonal Baseline            2,152       2,625
+493:  1864-BB30139PCS2                  +100.0%  Croston's                     0         250
+494:  1864-BB30176                       +71.2%  Heuristic                   432       1,500
+495:  1864-BB30188                       +88.1%  Croston's                 2,016      16,875
+496:  1864-BB30189                       +28.0%  Croston's                12,228      16,990
+497:  1864-BB30276EC                     +57.9%  Seasonal Baseline              558       1,326
+498:  1864-BB30279                      +100.0%  Croston's                     0         910
+499:  1864-BB30317PCS12                 +100.0%  Inactive                      0         120
+500:  1864-BB30371                       +72.3%  Croston's                   144         520
+501:  1864-BB30371PCS2                  +100.0%  Heuristic                     0         245
+502:  1864-BB30424                       +43.1%  Seasonal Baseline            9,888      17,380
+503:  1864-BB30461                       +10.4%  Croston's                   828         750
+504:  1864-BB30530                       +83.9%  Croston's                   940       5,850
+505:  1864-BB30587EC                    +100.0%  Seasonal Baseline                0         655
+506:  1864-BB30587PCS6                   +77.8%  Croston's                    32          18
+507:  1864-BB30930                       +24.0%  Seasonal Baseline          100,980      81,460
+508:  1864-BB30930PCS12                  +13.6%  Croston's                   108         125
+509:  1864-BB31165                       +77.5%  Sparse Intermittent              900       3,995
+510:  1864-BB31202                       +48.4%  Seasonal Baseline            4,644       8,995
+511:  1864-BB31203PCS4                  +100.0%  Croston's                     0          20
+512:  1864-BB31204PCS6                   +88.9%  Heuristic                    10          90
+513:  1864-BB31256                      +100.0%  Heuristic                     0         520
+514:  1864-BB31256PCS2                   +40.0%  Croston's                   147         245
+515:  1864-BB31473                       +10.0%  Seasonal Baseline            5,556       6,175
+516:  1864-BB31473PCS2                   +14.9%  Croston's                   936       1,100
+517:  1864-BB31552                       +33.5%  Croston's                23,952      35,995
+518:  1864-BB31552CLR/9                  +32.0%  Heuristic                 4,158       3,150
+519:  1864-BB31553                       +75.0%  Croston's                 1,248       5,000
+520:  1864-BB31553CLR/9                 +100.0%  Inactive                      0       8,310
+521:  1864-BB31553PCS3                   +90.4%  Seasonal Baseline              120       1,245
+522:  1864-BB31553PX3                   +100.0%  Inactive                      0         220
+523:  1864-BB31641PCS6                   +83.8%  Croston's                    21         130
+524:  1864-BB31649                      +100.0%  Croston's                     0       2,210
+525:  1864-BB31654                       +57.6%  Croston's                    78         184
+526:  1864-BB32329                      +100.0%  Inactive                      0         684
+527:  1864-BB32329PCS2                  +100.0%  Inactive                      0         245
+528:  1864-BB33045                      +100.0%  Heuristic                     0         720
+529:  1864-BB33048                      +140.0%  Croston's                   600         250
+530:  1864-BB33124                      +100.0%  Inactive                      0         120
+531:  1864-BB33242PCS2                  +100.0%  Heuristic                     0         180
+532:  1864-BB33243                       +79.5%  Seasonal Baseline              624       3,050
+533:  1864-BB33244                       +31.4%  Croston's                 3,120       2,375
+534:  1864-BB33246                       +13.1%  Seasonal Baseline            4,992       4,415
+535:  1864-BB33246PCS2                   +36.3%  Seasonal Baseline              156         245
+536:  1864-BB33248                       +50.9%  Seasonal Baseline            4,200       8,556
+537:  1864-BB33248PCS12                 +100.0%  Heuristic                     0         130
+538:  1864-BB33249                        +9.5%  Croston's                 2,304       2,105
+539:  1864-BB33249PCS12                 +100.0%  Heuristic                     0          18
+540:  1864-BB33249PCS2                   +63.3%  Seasonal Baseline               90         245
+541:  1864-BB33525                       +16.0%  Seasonal Baseline            1,740       1,500
+542:  1864-BB33526                       +23.9%  Seasonal Baseline            4,416       5,805
+543:  1864-BB33528                       +84.0%  Croston's                   576       3,600
+544:  1864-BB33530                       +33.6%  Seasonal Baseline            1,710       2,575
+545:  1864-BB33532                       +66.7%  Seasonal Baseline            1,200       3,600
+546:  1864-BB33534                       +55.7%  Croston's                 1,308       2,955
+547:  1864-BB33703                      +100.0%  Inactive                      0         120
+548:  1864-BB33703PCS2                  +100.0%  Croston's                     0         240
+549:  1864-BB33706                       +22.7%  Croston's                 5,682       7,352
+550:  1864-BB33708                       +29.3%  Croston's                59,928      46,350
+551:  1864-BB33721                       +80.0%  Seasonal Baseline               48         240
+552:  1864-BB33722                      +100.0%  Seasonal Baseline                0         475
+553:  1864-BB33723                      +100.0%  Seasonal Baseline                0         288
+554:  1864-BB34389                       +39.6%  Croston's                   264         437
+555:  1864-BB34390                       +24.2%  Croston's                   360         475
+556:  1864-BB34403                       +58.6%  Croston's                   240         580
+557:  1864-BB34682                       +35.4%  Heuristic                   168         260
+558:  1864-BB34682PCS6                  +100.0%  Inactive                      0         130
+559:  1864-BB34683                      +144.4%  Heuristic                   672         275
+560:  1864-BB34683PCS6                  +100.0%  Inactive                      0         130
+561:  1864-BB34711                       +67.9%  Croston's                 1,872       1,115
+562:  1864-BB34712                      +100.0%  Heuristic                     0         208
+563:  1864-BB34751                       +43.3%  Seasonal Baseline              462         815
+564:  1864-BB35032                       +55.5%  Seasonal Baseline            4,866      10,935
+565:  1864-BB35032PCS6                   +61.2%  Croston's                   101         260
+566:  1864-BB35039PCS6                   +19.2%  Seasonal Baseline              298         250
+567:  1864-BB35041                       +65.8%  Seasonal Baseline              624       1,825
+568:  1864-BB35041PCS6                  +100.0%  Heuristic                     0         130
+569:  1864-BB35043                       +23.9%  Seasonal Baseline            8,940       7,215
+570:  1864-BB35043PCS12                  +80.0%  Heuristic                    26         130
+571:  1864-BB35093PCS6                  +205.7%  Seasonal Baseline              321         105
+572:  1864-BB35094                       +57.5%  Seasonal Baseline            3,306       7,775
+573:  1864-BB35094PCS6                  +256.9%  Seasonal Baseline              928         260
+574:  1864-BB35095                       +46.7%  Croston's                 6,348      11,905
+575:  1864-BB35095PCS2                   +25.6%  Seasonal Baseline            3,711       2,955
+576:  1864-BB35095PCS6                   +13.5%  Seasonal Baseline              257         297
+577:  1864-BB35096                       +19.5%  Seasonal Baseline           22,356      27,768
+578:  1864-BB35096PCS6                   +41.0%  Seasonal Baseline              712         505
+579:  1864-BB35097                        +5.7%  Seasonal Baseline           23,037      21,789
+580:  1864-BB35097PCS3                   +95.0%  Croston's                    13         260
+581:  1864-BB35098                       +32.7%  Seasonal Baseline            7,308      10,865
+582:  1864-BB35098PCS6                  +153.6%  Seasonal Baseline              317         125
+583:  1864-BB35099PCS2                   +76.5%  Croston's                    61         260
+584:  1864-BB35100                       +15.7%  Seasonal Baseline            2,292       2,720
+585:  1864-BB35100PCS6                  +149.2%  Seasonal Baseline              299         120
+586:  1864-BB35101                       +74.9%  Seasonal Baseline            2,118       8,440
+587:  1864-BB35101PCS6                   +71.2%  Croston's                    36         125
+588:  1864-BB35103                       +17.6%  Seasonal Baseline            3,912       4,745
+589:  1864-BB35103PCS12                 +100.0%  Heuristic                     0         125
+590:  1864-BB35237                      +100.0%  Inactive                      0         180
+591:  1864-BB35514                      +100.0%  Heuristic                     0         125
+592:  1864-BB35514PCS6                  +100.0%  Inactive                      0         130
+593:  1864-BB35516                      +100.0%  Heuristic                     0         130
+594:  1864-BB35516PCS2                  +100.0%  Inactive                      0         180
+595:  1864-BB35516PCS6                  +100.0%  Inactive                      0         130
+596:  1864-BB35517                      +245.6%  Heuristic                   432         125
+597:  1864-BB35517PCS6                  +100.0%  Inactive                      0         130
+598:  1864-BB35519                      +100.0%  Heuristic                     0         260
+599:  1864-BB35519PCS6                  +100.0%  Inactive                      0         130
+600:  1864-BB35520                      +100.0%  Inactive                      0         120
+601:  1864-BB35520PCS6                  +100.0%  Inactive                      0         130
+602:  1864-BB35522                       +49.2%  Heuristic                   132         260
+603:  1864-BB35522PCS6                  +100.0%  Inactive                      0         130
+604:  1864-BB35639                       +27.2%  Croston's                   318         250
+605:  1864-BB35639PCS6                  +100.0%  Inactive                      0         130
+606:  1864-BB35649                       +17.6%  Croston's                   294         250
+607:  1864-BB35649PCS6                  +100.0%  Inactive                      0         130
+608:  1864-BB35722                      +290.0%  Heuristic                   156          40
+609:  1864-BB35723                       +93.1%  Croston's                    18         260
+610:  1864-BB35723PCS6                  +100.0%  Heuristic                     0         130
+611:  1864-BB35724                       +35.2%  Seasonal Baseline              162         250
+612:  1864-BB35904                       +13.2%  Croston's                 1,650       1,900
+613:  1864-BB35913                      +352.3%  Heuristic                   588         130
+614:  1864-BB35913PCS6                  +100.0%  Inactive                      0         130
+615:  1864-BB35914                       +81.8%  Heuristic                   180         988
+616:  1864-BB35914PCS6                  +100.0%  Inactive                      0         130
+617:  1864-BB35916                      +203.6%  Seasonal Baseline            3,036       1,000
+618:  1864-BB35917                       +80.0%  Seasonal Baseline              450         250
+619:  1864-BB35918                       +80.0%  Seasonal Baseline              450         250
+620:  1864-BB36058CLR                   +100.0%  Inactive                      0         175
+621:  1864-BB36083                      +100.0%  Heuristic                     0         210
+622:  1864-BB36083PCS8                   +71.1%  Heuristic                    26          90
+623:  1864-BB36086                      +100.0%  Heuristic                     0         210
+624:  1864-BB36086PCS12                  +60.6%  Heuristic                    71         180
+625:  1864-BB36089                      +100.0%  Heuristic                     0         210
+626:  1864-BB36089PCS12                 +100.0%  Heuristic                     0          90
+627:  1864-BB36134                      +100.0%  Heuristic                     0         210
+628:  1864-BB36134PCS6                  +100.0%  Heuristic                     0          90
+629:  1864-BB36137                      +100.0%  Heuristic                     0         210
+630:  1864-BB36137PCS6                  +100.0%  Heuristic                     0          90
+631:  1864-BB36140PCS6                  +125.6%  Heuristic                   203          90
+632:  1864-BB36234                      +100.0%  Croston's                     0         530
+633:  1864-BB36235                       +87.1%  Seasonal Baseline              192       1,485
+634:  1864-BB36237                        +6.2%  Seasonal Baseline              552         520
+635:  1864-BB36316                      +201.1%  Seasonal Baseline              858         285
+636:  1864-BB36316PCS6                  +100.0%  Inactive                      0         130
+637:  1864-BB36317                       +20.0%  Heuristic                   150         125
+638:  1864-BB36317PCS6                  +100.0%  Inactive                      0         130
+639:  1864-BB36318                       +95.2%  Heuristic                     6         125
+640:  1864-BB36318PCS6                  +100.0%  Inactive                      0         130
+641:  1864-BB36319                      +100.0%  Heuristic                     0         130
+642:  1864-BB36319PCS6                  +100.0%  Inactive                      0         130
+643:  1864-BB36558                      +100.0%  Inactive                      0         650
+644:  1864-BB36670                       +87.9%  Heuristic                    63         520
+645:  1864-BB36671                      +100.0%  Inactive                      0         360
+646:  1864-BB36671PCS3                  +100.0%  Heuristic                     0         245
+647:  1864-BB36796                       +24.2%  Heuristic                   474         625
+648:  1864-BB36976                      +100.0%  Heuristic                     0         152
+649:  1864-BB36979                       +60.0%  Heuristic                   156         390
+650:  1864-BB36980                       +60.0%  Croston's                   156         390
+651:  1864-BB36981                      +264.8%  Seasonal Baseline              456         125
+652:  1864-BB36981PCS6                  +100.0%  Inactive                      0          90
+653:  1864-BB36982                       +34.1%  Seasonal Baseline            2,622       1,955
+654:  1864-BB36982PCS6                   +30.0%  Heuristic                    26          20
+655:  1864-BB36989                       +14.8%  Seasonal Baseline            4,990       5,860
+656:  1864-BB36989PCS10                  +92.2%  Heuristic                     7          90
+657:  1864-BB36990                       +26.0%  Seasonal Baseline            2,420       3,270
+658:  1864-BB37426                       +44.1%  Seasonal Baseline            1,790       3,200
+659:  1864-BB37426PCS10                 +100.0%  Heuristic                     0          20
+660:  1864-BB38155                       +22.2%  Seasonal Baseline           12,522      16,100
+661:  1864-BB38259                       +60.8%  Heuristic                 2,436       1,515
+662:  1864-BB38261                      +191.9%  Heuristic                 2,160         740
+663:  1864-BB38638                       +11.0%  Croston's                10,980      12,334
+664:  1864-BB38924                      +100.0%  Sparse Intermittent                0          40
+665:  1864-BB38925                     +4220.0%  Sparse Intermittent            1,728          40
+666:  1864-BB38937                      +320.0%  Sparse Intermittent              168          40
+667:  1864-BB38938                      +100.0%  Sparse Intermittent                0          40
+668:  1864-FF10159AMZ2                   +44.9%  Croston's                 4,317       2,980
+669:  1864-FF10159AMZ6                   +34.4%  Heuristic                   256         390
+670:  1864-FF10159EC                     +17.1%  Seasonal Baseline           63,942      77,124
+671:  1864-FF10159PCS6                  +118.6%  Croston's                 1,071         490
+672:  1864-FF10162AMZ2                   +52.0%  Croston's                   300         625
+673:  1864-FF10162PCS6                   +85.7%  Croston's                    70         490
+674:  1864-FF10465                       +37.9%  Heuristic                 4,476       3,245
+675:  1864-FF10475                       +57.5%  Heuristic                 3,126       7,355
+676:  1864-FF10475AMZ2                   +47.6%  Heuristic                   516         984
+677:  1864-FF10475AMZ6                  +100.0%  Croston's                     0         245
+678:  1864-FF10477AMZ2                  +105.4%  Heuristic                 1,725         840
+679:  1864-FF10477AMZ6                   +82.7%  Seasonal Baseline               36         208
+680:  1864-FF10477EC                     +20.4%  Croston's                 6,582       8,270
+681:  1864-FF10479EC                     +17.1%  Croston's                39,684      47,892
+682:  1864-FF10479PCS6                  +412.0%  Heuristic                 2,253         440
+683:  1864-FF10479PX2                   +100.0%  Inactive                      0      20,720
+684:  1864-FF10479PX6                   +100.0%  Inactive                      0       2,415
+685:  1864-FF10530                        +8.9%  Croston's                19,032      20,895
+686:  1864-FF10530AMZ3                   +23.6%  Heuristic                 2,404       1,945
+687:  1864-FF10530AMZ6                  +272.2%  Heuristic                   912         245
+688:  1864-FF10530PCS12                 +100.0%  Heuristic                     0         208
+689:  1864-FF10556                       +14.0%  Heuristic                 9,222      10,720
+690:  1864-FF10556PCS2                  +395.0%  Seasonal Baseline               99          20
+691:  1864-FF11353                       +24.5%  Croston's                 3,948       3,170
+692:  1864-FF11453                       +38.5%  Sparse Intermittent              240         390
+693:  1864-FF11899PCS2                   +96.3%  Croston's                    24         655
+694:  1864-FF11926                      +100.0%  Inactive                      0       1,116
+695:  1864-FF11926PCS3                   +90.2%  Heuristic                    24         245
+696:  1864-FF11926PX24                  +100.0%  Heuristic                     0         200
+697:  1864-FF11927PCS24                 +100.0%  Heuristic                     0          12
+698:  1864-FF12008/4                    +100.0%  Inactive                      0         342
+699:  1864-FF12279                       +30.7%  Croston's                 3,672       5,295
+700:  1864-FF12279PCS2                   +73.8%  Croston's                    63         240
+701:  1864-FF12279PX6                    +87.5%  Heuristic                    25         200
+702:  1864-FF12283                       +29.5%  Heuristic                 1,434       2,035
+703:  1864-FF12283PCS6                  +100.0%  Croston's                     0         245
+704:  1864-FF12300/24                     +5.7%  Seasonal Baseline           75,048      70,974
+705:  1864-FF12300PCS6                  +399.2%  Croston's                 4,912         984
+706:  1864-FF12301/24                    +20.3%  Croston's                23,712      29,755
+707:  1864-FF12301/24AU                 +100.0%  Inactive                      0         787
+708:  1864-FF12302/24EC                  +48.5%  Croston's                26,688      51,792
+709:  1864-FF12302/24PCS2               +100.0%  Inactive                      0       1,190
+710:  1864-FF12302PCS2                  +308.0%  Seasonal Baseline            2,448         600
+711:  1864-FF12353AMZ                    +85.2%  Heuristic                 6,018       3,250
+712:  1864-FF12353PCS2                  +100.0%  Heuristic                     0         245
+713:  1864-FF12354                       +76.0%  Croston's                   156         650
+714:  1864-FF12355                      +110.4%  Croston's                 1,410         670
+715:  1864-FF12375                       +76.6%  Heuristic                   552       2,360
+716:  1864-FF12375PCS6                   +82.2%  Croston's                    37         208
+717:  1864-FF12375PX2                   +100.0%  Croston's                     0         200
+718:  1864-FF12376                       +12.3%  Croston's                23,484      26,770
+719:  1864-FF12376PCS6                  +198.0%  Seasonal Baseline              149          50
+720:  1864-FF12376PX2                    +80.8%  Heuristic                    75         390
+721:  1864-FF12377                       +17.5%  Croston's                 3,420       4,145
+722:  1864-FF12377PCS2                   +10.0%  Seasonal Baseline              225         250
+723:  1864-FF12377PCS6                   +50.0%  Croston's                    25          50
+724:  1864-FF12378                       +52.0%  Seasonal Baseline              786       1,638
+725:  1864-FF12378PCS6                   +70.0%  Croston's                    15          50
+726:  1864-FF12378PX2                    +75.0%  Heuristic                   525         300
+727:  1864-FF12379/6                     +69.8%  Seasonal Baseline              612       2,025
+728:  1864-FF12379/6PCS2                +100.0%  Inactive                      0          55
+729:  1864-FF12380/6                     +31.4%  Heuristic                 3,354       4,890
+730:  1864-FF12380/6PCS2                +100.0%  Inactive                      0         245
+731:  1864-FF12508                       +28.4%  Croston's                45,144      63,025
+732:  1864-FF12649                       +95.8%  Croston's                    78       1,875
+733:  1864-FF12649PCS2                  +100.0%  Croston's                     0         450
+734:  1864-FF12653                       +50.1%  Heuristic                   696       1,395
+735:  1864-FF12653EC                     +66.2%  Heuristic                   786       2,325
+736:  1864-FF12653PCS2                   +62.0%  Croston's                    93         245
+737:  1864-FF12655AU                    +100.0%  Inactive                      0         174
+738:  1864-FF12655EC                     +30.5%  Seasonal Baseline           35,040      50,419
+739:  1864-FF12656                       +28.1%  Heuristic                 4,356       6,055
+740:  1864-FF12689                       +20.7%  Croston's                77,160      97,350
+741:  1864-FF12717                      +100.0%  Croston's                     0         130
+742:  1864-FF12801                      +241.5%  Seasonal Baseline            3,360         984
+743:  1864-FF12805                      +100.0%  Inactive                      0           8
+744:  1864-FF12806                       +63.0%  Seasonal Baseline            6,432      17,390
+745:  1864-FF12806PCS48                 +100.0%  Inactive                      0          24
+746:  1864-FF12823                        +8.1%  Seasonal Baseline           54,504      59,305
+747:  1864-FF12823PCS12                  +57.6%  Croston's                   216         510
+748:  1864-FF12823PX12                  +100.0%  Inactive                      0         210
+749:  1864-FF12824                       +30.7%  Heuristic                 3,096       4,470
+750:  1864-FF12824PCS12                  +50.0%  Heuristic                    49          98
+751:  1864-FF12824PX12                  +100.0%  Inactive                      0          84
+752:  1864-FF12825                       +19.3%  Croston's                 7,440       9,215
+753:  1864-FF12825PCS12                  +80.0%  Heuristic                    26         130
+754:  1864-FF12837                       +88.3%  Croston's                17,982       9,550
+755:  1864-FF12837EC                     +57.0%  Croston's                14,874       9,475
+756:  1864-FF12837PCS2                   +44.8%  Seasonal Baseline              276         500
+757:  1864-FF12842                       +18.9%  Seasonal Baseline           37,128      45,796
+758:  1864-FF12842PCS12                  +27.9%  Heuristic                   173         240
+759:  1864-FF12842PCS3                   +13.3%  Croston's                 5,936       6,850
+760:  1864-FF12843                       +39.0%  Seasonal Baseline            7,332      12,025
+761:  1864-FF12843PCS12                  +42.8%  Heuristic                   372         650
+762:  1864-FF12843PCS3                   +63.7%  Seasonal Baseline            4,532      12,485
+763:  1864-FF12846                       +57.3%  Croston's                 4,656      10,900
+764:  1864-FF12846PCS24                  +89.4%  Croston's                    26         245
+765:  1864-FF12846PCS8                   +28.0%  Heuristic                 2,238       1,748
+766:  1864-FF12849                       +27.8%  Croston's                 3,384       4,685
+767:  1864-FF12849PCS12                  +96.8%  Croston's                     4         125
+768:  1864-FF12849PCS3                   +45.0%  Croston's                 1,756       3,190
+769:  1864-FF12850                        +5.8%  Heuristic                 6,792       7,210
+770:  1864-FF12850PCS2                   +61.6%  Croston's                   396         245
+771:  1864-FF12850PCS24                 +100.0%  Heuristic                     0         208
+772:  1864-FF12850PCS8                   +84.3%  Heuristic                   138         880
+773:  1864-FF12852                       +58.9%  Croston's                 2,436       5,925
+774:  1864-FF12852PCS12                 +100.0%  Croston's                     0         208
+775:  1864-FF12852PCS3                   +35.8%  Heuristic                   520         810
+776:  1864-FF12853                       +10.6%  Croston's                51,852      58,010
+777:  1864-FF12853PCS12                 +500.0%  Heuristic                   156          26
+778:  1864-FF12853PCS3                   +16.8%  Croston's                 2,068       2,485
+779:  1864-FF12887                       +15.1%  Seasonal Baseline           49,056      57,765
+780:  1864-FF12887PCS12                 +100.0%  Croston's                     0          78
+781:  1864-FF13115                      +233.7%  Heuristic                 2,496         748
+782:  1864-FF13116                      +100.0%  Inactive                      0         882
+783:  1864-FF13154                        +8.1%  Heuristic                 2,496       2,310
+784:  1864-FF13154PCS2                   +68.8%  Croston's                    75         240
+785:  1864-FF13421AU                    +100.0%  Inactive                      0          37
+786:  1864-FF13874                        +5.6%  Croston's                10,110       9,570
+787:  1864-FF13874PCS6                   +72.4%  Heuristic                   131         475
+788:  1864-FF13875PCS6                  +202.0%  Heuristic                   918         304
+789:  1864-FF13875PX6                   +100.0%  Inactive                      0         190
+790:  1864-FF13876                       +38.9%  Seasonal Baseline           14,688      24,030
+791:  1864-FF13876PCS6                   +98.1%  Croston's                    12         625
+792:  1864-FF13877                       +46.6%  Seasonal Baseline           10,560      19,780
+793:  1864-FF13877PCS2                   +62.9%  Seasonal Baseline            1,572       4,235
+794:  1864-FF13877PX6                    +87.5%  Reactivating                 26         208
+795:  1864-FF13878PCS6                   +68.0%  Croston's                   630         375
+796:  1864-FF13878PX6                   +100.0%  Inactive                      0         225
+797:  1864-FF13879                       +37.8%  Seasonal Baseline            4,914       7,895
+798:  1864-FF13879PCS2                   +52.9%  Croston's                 1,197       2,540
+799:  1864-FF13879PCS6                   +34.7%  Seasonal Baseline              245         375
+800:  1864-FF13880PCS2                   +38.7%  Seasonal Baseline              414         675
+801:  1864-FF13880PCS6                   +41.7%  Seasonal Baseline              140         240
+802:  1864-FF13881                        +9.2%  Seasonal Baseline           11,934      13,140
+803:  1864-FF13881PCS6                   +28.8%  Seasonal Baseline            1,580       2,220
+804:  1864-FF13885                       +15.7%  Seasonal Baseline           13,374      15,865
+805:  1864-FF13885PCS2                   +53.6%  Croston's                   384         250
+806:  1864-FF13885PCS3                   +11.8%  Seasonal Baseline            2,474       2,805
+807:  1864-FF14364                       +44.5%  Croston's                 2,112       3,805
+808:  1864-FF14364PCS12                  +66.7%  Croston's                    78         234
+809:  1864-FF14364PCS3                   +50.1%  Heuristic                 1,496       3,000
+810:  1864-FF14365                       +23.6%  Heuristic                 3,864       5,055
+811:  1864-FF14365PCS12                 +200.0%  Croston's                   312         104
+812:  1864-FF14365PCS3                   +35.6%  Heuristic                 1,408       2,185
+813:  1864-FF14584                       +14.2%  Seasonal Baseline           24,032      28,010
+814:  1864-FF15134                       +80.0%  Sparse Intermittent            1,296         720
+815:  1864-FF15584                       +82.7%  Seasonal Baseline            5,976      34,490
+816:  1864-FF15585                       +64.1%  Heuristic                 1,668       4,650
+817:  1864-FF15585PCS3                   +75.5%  Seasonal Baseline               92         375
+818:  1864-FF15588                      +100.0%  Heuristic                     0       4,325
+819:  1864-FF15589                       +10.6%  Croston's                41,748      46,710
+820:  1864-FF15592                       +11.5%  Croston's                 4,452       5,030
+821:  1864-FF15595                        +9.8%  Seasonal Baseline            2,820       3,125
+822:  1864-FF15718                       +30.7%  Croston's                 2,496       1,910
+823:  1864-FF15740                       +73.7%  Sparse Intermittent            1,728       6,575
+824:  1864-FF15747                      +100.0%  Heuristic                     0         208
+825:  1864-FF15982                       +99.5%  Heuristic                   144      31,450
+826:  1864-FF16341                       +88.4%  Croston's                    90         775
+827:  1864-FF16704                       +28.7%  Seasonal Baseline           22,308      31,285
+828:  1864-FF16705                       +16.6%  Heuristic                 7,932       9,510
+829:  1864-FF17588                       +31.8%  Croston's      [BW]       4,122       6,040
+830:  1864-FF17828                       +17.0%  Croston's                 6,840       8,240
+831:  1864-FF17831                       +57.6%  Heuristic                12,672      29,880
+832:  1864-FF17831PCS6                   +66.7%  Heuristic                   240         720
+833:  1864-FF18404/4                     +95.5%  Croston's                    24         528
+834:  1864-FF18908/24                    +10.3%  Heuristic                 2,112       1,915
+835:  1864-FF18909/24                    +21.9%  Seasonal Baseline            3,576       4,576
+836:  1864-FF18911/24                   +100.0%  Inactive                      0         286
+837:  1864-FF18912/24                    +23.1%  Croston's                   288         234
+838:  1864-FF18913                      +108.7%  Croston's                 1,248         598
+839:  1864-FF18956                       +45.5%  Heuristic                 1,200         825
+840:  1864-FF18956PCS2                   +36.3%  Croston's                   156         245
+841:  1864-FF18956PCS24                  +97.6%  Croston's                     6         250
+842:  1864-FF18958                       +63.8%  Heuristic                 2,496       6,890
+843:  1864-FF18959AU                    +100.0%  Inactive                      0          37
+844:  1864-FF18959PCS24                 +100.0%  Croston's                     0         260
+845:  1864-FF19341PCS2                    +5.9%  Seasonal Baseline            3,675       3,905
+846:  1864-FF19341PCS6                   +66.8%  Seasonal Baseline               95         286
+847:  1864-FF19534/24                   +100.0%  Inactive                      0         176
+848:  1864-FF19536                       +44.6%  Sparse Intermittent [BW]         144         260
+849:  1864-FF19546                       +15.2%  Seasonal Baseline           14,808      17,465
+850:  1864-FF19546PCS6                  +100.0%  Inactive                      0         144
+851:  1864-FF19993                      +823.1%  Sparse Intermittent              960         104
+852:  1864-FF20206EC                     +49.7%  Croston's                15,312      30,450
+853:  1864-FF20206PCS2                   +65.9%  Croston's                   420       1,230
+854:  1864-FF20206PCS6                   +73.6%  Croston's                    33         125
+855:  1864-FF20207EC                     +56.6%  Croston's                 1,302       3,000
+856:  1864-FF20208                        +9.5%  Seasonal Baseline           60,324      66,624
+857:  1864-FF20208AU                    +100.0%  Inactive                      0          37
+858:  1864-FF20208PCS3                   +11.2%  Seasonal Baseline            5,836       6,575
+859:  1864-FF20209                       +64.2%  Croston's                 1,674       4,680
+860:  1864-FF20209PCS6                   +94.2%  Heuristic                    12         208
+861:  1864-FF20210EC                     +74.1%  Croston's                   636       2,460
+862:  1864-FF20210PCS2                   +66.4%  Croston's                   126         375
+863:  1864-FF20210PCS6                  +100.0%  Croston's                     0          50
+864:  1864-FF20868                       +26.8%  Seasonal Baseline            2,040       2,785
+865:  1864-FF22031                        +9.1%  Seasonal Baseline           59,832      54,825
+866:  1864-FF22031PCS12                  +96.8%  Croston's                    12         375
+867:  1864-FF22070                       +23.7%  Seasonal Baseline            1,824       1,475
+868:  1864-FF22071                       +18.4%  Seasonal Baseline            1,488       1,257
+869:  1864-FF22187                       +45.5%  Seasonal Baseline            5,448       3,745
+870:  1864-FF22187PCS3                  +100.0%  Inactive                      0          36
+871:  1864-FF22317                      +100.0%  Seasonal Baseline                0       4,280
+872:  1864-FF22317PCS2                   +18.5%  Seasonal Baseline              936         790
+873:  1864-FF22318                      +100.0%  Inactive (zero order history)                0         735
+874:  1864-FF22321                       +23.1%  Croston's                 1,200       1,560
+875:  1864-FF22323                       +41.2%  Seasonal Baseline              624         442
+876:  1864-FF23346                       +62.1%  Seasonal Baseline              360         950
+877:  1864-FF23348                      +100.0%  Heuristic                     0         390
+878:  1864-FF23348PCS2                   +92.7%  Heuristic                    18         245
+879:  1864-FF25556                      +100.0%  Heuristic                     0         468
+880:  1864-FF25667                      +134.2%  Seasonal Baseline            1,464         625
+881:  1864-FF25670                      +100.0%  Inactive                      0         264
+882:  1864-FF25688                      +700.0%  Croston's                 1,872         234
+883:  1864-FF25689                      +190.1%  Croston's                 6,000       2,068
+884:  1864-FF25701                       +57.9%  Croston's                 1,848       1,170
+885:  1864-FF25895                       +23.9%  Seasonal Baseline           50,928      41,105
+886:  1864-FF26577                      +100.0%  Heuristic                     0         208
+887:  1864-FF26756                       +36.1%  Seasonal Baseline              342         535
+888:  1864-FF26756EC                     +17.6%  Seasonal Baseline              696         845
+889:  1864-FF26777                      +105.7%  Croston's                 3,798       1,846
+890:  1864-FF27258                       +63.5%  Croston's                 1,062       2,910
+891:  1864-FF27260                       +77.5%  Croston's                    72         320
+892:  1864-FF27261                       +25.3%  Seasonal Baseline            1,050       1,405
+893:  1864-FF27263                       +79.7%  Croston's                   312       1,535
+894:  1864-FF27264                      +188.4%  Croston's                 1,716         595
+895:  1864-FF27265                      +120.6%  Seasonal Baseline            5,592       2,535
+896:  1864-FF27266                       +88.2%  Croston's                   468       3,950
+897:  1864-FF27268                       +43.1%  Croston's                   492         865
+898:  1864-FF27332                       +31.4%  Seasonal Baseline              624         910
+899:  1864-FF27687                      +126.6%  Seasonal Baseline              963         425
+900:  1864-FF27687PCS3                  +100.0%  Inactive                      0         144
+901:  1864-FF27997                       +25.9%  Heuristic                 1,894       2,555
+902:  1864-FF27997PX2                    +99.0%  Heuristic                     2         207
+903:  1864-FF28036N                     +680.0%  Heuristic                   312          40
+904:  1864-FF28036PCS2                   +94.7%  Heuristic                    57       1,080
+905:  1864-FF28036PCS6                   +80.0%  Heuristic                    26         130
+906:  1864-FF28039AU                    +100.0%  Inactive                      0          63
+907:  1864-FF28400                       +93.6%  Heuristic                    24         375
+908:  1864-FF28402                       +62.5%  Croston's                   624       1,665
+909:  1864-FF28411                      +246.2%  Seasonal Baseline              720         208
+910:  1864-FF28429                      +100.0%  Croston's                     0         780
+911:  1864-FF28457                       +98.4%  Heuristic                    60       3,750
+912:  1864-FF28457N                      +62.6%  Croston's                   936       2,505
+913:  1864-FF28457PCS2                   +67.5%  Croston's                   288         885
+914:  1864-FF28457PX6                   +100.0%  Reactivating                  0         480
+915:  1864-FF28459N                     +100.0%  Croston's                     0         730
+916:  1864-FF28459PCS2                   +17.0%  Croston's                   468         400
+917:  1864-FF28459PX6                   +100.0%  Heuristic                     0         390
+918:  1864-FF28547                       +71.9%  Croston's                   600       2,132
+919:  1864-FF28856                       +16.7%  Seasonal Baseline              400         480
+920:  1864-FF29045                      +100.0%  Inactive                      0         144
+921:  1864-FF29046                      +100.0%  Heuristic                     0         192
+922:  1864-FF29220PCS2                   +74.0%  Croston's                   269       1,035
+923:  1864-FF29319                       +70.5%  Seasonal Baseline            2,652       1,555
+924:  1864-FF29833                       +33.5%  Seasonal Baseline            1,572       2,364
+925:  1864-FF29833PX6                   +100.0%  Heuristic                     0         104
+926:  1864-FF29834                       +77.2%  Croston's                   576       2,529
+927:  1864-FF29834PCS6                  +100.0%  Croston's                     0         150
+928:  1864-FF30114                       +43.3%  Croston's                   624       1,100
+929:  1864-FF30363                       +76.7%  Croston's                   168         720
+930:  1864-FF30364                      +100.0%  Croston's                     0       1,404
+931:  1864-FF30426                       +18.7%  Heuristic                 4,350       5,350
+932:  1864-FF30746                       +87.2%  Croston's                   276       2,158
+933:  1864-FF30748PS                    +100.0%  Croston's                     0         650
+934:  1864-FF30749                       +73.6%  Croston's                 2,544       9,650
+935:  1864-FF30755                       +49.5%  Seasonal Baseline           25,836      17,280
+936:  1864-FF30755EC                     +56.8%  Seasonal Baseline           35,874      22,875
+937:  1864-FF30755PCS6                   +33.8%  Croston's                 1,562       2,360
+938:  1864-FF30757                       +45.5%  Croston's                 4,992       9,160
+939:  1864-FF30758                      +100.0%  Heuristic                     0         208
+940:  1864-FF30758PCS3                   +51.7%  Heuristic                   232         480
+941:  1864-FF30759                       +30.2%  Croston's                 4,920       7,045
+942:  1864-FF30760                       +80.9%  Heuristic                    72         376
+943:  1864-FF30784                       +28.0%  Croston's                    72         100
+944:  1864-FF30879                       +49.1%  Heuristic                 1,584       3,115
+945:  1864-FF30879N                    +5540.0%  Heuristic                 2,256          40
+946:  1864-FF30879PCS2                   +96.6%  Croston's                    12         350
+947:  1864-FF30879PX6                   +100.0%  Heuristic                     0         208
+948:  1864-FF30880                       +41.0%  Seasonal Baseline            3,456       5,855
+949:  1864-FF30880PX6                   +100.0%  Heuristic                     0         260
+950:  1864-FF31032                       +15.6%  Seasonal Baseline            2,196       1,900
+951:  1864-FF31061                       +90.6%  Seasonal Baseline               96       1,025
+952:  1864-FF31062                       +39.7%  Croston's                 6,108      10,135
+953:  1864-FF31063                      +239.3%  Croston's                 4,632       1,365
+954:  1864-FF31063AMZ                   +100.0%  Inactive                      0       2,470
+955:  1864-FF31063PCS6                  +100.0%  Heuristic                     0          20
+956:  1864-FF31064N                     +100.0%  Heuristic                     0          40
+957:  1864-FF31064PCS2                  +100.0%  Inactive                      0         260
+958:  1864-FF31064PCS6                  +100.0%  Heuristic                     0         208
+959:  1864-FF31065                       +63.1%  Sparse Intermittent               96         260
+960:  1864-FF31068                       +89.3%  Croston's                 1,872      17,420
+961:  1864-FF31068PCS6                  +100.0%  Croston's                     0          20
+962:  1864-FF31075                       +17.4%  Seasonal Baseline           20,064      17,093
+963:  1864-FF31076                       +83.0%  Seasonal Baseline              900       5,295
+964:  1864-FF31183                       +68.8%  Croston's                   150         480
+965:  1864-FF31184                       +42.2%  Croston's                   231         400
+966:  1864-FF31186                       +82.4%  Croston's                    72         410
+967:  1864-FF31198N                     +100.0%  Croston's                     0          40
+968:  1864-FF31198PCS2                  +100.0%  Heuristic                     0         345
+969:  1864-FF31287                       +15.6%  Seasonal Baseline           19,648      23,285
+970:  1864-FF31287PCS8                   +50.0%  Heuristic                    25          50
+971:  1864-FF31289PCS6                   +44.9%  Croston's                    43          78
+972:  1864-FF31292                       +88.7%  Seasonal Baseline              368       3,264
+973:  1864-FF31293                       +87.8%  Croston's                    94         770
+974:  1864-FF31293PCS2                  +100.0%  Inactive                      0          70
+975:  1864-FF31295                       +21.6%  Heuristic                 1,008       1,285
+976:  1864-FF31295PCS6                  +100.0%  Inactive                      0          70
+977:  1864-FF31324                     +1204.3%  Seasonal Baseline            3,000         230
+978:  1864-FF31324AU                    +100.0%  Inactive                      0         215
+979:  1864-FF31324EC                    +261.7%  Seasonal Baseline            1,248         345
+980:  1864-FF31324PCS6                  +100.0%  Seasonal Baseline                0         240
+981:  1864-FF31325                       +12.5%  Croston's                10,884      12,445
+982:  1864-FF31325PCS3                    +6.7%  Croston's                 1,500       1,607
+983:  1864-FF31326                      +125.3%  Seasonal Baseline           18,078       8,025
+984:  1864-FF31326EC                     +22.0%  Seasonal Baseline           13,056      10,700
+985:  1864-FF31327                        +7.4%  Seasonal Baseline           12,732      11,850
+986:  1864-FF31452                      +100.0%  Heuristic                     0         475
+987:  1864-FF31453                      +100.0%  Heuristic                     0         450
+988:  1864-FF31454                     +1425.2%  Croston's                 9,456         620
+989:  1864-FF31455                      +100.0%  Inactive                      0         540
+990:  1864-FF31456                      +100.0%  Inactive                      0         130
+991:  1864-FF31456PCS2                  +100.0%  Heuristic                     0         180
+992:  1864-FF31480                       +85.3%  Croston's                   396       2,695
+993:  1864-FF31481                       +88.3%  Seasonal Baseline              336       2,875
+994:  1864-FF31605PCS12                 +100.0%  Heuristic                     0          25
+995:  1864-FF31606                       +58.6%  Croston's                   600       1,450
+996:  1864-FF31606PCS12                  +92.3%  Heuristic                     2          26
+997:  1864-FF31607                       +56.8%  Seasonal Baseline              684       1,584
+998:  1864-FF31608                       +51.6%  Heuristic                 1,296       2,678
+999:  1864-FF31608PCS12                 +100.0%  Heuristic                     0          26
+1000:  1864-FF31823                      +325.8%  Croston's                12,732       2,990
+1001:  1864-FF32148                       +76.3%  Seasonal Baseline            1,464       6,185
+1002:  1864-FF32149                       +23.1%  Seasonal Baseline            2,064       2,685
+1003:  1864-FF32364                       +95.0%  Seasonal Baseline            4,680       2,400
+1004:  1864-FF32365                       +61.2%  Heuristic                 1,110       2,860
+1005:  1864-FF32652                       +20.0%  Croston's                   312         390
+1006:  1864-FF32653                      +100.0%  Heuristic                     0         260
+1007:  1864-FF32654                      +100.0%  Heuristic                     0         250
+1008:  1864-FF32655                       +68.7%  Croston's                   144         460
+1009:  1864-FF32656                       +27.7%  Heuristic                   300         415
+1010:  1864-FF32657                        +9.5%  Croston's                   312         285
+1011:  1864-FF32824                       +11.1%  Seasonal Baseline            4,872       4,385
+1012:  1864-FF32826                       +68.4%  Heuristic                   288         910
+1013:  1864-FF32826PCS2                   +92.7%  Croston's                    18         245
+1014:  1864-FF32840                      +121.1%  Croston's                 7,284       3,295
+1015:  1864-FF32840PCS4                  +100.0%  Heuristic                     0         105
+1016:  1864-FF33135                       +22.1%  Croston's                 3,660       4,700
+1017:  1864-FF33135AU                    +100.0%  Inactive                      0         252
+1018:  1864-FF33137                       +18.8%  Seasonal Baseline            2,712       3,340
+1019:  1864-FF33137AU                    +100.0%  Inactive                      0         148
+1020:  1864-FF33139AU                    +100.0%  Inactive                      0         100
+1021:  1864-FF33413                       +39.2%  Croston's                 2,604       4,280
+1022:  1864-FF33449                       +30.7%  Croston's                 3,084       2,360
+1023:  1864-FF33541                      +100.0%  Heuristic                     0         200
+1024:  1864-FF33542                       +60.0%  Croston's                   600         375
+1025:  1864-FF33543                       +28.0%  Croston's                   864       1,200
+1026:  1864-FF33545                       +74.4%  Croston's                   192         750
+1027:  1864-FF33546                       +16.0%  Croston's                   168         200
+1028:  1864-FF33555                      +472.3%  Seasonal Baseline            1,488         260
+1029:  1864-FF33559                      +140.0%  Croston's                   624         260
+1030:  1864-FF33567                      +100.0%  Heuristic                     0         625
+1031:  1864-FF33567PCS2                  +100.0%  Inactive                      0         235
+1032:  1864-FF33568                      +667.3%  Croston's                 2,724         355
+1033:  1864-FF33568PCS2                  +100.0%  Heuristic                     0         245
+1034:  1864-FF33569                       +96.2%  Heuristic                    24         630
+1035:  1864-FF33571                      +100.0%  Inactive                      0         260
+1036:  1864-FF33573                      +100.0%  Croston's                     0         260
+1037:  1864-FF33637                       +16.2%  Croston's                 1,140       1,360
+1038:  1864-FF33638                      +100.0%  Croston's                     0         260
+1039:  1864-FF33641                       +63.6%  Croston's                   360         220
+1040:  1864-FF33868                      +100.0%  Heuristic                     0         260
+1041:  1864-FF33872                       +18.1%  Seasonal Baseline            4,560       5,565
+1042:  1864-FF33876                       +62.8%  Seasonal Baseline              450       1,210
+1043:  1864-FF33876EC                     +61.0%  Seasonal Baseline              468       1,200
+1044:  1864-FF33877                      +120.0%  Croston's                 6,600       3,000
+1045:  1864-FF34096                      +100.0%  Inactive                      0         210
+1046:  1864-FF34408                      +100.0%  Inactive                      0         210
+1047:  1864-FF34413                      +100.0%  Inactive                      0         210
+1048:  1864-FF34428                      +100.0%  Croston's                     0         520
+1049:  1864-FF34430                       +50.2%  Seasonal Baseline            2,574       5,165
+1050:  1864-FF34466                      +100.0%  Inactive (zero order history)                0       1,962
+1051:  1864-FF34467                       +61.1%  Heuristic                   888       2,285
+1052:  1864-FF34468                      +100.0%  Inactive                      0         490
+1053:  1864-FF34709                      +100.0%  Croston's                     0         245
+1054:  1864-FF34942                       +82.9%  Heuristic                    42         245
+1055:  1864-FF34974                       +33.6%  Seasonal Baseline            1,650       1,235
+1056:  1864-FF35147EC                     +59.0%  Seasonal Baseline            7,488      18,282
+1057:  1864-FF35344                      +236.0%  Heuristic                   672         200
+1058:  1864-FF35359                       +74.1%  Croston's                 1,212       4,680
+1059:  1864-FF35397                      +100.0%  Inactive                      0         210
+1060:  1864-FF35623                      +100.0%  Heuristic                     0         210
+1061:  1864-FF35624                      +100.0%  Heuristic                     0         210
+1062:  1864-FF35632                       +80.8%  Croston's                    48         250
+1063:  1864-FF35849                      +100.0%  Inactive                      0         210
+1064:  1864-FF36211                      +100.0%  Croston's                     0         260
+1065:  1864-FF36213                      +100.0%  Heuristic                     0         130
+1066:  1864-FF36214                      +100.0%  Heuristic                     0         995
+1067:  1864-FF36249                       +14.8%  Croston's                 2,280       2,675
+1068:  1864-FF36250                       +28.4%  Heuristic                 3,510       4,905
+1069:  1864-FF36251                       +41.7%  Croston's                 6,030       4,255
+1070:  1864-FF36291                      +100.0%  Heuristic                     0         630
+1071:  1864-FF36294                       +17.6%  Croston's                   288         245
+1072:  1864-FF36295                       +90.2%  Croston's                    24         245
+1073:  1864-FF36356                      +100.0%  Heuristic                     0         210
+1074:  1864-FF36560                      +288.8%  Croston's                   972         250
+1075:  1864-FF36663                      +100.0%  Heuristic                     0         630
+1076:  1864-FF37258                       +85.2%  Seasonal Baseline            4,176       2,255
+1077:  1864-FF37259                        +8.6%  Seasonal Baseline            2,736       2,520
+1078:  1864-FF37638                       +97.8%  Croston's                   900         455
+1079:  1864-FF37778                       +51.3%  Seasonal Baseline            8,634       5,705
+1080:  1864-FF37779                        +5.6%  Seasonal Baseline            9,684      10,260
+1081:  1864-FF37780                       +48.0%  Seasonal Baseline            6,276       4,240
+1082:  1864-FF37818                       +86.5%  Seasonal Baseline            1,800         965
+1083:  1864-FF37819                       +81.5%  Heuristic                    24         130
+1084:  1864-FF37822                       +80.4%  Croston's                    48         245
+1085:  1864-FF38327                      +100.0%  Heuristic                     0         260
+1086:  1864-FF38330                      +100.0%  Heuristic                     0          75
+1087:  1864-FF38331                      +100.0%  Heuristic                     0         170
+1088:  1864-FF38368                       +20.0%  Heuristic                    48          40
+1089:  1864-FF38488                       +66.3%  Croston's                   312         925
+1090:  1864-FF38676                      +758.8%  Heuristic                 5,196         605
+1091:  1864-FF4517AU                     +100.0%  Inactive                      0         870
+1092:  1864-FF4537AU                     +100.0%  Inactive                      0         133
+1093:  1864-FF4577                        +21.8%  Heuristic                 2,112       2,700
+1094:  1864-FF4577PCS2                    +61.5%  Seasonal Baseline              300         780
+1095:  1864-FF4577PCS24                  +100.0%  Heuristic                     0          20
+1096:  1864-FF4771AMZ                     +25.9%  Croston's                 7,584      10,235
+1097:  1864-FF4771PCS3                    +46.2%  Croston's                   190         130
+1098:  1864-FF4771PCS6                   +100.0%  Croston's                     0          25
+1099:  1864-FF4775AMZ                      +9.8%  Seasonal Baseline           74,070      82,150
+1100:  1864-FF4775PCS2                    +14.1%  Heuristic                 3,390       3,945
+1101:  1864-FF4775PCS6                    +76.7%  Heuristic                   318         180
+1102:  1864-FF4776AMZ                     +13.8%  Croston's                14,898      17,285
+1103:  1864-FF4776AMZ2                   +109.4%  Heuristic                 2,199       1,050
+1104:  1864-FF4849CP6                     +80.0%  Croston's                    12          60
+1105:  1864-FF4849PCS2                    +45.2%  Heuristic                   444         810
+1106:  1864-FF4849PX2                    +100.0%  Inactive                      0         315
+1107:  1864-FF4849PX6                    +100.0%  Inactive                      0         240
+1108:  1864-FF4923AMZ                    +100.0%  Inactive                      0         420
+1109:  1864-FF4923AMZ2                    +97.6%  Heuristic                     6         250
+1110:  1864-FF4930AMZ                     +51.2%  Heuristic                 1,410       2,890
+1111:  1864-FF4930AMZ2                   +100.0%  Seasonal Baseline                0       1,075
+1112:  1864-FF4930PCS6                   +144.0%  Seasonal Baseline              444         182
+1113:  1864-FF4933AMZ                     +67.8%  Heuristic                 1,248       3,875
+1114:  1864-FF4933AU                     +100.0%  Inactive                      0          26
+1115:  1864-FF4933PCS2                    +65.8%  Seasonal Baseline              300         877
+1116:  1864-FF4933PCS24                   +50.0%  Heuristic                     9          18
+1117:  1864-FF4934AMZ                     +31.5%  Heuristic                 8,472      12,370
+1118:  1864-FF4934AMZ2                    +74.4%  Croston's                 3,348       1,920
+1119:  1864-FF4934PCS24                   +30.8%  Croston's                    18          26
+1120:  1864-FF4935PCS2                   +154.0%  Croston's                 2,184         860
+1121:  1864-FF4935PCS24                  +100.0%  Heuristic                     0          20
+1122:  1864-FF4935PX2                    +100.0%  Inactive                      0       2,090
+1123:  1864-FF4936PCS2                    +61.9%  Seasonal Baseline              588       1,542
+1124:  1864-FF4936PCS24                  +100.0%  Heuristic                     0          20
+1125:  1864-FF5715AMZ2                    +23.2%  Croston's      [BW]       4,608       6,000
+1126:  1864-FF5715PCS72                   +39.4%  Heuristic                    63         104
+1127:  1864-FF5716                       +100.0%  Inactive (zero order history)                0       3,240
+1128:  1864-FF5716PCS72                   +80.6%  Heuristic                     7          36
+1129:  1864-FF5766AMZ                     +27.7%  Seasonal Baseline           54,696      42,840
+1130:  1864-FF5766AMZ2                   +100.0%  Inactive                      0       1,635
+1131:  1864-FF5766PCS6                    +79.2%  Seasonal Baseline               50         240
+1132:  1864-FF5769AMZ                     +33.3%  Seasonal Baseline           13,236      19,850
+1133:  1864-FF5769AMZ2                    +41.3%  Seasonal Baseline              279         475
+1134:  1864-FF5769PCS6                    +93.6%  Heuristic                     5          78
+1135:  1864-FF5772                        +72.7%  Heuristic                   150         550
+1136:  1864-FF5772PCS6                   +230.8%  Heuristic                    86          26
+1137:  1864-FF5773                        +33.7%  Seasonal Baseline           13,500      20,369
+1138:  1864-FF5773PCS6                   +320.0%  Seasonal Baseline              315          75
+1139:  1864-FF5776PCS2                    +56.2%  Seasonal Baseline              105         240
+1140:  1864-FF5777PCS2                    +66.4%  Croston's                    42         125
+1141:  1864-FF5777PCS6                    +90.9%  Croston's                    19         208
+1142:  1864-FF5780                         +6.8%  Seasonal Baseline            3,708       3,980
+1143:  1864-FF5780PCS6                   +142.9%  Seasonal Baseline              668         275
+1144:  1864-FF5807AMZ2                    +77.5%  Heuristic                   546       2,431
+1145:  1864-FF5807AMZN                  +1156.6%  Croston's                 5,592         445
+1146:  1864-FF5952EC                      +73.7%  Heuristic                 3,408      12,950
+1147:  1864-FF5952PCS2                    +16.7%  Seasonal Baseline           18,264      15,655
+1148:  1864-FF5952PCS24                   +78.8%  Heuristic                    22         104
+1149:  1864-FF6305                        +47.3%  Croston's                 7,536      14,290
+1150:  1864-FF6305AU                     +100.0%  Inactive                      0         184
+1151:  1864-FF6305PCS2                    +15.2%  Heuristic                 3,420       2,970
+1152:  1864-FF6305PCS24                   +50.0%  Croston's                    26          52
+1153:  1864-FF6553AMZ                     +22.8%  Croston's                10,374      13,445
+1154:  1864-FF6553PCS2                   +424.6%  Croston's                 2,046         390
+1155:  1864-FF6554                       +485.2%  Heuristic                 2,844         486
+1156:  1864-FF6554AMZ                    +100.0%  Inactive                      0       1,053
+1157:  1864-FF6554PX2                     +81.5%  Croston's                    48         260
+1158:  1864-FF6634                        +51.2%  Heuristic                   630       1,290
+1159:  1864-FF6634PCS6                    +30.0%  Croston's                    26          20
+1160:  1864-FF6636AMZ                     +71.3%  Croston's                   402       1,400
+1161:  1864-FF6639                        +74.8%  Croston's                   126         500
+1162:  1864-FF6639PCS2                   +100.0%  Heuristic                     0         245
+1163:  1864-FF6989                        +55.1%  Croston's                10,080       6,500
+1164:  1864-FF6989PCS2                     +6.4%  Croston's                 1,272       1,195
+1165:  1864-FF6989PCS48                  +100.0%  Croston's                     0          50
+1166:  1864-FF7110                       +100.0%  Heuristic                     0       2,610
+1167:  1864-FF7110AU                     +100.0%  Inactive                      0          70
+1168:  1864-FF7110PX2                     +20.0%  Heuristic                   312         390
+1169:  1864-FF7112                        +16.0%  Croston's                14,364      17,090
+1170:  1864-FF7112AMZ2                    +90.2%  Croston's                    24         245
+1171:  1864-FF7112PCS2                    +40.2%  Heuristic                 1,815       1,295
+1172:  1864-FF7112PCS6                    +82.2%  Croston's                    37         208
+1173:  1864-FF7115                        +10.8%  Croston's                11,520      12,915
+1174:  1864-FF7118                       +100.0%  Inactive (zero order history)                0       1,848
+1175:  1864-FF7118PX2                     +60.7%  Croston's                   297         755
+1176:  1864-FF7120AMZ2                    +68.6%  Croston's                    99         315
+1177:  1864-FF7120EC                       +6.0%  Seasonal Baseline           47,154      50,184
+1178:  1864-FF7120PCS2                    +65.3%  Seasonal Baseline            1,446         875
+1179:  1864-FF7120PX6                     +60.0%  Heuristic                    50         125
+1180:  1864-FF7210                        +47.7%  Seasonal Baseline            4,140       7,910
+1181:  1864-FF7215                        +39.0%  Seasonal Baseline            4,584       7,515
+1182:  1864-FF7217                        +55.6%  Seasonal Baseline            3,312       7,460
+1183:  1864-FF7217AU                     +100.0%  Inactive                      0          26
+1184:  1864-FF7218                        +33.2%  Seasonal Baseline            1,704       2,550
+1185:  1864-FF7221                        +19.7%  Croston's                12,168      15,145
+1186:  1864-FF7228                         +6.6%  Seasonal Baseline            9,804      10,500
+1187:  1864-FF7258AMZ                     +21.2%  Seasonal Baseline           54,156      68,750
+1188:  1864-FF7258PCS2                    +25.8%  Seasonal Baseline            4,377       5,895
+1189:  1864-FF7258PCS6                    +50.0%  Seasonal Baseline              150         100
+1190:  1864-FF7260AMZ                     +40.0%  Croston's                   312         520
+1191:  1864-FF7260AMZ2                    +89.3%  Croston's                    24         225
+1192:  1864-FF7261PCS2N                   +95.0%  Heuristic                    78          40
+1193:  1864-FF7261PCS6                   +100.0%  Croston's                     0          52
+1194:  1864-FF7263AMZN                    +70.3%  Heuristic                   468       1,575
+1195:  1864-FF7263PCS2                    +60.2%  Heuristic                   525       1,320
+1196:  1864-FF7266AMZ                     +45.5%  Heuristic                 3,150       5,775
+1197:  1864-FF7266CP6                    +100.0%  Croston's                     0         208
+1198:  1864-FF7266PCS2                   +100.0%  Inactive (zero order history)                0         180
+1199:  1864-FF7266PCS6                    +99.2%  Croston's                     1         130
+1200:  1864-FF7267AMZ2                   +100.0%  Inactive (zero order history)                0         945
+1201:  1864-FF7267AMZN                  +1550.0%  Heuristic                   660          40
+1202:  1864-FF7267CP6N                   +100.0%  Heuristic                     0          40
+1203:  1864-FF7297AMZ                    +100.0%  Inactive                      0      31,325
+1204:  1864-FF7297AMZ2                    +17.3%  Croston's                 4,296       5,195
+1205:  1864-FF7297AMZN                  +6800.0%  Croston's                 2,760          40
+1206:  1864-FF7372                        +64.2%  Seasonal Baseline           10,758      30,080
+1207:  1864-FF7372PCS2                   +107.4%  Heuristic                 3,453       1,665
+1208:  1864-FF7372PCS6                    +80.0%  Croston's                    26         130
+1209:  1864-FF7372PX3                     +84.4%  Croston's                   100         640
+1210:  1864-FF7488                        +47.2%  Croston's                 4,314       8,175
+1211:  1864-FF7488CP6                     +61.9%  Heuristic                 1,965       1,214
+1212:  1864-FF7488PX2                     +31.3%  Seasonal Baseline              567         825
+1213:  1864-FF7488PX3                     +40.0%  Heuristic                   150         250
+1214:  1864-FF7531                       +100.0%  Inactive                      0         390
+1215:  1864-FF7531PCS3                    +93.5%  Croston's                    16         245
+1216:  1864-FF7540                       +100.0%  Heuristic                     0         494
+1217:  1864-FF7541                       +100.0%  Heuristic                     0         494
+1218:  1864-FF7542                       +100.0%  Inactive                      0         399
+1219:  1864-FF7543                        +92.7%  Croston's                    36         494
+1220:  1864-FF7549                       +100.0%  Croston's                     0         208
+1221:  1864-FF7612PCS24                  +100.0%  Heuristic                     0         208
+1222:  1864-FF7618                       +104.0%  Heuristic                41,100      20,145
+1223:  1864-FF7618PX60                    +96.2%  Heuristic                    51          26
+1224:  1864-FF7619                        +17.3%  Heuristic                 6,240       5,320
+1225:  1864-FF7619PCS2                    +58.5%  Seasonal Baseline            1,290       3,110
+1226:  1864-FF7619PCS60                  +100.0%  Heuristic                     0          26
+1227:  1864-FF7639                        +94.0%  Croston's                    36         598
+1228:  1864-FF7716                        +60.0%  Seasonal Baseline              200         125
+1229:  1864-FF7717                        +60.0%  Seasonal Baseline              208         130
+1230:  1864-FF7942AU                     +100.0%  Inactive                      0         111
+1231:  1864-FF8256                       +100.0%  Inactive                      0         506
+1232:  1864-FF8258                       +100.0%  Inactive                      0       1,430
+1233:  1864-FF8287                        +21.7%  Heuristic                 4,800       3,945
+1234:  1864-FF8287PCS60                  +100.0%  Heuristic                     0          20
+1235:  1864-FF8298                       +100.0%  Inactive (zero order history)                0       6,765
+1236:  1864-FF8298AMZ3                    +96.7%  Heuristic                 3,580       1,820
+1237:  1864-FF8423                         +7.7%  Seasonal Baseline           52,416      48,675
+1238:  1864-FF8423AMZ3                     +8.3%  Croston's                 5,400       4,985
+1239:  1864-FF8423AMZ4                    +65.2%  Heuristic                 2,304       1,395
+1240:  1864-FF8423PCS36                  +100.0%  Heuristic                     0         260
+1241:  1864-FF8424                         +7.0%  Heuristic                 5,148       5,535
+1242:  1864-FF8424AMZ3                    +97.5%  Heuristic                    12         480
+1243:  1864-FF8424AMZ4                   +388.1%  Croston's                 1,269         260
+1244:  1864-FF8424PCS36                  +100.0%  Heuristic                     0          20
+1245:  1864-FF8425                        +22.9%  Heuristic                 7,992      10,370
+1246:  1864-FF8425AMZ4                    +77.7%  Croston's                 2,178       1,226
+1247:  1864-FF8425PCS2                    +47.2%  Heuristic                 2,340       4,435
+1248:  1864-FF8425PCS36                   +96.2%  Heuristic                     2          52
+1249:  1864-FF8431                       +100.0%  Inactive                      0       2,536
+1250:  1864-FF8433                       +100.0%  Inactive                      0       1,225
+1251:  1864-FF8433PCS2                    +51.0%  Croston's                   120         245
+1252:  1864-FF8608AU                     +100.0%  Inactive                      0         178
+1253:  1864-FF8649/24                     +43.2%  Seasonal Baseline           88,224      61,600
+1254:  1864-FF8649PCS24                  +100.0%  Croston's                     0          52
+1255:  1864-FF8649PCS48                   +34.3%  Croston's                    46          70
+1256:  1864-FF8651/8PCS2                 +100.0%  Inactive                      0          55
+1257:  1864-FF8651/8PCS8                 +100.0%  Inactive                      0         130
+1258:  1864-FF8651PCS2                    +73.3%  Croston's                    64         240
+1259:  1864-FF8651PCS8                   +100.0%  Inactive                      0          20
+1260:  1864-FF8652                        +10.8%  Croston's                 4,212       3,800
+1261:  1864-FF8652PCS6                    +30.0%  Croston's                    26          20
+1262:  1864-FF8653                        +26.0%  Seasonal Baseline           21,760      29,420
+1263:  1864-FF8653PCS4                   +171.2%  Croston's                   800         295
+1264:  1864-FF8653PX4                    +100.0%  Inactive                      0       1,170
+1265:  1864-FF8654                        +30.5%  Seasonal Baseline           65,718      94,500
+1266:  1864-FF8654PCS2                    +11.3%  Seasonal Baseline            1,450       1,635
+1267:  1864-FF8831N                      +100.0%  Heuristic                     0          40
+1268:  1864-FF8831PCS12                  +100.0%  Heuristic                     0         200
+1269:  1864-FF8831PCS3                    +90.2%  Croston's                    24         245
+1270:  1864-FF8882PCS2                   +102.2%  Seasonal Baseline            3,933       1,945
+1271:  1864-FF8882PCS6                   +545.3%  Croston's                   484          75
+1272:  1864-FF8882PX2                    +100.0%  Inactive                      0       5,200
+1273:  1864-FF8882PX6                    +100.0%  Inactive                      0         943
+1274:  1864-FF8990                        +12.7%  Seasonal Baseline          163,320     144,935
+1275:  1864-FF8990AMZ3                    +12.3%  Croston's                 6,416       7,320
+1276:  1864-FF8990PCS12                   +18.8%  Heuristic                   143         176
+1277:  1864-FF8990PCS3                    +31.8%  Seasonal Baseline            4,960       7,275
+1278:  1864-FF8991                       +100.0%  Inactive                      0      20,300
+1279:  1864-FF8991EC                     +182.3%  Croston's                18,492       6,550
+1280:  1864-FF9059                        +50.3%  Croston's                 2,466       4,961
+1281:  1864-FF9060                        +11.9%  Croston's                20,892      18,670
+1282:  1864-FF9250                        +33.3%  Heuristic                    96          72
+1283:  1864-FF9256                       +165.4%  Croston's                   552         208
+1284:  1864-FF9281AU                     +100.0%  Inactive                      0          48
+1285:  1864-FF9290/24PCS2                 +90.8%  Croston's                    24         260
+1286:  1864-FF9290PCS6                   +100.0%  Croston's                   100          50
+1287:  1864-FF9291/24                     +18.4%  Croston's                 9,864      12,095
+1288:  1864-FF9297/24                     +64.1%  Croston's               114,072      69,515
+1289:  1864-FF9297PCS2                    +22.0%  Croston's                   312         400
+1290:  1864-FF9298PCS3                    +43.9%  Seasonal Baseline            6,176      11,005
+1291:  1864-FF9314AU                     +100.0%  Inactive                      0          26
+1292:  1864-FF9315AU                     +100.0%  Inactive                      0          26
+1293:  1864-FF9318AU                     +100.0%  Inactive                      0          37
+1294:  1864-FF9721AU                     +100.0%  Inactive                      0          26
+1295:  1864-FF9756                        +73.7%  Croston's                   600       2,280
+1296:  1864-FF9757                        +59.9%  Heuristic                 2,400       5,980
+1297:  1864-SF8167                       +211.6%  Croston's                 5,328       1,710
+1298:  1864-SF8167AMZ3                   +100.0%  Heuristic                     0         975
+1299:  1864-SF8167AU                     +100.0%  Inactive                      0         352
+1300:  1864-SF8167PCS72                   +99.2%  Seasonal Baseline                3         365
+1301:  1864-SF8168                        +59.5%  Croston's                 7,200      17,765
+1302:  1864-SF8168PCS48                  +100.0%  Heuristic                     0          26
+1303:  1864-SF8169                       +100.0%  Heuristic                     0       4,670
+1304:  1864-SF8169PCS72                   +26.0%  Seasonal Baseline              126         100
+1305:  1864-SF8170PCS48                  +100.0%  Croston's                     0         100
+1306:  1864-SF8173EC                      +31.3%  Heuristic                11,280       8,590
+1307:  1864-SF8173PCS2                    +24.8%  Croston's                 2,628       3,495
+1308:  1864-SF8173PCS24                  +680.0%  Croston's                   156          20
+1309:  1864-SF8174EC                      +69.3%  Croston's                10,968      35,692
+1310:  1864-SF8174PCS2                    +25.3%  Croston's                   840       1,125
+1311:  1864-SF8174PCS24                   +83.7%  Heuristic                    17         104
