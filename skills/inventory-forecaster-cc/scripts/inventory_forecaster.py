@@ -8376,6 +8376,30 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"Planner should mark base style CLOSED for those weeks."
                     )
 
+    # ── F70b — Reverse switchover: zero VARIANT for base-active weeks ────────────────
+    # Complementary to F70 (which zeros the BASE for variant-active weeks).
+    # When the base style is active in W1..W(S-1) and the variant takes over from
+    # week S, the VARIANT AI forecast for W1..W(S-1) is also zeroed to prevent
+    # double-counting with the base style.
+    if variant_zero_weeks and not _f70_planner_protected:
+        _vz_entry = variant_zero_weeks.get(row.get("Acct_MStyle_Key_", ""))
+        if _vz_entry:
+            _vz_week_map = {}
+            for _wi, _base_mss in _vz_entry.items():
+                if 0 <= _wi < 26 and fcst[_wi] != 0:
+                    fcst[_wi] = 0
+                    _vz_week_map[_wi] = _base_mss
+            if _vz_week_map:
+                _fire("F70b")
+                _vz_zeroed = ", ".join(f"W{wi+1}" for wi in sorted(_vz_week_map))
+                _base_names = sorted({ms for msl in _vz_week_map.values() for ms in msl})
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F70b Reverse-switchover: base style(s) {', '.join(_base_names)} "
+                        f"are active in {_vz_zeroed} -- zeroed variant AI for "
+                        f"pre-switchover weeks to prevent double-counting."
+                    )
+
     prior = sum(manual_wks)
     new   = sum(fcst)
     pct   = abs(new - prior) / prior if prior > 0 else 0
