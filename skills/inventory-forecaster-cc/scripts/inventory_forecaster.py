@@ -9478,12 +9478,11 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
     # 1) Gap-week: LW=0 after a normal Prior-Wk order, otherwise stable.
     if (short_pct < 0 and lw == 0 and pw > 0 and per_l13 > 0 and
             pw <= per_l13 * 1.6 and medium_flat and len(l4_nz) >= 1):
-        expl = (f"Looks like a gap week, not a step-change — LW was 0 right "
-                f"after a normal {pw:.0f}u order, and the L26W rate "
-                f"({l26_avg:.0f}/wk) still tracks L13W. {cl} orders in "
-                f"bursts here, so a single quiet week is normal cadence. "
-                f"Watch the next 2-3 weeks; if no order lands, that's the "
-                f"real signal.")
+        expl = (f"LW=0 after a normal {pw:.0f}u Prior Wk order; L26W "
+                f"({l26_avg:.0f}/wk) still tracks L13W ({l13_avg:.0f}/wk) "
+                f"with {len(l13_nz)}/13W active. Single zero within an "
+                f"otherwise active cadence -- watch next 2-3 weeks; if no "
+                f"order lands, that is the real signal.")
     # 2) Per-order qty shrinkage with stable cadence.
     elif (short_pct < 0 and per_l13 > 0 and per_l4 > 0 and
           per_l4 / per_l13 <= 0.80 and
