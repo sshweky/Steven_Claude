@@ -2026,7 +2026,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         )
     if _f6_applied and _f6_applied != "F50_stockout_skip":
         meta.setdefault("drivers", []).append(
-            f"F6 L4/L13 decay: L4 nz avg ≤ 50% of L13 nz avg → baseline × 0.65 "
+            f"F6b L4/L13 decay: L4 nz avg <= 50% of L13 nz avg -> baseline x 0.65 "
             f"(recent softening detected from order history alone)"
         )
     if _f16_relief:
