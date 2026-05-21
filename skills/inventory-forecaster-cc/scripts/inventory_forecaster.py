@@ -9793,9 +9793,12 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         if _g2_parts:
             _g2_body = " ".join(_g2_parts)
             critical.insert(0,
-                f"<b>ACTION REQUIRED -- AI zeroed all 26 weeks (confirmed POs or "
-                f"guards cover demand):</b> {_g2_body} "
+                f"<span style='color:#c62828'>"
+                f"<b>&#9888; ACTION REQUIRED -- AI zeroed all 26 weeks "
+                f"(confirmed POs or guards cover demand):</b> "
+                f"{_g2_body} "
                 f"Please validate item status and manual projections."
+                f"</span>"
             )
 
     # ── Critical: EC supersession warning ────────────────────────────────────
