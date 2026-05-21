@@ -9845,6 +9845,8 @@ def main():
             return ms[:-2]
         if msu.endswith("COS"):
             return ms[:-3]
+        if msu.endswith("AMZ"):
+            return ms[:-3]
         return ms
 
     _amz_raw = {r["Mstyle"] for r in rows
