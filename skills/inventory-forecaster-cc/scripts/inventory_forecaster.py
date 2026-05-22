@@ -5972,6 +5972,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Croston's handles the gap/quantity pattern better than seasonal baseline,
         # with a post-spike drawdown guard to avoid locking onto a post-spike lull.
         _is_offprice_t1 = _is_offprice_cust(cust_name)
+        # DIAG-FF7297 (remove after diagnosis)
+        _diag_key = row.get("Acct_MStyle_Key_", "") or ""
+        _diag_lbl = _diag_key if "FF7297" in _diag_key and "AMZ2" not in _diag_key and "AMZN" not in _diag_key else None
         fcst, cap, meta = crostens(hist_for_model, mp, is_amazon=is_amazon,
                                    description=description,
                                    product_category=product_category,
@@ -5980,7 +5983,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                    pos_data=pos_data, season=season,
                                    is_offprice=_is_offprice_t1,
                                    is_new_launch=_f34_is_new_launch,
-                                   is_international=is_international)
+                                   is_international=is_international,
+                                   _debug_label=_diag_lbl)
         model    = "Croston's"
         biweekly = False
         _cadence_gap_c = detect_biweekly(hist_for_model)
