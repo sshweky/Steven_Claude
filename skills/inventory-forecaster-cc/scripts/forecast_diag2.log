@@ -1,0 +1,28 @@
+
+============================================================
+  [watchdog] Starting forecaster (attempt 1/3)
+============================================================
+
+==================================================================
+  Inventory Forecaster â€” Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_17_W1 â†’ 11_08_W26
+
+[1/4] Pulling projections from Quickbase ...
+      1844 records retrieved
+
+[2/4] Pulling master pack + Season from Styles ...
+  [watchdog] still running — 17s since last output | last: [2/4] Pulling master pack + Season from Styles ...
+      1841 master pack records loaded (164 with Season tag)
+
+[2.5] Pulling Amazon catalog POS for 1845 mstyles ...
+      1661 mstyles with POS data loaded
+      viewer_pos_cache.json refreshed (1661 mstyles)
+
+[2.6] Pulling Amazon Catalog US (F38 signals) for 1845 mstyles ...
+  [watchdog] still running — 20s since last output | last: [2.6] Pulling Amazon Catalog US (F38 signals) for 1845 mstyles ...
+      1661 mstyles with Amazon Catalog US signals loaded
+
+[2.6b] Pulling Amazon Inventory Health for 1661 ASINs ...
