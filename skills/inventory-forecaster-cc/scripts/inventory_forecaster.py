@@ -5985,6 +5985,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                    is_new_launch=_f34_is_new_launch,
                                    is_international=is_international,
                                    _debug_label=_diag_lbl)
+        if _diag_lbl:
+            print(f"  [F18-OUT]  {_diag_lbl}: fcst[:5]={[round(v) for v in fcst[:5]]}"
+                  f" f18={meta.get('drivers',[''])[0][:60] if meta.get('drivers') else 'none'}", flush=True)
         model    = "Croston's"
         biweekly = False
         _cadence_gap_c = detect_biweekly(hist_for_model)
