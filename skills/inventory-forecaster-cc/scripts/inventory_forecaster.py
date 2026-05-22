@@ -5993,6 +5993,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _cadence_gap_c = detect_biweekly(hist_for_model)
         biweekly = bool(_cadence_gap_c)
         fcst = apply_ordering_pattern(fcst, hist_for_model, mp)
+        if _diag_lbl:
+            print(f"  [AOP-OUT]  {_diag_lbl}: fcst[:5]={[round(v) for v in fcst[:5]]} mp={mp} total={round(sum(fcst))}", flush=True)
 
     else:
         # Dense buyer (≥ 50% non-zero): seasonal baseline + ordering pattern shape.
