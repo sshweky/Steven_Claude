@@ -4278,6 +4278,8 @@ def crostens(history, mp, is_amazon=False, description=None,
         )
     if _f18_applied and _f18_driver:
         meta.setdefault("drivers", []).append(_f18_driver)
+    if _f18_capped_down:
+        meta["f18_capped_down"] = True   # signal to forecast_record(): F59a/F59b must not re-lift
     if _vpq3_biweekly_smooth:
         meta.setdefault("drivers", []).append(
             "VP-Q3 bi-weekly smoothed to weekly: p=2 → p=1, z halved, "
