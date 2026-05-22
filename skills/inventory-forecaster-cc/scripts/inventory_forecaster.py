@@ -3840,8 +3840,7 @@ def seasonal_profile(history, n=26):
 def crostens(history, mp, is_amazon=False, description=None,
              product_category=None, product_subcategory=None,
              brand=None, brand_pt=None, pos_data=None, season=None,
-             is_offprice=False, is_new_launch=False, is_international=False,
-             _debug_label=None):
+             is_offprice=False, is_new_launch=False, is_international=False):
     """
     Croston's with α=0.3 smoothed over a 78-obs weighted series (3x L13W),
     then z and p are refined 70% from L13W actuals / 30% from smoothed values.
