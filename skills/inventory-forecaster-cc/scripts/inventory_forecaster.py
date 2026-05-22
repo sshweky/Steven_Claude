@@ -7442,6 +7442,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #   HIGH vol (L13W_nz ≥ 500):  floor = L4W × 0.95
         #   MED  vol (L13W_nz 150-499): floor = L4W × 0.90
         #   LOW  vol (L13W_nz < 150):   floor = L4W × 0.85
+        #
+        # Skip when F18 has already applied a POS-anchored cap (stocked-up or
+        # above-POS blend).  In that case the L4W order history reflects a
+        # front-loaded stock-up event — using it as the floor would undo the
+        # entire point of F18 by restoring the inflated order rate.
+        _f59_f18_capped = isinstance(meta, dict) and meta.get("f18_capped_down", False)
         if _f59_l13w_avg >= 500:
             _f59a_mult, _f59a_tier = 0.95, "HIGH"
         elif _f59_l13w_avg >= 150:
@@ -7454,7 +7460,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             or _f59_l4w_avg >= _f59_l8w_avg * 0.85
         )
         _f59a_floor = _f59_l4w_avg * _f59a_mult
-        if _f59_l4w_avg > 0 and _f59a_momentum and _f59a_floor > 0:
+        if _f59_l4w_avg > 0 and _f59a_momentum and _f59a_floor > 0 and not _f59_f18_capped:
             _f59a_fired = 0
             for _i in range(len(fcst)):
                 if fcst[_i] > 0 and fcst[_i] < _f59a_floor:
@@ -7472,7 +7478,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # accelerated recently (keyword gain, buy-box win, distribution add).
         # Model is discounting this as noise; re-blend non-zero weeks toward
         # a 60% L4W / 40% L13W target to preserve the recent signal.
-        if (_f59_l4w_avg > 0 and _f59_l13w_avg > 0
+        # Skip when F18 POS-anchored cap fired (same reason as F59a above).
+        if (not _f59_f18_capped
+                and _f59_l4w_avg > 0 and _f59_l13w_avg > 0
                 and _f59_l4w_avg >= _f59_l13w_avg * 1.40):
             _f59b_target = _f59_l4w_avg * 0.60 + _f59_l13w_avg * 0.40
             _f59b_fired  = 0
