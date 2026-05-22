@@ -4004,6 +4004,14 @@ def crostens(history, mp, is_amazon=False, description=None,
     _f18_applied     = False
     _f18_driver      = None
     _f18_capped_down = False   # True when F18 intentionally caps z DOWN (R6 must not re-lift)
+    if _debug_label:
+        _pd_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0) if pos_data else None
+        _pd_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0) if pos_data else None
+        _pd_l26 = float(pos_data.get("Avg_Units_Wk_L26w") or 0) if pos_data else None
+        print(f"  [F18-DIAG] {_debug_label}: z={z:.1f} p={p:.3f} p_final_est={max(1,round(p))}"
+              f" pos={'L4='+str(_pd_l4)+' L13='+str(_pd_l13)+' L26='+str(_pd_l26) if pos_data else 'NONE'}"
+              f" hist[-4:]={[round(float(v or 0)) for v in history[-4:]]}"
+              f" l13_all_avg={sum(float(v) for v in history[-13:])/13:.1f}", flush=True)
     if pos_data:
         _pos_l4_f18  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
         _pos_l13_f18 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
