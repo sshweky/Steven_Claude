@@ -6969,6 +6969,36 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"x 0.5 = {_f80_floor:.0f}/wk floor (item_status=Replen, L13W=0)"
             )
 
+    # F81 (2026-05-24): APL recency anchor.
+    # Amazon_Catalog carries Ordered_Units_LW and Ordered_Units_Prior_Wk for APL
+    # mstyles (B2B purchase orders).  When the 2-week catalog avg diverges >=20%
+    # from the L4W order-history avg, blend the recent signal into the forecast
+    # at 35% weight (capped at +/-25% total adjustment) to capture near-term
+    # trend shifts the longer history avg misses.
+    # Guards: is_apl, pos_data available, non-zero forecast, catalog values within
+    # 0.50x-2.00x of L4W avg (implausible outliers excluded).
+    _f81_applied = False
+    if is_apl and pos_data and sum(fcst) > 0:
+        _f81_ord_lw = float((pos_data or {}).get("Ordered_Units_LW") or 0)
+        _f81_ord_pw = float((pos_data or {}).get("Ordered_Units_Prior_Wk") or 0)
+        _f81_recent = ((_f81_ord_lw + _f81_ord_pw) / 2.0
+                       if _f81_ord_pw > 0 else _f81_ord_lw)
+        _f81_l4_nz  = [float(v or 0) for v in hist_for_model[-4:]
+                       if float(v or 0) > 0]
+        _f81_l4_avg = sum(_f81_l4_nz) / len(_f81_l4_nz) if _f81_l4_nz else 0
+        if (_f81_recent > 0 and _f81_l4_avg > 0
+                and 0.50 <= (_f81_recent / _f81_l4_avg) <= 2.00
+                and abs(_f81_recent / _f81_l4_avg - 1.0) >= 0.20):
+            _f81_ratio = _f81_recent / _f81_l4_avg
+            # 35% weight toward recent catalog signal, capped at +/-25% swing
+            _f81_scale = max(0.75, min(0.35 * _f81_ratio + 0.65, 1.25))
+            fcst = [snap(v * _f81_scale, mp) if v > 0 else 0 for v in fcst]
+            _f81_applied = True
+            meta.setdefault("drivers", []).append(
+                f"F81 APL recency: catalog 2-wk avg {_f81_recent:.0f} = "
+                f"{_f81_ratio:.2f}x L4W nz avg {_f81_l4_avg:.0f}; "
+                f"forecast scaled x{_f81_scale:.2f} (35% blend toward recent signal)")
+
     # F17 — Sparse cadence W1 seed (2026-04-22).  When the Sparse Intermittent
     # model places its first non-zero slot several weeks out but the planner
     # expects an order in W1, the cadence phase is off.  Shift the AI cadence
