@@ -10299,6 +10299,26 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                     f"<b>Amazon DC inventory:</b> " + " · ".join(_ih_parts) + "."
                 )
 
+    # ── Amazon AUR (Average Unit Revenue) ─────────────────────────────────────
+    # Pinned immediately after DC inventory so planners always see the consumer
+    # price context alongside the DC position.  L4W/L13W/L26W/L52W from the
+    # AdTrack Amazon Catalog (bqkdjaqi7).  LW is computed live in the codepage
+    # viewer.  No AUR bullet when all values are zero (data gap).
+    if amz_catalog:
+        _aur_l4w  = float(amz_catalog.get("AUR_L4w")  or 0)
+        _aur_l13w = float(amz_catalog.get("AUR_L13w") or 0)
+        _aur_l26w = float(amz_catalog.get("AUR_L26w") or 0)
+        _aur_l52w = float(amz_catalog.get("AUR_L52w") or 0)
+        if _aur_l4w > 0 or _aur_l13w > 0 or _aur_l26w > 0 or _aur_l52w > 0:
+            _aur_parts = []
+            if _aur_l4w  > 0: _aur_parts.append(f"L4W ${_aur_l4w:.2f}")
+            if _aur_l13w > 0: _aur_parts.append(f"L13W ${_aur_l13w:.2f}")
+            if _aur_l26w > 0: _aur_parts.append(f"L26W ${_aur_l26w:.2f}")
+            if _aur_l52w > 0: _aur_parts.append(f"L52W ${_aur_l52w:.2f}")
+            pinned_last.append(
+                "<b>Amazon AUR:</b> " + " | ".join(_aur_parts) + "."
+            )
+
     # ── Gap pill: Plan vs AI summary ──────────────────────────────────────────
     # Only surfaced when the gap is ≥ 15% (enough to warrant a review) or when
     # there is no manual plan at all. It's the lowest-priority bullet because
