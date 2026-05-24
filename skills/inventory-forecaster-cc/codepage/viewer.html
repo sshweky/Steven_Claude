@@ -250,6 +250,24 @@ window.QB_CONFIG = {
   // (W1's label is "MM DD W1" where MM/DD = the most recent Sunday).
   // viewer.js will discover these at startup by querying the table's
   // field metadata and matching label pattern  /^\d\d\s\d\d\sW\d{1,2}$/.
+
+  // -- Retailer POS data (bv2izcn5b Retailer Sales) -------------------------
+  // Live POS metrics fetched for non-Amazon customers when a detail panel opens.
+  // Queried by Mstyle (fid 9) + Acct# (fid 17).  Rows deduped by date (each
+  // week-ending Sunday appears exactly twice in the source table).
+  RTL_POS_TID: "bv2izcn5b",
+  RTL_POS_FID: {
+    DATE:    6,   // week-ending Sunday (date)
+    CUST:    7,   // Customer name (text)
+    MSTYLE:  9,   // Mstyle (text join key)
+    POS_U:  10,   // POS Units (consumer sell-through)
+    POS_D:  11,   // POS $ (for AUR$ = POS$ / POS Units)
+    OH_U:   12,   // OH Units (retailer on-hand)
+    TRT_ST: 13,   // Traited Store Count
+    POS_ST: 14,   // POS Store Count (stores reporting POS)
+    INSTOCK:15,   // Instock % (stored as fraction: 0.9992 = 99.92%)
+    ACCT:   17,   // Acct # (numeric; 1864 = Amazon, excluded here)
+  },
 };
 </script>
 
