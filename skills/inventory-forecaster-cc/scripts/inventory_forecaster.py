@@ -638,6 +638,73 @@ def _discover_prj_cols():
 # Populated at runtime in main() via _discover_prj_cols()
 ORIG_PRJ_COLS = _make_prj_cols()
 
+
+def _compute_event_boosts():
+    """
+    Compute per-week Amazon event boost multipliers for the current 26-week
+    forecast window based on actual calendar dates.
+
+    Prime Day (last Tuesday of June): ordering bumps on
+      May 1 (x1.25), May 15 (x1.25), May 29 (x1.50).
+    Fall Prime Day (first Tuesday of October): single ordering bump =
+      Tuesday after Memorial Day (last Monday of May + 1 day) at x1.30.
+
+    Returns:
+        prime_boosts  dict {1-indexed week: multiplier}  -- Prime Day bumps
+        fall_boosts   dict {1-indexed week: multiplier}  -- Fall Prime Day bump
+    """
+    from datetime import date, timedelta
+    if not ORIG_PRJ_COLS:
+        return {}, {}
+    col = ORIG_PRJ_COLS[0]   # e.g. "05_26_W1"
+    m, d = int(col[0:2]), int(col[3:5])
+    today = date.today()
+    prj_start = date(today.year, m, d)
+    if (prj_start - today).days < -180:
+        prj_start = date(today.year + 1, m, d)
+
+    prime_boosts = {}
+    for bump_month, bump_day, mult in PRIME_DAY_BUMPS:
+        for yr_off in (0, 1):
+            try:
+                bump = date(prj_start.year + yr_off, bump_month, bump_day)
+            except ValueError:
+                continue
+            delta = (bump - prj_start).days
+            if 0 <= delta < 26 * 7:
+                wk = delta // 7 + 1   # 1-indexed
+                # Two bumps can land in the same week -- take the larger
+                prime_boosts[wk] = max(prime_boosts.get(wk, 1.0), mult)
+                break
+
+    fall_boosts = {}
+    for yr_off in (0, 1):
+        yr = prj_start.year + yr_off
+        may31 = date(yr, 5, 31)
+        # Last Monday of May: walk back from May 31 to Monday
+        memorial_day = may31 - timedelta(days=may31.weekday())  # weekday()==0 is Mon
+        fall_bump = memorial_day + timedelta(days=1)            # Tuesday after
+        delta = (fall_bump - prj_start).days
+        if 0 <= delta < 26 * 7:
+            wk = delta // 7 + 1
+            fall_boosts[wk] = max(fall_boosts.get(wk, 1.0), FALL_PRIME_DAY_LIFT)
+            break
+
+    return prime_boosts, fall_boosts
+
+
+_EVENT_BOOSTS_CACHE = None   # (prime_boosts, fall_boosts) -- populated on first use
+
+
+def _get_event_boosts():
+    """Return cached (prime_day_boosts, fall_prime_day_boosts) for current window.
+    Cache is invalidated when ORIG_PRJ_COLS changes (see main())."""
+    global _EVENT_BOOSTS_CACHE
+    if _EVENT_BOOSTS_CACHE is None:
+        _EVENT_BOOSTS_CACHE = _compute_event_boosts()
+    return _EVENT_BOOSTS_CACHE
+
+
 # ─── CData helpers ────────────────────────────────────────────────────────────
 
 def _cdata_auth():
