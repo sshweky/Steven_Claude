@@ -3784,7 +3784,7 @@ def sparse_intermittent_forecast(history, mp, account_interval=None, is_offprice
     # higher than the cluster-derived avg. Prevents a quiet L13W from under-
     # projecting genuinely high-volume lumpy items.
     _l52_total_f9s = sum(h52)
-    if _l52_total_f9s > 15000:
+    if _l52_total_f9s > 0:   # Fix C (2026-05-24): apply MAX baseline to all active sparse items
         _l13_nz_s = [v for v in history[-13:] if v > 0]
         _l26_nz_s = [v for v in history[-26:] if v > 0]
         _l52_nz_s = [v for v in h52 if v > 0]
