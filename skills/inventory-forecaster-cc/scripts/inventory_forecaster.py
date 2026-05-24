@@ -9424,8 +9424,11 @@ def run_eda(rows, master_pack):
         else:
             week_lift[i + 1] = 1.0
 
-    prime_lift = float(np.mean([week_lift.get(w, 1.0) for w in PRIME_DAY_WEEKS]))
-    fall_lift  = float(np.mean([week_lift.get(w, 1.0) for w in FALL_DEAL_WEEKS]))
+    _eda_prime_wks, _eda_fall_wks = _get_event_boosts()
+    prime_lift = (float(np.mean([week_lift.get(w, 1.0) for w in _eda_prime_wks]))
+                  if _eda_prime_wks else 1.0)
+    fall_lift  = (float(np.mean([week_lift.get(w, 1.0) for w in _eda_fall_wks]))
+                  if _eda_fall_wks else 1.0)
 
     findings["calendar"] = {
         "prime_day_lift": round(prime_lift, 2),
