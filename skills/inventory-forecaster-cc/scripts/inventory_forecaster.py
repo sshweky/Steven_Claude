@@ -4427,6 +4427,11 @@ def crostens(history, mp, is_amazon=False, description=None,
         "avg_l13_ord": round(float(np.mean(l13_vals)), 1) if l13_vals else 0,
         "event_inserts": event_inserts,
     }
+    if _p8_trimmed:
+        meta.setdefault("drivers", []).append(
+            f"P8 Pre-launch history trim: detected {_p8_first_nz_in_l26}-wk leading-zero gap "
+            f"in L26; trimmed to {len(history)}w post-launch for z/p computation"
+        )
     if _r6_applied:
         _hv_tag = " [S3 high-vol ×1.0]" if _r6_high_vol else ""
         meta.setdefault("drivers", []).append(
