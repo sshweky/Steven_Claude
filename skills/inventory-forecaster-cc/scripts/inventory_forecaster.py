@@ -1795,23 +1795,21 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # (L4W < 50% of L13W — dying item, not a stocking-up scenario).
     pos_rate, pos_trend, pos_trend_ratio = 0.0, "n/a", 1.0
     _f15_driver = None
-    # F15 — Amazon ordering is lumpy: a single buy event can represent 4-8 weeks
-    # of supply.  The L13W order average naturally smooths over these events and
-    # represents Amazon's true forward demand rate to us.  POS (consumer sell-
-    # through) is a steady floor signal -- never a leading signal for our orders
-    # because Amazon's inventory management drives WHEN they order, not what
-    # consumers are buying.
+    # F15 — POS-anchored baseline (2026-05-24 revision).
+    # Over a 26-week horizon a customer's orders must converge to their consumer
+    # POS rate -- what they sell to consumers is what they will eventually reorder.
+    # POS is the primary demand anchor; order history is a secondary signal that
+    # captures any lead-time / safety-stock premium embedded in the order pattern.
     #
-    # Blend tiers for Amazon (ord/POS ratio):
-    #   > 2.0  : 100% POS     -- extreme stockup; order history misleads
-    #   1.5-2.0: 50/50 blend  -- elevated; both signals informative
-    #   1.0-1.5: ord-primary  -- normal Amazon ordering above POS; L13W ord IS
-    #                            the demand proxy.  POS_L13W is the floor.
-    #                            F38b suppressed (L13W already captures trend).
-    #   < 1.0  : 65/35 POS/ord -- depleting; POS anchors the coming reorder
+    # Blend tiers (ord_baseline / pos_rate):
+    #   > 2.0  : 100% POS       -- extreme stockup; order history misleads
+    #   1.5-2.0: 70/30 POS/ord  -- elevated; POS leads, orders secondary
+    #   1.0-1.5: 65/35 POS/ord  -- normal above-POS; POS primary 26w anchor
+    #   < 1.0  : 65/35 POS/ord  -- depleting; POS anchors coming reorder
     #
-    # _f15_amazon_ord_primary tracks when we used ord-primary so downstream
-    # rules (F38b) can skip double-counting the growth signal.
+    # _f15_amazon_ord_primary flag suppresses F38b for Amazon items where
+    # ord_baseline > pos_rate: amazon_pos_rate() already bakes L4/L13 trend
+    # weighting into pos_rate so applying F38b on top would double-count growth.
     _f15_amazon_ord_primary = False
     if pos_data:
         pos_rate, pos_trend, pos_trend_ratio = amazon_pos_rate(pos_data)
@@ -1828,27 +1826,26 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                                f"-> 100% POS ({pos_rate:.0f}/wk; "
                                f"ord {ord_baseline:.0f})")
             elif _ord_cov_ratio > 1.5:
-                # Elevated ordering (1.5-2.0x POS): Amazon is ordering noticeably
-                # above consumer velocity but not in extreme stockup territory.
-                # 50/50 blend -- orders and POS are equally informative.
-                baseline = pos_rate * 0.50 + ord_baseline * 0.50
+                # Elevated ordering (1.5-2.0x POS): Amazon is ordering above
+                # consumer velocity.  POS is the 26w demand anchor (70%);
+                # order history contributes 30% to preserve any lead-time
+                # or safety-stock premium.
+                baseline = pos_rate * 0.70 + ord_baseline * 0.30
                 _f15_driver = (f"F15 elevated {_ord_cov_ratio:.2f}x "
-                               f"-> 50/50 POS/ord "
-                               f"({pos_rate:.0f}/{ord_baseline:.0f})")
+                               f"-> 70/30 POS/ord "
+                               f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f}")
             elif _ord_cov_ratio > 1.0 and is_amazon:
-                # Normal Amazon ordering (1.0-1.5x POS): Amazon orders ahead
-                # of consumer demand to cover lead times and safety stock.
-                # The L13W order avg smooths over individual 4-8 week lump
-                # events and IS the best forward demand proxy.  Use the higher
-                # of L13W orders and POS_L13W as the baseline.
-                # F38b is suppressed: L13W ord already captures recent POS
-                # acceleration in its rolling window.
-                baseline = max(ord_baseline, _pos_l13_f15)
+                # Normal Amazon ordering (1.0-1.5x POS): over 26 weeks Amazon
+                # must reorder at its consumer POS rate.  POS is primary anchor
+                # (65%); order history adds 35% to retain any ordering premium.
+                # F38b suppressed: amazon_pos_rate() already bakes L4/L13 trend
+                # weighting into pos_rate; applying F38b on top double-counts.
+                baseline = pos_rate * 0.65 + ord_baseline * 0.35
                 _f15_amazon_ord_primary = True
-                _f15_driver = (f"F15 ord-primary {_ord_cov_ratio:.2f}x "
-                               f"-> max(ord {ord_baseline:.0f}, "
-                               f"POS_L13 {_pos_l13_f15:.0f}) = {baseline:.0f} "
-                               f"(L13W order rate is demand proxy; F38b suppressed)")
+                _f15_driver = (f"F15 ord>POS {_ord_cov_ratio:.2f}x "
+                               f"-> 65/35 POS/ord "
+                               f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f} "
+                               f"(POS primary 26w anchor; F38b suppressed)")
             elif _ord_cov_ratio > 1.0:
                 # Non-Amazon above-POS: keep original 75/25 POS/ord blend.
                 baseline = pos_rate * 0.75 + ord_baseline * 0.25
