@@ -6907,7 +6907,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                             is_ecom=_is_ecom_t4,
                                             is_new_launch=_f73_new_ramp,
                                             amz_catalog=amz_catalog)
-        model    = "Seasonal Baseline"
+        model    = ("Seasonal Baseline (burst)"
+                    if meta.get("model") == "seasonal_baseline_burst"
+                    else "Seasonal Baseline")
         # VP-Q3: detect_biweekly() now returns the cadence gap (>=3 for monthly+)
         # or 0; cast to bool for backward-compat with JSON consumers expecting bool.
         _cadence_gap = detect_biweekly(hist_for_model)
