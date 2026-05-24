@@ -5308,7 +5308,7 @@ def _top_manual_defect(manual, fcst, cust_label="this account"):
         top_val, top_n = cnt.most_common(1)[0]
         if top_n >= 13 and len(cnt) <= 3:
             return (f"The plan is a flat {int(top_val):,}/wk across all active "
-                    f"weeks — verify this reflects the intended demand "
+                    f"weeks -- verify this reflects the intended demand "
                     f"distribution for {cl}.")
 
     # Unsupported spike weeks (planned >> history).
