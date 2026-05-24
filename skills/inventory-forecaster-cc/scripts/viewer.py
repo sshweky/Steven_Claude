@@ -139,14 +139,13 @@ def _make_prj_cols(ref_date=None):
 # ─── State (loaded at startup) ────────────────────────────────────────────────
 
 RESULTS_PATH  = None   # set in main()
-LOG_PATH      = None
 records_by_key = {}    # key → record dict
 prj_cols       = []    # 26 column names
-VIEW_MODE      = "validate"  # always "validate" — forecast viewer removed
-validation_summary = {}      # populated when VIEW_MODE == "validate"
+VIEW_MODE      = "validate"   # "validate" or "forecast" depending on results file loaded
+validation_summary = {}       # populated when VIEW_MODE == "validate"
 
 
-_ENRICH_CACHE_PATH = "viewer_enrichment_cache.json"
+_ENRICH_CACHE_PATH = str(Path(__file__).parent.parent / "viewer_enrichment_cache.json")
 _BRAND_CACHE_PATH  = "viewer_brand_cache.json"
 SKIP_ENRICH_LIVE = True   # default: rely on disk cache; --enrich-live opts back in
 
