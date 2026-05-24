@@ -11862,7 +11862,7 @@ def main():
         if _w1_po_count:
             print(f"      W1 PO zero-out: {_w1_po_count} records have an open PO in W1 -- MAN PRJ W1 will be set to 0")
         if _w2_po_count:
-            print(f"      W2 PO zero-out: {_w2_po_count} records have an open PO in W2 -- MAN PRJ W2 will be set to 0")
+            print(f"      W2 open POs: {_w2_po_count} records have an open PO in W2 (MAN PRJ W2 left as-is -- planner controls via codepage Zero button)")
         if _po_cutoff_w1_count:
             print(f"      F_PO_CUTOFF W1: {_po_cutoff_w1_count} Fetch/BrandBuzz records past PO cutoff -- AI+MAN PRJ W1 zeroed")
         _man_w1_fid = _man_prj_fids.get(1)   # FID for the current MAN PRJ W1 column
