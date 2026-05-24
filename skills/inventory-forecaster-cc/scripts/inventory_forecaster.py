@@ -4294,7 +4294,7 @@ def crostens(history, mp, is_amazon=False, description=None,
                 forecast[ew - 1] = snap(z * bst, mp)
                 event_inserts.append({"week": ew, "boost": bst,
                                        "qty": forecast[ew - 1], "inserted": True})
-        # Fall Prime Day insertion (Tuesday after Memorial Day)
+        # Fall Prime Day insertion (Tuesday after Labor Day)
         if _ins_fall:
             fall_covered = any(forecast[ew - 1] > 0
                                for ew in _ins_fall if ew <= 26)
