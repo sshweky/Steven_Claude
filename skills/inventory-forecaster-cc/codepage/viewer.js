@@ -4781,8 +4781,8 @@ async function _loadRtlPos(r, safeId) {
   if (rtlPosStLw > 0) distItems.push(`<b>POS strs</b> ${fmt(rtlPosStLw)}${fmtDelta(posDelta)}`);
   if (rtlAurLw   > 0) distItems.push(`<b>AUR$ LW</b> ${fmtAur(rtlAurLw)}`);
   const rtlDistBulletHtml = distItems.length
-    ? '<b>Retailer distribution:</b> ' + distItems.join(sep)
-    : '<b>Retailer distribution:</b> <span style="color:#999;font-style:italic">no data</span>';
+    ? '<b>' + custName + ' distribution:</b> ' + distItems.join(sep)
+    : '<b>' + custName + ' distribution:</b> <span style="color:#999;font-style:italic">no data</span>';
 
   // -- Inject into AI Analysis <ul> -----------------------------------------
   const ul = document.getElementById('ai-bullets-' + safeId);
