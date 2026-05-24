@@ -2195,6 +2195,23 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # signal (e.g. summer-skewed grilling adjacents, mild fall lift items)
     # but no longer compresses items the planners haven't tagged.
     _f16_relief  = (bool(_seasonal_cat) or _raw_peak_trough >= 1.8) and _f16_vol_ok
+    # F16 Amazon POS-stability gate (2026-05-24).
+    # F16 relief fires when order history shows a 1.8x+ peak/trough ratio.  For
+    # Amazon items this often reflects ORDERING CADENCE (bulk buys every 4-8 wks)
+    # rather than true consumer demand seasonality.  When:
+    #   (a) the relief would fire from order history alone (no category profile), AND
+    #   (b) the item is Amazon with healthy POS data, AND
+    #   (c) POS L13W is within 30% of POS L26W  (consumer demand is stable)
+    # ... override back to DAMP_NORMAL.  Category-tagged items are always allowed
+    # full relief since the tag confirms genuine seasonality.
+    _f16_amz_pos_gate_fired = False
+    if _f16_relief and not bool(_seasonal_cat) and is_amazon and pos_data:
+        _pos_l26_f16g = float(pos_data.get("Avg_Units_Wk_L26w") or 0)
+        if _pos_l13_f16 > 0 and _pos_l26_f16g > 0:
+            _pos_ratio_f16g = _pos_l13_f16 / _pos_l26_f16g
+            if 0.70 <= _pos_ratio_f16g <= 1.40:   # POS stable -- order lumps are cadence noise
+                _f16_relief = False
+                _f16_amz_pos_gate_fired = True
     # Eased 2026-05-06: 0.4 → 0.85 (relief), 0.1 → 0.3 (base).  Allows post-cap
     # peak up to 2.5× so sharp Q3/Q4 seasonals (Halloween, Holiday) come
     # through at full strength.
