@@ -1809,7 +1809,7 @@ function _buildOrderTrendInsight(histOrd, lyOrd, custLabel) {
   const arrow = short_pct > 0
     ? '<span style="color:#2e7d32;font-weight:700">&#x25B2;</span>'
     : '<span style="color:#c62828;font-weight:700">&#x25BC;</span>';
-  const header = `<b>Order trend:</b> ${arrow} ${direction} ` +
+  const header = `<b>${cl} Order History:</b> ${arrow} ${direction} ` +
                  `${Math.abs(short_pct).toFixed(0)}% L4W (${l4_avg.toFixed(0)}/wk) ` +
                  `vs L13W (${l13_avg.toFixed(0)}/wk).`;
   let expl;
