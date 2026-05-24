@@ -2,8 +2,8 @@
   "id": "34",
   "subject": "Run full --all --validate forecast + push validation",
   "description": "Outer attempt 1/3. Run run_forecast.py --all --validate, then push_validation_qb.py on success.",
-  "activeForm": "Running forecast --all --validate",
-  "status": "pending",
+  "activeForm": "Pushing validation results to QB",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }

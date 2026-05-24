@@ -1,0 +1,201 @@
+key,mstyle,cust,desc,pattern,model,manual,ai,gap_pct,l13_nz_avg,l52_peak,bucket
+23011-FF8651/8,FF8651/8,WAL MART STORES,"Glad for Pets Activated Carbon Training Pads for Puppies and Senior Dogs  14 Cou",steady,Seasonal Baseline,319500,319488,-0.0,11953,27600,aligned
+23011-BB38905PDQ,BB38905PDQ,WAL MART STORES,"G4K- 9oz Plastic Cups  20ct- Zoomie Dogs",intermittent,Croston's,245529,387696,57.9,15823,29748,declining_overforecast
+23011-FF10159,FF10159,WAL MART STORES,"Arm & Hammer Super Deodorizing Shampoo 20oz",steady,Seasonal Baseline,229836,212538,-7.5,10944,19584,aligned
+23011-FF38640,FF38640,WAL MART STORES,"Fresh Step Litter Box Scent Crystals in Fresh Scent  32oz WALMART EXCLUSIVE",steady,Seasonal Baseline,206500,151200,-26.8,6712,44064,seasonal_ramp_underforecast
+23011-BB38904PDQ,BB38904PDQ,WAL MART STORES,"G4K - 8.5' Round Paper Plates  20ct - Zoomie Dogs",sparse_intermittent,Heuristic (F72 new-launch ramp),194740,58704,-69.9,11170,20136,sparse_baseline_too_low
+23011-BB38906PDQ,BB38906PDQ,WAL MART STORES,"G4K - 6oz Paper Snack Bowls w/o lid  24ct - Zoomie Dogs",intermittent,Croston's,191381,104949,-45.2,7470,20475,sparse_baseline_too_low
+23011-BB38480PDQ,BB38480PDQ,WAL MART STORES,"G4K- 9oz Plastic Cups  20ct  - Sharks",intermittent,Croston's,174958,244356,39.7,10144,20052,over_forecast_other
+23011-BB38504PDQ,BB38504PDQ,WAL MART STORES,"G4K- 6oz Paper Snack Bowls w/o Lid  24ct - Sharks",intermittent,Croston's,148209,154593,4.3,6464,13023,aligned
+1864-FF8990,FF8990,AMAZON.COM.KYDC,INC,"Fresh Step Litter Box Scent Crystals in Fresh Scent  15oz",steady,Seasonal Baseline,145335,156924,8.0,6004,11184,aligned
+23011-FF35059,FF35059,WAL MART STORES,"Vibrant Life Cleansing Wipes for Dogs - Cannister - TEXTURED",steady,Seasonal Baseline,143084,148389,3.7,7501,14256,aligned
+23011-FF8654,FF8654,WAL MART STORES,"Glad for Pets Activated Carbon Training Pads for Puppies and Senior Dogs  100 Co",steady,Seasonal Baseline,136000,113598,-16.5,5009,14124,aligned
+23011-FF4775COS,FF4775COS,WAL MART STORES,"Burts Bees Tearless 2 in 1 Shampoo and Conditioner for Puppies with Buttermilk &",steady,Seasonal Baseline,135130,145254,7.5,5731,11292,aligned
+23011-FF7258COS,FF7258COS,WAL MART STORES,"Burt's Bees Oatmeal Shampoo for Dogs 16oz",steady,Seasonal Baseline,112565,131196,16.6,4946,13182,spike_overforecast
+23011-FF7266COS,FF7266COS,WAL MART STORES,"Burt's Bees Itch Soothing Shampoo for Dogs 16oz",steady,Seasonal Baseline,112239,126582,12.8,4784,13008,aligned
+23011-FF20001,FF20001,WAL MART STORES,"Vibrant Life Bathing Palm Brush + Dispenser",steady,Seasonal Baseline,106786,104304,-2.3,4935,7560,aligned
+20006-BB38638,BB38638,TARGET CTRL INV PRCS,"G4K Disney Pixar - 3oz Paper Bath Cups 20ct (BBP31473) - Toy Story",new_item,Heuristic,100153,93024,-7.1,4860,21132,aligned
+23011-BB13436CLR/12,BB13436CLR/12,WAL MART STORES,"G4K - 8.5' Round Paper Plates - 20ct - Sharks - COLORED PERF",steady,Seasonal Baseline,97993,135372,38.1,7979,27648,declining_overforecast
+1864-FF8654,FF8654,AMAZON.COM.KYDC,INC,"Glad for Pets Activated Carbon Training Pads for Puppies and Senior Dogs  100 Co",steady,Seasonal Baseline,93250,97722,4.8,1395,3168,aligned
+23011-FF8882/2,FF8882/2,WAL MART STORES,"Glad for Pets Jumbo Activated Carbon Training Pads For Large Breeds  30 Count",steady,Seasonal Baseline,93100,101242,8.7,4080,6832,aligned
+1864-FF12689,FF12689,AMAZON.COM.KYDC,INC,"A&H Pet Scents Deodorizing Gel Beads - Fresh Breeze",steady,Seasonal Baseline,91300,119256,30.6,3660,10200,declining_overforecast
+1864-BB0237,BB0237,AMAZON.COM.KYDC,INC,"Glad - Assorted Cutlery  240ct - Clear",steady,Seasonal Baseline,89796,82476,-8.2,2674,5946,aligned
+23011-FF15585,FF15585,WAL MART STORES,"Palmer's for Pets Dog Wipes with Cocoa Butter 100ct",steady,Seasonal Baseline,85687,75384,-12.0,3780,7128,aligned
+23011-FF38642,FF38642,WAL MART STORES,"Fresh Step Litter Box Scent Crystals in Sweet Blossom  32oz WALMART EXCLUSIVE",steady,Seasonal Baseline,85000,79200,-6.8,3124,12960,aligned
+1864-BB20552,BB20552,AMAZON.COM.KYDC,INC,"Glad - Plastic Forks  70ct - Clear",new_item,Seasonal Baseline,84648,68292,-19.3,2369,5952,aligned
+1864-FF9298EC,FF9298EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Complete Care Dog Dental Rinse  Odorless and Flavorless  16 Ounces",steady,Seasonal Baseline,83295,83688,0.5,4768,20592,aligned
+23011-BB29490/6,BB29490/6,WAL MART STORES,"Toilet Bowl Plunger - Walmart item # 659282843",inactive,Pre-launch NEW (manual passthrough),81750,82890,1.4,0,0,aligned
+1864-FF4775AMZ,FF4775AMZ,AMAZON.COM.KYDC,INC,"Burts Bees Tearless 2 in 1 Shampoo and Conditioner for Puppies with Buttermilk &",steady,Seasonal Baseline,78125,82536,5.6,4215,9150,aligned
+12835-BB22272,BB22272,LOWES COMPANIES, INC,"Fabuloso Microfiber Cleaning Cloths Rainbow 8PK",steady,Seasonal Baseline,78000,57216,-26.6,6847,27360,seasonal_unmatched
+1864-BB0466,BB0466,AMAZON.COM.KYDC,INC,"Kingsford - Deluxe Charcoal Chimney Starter",steady,Seasonal Baseline,77350,117492,51.9,8950,27180,spike_overforecast
+23011-FF12859,FF12859,WAL MART STORES,"Vibrant Life Dual Action Grooming Glove - Deshedding",steady,Seasonal Baseline,77213,58056,-24.8,4032,7920,under_forecast_other
+1864-FF10159EC,FF10159EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Super Deodorizing Shampoo 20oz",new_item,Seasonal Baseline,77062,83610,8.5,3212,6546,aligned
+23011-BB38585PDQ,BB38585PDQ,WAL MART STORES,"G4K- 6oz Paper Snack Bowls w/o Lid  24ct - Dinosaur",intermittent,Croston's,76611,69993,-8.6,3242,6750,aligned
+23011-BB38564PDQ,BB38564PDQ,WAL MART STORES,"G4K- 9oz Plastic Cups  20ct  - Dinosaur",intermittent,Croston's,76122,125976,65.5,5138,10740,declining_overforecast
+23011-FF38641,FF38641,WAL MART STORES,"Fresh Step Litter Box Scent Crystals in Summer Breeze  32oz WALMART EXCLUSIVE",steady,Seasonal Baseline,75000,36972,-50.7,1996,24624,seasonal_ramp_underforecast
+1864-BB30930,BB30930,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - 6pk Garbage Can Stick Ups IN TRAY - Lavender  w/Eucalyptus",steady,Seasonal Baseline,72985,98280,34.7,3897,11004,spike_overforecast
+20006-FF8990,FF8990,TARGET CTRL INV PRCS,"Fresh Step Litter Box Scent Crystals in Fresh Scent  15oz",steady,Seasonal Baseline,71580,98376,37.4,2820,4824,over_forecast_other
+1864-FF12300/24,FF12300/24,AMAZON.COM.KYDC,INC,"A&H Complete Care Adult Boxed Toothpaste in Chicken Flavor - Value Size 6.2oz",steady,Seasonal Baseline,70594,81552,15.5,3367,9576,aligned
+1864-FF9297/24,FF9297/24,AMAZON.COM.KYDC,INC,"A&H Complete Care Dog Dental Kit - Includes: 2.5oz Toothpaste (Chicken)  Double ",intermittent,Croston's,69665,80520,15.6,5486,11808,declining_overforecast
+23011-BB13435CLR/12,BB13435CLR/12,WAL MART STORES,"G4K - 8.5' Round Paper Plates  20ct - Dinosaurs - COLORED PERF",steady,Seasonal Baseline,69112,91764,32.8,3462,9792,over_forecast_other
+1864-FF7258AMZ,FF7258AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Oatmeal Shampoo for Dogs 16oz",steady,Seasonal Baseline,68250,69030,1.1,3207,16860,aligned
+12446-BB0234CAN,BB0234CAN,LOBLAWS INC,"Glad - 16oz Paper Bowls  15ct - Green Victorian (French/English)",steady,Seasonal Baseline,66000,99468,50.7,3960,10080,declining_overforecast
+1864-FF20208,FF20208,AMAZON.COM.KYDC,INC,"Arm & Hammer Gentle Puppy Wipes - Coconut Water  100 Count",steady,Seasonal Baseline,65172,69120,6.1,2756,6084,aligned
+23011-BB33706PDQ,BB33706PDQ,WAL MART STORES,"G4K Disney - 3oz Bath Cups  100ct -Mickey Mouse - 6pc PDQ",sparse_intermittent,Heuristic (F72 new-launch ramp),65147,16230,-75.1,4095,7998,sparse_baseline_too_low
+1864-FF12508,FF12508,AMAZON.COM.KYDC,INC,"A&H Pet Scents Deodorizing Gel Beads - Lavender Fields",steady,Seasonal Baseline,62775,49032,-21.9,2129,4224,seasonal_ramp_underforecast
+22008-BB28480,BB28480,VARIETY WHOLESALERS ,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Island Escape",sparse_intermittent,Sparse Intermittent,62196,65424,5.2,18810,27072,aligned
+1864-FF12823,FF12823,AMAZON.COM.KYDC,INC,"Wags & Wiggles Nourish Moisturizing Wipes 100ct",new_item,Seasonal Baseline,61715,64812,5.0,3421,6336,aligned
+1864-FF8649/24,FF8649/24,AMAZON.COM.KYDC,INC,"Glad for Pets Heavy-Duty Scented Waste Bags Refill Rolls  6 Rolls/90 Bags",steady,Seasonal Baseline,61500,67008,9.0,2548,9456,aligned
+22008-BB28719,BB28719,VARIETY WHOLESALERS ,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Fresh Ocean Breeze",sparse_intermittent,Sparse Intermittent,59484,57828,-2.8,22596,25200,aligned
+23011-FF34938,FF34938,WAL MART STORES,"Vibrant Life Hairball Control Shampoo for Cats",steady,Seasonal Baseline,59208,62560,5.7,2646,4704,aligned
+23011-FF19998,FF19998,WAL MART STORES,"Vibrant Life Slicker Brush + Cleaning Comb",steady,Seasonal Baseline,57840,67260,16.3,2816,4608,aligned
+1864-FF8882,FF8882,AMAZON.COM.KYDC,INC,"Glad for Pets Jumbo Activated Carbon Training Pads For Large Breeds  30 Count",steady,Seasonal Baseline,57744,51066,-11.6,1800,5328,aligned
+1864-FF12853,FF12853,AMAZON.COM.KYDC,INC,"Wet Ones Multipurpose Wipe for Cats - 50 ct Canister",steady,Seasonal Baseline,57260,57204,-0.1,3111,6636,aligned
+23011-FF12858,FF12858,WAL MART STORES,"Vibrant Life Cat Flexible Slicker Massage Brush",steady,Seasonal Baseline,56622,75900,34.0,2832,10944,over_forecast_other
+1864-FF12887,FF12887,AMAZON.COM.KYDC,INC,"A&H Pet Scents Solid Gel Deodorizer - Fresh Breeze",steady,Seasonal Baseline,56447,60588,7.3,3088,8436,aligned
+1864-BB13437,BB13437,AMAZON.COM.KYDC,INC,"G4K - 8.5' Round Paper Plates  20ct - Unicorns",steady,Seasonal Baseline,56064,52374,-6.6,1974,5790,aligned
+23011-FF7267COS,FF7267COS,WAL MART STORES,"Burt's Bees Itch Soothing Spray for Dogs 10oz",steady,Seasonal Baseline,55221,51816,-6.2,2498,7782,aligned
+22008-BB28720,BB28720,VARIETY WHOLESALERS ,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Island Orchid",sparse_intermittent,Sparse Intermittent,54912,59100,7.6,23376,33768,aligned
+1864-FF22031,FF22031,AMAZON.COM.KYDC,INC,"Wags & Wiggles Cleanse Hypoallergenic Wipes 100ct",steady,Seasonal Baseline,54725,66012,20.6,1790,5412,over_forecast_other
+22008-BB29477,BB29477,VARIETY WHOLESALERS ,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Cherry Burst",sparse_intermittent,Sparse Intermittent,54084,52512,-2.9,21648,30312,aligned
+20006-FF9297PDQ,FF9297PDQ,TARGET CTRL INV PRCS,"A&H Complete Care Dog Dental Kit - Includes: 2.5oz Toothpaste (Chicken)  Double ",steady,Seasonal Baseline,53026,80448,51.7,2230,3984,over_forecast_other
+23011-FF15584,FF15584,WAL MART STORES,"Palmer's for Pets Direct Relief Lotion Spray with Cocoa Butter 8oz",steady,Seasonal Baseline,52006,42456,-18.4,2199,3456,aligned
+23011-FF15589,FF15589,WAL MART STORES,"Palmer's for Pets Paw Pad & Nose Balm with Cocoa Butter 3.5oz",steady,Seasonal Baseline,51922,44760,-13.8,2070,4320,aligned
+1864-FF12302/24EC,FF12302/24EC,AMAZON.COM.KYDC,INC,"A&H Complete Care Dog Dental Spray in Mint Flavor - Value Size 6oz",steady,Seasonal Baseline,51792,42120,-18.7,1972,5856,aligned
+1864-BB0578,BB0578,AMAZON.COM.KYDC,INC,"Glad - Plastic Spoons  24ct - Clear",steady,Seasonal Baseline,50577,39924,-21.1,1474,3636,under_forecast_other
+1864-FF12655EC,FF12655EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Ultra Fresh Waterless Bath Spray with Cucumber & White Tea",steady,Seasonal Baseline,49473,52098,5.3,1983,4500,aligned
+1864-FF7120EC,FF7120EC,AMAZON.COM.KYDC,INC,"BioSilk for Dogs Detangling and Shine Spray for Dogs  8 Ounces",steady,Seasonal Baseline,49032,59448,21.2,3281,26167,spike_overforecast
+12446-BB0761CAN,BB0761CAN,LOBLAWS INC,"Glad - 8.5' Square Paper Plates  50ct - Purple Victorian (French/English)",steady,Seasonal Baseline,49000,20484,-58.2,2109,3768,under_forecast_other
+1885-FF17554,FF17554,AMAZON PRIVATE LABEL,"Amazon Private Label: Rawhide-free Twists  Bacon & Cheese flavor  55-ct/12-oz Re",steady,Croston's,47250,57996,22.7,6957,19008,declining_overforecast
+1864-BB33708,BB33708,AMAZON.COM.KYDC,INC,"G4K Disney - 3oz Bath Cups  100ct -Princess",steady,Croston's,46850,28350,-39.5,4436,5292,under_forecast_other
+1864-FF8423,FF8423,AMAZON.COM.KYDC,INC,"Fresh Step Drawstring Litter Box Liners Scented  Large Size  30' x 17' - 7 Count",steady,Seasonal Baseline,46800,51552,10.2,1753,9360,aligned
+22008-BB28473,BB28473,VARIETY WHOLESALERS ,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Lavender",sparse_intermittent,Sparse Intermittent,45816,45864,0.1,18180,28872,aligned
+1864-FF12842,FF12842,AMAZON.COM.KYDC,INC,"Wet Ones Antibacterial All-Purpose Wipe for Dogs - 5.7in x 7.5in - 50ct Canister",steady,Seasonal Baseline,45731,73476,60.7,2871,5328,over_forecast_other
+1864-FF10479EC,FF10479EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Super Deodorizing Spray - Kiwi Blossom",steady,Seasonal Baseline,45702,63996,40.0,3178,8484,declining_overforecast
+23011-BB33708PDQ,BB33708PDQ,WAL MART STORES,"G4K Disney - 3oz Bath Cups  100ct - Princess - 6pc PDQ",steady,Seasonal Baseline,45052,32166,-28.6,1694,4740,under_forecast_other
+16553-FF8990,FF8990,PETSMART INC,"Fresh Step Litter Box Scent Crystals in Fresh Scent  15oz",steady,Seasonal Baseline,45000,41964,-6.7,1728,3456,aligned
+1864-FF15589,FF15589,AMAZON.COM.KYDC,INC,"Palmer's for Pets Paw Pad & Nose Balm with Cocoa Butter 3.5oz",steady,Croston's,44770,43836,-2.1,1191,5088,aligned
+16553-SF8168PS,SF8168PS,PETSMART INC,"Arm & Hammer Fresh Breath Dental Kit for Dogs  Chicken",steady,Seasonal Baseline,43347,31200,-28.0,2592,5184,under_forecast_other
+1864-FF25895,FF25895,AMAZON.COM.KYDC,INC,"A&H Litter Box Deodorizing Pod 2pk - 8pc Printed/Tear-Away PDQ",steady,Croston's,43260,32928,-23.9,4272,9984,under_forecast_other
+16553-FF7258,FF7258,PETSMART INC,"Burt's Bees Oatmeal Shampoo for Dogs 16oz",steady,Seasonal Baseline,42605,39708,-6.8,1648,2268,aligned
+1864-BB21250,BB21250,AMAZON.COM.KYDC,INC,"Kingsford - Grill Brush",steady,Seasonal Baseline,42550,85824,101.7,3821,6240,over_forecast_other
+20006-BB38671,BB38671,TARGET CTRL INV PRCS,"G4K - 10oz Paper Bowls  24ct - Happy Sea Creatures TARGET EXCLUSIVE",new_item,Heuristic,42484,62256,46.5,3273,15792,declining_overforecast
+20006-BB38674,BB38674,TARGET CTRL INV PRCS,"G4K- 6oz Paper Snack Bowls w/o Lid  24ct - Happy Sea Creatures - TARGET EXCLUSIV",new_item,Heuristic,41079,47412,15.4,3131,16821,declining_overforecast
+1864-FF5766AMZ,FF5766AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Hypoallergenic Shampoo for Cats 10oz",steady,Seasonal Baseline,40520,46398,14.5,2787,6606,aligned
+23011-FF15592,FF15592,WAL MART STORES,"GNC Pets ESSENTIALS  Calming  All Dog  60-ct 2.2g Soft Chews 12-oz",steady,Seasonal Baseline,38943,40164,3.1,2590,7260,aligned
+16553-SF8170PS,SF8170PS,PETSMART INC,"Arm & Hammer Tartar Control Dental Kit for Dogs  Beef",steady,Seasonal Baseline,38527,44928,16.6,2095,6144,aligned
+20006-BB38672,BB38672,TARGET CTRL INV PRCS,"G4K - 8.5' Paper Plate  24ct - Happy Sea Creatures TARGET EXCLUSIVE",new_item,Heuristic,38264,55044,43.9,3615,17118,declining_overforecast
+1864-BB0098,BB0098,AMAZON.COM.KYDC,INC,"Glad - 10' Round Paper Plates  50ct - Blue Flower",new_item,Seasonal Baseline,37560,38304,2.0,1859,4770,aligned
+1885-FF17574,FF17574,AMAZON PRIVATE LABEL,"Amazon Private Label: Extruded Dental Stick  Large  Chicken flavor  40-ct/35-oz ",steady,Seasonal Baseline,37300,35280,-5.4,1971,9840,aligned
+1864-BB31552,BB31552,AMAZON.COM.KYDC,INC,"G4K - 12oz Paper Snack Bowls w/o lid  20ct - Unicorns",steady,Seasonal Baseline,37275,33720,-9.5,1596,2520,aligned
+20006-BB38484,BB38484,TARGET CTRL INV PRCS,"G4K - 10oz Paper Bowls  24ct - Dinosaur Roar TARGET EXCLUSIVE",new_item,Heuristic,34518,53184,54.1,3529,17454,declining_overforecast
+1864-FF15584,FF15584,AMAZON.COM.KYDC,INC,"Palmer's for Pets Direct Relief Lotion Spray with Cocoa Butter 8oz",steady,Seasonal Baseline,34470,37896,9.9,1198,2808,aligned
+23011-FF14469,FF14469,WAL MART STORES,"Vibrant Life Coconut Vanilla Shampoo 24oz 3pc PDQ",steady,Seasonal Baseline,34221,34077,-0.4,1708,4032,aligned
+1864-BB22116,BB22116,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - In-Wash Scent Booster Crystals - 2 x 18oz - Ocean (Twin Pack ",steady,Seasonal Baseline,33365,35592,6.7,780,4086,aligned
+1864-FF15982,FF15982,AMAZON.COM.KYDC,INC,"CLEANZE Antibacterial Hand Wipes- 6' x 8' -100ct",sparse_intermittent,Heuristic,33300,384,-98.8,0,1920,sparse_baseline_too_low
+1864-SF8174EC,SF8174EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Tartar Control Dental Spray for Dogs  Mint",intermittent,Croston's,33228,24864,-25.2,1972,10344,seasonal_ramp_underforecast
+16553-FF4775,FF4775,PETSMART INC,"Burts Bees Tearless 2 in 1 Shampoo and Conditioner for Puppies with Buttermilk &",steady,Seasonal Baseline,33204,33204,0.0,1371,2430,aligned
+20006-BB38635,BB38635,TARGET CTRL INV PRCS,"G4K- 6oz Paper Snack Bowls w/o Lid  24ct - Dinosaur Roar - TARGET EXCLUSIVE",new_item,Heuristic,33202,64080,93.0,3357,18054,declining_overforecast
+20006-BB38673,BB38673,TARGET CTRL INV PRCS,"G4K- 9oz Plastic Cups  24ct  - Happy Sea Creatures - TARGET EXCLUSIVE",new_item,Heuristic,32989,46278,40.3,3072,16812,declining_overforecast
+23011-FF19592,FF19592,WAL MART STORES,"Vibrant Life Dander & Odor Control Foam for Cats 8oz",steady,Seasonal Baseline,32833,31410,-4.3,1485,2772,aligned
+22008-BB38466,BB38466,VARIETY WHOLESALERS ,"Clorox Fraganzia - Duo Cube Toilet Bowl Cleaner w/ Bleach - HALF WHITE/BLUE- 2 x",sparse_intermittent,Inactive (zeroed by guards),32800,0,-100.0,7596,9936,sparse_baseline_too_low
+12835-FF33086,FF33086,LOWES COMPANIES, INC,"MOXIE 50ct Antibac Hand Wipes - 5696381",new_item,Seasonal Baseline,32500,30768,-5.3,4560,11568,aligned
+1864-BB14812,BB14812,AMAZON.COM.KYDC,INC,"G4K Paw Patrol - 8.5' Round Paper Plates  20ct - Core Pups Blue",steady,Seasonal Baseline,32450,26350,-18.8,835,2700,prime_day_prebuy_gap
+1885-FF17578,FF17578,AMAZON PRIVATE LABEL,"Amazon Private Label: Extruded Dental Stick  Large  Beef flavor  40-ct/35-oz Res",steady,Seasonal Baseline,32250,34668,7.5,2357,8304,aligned
+1864-BB27359,BB27359,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - 6pk Deodorizing Balls - Fresh Ocean Breeze",steady,Seasonal Baseline,31775,10980,-65.4,400,8040,seasonal_unmatched
+20006-BB38489,BB38489,TARGET CTRL INV PRCS,"G4K - 8.5' Round Paper Plate  24ct - Dinosaur Roar TARGET EXCLUSIVE",new_item,Heuristic,31674,57588,81.8,3812,18672,declining_overforecast
+1864-FF17831,FF17831,AMAZON.COM.KYDC,INC,"CLEANZE Antibacterial Hand Wipes-Indiv. Wrapped-50ct in 6pc PDQ(Same UPC# as FFP",sparse_intermittent,Heuristic,31575,15888,-49.7,0,912,sparse_baseline_too_low
+12835-FF33094,FF33094,LOWES COMPANIES, INC,"MOXIE 16.9oz Scntd Hand Gel Pump - 5696380",steady,Croston's,31250,60948,95.0,6494,20934,declining_overforecast
+1864-FF20206EC,FF20206EC,AMAZON.COM.KYDC,INC,"Arm & Hammer Itch Relief Spray",intermittent,Croston's,30450,16038,-47.3,1085,1596,seasonal_ramp_underforecast
+20006-FF19341,FF19341,TARGET CTRL INV PRCS,"Fresh Step Litter Box Charcoal Odor Eliminating Powder  15 Ounces Sifting/Pour C",steady,Seasonal Baseline,30387,45372,49.3,1217,2280,over_forecast_other
+23011-FF15595,FF15595,WAL MART STORES,"GNC Pets ESSENTIALS  Digestion  All Dog  60-ct 2.2g Soft Chews in a 12-oz",steady,Seasonal Baseline,30313,29736,-1.9,1155,2400,aligned
+1864-BB13435,BB13435,AMAZON.COM.KYDC,INC,"G4K - 8.5' Round Paper Plates  20ct - Dinosaurs",new_item,Seasonal Baseline,30200,31074,2.9,1096,3120,aligned
+1864-FF7372,FF7372,AMAZON.COM.KYDC,INC,"Burts Bees Cat Dander Wipes-50ct",steady,Seasonal Baseline,30140,36828,22.2,675,2088,declining_overforecast
+13640-BB22272,BB22272,BURLINGTON COAT FACT,"Fabuloso Microfiber Cleaning Cloths Rainbow 8PK",steady,Seasonal Baseline,30000,36960,23.2,7006,42072,declining_overforecast
+1864-FF16704,FF16704,AMAZON.COM.KYDC,INC,"Arm and Hammer Cat Litter Box Crystals- Lavender Zen",steady,Seasonal Baseline,29355,28740,-2.1,1559,3288,aligned
+1864-FF8653,FF8653,AMAZON.COM.KYDC,INC,"Glad for Pets Activated Carbon Training Pads for Puppies and Senior Dogs  50 Cou",steady,Seasonal Baseline,29072,30756,5.8,1113,1820,aligned
+23685-BB36524,BB36524,WAKEFERN FOOD CORP,"Paperbird- Gel Air Freshener Cone - 6oz - Lavender Bliss",sparse_intermittent,Sparse Intermittent,29052,29256,0.7,3000,7200,aligned
+1864-BB35096,BB35096,AMAZON.COM.KYDC,INC,"Gladware Everyday - Deep Dish 64oz  Large Rectangle  3ct (BBG10316)",steady,Seasonal Baseline,28950,25800,-10.9,984,1980,aligned
+20006-BB38634,BB38634,TARGET CTRL INV PRCS,"G4K- 9oz Plastic Cups  24ct  - Dinosaur Roar - TARGET EXCLUSIVE",new_item,Heuristic,28833,50112,73.8,3365,18072,declining_overforecast
+16553-FF7216,FF7216,PETSMART INC,"Chi Oatmeal Conditioner For Dogs",steady,Seasonal Baseline,28563,28080,-1.7,1163,3024,aligned
+1864-FF12301/24,FF12301/24,AMAZON.COM.KYDC,INC,"A&H Complete Care Puppy Boxed Toothpaste in Peanut Butter Flavor - Value Size 6.",steady,Croston's,28500,25776,-9.6,624,11184,aligned
+12446-BB0125CAN,BB0125CAN,LOBLAWS INC,"Glad - 10'  Square Paper Plates   50ct - Green Victorian (English/French)",steady,Seasonal Baseline,28400,57288,101.7,1878,2970,declining_overforecast
+1864-SF8170,SF8170,AMAZON.COM.KYDC,INC,"Arm & Hammer Tartar Control Dental Kit for Dogs  Beef",steady,Croston's,28090,39504,40.6,1224,6192,declining_overforecast
+1864-FF14584,FF14584,AMAZON.COM.KYDC,INC,"Glad for Pets Jumbo Activated Carbon Training Pads  50 Count",steady,Seasonal Baseline,27975,28300,1.2,880,1860,aligned
+16820-FF18758,FF18758,PSP DISTRIBUTION, LL,"Play On Antibacterial Paw & Bum Wipes 100ct PDQ",steady,Seasonal Baseline,27541,24636,-10.5,2212,10692,aligned
+1864-BB24877,BB24877,AMAZON.COM.KYDC,INC,"G4K Disney - 8.5' Round Paper Plates  40ct - Floral Frames - MIXED PACK",steady,Seasonal Baseline,27515,45696,66.1,2494,5240,over_forecast_other
+1864-BB26922,BB26922,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Air Freshener Beads Twin Pack - 2x12oz - Fresh Ocean Breeze &",steady,Croston's,27420,14340,-47.7,1298,6162,seasonal_unmatched
+16553-FF9060,FF9060,PETSMART INC,"Chi Gentle 2 In 1 Shampoo And Conditioner",steady,Seasonal Baseline,27281,24096,-11.7,995,1848,aligned
+1864-BB20227,BB20227,AMAZON.COM.KYDC,INC,"G4K - Disposable Paper Bibs  30ct - Unicorns",steady,Seasonal Baseline,26681,28248,5.9,1014,1512,aligned
+1864-BB22272,BB22272,AMAZON.COM.KYDC,INC,"Fabuloso Microfiber Cleaning Cloths Rainbow 8PK",steady,Seasonal Baseline,26635,45000,69.0,1647,3768,over_forecast_other
+1864-FF12376,FF12376,AMAZON.COM.KYDC,INC,"Biosilk for Dogs Silk Therapy Detangling Conditioner",steady,Seasonal Baseline,26585,26772,0.7,873,2148,aligned
+23685-BB36526,BB36526,WAKEFERN FOOD CORP,"Paperbird - Gel Air Freshener Cone - 6oz - Ocean Breeze",sparse_intermittent,Sparse Intermittent,26580,26688,0.4,3000,5400,aligned
+1864-BB20228,BB20228,AMAZON.COM.KYDC,INC,"G4K - Disposable Paper Bibs  30ct - Sharks",steady,Seasonal Baseline,26472,25848,-2.4,900,1656,aligned
+1864-BB0131EC,BB0131EC,AMAZON.COM.KYDC,INC,"Kingsford - Grill Cleaner - Aerosol - 14.5oz",intermittent,Croston's,26180,25296,-3.4,2126,5628,aligned
+1864-BB21058/6,BB21058/6,AMAZON.COM.KYDC,INC,"Fabuloso - Microfiber Mitt Purple 1 CT (6PC Full Color PDQ)",steady,Seasonal Baseline,26108,18438,-29.4,638,1392,under_forecast_other
+13640-BB34403,BB34403,BURLINGTON COAT FACT,"Fabuloso Microfiber Cleaning Cloths Rainbow 12PK",intermittent,Croston's,26000,24114,-7.3,8173,13762,aligned
+1864-BB27773,BB27773,AMAZON.COM.KYDC,INC,"G4K Disney - 10' Round Paper Plates  30ct - Floral Frames - MIXED PACK",steady,Seasonal Baseline,25880,15640,-39.6,616,2060,seasonal_unmatched
+18360-BB34390,BB34390,ROSS STORES INC - ME,"Fabuloso-Sponges Purple 12 CT",sparse_intermittent,Sparse Intermittent,25800,16824,-34.8,8136,8136,sparse_baseline_too_low
+13225-BB11417FL/12,BB11417FL/12,MENARD INC,"Kingsford - Wooden Fire Starter Rolls - 16ct",inactive,Inactive,25384,0,-100.0,0,0,under_forecast_other
+12835-BB0237,BB0237,LOWES COMPANIES, INC,"Glad - Assorted Cutlery  240ct - Clear",inactive,Inactive,25000,0,-100.0,0,0,under_forecast_other
+16553-FF7228,FF7228,PETSMART INC,"Chi Detangling Finishing Spray For Dogs 10oz",steady,Seasonal Baseline,24514,26148,6.7,1104,2016,aligned
+1864-FF30755EC,FF30755EC,AMAZON.COM.KYDC,INC,"Wet One's - Antibacterial Paw Cleansing Foam - Tropical Splash - 5 oz",inactive,Inactive,24405,0,-100.0,0,0,under_forecast_other
+23011-FF12659/16,FF12659/16,WAL MART STORES,"Vibrant Life Lavender Chamomile Waterless Bath Foam for Dogs 8oz",inactive,Pre-launch NEW (manual passthrough),24247,24899,2.7,0,0,aligned
+1864-FF13876,FF13876,AMAZON.COM.KYDC,INC,"Arm & Hammer Med. Diapers-16.5'-21' Waist - 12 Pack",steady,Seasonal Baseline,24175,16158,-33.2,739,1440,seasonal_ramp_underforecast
+20595-FF10159,FF10159,TRACTOR SUPPLY COMPA,"Arm & Hammer Super Deodorizing Shampoo 20oz",steady,Seasonal Baseline,24125,22998,-4.7,904,2034,aligned
+16553-FF7221,FF7221,PETSMART INC,"Chi Deodorizing Spray For Dogs",steady,Seasonal Baseline,23768,23508,-1.1,973,2232,aligned
+16553-SF8169PS,SF8169PS,PETSMART INC,"Arm & Hammer Tartar Control Enzymatic Toothpaste for Dogs  Beef",steady,Seasonal Baseline,23725,19944,-15.9,1368,3600,aligned
+1864-FF7297AMZ,FF7297AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Waterless Shampoo for Cats 10oz",inactive,Inactive,23650,0,-100.0,0,0,under_forecast_other
+1864-BB12068,BB12068,AMAZON.COM.KYDC,INC,"Kingsford - Wooden Fire Starter Rolls - 32ct",steady,Seasonal Baseline,23620,13560,-42.6,966,7344,seasonal_ramp_underforecast
+16553-FF30784,FF30784,PETSMART INC,"Chi: 2 in 1 Dematting Deshedding Rake Dog",steady,Seasonal Baseline,23550,24168,2.6,999,2328,aligned
+23011-FF7120,FF7120,WAL MART STORES,"BioSilk for Dogs Detangling and Shine Spray for Dogs  8 Ounces",steady,Seasonal Baseline,23359,23148,-0.9,1152,2592,aligned
+1864-FF31287,FF31287,AMAZON.COM.KYDC,INC,"Glad for Pets Heavy Duty Activated Carbon Training Pads - 24' x 24' 30ct",steady,Seasonal Baseline,23280,29152,25.2,986,2224,over_forecast_other
+3102-FF8990,FF8990,CHEWY.COM,"Fresh Step Litter Box Scent Crystals in Fresh Scent  15oz",steady,Seasonal Baseline,23100,24204,4.8,978,2316,aligned
+22008-BB32892,BB32892,VARIETY WHOLESALERS ,"Clorox Fraganzia - Toilet Bowl Cleaner Tablets with BLEACH - WHITE - 2 x 50g - C",sparse_intermittent,Sparse Intermittent,22750,3888,-82.9,9720,9720,sparse_baseline_too_low
+20006-FF10159,FF10159,TARGET CTRL INV PRCS,"Arm & Hammer Super Deodorizing Shampoo 20oz",steady,Seasonal Baseline,22714,34056,49.9,981,1818,over_forecast_other
+16553-FF15718,FF15718,PETSMART INC,"Fresh Step Litter Box Deodorizing Gel Pod - Includes 1 pod  2 gel refills (25% P",steady,Seasonal Baseline,22512,20640,-8.3,857,1104,aligned
+16553-FF12655PSM,FF12655PSM,PETSMART INC,"Arm & Hammer Ultra Fresh Waterless Bath Spray with Cucumber & White Tea",steady,Seasonal Baseline,22442,18888,-15.8,780,2520,aligned
+3102-FF12846,FF12846,CHEWY.COM,"Wet Ones Anti-Bacterial Paw/Tushie Wipe for Dogs - 30 ct pouch",steady,Seasonal Baseline,22320,6840,-69.4,1218,5664,seasonal_ramp_underforecast
+23011-FF4849COS,FF4849COS,WAL MART STORES,"Burt's Bees Hypoallergenic Shampoo for Dogs 16oz",steady,Seasonal Baseline,22103,24768,12.1,1075,2676,aligned
+23011-FF12659,FF12659,WAL MART STORES,"Vibrant Life Lavender Chamomile Waterless Bath Foam for Dogs 8oz",steady,Seasonal Baseline,22077,22962,4.0,2010,4914,aligned
+16553-FF12649PSM,FF12649PSM,PETSMART INC,"Arm & Hammer Ultra Fresh 2-in-1 Tearless Puppy Shampoo + Conditioner with Butter",steady,Seasonal Baseline,21995,20190,-8.2,864,1536,aligned
+1864-BB28473,BB28473,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Lavender",steady,Seasonal Baseline,21950,17076,-22.2,508,1764,seasonal_unmatched
+23011-FF7112,FF7112,WAL MART STORES,"BioSilk for Dogs Whitening Shampoo  12 Ounces",steady,Seasonal Baseline,21720,18372,-15.4,947,2352,aligned
+16553-FF5715PS,FF5715PS,PETSMART INC,"Arm & Hammer Fresh Breath Enzymatic Toothpaste for Dogs  Vanilla Ginger",steady,Seasonal Baseline,21535,18720,-13.1,838,2304,aligned
+23685-BB36525,BB36525,WAKEFERN FOOD CORP,"Paperbird- Gel Air Freshener Cone - 6oz - Island Breeze",sparse_intermittent,Sparse Intermittent,21456,21540,0.4,3600,5400,aligned
+1864-BB28719,BB28719,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Gel Air Freshener Cone - 6oz - Fresh Ocean Breeze",steady,Seasonal Baseline,21435,28188,31.5,669,3504,declining_overforecast
+1864-FF8991,FF8991,AMAZON.COM.KYDC,INC,"Fresh Step Litter Box Scent Crystals in Summer Breeze  15oz",inactive,Inactive,21325,0,-100.0,0,0,under_forecast_other
+22008-BB15776,BB15776,VARIETY WHOLESALERS ,"Glad - Plastic Forks  24ct - Clear",sparse_intermittent,Sparse Intermittent,21252,23736,11.7,12000,16272,aligned
+1864-BB28360,BB28360,AMAZON.COM.KYDC,INC,"G4K Disney Pixar - 8.5' Round Paper Plates  40ct - Toy Story - Light Beams",steady,Croston's,21205,23388,10.3,2805,6456,aligned
+18360-FF5716PS,FF5716PS,ROSS STORES INC - ME,"Arm & Hammer Fresh Breath Dental Kit for Dogs  Vanilla Ginger",sparse_intermittent,Sparse Intermittent,21000,4032,-80.8,3744,3744,sparse_baseline_too_low
+1864-FF10530,FF10530,AMAZON.COM.KYDC,INC,"A&H Heavy Duty Multi-Purpose Pet Wipes - Mango  100 Count",steady,Seasonal Baseline,20915,22752,8.8,812,4068,aligned
+23011-BB21058/6,BB21058/6,WAL MART STORES,"Fabuloso - Microfiber Mitt Purple 1 CT (6PC Full Color PDQ)",steady,Seasonal Baseline,20900,39912,91.0,1920,4320,over_forecast_other
+16553-FF12653PSM,FF12653PSM,PETSMART INC,"Arm & Hammer Ultra Fresh 2-in-1 Detangling Shampoo + Conditioner with Coconut Oi",steady,Seasonal Baseline,20890,19758,-5.4,857,1536,aligned
+1864-FF5769AMZ,FF5769AMZ,AMAZON.COM.KYDC,INC,"Burt's Bees Tearless Kitten Shampoo 10oz",new_item,Seasonal Baseline,20675,19152,-7.4,1006,3252,aligned
+20595-FF7258,FF7258,TRACTOR SUPPLY COMPA,"Burt's Bees Oatmeal Shampoo for Dogs 16oz",steady,Seasonal Baseline,20615,18102,-12.2,652,2040,aligned
+1864-BB35097,BB35097,AMAZON.COM.KYDC,INC,"Gladware Everyday - Family Size 104oz  XL Square  3ct (BBG11107)",steady,Seasonal Baseline,20559,23835,15.9,884,2238,aligned
+23011-FF12660/16,FF12660/16,WAL MART STORES,"Vibrant Life Lemongrass Verbena Waterless Bath Foam for Dogs 8oz",inactive,Pre-launch NEW (manual passthrough),20206,20728,2.6,0,0,aligned
+20595-FF9297/24,FF9297/24,TRACTOR SUPPLY COMPA,"A&H Complete Care Dog Dental Kit - Includes: 2.5oz Toothpaste (Chicken)  Double ",steady,Seasonal Baseline,20120,33768,67.8,772,1968,over_forecast_other
+20595-FF7266,FF7266,TRACTOR SUPPLY COMPA,"Burt's Bees Itch Soothing Shampoo for Dogs 16oz",steady,Seasonal Baseline,20113,19626,-2.4,674,1566,aligned
+1864-FF10479PX2,FF10479PX2,AMAZON.COM.KYDC,INC,"Arm & Hammer Super Deodorizing Spray - Kiwi Blossom  8oz Bottle - 2 Pack",inactive,Inactive,20055,0,-100.0,0,0,under_forecast_other
+22008-BB25519,BB25519,VARIETY WHOLESALERS ,"Glad - 18oz Plastic Cups  40ct - Red (Same as BBP19517 but NO PREPRICE)",inactive,OTB (zero),20000,0,-100.0,0,21000,under_forecast_other
+1864-FF5773,FF5773,AMAZON.COM.KYDC,INC,"Burts Bees Kitten wipes -50ct",steady,Seasonal Baseline,19834,16506,-16.8,619,1356,prime_day_prebuy_gap
+1885-FF17546,FF17546,AMAZON PRIVATE LABEL,"Amazon Private Label: Rawhide-free Twists  Peanut Butter flavor  55-ct/12-oz Res",steady,Seasonal Baseline,19620,11472,-41.5,556,4896,seasonal_ramp_underforecast
+1864-FF13877,FF13877,AMAZON.COM.KYDC,INC,"Arm & Hammer Lrg. Diapers-18'-23' Waist - 12 Pack",steady,Seasonal Baseline,19615,18432,-6.0,813,1896,aligned
+16553-FF19008,FF19008,PETSMART INC,"Full Cheeks Small Animal Cage Cleaning Wipes 50ct Cannister",steady,Seasonal Baseline,19286,8964,-53.5,905,1824,under_forecast_other
+1864-FF7618,FF7618,AMAZON.COM.KYDC,INC,"Arm & Hammer Adv Care Fresh Breath Dental Mints for Dogs in Chicken Flavor  40 C",sparse_intermittent,Heuristic,19260,29940,55.5,3330,6480,declining_overforecast
+16553-FF7215,FF7215,PETSMART INC,"Chi Oatmeal Shampoo For Dogs",steady,Seasonal Baseline,19259,18120,-5.9,737,1344,aligned
+16553-FF7297,FF7297,PETSMART INC,"Burt's Bees Waterless Shampoo for Cats 10oz",new_item,Seasonal Baseline,19145,16572,-13.4,786,1176,aligned
+23011-FF12376,FF12376,WAL MART STORES,"Biosilk for Dogs Silk Therapy Detangling Conditioner",steady,Seasonal Baseline,19011,20220,6.4,812,1344,aligned
+1864-BB0150,BB0150,AMAZON.COM.KYDC,INC,"Clorox Fraganzia - Air Freshener Beads - 12oz JAR - Lavender w/Eucalyptus",steady,Seasonal Baseline,18965,16344,-13.8,617,1584,aligned
+12835-BB38259,BB38259,LOWES COMPANIES, INC,"Kingsford - Heavy Duty Grill Liners (New style of BBP0491)",inactive,OTB (zero),18932,0,-100.0,0,7752,under_forecast_other
+16579-FF4775,FF4775,PETCO ANIMAL SUPPLIE,"Burts Bees Tearless 2 in 1 Shampoo and Conditioner for Puppies with Buttermilk &",steady,Seasonal Baseline,18831,17340,-7.9,684,1488,aligned
+1864-SF8168,SF8168,AMAZON.COM.KYDC,INC,"Arm & Hammer Fresh Breath Dental Kit for Dogs  Chicken",steady,Croston's,18810,912,-95.2,464,1488,seasonal_ramp_underforecast
+16553-FF26580,FF26580,PETSMART INC,"ONP DOG ATTRACTANT SPRAY 16 FL OZ",steady,Inactive (zeroed by guards),18695,0,-100.0,1075,2112,under_forecast_other
+16553-FF20275,FF20275,PETSMART INC,"THRIVE PSM Reptile Habitat Cleaning Wipes 50 ct - with Enzymes",steady,Seasonal Baseline,18675,8028,-57.0,815,1680,under_forecast_other
+20474-FF10479,FF10479,THEIS DISTRIBUTING C,"Arm & Hammer Super Deodorizing Spray - Kiwi Blossom",steady,Seasonal Baseline,18550,20220,9.0,1361,3180,aligned
+23011-FF12660,FF12660,WAL MART STORES,"Vibrant Life Lemongrass Verbena Waterless Bath Foam for Dogs 8oz",steady,Seasonal Baseline,18399,24204,31.6,3541,9720,declining_overforecast
+1864-BB14500CLR/9,BB14500CLR/9,AMAZON.COM.KYDC,INC,"G4K - 12oz Paper Snack Bowls w/o lid  20ct - Sharks",sparse_intermittent,Heuristic,18351,2340,-87.2,1066,2640,sparse_baseline_too_low
+1864-FF31068,FF31068,AMAZON.COM.KYDC,INC,"Palmer's for Pets Facial Cleansing Pads with Cocoa Butter 100ct",steady,Seasonal Baseline,18340,15660,-14.6,699,3168,aligned
+1864-FF9060,FF9060,AMAZON.COM.KYDC,INC,"Chi Gentle 2 In 1 Shampoo And Conditioner",steady,Croston's,18050,15348,-15.0,1575,1776,aligned
+23011-FF14468,FF14468,WAL MART STORES,"Vibrant Life Oatmeal & Aloe Shampoo 24oz 3pc PDQ",steady,Seasonal Baseline,18021,22668,25.8,934,1890,over_forecast_other
