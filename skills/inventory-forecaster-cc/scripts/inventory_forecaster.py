@@ -2749,9 +2749,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         meta.setdefault("drivers", []).append(_f48_driver)
     if _r8_applied:
         meta.setdefault("drivers", []).append(
-            f"R8 burst-median ceiling: top2 ≥ 70% of L13 nz total "
-            f"→ ord_baseline capped at median × 1.5 = {ord_baseline:.0f}"
+            f"R8 burst-median ceiling: top2 >= 70% of L13 nz total "
+            f"-> ord_baseline capped at median x 1.5 = {ord_baseline:.0f}"
         )
+    if _f_steady_applied and _f_steady_driver:
+        meta["steady_buyer"] = True
+        meta.setdefault("drivers", []).append(_f_steady_driver)
 
     # F_BURST (2026-05-24) — Burst post-processor for pulsed ordering patterns.
     # Fires when: pulsed pattern already detected (_fa_applied, >=4 L13W zero
