@@ -5891,7 +5891,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             pattern = "sparse_intermittent"
 
     nz_rate_ = nz_rate(hist_for_model, window=26)   # fraction of non-zero weeks over L26W
-    is_dense   = nz_rate_ >= DENSE_THRESHOLD    # ≥ 50%: orders most weeks
+    is_dense   = nz_rate_ >= DENSE_THRESHOLD    # ≥ 35%: semi-regular ordering
     is_croston = nz_rate_ >= CROSTON_THRESHOLD  # ≥ 25%: intermittent (every 2–5 wks)
 
     # F-B (2026-04-22, updated 2026-05-24) — L13 burst-cadence override.
@@ -9017,7 +9017,7 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
 
     pattern    = classify(hist_for_model)
     nz_rate_   = nz_rate(hist_for_model, window=26)
-    is_dense   = nz_rate_ >= DENSE_THRESHOLD    # ≥ 50%: orders most weeks (Seasonal Baseline)
+    is_dense   = nz_rate_ >= DENSE_THRESHOLD    # ≥ 35%: semi-regular ordering (Seasonal Baseline)
     is_croston = nz_rate_ >= CROSTON_THRESHOLD  # ≥ 25%: intermittent (Croston's)
     season     = seasonal_profile(hist_for_model)
     biweekly   = bool(detect_biweekly(hist_for_model)) if is_dense else False  # VP-Q3: monthly+ only
