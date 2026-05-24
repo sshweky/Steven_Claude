@@ -12960,7 +12960,8 @@ def main():
 
     def write_one(rec):
         _rate_pace()
-        sql = build_update_sql(rec["key"], rec["forecast"], rec["alert"])
+        sql = build_update_sql(rec["key"], rec["forecast"], rec["alert"],
+                               confidence=rec.get("confidence"))
         ok  = cdata_update(sql, rec["key"])
         if ok:
             with done_lock:
