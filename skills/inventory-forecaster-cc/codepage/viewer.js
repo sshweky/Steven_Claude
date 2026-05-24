@@ -5256,9 +5256,6 @@ async function saveAllManEdits() {
     byKey.get(edit.key).push(edit);
   }
   const recordCount = byKey.size;
-  const msg = `Save ${total} edit(s) across ${recordCount} record(s) to Quickbase?\n\n`
-            + `This writes the new MAN projection values immediately and cannot be undone from this screen.`;
-  if (!confirm(msg)) return;
 
   const saveBtn = document.getElementById('saveAllBtn');
   const discBtn = document.getElementById('discardAllBtn');
