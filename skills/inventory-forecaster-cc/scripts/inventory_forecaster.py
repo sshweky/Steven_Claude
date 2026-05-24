@@ -297,23 +297,22 @@ CATEGORY_PROFILES = {
     #   Sep is early holiday ramp.  Updated 2026-05-20 per planner feedback
     #   (previous profile was summer-only; Thanksgiving/Christmas are also peaks).
     #   Fix A (2026-05-24): renamed from "Paper-goods"; added plastic/foam cutlery keywords.
-    _DT = [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55]
-    "snack bowl":       _DT,
-    "paper bowl":       _DT,
-    "paper plate":      _DT,
-    "paper cup":        _DT,
-    "plastic fork":     _DT,
-    "plastic knife":    _DT,
-    "plastic spoon":    _DT,
-    "plastic cup":      _DT,
-    "plastic bowl":     _DT,
-    "plastic plate":    _DT,
-    "foam plate":       _DT,
-    "foam bowl":        _DT,
-    "foam cup":         _DT,
-    "bath cup":         _DT,
-    "cutlery set":      _DT,
-    "cutlery":          _DT,
+    "snack bowl":    [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "paper bowl":    [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "paper plate":   [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "paper cup":     [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "plastic fork":  [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "plastic knife": [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "plastic spoon": [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "plastic cup":   [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "plastic bowl":  [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "plastic plate": [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "foam plate":    [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "foam bowl":     [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "foam cup":      [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "bath cup":      [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "cutlery set":   [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    "cutlery":       [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
 
     # ── Home fragrance / air-care — mild broad lift Apr–Aug ──────────────────
     # air freshener and scent booster have mild warm-weather lift.
