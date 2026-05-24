@@ -11239,7 +11239,8 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
         _hdr_parts.append(f"L52W {l52_avg:.0f}/wk")
     if not _hdr_parts:
         return ""
-    header = "<b>Order Trends:</b> " + ", ".join(_hdr_parts) + "."
+    _cl = cust_label or "this account"
+    header = f"<b>{_cl} Order History:</b> " + ", ".join(_hdr_parts) + "."
 
     # Only surface trend explanation when the shift is meaningful (>=10%)
     if abs(short_pct) < 10:
