@@ -7277,9 +7277,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 )
     elif _f37_skip and isinstance(meta, dict):
         _f37_skip_reason = "Status_Cust=NEW" if _f37_status_new else "active-growth (L4>=0.8*L13)"
+        # NOTE: don't put "F37" at the front of the driver string -- the
+        # rule_fires regex would match it as a fire event when it's actually
+        # a skip. Use "[F37-skip]" with brackets to make the intent explicit
+        # and avoid the regex.
         meta.setdefault("drivers", []).append(
-            f"F37 skipped: {_f37_skip_reason} -- new-launch / growth items "
-            f"should not have W1-W2 zeroed by warehouse OH"
+            f"P6 OH-shortfall guard activated: {_f37_skip_reason} -- "
+            f"new-launch / growth items not subject to F37 W1-W2 zeroing"
         )
 
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
