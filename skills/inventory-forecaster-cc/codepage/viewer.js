@@ -5456,6 +5456,28 @@ function _setManRange(key, fromIdx, toIdx, val) {
   });
 }
 
+// VP-Q4 duplicate demand: zero out MAN PRJ weeks that overlap with confirmed
+// Open POs.  Stages changes as dirty edits (yellow) -- user still clicks
+// Save All to write to QB.  Only fires for weeks listed in po_prj_conflicts.
+function zeroDuplicateManPrj(key, safeKey) {
+  const r = ALL_RECORDS.find(x => x.key === key);
+  if (!r || !r.po_prj_conflicts || !r.po_prj_conflicts.length) return;
+  // Collect unique 0-based week indices from the PRJ side of each conflict
+  const toZero = new Set(r.po_prj_conflicts.map(c => c.prjWk - 1));
+  for (const idx of toZero) {
+    _setManRange(key, idx, idx, 0);
+  }
+  updateSaveAllBadge();
+  // Update the button to show action was taken
+  const btn = document.getElementById('zero-dup-btn-' + (safeKey || key.replace(/[^a-zA-Z0-9]/g,'_')));
+  if (btn) {
+    btn.textContent = 'Zeroed -- click Save All to commit';
+    btn.disabled = true;
+    btn.style.background = '#888';
+    btn.style.cursor = 'default';
+  }
+}
+
 // Stage AI / Suggested: copy 26 source values into the editable inputs as
 // unsaved edits. Cells whose new value matches the QB-loaded original stay
 // un-dirty (onManEdit handles that automatically).
