@@ -8946,7 +8946,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             and isinstance(fcst, list) and len(fcst) >= 26):
 
         _rpl_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-        _rpl_ord_l13 = sum(float(v) for v in history[-13:]) / 13  # all-weeks avg
+        _rpl_ord_l13 = sum(float(row.get(c) or 0) for c in ORD_COLS[-13:]) / 13  # all-weeks avg
         _rpl_demand  = max(_rpl_pos_l13, _rpl_ord_l13)
 
         if _rpl_demand >= 50:
