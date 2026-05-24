@@ -8961,9 +8961,29 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _rpl_demand  = max(_rpl_pos_l13, _rpl_ord_l13)
 
         if _rpl_demand >= 50:
-            # Step 1 -- set baseline; preserve VP-Q4 / F_PO_CUTOFF / F70 zeros
+            # Step 1 -- build week-level rates: apply seasonal/event lifts on top
+            # of the demand baseline.  Seasonal profile: category week multipliers
+            # (F66-style floor at 1.0 -- seasonal only LIFTS, never reduces baseline).
+            # Event lifts: Prime Day / Fall Prime Day calendar boosts (Amazon-only).
             _rpl_base = snap(_rpl_demand, mp)
-            _rpl_new  = [0 if fcst[_wi] == 0 else _rpl_base for _wi in range(26)]
+            _rpl_cat_mults = _category_week_multipliers(
+                description, product_category, product_subcategory, brand, brand_pt,
+                season=season
+            ) if (description or product_category or product_subcategory or brand or brand_pt or season) else None
+            _rpl_pb, _rpl_fb = _get_event_boosts()
+            _rpl_rates = []
+            for _wi in range(26):
+                _mult = 1.0
+                if _rpl_cat_mults:
+                    _mult = max(1.0, _rpl_cat_mults[_wi])  # floor at 1.0 (F66-style)
+                wnum = _wi + 1
+                _ev = max(_rpl_pb.get(wnum, 1.0), _rpl_fb.get(wnum, 1.0))
+                if _ev > 1.0:
+                    _mult *= _ev
+                _rpl_rates.append(snap(_rpl_demand * _mult, mp))
+
+            # Preserve VP-Q4 / F_PO_CUTOFF / F70 zeros; apply per-week seasonal rate
+            _rpl_new = [0 if fcst[_wi] == 0 else _rpl_rates[_wi] for _wi in range(26)]
 
             # Step 2 -- DC inventory correction
             _rpl_wos = float(amz_catalog.get("Inv_WOS") or 0)
@@ -8973,6 +8993,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _rpl_opo = float(amz_catalog.get("Inv_OPO") or 0)
                 if _rpl_pos_l13 > 0:
                     _rpl_wos = (_rpl_soh + _rpl_opo) / _rpl_pos_l13
+
+            # Step 2a -- Pipeline adjustment: if last week's actual orders exceed
+            # the baseline rate, the excess is likely a DC fill order still in
+            # transit (not yet visible in DC open POs / SOH).  Add it back as
+            # equivalent WOS so we don't double-refill inventory that's already
+            # on its way.
+            _rpl_ord_lw_actual = float(row.get("Ord_LW") or 0)
+            _rpl_pipeline      = max(0.0, _rpl_ord_lw_actual - _rpl_base)
+            _rpl_pipeline_wos  = (_rpl_pipeline / _rpl_demand) if _rpl_demand > 0 else 0.0
+            if _rpl_pipeline_wos > 0 and _rpl_wos > 0:
+                _rpl_wos += _rpl_pipeline_wos
 
             if _rpl_wos > 0:
                 # Adjustment window: W1+W2 when W1 is free; else W2+W3
