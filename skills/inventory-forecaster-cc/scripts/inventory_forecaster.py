@@ -9232,7 +9232,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             # amounts as ratios relative to their mean (cap 2.5x, floor 0.5x) and
             # cycle that shape through steady-state weeks beyond the DC window.
             # Only activated for regular orderers (>= 8 of last 13 weeks non-zero).
-            _rpl_l13w_raw  = [float(row.get(c) or 0) for c in ORD_COLS[-13:]]
+            # Fix A (2026-05-24): use normalized hist so phantom orders zeroed by
+            # F41 don't distort variability ratios (e.g., single stock-up at 2.5x cap).
+            _rpl_l13w_raw  = [float(v) for v in hist[-13:]]
             _rpl_l13w_nz   = sum(1 for v in _rpl_l13w_raw if v > 0)
             _rpl_l13w_mean = sum(_rpl_l13w_raw) / 13   # all-weeks avg incl. zeros
             if _rpl_l13w_mean >= 50 and _rpl_l13w_nz >= 8:
