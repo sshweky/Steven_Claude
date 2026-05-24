@@ -4745,8 +4745,8 @@ async function _loadRtlPos(r, safeId) {
   if (rtlPosL26w > 0) posItems.push(`<b>L26W avg</b> ${fmtPos(rtlPosL26w)} u/wk`);
   if (rtlPosL52w > 0) posItems.push(`<b>L52W avg</b> ${fmtPos(rtlPosL52w)} u/wk`);
   const rtlPosBulletHtml = posItems.length
-    ? '<b>Retailer POS sales:</b> ' + posItems.join(sep)
-    : '<b>Retailer POS sales:</b> <span style="color:#999;font-style:italic">no POS data</span>';
+    ? '<b>' + custName + ' POS sales:</b> ' + posItems.join(sep)
+    : '<b>' + custName + ' POS sales:</b> <span style="color:#999;font-style:italic">no POS data</span>';
 
   // -- Bullet 2: Retailer inventory + OH WOS --------------------------------
   const fmtWos = n => n.toFixed(1);
