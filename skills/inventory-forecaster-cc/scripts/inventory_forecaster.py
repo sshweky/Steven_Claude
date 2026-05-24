@@ -12087,12 +12087,13 @@ def main():
                 for wk, fid in _man_prj_fids.items():
                     idx = wk - 1
                     row[fid] = int(round(rec["forecast"][idx])) if idx < len(rec["forecast"]) else 0
-            # MAN PRJ is never auto-zeroed by VP-Q4 for W1 or W2+.
-            # The codepage detail pane shows a red "DUPLICATE DEMAND" warning
-            # with a Zero button so the planner can act intentionally.
-            # F_PO_CUTOFF: no PO received by Fetch/BrandBuzz cutoff -- zero MAN PRJ W1.
-            # AI W1 is already 0 in rec["forecast"][0]; this ensures QB manual is also 0.
-            if _man_w1_fid and rec.get("zero_man_w1_cutoff"):
+            # MAN PRJ W1 zeroed in two cases:
+            #   1. Opn_W1 > 0: confirmed open order exists -- zero to avoid double-count.
+            #      (VP-Q4 already zeroed AI W1; this keeps MAN PRJ consistent.)
+            #   2. zero_man_w1_cutoff (F_PO_CUTOFF / F_PO_CUTOFF_ALL): past cutoff
+            #      with no open PO -- zero both AI and MAN PRJ.
+            _opn_w1 = float((rec.get("opn_w") or [0])[0] if rec.get("opn_w") else 0)
+            if _man_w1_fid and (_opn_w1 > 0 or rec.get("zero_man_w1_cutoff")):
                 row[_man_w1_fid] = 0
             payload.append(row)
         n_ok, n_fail, errors = qb_bulk_update(QB_PROJ_TABLE, payload, merge_fid)
