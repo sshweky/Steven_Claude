@@ -159,13 +159,22 @@ def main():
         for r in raw
     ]
 
-    # Build source index: UPPER(mstyle) -> first non-empty ASIN found
-    source = {}   # upper-mstyle -> asin
+    # Build source index: UPPER(mstyle) -> first VALID ASIN found.
+    # Only accept real ASINs (10-char B-prefixed alphanumeric).
+    # Some records have status text like "Active: Replen" in the ASIN field by
+    # mistake; exclude those so they are never propagated to variants.
+    source    = {}   # upper-mstyle -> valid asin
+    bad_asins = []   # (key, mstyle, bad_value) -- flagged for user attention
+
     for r in parsed:
-        if r["asin"]:
+        if not r["asin"]:
+            continue
+        if _ASIN_RE.match(r["asin"].upper()):
             ms_up = r["mstyle"].upper()
             if ms_up not in source:
-                source[ms_up] = r["asin"]
+                source[ms_up] = r["asin"].upper()
+        else:
+            bad_asins.append((r["key"], r["mstyle"], r["asin"]))
 
     # Find variant records that need ASIN inherited from their base style
     targets = []
