@@ -4723,6 +4723,7 @@ async function _loadRtlPos(r, safeId) {
 
   if (!rtlFetchOk) return;
 
+  const custName = _friendlyCustName(r.cust || '');
   const fmt    = n => Math.round(n).toLocaleString('en-US');
   const fmtPos = n => n % 1 === 0 ? Math.round(n).toLocaleString('en-US') : n.toFixed(1);
   const fmtAur = n => '$' + n.toFixed(2);
