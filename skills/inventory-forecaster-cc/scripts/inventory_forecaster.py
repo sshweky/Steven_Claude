@@ -5348,6 +5348,12 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     hist      = get_history(row, oos_entry=oos_entry)
     cust_name = row.get("Customr_Name") or ""
     is_amazon = AMAZON_CUST_SUBSTR in cust_name.upper()
+    # APL (Amazon Private Label): no POS or DC inventory data available.
+    # Treat as a standard order-history account — strip Amazon-specific flags so
+    # POS-blend rules (F15, F38, F59i/m/n, F79) do not fire.
+    is_apl    = APL_CUST_SUBSTR in cust_name.upper()
+    if is_apl:
+        is_amazon = False
     is_international = _is_international_cust(cust_name)
     pos_data  = (amazon_pos or {}).get(row.get("Mstyle", "")) if is_amazon else None
     # F59i-EC POS inheritance: EC/COS drop-ship variants have no own ASIN in
