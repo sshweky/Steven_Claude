@@ -659,8 +659,14 @@ def _compute_event_boosts():
     Compute per-week Amazon event boost multipliers for the current 26-week
     forecast window based on actual calendar dates.
 
-    Prime Day (last Tuesday of June): ordering bumps on
+    Prime Day consumer event = last Tuesday of June (end of June).
+    ORDERING bumps land in May (DC pre-buy, 4-8 weeks before consumer event):
       May 1 (x1.25), May 15 (x1.25), May 29 (x1.50).
+    IMPORTANT: no ordering bump is placed in July.  Any July spike in the
+    F_AMZ_RPL output is NOT Prime Day -- it is a variability-pattern artifact
+    that must be diagnosed and fixed at the source (EC variant ATS inheritance,
+    post-OOS catch-up normalization, etc.).
+
     Fall Prime Day (first Tuesday of October): single ordering bump =
       Tuesday after Labor Day (first Monday of September + 1 day) at x1.30.
 
