@@ -12,53 +12,53 @@ Source: `forecast_results.json`  ·  5571 records  ·  91 rules
 
 | Rank | Rule | Tier | n | Fire % | Median Δ | Unit gap | AI total | Top model |
 |------|------|------|---:|---:|---:|---:|---:|---|
-| 1 | `VP-Q4` | CRITICAL | 1661 | 29.8% | 40.6% | -1,053,552 | 9,457,068 | Seasonal Baseline |
-| 2 | `F64` | CRITICAL | 1658 | 29.8% | 35.9% | -806,559 | 9,211,499 | Croston's |
+| 1 | `VP-Q4` | CRITICAL | 1635 | 29.3% | 40.0% | -822,789 | 9,438,848 | Seasonal Baseline |
+| 2 | `F64` | CRITICAL | 1644 | 29.5% | 35.2% | -689,298 | 9,202,619 | Croston's |
 | 3 | `F65` | CRITICAL | 963 | 17.3% | 100.0% | -634,543 | 348,793 | Inactive |
-| 4 | `F37` | CRITICAL | 2288 | 41.1% | 40.0% | -560,043 | 12,965,193 | Croston's |
-| 5 | `F59h` | CRITICAL | 558 | 10.0% | 76.0% | -493,748 | 1,166,474 | Croston's |
-| 6 | `F10` | CRITICAL | 900 | 16.2% | 54.8% | -410,720 | 4,496,897 | Sparse Intermittent |
-| 7 | `F59j` | HIGH | 130 | 2.3% | 23.0% | +361,713 | 2,225,098 | Seasonal Baseline |
-| 8 | `F45` | HIGH | 198 | 3.6% | 36.4% | +328,247 | 1,889,943 | Seasonal Baseline |
-| 9 | `F43` | CRITICAL | 374 | 6.7% | 35.6% | +325,810 | 3,199,641 | Seasonal Baseline |
-| 10 | `VP-Q3` | CRITICAL | 812 | 14.6% | 41.1% | -312,603 | 2,293,175 | Croston's |
-| 11 | `F52` | CRITICAL | 550 | 9.9% | 76.0% | +304,948 | 621,464 | Inactive (zeroed by guards) |
-| 12 | `F59d` | HIGH | 247 | 4.4% | 43.4% | +288,752 | 1,611,440 | Croston's |
-| 13 | `F59f` | HIGH | 161 | 2.9% | 66.4% | -287,713 | 900,513 | Croston's |
-| 14 | `F26` | HIGH | 176 | 3.2% | 27.4% | -269,342 | 1,491,144 | Seasonal Baseline |
-| 15 | `VP-Q2` | HIGH | 102 | 1.8% | 61.4% | +268,967 | 563,114 | Seasonal Baseline |
-| 16 | `R2` | CRITICAL | 551 | 9.9% | 47.7% | -255,796 | 1,278,419 | Sparse Intermittent |
-| 17 | `F36` | CRITICAL | 605 | 10.9% | 100.0% | -231,474 | 275,087 | Inactive (zeroed by guards) |
-| 18 | `F49` | HIGH | 64 | 1.1% | 40.9% | +223,059 | 883,671 | Seasonal Baseline |
-| 19 | `F59i` | HIGH | 110 | 2.0% | 27.1% | -213,961 | 1,481,674 | Seasonal Baseline |
-| 20 | `F14a` | HIGH | 180 | 3.2% | 40.4% | -210,321 | 1,543,211 | Croston's |
-| 21 | `VP-OP` | HIGH | 130 | 2.3% | 39.4% | -206,626 | 412,556 | Sparse Intermittent |
-| 22 | `F59a` | HIGH | 242 | 4.3% | 38.0% | +205,818 | 2,498,820 | Seasonal Baseline |
-| 23 | `VP-ATS` | HIGH | 55 | 1.0% | 53.8% | +201,037 | 277,222 | Seasonal Baseline |
-| 24 | `F_PO_CUTOFF` | CRITICAL | 1303 | 23.4% | 94.7% | +199,346 | 3,162,032 | Inactive |
-| 25 | `F34` | CRITICAL | 736 | 13.2% | 57.8% | -187,873 | 3,015,018 | Sparse Intermittent |
-| 26 | `F35` | CRITICAL | 553 | 9.9% | 40.0% | -184,848 | 2,686,688 | Croston's |
-| 27 | `F72` | HIGH | 8 | 0.1% | 69.9% | -182,991 | 78,846 | Heuristic (F72 new-launch ramp) |
-| 28 | `F59g` | HIGH | 183 | 3.3% | 30.1% | +173,264 | 4,429,814 | Seasonal Baseline |
-| 29 | `F44` | HIGH | 47 | 0.8% | 41.2% | +170,898 | 353,324 | Seasonal Baseline |
-| 30 | `F46` | HIGH | 38 | 0.7% | 41.2% | +165,271 | 307,568 | Seasonal Baseline |
-| 31 | `F23b` | CRITICAL | 382 | 6.9% | 97.6% | -163,272 | 287,662 | Heuristic |
-| 32 | `F59e` | CRITICAL | 279 | 5.0% | 71.7% | +163,206 | 1,070,039 | Croston's |
-| 33 | `F51` | HIGH | 10 | 0.2% | 14.5% | +158,604 | 696,184 | Seasonal Baseline |
-| 34 | `F40` | HIGH | 36 | 0.6% | 40.0% | -153,119 | 432,199 | Croston's |
-| 35 | `F6b` | HIGH | 197 | 3.5% | 42.4% | -149,546 | 1,309,070 | Seasonal Baseline |
-| 36 | `F70` | CRITICAL | 475 | 8.5% | 100.0% | -141,963 | 48,426 | Inactive (zeroed by guards) |
-| 37 | `F62` | CRITICAL | 288 | 5.2% | 27.5% | -134,793 | 2,404,101 | Seasonal Baseline |
-| 38 | `F69` | HIGH | 36 | 0.6% | 21.6% | -130,225 | 531,681 | Croston's |
-| 39 | `F69-wos` | HIGH | 36 | 0.6% | 21.6% | -130,225 | 531,681 | Croston's |
-| 40 | `F59m` | HIGH | 78 | 1.4% | 20.2% | +127,471 | 1,325,216 | Seasonal Baseline |
+| 4 | `F59h` | CRITICAL | 558 | 10.0% | 75.6% | -481,478 | 1,166,102 | Croston's |
+| 5 | `F59j` | HIGH | 130 | 2.3% | 24.5% | +408,721 | 2,225,058 | Seasonal Baseline |
+| 6 | `F43` | CRITICAL | 374 | 6.7% | 35.6% | +392,205 | 3,199,937 | Seasonal Baseline |
+| 7 | `F10` | CRITICAL | 900 | 16.2% | 55.0% | -368,205 | 4,496,723 | Sparse Intermittent |
+| 8 | `F45` | HIGH | 197 | 3.5% | 39.0% | +363,416 | 1,888,935 | Seasonal Baseline |
+| 9 | `F37` | CRITICAL | 2280 | 40.9% | 40.0% | -348,545 | 12,928,528 | Croston's |
+| 10 | `F52` | CRITICAL | 550 | 9.9% | 76.0% | +308,909 | 620,729 | Inactive (zeroed by guards) |
+| 11 | `F59d` | HIGH | 247 | 4.4% | 42.7% | +304,364 | 1,611,134 | Croston's |
+| 12 | `VP-Q3` | CRITICAL | 812 | 14.6% | 40.0% | -277,982 | 2,293,805 | Croston's |
+| 13 | `F59f` | HIGH | 161 | 2.9% | 66.4% | -274,649 | 900,525 | Croston's |
+| 14 | `VP-Q2` | HIGH | 102 | 1.8% | 61.8% | +269,729 | 562,922 | Seasonal Baseline |
+| 15 | `F59a` | HIGH | 241 | 4.3% | 37.6% | +267,389 | 2,498,780 | Seasonal Baseline |
+| 16 | `F59g` | HIGH | 183 | 3.3% | 28.6% | +258,655 | 4,429,544 | Seasonal Baseline |
+| 17 | `R2` | CRITICAL | 551 | 9.9% | 47.7% | -255,255 | 1,278,775 | Sparse Intermittent |
+| 18 | `F26` | HIGH | 176 | 3.2% | 25.9% | -251,549 | 1,492,110 | Seasonal Baseline |
+| 19 | `F49` | HIGH | 64 | 1.1% | 42.9% | +243,289 | 883,671 | Seasonal Baseline |
+| 20 | `F36` | CRITICAL | 605 | 10.9% | 100.0% | -229,620 | 274,805 | Inactive (zeroed by guards) |
+| 21 | `VP-OP` | HIGH | 131 | 2.4% | 39.9% | -204,014 | 412,734 | Sparse Intermittent |
+| 22 | `VP-ATS` | HIGH | 55 | 1.0% | 52.0% | +201,905 | 277,222 | Seasonal Baseline |
+| 23 | `F_PO_CUTOFF` | CRITICAL | 1303 | 23.4% | 94.7% | +199,300 | 3,161,986 | Inactive |
+| 24 | `F14a` | HIGH | 180 | 3.2% | 40.0% | -189,741 | 1,542,779 | Croston's |
+| 25 | `F72` | HIGH | 8 | 0.1% | 69.9% | -182,931 | 78,846 | Heuristic (F72 new-launch ramp) |
+| 26 | `F15` | CRITICAL | 352 | 6.3% | 33.2% | +175,648 | 3,444,322 | Seasonal Baseline |
+| 27 | `F59e` | CRITICAL | 279 | 5.0% | 71.7% | +173,284 | 1,069,757 | Croston's |
+| 28 | `F38b` | HIGH | 223 | 4.0% | 30.4% | +172,047 | 2,478,342 | Seasonal Baseline |
+| 29 | `F59i` | HIGH | 110 | 2.0% | 26.3% | -171,432 | 1,481,728 | Seasonal Baseline |
+| 30 | `F44` | HIGH | 47 | 0.8% | 42.0% | +171,306 | 353,324 | Seasonal Baseline |
+| 31 | `F51` | HIGH | 10 | 0.2% | 16.5% | +169,742 | 696,196 | Seasonal Baseline |
+| 32 | `F46` | HIGH | 38 | 0.7% | 42.0% | +165,679 | 307,568 | Seasonal Baseline |
+| 33 | `F34` | CRITICAL | 736 | 13.2% | 58.3% | -165,013 | 3,015,276 | Sparse Intermittent |
+| 34 | `F23b` | CRITICAL | 382 | 6.9% | 97.6% | -163,548 | 287,386 | Heuristic |
+| 35 | `F59m` | HIGH | 78 | 1.4% | 24.5% | +156,712 | 1,325,176 | Seasonal Baseline |
+| 36 | `F16` | CRITICAL | 603 | 10.8% | 22.0% | +153,661 | 8,221,776 | Seasonal Baseline |
+| 37 | `F66` | CRITICAL | 482 | 8.7% | 30.6% | +153,627 | 3,655,376 | Seasonal Baseline |
+| 38 | `F40` | HIGH | 36 | 0.6% | 40.0% | -149,298 | 432,235 | Croston's |
+| 39 | `F70` | CRITICAL | 475 | 8.5% | 100.0% | -138,259 | 48,426 | Inactive (zeroed by guards) |
+| 40 | `VP-Q1` | CRITICAL | 829 | 14.9% | 26.2% | +134,281 | 8,332,460 | Seasonal Baseline |
 
 ## By rule family
 
 | Family | Rules | Total fires | Total |unit gap| |
 |---|---:|---:|---:|
-| F | 76 | 18707 | 10,656,054 |
-| VP | 8 | 3649 | 2,072,477 |
-| R | 5 | 1176 | 438,395 |
-| F_ | 1 | 1303 | 199,346 |
-| M | 1 | 774 | 94,632 |
+| F | 76 | 18655 | 10,611,982 |
+| VP | 8 | 3624 | 1,938,221 |
+| R | 5 | 1176 | 415,722 |
+| F_ | 1 | 1303 | 199,300 |
+| M | 1 | 774 | 126,209 |
