@@ -4590,11 +4590,13 @@ def heuristic(history, mp, l13w, is_amazon=False, description=None,
 
     forecast = []
     for h in range(1, 27):
-        # F11 — Prime Day per-week tapered lift (Amazon-only).
-        prime_mult = (PRIME_DAY_LIFT_SCHEDULE[h]
-                      if (is_amazon and h in PRIME_DAY_LIFT_SCHEDULE) else 1.0)
-        # R7 — Fall Deal Amazon-only (2026-04-22).
-        fall_mult  = FALL_DEAL_LIFT if (is_amazon and h in FALL_DEAL_WEEKS) else 1.0
+        # F11 — Prime Day / Fall Prime Day ordering lift (Amazon-only, calendar-based).
+        if is_amazon:
+            _hp, _hf = _get_event_boosts()
+            prime_mult = _hp.get(h, 1.0)
+            fall_mult  = _hf.get(h, 1.0)
+        else:
+            prime_mult = fall_mult = 1.0
         event_mult = max(prime_mult, fall_mult)
         forecast.append(snap(baseline * profile[h - 1] * event_mult, mp))
 
