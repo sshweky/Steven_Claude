@@ -121,6 +121,14 @@ Snapshot 2026-05-21.  Every rule that fires in `forecast_record()` or
 | F61  | Horizon confidence decay (W9-W26 x 0.88 for non-Amazon/non-seasonal) |
 | F29  | New-item floor (L4-L8 recent activity, with deferral gate for thin history) |
 | F71  | Front-week (W1) tail cap at 1.3x max(L4, L13, baseline) |
+| F72  | New-launch ramp detection (P1, 2026-05-24): reroute Sparse Intermittent -> Heuristic when L26[-6:] has >=4 nz AND L26[-12:-6] has >=5 zeros |
+| F18b | Croston burst carve-out (P2, 2026-05-24): cap z to pre-burst L13[:9]_nz_avg * 1.2 when L4W >> L13W AND POS doesn't justify burst |
+| R1 PATH C | Off-price hard-zero (P3, 2026-05-24): OFFPRICE_CUST_SUBSTRS customers with L4=0 AND manual<=100 -> OTB(zero) |
+| P4   | F52 planner-residual anchor (2026-05-24): cap each AI week at planner_rate * 2.5 on stable FD wind-down records |
+| P5   | F61 NEW guard (2026-05-24): skip horizon decay when Status_Cust contains "NEW" or item is in active growth |
+| P6   | F37 NEW + active-growth skip (2026-05-24): skip OH-shortfall capping on new-launch items |
+| P7   | Croston event-aware z (2026-05-24): exclude L13 weeks within +/-14d of past Prime Day / Labor Day from z computation |
+| P8   | Croston pre-launch history trim (2026-05-24): trim L52 history at first non-zero index when 8+ leading zeros in L26 |
 | F32  | Sparse-intermittent per-week + tiny-signal clamp |
 | F36  | Stock-up burn-off suppression (Amazon-only WOS-based front-zeroing) |
 | F40  | Order-rate deceleration scaling (L3_nz_avg / L13_nz_avg <= 0.30) |
