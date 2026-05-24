@@ -10007,7 +10007,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
     critical    = []   # critical flags (G2, F70, EC, truncation) — always shown first
     specific    = []   # Non-obvious specific callouts (alert sentences, PO context, smart trend)
     gap_pill    = []   # Plan vs AI gap summary — only if >= 15% gap; lowest priority
-    pinned_last = []   # Amazon POS Sales + DC Inv — always the final 2 bullets (Amazon only)
+    pinned_last = []   # Amazon POS Sales + DC Inv + AUR -- always the final 3 bullets (Amazon only)
 
     # ── Critical: Inactive-looking record warning (2026-05-21) ───────────────
     # When a record has no manual projections, no recent/future POG launch
