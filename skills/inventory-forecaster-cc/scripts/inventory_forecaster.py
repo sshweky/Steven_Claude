@@ -7460,26 +7460,18 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _effective_po_wk = []
     _vp_q4_zeroed_idx = set()   # 0-based indexes VP-Q4 set to 0 — F59d/F59a must skip
     # VP-Q4 — zero AI when a confirmed open PO already covers that week (double-count
-    # prevention).  W1 is included but guarded:
-    #   - Sunday (weekday=6): skip W1 for ALL customers — week just started,
-    #     no orders expected yet.
-    #   - Amazon FF/BB: also skip W1 when today is before the div-specific cutoff
-    #     (FF -> Tue cutoff=2, BB -> Wed cutoff=3); before that day orders are in flight.
+    # prevention).  W1 is included: if Opn_W1 > 0 (confirmed PO exists), AI W1 is
+    # zeroed so the open PO is not double-counted in forward demand.
+    # The condition _po_qty > 0 is the only guard — VP-Q4 never fires for weeks
+    # without a confirmed PO, so it naturally does nothing on Sunday/Monday when
+    # no orders have arrived yet (Opn_W1 = 0).
     # MAN PRJ W1 is NEVER auto-zeroed by VP-Q4 — the codepage "DUPLICATE DEMAND"
     # red warning + Zero button lets the planner handle it intentionally.
-    _vp_today_wd = datetime.now().weekday()   # Mon=0 ... Sun=6
-    _vp_w1_before_cutoff = (_vp_today_wd == 6)  # Sunday: protect W1 for all customers
-    if is_amazon and not _vp_w1_before_cutoff:
-        _vp_div = (row.get("Div") or "").upper().strip()
-        if _vp_div in AMZ_DIV_PO_CUTOFF:
-            _vp_cutoff_wd = AMZ_DIV_PO_CUTOFF[_vp_div]
-            # Before the cutoff day the PO is still in flight — don't zero W1
-            _vp_w1_before_cutoff = not (_vp_cutoff_wd <= _vp_today_wd <= 5)
     if _effective_po_wk:
         _po_zeroed = []
-        for _i in range(0, min(26, len(fcst))):   # W1 included (index 0)
+        for _i in range(0, min(26, len(fcst))):   # W1 through W26
             _po_qty = float(_effective_po_wk[_i]) if _i < len(_effective_po_wk) else 0.0
-            if _po_qty > 0 and fcst[_i] > 0 and not (_i == 0 and _vp_w1_before_cutoff):
+            if _po_qty > 0 and fcst[_i] > 0:
                 _po_zeroed.append((_i + 1, fcst[_i], _po_qty))
                 fcst[_i] = 0
                 _vp_q4_zeroed_idx.add(_i)   # guard: F59d must not restore these
