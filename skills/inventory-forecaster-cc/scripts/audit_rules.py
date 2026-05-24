@@ -41,10 +41,12 @@ from collections import defaultdict
 # _fire("F18"), _fire('F59a'), _fire("VP-Q1")
 _FIRE_PATTERN = re.compile(r'''_fire\(\s*["']([A-Za-z][A-Za-z0-9_\-]*)["']''')
 
-# meta["drivers"].append("F70 Switchover ...") or .setdefault("drivers", []).append("F70 ...")
-# Capture the rule code at the start of the driver string.
+# meta["drivers"].append(f"F70 Switchover ...") or
+# meta.setdefault("drivers", []).append(f"F70 ...") or
+# Capture the rule code at the start of any .append() call (drivers/alerts/etc).
+# We restrict to is_rule_code() downstream so non-rule .append() calls are filtered.
 _DRIVER_PATTERN = re.compile(
-    r'''drivers["\']?\)?(?:\s*,\s*\[\])?\)?\s*\.\s*append\s*\(\s*['"f]*?([A-Za-z][A-Za-z0-9\-_]*?)\s+'''
+    r'''\.append\s*\(\s*[fF]?\s*["']([A-Za-z][A-Za-z0-9\-_]*)\b'''
 )
 
 # RULES.md table row: starts with "|", second cell may contain a rule code
