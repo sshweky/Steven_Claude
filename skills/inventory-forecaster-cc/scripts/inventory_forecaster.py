@@ -11882,10 +11882,9 @@ def main():
                 for wk, fid in _man_prj_fids.items():
                     idx = wk - 1
                     row[fid] = int(round(rec["forecast"][idx])) if idx < len(rec["forecast"]) else 0
-            # W1-W2 PO zero-out: if a confirmed customer PO exists in W1 or W2, zero
-            # out the corresponding manual projection.  The customer has already committed
-            # -- the manual projection on top is redundant and causes double-counting in
-            # inventory planning.  W3-W26 are untouched.
+            # W1 PO zero-out: if a confirmed customer PO exists in W1, zero out MAN PRJ W1.
+            # W2+ are intentionally NOT touched -- the codepage detail pane shows a red
+            # "DUPLICATE DEMAND" warning with a Zero button for the planner to act on.
             # W1 early-week gate (Amazon FF/BB): same cutoff-day logic as F_PO_CUTOFF.
             # On Sunday (and pre-cutoff), don't zero W1 MAN PRJ -- the week has just
             # started and the open PO is the active current-week order.
@@ -11899,8 +11898,6 @@ def main():
                     _w1_apply_po_zero = (_wb_cutoff_wd <= _wb_today_wd <= 5)
             if _man_w1_fid and _opn_w and _opn_w[0] > 0 and _w1_apply_po_zero:
                 row[_man_w1_fid] = 0
-            if _man_w2_fid and len(_opn_w) > 1 and _opn_w[1] > 0:
-                row[_man_w2_fid] = 0
             # F_PO_CUTOFF: no PO received by Fetch/BrandBuzz cutoff -- zero MAN PRJ W1.
             # AI W1 is already 0 in rec["forecast"][0]; this ensures QB manual is also 0.
             if _man_w1_fid and rec.get("zero_man_w1_cutoff"):
