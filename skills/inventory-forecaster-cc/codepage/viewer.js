@@ -517,6 +517,7 @@ let INV_FLOW_ATS_OH_FID   = null;   // ATS_OH_
 let INV_FLOW_ATS_OO_FID   = null;   // ATS_OH_OO_
 let INV_FLOW_ATS_OH_WOS_FID  = null; // ATS_WOS_OH_
 let INV_FLOW_ATS_OO_WOS_FID  = null; // ATS_WOS_OH_OO_
+let INV_FLOW_FIRST_SHPD_FID  = null; // 1st Shpd Date  (first warehouse shipment date)
 
 // Order History (bpe4maa4c) FIDs — discovered lazily on first detail open
 let ORD_HIST_ACCT_MSTYLE_FID = null;
