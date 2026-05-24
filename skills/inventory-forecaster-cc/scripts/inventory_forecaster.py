@@ -10497,15 +10497,7 @@ def main():
     if _is_wide_scope:
         print(f"  [auto-throttle] --all detected → workers={args.workers}, "
               f"rate_limit_ms={args.rate_limit_ms}, "
-              f"bulk_writeback={'on' if args.bulk_writeback else 'off'}, "
-              f"lean_pull={'on' if args.lean_pull else 'off'}")
-    if args.lean_pull:
-        # TODO: wire build_prj_select() to honor a lean-mode that skips
-        #       AI_PRJ_W1..W26 (only need them for variance/resume), Description,
-        #       Inventory_Manager, Last_Ord_Date, Last_Shp_Date, SUGG_COLS.
-        #       Currently pulls them anyway — flag is scaffolded for next pass.
-        print("  [warn] --lean-pull: flag accepted but not yet wired into "
-              "build_prj_select(). No-op for now.")
+              f"bulk_writeback={'on' if args.bulk_writeback else 'off'}")
 
     # F19 — expose flag globally so forecast_record can consult it.
     # 2026-05-06: F19 is now ON by default (CONSERVATIVE_INACTIVE = True at
