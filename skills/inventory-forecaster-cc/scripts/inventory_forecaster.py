@@ -1455,6 +1455,24 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # (L4W < 50% of L13W — dying item, not a stocking-up scenario).
     pos_rate, pos_trend, pos_trend_ratio = 0.0, "n/a", 1.0
     _f15_driver = None
+    # F15 — Amazon ordering is lumpy: a single buy event can represent 4-8 weeks
+    # of supply.  The L13W order average naturally smooths over these events and
+    # represents Amazon's true forward demand rate to us.  POS (consumer sell-
+    # through) is a steady floor signal -- never a leading signal for our orders
+    # because Amazon's inventory management drives WHEN they order, not what
+    # consumers are buying.
+    #
+    # Blend tiers for Amazon (ord/POS ratio):
+    #   > 2.0  : 100% POS     -- extreme stockup; order history misleads
+    #   1.5-2.0: 50/50 blend  -- elevated; both signals informative
+    #   1.0-1.5: ord-primary  -- normal Amazon ordering above POS; L13W ord IS
+    #                            the demand proxy.  POS_L13W is the floor.
+    #                            F38b suppressed (L13W already captures trend).
+    #   < 1.0  : 65/35 POS/ord -- depleting; POS anchors the coming reorder
+    #
+    # _f15_amazon_ord_primary tracks when we used ord-primary so downstream
+    # rules (F38b) can skip double-counting the growth signal.
+    _f15_amazon_ord_primary = False
     if pos_data:
         pos_rate, pos_trend, pos_trend_ratio = amazon_pos_rate(pos_data)
         _pos_l4_f15  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
@@ -1463,29 +1481,49 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         if pos_rate > 0 and _pos_healthy_f15:
             _ord_cov_ratio = ord_baseline / pos_rate
             if _ord_cov_ratio > 2.0:
-                # Customer is heavily stocked up — recent orders are inventory
-                # build, not ongoing demand.  Use 100% POS as the rate anchor.
+                # Extreme stockup: recent orders are inventory build, not demand.
+                # 100% POS as the rate anchor.
                 baseline = pos_rate
-                _f15_driver = (f"F15 stocked-up {_ord_cov_ratio:.1f}× > 2.0 "
-                               f"→ 100% POS ({pos_rate:.0f}/wk; "
+                _f15_driver = (f"F15 stocked-up {_ord_cov_ratio:.1f}x > 2.0 "
+                               f"-> 100% POS ({pos_rate:.0f}/wk; "
                                f"ord {ord_baseline:.0f})")
+            elif _ord_cov_ratio > 1.5:
+                # Elevated ordering (1.5-2.0x POS): Amazon is ordering noticeably
+                # above consumer velocity but not in extreme stockup territory.
+                # 50/50 blend -- orders and POS are equally informative.
+                baseline = pos_rate * 0.50 + ord_baseline * 0.50
+                _f15_driver = (f"F15 elevated {_ord_cov_ratio:.2f}x "
+                               f"-> 50/50 POS/ord "
+                               f"({pos_rate:.0f}/{ord_baseline:.0f})")
+            elif _ord_cov_ratio > 1.0 and is_amazon:
+                # Normal Amazon ordering (1.0-1.5x POS): Amazon orders ahead
+                # of consumer demand to cover lead times and safety stock.
+                # The L13W order avg smooths over individual 4-8 week lump
+                # events and IS the best forward demand proxy.  Use the higher
+                # of L13W orders and POS_L13W as the baseline.
+                # F38b is suppressed: L13W ord already captures recent POS
+                # acceleration in its rolling window.
+                baseline = max(ord_baseline, _pos_l13_f15)
+                _f15_amazon_ord_primary = True
+                _f15_driver = (f"F15 ord-primary {_ord_cov_ratio:.2f}x "
+                               f"-> max(ord {ord_baseline:.0f}, "
+                               f"POS_L13 {_pos_l13_f15:.0f}) = {baseline:.0f} "
+                               f"(L13W order rate is demand proxy; F38b suppressed)")
             elif _ord_cov_ratio > 1.0:
-                # Orders moderately above POS — some coverage premium exists
-                # (safety stock, lead-time buffer), but POS is the primary
-                # signal.  75/25 POS/ord blend.
+                # Non-Amazon above-POS: keep original 75/25 POS/ord blend.
                 baseline = pos_rate * 0.75 + ord_baseline * 0.25
-                _f15_driver = (f"F15 above-POS {_ord_cov_ratio:.2f}× "
-                               f"→ 75/25 POS/ord "
+                _f15_driver = (f"F15 above-POS {_ord_cov_ratio:.2f}x "
+                               f"-> 75/25 POS/ord "
                                f"({pos_rate:.0f}/{ord_baseline:.0f})")
             else:
-                # Orders at or below POS — customer may be depleting stock.
+                # Orders at or below POS -- customer may be depleting stock.
                 # POS still anchors the baseline; 65/35 POS/ord blend.
                 baseline = pos_rate * 0.65 + ord_baseline * 0.35
-                _f15_driver = (f"F15 depleting {_ord_cov_ratio:.2f}× "
-                               f"→ 65/35 POS/ord "
+                _f15_driver = (f"F15 depleting {_ord_cov_ratio:.2f}x "
+                               f"-> 65/35 POS/ord "
                                f"({pos_rate:.0f}/{ord_baseline:.0f})")
         else:
-            # POS present but collapsing (L4 < 50% of L13) or zero — fall back
+            # POS present but collapsing (L4 < 50% of L13) or zero -- fall back
             # to order-history baseline (dying item, not a stocking-up scenario).
             baseline = ord_baseline
     else:
