@@ -1303,6 +1303,17 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if len(l13_nz) >= 3:
         _sorted_nz = sorted(l13_nz)
         _median_nz = _sorted_nz[len(_sorted_nz) // 2]
+        # Fix B (2026-05-24): single-occurrence check — if the max value
+        # appears exactly once AND max > 2x mean of remaining values, cap
+        # at 2x mean rather than 2.5x median.  One giant order should not
+        # inflate the baseline even after a 2.5x cap.
+        _l13_nz_mean = sum(l13_nz) / len(l13_nz)
+        _l13_nz_max  = max(l13_nz)
+        if (l13_nz.count(_l13_nz_max) == 1
+                and _l13_nz_mean > 0
+                and _l13_nz_max > 2.0 * _l13_nz_mean):
+            _single_cap = 2.0 * _l13_nz_mean
+            l13_nz = [min(v, _single_cap) for v in l13_nz]
         # F38-pre (2026-05-20): tighten spike cap to 2.0x when Amazon buy-box
         # price is below MAP — buy-box event drove a temporary order spike that
         # should not anchor the 26-week baseline.  3.0x applies otherwise.
