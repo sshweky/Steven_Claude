@@ -852,7 +852,7 @@ it as the final sentence.
   (unwraps `results[0].rows` — important).
 - Columns added: Description, Status @ Cust (pulled from `Status_Cust`),
   Item Status (from `PT_Item_Status`), Ord/Wk L13W, AI vs L13, Man vs L13.
-- Volume tier (HIGH ≥ 1,000 prj/wk · MEDIUM 200–999 · LOW < 200) and layered
+- Volume tier (HIGH ≥ 500 prj/wk · MEDIUM 200-499 · LOW < 200) and layered
   priority (CRITICAL = HIGH vol + |Δ|>10% · MEDIUM = MEDIUM vol + |Δ|>10% ·
   LOW = rest).
 - Detail row shows full 26-week ord + shp history (fields `history_l26_ord`
