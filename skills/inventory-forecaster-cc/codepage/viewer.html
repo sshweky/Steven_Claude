@@ -196,6 +196,21 @@ window.QB_CONFIG = {
   // Per-mstyle Amazon DC inventory.  Queried live when an Amazon detail panel
   // opens so the planner always sees fresh data (independent of forecast run).
   // Join key: Mstyle (FID 34).  Data sourced from Amazon Inventory Health feed.
+  // -- Amazon AUR pricing (bqkdjaqi7 AdTrack Amazon Catalog) -------------------
+  // Average Unit Revenue fetched live when an Amazon detail panel opens.
+  // Separate table from DC inv health; joined on Mstyle (FID 10).
+  // AUR LW is computed client-side: Ordered Revenue LW / Ordered Units LW.
+  AMZ_AUR_TID: "bqkdjaqi7",
+  AMZ_AUR_FID: {
+    MSTYLE:    10,   // Mstyle  -  text join key
+    AUR_L4W:  1051,  // AUR$ L4w
+    AUR_L13W: 1052,  // AUR$ L13w
+    AUR_L26W: 1054,  // AUR$ L26w
+    AUR_L52W: 1053,  // AUR$ L52w
+    REV_LW:    187,  // Ordered Revenue LW  (numerator for AUR LW)
+    UNITS_LW:  195,  // Ordered Units LW    (denominator for AUR LW)
+  },
+
   AMZ_CATALOG_TID: "bqp8vz625",
   AMZ_CATALOG_FID: {
     MSTYLE:  34,  // Mstyle  -  text join key
