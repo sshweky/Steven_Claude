@@ -7459,24 +7459,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     else:
         _effective_po_wk = []
     _vp_q4_zeroed_idx = set()   # 0-based indexes VP-Q4 set to 0 — F59d/F59a must skip
-    # W1 zero gate — universal Sunday rule + Amazon FF/BB pre-cutoff extension.
-    # Sunday (weekday=6): the forecast week has just started for ALL customers.
-    # Open POs in W1 are orders expected to arrive this week -- they have not
-    # been received yet and the demand signal is still live.  Never zero W1 on
-    # Sunday regardless of customer type.
-    # Amazon FF/BB: additionally protect Mon-Tue (pre-cutoff days).
-    _vp_today_wd         = datetime.now().weekday()
-    _vp_w1_before_cutoff = (_vp_today_wd == 6)   # Sunday: all customers protected
-    if is_amazon and not _vp_w1_before_cutoff:
-        _vp_div = (row.get("Div") or "").upper().strip()
-        if _vp_div in AMZ_DIV_PO_CUTOFF:
-            _vp_cutoff_wd = AMZ_DIV_PO_CUTOFF[_vp_div]
-            _vp_w1_before_cutoff = not (_vp_cutoff_wd <= _vp_today_wd <= 5)
+    # VP-Q4 applies to W2-W26 ONLY.  W1 is never zeroed here regardless of
+    # whether an open PO exists.  When orders exist in W1 (Opn_W1>0), the
+    # codepage "DUPLICATE DEMAND" red warning + Zero button handles it.
+    # When no orders exist by the cutoff, F_PO_CUTOFF (Amazon FF/BB) or
+    # F_PO_CUTOFF_ALL (all other customers, Wednesday 9am EST) handles W1.
     if _effective_po_wk:
         _po_zeroed = []
-        for _i in range(min(26, len(fcst))):
+        for _i in range(1, min(26, len(fcst))):   # start at 1 = W2; W1 excluded
             _po_qty = float(_effective_po_wk[_i]) if _i < len(_effective_po_wk) else 0.0
-            if _po_qty > 0 and fcst[_i] > 0 and not (_i == 0 and _vp_w1_before_cutoff):
+            if _po_qty > 0 and fcst[_i] > 0:
                 _po_zeroed.append((_i + 1, fcst[_i], _po_qty))
                 fcst[_i] = 0
                 _vp_q4_zeroed_idx.add(_i)   # guard: F59d must not restore these
