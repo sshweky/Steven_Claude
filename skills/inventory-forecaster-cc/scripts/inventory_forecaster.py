@@ -10967,8 +10967,8 @@ def main():
               f"Lumpy={imm_sum.get('Lumpy',0)}")
         print(f"      Outliers detected: {len(findings['outliers'])}")
         cal = findings["calendar"]
-        print(f"      Calendar lifts — Prime Day: {cal['prime_day_lift']:.2f}x  "
-              f"Fall Deal: {cal['fall_deal_lift']:.2f}x")
+        print(f"      Calendar lifts -- Prime Day: {cal['prime_day_lift']:.2f}x  "
+              f"Fall Prime Day: {cal['fall_deal_lift']:.2f}x")
 
     if args.analyze_only:
         # Write EDA-only report and exit
