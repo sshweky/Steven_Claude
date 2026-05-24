@@ -3,7 +3,7 @@
   "subject": "Variance deep-dive: AI vs manual where |delta| > 5%",
   "description": "Parse forecast_results.json. For records where |AI - manual| / manual > 5%, examine: manual week shape vs AI week shape, history, POS, customer, status, drivers list. Look for patterns where the manual plan reveals signal the AI is missing.",
   "activeForm": "Analyzing AI vs manual variance",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
