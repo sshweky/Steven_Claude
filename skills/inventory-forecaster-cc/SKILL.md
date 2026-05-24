@@ -701,16 +701,6 @@ window shifts each week.
 
 ---
 
-## Model Fixes (applied 2026-04-21)
-
-| Fix | Description |
-|---|---|
-| **Fix 1 — Category seasonality** | CATEGORY_PROFILES dict keyed by description keyword. Monthly multipliers blended 70% category / 30% historical profile, re-normalized. Applied in `seasonal_baseline()`, `crostens()`, `heuristic()`. |
-| **Fix 2 — ISO routing** | `detect_iso()` flags records with a stocking spike within L26W. These are routed to Heuristic regardless of CV/zeros, preventing Croston's from projecting repeat spikes. |
-| **Fix 3 — Outlier cap** | Before computing L13W / L26W non-zero avg: if max > 3× median, cap spike values. Prevents a single order event from inflating the baseline. |
-| **Fix 4 — Bi-weekly baseline** | If `detect_biweekly()` and non-zero avg > all-weeks avg × 1.05, substitute all-weeks avg. Non-zero avg is ~2× the true weekly rate for bi-weekly cadence items. |
-| **Fix 5 — Croston's rescaling** | After Croston's produces 26 forecast values: if AI avg > L13W all-weeks avg × 1.10, scale down (floor 0.5×) to keep total demand grounded to observed weekly rate. |
-
 **CATEGORY_PROFILES — see `scripts/derived_category_profiles.json` for current values.**
 
 > NOTE: The profile values previously listed here are stale (2026-05-23 audit). The live
