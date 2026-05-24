@@ -4201,7 +4201,7 @@ async function toggleDetail(key) {
     ${autoProjectBtn}
     ${fdStatusHtml}
     ${seasonHtml}
-    ${_buildPogBlockHtml(r)}
+    ${isAmazonRec ? _buildAmzInfoBlockHtml(r) : _buildPogBlockHtml(r)}
     ${narrativeHtml}
     <div style="overflow-x:auto;padding:8px 12px;">
       ${editToolbar}
