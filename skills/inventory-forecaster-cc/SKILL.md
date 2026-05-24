@@ -643,15 +643,6 @@ Phase 4 — Write-back
 
 ---
 
-## Model Fixes (applied 2026-05-17 — DI direct-import sibling blending)
-
-| Fix | Rule Code | Description |
-|---|---|---|
-| **F69 — DI sibling history blend** | `F69`, Phase 2.9b pre-pass | Amazon (and sometimes other customers) order product direct from P+P's overseas factory ("Direct Import" / "DI"). These variants share the base mstyle but carry a suffix of **MPP** or **ADF** (e.g., FF8654MPP, FF8654ADF). Amazon writes its own POs 35–65 days before factory shipment (~10 week transit to Amazon DC); P+P does not project for them. Crucially: MPP/ADF have **no Projections record** — they exist only in Order History (`bpe4maa4c`). They also order **concurrently** with the warehouse base record (unlike EC which is a switchover). Fix: in a pre-pass (Phase 2.9b), generate candidate sibling keys for every base record, query Order History via `fetch_clean_demand()`, and **accumulate the sibling's `raw_ord` 52-week array into the base row's ORD_COLS in-place** (`raw_ord[i]` aligns 1:1 with `ORD_COLS[i]`, both oldest→newest). The forecaster then sees total demand (warehouse + factory-direct) without any model logic changes. Driver note added to base record: "F69 DI blend: FF8654MPP(+NNN L13), FF8654ADF(+NNN L13) direct-import history added to base demand signal." |
-| **F69-WOS — DI POS-anchor + WOS-excess correction** | `F69-wos`, post-model | After the model runs on the blended history, the combined order signal may still understate demand due to lumpy DI cadence. For DI-blended Amazon records, **anchor the 26-week forecast to the consumer POS L13W rate**, then apply a WOS-excess reduction for any inventory Amazon holds above its ~12-week target. Formula: `excess = max(0, wos − 12)`, `scale = max(0.70, 1 − excess/26)`, `target/wk = pos_l13w × scale`. Proportional rescale preserves seasonal shape. Covers all 26 weeks (supersedes F59h's 8-week soft taper for DI-blended records). Example: POS=2,858/wk, WOS=16.2→ excess=4.2 → scale=0.838 → target≈2,394/wk. |
-
----
-
 ## Fulfillment Mode Conventions (mstyle suffixes + AI Events)
 
 Some mstyles carry a suffix that signals a non-standard fulfillment mode. These are **not** separate SKUs — they share the same item but ship differently.

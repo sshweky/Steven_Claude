@@ -3,7 +3,7 @@
   "subject": "A2: Consolidate SKILL.md model-fix tables",
   "description": "Currently 9 separate \"Model Fixes\" tables scattered through SKILL.md. Replace with a single short summary + pointer to RULES.md. RULES.md becomes the authoritative rule registry. Fix any other doc inconsistencies surfaced in audit.",
   "activeForm": "Consolidating SKILL.md doc structure",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
