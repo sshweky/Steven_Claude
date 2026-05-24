@@ -10696,11 +10696,9 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
     l4_avg  = sum(l4)  / 4.0
     l13_avg = sum(l13) / 13.0
     l26_avg = sum(l26) / 26.0 if len(l26) >= 26 else (sum(l26) / max(len(l26), 1))
-    if l13_avg <= 0:
+    if l13_avg <= 0 and l4_avg <= 0:
         return ""
-    short_pct = (l4_avg / l13_avg - 1.0) * 100
-    if abs(short_pct) < 10:
-        return ""
+    short_pct = (l4_avg / l13_avg - 1.0) * 100 if l13_avg > 0 else 0.0
     l13_nz = [v for v in l13 if v > 0]
     l4_nz  = [v for v in l4  if v > 0]
     per_l13 = (sum(l13_nz) / len(l13_nz)) if l13_nz else 0.0
@@ -10709,19 +10707,40 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
     freq_l4  = len(l4_nz)  / 4.0
     lw = h[-1]; pw = h[-2] if len(h) >= 2 else 0
     medium_flat = (abs(l26_avg - l13_avg) / max(l13_avg, 1)) < 0.15
-    # L52: optional, combined LY + current 26 if LY history provided
+    # L52: from full history when available (hist is 52w); fallback to LY+L26 splice
     l52_avg = None
-    if ly_hist_26 and len(ly_hist_26) >= 13:
-        full52 = [float(v or 0) for v in ly_hist_26] + l26
+    if len(h) >= 52:
+        l52_avg = sum(h[-52:]) / 52.0
+    elif ly_hist_26 and len(ly_hist_26) >= 13:
+        full52 = [float(v or 0) for v in ly_hist_26] + list(l26)
         if len(full52) >= 40:
             l52_avg = sum(full52) / len(full52)
+
+    # Compact run-rate header: LW, Avg L4W, L13W, L26W, L52W
+    # (mirrors Amazon POS Sales format; shown for all non-Amazon records)
+    _hdr_parts = []
+    if lw > 0:
+        _hdr_parts.append(f"LW {int(lw):,}u")
+    if l4_avg > 0:
+        _hdr_parts.append(f"Avg L4W {l4_avg:.0f}/wk")
+    if l13_avg > 0:
+        _hdr_parts.append(f"L13W {l13_avg:.0f}/wk")
+    if l26_avg > 0:
+        _hdr_parts.append(f"L26W {l26_avg:.0f}/wk")
+    if l52_avg and l52_avg > 0:
+        _hdr_parts.append(f"L52W {l52_avg:.0f}/wk")
+    if not _hdr_parts:
+        return ""
+    header = "<b>Order Trends:</b> " + ", ".join(_hdr_parts) + "."
+
+    # Only surface trend explanation when the shift is meaningful (>=10%)
+    if abs(short_pct) < 10:
+        return header
 
     direction = "up" if short_pct > 0 else "down"
     arrow = ('<span style="color:#2e7d32;font-weight:700">&#x25B2;</span>'
              if short_pct > 0 else
              '<span style="color:#c62828;font-weight:700">&#x25BC;</span>')
-    header = (f"<b>Order trend:</b> {arrow} {direction} {abs(short_pct):.0f}% "
-              f"L4W ({l4_avg:.0f}/wk) vs L13W ({l13_avg:.0f}/wk).")
 
     cl = cust_label or "this account"
     expl = None
