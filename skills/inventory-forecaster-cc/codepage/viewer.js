@@ -7065,4 +7065,14 @@ async function bootstrap() {
     _setDetail((e && e.message ? e.message : String(e)) + ' | check the browser console for details');
   }
 }
+// Warn the user before leaving the page when there are unsaved MAN PRJ edits.
+// The browser shows its own generic "Leave site?" dialog -- we cannot customise
+// the message text in modern browsers, but setting returnValue triggers it.
+window.addEventListener('beforeunload', function(e) {
+  if (DIRTY_EDITS.size > 0) {
+    e.preventDefault();
+    e.returnValue = '';   // required for Chrome/Edge to show the dialog
+  }
+});
+
 bootstrap();
