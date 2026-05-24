@@ -9809,6 +9809,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "new_total":   new,
         "prior_total": int(prior),
         "pct_diff":    round(pct * 100, 1),
+        "confidence":  _confidence,
         # F56 — surface VP-Q4 PO-zeroed context so narrative can show
         # "Total forward demand = AI + confirmed POs" alongside visible AI.
         "po_zeroed_weeks":   (meta.get("po_zeroed_weeks", []) if isinstance(meta, dict) else []),
