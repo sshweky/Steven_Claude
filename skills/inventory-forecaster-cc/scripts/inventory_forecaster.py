@@ -2246,6 +2246,26 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                 f"{_l13_nz_avg_f10:.0f}; blended 30/70 toward L4W"
             )
 
+    # F79 (2026-05-24): Amazon growth trend multiplier.
+    # When Amazon is buying at an accelerating rate (L4W / L13W nz avg >= 1.20),
+    # scale the forecast up by min(L4W / L13W_nz_avg, 1.50) to capture growth
+    # the static baseline misses.  Only fires on Seasonal Baseline (this function),
+    # not Croston's/Heuristic (they have their own trend handling).
+    # Guard: skip if F10 or F77 already applied a decline correction.
+    if (is_amazon
+            and not _f10_applied
+            and not _f77_applied
+            and not is_new_launch
+            and _l13_nz_avg_f10 > 0
+            and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20):
+        _f79_ratio  = min(_l4_avg_f10 / _l13_nz_avg_f10, 1.50)
+        forecast    = [snap(v * _f79_ratio, mp) if v > 0 else 0 for v in forecast]
+        meta.setdefault("drivers", []).append(
+            f"F79 Amazon growth: L4W avg {_l4_avg_f10:.0f} = "
+            f"{_f79_ratio:.2f}x L13W nz avg {_l13_nz_avg_f10:.0f}; "
+            f"forecast scaled up x{_f79_ratio:.2f}"
+        )
+
     l26_avg = sum(float(v) for v in history[-26:]) / 26
     cap_base = baseline
     meta = {
