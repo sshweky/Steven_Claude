@@ -9074,10 +9074,73 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     _rpl_t5_applied.append(wnum)
                 _rpl_rates.append(snap(_rpl_demand * _mult, mp))
 
-            # Preserve VP-Q4 / F_PO_CUTOFF / F70 zeros; apply per-week seasonal rate
-            _rpl_new = [0 if fcst[_wi] == 0 else _rpl_rates[_wi] for _wi in range(26)]
+            # Fix 1 (2026-05-24): W1 always non-zero for Amazon Active Replen.
+            # VP-Q4 and F_PO_CUTOFF may zero W1, but the AI must always show a W1
+            # recommendation -- the planner needs to see it even when a PO was already
+            # submitted this week.  Downstream VP-Q4/F70 zeros on W2+ still apply.
+            _rpl_new = (
+                [_rpl_rates[0]] +
+                [0 if fcst[_wi] == 0 else _rpl_rates[_wi] for _wi in range(1, 26)]
+            )
+
+            # Fix 2 (2026-05-24): L13W ordering-variability setup.
+            # Amazon's actual weekly order quantities fluctuate naturally -- a flat
+            # line misrepresents real ordering behavior.  Compute the L13W order
+            # amounts as ratios relative to their mean (cap 2.5x, floor 0.5x) and
+            # cycle that shape through steady-state weeks beyond the DC window.
+            # Only activated for regular orderers (>= 8 of last 13 weeks non-zero).
+            _rpl_l13w_raw  = [float(row.get(c) or 0) for c in ORD_COLS[-13:]]
+            _rpl_l13w_nz   = sum(1 for v in _rpl_l13w_raw if v > 0)
+            _rpl_l13w_mean = sum(_rpl_l13w_raw) / 13   # all-weeks avg incl. zeros
+            if _rpl_l13w_mean >= 50 and _rpl_l13w_nz >= 8:
+                _rpl_var_ratios = [
+                    min(2.5, max(0.5, v / _rpl_l13w_mean)) if v > 0 else 0.5
+                    for v in _rpl_l13w_raw
+                ]
+            else:
+                _rpl_var_ratios = None   # sparse history: keep flat baseline
 
             # Step 2 -- DC inventory correction
+            # Fix 3 (2026-05-24): Use POS L4W as the correction demand basis
+            # (most current consumer signal).  AUR trend guards: if L4W AUR differs
+            # significantly from L13W AUR, fall back to L13W POS to avoid using a
+            # price-distorted velocity as the fill basis.
+            # Formula: simple gap fill to target WOS (no sell-through offset):
+            #   Understocked (WOS < 10): fill = (10 - wos) * corr_demand
+            #   Overstocked  (WOS > 12): fill = 0 per week (drain naturally)
+            #   Normal      (10-12 WOS): no adjustment
+            _rpl_pos_l4w  = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
+            _rpl_aur_l4w  = float(amz_catalog.get("AUR_L4w")  or 0)
+            _rpl_aur_l13w = float(amz_catalog.get("AUR_L13w") or 0)
+            _rpl_aur_note = ""
+            if _rpl_aur_l4w > 0 and _rpl_aur_l13w > 0:
+                _rpl_aur_ratio = _rpl_aur_l4w / _rpl_aur_l13w
+                if _rpl_aur_ratio > 1.10:
+                    # AUR rising > 10%: price increase likely compressing volume.
+                    # L4W POS may understate true demand -- use L13W as stable basis.
+                    _rpl_corr_demand = _rpl_pos_l13 if _rpl_pos_l13 >= 50 else (_rpl_pos_l4w or _rpl_pos_l13)
+                    _rpl_aur_note = (
+                        f" AUR: ${_rpl_aur_l4w:.2f} L4W vs ${_rpl_aur_l13w:.2f} L13W"
+                        f" (ratio {_rpl_aur_ratio:.2f}x -- price rising, used L13W POS)."
+                    )
+                elif _rpl_aur_ratio < 0.90:
+                    # AUR falling > 10%: possible deal/promo inflating L4W POS.
+                    # Use L13W as deal-adjusted baseline.
+                    _rpl_corr_demand = _rpl_pos_l13 if _rpl_pos_l13 >= 50 else (_rpl_pos_l4w or _rpl_pos_l13)
+                    _rpl_aur_note = (
+                        f" AUR: ${_rpl_aur_l4w:.2f} L4W vs ${_rpl_aur_l13w:.2f} L13W"
+                        f" (ratio {_rpl_aur_ratio:.2f}x -- price dropping/promo, used L13W POS)."
+                    )
+                else:
+                    # Stable AUR: POS L4W is the most current signal
+                    _rpl_corr_demand = _rpl_pos_l4w if _rpl_pos_l4w >= 50 else _rpl_pos_l13
+                    _rpl_aur_note = (
+                        f" AUR: ${_rpl_aur_l4w:.2f} L4W vs ${_rpl_aur_l13w:.2f} L13W (stable)."
+                    )
+            else:
+                # No AUR data: use L4W POS if sufficient, else L13W
+                _rpl_corr_demand = _rpl_pos_l4w if _rpl_pos_l4w >= 50 else _rpl_pos_l13
+
             _rpl_wos = float(amz_catalog.get("Inv_WOS") or 0)
             if _rpl_wos <= 0:
                 # Fallback: compute from SOH + OPO when Inv_WOS is absent
@@ -9097,35 +9160,32 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             if _rpl_pipeline_wos > 0 and _rpl_wos > 0:
                 _rpl_wos += _rpl_pipeline_wos
 
+            # Fix 1 ensures W1 is always set, so correction window is always W1+W2.
+            _rpl_dc_end = 2   # steady-state starts at W3 (index 2)
             if _rpl_wos > 0:
-                # Adjustment window: W1+W2 when W1 is free; else W2+W3
-                _rpl_w1_locked = (_rpl_new[0] == 0)
-                _rpl_adj1 = 1 if _rpl_w1_locked else 0   # 0-based index
-                _rpl_adj2 = _rpl_adj1 + 1
+                _rpl_adj1, _rpl_adj2 = 0, 1
 
                 if _rpl_wos > 12:
-                    # Overstocked: drain DC to 12 WOS over the 2-week window.
-                    # Math: I0 - 2d + adj1 + adj2 = 12d  =>  adj total = (14-wos)*d
-                    _rpl_window = max(0.0, (14.0 - _rpl_wos) * _rpl_demand)
-                    _rpl_each   = snap(_rpl_window / 2.0, mp)
-                    _rpl_new[_rpl_adj1] = _rpl_each
-                    _rpl_new[_rpl_adj2] = _rpl_each
+                    # Overstocked: zero the correction window -- let DC drain
+                    # naturally to 12 WOS via ongoing consumer sell-through.
+                    _rpl_new[_rpl_adj1] = 0
+                    _rpl_new[_rpl_adj2] = 0
                     _rpl_inv_note = (
                         f"DC WOS={_rpl_wos:.1f} > 12 (overstocked) -- "
-                        f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
-                        f"{_rpl_each:.0f}/ea (drain to 12 WOS)"
+                        f"W{_rpl_adj1+1}+W{_rpl_adj2+1} zeroed to drain to 12 WOS"
                     )
                 elif _rpl_wos < 10:
-                    # Understocked: refill DC to 10 WOS over the 2-week window.
-                    # Math: I0 - 2d + adj1 + adj2 = 10d  =>  adj total = (12-wos)*d
-                    _rpl_window = (12.0 - _rpl_wos) * _rpl_demand
+                    # Understocked: simple gap fill -- order exactly enough to bridge
+                    # current WOS to 10 WOS target (no sell-through offset per rule).
+                    _rpl_window = max(0.0, (10.0 - _rpl_wos) * _rpl_corr_demand)
                     _rpl_each   = snap(_rpl_window / 2.0, mp)
                     _rpl_new[_rpl_adj1] = _rpl_each
                     _rpl_new[_rpl_adj2] = _rpl_each
                     _rpl_inv_note = (
                         f"DC WOS={_rpl_wos:.1f} < 10 (understocked) -- "
                         f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
-                        f"{_rpl_each:.0f}/ea (refill to 10 WOS)"
+                        f"{_rpl_each:.0f}/ea (gap fill to 10 WOS; "
+                        f"corr basis={_rpl_corr_demand:.0f}/wk)"
                     )
                 else:
                     _rpl_inv_note = (
@@ -9135,6 +9195,25 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             else:
                 _rpl_inv_note = "DC WOS unknown -- no adjustment applied"
 
+            # Fix 2 (2026-05-24): Apply L13W variability pattern to W3+ so the
+            # projection reflects Amazon's natural order fluctuation rather than a
+            # flat line.  T5/Holiday and Prime Day boost weeks are skipped (those
+            # seasonal lifts are already calibrated).  VP-Q4/F70 zeros preserved.
+            if _rpl_var_ratios:
+                for _wi in range(_rpl_dc_end, 26):
+                    if _rpl_new[_wi] != 0:
+                        wnum = _wi + 1
+                        _has_event = (
+                            _rpl_t5.get(wnum, 1.0) > 1.0 or
+                            _rpl_pb.get(wnum, 1.0) > 1.0 or
+                            _rpl_fb.get(wnum, 1.0) > 1.0
+                        )
+                        if not _has_event:
+                            _pat_i = (_wi - _rpl_dc_end) % 13
+                            _rpl_new[_wi] = snap(
+                                _rpl_rates[_wi] * _rpl_var_ratios[_pat_i], mp
+                            )
+
             fcst[:] = _rpl_new
             _fire("F_AMZ_RPL")
             _rpl_t5_note = (
@@ -9142,13 +9221,21 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f" (Season={season or 'standard'});"
                 if _rpl_t5_applied else ""
             )
+            _rpl_var_note = (
+                " L13W variability pattern applied (W3+)."
+                if _rpl_var_ratios else
+                " L13W variability not applied (sparse history -- flat baseline)."
+            )
             if isinstance(meta, dict):
                 meta.setdefault("drivers", []).append(
                     f"F_AMZ_RPL Active Replen override: "
                     f"demand={_rpl_demand:.0f}/wk "
                     f"(POS L13W={_rpl_pos_l13:.0f}/wk, "
+                    f"POS L4W={_rpl_pos_l4w:.0f}/wk, "
                     f"Ord L13W all-wks={_rpl_ord_l13:.0f}/wk); "
-                    f"{_rpl_inv_note}.{_rpl_t5_note} "
+                    f"corr basis={_rpl_corr_demand:.0f}/wk; "
+                    f"{_rpl_inv_note}.{_rpl_aur_note}{_rpl_t5_note}"
+                    f"{_rpl_var_note} "
                     f"Supersedes prior model ({model})."
                 )
 
