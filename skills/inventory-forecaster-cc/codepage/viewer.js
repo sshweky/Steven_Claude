@@ -3942,14 +3942,12 @@ async function toggleDetail(key) {
       '<ul id="' + _narUlId + '" style="margin:2px 0;padding-left:16px;">' +
       _narParts.map(p => '<li style="margin-bottom:4px;">' + p + '</li>').join('') +
       '</ul></div>'
-    // Amazon records with no narrative yet: render an empty AI Analysis shell
-    // so _loadAmzDcInv has a ul to inject the live DC inventory bullet into.
-    : (isAmazonRec
-        ? '<div id="' + _narWrapId + '" style="' + _narDivStyle + '">' +
-          _narHdrHtml +
-          '<ul id="' + _narUlId + '" style="margin:2px 0;padding-left:16px;"></ul>' +
-          '</div>'
-        : '');
+    // No narrative yet: render an empty AI Analysis shell so _loadAmzDcInv
+    // (Amazon) and _loadRtlPos (retailers) have a <ul> to inject bullets into.
+    : '<div id="' + _narWrapId + '" style="' + _narDivStyle + '">' +
+      _narHdrHtml +
+      '<ul id="' + _narUlId + '" style="margin:2px 0;padding-left:16px;"></ul>' +
+      '</div>';
 
   const safeKey = r.key.replace(/'/g, "&#39;");
   const safeId   = r.key.replace(/[^a-zA-Z0-9]/g, '_');
