@@ -970,6 +970,149 @@ def _qb_request(method, path, body=None, timeout=60):
         return json.loads(resp.read().decode())
 
 
+def _fetch_retailer_pos(rows):
+    """
+    Phase 2.6c — Fetch POS + OH data from Retailer Sales (bv2izcn5b) for
+    non-Amazon projection records.
+
+    Queries the table via QB REST API (known field IDs, no CData schema needed).
+    Each week appears exactly twice in the source table; rows are deduplicated
+    by date within each (acct, mstyle) group.
+
+    Returns dict keyed by "ACCT-MSTYLE" (matching Acct_MStyle_Key_) ->
+    {
+        Avg_Units_Wk_L4w:   float  -- 4-week avg POS units/wk
+        Avg_Units_Wk_L13w:  float  -- 13-week avg POS units/wk
+        Avg_Units_Wk_L26w:  float  -- 26-week avg POS units/wk
+        Avg_Units_Wk_L52w:  float  -- 52-week avg POS units/wk
+        OH_Units_LW:        float  -- latest-week OH units at retailer
+        Instock_LW:         float  -- latest-week instock % (fraction 0-1)
+        OH_WOS:             float  -- OH_Units_LW / L4W avg (0 when no POS data)
+    }
+    """
+    RTL_TID   = "bv2izcn5b"
+    F_DATE    = 6
+    F_MSTYLE  = 9
+    F_POS_U   = 10
+    F_OH_U    = 12
+    F_INSTOCK = 15
+    F_ACCT    = 17
+    AMZ_ACCT  = "1864"          # Acct # for Amazon -- excluded
+
+    # Collect non-Amazon mstyles from the projection rows
+    non_amz_mstyles = set()
+    for row in rows:
+        cust = (row.get("Customr_Name") or "").upper()
+        if AMAZON_CUST_SUBSTR in cust:
+            continue
+        ms = row.get("Mstyle", "")
+        if ms:
+            non_amz_mstyles.add(ms)
+
+    if not non_amz_mstyles:
+        return {}
+
+    # Date cutoff: 56 weeks ago (enough for 52W avg + some buffer)
+    cutoff = (date.today() - timedelta(weeks=56)).isoformat()
+
+    # Batch by mstyle (25 per batch keeps WHERE clause manageable)
+    BATCH   = 25
+    ms_list = sorted(non_amz_mstyles)
+    raw_rows = []
+
+    for i in range(0, len(ms_list), BATCH):
+        batch = ms_list[i : i + BATCH]
+        # Build OR'd mstyle filter
+        ms_filter = "OR".join(
+            "{" + str(F_MSTYLE) + ".EX.'" + ms.replace("'", "''") + "'}"
+            for ms in batch
+        )
+        where = (f"({ms_filter})"
+                 f"AND{{{F_ACCT}.XCT.'{AMZ_ACCT}'}}"
+                 f"AND{{{F_DATE}.AF.'{cutoff}'}}")
+        skip = 0
+        while True:
+            try:
+                resp = _qb_request("POST", "/records/query", {
+                    "from":    RTL_TID,
+                    "select":  [F_DATE, F_MSTYLE, F_POS_U, F_OH_U, F_INSTOCK, F_ACCT],
+                    "where":   where,
+                    "sortBy":  [{"fieldId": F_DATE, "order": "DESC"}],
+                    "options": {"top": 1000, "skip": skip},
+                }, timeout=90)
+            except Exception as _e:
+                print(f"      [WARN] retailer_pos batch {i // BATCH + 1} "
+                      f"skip={skip} failed: {_e}", flush=True)
+                break
+            batch_data = resp.get("data", [])
+            raw_rows.extend(batch_data)
+            total = resp.get("metadata", {}).get("totalRecords", 0)
+            if len(batch_data) < 1000 or (total > 0 and len(raw_rows) >= total):
+                break
+            skip += 1000
+            time.sleep(0.15)
+
+    if not raw_rows:
+        return {}
+
+    # Parse: group by (acct_str, mstyle_str), dedup by date
+    from collections import defaultdict
+    grouped = defaultdict(dict)   # (acct, mstyle) -> {date: {pos_u, oh_u, instock}}
+
+    def _sv(row, fid):
+        v = (row.get(str(fid)) or {}).get("value")
+        return v
+
+    for row in raw_rows:
+        ms_v    = str(_sv(row, F_MSTYLE) or "").strip()
+        acct_v  = str(_sv(row, F_ACCT)   or "").strip()
+        date_v  = str(_sv(row, F_DATE)   or "")[:10]   # YYYY-MM-DD
+        if not ms_v or not acct_v or not date_v:
+            continue
+        key = (acct_v, ms_v)
+        if date_v not in grouped[key]:                  # deduplicate by date
+            grouped[key][date_v] = {
+                "pos_u":   float(_sv(row, F_POS_U)   or 0) or 0,
+                "oh_u":    float(_sv(row, F_OH_U)    or 0) or 0,
+                "instock": float(_sv(row, F_INSTOCK) or 0) or 0,
+            }
+
+    # Compute per-acct-mstyle metrics
+    result = {}
+    for (acct_str, ms_str), date_dict in grouped.items():
+        sorted_dates = sorted(date_dict.keys(), reverse=True)
+        if not sorted_dates:
+            continue
+
+        def _avg_pos(n):
+            wks = sorted_dates[:n]
+            if not wks:
+                return 0.0
+            return sum(date_dict[d]["pos_u"] for d in wks) / len(wks)
+
+        lw_data  = date_dict[sorted_dates[0]]
+        oh_lw    = lw_data["oh_u"]
+        inst_lw  = lw_data["instock"]
+        l4w      = _avg_pos(4)
+        l13w     = _avg_pos(13)
+        l26w     = _avg_pos(26)
+        l52w     = _avg_pos(52)
+        oh_wos   = oh_lw / max(l4w, 0.1) if l4w > 0 else 0.0
+
+        am_key = f"{acct_str}-{ms_str}"
+        result[am_key] = {
+            "Avg_Units_Wk_L4w":  l4w,
+            "Avg_Units_Wk_L13w": l13w,
+            "Avg_Units_Wk_L26w": l26w,
+            "Avg_Units_Wk_L52w": l52w,
+            "OH_Units_LW":       oh_lw,
+            "Instock_LW":        inst_lw,
+            "OH_WOS":            oh_wos,
+        }
+
+    return result
+
+
 def qb_get_field_map(table_id, force_refresh=False):
     """Returns {field_label: field_id} for a Quickbase table.  Cached."""
     if not force_refresh and table_id in _QB_FIELD_MAP_CACHE:
