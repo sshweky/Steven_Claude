@@ -99,6 +99,90 @@ FALL_DEAL_LIFT = float(os.environ.get("FALL_DEAL_LIFT", "1.12"))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# T5/HOLIDAY + SEASON-SPECIFIC ORDER BOOST CURVES (Amazon Active Replen only)
+# Applied via _get_t5_seasonal_boosts(season) in inventory_forecaster.py.
+#
+# Format: {season_tag: [(month, day, multiplier), ...]}
+# Calendar-date based -- same engine as PRIME_DAY_BUMPS.  Each (month, day)
+# names the START of the week that gets the lift; the forecaster maps it to
+# whichever projection week contains that date.
+#
+# Empirically derived from LY order history (2025) across 871 Amazon Active
+# Replen items with sufficient non-tariff history.  Analysis run 2026-05-24.
+# Season tags sourced from QB Styles.[Season] field (NOT the BB/FF prefix).
+#
+# Multipliers are applied via MAX with the category-profile mult in F_AMZ_RPL
+# (prevents stacking with empirical category profiles that already capture
+# some seasonal lift).
+#
+# Key findings:
+#   Standard (no Season): modest T5 ramp Oct 19+; median 0.85x vs active-week
+#     baseline, mean 1.17x -- indicates ordering FREQUENCY rises, not magnitude.
+#     Conservative boost applied to capture incremental pre-T5 orders.
+#   Holiday:  W25(Nov 2)=1.59x, W26(Nov 9)=1.57x vs active-week baseline.
+#     Strong pre-T5 order build confirmed in data.
+#   Halloween: spike Sep 21-28 (pre-Halloween consumer demand, ~4-6w before Oct 31).
+#   Fall/Winter: moderate T5 ramp similar to standard but starting one week earlier.
+#   July 4th: pre-holiday inventory build in early-mid June.
+#   Seasons with no boost in the May-Nov window (off-season):
+#     Easter, Spring/Summer, St Patrick's Day, Pride.
+# ─────────────────────────────────────────────────────────────────────────────
+AMZ_T5_HOLIDAY_BOOSTS = {
+    "": [
+        # Standard -- T5 pre-build ramp, Oct W3 onwards (no Season tag)
+        (10, 19, float(os.environ.get("AMZ_T5_STD_W23", "1.10"))),
+        (10, 26, float(os.environ.get("AMZ_T5_STD_W24", "1.10"))),
+        (11,  2, float(os.environ.get("AMZ_T5_STD_W25", "1.12"))),
+        (11,  9, float(os.environ.get("AMZ_T5_STD_W26", "1.15"))),
+    ],
+    "Holiday": [
+        # Holiday-tagged items: strong T5 pre-build (backed by data)
+        (10, 12, float(os.environ.get("AMZ_T5_HOL_W22", "1.15"))),
+        (10, 19, float(os.environ.get("AMZ_T5_HOL_W23", "1.30"))),
+        (10, 26, float(os.environ.get("AMZ_T5_HOL_W24", "1.50"))),
+        (11,  2, float(os.environ.get("AMZ_T5_HOL_W25", "1.65"))),
+        (11,  9, float(os.environ.get("AMZ_T5_HOL_W26", "1.75"))),
+    ],
+    "Fall/Winter": [
+        # Fall/Winter tagged: moderate T5 ramp (data: 1.17-1.27x)
+        (10, 12, float(os.environ.get("AMZ_T5_FW_W22", "1.15"))),
+        (10, 19, float(os.environ.get("AMZ_T5_FW_W23", "1.25"))),
+        (10, 26, float(os.environ.get("AMZ_T5_FW_W24", "1.15"))),
+        (11,  2, float(os.environ.get("AMZ_T5_FW_W25", "1.20"))),
+        (11,  9, float(os.environ.get("AMZ_T5_FW_W26", "1.15"))),
+    ],
+    "Halloween": [
+        # Pre-Halloween ordering ramp (data: 1.29x on Sep 21+)
+        # Amazon orders P+P product 4-6 weeks before Oct 31 consumer demand.
+        (9,  7, float(os.environ.get("AMZ_HAL_SEP7",  "1.10"))),
+        (9, 14, float(os.environ.get("AMZ_HAL_SEP14", "1.25"))),
+        (9, 21, float(os.environ.get("AMZ_HAL_SEP21", "1.30"))),
+        (9, 28, float(os.environ.get("AMZ_HAL_SEP28", "1.30"))),
+        (10,  5, float(os.environ.get("AMZ_HAL_OCT5",  "1.20"))),
+        (10, 12, float(os.environ.get("AMZ_HAL_OCT12", "1.10"))),
+        # No T5 boost: Halloween is over by end of October
+    ],
+    "July 4th": [
+        # Pre-4th of July inventory build in June
+        (6,  7, float(os.environ.get("AMZ_J4_JUN7",  "1.20"))),
+        (6, 14, float(os.environ.get("AMZ_J4_JUN14", "1.25"))),
+        (6, 21, float(os.environ.get("AMZ_J4_JUN21", "1.25"))),
+        (6, 28, float(os.environ.get("AMZ_J4_JUN28", "1.20"))),
+        # No T5 boost: July 4th items are off-season in Oct-Nov
+    ],
+    # Off-season items in the May-Nov projection window: no boost applied
+    "Easter":           [],
+    "Spring/Summer":    [],
+    "St Patrick's Day": [],
+    "Pride":            [],
+}
+"""Season-specific T5/Holiday order boost curves for Amazon Active Replen.
+Keyed by QB Styles.[Season] field value (NOT item prefix/div).
+Empty list = no boost in current May-Nov projection window.
+Unknown season tags fall back to standard ('') boosts."""
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # TRADE FALL CALENDAR -- non-Amazon retailers
 # F64 (2026-05-17): top-2 planner spike weeks in trade replenishment
 # ─────────────────────────────────────────────────────────────────────────────

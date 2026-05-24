@@ -56,135 +56,298 @@
     "2026-05-03",
     "2026-05-10"
   ],
-  "season_item_counts": {
-    "": 862,
-    "Easter": 0,
-    "Fall/Winter": 2,
-    "Halloween": 0,
-    "Holiday": 3,
-    "July 4th": 2,
-    "Pride": 0,
-    "Spring/Summer": 2,
-    "St Patrick's Day": 0
-  },
   "boosts": {
     "": {
-      "ly": {
-        "17": {
-          "week_date": "2025-09-14",
-          "median": 0.309,
-          "mean": 2.354,
-          "n": 617
-        },
-        "18": {
-          "week_date": "2025-09-21",
-          "median": 0.012,
-          "mean": 1.245,
-          "n": 617
-        },
-        "19": {
-          "week_date": "2025-09-28",
-          "median": 0.0,
-          "mean": 0.889,
-          "n": 617
-        },
-        "20": {
-          "week_date": "2025-10-05",
-          "median": 0.0,
-          "mean": 0.8,
-          "n": 617
-        },
-        "21": {
-          "week_date": "2025-10-12",
-          "median": 0.0,
-          "mean": 0.653,
-          "n": 617
-        },
-        "22": {
-          "week_date": "2025-10-19",
-          "median": 0.361,
-          "mean": 1.751,
-          "n": 617
-        },
-        "23": {
-          "week_date": "2025-10-26",
-          "median": 0.168,
-          "mean": 1.279,
-          "n": 617
-        },
-        "24": {
-          "week_date": "2025-11-02",
-          "median": 0.411,
-          "mean": 1.957,
-          "n": 617
-        },
-        "25": {
-          "week_date": "2025-11-09",
-          "median": 0.644,
-          "mean": 1.979,
-          "n": 617
-        }
+      "17": {
+        "date": "2025-09-14",
+        "median": 0.95,
+        "mean": 1.586,
+        "ordered": 565,
+        "total": 1144
       },
-      "l26w_extra": {
-        "0": {
-          "week_date": "2025-11-16",
-          "median": 0.09,
-          "mean": 1.137,
-          "n": 617
-        },
-        "1": {
-          "week_date": "2025-11-23",
-          "median": 0.219,
-          "mean": 1.282,
-          "n": 617
-        },
-        "2": {
-          "week_date": "2025-11-30",
-          "median": 0.279,
-          "mean": 1.396,
-          "n": 617
-        },
-        "3": {
-          "week_date": "2025-12-07",
-          "median": 0.438,
-          "mean": 2.422,
-          "n": 617
-        },
-        "4": {
-          "week_date": "2025-12-14",
-          "median": 0.175,
-          "mean": 1.374,
-          "n": 617
-        },
-        "5": {
-          "week_date": "2025-12-21",
-          "median": 0.258,
-          "mean": 1.332,
-          "n": 617
-        },
-        "6": {
-          "week_date": "2025-12-28",
-          "median": 0.821,
-          "mean": 2.089,
-          "n": 617
-        }
+      "18": {
+        "date": "2025-09-21",
+        "median": 0.538,
+        "mean": 0.847,
+        "ordered": 474,
+        "total": 1144
+      },
+      "19": {
+        "date": "2025-09-28",
+        "median": 0.448,
+        "mean": 0.719,
+        "ordered": 426,
+        "total": 1144
+      },
+      "20": {
+        "date": "2025-10-05",
+        "median": 0.336,
+        "mean": 0.491,
+        "ordered": 467,
+        "total": 1144
+      },
+      "21": {
+        "date": "2025-10-12",
+        "median": 0.483,
+        "mean": 0.62,
+        "ordered": 466,
+        "total": 1144
+      },
+      "22": {
+        "date": "2025-10-19",
+        "median": 0.849,
+        "mean": 1.172,
+        "ordered": 600,
+        "total": 1144
+      },
+      "23": {
+        "date": "2025-10-26",
+        "median": 0.648,
+        "mean": 0.833,
+        "ordered": 546,
+        "total": 1144
+      },
+      "24": {
+        "date": "2025-11-02",
+        "median": 0.751,
+        "mean": 1.036,
+        "ordered": 612,
+        "total": 1144
+      },
+      "25": {
+        "date": "2025-11-09",
+        "median": 0.846,
+        "mean": 1.027,
+        "ordered": 648,
+        "total": 1144
       }
     },
     "Fall/Winter": {
-      "ly": {},
-      "l26w_extra": {}
+      "17": {
+        "date": "2025-09-14",
+        "median": 0.24,
+        "mean": 1.418,
+        "ordered": 11,
+        "total": 14
+      },
+      "18": {
+        "date": "2025-09-21",
+        "median": 0.389,
+        "mean": 0.46,
+        "ordered": 10,
+        "total": 14
+      },
+      "19": {
+        "date": "2025-09-28",
+        "median": 0.326,
+        "mean": 0.394,
+        "ordered": 11,
+        "total": 14
+      },
+      "20": {
+        "date": "2025-10-05",
+        "median": 0.526,
+        "mean": 0.499,
+        "ordered": 12,
+        "total": 14
+      },
+      "21": {
+        "date": "2025-10-12",
+        "median": 0.25,
+        "mean": 0.29,
+        "ordered": 13,
+        "total": 14
+      },
+      "22": {
+        "date": "2025-10-19",
+        "median": 1.269,
+        "mean": 1.306,
+        "ordered": 10,
+        "total": 14
+      },
+      "23": {
+        "date": "2025-10-26",
+        "median": 0.345,
+        "mean": 0.478,
+        "ordered": 10,
+        "total": 14
+      },
+      "24": {
+        "date": "2025-11-02",
+        "median": 1.204,
+        "mean": 1.633,
+        "ordered": 11,
+        "total": 14
+      },
+      "25": {
+        "date": "2025-11-09",
+        "median": 1.166,
+        "mean": 1.281,
+        "ordered": 11,
+        "total": 14
+      }
+    },
+    "Halloween": {
+      "17": {
+        "date": "2025-09-14",
+        "median": 0.976,
+        "mean": 1.142,
+        "ordered": 6,
+        "total": 12
+      },
+      "18": {
+        "date": "2025-09-21",
+        "median": 1.286,
+        "mean": 1.614,
+        "ordered": 7,
+        "total": 12
+      },
+      "19": {
+        "date": "2025-09-28",
+        "median": 1.286,
+        "mean": 1.666,
+        "ordered": 5,
+        "total": 12
+      },
+      "20": {
+        "date": "2025-10-05",
+        "median": 0.326,
+        "mean": 0.372,
+        "ordered": 4,
+        "total": 12
+      },
+      "21": {
+        "date": "2025-10-12",
+        "median": 1.449,
+        "mean": 1.551,
+        "ordered": 4,
+        "total": 12
+      },
+      "22": {
+        "date": "2025-10-19",
+        "median": 0.937,
+        "mean": 1.25,
+        "ordered": 8,
+        "total": 12
+      },
+      "23": {
+        "date": "2025-10-26",
+        "median": 0.937,
+        "mean": 1.249,
+        "ordered": 6,
+        "total": 12
+      },
+      "24": {
+        "date": "2025-11-02",
+        "median": 0.802,
+        "mean": 1.006,
+        "ordered": 8,
+        "total": 12
+      },
+      "25": {
+        "date": "2025-11-09",
+        "median": 1.341,
+        "mean": 1.186,
+        "ordered": 3,
+        "total": 12
+      }
     },
     "Holiday": {
-      "ly": {},
-      "l26w_extra": {}
+      "17": {
+        "date": "2025-09-14",
+        "median": 0.369,
+        "mean": 1.209,
+        "ordered": 7,
+        "total": 29
+      },
+      "18": {
+        "date": "2025-09-21",
+        "median": 0.238,
+        "mean": 0.901,
+        "ordered": 11,
+        "total": 29
+      },
+      "19": {
+        "date": "2025-09-28",
+        "median": 0.382,
+        "mean": 0.401,
+        "ordered": 6,
+        "total": 29
+      },
+      "20": {
+        "date": "2025-10-05",
+        "median": 0.304,
+        "mean": 0.42,
+        "ordered": 7,
+        "total": 29
+      },
+      "21": {
+        "date": "2025-10-12",
+        "median": 0.26,
+        "mean": 0.331,
+        "ordered": 6,
+        "total": 29
+      },
+      "22": {
+        "date": "2025-10-19",
+        "median": 0.714,
+        "mean": 0.75,
+        "ordered": 16,
+        "total": 29
+      },
+      "23": {
+        "date": "2025-10-26",
+        "median": 0.616,
+        "mean": 0.737,
+        "ordered": 17,
+        "total": 29
+      },
+      "24": {
+        "date": "2025-11-02",
+        "median": 1.586,
+        "mean": 1.638,
+        "ordered": 18,
+        "total": 29
+      },
+      "25": {
+        "date": "2025-11-09",
+        "median": 1.567,
+        "mean": 1.567,
+        "ordered": 21,
+        "total": 29
+      }
     },
     "July 4th": {
-      "ly": {},
-      "l26w_extra": {}
+      "24": {
+        "date": "2025-11-02",
+        "median": 0.881,
+        "mean": 0.783,
+        "ordered": 3,
+        "total": 10
+      },
+      "25": {
+        "date": "2025-11-09",
+        "median": 0.616,
+        "mean": 0.616,
+        "ordered": 2,
+        "total": 10
+      }
     },
     "Spring/Summer": {
-      "ly": {},
-      "l26w_extra": {}
+      "19": {
+        "date": "2025-09-28",
+        "median": 0.394,
+        "mean": 0.394,
+        "ordered": 2,
+        "total": 4
+      },
+      "21": {
+        "date": "2025-10-12",
+        "median": 0.394,
+        "mean": 0.394,
+        "ordered": 2,
+        "total": 4
+      }
     }
   }
 }
