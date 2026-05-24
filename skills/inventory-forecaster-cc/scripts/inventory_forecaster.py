@@ -8998,66 +8998,14 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"({_f58_summary}); planner's MAN override still in effect"
                 )
 
-    # ── F_PO_CUTOFF (2026-05-21, fixed 2026-05-24) — Amazon Fetch / Brand Buzz W1 zero-out ──
-    # If no confirmed open PO exists for W1 AND today is past the division-specific
-    # cutoff WITHIN the current calendar week, zero both AI and manual projections
-    # for W1.  Past the cutoff there is no time to receive and ship in the current
-    # week; any remaining projection would inflate reorder signals.
-    #
-    # IMPORTANT: the firing window is Wed-Sat (FF) or Thu-Sat (BB) ONLY.  Sunday
-    # is the START of a new week -- the upcoming Tuesday/Wednesday cutoff hasn't
-    # arrived yet, so we should populate W1 normally and wait for the PO.
-    # weekday(): Mon=0 Tue=1 Wed=2 Thu=3 Fri=4 Sat=5 Sun=6
+    # ── F_PO_CUTOFF / F_PO_CUTOFF_ALL — REMOVED (2026-05-24) ───────────────────
+    # These rules zeroed AI W1 when no confirmed open PO existed by a day-of-week
+    # cutoff.  Per planner direction: AI W1 must always be populated when there
+    # are NO open orders in W1 -- the planner needs to see the recommendation so
+    # they know what to order.  VP-Q4 (above) already zeros AI W1 when there IS
+    # a confirmed open PO, so no double-counting occurs.
     _po_cutoff_zero_w1 = False
     _div_code = (row.get("Div") or "").upper().strip()
-    if is_amazon and _div_code in AMZ_DIV_PO_CUTOFF:
-        _today_wd  = datetime.now().weekday()
-        _cutoff_wd = AMZ_DIV_PO_CUTOFF[_div_code]
-        _w1_po_qty = float(_effective_po_wk[0]) if _effective_po_wk else 0.0
-        # Fire only Wed-Sat (FF) / Thu-Sat (BB): _cutoff_wd <= today <= 5.
-        # Sunday (6), Monday (0), Tuesday (1) are pre-cutoff days for the
-        # upcoming W1 -- don't zero prematurely.
-        _in_firing_window = (_cutoff_wd <= _today_wd <= 5)
-        if _in_firing_window and _w1_po_qty == 0:
-            _div_name   = "Fetch" if _div_code == "FF" else "Brand Buzz"
-            _cutoff_day = "Tue" if _div_code == "FF" else "Wed"
-            if isinstance(meta, dict):
-                meta.setdefault("drivers", []).append(
-                    f"F_PO_CUTOFF: {_div_name} (Div={_div_code}) -- "
-                    f"no confirmed W1 PO by {_cutoff_day} night "
-                    f"(today weekday={_today_wd}); zeroing AI W1={fcst[0]:.0f} "
-                    f"MAN W1={manual_wks[0]:.0f} -> 0"
-                )
-            fcst[0] = 0
-            if isinstance(manual_wks, list):
-                manual_wks[0] = 0
-            _po_cutoff_zero_w1 = True
-            _fire("F_PO_CUTOFF")
-
-    # ── F_PO_CUTOFF_ALL (2026-05-24) — Non-Amazon W1 zero when no orders by Wed 9am EST ──
-    # For all non-Amazon customers: if Wednesday 9am EST (14:00 UTC) or later and
-    # no confirmed open PO exists for W1, zero AI PRJ W1.  This mirrors F_PO_CUTOFF
-    # (Amazon FF/BB) but uses Wednesday as the universal order-received deadline.
-    # Sun/Mon/Tue are always protected -- orders may still arrive.
-    # MAN PRJ W1 is never auto-zeroed; planner sees the codepage warning instead.
-    if not is_amazon and not _po_cutoff_zero_w1:
-        _now_utc   = datetime.utcnow()
-        _pc_all_wd = _now_utc.weekday()
-        # Wednesday (wd=2) at 14:00 UTC = 9am EST / 10am EDT (conservative gate)
-        _pc_all_window = (
-            (_pc_all_wd >= 3)  # Thu-Sat: always in window
-            or (_pc_all_wd == 2 and _now_utc.hour >= 14)  # Wed past 9am EST
-        )
-        _pc_all_w1_qty = float(_effective_po_wk[0]) if _effective_po_wk else 0.0
-        if _pc_all_window and _pc_all_w1_qty == 0 and fcst[0] > 0:
-            if isinstance(meta, dict):
-                meta.setdefault("drivers", []).append(
-                    f"F_PO_CUTOFF_ALL: non-Amazon customer, no confirmed W1 PO "
-                    f"by Wed 9am EST (weekday={_pc_all_wd}, UTC hour={_now_utc.hour}); "
-                    f"zeroing AI W1={fcst[0]:.0f}"
-                )
-            fcst[0] = 0
-            _fire("F_PO_CUTOFF_ALL")
 
     # ── F70 — Switchover variant conflict (2026-05-21) ───────────────────────────
     # When a variant style (e.g. FF8654EC/COS/AMZ) at the same account has
