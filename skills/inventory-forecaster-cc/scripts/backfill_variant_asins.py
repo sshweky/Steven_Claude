@@ -79,7 +79,7 @@ def fetch_all_amazon_active():
     Paginates automatically (QB caps at 1000/page).
     """
     where = "({'10'.SW.'A'}OR{'10'.SW.'FD'})AND{'874'.CT.'amazon'}"
-    select = [FID_KEY, FID_MSTYLE, FID_ASIN]
+    select = [FID_KEY, FID_MSTYLE, FID_CUST_SKU]
 
     all_rows = []
     skip = 0
@@ -154,7 +154,7 @@ def main():
         {
             "key":    cell_val(r, FID_KEY),
             "mstyle": cell_val(r, FID_MSTYLE),
-            "asin":   cell_val(r, FID_ASIN),
+            "asin":   cell_val(r, FID_CUST_SKU),
         }
         for r in raw
     ]
@@ -237,7 +237,7 @@ def main():
     upsert_rows = [
         {
             str(FID_KEY):  {"value": t["key"]},
-            str(FID_ASIN): {"value": t["asin"]},
+            str(FID_CUST_SKU): {"value": t["asin"]},
         }
         for t in targets
     ]
