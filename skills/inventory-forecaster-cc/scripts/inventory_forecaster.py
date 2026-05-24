@@ -1908,7 +1908,6 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         _pos_l4_f15  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
         _pos_l13_f15 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
         _pos_healthy_f15 = _pos_l13_f15 > 0 and _pos_l4_f15 >= _pos_l13_f15 * 0.5
-        import sys as _sys_f15dbg; print(f"[F15-DBG] pos_rate={pos_rate:.1f} L4={_pos_l4_f15:.1f} L13={_pos_l13_f15:.1f} healthy={_pos_healthy_f15} ord_base={ord_baseline:.1f}", flush=True, file=_sys_f15dbg.stderr)  # TEMP
         if pos_rate > 0 and _pos_healthy_f15:
             _ord_cov_ratio = ord_baseline / pos_rate
             if _ord_cov_ratio > 2.0:
