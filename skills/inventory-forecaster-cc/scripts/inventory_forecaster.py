@@ -8793,18 +8793,27 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"({_f58_summary}); planner's MAN override still in effect"
                 )
 
-    # ── F_PO_CUTOFF (2026-05-21) — Amazon Fetch / Brand Buzz W1 zero-out ───────
+    # ── F_PO_CUTOFF (2026-05-21, fixed 2026-05-24) — Amazon Fetch / Brand Buzz W1 zero-out ──
     # If no confirmed open PO exists for W1 AND today is past the division-specific
-    # cutoff, zero both AI and manual projections for W1.  Past the cutoff there
-    # is no time to receive and ship in the current week; any remaining projection
-    # would inflate reorder signals and create phantom demand.
+    # cutoff WITHIN the current calendar week, zero both AI and manual projections
+    # for W1.  Past the cutoff there is no time to receive and ship in the current
+    # week; any remaining projection would inflate reorder signals.
+    #
+    # IMPORTANT: the firing window is Wed-Sat (FF) or Thu-Sat (BB) ONLY.  Sunday
+    # is the START of a new week -- the upcoming Tuesday/Wednesday cutoff hasn't
+    # arrived yet, so we should populate W1 normally and wait for the PO.
+    # weekday(): Mon=0 Tue=1 Wed=2 Thu=3 Fri=4 Sat=5 Sun=6
     _po_cutoff_zero_w1 = False
     _div_code = (row.get("Div") or "").upper().strip()
     if is_amazon and _div_code in AMZ_DIV_PO_CUTOFF:
-        _today_wd  = datetime.now().weekday()   # Mon=0 ... Sun=6
+        _today_wd  = datetime.now().weekday()
         _cutoff_wd = AMZ_DIV_PO_CUTOFF[_div_code]
         _w1_po_qty = float(_effective_po_wk[0]) if _effective_po_wk else 0.0
-        if _today_wd >= _cutoff_wd and _w1_po_qty == 0:
+        # Fire only Wed-Sat (FF) / Thu-Sat (BB): _cutoff_wd <= today <= 5.
+        # Sunday (6), Monday (0), Tuesday (1) are pre-cutoff days for the
+        # upcoming W1 -- don't zero prematurely.
+        _in_firing_window = (_cutoff_wd <= _today_wd <= 5)
+        if _in_firing_window and _w1_po_qty == 0:
             _div_name   = "Fetch" if _div_code == "FF" else "Brand Buzz"
             _cutoff_day = "Tue" if _div_code == "FF" else "Wed"
             if isinstance(meta, dict):
