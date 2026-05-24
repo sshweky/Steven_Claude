@@ -872,8 +872,9 @@ async function attachInvFlow(records) {
           r.inv_flow_ats_now   = d.ats_now   || 0;
           r.inv_flow_ats_oh    = d.ats_oh    || 0;
           r.inv_flow_ats_oo    = d.ats_oo    || 0;
-          r.inv_flow_ats_oh_wos = d.ats_oh_wos || 0;
-          r.inv_flow_ats_oo_wos = d.ats_oo_wos || 0;
+          r.inv_flow_ats_oh_wos  = d.ats_oh_wos  || 0;
+          r.inv_flow_ats_oo_wos  = d.ats_oo_wos  || 0;
+          r.inv_flow_first_shpd  = d.first_shpd  || '';
           nMatched++;
         }
       }
