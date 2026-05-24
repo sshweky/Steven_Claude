@@ -4541,7 +4541,9 @@ async function _loadAmzDcInv(r, safeId) {
         wosHtml
     : '<b>Amazon DC inventory:</b> <span style="color:#999;font-style:italic">not in catalog (no data)</span>';
 
-  // AUR bullet
+  // AUR bullet -- L13W may be interpolated from L4W + L26W (see fallback above).
+  // We track the actual catalog L13W in aurL13wRaw so we can mark the
+  // displayed L13W with a trailing asterisk when it was derived.
   let aurBulletHtml;
   if (!aurFetchOk) {
     aurBulletHtml = '<b>Amazon AUR:</b> <span style="color:#999;font-style:italic">no pricing data</span>';
@@ -4549,7 +4551,14 @@ async function _loadAmzDcInv(r, safeId) {
     const aurItems = [];
     if (aurLw  > 0) aurItems.push(`<b>LW</b> ${fmtAur(aurLw)}`);
     if (aurL4w  > 0) aurItems.push(`<b>L4W avg</b> ${fmtAur(aurL4w)}`);
-    if (aurL13w > 0) aurItems.push(`<b>L13W avg</b> ${fmtAur(aurL13w)}`);
+    if (aurL13w > 0) {
+      // If L13W catalog value was 0/null and we computed it from L4W+L26W,
+      // mark it with "*" so planners know it's a derived estimate.
+      const catalogL13w = aurRow ? (parseFloat((aurRow[AA.AUR_L13W] && aurRow[AA.AUR_L13W].value) || 0) || 0) : 0;
+      const isInterp = (catalogL13w === 0 && aurL4w > 0 && aurL26w > 0);
+      const mark = isInterp ? '<span title="interpolated from L4W/L26W (catalog L13W is null)" style="color:#999">*</span>' : '';
+      aurItems.push(`<b>L13W avg</b> ${fmtAur(aurL13w)}${mark}`);
+    }
     if (aurL26w > 0) aurItems.push(`<b>L26W avg</b> ${fmtAur(aurL26w)}`);
     if (aurL52w > 0) aurItems.push(`<b>L52W avg</b> ${fmtAur(aurL52w)}`);
     aurBulletHtml = aurItems.length
