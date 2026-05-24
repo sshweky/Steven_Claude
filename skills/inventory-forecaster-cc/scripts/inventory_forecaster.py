@@ -1428,10 +1428,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     This correctly handles post-event-buy drawdown: after a Prime Day or holiday
     pre-buy the item goes quiet, so the all-weeks avg understates the true run rate.
 
-    Amazon POS blend — when pos_data is supplied for Amazon items, the order-history
-    baseline is blended 55/45 with the trend-adjusted consumer POS rate from the
-    Amazon Catalog.  This pulls the baseline toward actual consumer demand velocity,
-    adjusting for acceleration/deceleration detected from L4W vs L13W trends.
+    Amazon POS blend — when pos_data is supplied, POS is the primary demand anchor
+    over the 26-week horizon.  F15 blend tiers (ord/POS ratio): >2.0x = 100% POS;
+    1.5-2.0x = 70/30 POS/ord; 1.0-1.5x = 65/35 POS/ord; <1.0x = 65/35 POS/ord.
+    The trend-adjusted POS rate from amazon_pos_rate() already bakes in L4/L13
+    acceleration, so F38b (trend passthrough) is suppressed when the blend is active
+    to avoid double-counting growth.
 
     Shape -- damped seasonal profile.  Base DAMP=0.30 (30% historical / 70%
     flat), relief DAMP=0.85 when F16 detects strong-signal Halloween/Easter/
