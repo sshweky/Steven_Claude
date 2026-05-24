@@ -11889,8 +11889,18 @@ def main():
             # out the corresponding manual projection.  The customer has already committed
             # -- the manual projection on top is redundant and causes double-counting in
             # inventory planning.  W3-W26 are untouched.
+            # W1 early-week gate (Amazon FF/BB): same cutoff-day logic as F_PO_CUTOFF.
+            # On Sunday (and pre-cutoff), don't zero W1 MAN PRJ -- the week has just
+            # started and the open PO is the active current-week order.
             _opn_w = rec.get("opn_w") or []
-            if _man_w1_fid and _opn_w and _opn_w[0] > 0:
+            _w1_apply_po_zero = True
+            if _opn_w and _opn_w[0] > 0:
+                _rec_div = rec.get("div", "")
+                if _rec_div in AMZ_DIV_PO_CUTOFF:
+                    _wb_today_wd  = datetime.now().weekday()
+                    _wb_cutoff_wd = AMZ_DIV_PO_CUTOFF[_rec_div]
+                    _w1_apply_po_zero = (_wb_cutoff_wd <= _wb_today_wd <= 5)
+            if _man_w1_fid and _opn_w and _opn_w[0] > 0 and _w1_apply_po_zero:
                 row[_man_w1_fid] = 0
             if _man_w2_fid and len(_opn_w) > 1 and _opn_w[1] > 0:
                 row[_man_w2_fid] = 0
