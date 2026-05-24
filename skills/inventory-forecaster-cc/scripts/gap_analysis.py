@@ -420,7 +420,7 @@ def run_analysis(results_path, top_n, out_path):
                 a = r.get("ai_total", 0)
                 g = (a - m) / m * 100 if m else 0
                 hist_ord = r.get("history_l26_ord", [])
-                l13_nz = [v for v in hist_ord[:13] if v > 0]
+                l13_nz = [v for v in hist_ord[-13:] if v > 0]
                 l13_nz_avg = sum(l13_nz)/len(l13_nz) if l13_nz else 0
                 peak = max(hist_ord) if hist_ord else 0
                 b, _ = classify_gap(r)

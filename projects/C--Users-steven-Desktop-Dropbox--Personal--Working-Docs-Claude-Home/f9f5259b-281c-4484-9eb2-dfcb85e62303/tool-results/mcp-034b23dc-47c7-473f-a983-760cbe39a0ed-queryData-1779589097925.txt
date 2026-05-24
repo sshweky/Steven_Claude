@@ -1,0 +1,5811 @@
+{
+  "results": [
+    {
+      "schema": [
+        {
+          "ordinal": 0,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN",
+          "columnLabel": "ASIN",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 1,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_link_",
+          "columnLabel": "Amazon_link_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 2,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Mstyle_model_",
+          "columnLabel": "Mstyle_model_",
+          "dataTypeName": "VARCHAR",
+          "nullable": false
+        },
+        {
+          "ordinal": 3,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Status",
+          "columnLabel": "ASIN_Status",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 4,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Item_Status",
+          "columnLabel": "Item_Status",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 5,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Description_",
+          "columnLabel": "Description_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 6,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Brand_PT_",
+          "columnLabel": "Brand_PT_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 7,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_Qty_not_alloc_d_",
+          "columnLabel": "ATS_Qty_not_alloc_d_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 8,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Stock_Summary_",
+          "columnLabel": "Stock_Summary_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 9,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Prjns_Orders_Ships",
+          "columnLabel": "Amazon_Prjns_Orders_Ships",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 10,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Buyability_Flag",
+          "columnLabel": "ASIN_Buyability_Flag",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 11,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Suggested_Action_",
+          "columnLabel": "Suggested_Action_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 12,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bestseller_Rank",
+          "columnLabel": "Bestseller_Rank",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 13,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Units_Wk_L4w",
+          "columnLabel": "Avg_Units_Wk_L4w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 14,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Units_Wk_L13w",
+          "columnLabel": "Avg_Units_Wk_L13w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 15,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Units_Wk_L26w",
+          "columnLabel": "Avg_Units_Wk_L26w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 16,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Units_Wk_L52w",
+          "columnLabel": "Avg_Units_Wk_L52w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 17,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Prj_Wk_Cust_",
+          "columnLabel": "Prj_Wk_Cust_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 18,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Rcvd_L14_Days",
+          "columnLabel": "Qty_Ord_Rcvd_L14_Days",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 19,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Shpd_to_AMZ_L14d",
+          "columnLabel": "Qty_Shpd_to_AMZ_L14d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 20,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ord_Wk_L13_Amazon_",
+          "columnLabel": "Ord_Wk_L13_Amazon_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 21,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ord_Wk_L4_Amazon_",
+          "columnLabel": "Ord_Wk_L4_Amazon_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 22,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Master_Pack",
+          "columnLabel": "Master_Pack",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 23,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Amazon_Ratings",
+          "columnLabel": "_Amazon_Ratings",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 24,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Days_local_Relationship_",
+          "columnLabel": "_Days_local_Relationship_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 25,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Days_LWTD_",
+          "columnLabel": "_Days_LWTD_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 26,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_images",
+          "columnLabel": "_images",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 27,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_images_w_o_main_",
+          "columnLabel": "_images_w_o_main_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 28,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Keywords_mirror_",
+          "columnLabel": "_Keywords_mirror_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 29,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Keywords",
+          "columnLabel": "_Keywords",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 30,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_of_Target_ASINs",
+          "columnLabel": "_of_Target_ASINs",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 31,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Target_ASINs",
+          "columnLabel": "_Target_ASINs",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 32,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Last_OOS_Date",
+          "columnLabel": "Amazon_Last_OOS_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 33,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Last_OOS_Date2",
+          "columnLabel": "Amazon_Last_OOS_Date2",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 34,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_List_Price",
+          "columnLabel": "Amazon_List_Price",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 35,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Lost_Sales_wk_L4w_",
+          "columnLabel": "Amazon_Lost_Sales_wk_L4w_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 36,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Lost_Units_wk_L4w_",
+          "columnLabel": "Amazon_Lost_Units_wk_L4w_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 37,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_LY_Cxld_",
+          "columnLabel": "Amazon_LY_Cxld_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 38,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Ord_Rcvd_LW",
+          "columnLabel": "_Ord_Rcvd_LW",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 39,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Volume_Price_from_Min_",
+          "columnLabel": "_Volume_Price_from_Min_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 40,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_from_Bestsellers_Use_Amazon_Ad_Mgr_",
+          "columnLabel": "_from_Bestsellers_Use_Amazon_Ad_Mgr_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 41,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Top_Keywords",
+          "columnLabel": "_Top_Keywords",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 42,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "0071M",
+          "columnLabel": "0071M",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 43,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "0071M_FCA_Current_Cost",
+          "columnLabel": "0071M_FCA_Current_Cost",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 44,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "3X6J2_FCA_Current_Cost",
+          "columnLabel": "3X6J2_FCA_Current_Cost",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 45,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Acct_div",
+          "columnLabel": "Acct_div",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 46,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Acct_Mstyle",
+          "columnLabel": "Acct_Mstyle",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 47,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Acct_Mstyle_mirror_",
+          "columnLabel": "Acct_Mstyle_mirror_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 48,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Active_",
+          "columnLabel": "Active_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 49,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Add_Item",
+          "columnLabel": "Add_Item",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 50,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Add_Keyword",
+          "columnLabel": "Add_Keyword",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 51,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Add_MStyle",
+          "columnLabel": "Add_MStyle",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 52,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Add_Retail_Price_Snapshot",
+          "columnLabel": "Add_Retail_Price_Snapshot",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 53,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Add_Style",
+          "columnLabel": "Add_Style",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 54,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Add_to_Inv_Tracker_",
+          "columnLabel": "Add_to_Inv_Tracker_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 55,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ADF_Exists_",
+          "columnLabel": "ADF_Exists_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 56,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ADF_Sales_",
+          "columnLabel": "ADF_Sales_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 57,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Aged_90_Days_Sellable_Inventory",
+          "columnLabel": "Aged_90_Days_Sellable_Inventory",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 58,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Aged_90_Days_Sellable_Inventory_Trailing_30_day_Average",
+          "columnLabel": "Aged_90_Days_Sellable_Inventory_Trailing_30_day_Average",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 59,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Aged_90_Days_Sellable_Units",
+          "columnLabel": "Aged_90_Days_Sellable_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 60,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Alternate_Brand_Name",
+          "columnLabel": "Alternate_Brand_Name",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 61,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Buybox",
+          "columnLabel": "Amazon_Buybox",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 62,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Daily_Sales",
+          "columnLabel": "Amazon_Daily_Sales",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 63,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_DI_",
+          "columnLabel": "Amazon_DI_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 64,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_In_Stock_Date",
+          "columnLabel": "Amazon_In_Stock_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 65,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_In_Stock_Date_mirror_",
+          "columnLabel": "Amazon_In_Stock_Date_mirror_",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 66,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_In_Stock_Now_",
+          "columnLabel": "Amazon_In_Stock_Now_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 67,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Inv_Pipeline_Qty",
+          "columnLabel": "Amazon_Inv_Pipeline_Qty",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 68,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Inv_Tracker",
+          "columnLabel": "Amazon_Inv_Tracker",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 69,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_LY_Qty_Cxld",
+          "columnLabel": "Amazon_LY_Qty_Cxld",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 70,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_MU_Buybox_",
+          "columnLabel": "Amazon_MU_Buybox_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 71,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_MU_List_",
+          "columnLabel": "Amazon_MU_List_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 72,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Ord_L45d_EC_",
+          "columnLabel": "Amazon_Ord_L45d_EC_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 73,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Ord_L45d_ASIN_",
+          "columnLabel": "Amazon_Ord_L45d_ASIN_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 74,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Ord_L45d_w_o_EC_",
+          "columnLabel": "Amazon_Ord_L45d_w_o_EC_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 75,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Ordered_Units_L12m",
+          "columnLabel": "Amazon_Ordered_Units_L12m",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 76,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Port",
+          "columnLabel": "Amazon_Port",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 77,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Prjn_Exists_",
+          "columnLabel": "Amazon_Prjn_Exists_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 78,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Qty_Cxld_L12m",
+          "columnLabel": "Amazon_Qty_Cxld_L12m",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 79,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Rating",
+          "columnLabel": "Amazon_Rating",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 80,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Shpd_L12m",
+          "columnLabel": "Amazon_Shpd_L12m",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 81,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Shpd_Units_L12m",
+          "columnLabel": "Amazon_Shpd_Units_L12m",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 82,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Sold_Units_L60d",
+          "columnLabel": "Amazon_Sold_Units_L60d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 83,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_WOS_OH",
+          "columnLabel": "Amazon_WOS_OH",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 84,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_WOS_OH_OO",
+          "columnLabel": "Amazon_WOS_OH_OO",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 85,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_YTD_Cxld_",
+          "columnLabel": "Amazon_YTD_Cxld_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 86,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_YTD_Qty_Cxld",
+          "columnLabel": "Amazon_YTD_Qty_Cxld",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 87,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Sales_Inventory",
+          "columnLabel": "Amazon_Sales_Inventory",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 88,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Stock_Status",
+          "columnLabel": "Amazon_Stock_Status",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 89,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Annualized_Sales_L12m_All_Customers_",
+          "columnLabel": "Annualized_Sales_L12m_All_Customers_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 90,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Apparel_Size",
+          "columnLabel": "Apparel_Size",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 91,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Apparel_Size_Width",
+          "columnLabel": "Apparel_Size_Width",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 92,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Arrived_at_Whse_Date_Latest_",
+          "columnLabel": "Arrived_at_Whse_Date_Latest_",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 93,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_forecast_",
+          "columnLabel": "ASIN_forecast_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 94,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_invhealth_",
+          "columnLabel": "ASIN_invhealth_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 95,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_mirror_2_",
+          "columnLabel": "ASIN_mirror_2_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 96,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_mirror_3_",
+          "columnLabel": "ASIN_mirror_3_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 97,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_mirror_4_",
+          "columnLabel": "ASIN_mirror_4_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 98,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_mirror_5_",
+          "columnLabel": "ASIN_mirror_5_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 99,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_mirror_6_",
+          "columnLabel": "ASIN_mirror_6_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 100,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_mirror_2_2",
+          "columnLabel": "ASIN_mirror_2_2",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 101,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_mirror_",
+          "columnLabel": "ASIN_mirror_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 102,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_sales_",
+          "columnLabel": "ASIN_sales_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 103,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Exists_in_Product_Data_Table_",
+          "columnLabel": "ASIN_Exists_in_Product_Data_Table_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 104,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Flag_History",
+          "columnLabel": "ASIN_Flag_History",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 105,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_in_Top_10_",
+          "columnLabel": "ASIN_in_Top_10_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 106,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_in_Top_3_",
+          "columnLabel": "ASIN_in_Top_3_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 107,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_in_Top_50_",
+          "columnLabel": "ASIN_in_Top_50_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 108,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Keyword_Pairs",
+          "columnLabel": "ASIN_Keyword_Pairs",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 109,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Search_Entry",
+          "columnLabel": "ASIN_Search_Entry",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 110,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Sourceability_Notes",
+          "columnLabel": "ASIN_Sourceability_Notes",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 111,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Sourceability_Status",
+          "columnLabel": "ASIN_Sourceability_Status",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 112,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Status_lookup_",
+          "columnLabel": "ASIN_Status_lookup_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 113,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Suppressed_",
+          "columnLabel": "ASIN_Suppressed_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 114,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Title",
+          "columnLabel": "ASIN_Title",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 115,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_State",
+          "columnLabel": "ASIN_State",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 116,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Target_ASIN_Pairs_Local_Relationship_",
+          "columnLabel": "ASIN_Target_ASIN_Pairs_Local_Relationship_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 117,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASINS",
+          "columnLabel": "ASINS",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 118,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_NOW",
+          "columnLabel": "ATS_NOW",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 119,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_Now_Root_",
+          "columnLabel": "ATS_Now_Root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 120,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_Now_root_2",
+          "columnLabel": "ATS_Now_root_2",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 121,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_OH_Root_",
+          "columnLabel": "ATS_OH_Root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 122,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_OH_OO_",
+          "columnLabel": "ATS_OH_OO_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 123,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_OH_OO_Root_",
+          "columnLabel": "ATS_OH_OO_Root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 124,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_OH_",
+          "columnLabel": "ATS_OH_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 125,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_Qty_OH_",
+          "columnLabel": "ATS_Qty_OH_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 126,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_Qty_OH_root_",
+          "columnLabel": "ATS_Qty_OH_root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 127,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_Qty_OH_not_alloc_d_root_",
+          "columnLabel": "ATS_Qty_OH_not_alloc_d_root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 128,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_Qty_OH_OO_root_",
+          "columnLabel": "ATS_Qty_OH_OO_root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 129,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_WOS_OH_",
+          "columnLabel": "ATS_WOS_OH_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 130,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ATS_WOS_OH_OO_",
+          "columnLabel": "ATS_WOS_OH_OO_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 131,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Author_Artist",
+          "columnLabel": "Author_Artist",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 132,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Available_Inventory_Prior_Period",
+          "columnLabel": "Available_Inventory_Prior_Period",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 133,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Amazon_Rating_L90d",
+          "columnLabel": "Avg_Amazon_Rating_L90d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 134,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Buybox_3_Mo_Ago_",
+          "columnLabel": "Avg_Buybox_3_Mo_Ago_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 135,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Glance_Views_Wk_L13w",
+          "columnLabel": "Avg_Glance_Views_Wk_L13w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 136,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Glance_Views_Wk_L26w",
+          "columnLabel": "Avg_Glance_Views_Wk_L26w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 137,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Glance_Views_Wk_L4w",
+          "columnLabel": "Avg_Glance_Views_Wk_L4w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 138,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Glance_Views_Wk_L52w",
+          "columnLabel": "Avg_Glance_Views_Wk_L52w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 139,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Ord_Day_WTD_",
+          "columnLabel": "Avg_Ord_Day_WTD_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 140,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Retail_Price_LW",
+          "columnLabel": "Avg_Retail_Price_LW",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 141,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Revenue_Wk_L12m",
+          "columnLabel": "Avg_Revenue_Wk_L12m",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 142,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Revenue_Wk_L13w",
+          "columnLabel": "Avg_Revenue_Wk_L13w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 143,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Revenue_Wk_L26w",
+          "columnLabel": "Avg_Revenue_Wk_L26w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 144,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Revenue_Wk_L52w",
+          "columnLabel": "Avg_Revenue_Wk_L52w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 145,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Revenue_Wk_LY",
+          "columnLabel": "Avg_Revenue_Wk_LY",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 146,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Revenue_Wk_YTD",
+          "columnLabel": "Avg_Revenue_Wk_YTD",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 147,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Units_Wk_L12m",
+          "columnLabel": "Avg_Units_Wk_L12m",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 148,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Units_Wk_LY",
+          "columnLabel": "Avg_Units_Wk_LY",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 149,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Units_Wk_YTD",
+          "columnLabel": "Avg_Units_Wk_YTD",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 150,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bestseller_Rank_7d_vs_30d",
+          "columnLabel": "Bestseller_Rank_7d_vs_30d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 151,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Binding",
+          "columnLabel": "Binding",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 152,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Brand",
+          "columnLabel": "Brand",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 153,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Brand_Code",
+          "columnLabel": "Brand_Code",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 154,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Brand_Store_Link",
+          "columnLabel": "Brand_Store_Link",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 155,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Brand_Type",
+          "columnLabel": "Brand_Type",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 156,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "BSR_30d_av",
+          "columnLabel": "BSR_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 157,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_1",
+          "columnLabel": "Bullet_1",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 158,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_1_Length_",
+          "columnLabel": "Bullet_1_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 159,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_10",
+          "columnLabel": "Bullet_10",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 160,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_10_Length_",
+          "columnLabel": "Bullet_10_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 161,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_2",
+          "columnLabel": "Bullet_2",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 162,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_2_Length_",
+          "columnLabel": "Bullet_2_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 163,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_3",
+          "columnLabel": "Bullet_3",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 164,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_3_Length_",
+          "columnLabel": "Bullet_3_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 165,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_4",
+          "columnLabel": "Bullet_4",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 166,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_4_Length_",
+          "columnLabel": "Bullet_4_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 167,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_5",
+          "columnLabel": "Bullet_5",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 168,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_5_Length_",
+          "columnLabel": "Bullet_5_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 169,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_6",
+          "columnLabel": "Bullet_6",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 170,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_6_Length_",
+          "columnLabel": "Bullet_6_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 171,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_7",
+          "columnLabel": "Bullet_7",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 172,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_7_Length_",
+          "columnLabel": "Bullet_7_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 173,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_8",
+          "columnLabel": "Bullet_8",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 174,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_8_Length_",
+          "columnLabel": "Bullet_8_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 175,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_9",
+          "columnLabel": "Bullet_9",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 176,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Bullet_9_Length_",
+          "columnLabel": "Bullet_9_Length_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 177,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Buybox_is_Amazon_",
+          "columnLabel": "Buybox_is_Amazon_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 178,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "buybox_winner_availability_raw",
+          "columnLabel": "buybox_winner_availability_raw",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 179,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "buybox_winner_availability_raw_local_Relationship_",
+          "columnLabel": "buybox_winner_availability_raw_local_Relationship_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 180,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Cartons_per_Pallet",
+          "columnLabel": "Cartons_per_Pallet",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 181,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Case_Mstyle_Exists_",
+          "columnLabel": "Case_Mstyle_Exists_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 182,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Chewy_Buybox",
+          "columnLabel": "Chewy_Buybox",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 183,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Clear_Selected_ASINs",
+          "columnLabel": "Clear_Selected_ASINs",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 184,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Color",
+          "columnLabel": "Color",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 185,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Color_Count",
+          "columnLabel": "Color_Count",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 186,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Content_Style_Master_Pack",
+          "columnLabel": "Content_Style_Master_Pack",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 187,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Current_Cost_FETV2_",
+          "columnLabel": "Current_Cost_FETV2_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 188,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Current_Cost_WC636_",
+          "columnLabel": "Current_Cost_WC636_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 189,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Current_Sell_Price",
+          "columnLabel": "Current_Sell_Price",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 190,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Current_User",
+          "columnLabel": "Current_User",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 191,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Current_User_of_Selected_MStyles",
+          "columnLabel": "Current_User_of_Selected_MStyles",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 192,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Current_User_User_Exists_in_Amazon_Keyword_User_focus_",
+          "columnLabel": "Current_User_User_Exists_in_Amazon_Keyword_User_focus_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 193,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Cust_Open_PO_Qty",
+          "columnLabel": "Cust_Open_PO_Qty",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 194,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Customer_PO_s",
+          "columnLabel": "Customer_PO_s",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 195,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "CVR_30d_av",
+          "columnLabel": "CVR_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 196,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "CVR_L13W_av",
+          "columnLabel": "CVR_L13W_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 197,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "CVR_L26W_av",
+          "columnLabel": "CVR_L26W_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 198,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "CVR_L4W_av",
+          "columnLabel": "CVR_L4W_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 199,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "CVR_L52W_av",
+          "columnLabel": "CVR_L52W_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 200,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_1st_Rcvd",
+          "columnLabel": "Date_1st_Rcvd",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 201,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_1st_Shpd",
+          "columnLabel": "Date_1st_Shpd",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 202,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_1st_Shpd_to_Amazon",
+          "columnLabel": "Date_1st_Shpd_to_Amazon",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 203,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_A_Added",
+          "columnLabel": "Date_A_Added",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 204,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_Created",
+          "columnLabel": "Date_Created",
+          "dataTypeName": "TIMESTAMP",
+          "nullable": true
+        },
+        {
+          "ordinal": 205,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_Images_Rcvd",
+          "columnLabel": "Date_Images_Rcvd",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 206,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_Modified",
+          "columnLabel": "Date_Modified",
+          "dataTypeName": "TIMESTAMP",
+          "nullable": true
+        },
+        {
+          "ordinal": 207,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_Sending_to_Studio",
+          "columnLabel": "Date_Sending_to_Studio",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 208,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Days_Amazon_OOS_L30d_",
+          "columnLabel": "Days_Amazon_OOS_L30d_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 209,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Div",
+          "columnLabel": "Div",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 210,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Div_lookup_",
+          "columnLabel": "Div_lookup_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 211,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Div_Override",
+          "columnLabel": "Div_Override",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 212,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Dt_Last_Counted",
+          "columnLabel": "Dt_Last_Counted",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 213,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "dummy_date_time",
+          "columnLabel": "dummy_date_time",
+          "dataTypeName": "TIMESTAMP",
+          "nullable": true
+        },
+        {
+          "ordinal": 214,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Duty_Rate",
+          "columnLabel": "Duty_Rate",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 215,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "EAN",
+          "columnLabel": "EAN",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 216,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Eligibility_Status",
+          "columnLabel": "Eligibility_Status",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 217,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Exists_in_Inv_Tracker_",
+          "columnLabel": "Exists_in_Inv_Tracker_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 218,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Final_Decision",
+          "columnLabel": "Final_Decision",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 219,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "FOB_Cost",
+          "columnLabel": "FOB_Cost",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 220,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "FOB_Point",
+          "columnLabel": "FOB_Point",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 221,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Fragrance",
+          "columnLabel": "Fragrance",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 222,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Full_Size_URL",
+          "columnLabel": "Full_Size_URL",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 223,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Glance_Views_30d_av",
+          "columnLabel": "Glance_Views_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 224,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "GPT_Image",
+          "columnLabel": "GPT_Image",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 225,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_A_",
+          "columnLabel": "Has_A_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 226,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_Coupon_",
+          "columnLabel": "Has_Coupon_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 227,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_Inner_Multi_Pk_",
+          "columnLabel": "Has_Inner_Multi_Pk_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 228,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_Inner_Multipack_",
+          "columnLabel": "Has_Inner_Multipack_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 229,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_Master_Multi_Pk_",
+          "columnLabel": "Has_Master_Multi_Pk_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 230,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_Master_Multipack_",
+          "columnLabel": "Has_Master_Multipack_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 231,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_Parent_",
+          "columnLabel": "Has_Parent_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 232,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_SB_Campaign_",
+          "columnLabel": "Has_SB_Campaign_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 233,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Highest_Sell_Price_L52w",
+          "columnLabel": "Highest_Sell_Price_L52w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 234,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Hold_Order_Qty",
+          "columnLabel": "Hold_Order_Qty",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 235,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "HTS_",
+          "columnLabel": "HTS_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 236,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "I_T_I_W_root_",
+          "columnLabel": "I_T_I_W_root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 237,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "I_W_I_T",
+          "columnLabel": "I_W_I_T",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 238,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Image",
+          "columnLabel": "Image",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 239,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Image_Notes",
+          "columnLabel": "Image_Notes",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 240,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Import_Keywords",
+          "columnLabel": "Import_Keywords",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 241,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Import_Target_ASINs",
+          "columnLabel": "Import_Target_ASINs",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 242,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "In_Amazon_Product_Data_",
+          "columnLabel": "In_Amazon_Product_Data_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 243,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "In_Inv_Tracker_",
+          "columnLabel": "In_Inv_Tracker_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 244,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "In_Stock_Now_",
+          "columnLabel": "In_Stock_Now_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 245,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Inner_Pack",
+          "columnLabel": "Inner_Pack",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 246,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Internal_MU_",
+          "columnLabel": "Internal_MU_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 247,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Internal_MU_OH",
+          "columnLabel": "Internal_MU_OH",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 248,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Is_Liquid_",
+          "columnLabel": "Is_Liquid_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 249,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Issue_Description_",
+          "columnLabel": "Issue_Description_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 250,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Issue_Type_",
+          "columnLabel": "Issue_Type_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 251,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Item_records",
+          "columnLabel": "Item_records",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 252,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Keywords",
+          "columnLabel": "Keywords",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 253,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Kit_Style_",
+          "columnLabel": "Kit_Style_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 254,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Landed_Cost",
+          "columnLabel": "Landed_Cost",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 255,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Landed_Cost_OH",
+          "columnLabel": "Landed_Cost_OH",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 256,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Action_Date",
+          "columnLabel": "Last_Action_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 257,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Action_comments_",
+          "columnLabel": "Last_Action_comments_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 258,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_BTR_Results",
+          "columnLabel": "Last_BTR_Results",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 259,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Dt_Shipped_Amazon_DI",
+          "columnLabel": "Last_Dt_Shipped_Amazon_DI",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 260,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Dt_Shipped_Amazon_DI2",
+          "columnLabel": "Last_Dt_Shipped_Amazon_DI2",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 261,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Modified_By",
+          "columnLabel": "Last_Modified_By",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 262,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Order",
+          "columnLabel": "Last_Order",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 263,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Order_Date",
+          "columnLabel": "Last_Order_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 264,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Shp_Date",
+          "columnLabel": "Last_Shp_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 265,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Shpd_Date",
+          "columnLabel": "Last_Shpd_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 266,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Last_Action_",
+          "columnLabel": "Last_Action_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 267,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Latest_Cxl_Dt_for_Amazon_DI_Order",
+          "columnLabel": "Latest_Cxl_Dt_for_Amazon_DI_Order",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 268,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Latest_Dt_for_Open_Amazon_DI_Order",
+          "columnLabel": "Latest_Dt_for_Open_Amazon_DI_Order",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 269,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Latest_Dt_for_Open_Amazon_DI_Order2",
+          "columnLabel": "Latest_Dt_for_Open_Amazon_DI_Order2",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 270,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Lead_Time",
+          "columnLabel": "Lead_Time",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 271,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Link_to_ASIN_Search_1_",
+          "columnLabel": "Link_to_ASIN_Search_1_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 272,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "List_Price_OLD",
+          "columnLabel": "List_Price_OLD",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 273,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Listing_Complete_",
+          "columnLabel": "Listing_Complete_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 274,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Listing_Description",
+          "columnLabel": "Listing_Description",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 275,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Main_Image",
+          "columnLabel": "Main_Image",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 276,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "main_image_link",
+          "columnLabel": "main_image_link",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 277,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Managing_Optimization",
+          "columnLabel": "Managing_Optimization",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 278,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Manufacturer_Code",
+          "columnLabel": "Manufacturer_Code",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 279,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MAP_Price",
+          "columnLabel": "MAP_Price",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 280,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MAP_Price_Override",
+          "columnLabel": "MAP_Price_Override",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 281,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Master_Brand",
+          "columnLabel": "Master_Brand",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 282,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Master_Pack_Root_",
+          "columnLabel": "Master_Pack_Root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 283,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Min_Sell_Price",
+          "columnLabel": "Min_Sell_Price",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 284,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MOQ",
+          "columnLabel": "MOQ",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 285,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MPP_Exists_",
+          "columnLabel": "MPP_Exists_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 286,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MPP_Mstyle",
+          "columnLabel": "MPP_Mstyle",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 287,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MPP_PO_s",
+          "columnLabel": "MPP_PO_s",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 288,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MPP_Sales_",
+          "columnLabel": "MPP_Sales_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 289,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MSRP_PT_",
+          "columnLabel": "MSRP_PT_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 290,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Mstyle_mirror_2_",
+          "columnLabel": "Mstyle_mirror_2_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 291,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Mstyle_mirror_3_",
+          "columnLabel": "Mstyle_mirror_3_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 292,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Mstyle_mirror_",
+          "columnLabel": "Mstyle_mirror_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 293,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Mstyle_Exists_in_Mstyle_Mirror_For_AMZ_Catalog_",
+          "columnLabel": "Mstyle_Exists_in_Mstyle_Mirror_For_AMZ_Catalog_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 294,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Mstyle_mirrors",
+          "columnLabel": "Mstyle_mirrors",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 295,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MStyle_records",
+          "columnLabel": "MStyle_records",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 296,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MU_on_OH_acct_mstyle_master_",
+          "columnLabel": "MU_on_OH_acct_mstyle_master_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 297,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MU_FCA",
+          "columnLabel": "MU_FCA",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 298,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MU_MPP",
+          "columnLabel": "MU_MPP",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 299,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Need_Amazon_Prjn_",
+          "columnLabel": "Need_Amazon_Prjn_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 300,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Net_PPM",
+          "columnLabel": "Net_PPM",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 301,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Net_PPM_Prior_Period",
+          "columnLabel": "Net_PPM_Prior_Period",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 302,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Net_PPM_Same_Period_Last_Year",
+          "columnLabel": "Net_PPM_Same_Period_Last_Year",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 303,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Net_Received",
+          "columnLabel": "Net_Received",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 304,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Net_Received_Units",
+          "columnLabel": "Net_Received_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 305,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "New_Int_MU_",
+          "columnLabel": "New_Int_MU_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 306,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "New_Sell_Price",
+          "columnLabel": "New_Sell_Price",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 307,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Next_Out_Date",
+          "columnLabel": "Next_Out_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 308,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Next_Rcpt_Dt",
+          "columnLabel": "Next_Rcpt_Dt",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 309,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Next_Rcpt_Dt_Root_",
+          "columnLabel": "Next_Rcpt_Dt_Root_",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 310,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Next_Rcpt_Dt_root_2",
+          "columnLabel": "Next_Rcpt_Dt_root_2",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 311,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "OE6KK_MPP_Current_Cost",
+          "columnLabel": "OE6KK_MPP_Current_Cost",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 312,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "OH_Cost_acct_mstyle_master_",
+          "columnLabel": "OH_Cost_acct_mstyle_master_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 313,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "OH_OO_",
+          "columnLabel": "OH_OO_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 314,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "On_DI_DELETE",
+          "columnLabel": "On_DI_DELETE",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 315,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Open_Orders_all_",
+          "columnLabel": "Open_Orders_all_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 316,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Open_Orders_Amazon_",
+          "columnLabel": "Open_Orders_Amazon_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 317,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Open_PO_ETA_s",
+          "columnLabel": "Open_PO_ETA_s",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 318,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Open_PO_ETD_s",
+          "columnLabel": "Open_PO_ETD_s",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 319,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Open_PO_Qty_Amazon_s_",
+          "columnLabel": "Open_PO_Qty_Amazon_s_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 320,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Open_POs_Qtys",
+          "columnLabel": "Open_POs_Qtys",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 321,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Open_Purchase_Order_Quantity_Prior_Period",
+          "columnLabel": "Open_Purchase_Order_Quantity_Prior_Period",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 322,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ord_Wk_L13_",
+          "columnLabel": "Ord_Wk_L13_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 323,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ord_Wk_L2_",
+          "columnLabel": "Ord_Wk_L2_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 324,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ord_Wk_L4_",
+          "columnLabel": "Ord_Wk_L4_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 325,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ord_Wk_L4w_Amazon_",
+          "columnLabel": "Ord_Wk_L4w_Amazon_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 326,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Revenue_Last_Year",
+          "columnLabel": "Ordered_Revenue_Last_Year",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 327,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Revenue_Prior_Period",
+          "columnLabel": "Ordered_Revenue_Prior_Period",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 328,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Revenue_LW",
+          "columnLabel": "Ordered_Revenue_LW",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 329,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_Chg_LW_",
+          "columnLabel": "Ordered_Units_Chg_LW_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 330,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_LW_vs_L26w_",
+          "columnLabel": "Ordered_Units_LW_vs_L26w_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 331,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_LW_vs_L52w_",
+          "columnLabel": "Ordered_Units_LW_vs_L52w_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 332,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_LWTD_",
+          "columnLabel": "Ordered_Units_LWTD_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 333,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_WTD_",
+          "columnLabel": "Ordered_Units_WTD_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 334,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_Last_Year",
+          "columnLabel": "Ordered_Units_Last_Year",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 335,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_Prior_Period_",
+          "columnLabel": "Ordered_Units_Prior_Period_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 336,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_30d_av",
+          "columnLabel": "Ordered_Units_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 337,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_60d_av",
+          "columnLabel": "Ordered_Units_60d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 338,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_Avg_L8w",
+          "columnLabel": "Ordered_Units_Avg_L8w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 339,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_L13w",
+          "columnLabel": "Ordered_Units_L13w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 340,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_LW",
+          "columnLabel": "Ordered_Units_LW",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 341,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_Prior_Wk",
+          "columnLabel": "Ordered_Units_Prior_Wk",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 342,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Overall_Vendor_Lead_Time_days_",
+          "columnLabel": "Overall_Vendor_Lead_Time_days_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 343,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Parent_ASIN",
+          "columnLabel": "Parent_ASIN",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 344,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Parent_Link_to_Amazon",
+          "columnLabel": "Parent_Link_to_Amazon",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 345,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Parent_Manufacturer_Code",
+          "columnLabel": "Parent_Manufacturer_Code",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 346,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Pcs_Kit",
+          "columnLabel": "Pcs_Kit",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 347,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Prep_Instructions_Required",
+          "columnLabel": "Prep_Instructions_Required",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 348,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Prep_Instructions_Vendor_State",
+          "columnLabel": "Prep_Instructions_Vendor_State",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 349,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Price_Action_Taken",
+          "columnLabel": "Price_Action_Taken",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 350,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Price_Chg_absolute_",
+          "columnLabel": "Price_Chg_absolute_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 351,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Price_Chg_vs_LW",
+          "columnLabel": "Price_Chg_vs_LW",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 352,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Priority_Notes",
+          "columnLabel": "Priority_Notes",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 353,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Prj_Wk_All_",
+          "columnLabel": "Prj_Wk_All_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 354,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Prj_Wk_Amazon",
+          "columnLabel": "Prj_Wk_Amazon",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 355,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Product_Category",
+          "columnLabel": "Product_Category",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 356,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Product_Group",
+          "columnLabel": "Product_Group",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 357,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Product_Manager",
+          "columnLabel": "Product_Manager",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 358,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Product_Mngr",
+          "columnLabel": "Product_Mngr",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 359,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Product_Segment_Code",
+          "columnLabel": "Product_Segment_Code",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 360,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Product_Segment_Descrn",
+          "columnLabel": "Product_Segment_Descrn",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 361,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Product_Subcategory",
+          "columnLabel": "Product_Subcategory",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 362,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Product_Title",
+          "columnLabel": "Product_Title",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 363,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Projections_Exist_",
+          "columnLabel": "Projections_Exist_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 364,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Cxld_L13w",
+          "columnLabel": "Qty_Cxld_L13w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 365,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_in_Prodn",
+          "columnLabel": "Qty_in_Prodn",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 366,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_In_Prodn_root_",
+          "columnLabel": "Qty_In_Prodn_root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 367,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_in_Transit",
+          "columnLabel": "Qty_in_Transit",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 368,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_In_Transit_root_",
+          "columnLabel": "Qty_In_Transit_root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 369,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_OH",
+          "columnLabel": "Qty_OH",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 370,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_OH_Kits_Ext_d_",
+          "columnLabel": "Qty_OH_Kits_Ext_d_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 371,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_OH_Root_",
+          "columnLabel": "Qty_OH_Root_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 372,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_OH_root_2",
+          "columnLabel": "Qty_OH_root_2",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 373,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Open_Amazon_DI",
+          "columnLabel": "Qty_Open_Amazon_DI",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 374,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Lifetime_",
+          "columnLabel": "Qty_Ord_Lifetime_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 375,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Rcvd_L30_Days",
+          "columnLabel": "Qty_Ord_Rcvd_L30_Days",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 376,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Rcvd_L45_Days",
+          "columnLabel": "Qty_Ord_Rcvd_L45_Days",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 377,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Rcvd_YTD",
+          "columnLabel": "Qty_Ord_Rcvd_YTD",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 378,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ordered_L13w",
+          "columnLabel": "Qty_Ordered_L13w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 379,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Shipped_L13w",
+          "columnLabel": "Qty_Shipped_L13w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 380,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Shpd_Lifetime_",
+          "columnLabel": "Qty_Shpd_Lifetime_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 381,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Shpd_Amazon_DI_L12m",
+          "columnLabel": "Qty_Shpd_Amazon_DI_L12m",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 382,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Shpd_to_AMZ_L8W",
+          "columnLabel": "Qty_Shpd_to_AMZ_L8W",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 383,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Rank_yest_",
+          "columnLabel": "Rank_yest_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 384,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Reason_for_Price_Increase",
+          "columnLabel": "Reason_for_Price_Increase",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 385,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Receive_Fill_Rate_",
+          "columnLabel": "Receive_Fill_Rate_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 386,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Record_Category",
+          "columnLabel": "Record_Category",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 387,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Record_ID_",
+          "columnLabel": "Record_ID_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 388,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Record_Owner",
+          "columnLabel": "Record_Owner",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 389,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Release_Date",
+          "columnLabel": "Release_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 390,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Release_Date_DELETE",
+          "columnLabel": "Release_Date_DELETE",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 391,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Replenishment_Category",
+          "columnLabel": "Replenishment_Category",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 392,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Replenishment_Code",
+          "columnLabel": "Replenishment_Code",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 393,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Retail_Price_Snapshot_records",
+          "columnLabel": "Retail_Price_Snapshot_records",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 394,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Root_Item_Status",
+          "columnLabel": "Root_Item_Status",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 395,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Root_Mstyle",
+          "columnLabel": "Root_Mstyle",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 396,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Root_Mstyle_mirror_",
+          "columnLabel": "Root_Mstyle_mirror_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 397,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Root_Mstyle2",
+          "columnLabel": "Root_Mstyle2",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 398,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Royalty_Rate",
+          "columnLabel": "Royalty_Rate",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 399,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "S66JV_FCA_Current_Cost",
+          "columnLabel": "S66JV_FCA_Current_Cost",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 400,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "scrap",
+          "columnLabel": "scrap",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 401,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Season",
+          "columnLabel": "Season",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 402,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Select_ASIN_Refresh_Report",
+          "columnLabel": "Select_ASIN_Refresh_Report",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 403,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Select_ASIN_quiet_pop_up_",
+          "columnLabel": "Select_ASIN_quiet_pop_up_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 404,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sell_to_Make_10_",
+          "columnLabel": "Sell_to_Make_10_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 405,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sell_to_Make_15_",
+          "columnLabel": "Sell_to_Make_15_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 406,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sell_to_Make_20_",
+          "columnLabel": "Sell_to_Make_20_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 407,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sell_to_Make_25_",
+          "columnLabel": "Sell_to_Make_25_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 408,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sell_to_Make_27_5_",
+          "columnLabel": "Sell_to_Make_27_5_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 409,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sell_to_Make_30_",
+          "columnLabel": "Sell_to_Make_30_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 410,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sell_Through_Rate",
+          "columnLabel": "Sell_Through_Rate",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 411,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sellable_On_Hand_Inventory",
+          "columnLabel": "Sellable_On_Hand_Inventory",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 412,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sellable_On_Hand_Inventory_Trailing_30_day_Average",
+          "columnLabel": "Sellable_On_Hand_Inventory_Trailing_30_day_Average",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 413,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Sellable_On_Hand_Units",
+          "columnLabel": "Sellable_On_Hand_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 414,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Short_Descrn_",
+          "columnLabel": "Short_Descrn_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 415,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Show_Selected_ASINs_Only_",
+          "columnLabel": "Show_Selected_ASINs_Only_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 416,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Shpd_L13W",
+          "columnLabel": "Shpd_L13W",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 417,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Shpd_L4",
+          "columnLabel": "Shpd_L4",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 418,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Shpd_Wk_L13w_Amazon_",
+          "columnLabel": "Shpd_Wk_L13w_Amazon_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 419,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Shpd_Wk_L4w_Amazon_",
+          "columnLabel": "Shpd_Wk_L4w_Amazon_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 420,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "SITB_enabled_",
+          "columnLabel": "SITB_enabled_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 421,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Stock_Summary_2",
+          "columnLabel": "Stock_Summary_2",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 422,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Style_",
+          "columnLabel": "Style_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 423,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Style_records",
+          "columnLabel": "Style_records",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 424,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Suggested_Action_txt_",
+          "columnLabel": "Suggested_Action_txt_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 425,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Supplier_POs",
+          "columnLabel": "Supplier_POs",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 426,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Thumb",
+          "columnLabel": "Thumb",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 427,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Thumbnail",
+          "columnLabel": "Thumbnail",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 428,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Thumbnail_root_",
+          "columnLabel": "Thumbnail_root_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 429,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Thumbnail_Root_mirror_",
+          "columnLabel": "Thumbnail_Root_mirror_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 430,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Thumbnail_sync_",
+          "columnLabel": "Thumbnail_sync_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 431,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Thumbnail3",
+          "columnLabel": "Thumbnail3",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 432,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Today",
+          "columnLabel": "Today",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 433,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Tot_Ord_L13W",
+          "columnLabel": "Tot_Ord_L13W",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 434,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Tot_Ord_L2W",
+          "columnLabel": "Tot_Ord_L2W",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 435,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Tot_Ord_L4W",
+          "columnLabel": "Tot_Ord_L4W",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 436,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Tot_Shpd_L2W",
+          "columnLabel": "Tot_Shpd_L2W",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 437,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Total_I_W_I_T",
+          "columnLabel": "Total_I_W_I_T",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 438,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Trigger_for_Flag_HIstory_Automation",
+          "columnLabel": "Trigger_for_Flag_HIstory_Automation",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 439,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "true",
+          "columnLabel": "true",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 440,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Under_Development",
+          "columnLabel": "Under_Development",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 441,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Unfilled_Customer_Ordered_Units",
+          "columnLabel": "Unfilled_Customer_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 442,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Unhealthy_Inventory",
+          "columnLabel": "Unhealthy_Inventory",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 443,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Unhealthy_Inventory_Trailing_30_day_Average",
+          "columnLabel": "Unhealthy_Inventory_Trailing_30_day_Average",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 444,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Unhealthy_Units",
+          "columnLabel": "Unhealthy_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 445,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Unit_Chg_LW_vs_Prior_Wk_units_",
+          "columnLabel": "Unit_Chg_LW_vs_Prior_Wk_units_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 446,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Unsellable_On_Hand_Inventory",
+          "columnLabel": "Unsellable_On_Hand_Inventory",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 447,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Unsellable_On_Hand_Inventory_Trailing_30_day_Average",
+          "columnLabel": "Unsellable_On_Hand_Inventory_Trailing_30_day_Average",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 448,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Unsellable_On_Hand_Units",
+          "columnLabel": "Unsellable_On_Hand_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 449,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "UPC_PT_",
+          "columnLabel": "UPC_PT_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 450,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "UPC_catalog_",
+          "columnLabel": "UPC_catalog_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 451,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Valid_for_ASIN_Search_Results_",
+          "columnLabel": "Valid_for_ASIN_Search_Results_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 452,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor_ASIN",
+          "columnLabel": "Vendor_ASIN",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 453,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor",
+          "columnLabel": "Vendor",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 454,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor_ASIN_0071M_FCA_",
+          "columnLabel": "Vendor_ASIN_0071M_FCA_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 455,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor_ASIN_3X6J2_FCA_",
+          "columnLabel": "Vendor_ASIN_3X6J2_FCA_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 456,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor_ASIN_FETV2_DF_",
+          "columnLabel": "Vendor_ASIN_FETV2_DF_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 457,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor_ASIN_OE6KK_",
+          "columnLabel": "Vendor_ASIN_OE6KK_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 458,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor_ASIN_S66JV_FCA_",
+          "columnLabel": "Vendor_ASIN_S66JV_FCA_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 459,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor_ASIN_WC636_",
+          "columnLabel": "Vendor_ASIN_WC636_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 460,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Vendor_ASIN_XA6S8_MPP_",
+          "columnLabel": "Vendor_ASIN_XA6S8_MPP_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 461,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "View_Style",
+          "columnLabel": "View_Style",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 462,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Volume_Price_PT_",
+          "columnLabel": "Volume_Price_PT_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 463,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Wake_Up_Date",
+          "columnLabel": "Wake_Up_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 464,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Walmart_Buybox",
+          "columnLabel": "Walmart_Buybox",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 465,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Petsmart_Buybox",
+          "columnLabel": "Petsmart_Buybox",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 466,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Petco_Buybox",
+          "columnLabel": "Petco_Buybox",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 467,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_1_Ordered_Units",
+          "columnLabel": "Week_1_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 468,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_2_Ordered_Units",
+          "columnLabel": "Week_2_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 469,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_3_Ordered_Units",
+          "columnLabel": "Week_3_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 470,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_4_Ordered_Units",
+          "columnLabel": "Week_4_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 471,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_5_Ordered_Units",
+          "columnLabel": "Week_5_Ordered_Units",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 472,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_6_Ordered_Units",
+          "columnLabel": "Week_6_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 473,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_7_Ordered_Units",
+          "columnLabel": "Week_7_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 474,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_8_Ordered_Units",
+          "columnLabel": "Week_8_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 475,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_9_Ordered_Units",
+          "columnLabel": "Week_9_Ordered_Units",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 476,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_1_P70_Forecast",
+          "columnLabel": "Week_1_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 477,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_2_P70_Forecast",
+          "columnLabel": "Week_2_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 478,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_3_P70_Forecast",
+          "columnLabel": "Week_3_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 479,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_4_P70_Forecast",
+          "columnLabel": "Week_4_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 480,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_5_P70_Forecast",
+          "columnLabel": "Week_5_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 481,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_6_P70_Forecast",
+          "columnLabel": "Week_6_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 482,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_7_P70_Forecast",
+          "columnLabel": "Week_7_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 483,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_8_P70_Forecast",
+          "columnLabel": "Week_8_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 484,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_9_P70_Forecast",
+          "columnLabel": "Week_9_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 485,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_10_P70_Forecast",
+          "columnLabel": "Week_10_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 486,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_11_P70_Forecast",
+          "columnLabel": "Week_11_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 487,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_12_P70_Forecast",
+          "columnLabel": "Week_12_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 488,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_13_P70_Forecast",
+          "columnLabel": "Week_13_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 489,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_14_P70_Forecast",
+          "columnLabel": "Week_14_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 490,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_15_P70_Forecast",
+          "columnLabel": "Week_15_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 491,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_16_P70_Forecast",
+          "columnLabel": "Week_16_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 492,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_17_P70_Forecast",
+          "columnLabel": "Week_17_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 493,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_18_P70_Forecast",
+          "columnLabel": "Week_18_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 494,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_19_P70_Forecast",
+          "columnLabel": "Week_19_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 495,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_20_P70_Forecast",
+          "columnLabel": "Week_20_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 496,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_21_P70_Forecast",
+          "columnLabel": "Week_21_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 497,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_22_P70_Forecast",
+          "columnLabel": "Week_22_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 498,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_23_P70_Forecast",
+          "columnLabel": "Week_23_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 499,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_24_P70_Forecast",
+          "columnLabel": "Week_24_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 500,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_25_P70_Forecast",
+          "columnLabel": "Week_25_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 501,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Week_26_P70_Forecast",
+          "columnLabel": "Week_26_P70_Forecast",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 502,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Whse_Rcv_Messages",
+          "columnLabel": "Whse_Rcv_Messages",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 503,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "WTD_days_",
+          "columnLabel": "WTD_days_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 504,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "XA6S8_MPP_Current_Cost",
+          "columnLabel": "XA6S8_MPP_Current_Cost",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 505,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "GPT_Image_Preview",
+          "columnLabel": "GPT_Image_Preview",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 506,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "New_Product_Title",
+          "columnLabel": "New_Product_Title",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 507,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Freight_In",
+          "columnLabel": "Freight_In",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 508,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Freight_In_LA",
+          "columnLabel": "Freight_In_LA",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 509,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "YTD_Shpd_Domestic_",
+          "columnLabel": "YTD_Shpd_Domestic_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 510,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Buybox_Unit",
+          "columnLabel": "Buybox_Unit",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 511,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Pcs_Kit_calc_",
+          "columnLabel": "_Pcs_Kit_calc_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 512,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Buybox_6_18_25",
+          "columnLabel": "Buybox_6_18_25",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 513,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Buybox_GPT_",
+          "columnLabel": "Amazon_Buybox_GPT_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 514,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Daily_Glance_Views_L30d",
+          "columnLabel": "Avg_Daily_Glance_Views_L30d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 515,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Daily_Glance_Views_L7d",
+          "columnLabel": "Avg_Daily_Glance_Views_L7d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 516,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Daily_Ordered_Units_L30d",
+          "columnLabel": "Avg_Daily_Ordered_Units_L30d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 517,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Daily_Ordered_Units_L7d",
+          "columnLabel": "Avg_Daily_Ordered_Units_L7d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 518,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_CVR_L30d",
+          "columnLabel": "Avg_CVR_L30d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 519,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Action_Steps",
+          "columnLabel": "Action_Steps",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 520,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "CVR7d",
+          "columnLabel": "CVR7d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 521,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ACoS_7d_",
+          "columnLabel": "ACoS_7d_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 522,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Action_Comments",
+          "columnLabel": "Action_Comments",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 523,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Freeze_Date",
+          "columnLabel": "Freeze_Date",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 524,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "BSR_on_Freeze_Date",
+          "columnLabel": "BSR_on_Freeze_Date",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 525,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Pause_Ads_lookup_",
+          "columnLabel": "Pause_Ads_lookup_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 526,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "BSR_Trend_L30d",
+          "columnLabel": "BSR_Trend_L30d",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 527,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "BSR_Chg_Since_Freeze",
+          "columnLabel": "BSR_Chg_Since_Freeze",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 528,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Retail_Unit",
+          "columnLabel": "Retail_Unit",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 529,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "_Indexing_Keywords",
+          "columnLabel": "_Indexing_Keywords",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 530,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ordered_Units_Chg_L7_vs_30d_",
+          "columnLabel": "Ordered_Units_Chg_L7_vs_30d_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 531,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_Buyability_Notes",
+          "columnLabel": "ASIN_Buyability_Notes",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 532,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ad_CTR_30d_av",
+          "columnLabel": "Ad_CTR_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 533,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ad_Impressions_30d_av",
+          "columnLabel": "Ad_Impressions_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 534,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_2_or_3_Pc_Multi_",
+          "columnLabel": "Has_2_or_3_Pc_Multi_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 535,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_1st_Shpd_to_Amazon_ASIN_",
+          "columnLabel": "Date_1st_Shpd_to_Amazon_ASIN_",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 536,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Avg_Revenue_Wk_L4w",
+          "columnLabel": "Avg_Revenue_Wk_L4w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 537,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "AUR_L4w",
+          "columnLabel": "AUR_L4w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 538,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "AUR_L13w",
+          "columnLabel": "AUR_L13w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 539,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "AUR_L52w",
+          "columnLabel": "AUR_L52w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 540,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "AUR_L26w",
+          "columnLabel": "AUR_L26w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 541,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "W1_Prj",
+          "columnLabel": "W1_Prj",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 542,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ord_LW_Amz_",
+          "columnLabel": "Ord_LW_Amz_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 543,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "L4w_vs_L52w",
+          "columnLabel": "L4w_vs_L52w",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 544,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Variation_Notes",
+          "columnLabel": "Variation_Notes",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 545,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "No_Parent_OK_",
+          "columnLabel": "No_Parent_OK_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 546,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "ASIN_records",
+          "columnLabel": "ASIN_records",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 547,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Add_ASIN",
+          "columnLabel": "Add_ASIN",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 548,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_7_Images_",
+          "columnLabel": "Has_7_Images_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 549,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Has_Main_Image_",
+          "columnLabel": "Has_Main_Image_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 550,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Suggested_Priority",
+          "columnLabel": "Suggested_Priority",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 551,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Date_F_B_Added",
+          "columnLabel": "Date_F_B_Added",
+          "dataTypeName": "DATE",
+          "nullable": true
+        },
+        {
+          "ordinal": 552,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Final_Priority",
+          "columnLabel": "Final_Priority",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 553,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Shpd_Amazon_DI_L4m",
+          "columnLabel": "Qty_Shpd_Amazon_DI_L4m",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 554,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "RRS",
+          "columnLabel": "RRS",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 555,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "RRS_Detail",
+          "columnLabel": "RRS_Detail",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 556,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Listing_Updates_L90d_",
+          "columnLabel": "Listing_Updates_L90d_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 557,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Listing_Actions_Needed",
+          "columnLabel": "Listing_Actions_Needed",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 558,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Rcvd_L45d_ASIN_",
+          "columnLabel": "Qty_Ord_Rcvd_L45d_ASIN_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 559,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Rcvd_L14d_ASIN_",
+          "columnLabel": "Qty_Ord_Rcvd_L14d_ASIN_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 560,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Rcvd_L30d_ASIN_",
+          "columnLabel": "Qty_Ord_Rcvd_L30d_ASIN_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 561,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Qty_Ord_Rcvd_YTD_ASIN_",
+          "columnLabel": "Qty_Ord_Rcvd_YTD_ASIN_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 562,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "UPC_txt_",
+          "columnLabel": "UPC_txt_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 563,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Buybox_Unit_Out_of_Range_",
+          "columnLabel": "Buybox_Unit_Out_of_Range_",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 564,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Price_Variance_Flag",
+          "columnLabel": "Price_Variance_Flag",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 565,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Normalized_Price_Per_Item_",
+          "columnLabel": "Normalized_Price_Per_Item_",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 566,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Size_Ct",
+          "columnLabel": "Size_Ct",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 567,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Price_Variation_Notes",
+          "columnLabel": "Price_Variation_Notes",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 568,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Record_ID_of_Style_in_ProductTrack",
+          "columnLabel": "Record_ID_of_Style_in_ProductTrack",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 569,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "MSRP_Each",
+          "columnLabel": "MSRP_Each",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 570,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "isMulti_",
+          "columnLabel": "isMulti_",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        },
+        {
+          "ordinal": 571,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Amazon_Review_Topic_records",
+          "columnLabel": "Amazon_Review_Topic_records",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 572,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ad_ACoS_30d_av",
+          "columnLabel": "Ad_ACoS_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 573,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ad_Clicks_30d_av",
+          "columnLabel": "Ad_Clicks_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 574,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ad_Conversions_30d_av",
+          "columnLabel": "Ad_Conversions_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 575,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ad_Cost_30d_av",
+          "columnLabel": "Ad_Cost_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 576,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Ad_CVR_30d_av",
+          "columnLabel": "Ad_CVR_30d_av",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 577,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Total_Lead_Time",
+          "columnLabel": "Total_Lead_Time",
+          "dataTypeName": "DOUBLE",
+          "nullable": true
+        },
+        {
+          "ordinal": 578,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "Listing_Status",
+          "columnLabel": "Listing_Status",
+          "dataTypeName": "VARCHAR",
+          "nullable": true
+        },
+        {
+          "ordinal": 579,
+          "catalogName": "Quickbase1",
+          "schemaName": "ProductTrack",
+          "tableName": "Amazon_Catalog_US",
+          "columnName": "In_Asana",
+          "columnLabel": "In_Asana",
+          "dataTypeName": "BOOLEAN",
+          "nullable": true
+        }
+      ],
+      "rows": [],
+      "affectedRows": -1,
+      "rowsTruncated": false
+    }
+  ]
+}
