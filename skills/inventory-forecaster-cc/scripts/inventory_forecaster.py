@@ -62,24 +62,32 @@ QB_OPEN_POS_REPORT = int(os.environ.get("QB_OPEN_POS_REPORT", "27"))
 QB_OPEN_POS_CACHE_HOURS = int(os.environ.get("QB_OPEN_POS_CACHE_HOURS", "24"))
 ALERT_THRESHOLD = 0.075  # 7.5% variance vs prior triggers AI_ALERT write
 
-# Smoothing parameters (legacy -- holt_winters() removed 2026-05-21;
-# constants retained as documentation of original level/trend smoothing intent)
-HW_ALPHA = 0.3   # level
-HW_BETA  = 0.1   # trend
-CR_ALPHA = 0.3   # Croston's demand + interval
+CR_ALPHA = 0.3   # Croston's demand + interval smoothing
 
-# Event calendar (1-indexed forecast weeks)
-# NOTE: BOTH Prime Day AND Fall Deal are Amazon-ONLY promotions.
-# Only apply PRIME_DAY_LIFT and FALL_DEAL_LIFT when the customer name contains
-# "AMAZON" (case-insensitive).  Other retailers don't run these specific events
-# and inserting a lift on their forecast over-projects the surrounding weeks.
-# F11 — Tapered Prime Day lift schedule (Amazon pre-buy behavior).
-PRIME_DAY_LIFT_SCHEDULE = {5: 1.10, 6: 1.15, 7: 1.25, 8: 1.25, 9: 1.20}
-PRIME_DAY_WEEKS    = set(PRIME_DAY_LIFT_SCHEDULE.keys())  # {5,6,7,8,9}
-FALL_DEAL_WEEKS    = {23, 24, 25}   # early-Sep pre-order
-EVENT_WEEKS        = PRIME_DAY_WEEKS | FALL_DEAL_WEEKS
-PRIME_DAY_LIFT     = 1.25            # legacy constant (still used for insertion/messaging)
-FALL_DEAL_LIFT     = 1.12
+# Event calendar — Amazon-ONLY promotions (Prime Day and Fall Prime Day).
+# NOTE: Apply event lifts ONLY when customer name contains "AMAZON" (case-insensitive).
+# Other retailers don't run these events; lifting their forecast over-projects.
+#
+# F11 — Prime Day (last Tuesday of June) ordering bump schedule — CALENDAR-BASED:
+#   May 1  x1.25  first pre-buy wave
+#   May 15 x1.25  second pre-buy wave
+#   May 29 x1.50  final (largest) pre-buy
+#
+# Fall Prime Day (first Tuesday of October) ordering bump — CALENDAR-BASED:
+#   Tuesday after Memorial Day (last Monday of May + 1 day) x1.30
+#   Much smaller than Prime Day; single discrete order event.
+#
+# Week-to-boost mappings are computed at runtime by _get_event_boosts() because
+# the 26-week projection window shifts each week — hard-coded week numbers become
+# wrong as soon as the run date moves past the bump dates.
+PRIME_DAY_BUMPS = [
+    (5, 1,  1.25),   # May 1    — first pre-buy
+    (5, 15, 1.25),   # May 15   — second pre-buy
+    (5, 29, 1.50),   # May 29   — peak pre-buy
+]
+FALL_PRIME_DAY_LIFT = 1.30   # Tuesday after Memorial Day
+PRIME_DAY_LIFT      = 1.25   # representative lift (EDA / messaging)
+FALL_DEAL_LIFT      = 1.12   # legacy (retained for TRADE_FALL reference)
 # F64 — Trade fall calendar events (2026-05-17).  Based on manual-vs-AI analysis:
 # W17-W18 = early September fall replenishment (most common planner spike week);
 # W21-W22 = early October holiday pre-order wave (2nd most common spike week).
