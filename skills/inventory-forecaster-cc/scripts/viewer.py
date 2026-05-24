@@ -4011,7 +4011,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(payload)
         elif self.path == "/api/status":
-            self._json({"accepted": list(accepted_keys()), "total": len(records_by_key)})
+            self._json({"accepted": [], "total": len(records_by_key)})
         elif self.path.startswith("/api/detail"):
             # Return detail for one record (fallback for records not preloaded in page JS)
             from urllib.parse import urlparse, parse_qs
