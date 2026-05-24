@@ -3,7 +3,7 @@
   "subject": "B5: Rule namespace alias helper + migration guide",
   "description": "Build rule_aliases.py mapping old codes (F18, R1, VP-Q4) to new phase-prefixed codes (BAS-018, CLS-001, HRD-004). Migration guide in RULES.md. Aliases work bidirectionally; no rename of existing rules.",
   "activeForm": "Building namespace alias helper",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
