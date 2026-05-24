@@ -2457,6 +2457,45 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                 baseline = _f48_ceiling
                 _f48_applied = True
 
+    # F_STEADY (2026-05-24) — Steady-buyer seasonal-damping guard.
+    # For customers who order every week with low variability (L13 zero-weeks <= 1,
+    # CV <= 0.50), the 52-week positional seasonal profile gets corrupted when LY
+    # had a different ordering cadence (e.g. large spring batch POs that create 2x
+    # summer peaks and 0.5x fall troughs).  For these steady buyers the flat L13
+    # rate is the correct forward signal -- the LY ordering SHAPE does not predict
+    # their demand distribution.
+    # Fix: damp the seasonal profile 85% toward flat (DAMP = 0.15) so multipliers
+    # stay within ~1.0-1.18x regardless of LY ordering shape.  Total 26w demand is
+    # preserved (mean(S) stays ~1.0); only the weekly distribution is flattened.
+    # Guards:
+    #   - skip Amazon (DC replenishment uses different seasonal signals)
+    #   - skip pulsed items (_fa_applied): F_BURST handles those
+    #   - skip if fewer than 13 L13W observations (thin history)
+    _f_steady_applied = False
+    _f_steady_driver  = None
+    if (not is_amazon
+            and not _fa_applied
+            and l13_zero_count <= 1
+            and l13_avg > 0
+            and len(l13) >= 13):
+        try:
+            import statistics as _stat_fs
+            _l13_cv = _stat_fs.stdev(l13) / l13_avg if len(l13) > 1 else 99.0
+        except Exception:
+            _l13_cv = 99.0
+        if _l13_cv <= 0.50:
+            DAMP_STEADY   = 0.15
+            _s_min_raw    = min(S)
+            _s_max_raw    = max(S)
+            S             = [1.0 + DAMP_STEADY * (s - 1.0) for s in S]
+            _f_steady_applied = True
+            _f_steady_driver  = (
+                f"F_STEADY steady buyer: L13 zero-weeks={l13_zero_count}/13, "
+                f"CV={_l13_cv:.2f} (<=0.50); seasonal damped 85% toward flat "
+                f"(S range {_s_min_raw:.2f}-{_s_max_raw:.2f} -> "
+                f"{min(S):.2f}-{max(S):.2f})"
+            )
+
     # Raw forecast: damped profile + explicit event lifts
     raw = []
     _f66_floored = 0
