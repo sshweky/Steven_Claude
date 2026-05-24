@@ -10524,7 +10524,8 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
          coming).  Keys: 'l4w','l13w','l26w','l52w','ordered_lw','ordered_prior_wk'
          or upstream-formatted 'Avg_Units_Wk_*' / 'Ordered_Units_*'.
     amz_catalog: Amazon Catalog US + Invtry Health merged dict for this mstyle.
-         Keys used here: 'Inv_SOH', 'Inv_OPO', 'Inv_WOS'.
+         Keys used here: 'Inv_SOH', 'Inv_OPO', 'Inv_WOS',
+         'AUR_L4w', 'AUR_L13w', 'AUR_L26w', 'AUR_L52w'.
     """
     from html import escape as _e
     MAX_BULLETS = 5  # POS + DC inv + AUR are 3 pinned; keep 2 slots for specific/critical
