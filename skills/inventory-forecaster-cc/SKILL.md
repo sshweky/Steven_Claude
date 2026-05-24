@@ -586,7 +586,7 @@ Phase 3 — Forecast (pure Python, no API calls)
   │     Applied in seasonal_baseline(), crostens(), and heuristic()
   │   Explicit event lifts (Amazon-only, calendar-date-based):
   │     Prime Day (last Tue of June): ordering bumps May 1 x1.25, May 15 x1.25, May 29 x1.50
-  │     Fall Prime Day (first Tue of Oct): ordering bump Tuesday after Memorial Day x1.30
+  │     Fall Prime Day (first Tue of Oct): ordering bump Tuesday after Labor Day x1.30
   │
   ├── Croston's: α=0.3 over 78-obs weighted series
   │   z and p refined 70% L13W / 30% smoothed model output
@@ -636,7 +636,7 @@ Phase 4 — Write-back
 | Master pack | `Master_Pack` on `Quickbase1.ProductTrack.Styles` |
 | Amazon Catalog | `Quickbase1.InventoryTrack.Amazon_Catalog` (join on `Mstyle`) |
 | POS fields | `Ordered_Units_LW`, `Avg_Units_Wk_L4w`, `Avg_Units_Wk_L13w`, `Avg_Units_Wk_L26w`, `Avg_Units_Wk_L52w` |
-| Event windows | Prime Day (calendar): May 1 x1.25, May 15 x1.25, May 29 x1.50 (Amazon-only) · Fall Prime Day: Tuesday after Memorial Day x1.30 (Amazon-only) |
+| Event windows | Prime Day (calendar): May 1 x1.25, May 15 x1.25, May 29 x1.50 (Amazon-only) · Fall Prime Day: Tuesday after Labor Day x1.30 (Amazon-only) |
 | Amazon gate | `AMAZON_CUST_SUBSTR = "AMAZON"` — all Prime Day lifts and POS pulls conditioned on this |
 | Alert threshold | >7.5% variance vs manual projections |
 
@@ -755,7 +755,7 @@ Top 104 high-volume acct 1864 records: AI total **2.73M units** vs manual **3.73
 | **F8** | Seasonal category not in CATEGORY_PROFILES | 9 | 102,281 | Expand match inputs to include `Product_Category`, `Product_Subcategory`, `Brand`, `Brand_PT_`. Add new profiles: `kingsford` / `fabuloso` / `fraganzia` / `air freshener` / `deodorizing ball` / `scent booster` / `paper bowl` / `snack bowl` / `grill cleaner` / `wooden fire`. |
 | **F9** | Sparse/intermittent baseline too conservative | 6 | 93,221 | For `sparse_intermittent` & `intermittent` with annual_volume > 15K: baseline = `MAX(L13 nz avg, L26 nz avg, L52 nz avg)` instead of L13-first-fallback chain. |
 | **F10** | Declining item over-forecast | 5 | 74,729 | Detect end-of-life: if L4W avg < L13W nz avg × 0.7, blend 26w forecast = 0.5×model + 0.5×L4W avg. Further down-weight W14-W26 by 0.85×. |
-| **F11** | Amazon Prime Day pre-buy gap (calendar-based) | 3 | 36,350 | IMPLEMENTED (2026-05-23): replaced static week-number schedule with calendar-date bumps: May 1 x1.25, May 15 x1.25, May 29 x1.50. Fall Prime Day added: Tuesday after Memorial Day x1.30. Week mapping computed at runtime from ORIG_PRJ_COLS[0] via _get_event_boosts(). |
+| **F11** | Amazon Prime Day pre-buy gap (calendar-based) | 3 | 36,350 | IMPLEMENTED (2026-05-23): replaced static week-number schedule with calendar-date bumps: May 1 x1.25, May 15 x1.25, May 29 x1.50. Fall Prime Day added: Tuesday after Labor Day x1.30. Week mapping computed at runtime from ORIG_PRJ_COLS[0] via _get_event_boosts(). |
 | **F12** | Isolated spike over-forecast (outlier cap) | 2 | 14,878 | Tighten Fix 3: lower cap from 3.0× → 2.5× median. Add secondary check: if max(L13 nz) > 2× L13_all_avg AND max occurs only once, cap at 2× L13_all_avg. |
 
 **Workflow for applying queued fixes:**
