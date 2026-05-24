@@ -75,7 +75,7 @@ def compute_metric(results_path: Path, metric: str) -> float:
         ds = []
         for r in records:
             m = sum(r.get("manual", []))
-            a = sum(r.get("fcst", []))
+            a = sum(r.get("forecast", r.get("fcst", [])))
             if m > 0:
                 ds.append(min(abs(a - m) / m, 2.0))
             elif a > 0:
@@ -84,7 +84,7 @@ def compute_metric(results_path: Path, metric: str) -> float:
 
     elif metric == "ai_vs_manual":
         # Absolute aggregate unit gap (lower = closer to planner consensus)
-        ai = sum(sum(r.get("fcst", [])) for r in records)
+        ai = sum(sum(r.get("forecast", r.get("fcst", []))) for r in records)
         man = sum(sum(r.get("manual", [])) for r in records)
         return abs(ai - man)
 
@@ -92,7 +92,7 @@ def compute_metric(results_path: Path, metric: str) -> float:
         ds = []
         for r in records:
             m = sum(r.get("manual", []))
-            a = sum(r.get("fcst", []))
+            a = sum(r.get("forecast", r.get("fcst", [])))
             if m > 0:
                 ds.append(min(abs(a - m) / m, 2.0))
         ds.sort()
