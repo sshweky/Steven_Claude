@@ -10347,7 +10347,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             )
 
     # ── Assemble in priority order: critical → specific → gap_pill → pinned ──
-    # pinned_last (Amazon POS Sales then DC Inv) always anchor the last positions
+    # pinned_last (Amazon POS Sales, DC Inv, AUR) always anchor the last positions
     # so planners see a consistent layout on every Amazon record.
     parts = critical[:]                                 # always shown, no cap
     _pinned_count = len(pinned_last)
