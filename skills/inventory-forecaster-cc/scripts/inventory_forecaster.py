@@ -4035,6 +4035,61 @@ def crostens(history, mp, is_amazon=False, description=None,
     l13_vals  = [float(v) for v in l13 if v > 0]
     l13_weeks = [i for i, v in enumerate(l13) if float(v) > 0]
 
+    # P7 (2026-05-24): Croston event-aware z.
+    # For Amazon, if any of the L13 burst weeks fall within a +/-2-week window
+    # of a known Prime Day / Fall Prime Day ordering bump in past calendar
+    # (i.e. last year's bumps), the burst was event-driven, not steady-state.
+    # Exclude those weeks from z computation -- future event boosts will
+    # re-add them at the right calendar time, so keeping them in z =
+    # double-counting.
+    _p7_burst_weeks_excluded = 0
+    if is_amazon and len(l13_vals) >= 2:
+        from datetime import date as _p7_date, timedelta as _p7_td
+        if ORIG_PRJ_COLS:
+            try:
+                _p7_col0 = ORIG_PRJ_COLS[0]
+                _p7_m, _p7_d = int(_p7_col0[0:2]), int(_p7_col0[3:5])
+                _p7_today = _p7_date.today()
+                _p7_prj_start = _p7_date(_p7_today.year, _p7_m, _p7_d)
+                if (_p7_prj_start - _p7_today).days < -180:
+                    _p7_prj_start = _p7_date(_p7_today.year + 1, _p7_m, _p7_d)
+                # Past Prime Day bumps (one year ago) and Labor Day bumps
+                _p7_event_dates = []
+                for _yr_off in (-1, 0):
+                    _yr = _p7_prj_start.year + _yr_off
+                    for _mo, _dy, _ in PRIME_DAY_BUMPS:
+                        try:
+                            _p7_event_dates.append(_p7_date(_yr, _mo, _dy))
+                        except ValueError:
+                            pass
+                    # Labor Day Tuesday-after, same year
+                    try:
+                        _p7_sep1 = _p7_date(_yr, 9, 1)
+                        _p7_labor = _p7_sep1 + _p7_td(days=(0 - _p7_sep1.weekday()) % 7)
+                        _p7_event_dates.append(_p7_labor + _p7_td(days=1))
+                    except ValueError:
+                        pass
+                # L13 covers weeks (prj_start - 13*7) through (prj_start - 1)
+                _p7_l13_start = _p7_prj_start - _p7_td(days=13 * 7)
+                _p7_excluded_indices = set()
+                for _i in l13_weeks:
+                    _p7_week_date = _p7_l13_start + _p7_td(days=_i * 7)
+                    for _ev in _p7_event_dates:
+                        if abs((_p7_week_date - _ev).days) <= 14:
+                            _p7_excluded_indices.add(_i)
+                            break
+                if _p7_excluded_indices and len(_p7_excluded_indices) < len(l13_weeks):
+                    _l13_vals_filtered = [float(l13[i]) for i in l13_weeks
+                                          if i not in _p7_excluded_indices]
+                    _l13_weeks_filtered = [i for i in l13_weeks
+                                           if i not in _p7_excluded_indices]
+                    if _l13_vals_filtered:
+                        _p7_burst_weeks_excluded = len(_p7_excluded_indices)
+                        l13_vals  = _l13_vals_filtered
+                        l13_weeks = _l13_weeks_filtered
+            except (ValueError, TypeError, AttributeError):
+                pass
+
     if l13_vals:
         # M3 (2026-04-22, loosened v2) — Acceleration-aware z blend.
         # Default weight is 70% L13 actuals / 30% smoothed.  When L13 non-zero

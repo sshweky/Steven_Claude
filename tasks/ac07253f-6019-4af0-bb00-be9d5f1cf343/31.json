@@ -3,7 +3,7 @@
   "subject": "P7: Croston event-aware z (carve out burst weeks)",
   "description": "For Amazon Croston's, exclude L26 weeks that fall in event boost windows from z computation (so future event boosts don't double-count past burst).",
   "activeForm": "Implementing P7 Croston event-aware z",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
