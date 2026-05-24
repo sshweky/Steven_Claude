@@ -6664,8 +6664,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "category profile" in str(d).lower() or "F64" in str(d)
         for d in meta.get("drivers", [])
     )
+    # P5 (2026-05-24): status_cust signals are an additional NEW-launch escape
+    # hatch. Variance deep-dive showed F61 over-decaying Walmart "A: NEW"
+    # Croston's items where the historic _f34 signal was borderline. Also
+    # short-circuit when L4W avg is strong relative to L13W (item is in
+    # active growth -- back-half should not decay).
+    _f61_status_new = "NEW" in (row.get("Status_Cust") or "").upper()
+    _f61_l4_avg     = sum(float(v or 0) for v in hist[-4:])  / 4  if len(hist) >= 4  else 0
+    _f61_l13_avg    = sum(float(v or 0) for v in hist[-13:]) / 13 if len(hist) >= 13 else 0
+    _f61_active_growth = (_f61_l13_avg > 0 and _f61_l4_avg >= _f61_l13_avg * 0.80)
     if (not is_amazon and not _f34_is_new_launch and not _f61_is_seasonal
-            and not _f61_has_cat_prof and model != "Inactive" and sum(fcst) > 0):
+            and not _f61_has_cat_prof and not _f61_status_new
+            and not _f61_active_growth
+            and model != "Inactive" and sum(fcst) > 0):
         _f61_fired = 0
         for _wi in range(8, 26):       # W9-W26 (0-indexed: 8-25)
             if fcst[_wi] > 0:
