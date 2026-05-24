@@ -3,7 +3,7 @@
   "subject": "D5: Anomaly explanation viewer endpoint",
   "description": "/api/explain endpoint in viewer.py. Click a forecast cell -> returns full rule firing trace (which rules fired, in what order, what they did to fcst).",
   "activeForm": "Building explain API",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }

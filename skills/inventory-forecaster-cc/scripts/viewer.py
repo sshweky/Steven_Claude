@@ -4118,6 +4118,33 @@ class Handler(BaseHTTPRequestHandler):
             qs = parse_qs(urlparse(self.path).query)
             key = qs.get("key", [""])[0]
             self._json({"suggested": fetch_suggested_weeks(key)})
+        elif self.path.startswith("/api/explain"):
+            # D5: Anomaly explain endpoint -- returns the full rule firing trace
+            # for one record so a planner can self-serve "why is W7 = 2,760?"
+            from urllib.parse import urlparse, parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            key = qs.get("key", [""])[0]
+            rec = records_by_key.get(key)
+            if not rec:
+                self._json({"error": f"no record for key {key}"})
+            else:
+                # Pull both the structured drivers (new fire() API) and the
+                # legacy text drivers + rule_fires set for back-compat.
+                meta = rec.get("meta", {})
+                explain = {
+                    "key":                key,
+                    "model":              rec.get("model"),
+                    "baseline_mode":      rec.get("baseline_mode") or meta.get("baseline_mode"),
+                    "rule_fires":         rec.get("rule_fires", []),
+                    "structured_drivers": meta.get("structured_drivers", []),
+                    "drivers":            meta.get("drivers", []),
+                    "fcst":               rec.get("fcst", []),
+                    "manual":             rec.get("manual", []),
+                    "alert":              rec.get("alert"),
+                    "history_l13_ord":    (rec.get("history_l26_ord") or [])[-13:],
+                    "history_l4_ord":     (rec.get("history_l26_ord") or [])[-4:],
+                }
+                self._json(explain)
         elif self.path.startswith("/api/comment-history"):
             # Two-table fetch: mgr/flag comments from [Projection Comments]
             # plus AI-adjustment comments from [AI Comments] (separate table).
