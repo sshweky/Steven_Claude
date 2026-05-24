@@ -4748,7 +4748,7 @@ async function _loadRtlPos(r, safeId) {
     ? '<b>' + custName + ' POS sales:</b> ' + posItems.join(sep)
     : '<b>' + custName + ' POS sales:</b> <span style="color:#999;font-style:italic">no POS data</span>';
 
-  // -- Bullet 2: Retailer inventory + OH WOS --------------------------------
+  // -- Bullet 2: Customer inventory + OH WOS --------------------------------
   const fmtWos = n => n.toFixed(1);
   const ohWos  = rtlPosL4w > 0 ? rtlOhLw / rtlPosL4w : 0;
   const invItems = [];
