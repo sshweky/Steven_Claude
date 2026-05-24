@@ -11874,6 +11874,55 @@ def main():
         _f60_count += 1
     print(f"      {_f60_count} EC variants inherited parent history", flush=True)
 
+    # F60-ATS (2026-05-24): propagate parent ATS + OOS data to EC variants.
+    #
+    # F60 copies ORD_COLS + SHP_COLS from parent into EC row so the forecaster
+    # sees real demand.  But two downstream normalizers are keyed differently:
+    #
+    #   VP-ATS / VP-ATS-Catch: keyed by Mstyle in ats_data.
+    #     Inventory History - Weekly has a record for "FF35147" (parent) but
+    #     NOT "FF35147EC" (EC variant) -- ats_data.get("FF35147EC") = None.
+    #     Result: normalize_ats_catchup_spikes() is silently skipped for all
+    #     EC variants, leaving post-OOS catch-up spike weeks uncapped in L13W.
+    #
+    #   VP-Q2 OOS clean demand: keyed by Acct_MStyle_Key_ in oos_data.
+    #     Order_History rows exist for "1864-FF35147" but not "1864-FF35147EC"
+    #     -- oos_data.get("1864-FF35147EC") = None.
+    #
+    # Consequence: inflated catch-up orders remain in EC variant L13W -->
+    # _rpl_ord_l13 and _rpl_var_ratios both inherit the contamination -->
+    # demand baseline too high AND spurious spikes cycle into July / other
+    # months (because the variability pattern replays the catch-up ratio).
+    #
+    # Fix: for each EC row that used F60 inheritance, copy parent's ATS and
+    # OOS entries into the EC mstyle / EC key slots so both normalizers fire.
+    _f60_ats_ct = 0
+    _f60_oos_ct = 0
+    for _row in rows:
+        if not _row.get("_ec_transition"):
+            continue
+        _ec_ms   = _row.get("Mstyle", "")
+        _ec_key  = _row.get("Acct_MStyle_Key_", "")
+        _par_ms  = _row.get("_ec_parent_mstyle", "")
+        _par_key = _row.get("_ec_parent_key", "")
+        # ATS inheritance
+        if _par_ms and ats_data:
+            _ec_ats  = ats_data.get(_ec_ms)
+            _par_ats = ats_data.get(_par_ms)
+            if _par_ats and (not _ec_ats or sum(_ec_ats) == 0):
+                ats_data[_ec_ms] = _par_ats
+                _f60_ats_ct += 1
+        # VP-Q2 OOS inheritance (when --oos-smoothing is active)
+        if _par_key and oos_data:
+            _ec_oos  = oos_data.get(_ec_key)
+            _par_oos = oos_data.get(_par_key)
+            if _par_oos and not _ec_oos:
+                oos_data[_ec_key] = _par_oos
+                _f60_oos_ct += 1
+    if _f60_ats_ct or _f60_oos_ct:
+        print(f"      [F60-ATS] {_f60_ats_ct} EC mstyles mapped to parent ATS; "
+              f"{_f60_oos_ct} EC keys mapped to parent OOS data", flush=True)
+
     # ── Phase 2.9b: F69 — DI direct-import sibling history pull ─────────────
     # Amazon (and sometimes other customers) order product direct from P+P's
     # overseas factory — "Direct Import" (DI).  These variants share the base
