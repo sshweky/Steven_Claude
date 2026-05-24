@@ -4897,7 +4897,7 @@ async function addComment(key) {
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   // Deferred auto-flag QB write: only now that the comment is saved do we
   // write Flagged=true to QB (autoFlagOnComment updated UI only, not QB).
-  if (rec && rec._auto_flagged && rec.flagged) {
+  if (rec && rec._auto_flagged && rec.flagged && flag !== 'FYI') {
     try {
       const pf = {};
       pf[CFG.FID.KEY]     = { value: key };
