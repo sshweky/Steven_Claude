@@ -122,6 +122,7 @@ Snapshot 2026-05-21.  Every rule that fires in `forecast_record()` or
 | F29  | New-item floor (L4-L8 recent activity, with deferral gate for thin history) |
 | F71  | Front-week (W1) tail cap at 1.3x max(L4, L13, baseline) |
 | F72  | New-launch ramp detection (P1, 2026-05-24): reroute Sparse Intermittent -> Heuristic when L26[-6:] has >=4 nz AND L26[-12:-6] has >=5 zeros |
+| F73  | New-launch recency anchor (2026-05-24): for F34 new-launch OR Status_Cust='NEW' items with <=13 active weeks, Fix 5 inside Croston's uses L13W nz-avg reference instead of all-weeks avg so zero-diluted L13 doesn't cap the forecast below the emerging run rate |
 | F18b | Croston burst carve-out (P2, 2026-05-24): cap z to pre-burst L13[:9]_nz_avg * 1.2 when L4W >> L13W AND POS doesn't justify burst |
 | R1 PATH C | Off-price hard-zero (P3, 2026-05-24): OFFPRICE_CUST_SUBSTRS customers with L4=0 AND manual<=100 -> OTB(zero) |
 | P4   | F52 planner-residual anchor (2026-05-24): cap each AI week at planner_rate * 2.5 on stable FD wind-down records |
