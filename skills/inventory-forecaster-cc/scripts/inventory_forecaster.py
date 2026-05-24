@@ -2714,6 +2714,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         if _burst_fcst is not None:
             forecast = _burst_fcst
             meta["burst_clustered"] = True
+            meta["model"] = "seasonal_baseline_burst"
     if _burst_driver:
         meta.setdefault("drivers", []).append(_burst_driver)
 
