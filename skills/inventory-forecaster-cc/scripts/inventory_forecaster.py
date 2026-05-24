@@ -5545,6 +5545,20 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
             if _fwd_cat:
                 amz_catalog = _fwd_cat
                 break
+    # Retailer POS lookup — non-Amazon customers only.
+    # When retailer POS data is available, populate pos_data with the same
+    # field names used by Amazon POS so the existing F15 blend (seasonal_baseline),
+    # F18 (Croston's z-adjustment), and F43 (spike attenuation) fire naturally.
+    # Amazon-specific rules (F13, F36, F38, F59h, etc.) are gated by is_amazon
+    # and will NOT fire even though pos_data is set.
+    rtl_pos = None
+    if not is_amazon and not is_international and retailer_pos:
+        _rtl_key = row.get("Acct_MStyle_Key_", "")
+        if _rtl_key:
+            _rtl_entry = retailer_pos.get(_rtl_key)
+            if _rtl_entry and float(_rtl_entry.get("Avg_Units_Wk_L13w") or 0) > 0:
+                rtl_pos  = _rtl_entry
+                pos_data = _rtl_entry  # same field names as Amazon POS
     season    = (season_map or {}).get(row.get("Mstyle", "")) or None
     # F35 — Stockout backlog normalization.  Strip pent-up backlog from
     # post-stockout catch-up weeks so the rest of the pipeline sees real
