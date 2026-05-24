@@ -136,7 +136,7 @@ for s, c in sorted(season_counts.items(), key=lambda x: -x[1]):
 # -----------------------------------------------------------------
 amz_replen = []
 for r in records:
-    cust   = (r.get("cust") or "").upper()
+    cust   = (r.get("cust") or "").lower()
     status = (r.get("item_status") or "").lower()
     model  = (r.get("model") or "").lower()
     if ("amazon" not in cust):
