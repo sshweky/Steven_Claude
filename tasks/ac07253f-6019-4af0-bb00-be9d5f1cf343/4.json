@@ -3,7 +3,7 @@
   "subject": "B6: Remove dead code (--lean-pull, M3 regex, unused vars)",
   "description": "Three items: (1) Remove --lean-pull CLI flag (accepted but no-op at line 10490). (2) Remove M3 from _scan_rule_fires() regex (no _fire(\"M3\") exists). (3) Remove _f39_corrections/_f41_corrections/_f43_corrections/_f47_corrections retrievals at lines 5579-5583 that are never used. (4) Archive top-of-skill-root one-off scripts and snapshot JSONs to scripts/archive/.",
   "activeForm": "Removing dead code and archiving artifacts",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }

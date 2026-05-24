@@ -10443,9 +10443,6 @@ def main():
                         "QB API hits). Default: ON for --all scope, OFF otherwise.")
     p.add_argument("--no-bulk-writeback", dest="bulk_writeback", action="store_false",
                    help="Force per-record SQL UPDATE writeback (legacy path).")
-    p.add_argument("--lean-pull",     action="store_true",
-                   help="Reduce SELECT column count on Phase 1 to ~30 essential cols "
-                        "(cuts pull latency 30-50%% on QB-side row reconstruction).")
     p.add_argument("--dry-run",       action="store_true", help="Forecast only, no write-back")
     p.add_argument("--analyze",       action="store_true", help="Run EDA and generate HTML report")
     p.add_argument("--analyze-only",  action="store_true", help="Run EDA only, skip forecasting")
