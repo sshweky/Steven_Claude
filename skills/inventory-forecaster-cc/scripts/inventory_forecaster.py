@@ -11696,10 +11696,28 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                 f"AI {ai_wk:,}/wk ({ai_total:,} total 26W) - no manual plan entered."
             )
 
-    # ── Assemble in priority order: critical → specific → gap_pill → pinned ──
+    # ── Assemble in priority order: confidence → critical → specific → gap_pill → pinned ──
     # pinned_last (Amazon POS Sales, DC Inv, AUR) always anchor the last positions
     # so planners see a consistent layout on every Amazon record.
-    parts = critical[:]                                 # always shown, no cap
+
+    # Confidence badge — always the very first element so planners see it immediately.
+    parts = []
+    _conf = rec.get("confidence")
+    if _conf is not None:
+        _conf_val = int(_conf)
+        if _conf_val >= 75:
+            _conf_color, _conf_bg, _conf_label = "#2e7d32", "#e8f5e9", "High"
+        elif _conf_val >= 50:
+            _conf_color, _conf_bg, _conf_label = "#e65100", "#fff3e0", "Medium"
+        else:
+            _conf_color, _conf_bg, _conf_label = "#c62828", "#ffebee", "Low"
+        _conf_badge = (
+            f'<span style="display:inline-block;padding:2px 9px;border-radius:3px;'
+            f'background:{_conf_bg};color:{_conf_color};font-weight:700;font-size:12px;">'
+            f'AI Confidence: {_conf_val}/100 ({_conf_label})</span>'
+        )
+        parts.append(_conf_badge)
+    parts.extend(critical)                              # always shown, no cap
     _pinned_count = len(pinned_last)
     remaining = MAX_BULLETS - len(parts) - _pinned_count
     parts.extend(specific[:max(0, remaining)])
