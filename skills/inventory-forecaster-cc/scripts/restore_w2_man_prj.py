@@ -27,18 +27,14 @@ QB_PROJ_TABLE = "bpd237tvm"
 QB_REALM      = "pim.quickbase.com"
 QB_USER_TOKEN = os.environ.get("QB_USER_TOKEN", "")  # set in env or paste below
 
-CDATA_EMAIL = os.environ.get("CDATA_EMAIL", "steven@skaffles.com")
-CDATA_PAT   = os.environ.get("CDATA_PAT", "")
-
-QB_BULK_BATCH = 500
+sys.path.insert(0, str(SCRIPT_DIR))
+from config import QB_USER_TOKEN, QB_REALM, QB_BULK_BATCH
 
 # ---------------------------------------------------------------------------
 # Auth helpers (reuse pattern from inventory_forecaster.py)
 # ---------------------------------------------------------------------------
 
 def _qb_headers():
-    if not QB_USER_TOKEN:
-        raise RuntimeError("Set QB_USER_TOKEN env var to your QuickBase user token.")
     return {
         "Authorization": f"QB-USER-TOKEN {QB_USER_TOKEN}",
         "QB-Realm-Hostname": QB_REALM,
