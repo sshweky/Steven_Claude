@@ -739,6 +739,51 @@ def _adapt_forecast_to_validation(rec):
                                 f"history to read multi-window context.")
                 narrative_parts.append(f"{header} {expl}")
 
+    # ── Bullets: Amazon DC inventory + AUR (pinned after POS on Amazon records) ─
+    amz = rec.get("_amz") or {}
+    if amz:
+        # DC inventory
+        _ih_soh = float(amz.get("inv_soh") or 0)
+        _ih_opo = float(amz.get("inv_opo") or 0)
+        _ih_wos = float(amz.get("inv_wos") or 0)
+        if _ih_soh > 0 or _ih_opo > 0 or _ih_wos > 0:
+            _ih_parts = []
+            if _ih_soh > 0:
+                _ih_parts.append(f"SOH {int(_ih_soh):,}u")
+            if _ih_opo > 0:
+                _ih_parts.append(f"Open PO {int(_ih_opo):,}u")
+            if _ih_wos > 0:
+                if _ih_wos < 3:
+                    _wos_str = (f"<span style='color:#c62828'><b>WOS "
+                                f"{_ih_wos:.1f}wks</b></span>")
+                elif _ih_wos < 8:
+                    _wos_str = (f"<span style='color:#e65100'>WOS "
+                                f"{_ih_wos:.1f}wks</span>")
+                elif _ih_wos >= 16:
+                    _wos_str = (f"<span style='color:#f57f17'>WOS "
+                                f"{_ih_wos:.1f}wks (overstocked)</span>")
+                else:
+                    _wos_str = f"WOS {_ih_wos:.1f}wks"
+                _ih_parts.append(_wos_str)
+            if _ih_parts:
+                narrative_parts.append(
+                    "<b>Amazon DC inventory:</b> " + " | ".join(_ih_parts) + "."
+                )
+        # AUR
+        _aur_l4w  = float(amz.get("aur_l4w")  or 0)
+        _aur_l13w = float(amz.get("aur_l13w") or 0)
+        _aur_l26w = float(amz.get("aur_l26w") or 0)
+        _aur_l52w = float(amz.get("aur_l52w") or 0)
+        if _aur_l4w > 0 or _aur_l13w > 0 or _aur_l26w > 0 or _aur_l52w > 0:
+            _aur_items = []
+            if _aur_l4w  > 0: _aur_items.append(f"L4W ${_aur_l4w:.2f}")
+            if _aur_l13w > 0: _aur_items.append(f"L13W ${_aur_l13w:.2f}")
+            if _aur_l26w > 0: _aur_items.append(f"L26W ${_aur_l26w:.2f}")
+            if _aur_l52w > 0: _aur_items.append(f"L52W ${_aur_l52w:.2f}")
+            narrative_parts.append(
+                "<b>Amazon AUR:</b> " + " | ".join(_aur_items) + "."
+            )
+
     # Order context for non-POS records — LW/PW WoW merged into the trend header
     # so the planner gets one unified ordering bullet instead of two.
     if not pos and len(hist) >= 2:
