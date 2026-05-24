@@ -8988,28 +8988,29 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
     # ── F_AMZ_RPL — Amazon Active Replen baseline + DC inventory correction ──────
     # Rule (per planner, 2026-05-24): for EVERY Amazon "Active Replen" item,
-    # the forecast must follow exactly two steps -- no exceptions:
+    # the forecast follows these rules -- no exceptions:
     #
     #   (1) Establish demand baseline = max(POS L13W consumer velocity,
     #                                       Ord L13W all-weeks avg).
     #       POS is the primary signal (what consumers buy).  Ord L13W covers
     #       genuine demand above POS (e.g. active ramp buys).  Never go below POS.
     #
-    #   (2) Set the full 26-week forecast at that rate, then apply a DC inventory
-    #       correction in the FIRST AVAILABLE 2-week window:
-    #         - W1+W2 if W1 is free (no open PO / PO-cutoff this week)
-    #         - W2+W3 if W1 is locked by an existing PO
+    #   (2) W1 always non-zero.  AI shows W1 demand regardless of VP-Q4/PO-cutoff.
+    #
+    #   (3) DC inventory correction in W1+W2 using POS L4W as the correction basis
+    #       (most current consumer signal; AUR-trend guarded -- see Fix 3 comment):
     #
     #       Overstocked (DC WOS > 12):
-    #         window orders = max(0, 14 - dc_wos) * demand / 2 per week
-    #         Result: after 2wk sell-through + window orders, DC reaches 12 WOS.
-    #         (dc_wos >= 14 -> window = 0, DC drains naturally.)
+    #         W1+W2 = 0.  Let DC drain naturally to 12 WOS via sell-through.
     #
     #       Understocked (DC WOS < 10):
-    #         window orders = (12 - dc_wos) * demand / 2 per week
-    #         Result: after 2wk sell-through + window orders, DC reaches 10 WOS.
+    #         W1+W2 = (10 - dc_wos) * corr_demand / 2 per week (simple gap fill).
+    #         Brings DC from current WOS to 10 WOS target.
     #
-    #       Normal (10 <= dc_wos <= 12): window = baseline, no change.
+    #       Normal (10 <= dc_wos <= 12): no adjustment.
+    #
+    #   (4) W3+ applies L13W ordering variability pattern (natural week-to-week
+    #       fluctuation) instead of a flat baseline.  T5/event boost weeks skipped.
     #
     # This is a FINAL override -- supersedes all prior model/correction logic.
     # Protected exceptions:
