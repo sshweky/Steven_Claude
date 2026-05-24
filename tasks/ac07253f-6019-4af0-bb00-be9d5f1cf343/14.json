@@ -3,7 +3,7 @@
   "subject": "D1: tune_thresholds.py (grid search over config.py)",
   "description": "Grid search across env-var-overridable thresholds in config.py. Metric = minimize aggregate |AI - manual| on top-N high-volume records. Reports best param set + improvement margin.",
   "activeForm": "Building threshold tuner",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
