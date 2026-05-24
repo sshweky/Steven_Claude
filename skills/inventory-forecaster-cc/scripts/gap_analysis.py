@@ -96,7 +96,8 @@ def classify_gap(rec):
     l13_all_avg = sum(l13) / 13 if l13 else 0
     l13_nz_avg = sum(l13_nz) / len(l13_nz) if l13_nz else 0
     l26_nz_avg = sum(l26_nz) / len(l26_nz) if l26_nz else 0
-    l4_avg = sum(l13[:4]) / 4 if len(l13) >= 4 else 0
+    # l4_avg = most recent 4 weeks (last 4 elements of l13, which is already [-13:])
+    l4_avg = sum(l13[-4:]) / 4 if len(l13) >= 4 else sum(l13) / max(len(l13), 1)
     peak = max(hist_full) if hist_full else 0
     peak_ratio = peak / l13_nz_avg if l13_nz_avg > 0 else 0
 
