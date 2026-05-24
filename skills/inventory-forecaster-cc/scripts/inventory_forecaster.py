@@ -8887,6 +8887,123 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"pre-switchover weeks to prevent double-counting."
                     )
 
+    # ── F_AMZ_RPL — Amazon Active Replen baseline + DC inventory correction ──────
+    # Rule (per planner, 2026-05-24): for EVERY Amazon "Active Replen" item,
+    # the forecast must follow exactly two steps -- no exceptions:
+    #
+    #   (1) Establish demand baseline = max(POS L13W consumer velocity,
+    #                                       Ord L13W all-weeks avg).
+    #       POS is the primary signal (what consumers buy).  Ord L13W covers
+    #       genuine demand above POS (e.g. active ramp buys).  Never go below POS.
+    #
+    #   (2) Set the full 26-week forecast at that rate, then apply a DC inventory
+    #       correction in the FIRST AVAILABLE 2-week window:
+    #         - W1+W2 if W1 is free (no open PO / PO-cutoff this week)
+    #         - W2+W3 if W1 is locked by an existing PO
+    #
+    #       Overstocked (DC WOS > 12):
+    #         window orders = max(0, 14 - dc_wos) * demand / 2 per week
+    #         Result: after 2wk sell-through + window orders, DC reaches 12 WOS.
+    #         (dc_wos >= 14 -> window = 0, DC drains naturally.)
+    #
+    #       Understocked (DC WOS < 10):
+    #         window orders = (12 - dc_wos) * demand / 2 per week
+    #         Result: after 2wk sell-through + window orders, DC reaches 10 WOS.
+    #
+    #       Normal (10 <= dc_wos <= 12): window = baseline, no change.
+    #
+    # This is a FINAL override -- supersedes all prior model/correction logic.
+    # Protected exceptions:
+    #   - F58 Tell-AI explicit planner comment (planner intent always wins)
+    #   - F69 DI-blended records (handled by F69-WOS separately)
+    #   - Inactive / OTB / Pre-launch models (no forward demand to anchor)
+    _f_amz_rpl_f58 = (
+        is_amazon
+        and any(
+            "F58 Tell-AI replay" in str(d)
+            for d in ((meta or {}).get("drivers") or [])
+            if d and "not auto-applied" not in str(d)
+        )
+    )
+    if (is_amazon
+            and "replen" in (row.get("PT_Item_Status") or "").lower()
+            and pos_data
+            and amz_catalog
+            and not row.get("_di_blend")
+            and not _f_amz_rpl_f58
+            and not model.startswith("Inactive")
+            and not model.startswith("OTB")
+            and not model.startswith("Pre-launch")
+            and isinstance(fcst, list) and len(fcst) >= 26):
+
+        _rpl_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _rpl_ord_l13 = sum(float(v) for v in history[-13:]) / 13  # all-weeks avg
+        _rpl_demand  = max(_rpl_pos_l13, _rpl_ord_l13)
+
+        if _rpl_demand >= 50:
+            # Step 1 -- set baseline; preserve VP-Q4 / F_PO_CUTOFF / F70 zeros
+            _rpl_base = snap(_rpl_demand, mp)
+            _rpl_new  = [0 if fcst[_wi] == 0 else _rpl_base for _wi in range(26)]
+
+            # Step 2 -- DC inventory correction
+            _rpl_wos = float(amz_catalog.get("Inv_WOS") or 0)
+            if _rpl_wos <= 0:
+                # Fallback: compute from SOH + OPO when Inv_WOS is absent
+                _rpl_soh = float(amz_catalog.get("Inv_SOH") or 0)
+                _rpl_opo = float(amz_catalog.get("Inv_OPO") or 0)
+                if _rpl_pos_l13 > 0:
+                    _rpl_wos = (_rpl_soh + _rpl_opo) / _rpl_pos_l13
+
+            if _rpl_wos > 0:
+                # Adjustment window: W1+W2 when W1 is free; else W2+W3
+                _rpl_w1_locked = (_rpl_new[0] == 0)
+                _rpl_adj1 = 1 if _rpl_w1_locked else 0   # 0-based index
+                _rpl_adj2 = _rpl_adj1 + 1
+
+                if _rpl_wos > 12:
+                    # Overstocked: drain DC to 12 WOS over the 2-week window.
+                    # Math: I0 - 2d + adj1 + adj2 = 12d  =>  adj total = (14-wos)*d
+                    _rpl_window = max(0.0, (14.0 - _rpl_wos) * _rpl_demand)
+                    _rpl_each   = snap(_rpl_window / 2.0, mp)
+                    _rpl_new[_rpl_adj1] = _rpl_each
+                    _rpl_new[_rpl_adj2] = _rpl_each
+                    _rpl_inv_note = (
+                        f"DC WOS={_rpl_wos:.1f} > 12 (overstocked) -- "
+                        f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
+                        f"{_rpl_each:.0f}/ea (drain to 12 WOS)"
+                    )
+                elif _rpl_wos < 10:
+                    # Understocked: refill DC to 10 WOS over the 2-week window.
+                    # Math: I0 - 2d + adj1 + adj2 = 10d  =>  adj total = (12-wos)*d
+                    _rpl_window = (12.0 - _rpl_wos) * _rpl_demand
+                    _rpl_each   = snap(_rpl_window / 2.0, mp)
+                    _rpl_new[_rpl_adj1] = _rpl_each
+                    _rpl_new[_rpl_adj2] = _rpl_each
+                    _rpl_inv_note = (
+                        f"DC WOS={_rpl_wos:.1f} < 10 (understocked) -- "
+                        f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
+                        f"{_rpl_each:.0f}/ea (refill to 10 WOS)"
+                    )
+                else:
+                    _rpl_inv_note = (
+                        f"DC WOS={_rpl_wos:.1f} in target range (10-12) -- "
+                        f"no inventory adjustment"
+                    )
+            else:
+                _rpl_inv_note = "DC WOS unknown -- no adjustment applied"
+
+            fcst[:] = _rpl_new
+            _fire("F_AMZ_RPL")
+            if isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F_AMZ_RPL Active Replen override: "
+                    f"demand={_rpl_demand:.0f}/wk "
+                    f"(POS L13W={_rpl_pos_l13:.0f}/wk, "
+                    f"Ord L13W all-wks={_rpl_ord_l13:.0f}/wk); "
+                    f"{_rpl_inv_note}. "
+                    f"Supersedes prior model ({model})."
+                )
+
     prior = sum(manual_wks)
     new   = sum(fcst)
     pct   = abs(new - prior) / prior if prior > 0 else 0
