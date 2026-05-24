@@ -1,0 +1,9 @@
+{
+  "id": "8",
+  "subject": "Run --all --validate + push with F_AMZ_RPL three fixes",
+  "description": "Run forecast + validate after implementing Fix 1 (W1 always non-zero), Fix 2 (L13W variability pattern), Fix 3 (POS L4W / 10 WOS simple gap fill). Then push validation results.",
+  "activeForm": "Running forecast with F_AMZ_RPL fixes",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

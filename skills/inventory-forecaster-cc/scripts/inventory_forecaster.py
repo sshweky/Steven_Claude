@@ -7516,14 +7516,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     else:
         _effective_po_wk = []
     _vp_q4_zeroed_idx = set()   # 0-based indexes VP-Q4 set to 0 — F59d/F59a must skip
-    # VP-Q4 — zero AI when a confirmed open PO already covers that week (double-count
-    # prevention).  W1 is included: if Opn_W1 > 0 (confirmed PO exists), AI W1 is
-    # zeroed so the open PO is not double-counted in forward demand.
-    # The condition _po_qty > 0 is the only guard — VP-Q4 never fires for weeks
-    # without a confirmed PO, so it naturally does nothing on Sunday/Monday when
-    # no orders have arrived yet (Opn_W1 = 0).
-    # MAN PRJ W1 is NEVER auto-zeroed by VP-Q4 — the codepage "DUPLICATE DEMAND"
-    # red warning + Zero button lets the planner handle it intentionally.
+    # VP-Q4 — zero AI and MAN PRJ when a confirmed open PO covers that week.
+    # W1: BOTH AI PRJ and MAN PRJ are zeroed when Opn_W1 > 0.  The open PO is
+    # the confirmed demand signal; showing any projection on top would double-count
+    # it in forward demand.  MAN PRJ W2+ are NOT auto-zeroed (planner handles via
+    # codepage warning + Zero button).
+    # The _po_qty > 0 condition is the only gate — if no PO exists the rule is
+    # silent, so it naturally does nothing when Opn_W1 = 0.
     if _effective_po_wk:
         _po_zeroed = []
         for _i in range(0, min(26, len(fcst))):   # W1 through W26
@@ -7532,6 +7531,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _po_zeroed.append((_i + 1, fcst[_i], _po_qty))
                 fcst[_i] = 0
                 _vp_q4_zeroed_idx.add(_i)   # guard: F59d must not restore these
+        # W1 MAN PRJ: zero whenever Opn_W1 > 0 regardless of AI value
+        # (AI may already be 0 from a prior rule, but MAN PRJ still needs zeroing).
+        _vp_q4_w1_po = float(_effective_po_wk[0]) if _effective_po_wk else 0.0
+        if _vp_q4_w1_po > 0 and isinstance(manual_wks, list) and len(manual_wks) > 0:
+            manual_wks[0] = 0
         if _po_zeroed and isinstance(meta, dict):
             _po_total_removed = sum(z[1] for z in _po_zeroed)
             _po_total_qty     = sum(z[2] for z in _po_zeroed)
