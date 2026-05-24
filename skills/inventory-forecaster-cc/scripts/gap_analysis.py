@@ -78,9 +78,14 @@ def classify_gap(rec):
         return None, None
     gap_pct = (a - m) / m * 100
     hist_ord = rec.get("history_l26_ord", [])
-    hist_full = rec.get("history_l52_ord", hist_ord)  # fall back to L26
-    l13 = hist_ord[:13]
-    l26_tail = hist_ord[13:26] if len(hist_ord) >= 26 else []
+    # history_ly_ord = order data for weeks 27-52 ago (oldest->newest, aligned W1..W26).
+    # Combine with hist_ord to get ~52 weeks of history for peak-ratio computation.
+    hist_ly   = rec.get("history_ly_ord", [])
+    hist_full = hist_ly + hist_ord if hist_ly else hist_ord
+    # history_l26_ord is oldest->newest: index 0 = 26 weeks ago, index 25 = last week.
+    # l13 must be the MOST RECENT 13 weeks ([-13:]), not the oldest ([:13]).
+    l13 = hist_ord[-13:]
+    l26_tail = hist_ord[:13]  # prior 13 weeks (weeks 26-14 ago)
     l13_nz = [v for v in l13 if v > 0]
     l26_tail_nz = [v for v in l26_tail if v > 0]
     l26_nz = l13_nz + l26_tail_nz
