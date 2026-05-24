@@ -5883,22 +5883,20 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     is_dense   = nz_rate_ >= DENSE_THRESHOLD    # ≥ 50%: orders most weeks
     is_croston = nz_rate_ >= CROSTON_THRESHOLD  # ≥ 25%: intermittent (every 2–5 wks)
 
-    # F-B (2026-04-22) — L13 burst-cadence override.  When the account has
-    # ≥ 4 zero weeks in the last 13 (≥ 25% L13 zero-rate), the recent rhythm
-    # is lumpy even if L26 nz-rate is ≥ 50%.  Forcing the item onto the
-    # Seasonal Baseline path spreads demand smoothly across 26 weeks and
-    # misstates how the account actually places orders — it should go through
-    # Croston's, which models order size × cadence separately and correctly
-    # preserves the burst-then-quiet pattern.  Catches international /
-    # distributor accounts that sit at the 50% threshold (Loblaws, Wakefern,
-    # Petbarn, Canadian grocery, etc.) where orders come in lumps every 1–3
-    # weeks rather than weekly replen.  ISO-protected so bi-weekly dense
-    # accounts aren't misrouted.
+    # F-B (2026-04-22, updated 2026-05-24) — L13 burst-cadence override.
+    # Original intent: catch lumpy accounts sitting at the 50% L26W threshold
+    # (distributors, international, etc.) where orders come in bursts.
+    # Updated for DENSE_THRESHOLD=0.35: items in the 35-49% range naturally
+    # carry off-season zeros; the old >=4 threshold would always downgrade
+    # them to Croston's, defeating the new threshold.  Raised to >=8 zeros
+    # (>60% of L13W empty) so only truly sporadic recent behavior triggers
+    # a downgrade -- seasonal off-months (4-7 zeros) stay on Seasonal Baseline.
+    # ISO-protected so bi-weekly dense accounts are never misrouted.
     _l13_nz_count_fb = sum(1 for v in hist_for_model[-13:] if v > 0)
     _l13_zero_count_fb = 13 - _l13_nz_count_fb
-    if is_dense and _l13_zero_count_fb >= 4 and not iso["is_iso"]:
+    if is_dense and _l13_zero_count_fb >= 8 and not iso["is_iso"]:
         is_dense = False
-        # nz_rate_ is still >= 50% so is_croston remains True — Croston's branch
+        # nz_rate_ is still >= DENSE_THRESHOLD so is_croston=True if >= CROSTON_THRESHOLD
 
     # F44 — F43-aware dense override (2026-05-06).
     # When F43 capped recent-spike outliers, the L13 zero count is suspect:
