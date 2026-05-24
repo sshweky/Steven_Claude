@@ -974,8 +974,9 @@ async function attachInvFlow(records) {
         ats_now:   ATS_NOW   ? numCell(row, ATS_NOW)   : 0,
         ats_oh:    ATS_OH    ? numCell(row, ATS_OH)    : 0,
         ats_oo:    ATS_OO    ? numCell(row, ATS_OO)    : 0,
-        ats_oh_wos: ATS_OH_WOS ? numCell(row, ATS_OH_WOS) : 0,
-        ats_oo_wos: ATS_OO_WOS ? numCell(row, ATS_OO_WOS) : 0,
+        ats_oh_wos:  ATS_OH_WOS  ? numCell(row, ATS_OH_WOS)  : 0,
+        ats_oo_wos:  ATS_OO_WOS  ? numCell(row, ATS_OO_WOS)  : 0,
+        first_shpd:  FIRST_SHPD  ? strCell(row, FIRST_SHPD)  : '',
       };
     }
     totalFetched += rows.length;
