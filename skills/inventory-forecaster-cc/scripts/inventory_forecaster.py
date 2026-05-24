@@ -1976,8 +1976,16 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     _pos_l4w_f13  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0) if (is_amazon and pos_data) else 0  # noqa
     _pos_l13w_f13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0) if (is_amazon and pos_data) else 0
     _pos_healthy  = _pos_l13w_f13 > 0 and _pos_l4w_f13 >= _pos_l13w_f13 * 0.5
+    # F13 POS guard: if pos_rate is below the L13W order avg, Amazon has been
+    # ordering MORE than consumers are buying -- they are already overstocked
+    # relative to consumer demand.  The "drawdown" F13 detects (our shipments
+    # outpacing Amazon orders) is their stockpile burning off, not a signal to
+    # forecast higher.  Skip F13 to prevent the replen floor from pushing the
+    # baseline above what POS supports over the forward 26-week horizon.
+    _f13_pos_overstocked = (pos_rate > 0 and l13_avg > 0 and pos_rate < l13_avg * 0.95)
     if (is_amazon and _pos_healthy and shpd_l13 > 0 and l13_avg > 0
-            and shpd_l13 > l13_avg * 1.15 and ord_baseline > 0):
+            and shpd_l13 > l13_avg * 1.15 and ord_baseline > 0
+            and not _f13_pos_overstocked):
         _drawdown_ratio = shpd_l13 / l13_avg
         _depletion_per_wk = max(0.0, shpd_l13 - l13_avg) * 13.0 / 26.0
         _replen_floor = min(shpd_l13 + _depletion_per_wk, ord_baseline * 1.50)
@@ -1987,8 +1995,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             _f13_applied = True
             _f13_driver = (
                 f"drawdown: shpd {shpd_l13:.0f}/wk vs ord {l13_avg:.0f}/wk "
-                f"({_drawdown_ratio:.2f}×), POS L4/L13={_pos_l4w_f13/_pos_l13w_f13:.2f} "
-                f"→ replen floor {_replen_floor:.0f} (prev {_prev_baseline:.0f})"
+                f"({_drawdown_ratio:.2f}x), POS L4/L13={_pos_l4w_f13/_pos_l13w_f13:.2f} "
+                f"-> replen floor {_replen_floor:.0f} (prev {_prev_baseline:.0f})"
             )
 
     # ── F38 — POS-trend sensitivity (Amazon-only, 2026-05-06) ──────────────────
