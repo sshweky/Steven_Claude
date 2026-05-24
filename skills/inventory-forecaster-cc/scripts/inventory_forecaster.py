@@ -9753,7 +9753,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _rpl_l13w_raw  = [float(v) for v in hist[-13:]]
             _rpl_l13w_nz   = sum(1 for v in _rpl_l13w_raw if v > 0)
             _rpl_l13w_mean = sum(_rpl_l13w_raw) / 13   # all-weeks avg incl. zeros
-            if _rpl_l13w_mean >= 50 and _rpl_l13w_nz >= 8:
+            if _rpl_pos_primary:
+                # POS-primary: order-history variability reflects Amazon's
+                # inventory-management decisions (builds/drawdowns) rather than
+                # consumer demand patterns.  Applying those ratios to a POS-
+                # anchored demand baseline would reintroduce the same spikes we
+                # just corrected.  Keep a flat baseline so the 26-week forecast
+                # tracks the POS rate without order-history amplification.
+                _rpl_var_ratios = None
+            elif _rpl_l13w_mean >= 50 and _rpl_l13w_nz >= 8:
                 _rpl_var_ratios = [
                     min(2.5, max(0.5, v / _rpl_l13w_mean)) if v > 0 else 0.5
                     for v in _rpl_l13w_raw
