@@ -9321,6 +9321,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             # projection reflects Amazon's natural order fluctuation rather than a
             # flat line.  T5/Holiday and Prime Day boost weeks are skipped (those
             # seasonal lifts are already calibrated).  VP-Q4/F70 zeros preserved.
+            #
+            # F60-ATS safety (2026-05-24): EC variants that inherited parent order
+            # history via F60 also inherit parent ATS data (see F60-ATS block in
+            # main()).  But if the PARENT itself has no ATS record (rare -- old
+            # mstyle or table not yet loaded), the variability pattern would replay
+            # contaminated post-OOS catch-up ratios as spurious spikes in July or
+            # other months.  Guard: disable variability pattern for EC-transitioned
+            # records when ATS data is absent or all-zero (normalizers couldn't
+            # run → history may still contain uncapped catch-up orders).
+            if _rpl_var_ratios and row.get("_ec_transition") and not any(ats_hist_l26 or []):
+                _rpl_var_ratios = None   # safer flat baseline than cycling bad ratios
             if _rpl_var_ratios:
                 for _wi in range(_rpl_dc_end, 26):
                     if _rpl_new[_wi] != 0:
