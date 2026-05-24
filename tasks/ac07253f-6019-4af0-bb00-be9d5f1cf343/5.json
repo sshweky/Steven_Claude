@@ -3,7 +3,7 @@
   "subject": "C5: Add _schema_version to forecast_results.json",
   "description": "Top-level _schema_version field in forecast_results.json + validation_results.json. Date-string (e.g. \"2026.05.23\"). Add load-time validation that warns when version differs from current code version. Prevents silently re-analyzing stale JSONs after rule semantics change.",
   "activeForm": "Adding schema version to output JSONs",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
