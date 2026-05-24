@@ -3,7 +3,7 @@
   "subject": "D4: Planner feedback loop framework",
   "description": "scripts/feedback_loop.py framework. Logs every manual override of AI (via F58 comments or Use AI/Use Suggested) to a local JSONL. Includes learn_from_overrides.py for periodic analysis.",
   "activeForm": "Building feedback loop framework",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
