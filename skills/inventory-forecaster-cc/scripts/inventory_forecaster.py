@@ -9041,24 +9041,37 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
         if _rpl_demand >= 50:
             # Step 1 -- build week-level rates: apply seasonal/event lifts on top
-            # of the demand baseline.  Seasonal profile: category week multipliers
-            # (F66-style floor at 1.0 -- seasonal only LIFTS, never reduces baseline).
-            # Event lifts: Prime Day / Fall Prime Day calendar boosts (Amazon-only).
+            # of the demand baseline.  Three lift layers (applied in order):
+            #   (a) Category profile (empirical monthly index, F66-style floor 1.0).
+            #   (b) Prime Day / Fall Prime Day calendar boosts (discrete events).
+            #   (c) T5/Holiday + Season-specific ramp (AMZ_T5_HOLIDAY_BOOSTS).
+            # Layers (a) and (c) use MAX to avoid double-counting when the empirical
+            # category profile already captures some T5 lift.  Layer (b) multiplies
+            # because Prime Day is a discrete discrete uplift on top of any baseline.
             _rpl_base = snap(_rpl_demand, mp)
             _rpl_cat_mults = _category_week_multipliers(
                 description, product_category, product_subcategory, brand, brand_pt,
                 season=season
             ) if (description or product_category or product_subcategory or brand or brand_pt or season) else None
             _rpl_pb, _rpl_fb = _get_event_boosts()
+            _rpl_t5 = _get_t5_seasonal_boosts(season)   # Season-tag-aware T5/Halloween ramp
+            _rpl_t5_applied = []
             _rpl_rates = []
             for _wi in range(26):
                 _mult = 1.0
+                # (a) category profile -- lifts only (floor at 1.0)
                 if _rpl_cat_mults:
-                    _mult = max(1.0, _rpl_cat_mults[_wi])  # floor at 1.0 (F66-style)
+                    _mult = max(1.0, _rpl_cat_mults[_wi])
                 wnum = _wi + 1
+                # (b) Prime Day / Fall Prime Day -- multiplicative (discrete event)
                 _ev = max(_rpl_pb.get(wnum, 1.0), _rpl_fb.get(wnum, 1.0))
                 if _ev > 1.0:
                     _mult *= _ev
+                # (c) T5/Holiday seasonal ramp -- MAX with existing mult (no stack)
+                _t5 = _rpl_t5.get(wnum, 1.0)
+                if _t5 > _mult:
+                    _mult = _t5
+                    _rpl_t5_applied.append(wnum)
                 _rpl_rates.append(snap(_rpl_demand * _mult, mp))
 
             # Preserve VP-Q4 / F_PO_CUTOFF / F70 zeros; apply per-week seasonal rate
