@@ -4464,7 +4464,13 @@ def crostens(history, mp, is_amazon=False, description=None,
     _l13_nz_list_f5 = [float(v) for v in history[-13:] if v > 0]
     _l13_nz_avg_f5  = (sum(_l13_nz_list_f5) / len(_l13_nz_list_f5)
                        if _l13_nz_list_f5 else _l13_all_avg)
-    _fix5_ref = _l13_nz_avg_f5 if is_amazon else _l13_all_avg
+    # F73 (2026-05-24): New-launch items get the same nz-avg reference as Amazon.
+    # For items with <= 13 active weeks the all-weeks L13 avg is zero-diluted
+    # (leading pre-launch weeks count as zeros) and drags Fix 5 too low, capping
+    # Croston's output well below the true emerging run rate.  Using nz-avg means
+    # Fix 5 only fires if Croston's exceeds the non-zero baseline by > 10%,
+    # preserving the true demand signal during the ramp-up phase.
+    _fix5_ref = _l13_nz_avg_f5 if (is_amazon or is_new_launch) else _l13_all_avg
     if _fix5_ref > 0 and sum(forecast) > 0:
         _ai_avg = sum(forecast) / 26
         if _ai_avg > _fix5_ref * 1.10:
@@ -6308,7 +6314,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                     product_subcategory=product_subcategory,
                                     brand=brand, brand_pt=brand_pt,
                                     pos_data=pos_data, season=season,
-                                    is_new_launch=_f34_is_new_launch)
+                                    is_new_launch=_f73_new_ramp)
         model    = "Heuristic"
         biweekly = False
 
@@ -6320,7 +6326,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                     product_subcategory=product_subcategory,
                                     brand=brand, brand_pt=brand_pt,
                                     pos_data=pos_data, season=season,
-                                    is_new_launch=_f34_is_new_launch)
+                                    is_new_launch=_f73_new_ramp)
         model    = "Heuristic"
         biweekly = False
 
@@ -6338,7 +6344,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                         product_subcategory=product_subcategory,
                                         brand=brand, brand_pt=brand_pt,
                                         pos_data=pos_data, season=season,
-                                        is_new_launch=_f34_is_new_launch)
+                                        is_new_launch=_f73_new_ramp)
             model    = "Heuristic"
             biweekly = False
             meta.setdefault("drivers", []).append(
@@ -6402,7 +6408,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                    brand=brand, brand_pt=brand_pt,
                                    pos_data=pos_data, season=season,
                                    is_offprice=_is_offprice_t1,
-                                   is_new_launch=_f34_is_new_launch,
+                                   is_new_launch=_f73_new_ramp,
                                    is_international=is_international)
         model    = "Croston's"
         biweekly = False
@@ -6420,7 +6426,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                             brand=brand, brand_pt=brand_pt,
                                             shpd_l13=l13w, season=season,
                                             is_ecom=_is_ecom_t4,
-                                            is_new_launch=_f34_is_new_launch,
+                                            is_new_launch=_f73_new_ramp,
                                             amz_catalog=amz_catalog)
         model    = "Seasonal Baseline"
         # VP-Q3: detect_biweekly() now returns the cadence gap (≥3 for monthly+)
