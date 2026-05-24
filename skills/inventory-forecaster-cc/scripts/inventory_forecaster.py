@@ -9336,8 +9336,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     # fill = 10 * corr_demand split over W1+W2.
                     _rpl_window = max(0.0, (10.0 - _rpl_wos) * _rpl_corr_demand)
                     _rpl_each   = snap(_rpl_window / 2.0, mp)
-                    _rpl_new[_rpl_adj1] = _rpl_each
-                    _rpl_new[_rpl_adj2] = _rpl_each
+                    # Guard: W1 must never fall below the steady-state demand rate.
+                    # When corr_demand is near-zero (POS feed thin/absent) but
+                    # order history drives _rpl_demand >= 50, the fill resolves
+                    # to 0 and would silently erase Fix 1's non-zero W1.  Floor
+                    # both windows at the rate-based value so the planner always
+                    # sees the demand signal regardless of the fill calc outcome.
+                    _rpl_w1_floor = _rpl_rates[_rpl_adj1]
+                    _rpl_w2_floor = _rpl_rates[_rpl_adj2]
+                    _rpl_new[_rpl_adj1] = max(_rpl_each, _rpl_w1_floor)
+                    _rpl_new[_rpl_adj2] = max(_rpl_each, _rpl_w2_floor)
                     if _rpl_dc_depleted:
                         _rpl_inv_note = (
                             f"DC WOS=0.0 (depleted/inferred; SOH=0 OPO=0 -- "
