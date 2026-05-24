@@ -7459,15 +7459,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     else:
         _effective_po_wk = []
     _vp_q4_zeroed_idx = set()   # 0-based indexes VP-Q4 set to 0 — F59d/F59a must skip
-    # W1 early-week gate: for Amazon FF/BB, don't zero AI W1 before the PO cutoff
-    # day (Tue=2 for FF, Wed=3 for BB).  On Sunday the week has just started and
-    # the open PO IS the current week's order -- zeroing AI W1 removes the demand
-    # signal prematurely.  Only gate W1; W2+ are unaffected.
-    _vp_w1_before_cutoff = False
-    if is_amazon:
+    # W1 zero gate — universal Sunday rule + Amazon FF/BB pre-cutoff extension.
+    # Sunday (weekday=6): the forecast week has just started for ALL customers.
+    # Open POs in W1 are orders expected to arrive this week -- they have not
+    # been received yet and the demand signal is still live.  Never zero W1 on
+    # Sunday regardless of customer type.
+    # Amazon FF/BB: additionally protect Mon-Tue (pre-cutoff days).
+    _vp_today_wd         = datetime.now().weekday()
+    _vp_w1_before_cutoff = (_vp_today_wd == 6)   # Sunday: all customers protected
+    if is_amazon and not _vp_w1_before_cutoff:
         _vp_div = (row.get("Div") or "").upper().strip()
         if _vp_div in AMZ_DIV_PO_CUTOFF:
-            _vp_today_wd  = datetime.now().weekday()
             _vp_cutoff_wd = AMZ_DIV_PO_CUTOFF[_vp_div]
             _vp_w1_before_cutoff = not (_vp_cutoff_wd <= _vp_today_wd <= 5)
     if _effective_po_wk:
