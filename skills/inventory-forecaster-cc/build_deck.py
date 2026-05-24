@@ -193,7 +193,7 @@ add_bullets(s, prs, [
     "Each became a code change on `inventory_forecaster.py` and a back-test on acct 1864.",
     (1, "Goal: deliver four small, defensible improvements that planners can audit on a single record."),
 ], top=Inches(1.4), font_size=16)
-add_footer(s, prs, "inventory-forecaster-cc · METHODOLOGY.md")
+add_footer(s, prs, "inventory-forecaster-cc - SKILL.md + RULES.md")
 
 # ── Slide 3: Pipeline at a glance ───────────────────────────────
 s = prs.slides.add_slide(blank)
