@@ -3929,7 +3929,7 @@ async function toggleDetail(key) {
         <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
           ${_USER_IS_PLANNER
             ? `<label style="font-size:11px;color:#616161;display:flex;align-items:center;gap:4px;cursor:pointer;">
-                 <input type="checkbox" id="cmt-fyi-${safeKey}" style="cursor:pointer;"> Mark as FYI
+                 <input type="checkbox" id="cmt-fyi-${safeKey}" onchange="autoFlagOnComment('${safeKey}')" style="cursor:pointer;"> Mark as FYI
                </label>`
             : `<label style="font-size:11px;color:#555;">Type:
                  <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
