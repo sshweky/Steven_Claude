@@ -12889,6 +12889,8 @@ def main():
             row = {merge_fid: rec["key"], ai_alert_fid: _sanitize_for_qb(rec.get("alert", ""))}
             if ai_analysis_fid:
                 row[ai_analysis_fid] = _sanitize_for_qb(rec.get("ai_analysis", ""))
+            if ai_confidence_fid and rec.get("confidence") is not None:
+                row[ai_confidence_fid] = int(rec["confidence"])
             for i, fid in enumerate(wk_fids):
                 row[fid] = int(round(rec["forecast"][i])) if i < len(rec["forecast"]) else 0
             # Auto Project: copy AI forecast values into MAN PRJ columns for flagged records
