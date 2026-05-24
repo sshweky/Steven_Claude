@@ -200,7 +200,7 @@ Snapshot 2026-05-21.  Every rule that fires in `forecast_record()` or
 
 ## Next available numbers
 
-- **F74** and above
+- **F77** and above
 - **R10** and above
 - **M4+** (M1, M2, M3 only)
 - **T5+** (T1, T2, T3, T4 only)
