@@ -11866,11 +11866,8 @@ def main():
         if _po_cutoff_w1_count:
             print(f"      F_PO_CUTOFF W1: {_po_cutoff_w1_count} Fetch/BrandBuzz records past PO cutoff -- AI+MAN PRJ W1 zeroed")
         _man_w1_fid = _man_prj_fids.get(1)   # FID for the current MAN PRJ W1 column
-        _man_w2_fid = _man_prj_fids.get(2)   # FID for the current MAN PRJ W2 column
         if _w1_po_count and not _man_w1_fid:
             print(f"      [WARN] W1 PO zero-out: MAN PRJ W1 FID not found in field map -- skipping")
-        if _w2_po_count and not _man_w2_fid:
-            print(f"      [WARN] W2 PO zero-out: MAN PRJ W2 FID not found in field map -- skipping")
         if _po_cutoff_w1_count and not _man_w1_fid:
             print(f"      [WARN] F_PO_CUTOFF: MAN PRJ W1 FID not found in field map -- manual W1 not zeroed in QB")
         payload = []
