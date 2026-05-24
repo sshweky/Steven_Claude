@@ -11204,8 +11204,8 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
 
     # ── Specific: Smart trend insight ─────────────────────────────────────────
     # For POS-connected accounts: consumer velocity patterns (stocking-up,
-    # acceleration, deceleration). For all others: order-pattern anomalies
-    # (gap weeks, qty shrinkage, cadence drops, YoY softening).
+    # acceleration, deceleration). For APL: B2B order activity bullet.
+    # For all others: order-pattern anomalies from order history.
     if pos:
         ord_lw = float(pos.get("Ordered_Units_LW")       or pos.get("ordered_lw")       or 0)
         ord_pw = float(pos.get("Ordered_Units_Prior_Wk")  or pos.get("ordered_prior_wk")  or 0)
@@ -11213,41 +11213,60 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         l13 = float(pos.get("Avg_Units_Wk_L13w") or pos.get("l13w") or 0)
         l26 = float(pos.get("Avg_Units_Wk_L26w") or pos.get("l26w") or 0)
         l52 = float(pos.get("Avg_Units_Wk_L52w") or pos.get("l52w") or 0)
-        l13_anomaly = (l13 == 0 and l4 > 0 and l26 > 0)
-        # Always emit a compact POS run-rate line so planners see consumer
-        # velocity even when the trend is flat (<10% change L4W vs L13W).
-        # "Amazon POS Sales:" matches the viewer's idempotency check.
-        if l4 > 0 or l13 > 0:
-            _l13_display = ((l4 + l26) / 2.0) if l13_anomaly else l13
-            _trend_ratio = (l4 / _l13_display) if _l13_display > 0 else 1.0
-            _trend_lbl   = ("accel" if _trend_ratio >= 1.15
-                            else "decel" if _trend_ratio <= 0.85
-                            else "stable")
-            _pos_parts = []
-            if ord_lw > 0:
-                _pos_parts.append(f"LW {int(ord_lw):,}u")
-            if l4 > 0:
-                _pos_parts.append(f"L4W {l4:.0f}/wk")
-            if _l13_display > 0:
-                _pos_parts.append(f"L13W {_l13_display:.0f}/wk")
-            if l26 > 0:
-                _pos_parts.append(f"L26W {l26:.0f}/wk")
-            if l52 > 0:
-                _pos_parts.append(f"L52W {l52:.0f}/wk")
-            if _pos_parts:
+
+        if is_apl:
+            # APL: no consumer POS; show B2B order fields from Amazon Catalog
+            # as the POS-equivalent bullet, then fall through to Order Trends.
+            specific.append(
+                "<b>Amazon Private Label:</b> No consumer POS or DC inventory "
+                "data available. Forecast uses order history + seasonal/category "
+                "profiles."
+            )
+            if ord_lw > 0 or ord_pw > 0:
+                _apl_parts = []
+                if ord_lw > 0:
+                    _apl_parts.append(f"LW {int(ord_lw):,}u")
+                if ord_pw > 0:
+                    _apl_parts.append(f"Prior Wk {int(ord_pw):,}u")
                 pinned_last.append(
-                    f"<b>Amazon POS Sales:</b> "
-                    + ", ".join(_pos_parts)
-                    + f" ({_trend_lbl})."
+                    "<b>Amazon B2B Orders:</b> " + ", ".join(_apl_parts) + "."
                 )
-        _smart = _smart_pos_trend(l4, l13, l26, l52,
-                                  ord_lw=ord_lw, ord_pw=ord_pw,
-                                  l13_anomaly=l13_anomaly,
-                                  cust_label=_cust_label)
-        if _smart:
-            specific.append(_smart)
-        # Order Trends bullet: B2B order history run-rate alongside POS consumer signal.
-        # Shows LW / Avg L4W / L13W / L26W / L52W from order history for all records.
+        else:
+            l13_anomaly = (l13 == 0 and l4 > 0 and l26 > 0)
+            # Always emit a compact POS run-rate line so planners see consumer
+            # velocity even when the trend is flat (<10% change L4W vs L13W).
+            # "Amazon POS Sales:" matches the viewer's idempotency check.
+            if l4 > 0 or l13 > 0:
+                _l13_display = ((l4 + l26) / 2.0) if l13_anomaly else l13
+                _trend_ratio = (l4 / _l13_display) if _l13_display > 0 else 1.0
+                _trend_lbl   = ("accel" if _trend_ratio >= 1.15
+                                else "decel" if _trend_ratio <= 0.85
+                                else "stable")
+                _pos_parts = []
+                if ord_lw > 0:
+                    _pos_parts.append(f"LW {int(ord_lw):,}u")
+                if l4 > 0:
+                    _pos_parts.append(f"L4W {l4:.0f}/wk")
+                if _l13_display > 0:
+                    _pos_parts.append(f"L13W {_l13_display:.0f}/wk")
+                if l26 > 0:
+                    _pos_parts.append(f"L26W {l26:.0f}/wk")
+                if l52 > 0:
+                    _pos_parts.append(f"L52W {l52:.0f}/wk")
+                if _pos_parts:
+                    pinned_last.append(
+                        f"<b>Amazon POS Sales:</b> "
+                        + ", ".join(_pos_parts)
+                        + f" ({_trend_lbl})."
+                    )
+            _smart = _smart_pos_trend(l4, l13, l26, l52,
+                                      ord_lw=ord_lw, ord_pw=ord_pw,
+                                      l13_anomaly=l13_anomaly,
+                                      cust_label=_cust_label)
+            if _smart:
+                specific.append(_smart)
+
+        # Order Trends bullet: B2B order history run-rate (all records with pos data).
         if len(hist) >= 4:
             _ly_hist_pos = rec.get("history_ly_ord") or []
             _smart_ord = _smart_order_trend(hist,
@@ -11256,24 +11275,15 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             if _smart_ord:
                 specific.append(_smart_ord)
     else:
-        # No POS data.  Three cases:
-        #   1) APL (Amazon Private Label) — no POS/DC data by design; use order history.
-        #   2) Standard Amazon mstyle not found in Amazon Catalog — surface a warning.
-        #   3) Non-Amazon — fall through to the Order Trends bullet.
-        if is_apl:
-            specific.append(
-                "<b>Amazon Private Label:</b> POS and DC inventory data are not "
-                "available for Private Label accounts. Forecast is based on "
-                "order history + seasonal/category profiles."
-            )
-        elif is_amazon:
+        # No POS data at all.
+        if is_amazon:
             critical.append(
                 "Amazon POS / DC data not available for this mstyle "
                 "(not found in Amazon Catalog). "
                 "Forecast uses order history only -- "
                 "verify item is set up in the Amazon Catalog table in QB."
             )
-        if is_apl or (not is_amazon and len(hist) >= 4):
+        if not is_amazon and len(hist) >= 4:
             _ly_hist = rec.get("history_ly_ord") or []
             _smart_ord = _smart_order_trend(hist,
                                             ly_hist_26=_ly_hist if _ly_hist else None,
