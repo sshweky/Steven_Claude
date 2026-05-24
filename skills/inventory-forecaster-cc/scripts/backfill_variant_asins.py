@@ -31,7 +31,7 @@ FID_KEY    = 292   # Acct# - MStyle (Key) -- merge key for upserts
 FID_MSTYLE = 196   # Mstyle
 FID_STATUS = 10    # Status @ Cust
 FID_CUST   = 874   # Customr Name (typo is in QB -- no trailing 'e')
-FID_ASIN   = 821   # Cust SKU# (ASIN for Amazon records)
+FID_CUST_SKU = 821   # Cust SKU#  -- writable text field (fid 817 "ASIN" is a lookup, not writable)
 
 # Match same suffixes as SWITCHOVER_SUFFIXES in the forecaster.
 # Ordered longest-first so "DTC" matches before a hypothetical "C" etc.
