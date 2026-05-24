@@ -19,7 +19,9 @@ def test_p9_target_ctrl_in_bias_corrections(fc):
 
 def test_p3_otb_path_c_offprice_hardzero(fc):
     """PATH C: off-price customer + L4=0 + manual<=100 -> OTB(zero)."""
-    history = [0]*48 + [5000, 3000, 1500, 0]  # L4 = 0 (last 4 weeks)
+    # Off-price item that had a closeout buy 8 weeks ago, now nothing for 4w
+    history = [0]*40 + [5000, 3000, 1500, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    assert sum(history[-4:]) == 0
     is_otb, meta = fc._detect_otb(history, is_amazon=False,
                                    is_offprice=True, manual_total=50)
     assert is_otb is True
@@ -28,7 +30,7 @@ def test_p3_otb_path_c_offprice_hardzero(fc):
 
 def test_p3_otb_path_c_skipped_when_manual_present(fc):
     """PATH C should NOT fire when planner is still projecting demand."""
-    history = [0]*48 + [5000, 3000, 1500, 0]
+    history = [0]*40 + [5000, 3000, 1500, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     is_otb, meta = fc._detect_otb(history, is_amazon=False,
                                    is_offprice=True, manual_total=5000)
     # PATH C requires manual<=100; A/B may still fire on the history shape.
@@ -39,7 +41,7 @@ def test_p3_otb_path_c_skipped_when_manual_present(fc):
 
 def test_p3_otb_path_c_requires_offprice(fc):
     """Even with manual<=100 and L4=0, non-off-price shouldn't trigger PATH C."""
-    history = [0]*48 + [5000, 3000, 1500, 0]
+    history = [0]*40 + [5000, 3000, 1500, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     is_otb, meta = fc._detect_otb(history, is_amazon=False,
                                    is_offprice=False, manual_total=50)
     if is_otb:
@@ -48,7 +50,7 @@ def test_p3_otb_path_c_requires_offprice(fc):
 
 def test_p3_amazon_never_otb(fc):
     """Amazon items NEVER classified OTB regardless of other flags."""
-    history = [0]*48 + [5000, 3000, 1500, 0]
+    history = [0]*40 + [5000, 3000, 1500, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     is_otb, _ = fc._detect_otb(history, is_amazon=True,
                                 is_offprice=True, manual_total=50)
     assert is_otb is False
