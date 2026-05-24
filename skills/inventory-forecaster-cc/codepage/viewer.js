@@ -4116,22 +4116,29 @@ async function toggleDetail(key) {
         return `W${c.poWk}: Open PO ${fmtN(c.poQty)} units  |  Manual Prj ${fmtN(c.prjQty)} units  (same week)`;
       } else {
         const gap = Math.abs(c.poWk - c.prjWk);
-        return `Open PO ${fmtN(c.poQty)} units (W${c.poWk})  +  Manual Prj ${fmtN(c.prjQty)} units (W${c.prjWk})  — ${gap} wk apart`;
+        return `Open PO ${fmtN(c.poQty)} units (W${c.poWk})  +  Manual Prj ${fmtN(c.prjQty)} units (W${c.prjWk})  -- ${gap} wk apart`;
       }
     });
     const _alertTitle = _isOP
-      ? 'Off-Price Account: Open PO within 4 weeks of Manual Projection'
-      : 'Open PO and Manual Projection in the Same Week';
+      ? 'DUPLICATE DEMAND: Off-Price Open PO + Manual Projection overlap'
+      : 'DUPLICATE DEMAND: Open PO and Manual Projection in the Same Week';
     const _alertDesc = _isOP
-      ? 'Off-price POs ship the same or following week — a Manual Projection within 4 weeks of an Open PO likely double-counts that demand. Review and zero out the overlapping Manual Projection weeks unless you expect an additional separate order.'
-      : 'One or more weeks have both an Open Customer PO and a Manual Projection. The PO is a confirmed order — projecting additional demand in the same week overstates requirements. Zero out the Manual Projection for those weeks unless you expect a second separate order.';
+      ? 'Off-price POs ship the same or following week. A Manual Projection within 4 weeks of an Open PO double-counts that demand and overstates replenishment requirements. Zero out the overlapping Manual Projection weeks unless you expect a completely separate additional order.'
+      : 'One or more weeks have BOTH a confirmed Open Customer PO and a Manual Projection. The PO is already a committed order -- the Manual Projection on top of it double-counts demand. Zero out the Manual Projection for conflicting weeks unless you expect a second independent order in the same week.';
+    const _safeKeyForBtn = r.key.replace(/[^a-zA-Z0-9]/g, '_');
     poPrjAlertHtml = `
-      <div style="margin:8px 12px 0 12px;padding:12px 14px;background:#fff3e0;border:2px solid #e65100;border-radius:6px;">
-        <div style="font-weight:700;font-size:13px;color:#bf360c;margin-bottom:5px;">&#x26A0; ${escHtml(_alertTitle)}</div>
-        <div style="font-size:11px;color:#5d3a00;line-height:1.5;margin-bottom:8px;">${escHtml(_alertDesc)}</div>
-        <div style="font-size:11px;font-family:monospace;line-height:1.7;color:#5d3a00;background:#fff8f0;padding:6px 10px;border-radius:4px;border:1px solid #ffcc80;">
+      <div id="po-prj-alert-${_safeKeyForBtn}" style="margin:10px 12px 0 12px;padding:14px 16px;background:#ffebee;border:3px solid #c62828;border-radius:6px;">
+        <div style="font-weight:700;font-size:14px;color:#b71c1c;margin-bottom:6px;">&#9888; ${escHtml(_alertTitle)}</div>
+        <div style="font-size:12px;color:#7f0000;line-height:1.6;margin-bottom:10px;">${escHtml(_alertDesc)}</div>
+        <div style="font-size:11px;font-family:monospace;line-height:1.8;color:#7f0000;background:#fff8f8;padding:8px 12px;border-radius:4px;border:1px solid #ef9a9a;margin-bottom:10px;">
           ${_conflictLines.map(l => escHtml(l)).join('<br>')}
         </div>
+        <button id="zero-dup-btn-${_safeKeyForBtn}"
+          onclick="zeroDuplicateManPrj('${r.key.replace(/'/g, "\\'")}', '${_safeKeyForBtn}')"
+          style="background:#c62828;color:#fff;border:none;padding:7px 16px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;">
+          Zero Duplicate MAN PRJ Weeks
+        </button>
+        <span style="font-size:10px;color:#b71c1c;margin-left:10px;">Changes will be staged -- click Save All to write to QB.</span>
       </div>`;
   }
 
