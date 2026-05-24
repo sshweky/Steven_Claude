@@ -1090,8 +1090,9 @@ async function _loadOneInvFlowRow(r) {
         r.inv_flow_ats_now    = ATS_NOW   ? numCell(row, ATS_NOW)   : 0;
         r.inv_flow_ats_oh     = ATS_OH    ? numCell(row, ATS_OH)    : 0;
         r.inv_flow_ats_oo     = ATS_OO    ? numCell(row, ATS_OO)    : 0;
-        r.inv_flow_ats_oh_wos = ATS_OH_WOS ? numCell(row, ATS_OH_WOS) : 0;
-        r.inv_flow_ats_oo_wos = ATS_OO_WOS ? numCell(row, ATS_OO_WOS) : 0;
+        r.inv_flow_ats_oh_wos  = ATS_OH_WOS  ? numCell(row, ATS_OH_WOS)  : 0;
+        r.inv_flow_ats_oo_wos  = ATS_OO_WOS  ? numCell(row, ATS_OO_WOS)  : 0;
+        r.inv_flow_first_shpd  = FIRST_SHPD  ? strCell(row, FIRST_SHPD)  : '';
       }
       return true;
     } catch (e) {
