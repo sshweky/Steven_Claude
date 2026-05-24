@@ -1,0 +1,9 @@
+{
+  "id": "26",
+  "subject": "P6: F37 NEW + active-growth guard",
+  "description": "Skip F37 W1-W2 zeroing when status_cust contains 'NEW' OR L4W avg >= 0.8 * L13W avg.",
+  "activeForm": "Implementing P6 F37 guard",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

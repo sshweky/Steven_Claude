@@ -99,6 +99,7 @@ CUSTOMER_BIAS_CORRECTIONS = {
     "THEIS DISTRIBUTING":        1.25,
     "IMPERIAL DISTRIBUTORS":     1.35,
     "ARMY-AIR-FORCE EXCH":       1.40,
+    "TARGET CTRL INV PRCSNG":    1.40,  # P9 (2026-05-24): manual UP-bias on 13/15 records, $103K gap
     "PET PHARM":                 0.55,
     "H G BUYING":                0.45,
     "PETCO MEXICO":              0.45,

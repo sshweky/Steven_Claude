@@ -1,0 +1,9 @@
+{
+  "id": "27",
+  "subject": "P8: Croston pre-launch history trim",
+  "description": "In crostens(), when first non-zero index in L26 is >=8 (long pre-launch zeros), trim history before z/p computation.",
+  "activeForm": "Implementing P8 Croston pre-launch trim",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

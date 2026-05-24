@@ -1,0 +1,9 @@
+{
+  "id": "24",
+  "subject": "P9: Target CTRL bias correction (1 line)",
+  "description": "Add TARGET CTRL INV PRCSNG to CUSTOMER_BIAS_CORRECTIONS at ~1.40.",
+  "activeForm": "Implementing P9 Target bias",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

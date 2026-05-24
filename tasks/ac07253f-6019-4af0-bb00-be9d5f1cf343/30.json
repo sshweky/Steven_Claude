@@ -1,0 +1,9 @@
+{
+  "id": "30",
+  "subject": "P1: New-launch ramp detection (F72)",
+  "description": "If L52 nz count < 13 (sparse classification) AND L26[-6:] has >=4 non-zero AND L26[-12:-6] has >=5 zeros, reroute to Heuristic with baseline = mean(L26[-6:] non-zero).",
+  "activeForm": "Implementing P1 F72 new-launch detection",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}
