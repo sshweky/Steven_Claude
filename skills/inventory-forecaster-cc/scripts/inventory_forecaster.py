@@ -5348,20 +5348,18 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     hist      = get_history(row, oos_entry=oos_entry)
     cust_name = row.get("Customr_Name") or ""
     is_amazon = AMAZON_CUST_SUBSTR in cust_name.upper()
-    # APL (Amazon Private Label): no POS or DC inventory data available.
-    # Treat as a standard order-history account — strip Amazon-specific flags so
-    # POS-blend rules (F15, F38, F59i/m/n, F79) do not fire.
+    # APL (Amazon Private Label): no consumer POS or DC inventory data.
+    # is_amazon = False strips POS-blend rules (F15, F38, F59i/m/n, F79).
+    # pos_data IS fetched for APL — Amazon_Catalog carries Ordered_Units_LW and
+    # Ordered_Units_Prior_Wk (B2B order qty) even though consumer Avg_Units_Wk_*
+    # fields are absent.  F81 uses these two fields as a recency anchor.
     is_apl    = APL_CUST_SUBSTR in cust_name.upper()
     if is_apl:
         is_amazon = False
+    _fetch_pos = is_amazon or is_apl   # APL: fetch pos for B2B order fields only
     is_international = _is_international_cust(cust_name)
-    pos_data  = (amazon_pos or {}).get(row.get("Mstyle", "")) if is_amazon else None
-    # F59i-EC POS inheritance: EC/COS drop-ship variants have no own ASIN in
-    # Amazon's catalog POS feed (they ship direct-to-consumer, not via DC).
-    # When pos_data is missing for an EC/COS mstyle, fall back to the parent
-    # mstyle's POS as a consumer-demand proxy.  This feeds the F59i-EC anchor
-    # (which otherwise fails silently on pos_data=None) so EC items get the
-    # same AI-vs-consumer-demand correction as their base style siblings.
+    pos_data  = (amazon_pos or {}).get(row.get("Mstyle", "")) if _fetch_pos else None
+    # F59i-EC POS inheritance (Amazon only — APL items don't have EC variants)
     if is_amazon and pos_data is None:
         _pos_ms = (row.get("Mstyle") or "").upper()
         if _pos_ms.endswith("EC") or _pos_ms.endswith("COS") or _pos_ms.endswith("AMZ"):
@@ -5371,10 +5369,7 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
             _parent_pos = (amazon_pos or {}).get(_parent_ms)
             if _parent_pos and float(_parent_pos.get("Avg_Units_Wk_L13w") or 0) > 0:
                 pos_data = _parent_pos
-    # Forward lookup: if BASE style has no catalog entry, try common variant suffixes.
-    # Some base styles (e.g. FF7297) are tracked in Amazon Catalog under a variant
-    # mstyle (e.g. FF7297AMZ).  Share that POS data with the base so F15/F38b/F49
-    # have a consumer-demand anchor to work with.
+    # Forward lookup (Amazon only — APL variant suffixes not expected)
     if is_amazon and pos_data is None:
         _fwd_base_ms = row.get("Mstyle", "")
         for _fwd_sfx in ("AMZ", "EC", "COS", "DS"):
