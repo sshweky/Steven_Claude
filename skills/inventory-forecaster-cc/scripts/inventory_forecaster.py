@@ -2679,6 +2679,27 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             f"R8 burst-median ceiling: top2 ≥ 70% of L13 nz total "
             f"→ ord_baseline capped at median × 1.5 = {ord_baseline:.0f}"
         )
+
+    # F_BURST (2026-05-24) — Burst post-processor for pulsed ordering patterns.
+    # Fires when: pulsed pattern already detected (_fa_applied, >=4 L13W zero
+    # weeks) AND the avg non-zero order size is >=1.5x the smooth weekly baseline,
+    # confirming the customer places large infrequent POs, not weekly replenishment.
+    # Guard: skip for Amazon (DC replenishment logic -- not bulk PO customers).
+    _burst_driver = None
+    if (_fa_applied
+            and not is_amazon
+            and len(l13_nz) >= 2
+            and l13_avg > 0
+            and sum(l13_nz) / len(l13_nz) >= 1.5 * l13_avg):
+        _burst_fcst, _burst_driver = _burst_postprocess(
+            forecast, history, mp, l13_zero_count
+        )
+        if _burst_fcst is not None:
+            forecast = _burst_fcst
+            meta["burst_clustered"] = True
+    if _burst_driver:
+        meta.setdefault("drivers", []).append(_burst_driver)
+
     return forecast, round(cap_base, 1), meta
 
 
