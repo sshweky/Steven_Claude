@@ -12067,7 +12067,7 @@ def main():
             if len(_man_prj_fids) < 26:
                 print(f"      [WARN] Auto Project: only {len(_man_prj_fids)} MAN PRJ week FIDs found (expected 26) -- partial copy")
         if _w1_po_count:
-            print(f"      W1 open POs: {_w1_po_count} records have an open PO in W1 (MAN PRJ W1 left as-is -- red warning shown in codepage)")
+            print(f"      W1 open POs: {_w1_po_count} records -- AI PRJ W1 and MAN PRJ W1 zeroed (confirmed PO covers W1 demand)")
         if _w2_po_count:
             print(f"      W2 open POs: {_w2_po_count} records have an open PO in W2 (MAN PRJ W2 left as-is -- planner controls via codepage Zero button)")
         if _po_cutoff_w1_count:
