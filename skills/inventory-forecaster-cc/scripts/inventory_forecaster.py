@@ -2214,6 +2214,38 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         forecast = _new_fcst
         _f10_applied = True
 
+    # F77 (2026-05-24): Severe-decline blend without YoY gate.
+    # F10 requires YoY confirmation, which blocks it on items declining within
+    # their product lifecycle at the same seasonal stage as last year.
+    # F77 fires independently when:
+    #   - F10 did NOT fire (not _f10_applied)
+    #   - L4W < L13W nz avg × 0.65 (>35% drop — more severe than F10's 0.70)
+    #   - Seasonal profile variance is modest: max(S)/min_nz(S) < 2.5
+    #     (protects genuinely high-seasonality items from getting blended down)
+    #   - Not a new launch
+    # Blend is lighter than F10: 0.30 × L4W + 0.70 × model; W14+ × 0.90.
+    if (not _f10_applied and not is_new_launch
+            and _l13_nz_avg_f10 > 0
+            and _l4_avg_f10 < _l13_nz_avg_f10 * 0.65):
+        # Gate on seasonal profile variance
+        _f77_S_min_nz = min((v for v in S if v > 0), default=1.0) if S else 1.0
+        _f77_S_max    = max(S) if S else 1.0
+        _f77_seasonal = _f77_S_max > 0 and (_f77_S_max / _f77_S_min_nz) >= 2.5
+        if not _f77_seasonal:
+            _new_f77 = []
+            for _w_f77, _v_f77 in enumerate(forecast):
+                _blend = 0.30 * _l4_avg_f10 + 0.70 * _v_f77
+                if _w_f77 >= 13:
+                    _blend *= 0.90
+                _new_f77.append(snap(_blend, mp) if _blend > 0 else 0)
+            forecast = _new_f77
+            _f77_applied = True
+            _f77_driver = (
+                f"F77 severe-decline blend (no YoY): L4W avg {_l4_avg_f10:.0f} "
+                f"= {(_l4_avg_f10/_l13_nz_avg_f10)*100:.0f}% of L13W nz avg "
+                f"{_l13_nz_avg_f10:.0f}; blended 30/70 toward L4W"
+            )
+
     l26_avg = sum(float(v) for v in history[-26:]) / 26
     cap_base = baseline
     meta = {
