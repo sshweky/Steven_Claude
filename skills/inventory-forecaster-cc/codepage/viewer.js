@@ -4658,6 +4658,155 @@ async function _loadAmzDcInv(r, safeId) {
   // nothing left for _loadAmzDcInv to do after the bullets above.
 }
 
+// -- Retailer POS live fetch --------------------------------------------------
+// Called for non-Amazon records when a detail panel opens.  Queries the
+// Retailer Sales table (bv2izcn5b) by Mstyle + Acct# and injects three
+// POS bullets into the AI Analysis <ul>.  Each week appears exactly twice in
+// the source table so rows are deduplicated by date before computing averages.
+async function _loadRtlPos(r, safeId) {
+  if (!CFG.RTL_POS_TID) return;
+  const RF     = CFG.RTL_POS_FID;
+  const mstyle = (r.mstyle || '').trim();
+  if (!mstyle) return;
+  // Extract acct# from key (format: "ACCT-MSTYLE", e.g. "23011-FF8654")
+  const acctStr = r.key ? r.key.slice(0, r.key.length - mstyle.length - 1) : '';
+  if (!acctStr) return;
+
+  let rtlPosLw = 0, rtlPosL4w = 0, rtlPosL13w = 0, rtlPosL26w = 0, rtlPosL52w = 0;
+  let rtlOhLw = 0, rtlInstockLw = 0;
+  let rtlTrtStLw = 0, rtlTrtStPrior = 0;
+  let rtlPosStLw = 0, rtlPosStPrior = 0;
+  let rtlAurLw = 0;
+  let rtlFetchOk = false;
+
+  try {
+    const selectFids = [RF.DATE, RF.POS_U, RF.POS_D, RF.OH_U, RF.TRT_ST, RF.POS_ST, RF.INSTOCK];
+    const rtlResp = await qb('/records/query', {
+      from:    CFG.RTL_POS_TID,
+      select:  selectFids,
+      where:   `{${RF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}AND{${RF.ACCT}.EX.'${acctStr}'}`,
+      sortBy:  [{ fieldId: RF.DATE, order: 'DESC' }],
+      options: { top: 120 },
+    });
+    const rawRows = rtlResp.data || [];
+
+    // Deduplicate by date (each week-ending Sunday appears exactly twice)
+    const seen = new Set();
+    const rows = [];
+    for (const row of rawRows) {
+      const dateVal = (row[RF.DATE] && row[RF.DATE].value) || '';
+      if (!dateVal || seen.has(dateVal)) continue;
+      seen.add(dateVal);
+      rows.push(row);
+    }
+    if (!rows.length) return;   // no POS data for this acct-mstyle
+
+    const nv = (row, fid) => parseFloat((row[fid] && row[fid].value) || 0) || 0;
+
+    // Average POS Units over the most-recent N deduplicated weeks
+    const avgPosU = (n) => {
+      const slice = rows.slice(0, Math.min(n, rows.length));
+      if (!slice.length) return 0;
+      return slice.reduce((acc, row) => acc + nv(row, RF.POS_U), 0) / slice.length;
+    };
+
+    rtlPosLw   = nv(rows[0], RF.POS_U);
+    rtlPosL4w  = avgPosU(4);
+    rtlPosL13w = avgPosU(13);
+    rtlPosL26w = avgPosU(26);
+    rtlPosL52w = avgPosU(52);
+
+    rtlOhLw      = nv(rows[0], RF.OH_U);
+    rtlInstockLw = nv(rows[0], RF.INSTOCK);
+
+    rtlTrtStLw    = nv(rows[0], RF.TRT_ST);
+    rtlTrtStPrior = rows.length > 1 ? nv(rows[1], RF.TRT_ST) : 0;
+    rtlPosStLw    = nv(rows[0], RF.POS_ST);
+    rtlPosStPrior = rows.length > 1 ? nv(rows[1], RF.POS_ST) : 0;
+
+    const posUlw = nv(rows[0], RF.POS_U);
+    const posDlw = nv(rows[0], RF.POS_D);
+    rtlAurLw = (posUlw > 0) ? posDlw / posUlw : 0;
+
+    rtlFetchOk = true;
+  } catch (e) {
+    console.warn('[RTL POS] fetch failed for', mstyle, acctStr, e);
+  }
+
+  if (!rtlFetchOk) return;
+
+  const fmt    = n => Math.round(n).toLocaleString('en-US');
+  const fmtPos = n => n % 1 === 0 ? Math.round(n).toLocaleString('en-US') : n.toFixed(1);
+  const fmtAur = n => '$' + n.toFixed(2);
+  const fmtPct = n => (n * 100).toFixed(1) + '%';
+  const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
+
+  // Show week-over-week store count change: green for gain, red for loss
+  const fmtDelta = (delta) => {
+    if (delta === 0) return '';
+    const sign = delta > 0 ? '+' : '';
+    return ` <span style="color:${delta > 0 ? '#2e7d32' : '#c62828'};font-size:11px">(${sign}${fmt(delta)})</span>`;
+  };
+
+  // -- Bullet 1: POS Sales --------------------------------------------------
+  const posItems = [];
+  if (rtlPosLw   > 0) posItems.push(`<b>LW</b> ${fmtPos(rtlPosLw)} u`);
+  if (rtlPosL4w  > 0) posItems.push(`<b>L4W avg</b> ${fmtPos(rtlPosL4w)} u/wk`);
+  if (rtlPosL13w > 0) posItems.push(`<b>L13W avg</b> ${fmtPos(rtlPosL13w)} u/wk`);
+  if (rtlPosL26w > 0) posItems.push(`<b>L26W avg</b> ${fmtPos(rtlPosL26w)} u/wk`);
+  if (rtlPosL52w > 0) posItems.push(`<b>L52W avg</b> ${fmtPos(rtlPosL52w)} u/wk`);
+  const rtlPosBulletHtml = posItems.length
+    ? '<b>Retailer POS sales:</b> ' + posItems.join(sep)
+    : '<b>Retailer POS sales:</b> <span style="color:#999;font-style:italic">no POS data</span>';
+
+  // -- Bullet 2: Retailer inventory -----------------------------------------
+  const invItems = [];
+  if (rtlOhLw > 0) invItems.push(`<b>OH</b> ${fmt(rtlOhLw)} u`);
+  if (rtlInstockLw > 0) {
+    const instPct   = fmtPct(rtlInstockLw);
+    const instColor = rtlInstockLw < 0.90 ? '#c62828' : rtlInstockLw < 0.95 ? '#e65100' : '';
+    const instHtml  = instColor
+      ? `<span style="color:${instColor};font-weight:600">${instPct}</span>`
+      : instPct;
+    invItems.push(`<b>Instock</b> ${instHtml}`);
+  }
+  const rtlInvBulletHtml = invItems.length
+    ? '<b>Retailer inventory:</b> ' + invItems.join(sep)
+    : '<b>Retailer inventory:</b> <span style="color:#999;font-style:italic">no data</span>';
+
+  // -- Bullet 3: Distribution -----------------------------------------------
+  const trtDelta = rtlTrtStLw - rtlTrtStPrior;
+  const posDelta = rtlPosStLw - rtlPosStPrior;
+  const distItems = [];
+  if (rtlTrtStLw > 0) distItems.push(`<b>Traited strs</b> ${fmt(rtlTrtStLw)}${fmtDelta(trtDelta)}`);
+  if (rtlPosStLw > 0) distItems.push(`<b>POS strs</b> ${fmt(rtlPosStLw)}${fmtDelta(posDelta)}`);
+  if (rtlAurLw   > 0) distItems.push(`<b>AUR$ LW</b> ${fmtAur(rtlAurLw)}`);
+  const rtlDistBulletHtml = distItems.length
+    ? '<b>Retailer distribution:</b> ' + distItems.join(sep)
+    : '<b>Retailer distribution:</b> <span style="color:#999;font-style:italic">no data</span>';
+
+  // -- Inject into AI Analysis <ul> -----------------------------------------
+  const ul = document.getElementById('ai-bullets-' + safeId);
+  if (!ul) return;
+
+  // Remove any stale RTL bullets (handles panel re-open)
+  Array.from(ul.querySelectorAll('li')).forEach(li => {
+    if (li.hasAttribute('data-rtl-pos') || li.hasAttribute('data-rtl-inv')
+        || li.hasAttribute('data-rtl-dist')) li.remove();
+  });
+
+  const mkLi = (html, attr) => {
+    const li = document.createElement('li');
+    li.style.marginBottom = '4px';
+    li.setAttribute(attr, '1');
+    li.innerHTML = html;
+    return li;
+  };
+  ul.appendChild(mkLi(rtlPosBulletHtml,  'data-rtl-pos'));
+  ul.appendChild(mkLi(rtlInvBulletHtml,  'data-rtl-inv'));
+  ul.appendChild(mkLi(rtlDistBulletHtml, 'data-rtl-dist'));
+}
+
 // -- Comment history loader --------------------------------------------------
 //
 // Two parallel queries  -  one per table  -  populate the two panes:
