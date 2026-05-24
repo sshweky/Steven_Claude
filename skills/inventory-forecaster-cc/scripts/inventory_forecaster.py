@@ -10881,6 +10881,7 @@ def main():
         pri_low     = sum(1 for r in val_results if r["priority"] == "LOW")
         pri_onplan  = sum(1 for r in val_results if r["priority"] == "On-Plan")
         val_output = {
+            "_schema_version": SCHEMA_VERSION,
             "meta": {
                 "generated_at": datetime.now().isoformat(timespec="seconds"),
                 "scope":        scope_desc,
