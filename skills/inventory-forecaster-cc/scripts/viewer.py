@@ -1017,10 +1017,16 @@ def _strip_html(s):
     return " ".join(out.split()).strip()
 
 def load_results(path):
-    """Load results JSON — auto-detects forecast vs validation format."""
+    """Load results JSON -- auto-detects forecast vs validation format."""
     global records_by_key, prj_cols, VIEW_MODE, validation_summary
     with open(path) as f:
         data = json.load(f)
+    # Schema check (warn-only; viewer is permissive about older snapshots).
+    try:
+        from config import check_schema_version
+        check_schema_version(data, source_path=path)
+    except ImportError:
+        pass  # config.py not yet on path
     if isinstance(data, list):
         recs = data
         prj_cols = _make_prj_cols()
