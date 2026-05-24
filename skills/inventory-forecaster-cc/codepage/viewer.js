@@ -4452,10 +4452,54 @@ async function _loadAmzDcInv(r, safeId) {
     console.warn('[DC Inv] fetch failed for mstyle', mstyle, e);
   }
 
+  // ── AUR fetch (bqkdjaqi7 AdTrack Amazon Catalog) ─────────────────────────
+  if (CFG.AMZ_AUR_TID && mstyle) {
+    const AA = CFG.AMZ_AUR_FID;
+    try {
+      const aurSelectFids = [AA.MSTYLE, AA.AUR_L4W, AA.AUR_L13W, AA.AUR_L26W,
+                             AA.AUR_L52W, AA.REV_LW, AA.UNITS_LW].filter(v => v != null);
+      // Try exact mstyle, then strip /N pack suffix, then strip EC/COS suffix
+      const aurTryMstyles = [mstyle];
+      const aurStripped = mstyle.replace(/\/\d+$/, '');
+      if (aurStripped !== mstyle) aurTryMstyles.push(aurStripped);
+      const aurBase = mstyle.replace(/(COS|EC)$/i, '');
+      if (aurBase !== mstyle && !aurTryMstyles.includes(aurBase)) {
+        aurTryMstyles.push(aurBase);
+        const aurBareBase = aurBase.replace(/\/\d+$/, '');
+        if (aurBareBase !== aurBase && !aurTryMstyles.includes(aurBareBase)) aurTryMstyles.push(aurBareBase);
+      }
+      let aurRow = null;
+      for (const ms of aurTryMstyles) {
+        const aurResp = await qb('/records/query', {
+          from:   CFG.AMZ_AUR_TID,
+          select: aurSelectFids,
+          where:  `{${AA.MSTYLE}.EX.'${ms.replace(/'/g, "''")}'}`,
+          options: { top: 1 },
+        });
+        const aurRows = aurResp.data || [];
+        if (aurRows.length) { aurRow = aurRows[0]; break; }
+      }
+      if (aurRow) {
+        const anv = fid => fid != null ? (parseFloat((aurRow[fid] && aurRow[fid].value) || 0) || 0) : 0;
+        const revLw   = anv(AA.REV_LW);
+        const unitsLw = anv(AA.UNITS_LW);
+        aurLw   = (unitsLw > 0) ? revLw / unitsLw : 0;
+        aurL4w  = anv(AA.AUR_L4W);
+        aurL13w = anv(AA.AUR_L13W);
+        aurL26w = anv(AA.AUR_L26W);
+        aurL52w = anv(AA.AUR_L52W);
+        aurFetchOk = true;
+      }
+    } catch (e) {
+      console.warn('[AUR] fetch failed for mstyle', mstyle, e);
+    }
+  }
+
   // ── AI Analysis bullets ───────────────────────────────────────────────────
   const fmt    = n => Math.round(n).toLocaleString('en-US');
   const fmtWos = n => n.toFixed(1);
   const fmtPos = n => n % 1 === 0 ? Math.round(n).toLocaleString('en-US') : n.toFixed(1);
+  const fmtAur = n => '$' + n.toFixed(2);
   const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
 
   // POS bullet
