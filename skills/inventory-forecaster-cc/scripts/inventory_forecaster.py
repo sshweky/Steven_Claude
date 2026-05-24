@@ -8780,11 +8780,10 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         sf   = season[w]
         wnum = w + 1   # 1-indexed week number
 
-        # Event lift for this week -- both Prime Day AND Fall Deal are Amazon-only
-        if is_amazon and wnum in PRIME_DAY_WEEKS:
-            ev_lift = PRIME_DAY_LIFT
-        elif is_amazon and wnum in FALL_DEAL_WEEKS:
-            ev_lift = FALL_DEAL_LIFT
+        # Event lift for this week -- Prime Day AND Fall Prime Day are Amazon-only.
+        if is_amazon:
+            _vp, _vf = _get_event_boosts()
+            ev_lift = max(_vp.get(wnum, 1.0), _vf.get(wnum, 1.0))
         else:
             ev_lift = 1.0
 
@@ -8797,11 +8796,15 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         reason   = None
 
         # Event context for messages -- both events are Amazon-only
-        ev_note = ""
-        if is_amazon and wnum in PRIME_DAY_WEEKS:
-            ev_note = " This is a Prime Day pre-order week (Amazon only)."
-        elif is_amazon and wnum in FALL_DEAL_WEEKS:
-            ev_note = " This is a Fall Deal pre-order week (Amazon only)."
+        if is_amazon:
+            _mn, _mf = _get_event_boosts()
+            ev_note = ""
+            if wnum in _mn:
+                ev_note = " This is a Prime Day pre-order week (Amazon only)."
+            elif wnum in _mf:
+                ev_note = " This is a Fall Prime Day pre-order week (Amazon only)."
+        else:
+            ev_note = ""
 
         # ISO settle-period: retailer just took the item; low/zero projections
         # are expected while product ships to stores and sales develop.
