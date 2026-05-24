@@ -12319,7 +12319,9 @@ def main():
         # records that happen to share the same mstyle.
         _cust_name = (row.get("Customr_Name") or r.get("cust") or "")
         _is_apl_rec    = APL_CUST_SUBSTR in _cust_name.upper()
-        _is_amazon_rec = (AMAZON_CUST_SUBSTR in _cust_name.upper()) and not _is_apl_rec
+        # APL is_amazon_rec = True so _pos_for_rec is fetched (has Ordered_Units_LW/Prior_Wk).
+        # build_ai_analysis() routes APL through its own bullet via is_apl flag.
+        _is_amazon_rec = AMAZON_CUST_SUBSTR in _cust_name.upper()
         # EC items (e.g. "FF12302/24EC") have POS and DC Inv stored under
         # the parent mstyle ("FF12302/24") in the Amazon catalog tables.
         # Try the literal mstyle first; fall back to parent if not found.
