@@ -1,0 +1,449 @@
+Fetching projections...
+  1914 records
+
+=== SUMMARY ===
+  Total active/FD Amazon projections : 1914
+  Original style (no suffix)          : 1834
+  Variant style  (EC/COS/AMZ/DS/DTC)  : 80
+  No ASIN (Cust SKU# blank)            : 135
+
+  ASINs with BOTH original + variant active: 68
+
+  --- CONFLICTS (same ASIN on original AND variant projection) ---
+  ASIN B00A2383W2:
+    1864-FF10477                         FF10477                 Original (A)
+    1864-FF10477EC                       FF10477EC               Variant (A)
+  ASIN B00B5RFPYS:
+    1864-SF8174                          SF8174                  Original (A)
+    1864-SF8174EC                        SF8174EC                Variant (A)
+  ASIN B00CEY4Z38:
+    1864-FF4935                          FF4935                  Original (A)
+    1864-FF4935AMZ                       FF4935AMZ               Variant (A)
+  ASIN B00CEY5082:
+    1864-FF4933                          FF4933                  Original (A)
+    1864-FF4933AMZ                       FF4933AMZ               Variant (A)
+  ASIN B00CEY50VO:
+    1864-FF4934                          FF4934                  Original (A)
+    1864-FF4934AMZ                       FF4934AMZ               Variant (A)
+  ASIN B00CEY59L0:
+    1864-FF4936                          FF4936                  Original (A)
+    1864-FF4936AMZ                       FF4936AMZ               Variant (A)
+  ASIN B00CEY5A50:
+    1864-FF7267                          FF7267                  Original (A)
+    1864-FF7267COS                       FF7267COS               Variant (A)
+    1864-FF7267AMZ                       FF7267AMZ               Variant (A)
+  ASIN B00CEY5C4Y:
+    1864-FF4930                          FF4930                  Original (A)
+    1864-FF4930AMZ                       FF4930AMZ               Variant (A)
+  ASIN B00CEY5IUC:
+    1864-FF7263                          FF7263                  Original (A)
+    1864-FF7263AMZ                       FF7263AMZ               Variant (A)
+  ASIN B00CEY5K64:
+    1864-FF4923                          FF4923                  Original (A)
+    1864-FF4923AMZ                       FF4923AMZ               Variant (A)
+  ASIN B00CEY5L7C:
+    1864-FF7266                          FF7266                  Original (A)
+    1864-FF7266COS                       FF7266COS               Variant (A)
+    1864-FF7266AMZ                       FF7266AMZ               Variant (A)
+  ASIN B00CEY5NE8:
+    1864-FF4849                          FF4849                  Original (A)
+    1864-FF4849COS                       FF4849COS               Variant (A)
+    1864-FF4849AMZ                       FF4849AMZ               Variant (A)
+  ASIN B00CI3USHC:
+    1864-SF8173                          SF8173                  Original (A)
+    1864-SF8173EC                        SF8173EC                Variant (A)
+  ASIN B00CVTRO48:
+    1864-FF4775                          FF4775                  Original (A)
+    1864-FF4775COS                       FF4775COS               Variant (A)
+    1864-FF4775AMZ                       FF4775AMZ               Variant (A)
+  ASIN B00CVTROG6:
+    1864-FF7260                          FF7260                  Original (A)
+    1864-FF7260AMZ                       FF7260AMZ               Variant (A)
+  ASIN B00CVTROQ6:
+    1864-FF4776                          FF4776                  Original (A)
+    1864-FF4776AMZ                       FF4776AMZ               Variant (A)
+  ASIN B00DTEV54Y:
+    1864-FF7258                          FF7258                  Original (A)
+    1864-FF7258COS                       FF7258COS               Variant (A)
+    1864-FF7258AMZ                       FF7258AMZ               Variant (A)
+  ASIN B00DTEV5M6:
+    1864-FF4771                          FF4771                  Original (A)
+    1864-FF4771COS                       FF4771COS               Variant (A)
+    1864-FF4771AMZ                       FF4771AMZ               Variant (A)
+  ASIN B00E1LDEWA:
+    1864-FF7261                          FF7261                  Original (A)
+    1864-FF7261AMZ                       FF7261AMZ               Variant (A)
+  ASIN B00U0KEQX2:
+    1864-FF5777                          FF5777                  Original (A)
+    1864-FF5777AMZ                       FF5777AMZ               Variant (A)
+  ASIN B00XK4JP0Y:
+    1864-FF5807                          FF5807                  Original (A)
+    1864-FF5807COS                       FF5807COS               Variant (A)
+    1864-FF5807AMZ                       FF5807AMZ               Variant (A)
+  ASIN B01330HT84:
+    1864-FF7112                          FF7112                  Original (A)
+    1864-FF7112EC                        FF7112EC                Variant (A)
+  ASIN B01330IKAA:
+    1864-FF7120                          FF7120                  Original (A)
+    1864-FF7120EC                        FF7120EC                Variant (A)
+  ASIN B01330INMU:
+    1864-FF7115                          FF7115                  Original (A)
+    1864-FF7115EC                        FF7115EC                Variant (A)
+  ASIN B014TMYBFO:
+    1864-FF7297                          FF7297                  Original (A)
+    1864-FF7297COS                       FF7297COS               Variant (A)
+    1864-FF7297AMZ                       FF7297AMZ               Variant (A)
+  ASIN B0170GSF2Q:
+    1864-BB0018                          BB0018                  Original (A)
+    1864-BB0018EC                        BB0018EC                Variant (A)
+  ASIN B01BZU1SU4:
+    1864-BB0080                          BB0080                  Original (A)
+    1864-BB0080EC                        BB0080EC                Variant (A)
+  ASIN B01CCFPBEU:
+    1864-FF5776                          FF5776                  Original (A)
+    1864-FF5776AMZ                       FF5776AMZ               Variant (A)
+  ASIN B01CCFPC08:
+    1864-FF5769                          FF5769                  Original (A)
+    1864-FF5769AMZ                       FF5769AMZ               Variant (A)
+  ASIN B01CCFPC0I:
+    1864-FF5766                          FF5766                  Original (A)
+    1864-FF5766AMZ                       FF5766AMZ               Variant (A)
+  ASIN B01CEDQ6IU:
+    1864-FF5952                          FF5952                  Original (A)
+    1864-FF5952EC                        FF5952EC                Variant (A)
+  ASIN B01N4RXHLX:
+    1864-FF6554                          FF6554                  Original (A)
+    1864-FF6554COS                       FF6554COS               Variant (A)
+  ASIN B078GPFMN1:
+    1864-BB0131                          BB0131                  Original (A)
+    1864-BB0131EC                        BB0131EC                Variant (A)
+  ASIN B07CJ5QD3R:
+    1864-FF10475                         FF10475                 Original (A)
+    1864-FF10475EC                       FF10475EC               Variant (A)
+  ASIN B07F2D3R48:
+    1864-FF8991                          FF8991                  Original (A)
+    1864-FF8991EC                        FF8991EC                Variant (FD)
+  ASIN B07RVD63J1:
+    1864-FF10159                         FF10159                 Original (A)
+    1864-FF10159EC                       FF10159EC               Variant (A)
+  ASIN B07RWF8X9P:
+    1864-FF10479                         FF10479                 Original (A)
+    1864-FF10479EC                       FF10479EC               Variant (A)
+  ASIN B07SZG9MGH:
+    1864-BB0409                          BB0409                  Original (A)
+    1864-BB0409EC                        BB0409EC                Variant (A)
+  ASIN B07TBBC178:
+    1864-BB0705                          BB0705                  Original (A)
+    1864-BB0705EC                        BB0705EC                Variant (A)
+  ASIN B07TBBR46P:
+    1864-BB0424                          BB0424                  Original (A)
+    1864-BB0424EC                        BB0424EC                Variant (A)
+  ASIN B07VFKH7HK:
+    1864-FF12354                         FF12354                 Original (A)
+    1864-FF12354COS                      FF12354COS              Variant (A)
+  ASIN B07VFKH7HL:
+    1864-FF12353                         FF12353                 Original (A)
+    1864-FF12353COS                      FF12353COS              Variant (A)
+    1864-FF12353AMZ                      FF12353AMZ              Variant (A)
+  ASIN B082N5X4SX:
+    1864-FF6553                          FF6553                  Original (A)
+    1864-FF6553COS                       FF6553COS               Variant (A)
+    1864-FF6553AMZ                       FF6553AMZ               Variant (A)
+  ASIN B089YVNQGD:
+    1864-FF12837                         FF12837                 Original (A)
+    1864-FF12837EC                       FF12837EC               Variant (A)
+  ASIN B08CL2PRPD:
+    1864-FF12653                         FF12653                 Original (A)
+    1864-FF12653EC                       FF12653EC               Variant (A)
+  ASIN B08CL3CJQW:
+    1864-FF12655                         FF12655                 Original (A)
+    1864-FF12655EC                       FF12655EC               Variant (A)
+  ASIN B08PDMBCK2:
+    1864-FF15584                         FF15584                 Original (A)
+    1864-FF15584AMZ                      FF15584AMZ              Variant (A)
+  ASIN B08QJMZPNH:
+    1864-FF9298                          FF9298                  Original (A)
+    1864-FF9298EC                        FF9298EC                Variant (A)
+    1864-FF9298CA                        FF9298CA                Original (A)
+  ASIN B08QJQ94CY:
+    1864-FF12302EC                       FF12302EC               Variant (A)
+    1864-FF12302/24                      FF12302/24              Original (A)
+    1864-FF12302/24EC                    FF12302/24EC            Variant (A)
+  ASIN B08YGYMFVZ:
+    1864-FF12355                         FF12355                 Original (A)
+    1864-FF12355COS                      FF12355COS              Variant (A)
+  ASIN B09LC1JR52:
+    1864-FF6636                          FF6636                  Original (A)
+    1864-FF6636AMZ                       FF6636AMZ               Variant (A)
+  ASIN B09LCRY6ZJ:
+    1864-FF6634                          FF6634                  Original (A)
+    1864-FF6634AMZ                       FF6634AMZ               Variant (A)
+  ASIN B09NW8ZZCF:
+    1864-FF4930AMZ2                      FF4930AMZ2              Original (A)
+    1864-FF4930AMZ2COS                   FF4930AMZ2COS           Variant (A: NEW)
+  ASIN B09XN8LNFT:
+    1864-BB11603                         BB11603                 Original (A)
+    1864-BB11603EC                       BB11603EC               Variant (A)
+  ASIN B0BPJW9DVB:
+    1864-FF20210                         FF20210                 Original (A)
+    1864-FF20210EC                       FF20210EC               Variant (A)
+  ASIN B0BPJZ5GDD:
+    1864-FF20206                         FF20206                 Original (A)
+    1864-FF20206EC                       FF20206EC               Variant (A)
+  ASIN B0BPK2MSL5:
+    1864-FF20207                         FF20207                 Original (A)
+    1864-FF20207EC                       FF20207EC               Variant (A)
+  ASIN B0CFZP2NLJ:
+    1864-BB30587                         BB30587                 Original (A)
+    1864-BB30587EC                       BB30587EC               Variant (A: NEW)
+  ASIN B0CG1369VS:
+    1864-BB30276                         BB30276                 Original (A)
+    1864-BB30276EC                       BB30276EC               Variant (A: NEW)
+  ASIN B0CSDY82HH:
+    1864-FF26756                         FF26756                 Original (FD)
+    1864-FF26756EC                       FF26756EC               Variant (A)
+  ASIN B0CT623C62:
+    1864-FF30755                         FF30755                 Original (A)
+    1864-FF30755EC                       FF30755EC               Variant (A)
+  ASIN B0D3FC3FGW:
+    1864-FF31324                         FF31324                 Original (A)
+    1864-FF31324EC                       FF31324EC               Variant (A)
+  ASIN B0DB9L45NZ:
+    1864-FF31063                         FF31063                 Original (A)
+    1864-FF31063AMZ                      FF31063AMZ              Variant (A)
+  ASIN B0DJ3HV4LN:
+    1864-FF31326                         FF31326                 Original (A)
+    1864-FF31326EC                       FF31326EC               Variant (A)
+  ASIN B0DTLW2RR2:
+    1864-FF30426                         FF30426                 Original (A)
+    1864-FF30426EC                       FF30426EC               Variant (A)
+  ASIN B0F2G8KFXV:
+    1864-FF33876                         FF33876                 Original (A)
+    1864-FF33876EC                       FF33876EC               Variant (A)
+  ASIN B0F2GBN4HY:
+    1864-FF33877                         FF33877                 Original (A)
+    1864-FF33877EC                       FF33877EC               Variant (A)
+  ASIN B0FXBDSYPZ:
+    1864-FF35147                         FF35147                 Original (A)
+    1864-FF35147EC                       FF35147EC               Variant (A)
+
+=== VARIANTS ===
+  Key                                  Mstyle                  Suffix  Base                    ASIN          Status
+  --------------------------------------------------------------------------------------------------------------
+  1864-FF12353AMZ                      FF12353AMZ              AMZ     FF12353                 B07VFKH7HL    A
+  1864-FF15584AMZ                      FF15584AMZ              AMZ     FF15584                 B08PDMBCK2    A
+  1864-FF31063AMZ                      FF31063AMZ              AMZ     FF31063                 B0DB9L45NZ    A
+  1864-FF4771AMZ                       FF4771AMZ               AMZ     FF4771                  B00DTEV5M6    A
+  1864-FF4775AMZ                       FF4775AMZ               AMZ     FF4775                  B00CVTRO48    A
+  1864-FF4776AMZ                       FF4776AMZ               AMZ     FF4776                  B00CVTROQ6    A
+  1864-FF4849AMZ                       FF4849AMZ               AMZ     FF4849                  B00CEY5NE8    A
+  1864-FF4923AMZ                       FF4923AMZ               AMZ     FF4923                  B00CEY5K64    A
+  1864-FF4930AMZ                       FF4930AMZ               AMZ     FF4930                  B00CEY5C4Y    A
+  1864-FF4933AMZ                       FF4933AMZ               AMZ     FF4933                  B00CEY5082    A
+  1864-FF4934AMZ                       FF4934AMZ               AMZ     FF4934                  B00CEY50VO    A
+  1864-FF4935AMZ                       FF4935AMZ               AMZ     FF4935                  B00CEY4Z38    A
+  1864-FF4936AMZ                       FF4936AMZ               AMZ     FF4936                  B00CEY59L0    A
+  1864-FF5766AMZ                       FF5766AMZ               AMZ     FF5766                  B01CCFPC0I    A
+  1864-FF5769AMZ                       FF5769AMZ               AMZ     FF5769                  B01CCFPC08    A
+  1864-FF5776AMZ                       FF5776AMZ               AMZ     FF5776                  B01CCFPBEU    A
+  1864-FF5777AMZ                       FF5777AMZ               AMZ     FF5777                  B00U0KEQX2    A
+  1864-FF5807AMZ                       FF5807AMZ               AMZ     FF5807                  B00XK4JP0Y    A
+  1864-FF6553AMZ                       FF6553AMZ               AMZ     FF6553                  B082N5X4SX    A
+  1864-FF6554AMZ                       FF6554AMZ               AMZ     FF6554                  0             A
+  1864-FF6634AMZ                       FF6634AMZ               AMZ     FF6634                  B09LCRY6ZJ    A
+  1864-FF6636AMZ                       FF6636AMZ               AMZ     FF6636                  B09LC1JR52    A
+  1864-FF7258AMZ                       FF7258AMZ               AMZ     FF7258                  B00DTEV54Y    A
+  1864-FF7260AMZ                       FF7260AMZ               AMZ     FF7260                  B00CVTROG6    A
+  1864-FF7261AMZ                       FF7261AMZ               AMZ     FF7261                  B00E1LDEWA    A
+  1864-FF7263AMZ                       FF7263AMZ               AMZ     FF7263                  B00CEY5IUC    A
+  1864-FF7266AMZ                       FF7266AMZ               AMZ     FF7266                  B00CEY5L7C    A
+  1864-FF7267AMZ                       FF7267AMZ               AMZ     FF7267                  B00CEY5A50    A
+  1864-FF7297AMZ                       FF7297AMZ               AMZ     FF7297                  B014TMYBFO    A
+  1864-FF12353COS                      FF12353COS              COS     FF12353                 B07VFKH7HL    A
+  1864-FF12354COS                      FF12354COS              COS     FF12354                 B07VFKH7HK    A
+  1864-FF12355COS                      FF12355COS              COS     FF12355                 B08YGYMFVZ    A
+  1864-FF4771COS                       FF4771COS               COS     FF4771                  B00DTEV5M6    A
+  1864-FF4775COS                       FF4775COS               COS     FF4775                  B00CVTRO48    A
+  1864-FF4849COS                       FF4849COS               COS     FF4849                  B00CEY5NE8    A
+  1864-FF4930AMZ2COS                   FF4930AMZ2COS           COS     FF4930AMZ2              B09NW8ZZCF    A: NEW
+  1864-FF5807COS                       FF5807COS               COS     FF5807                  B00XK4JP0Y    A
+  1864-FF6553COS                       FF6553COS               COS     FF6553                  B082N5X4SX    A
+  1864-FF6554COS                       FF6554COS               COS     FF6554                  B01N4RXHLX    A
+  1864-FF7258COS                       FF7258COS               COS     FF7258                  B00DTEV54Y    A
+  1864-FF7266COS                       FF7266COS               COS     FF7266                  B00CEY5L7C    A
+  1864-FF7267COS                       FF7267COS               COS     FF7267                  B00CEY5A50    A
+  1864-FF7297COS                       FF7297COS               COS     FF7297                  B014TMYBFO    A
+  1864-BB0018EC                        BB0018EC                EC      BB0018                  B0170GSF2Q    A
+  1864-BB0080EC                        BB0080EC                EC      BB0080                  B01BZU1SU4    A
+  1864-BB0131EC                        BB0131EC                EC      BB0131                  B078GPFMN1    A
+  1864-BB0409EC                        BB0409EC                EC      BB0409                  B07SZG9MGH    A
+  1864-BB0424EC                        BB0424EC                EC      BB0424                  B07TBBR46P    A
+  1864-BB0705EC                        BB0705EC                EC      BB0705                  B07TBBC178    A
+  1864-BB11603EC                       BB11603EC               EC      BB11603                 B09XN8LNFT    A
+  1864-BB30276EC                       BB30276EC               EC      BB30276                 B0CG1369VS    A: NEW
+  1864-BB30587EC                       BB30587EC               EC      BB30587                 B0CFZP2NLJ    A: NEW
+  1864-FF10159EC                       FF10159EC               EC      FF10159                 B07RVD63J1    A
+  1864-FF10475EC                       FF10475EC               EC      FF10475                 B07CJ5QD3R    A
+  1864-FF10477EC                       FF10477EC               EC      FF10477                 B00A2383W2    A
+  1864-FF10479EC                       FF10479EC               EC      FF10479                 B07RWF8X9P    A
+  1864-FF12302/24EC                    FF12302/24EC            EC      FF12302/24              B08QJQ94CY    A
+  1864-FF12302EC                       FF12302EC               EC      FF12302                 B08QJQ94CY    A
+  1864-FF12653EC                       FF12653EC               EC      FF12653                 B08CL2PRPD    A
+  1864-FF12655EC                       FF12655EC               EC      FF12655                 B08CL3CJQW    A
+  1864-FF12837EC                       FF12837EC               EC      FF12837                 B089YVNQGD    A
+  1864-FF20206EC                       FF20206EC               EC      FF20206                 B0BPJZ5GDD    A
+  1864-FF20207EC                       FF20207EC               EC      FF20207                 B0BPK2MSL5    A
+  1864-FF20210EC                       FF20210EC               EC      FF20210                 B0BPJW9DVB    A
+  1864-FF26756EC                       FF26756EC               EC      FF26756                 B0CSDY82HH    A
+  1864-FF30426EC                       FF30426EC               EC      FF30426                 B0DTLW2RR2    A
+  1864-FF30755EC                       FF30755EC               EC      FF30755                 B0CT623C62    A
+  1864-FF31324EC                       FF31324EC               EC      FF31324                 B0D3FC3FGW    A
+  1864-FF31326EC                       FF31326EC               EC      FF31326                 B0DJ3HV4LN    A
+  1864-FF33876EC                       FF33876EC               EC      FF33876                 B0F2G8KFXV    A
+  1864-FF33877EC                       FF33877EC               EC      FF33877                 B0F2GBN4HY    A
+  1864-FF35147EC                       FF35147EC               EC      FF35147                 B0FXBDSYPZ    A
+  1864-FF5952EC                        FF5952EC                EC      FF5952                  B01CEDQ6IU    A
+  1864-FF7112EC                        FF7112EC                EC      FF7112                  B01330HT84    A
+  1864-FF7115EC                        FF7115EC                EC      FF7115                  B01330INMU    A
+  1864-FF7120EC                        FF7120EC                EC      FF7120                  B01330IKAA    A
+  1864-FF8991EC                        FF8991EC                EC      FF8991                  B07F2D3R48    FD
+  1864-FF9298EC                        FF9298EC                EC      FF9298                  B08QJMZPNH    A
+  1864-SF8173EC                        SF8173EC                EC      SF8173                  B00CI3USHC    A
+  1864-SF8174EC                        SF8174EC                EC      SF8174                  B00B5RFPYS    A
+
+=== NO ASIN ===
+  1864-BB11483PX6                      BB11483PX6              Original  A
+  1864-BB12022/12                      BB12022/12              Original  A
+  1864-BB13435PX3                      BB13435PX3              Original  A
+  1864-BB13435PX6                      BB13435PX6              Original  A
+  1864-BB13436CLR/12                   BB13436CLR/12           Original  A
+  1864-BB13437PX3                      BB13437PX3              Original  A
+  1864-BB13437PX6                      BB13437PX6              Original  A
+  1864-BB13447CLR/12                   BB13447CLR/12           Original  A
+  1864-BB13448CLR/12                   BB13448CLR/12           Original  A
+  1864-BB14500CLR/9                    BB14500CLR/9            Original  A
+  1864-BB16534PX12                     BB16534PX12             Original  A
+  1864-BB26411PX2                      BB26411PX2              Original  A
+  1864-BB27359/10                      BB27359/10              Original  A
+  1864-BB30424/10                      BB30424/10              Original  A
+  1864-BB31552CLR/9                    BB31552CLR/9            Original  A
+  1864-BB31553CLR/9                    BB31553CLR/9            Original  A
+  1864-BB31553PX3                      BB31553PX3              Original  A
+  1864-BB33706PDQ                      BB33706PDQ              Original  A
+  1864-BB33708PDQ                      BB33708PDQ              Original  A
+  1864-BB36058CLR/12                   BB36058CLR/12           Original  A
+  1864-BB38258                         BB38258                 Original  A: NEW
+  1864-BB38262                         BB38262                 Original  A: NEW
+  1864-BB38263                         BB38263                 Original  A: NEW
+  1864-BB38264                         BB38264                 Original  A: NEW
+  1884-FF10159AU                       FF10159AU               Original  A
+  1864-FF10159PCS2                     FF10159PCS2             Original  A
+  1884-FF10162AU                       FF10162AU               Original  A
+  1864-FF10475PCS2                     FF10475PCS2             Original  A
+  1884-FF10477AU                       FF10477AU               Original  A
+  1864-FF10477PCS2                     FF10477PCS2             Original  A
+  1884-FF10479AU                       FF10479AU               Original  A
+  1864-FF10479PX2                      FF10479PX2              Original  A
+  1864-FF10479PX6                      FF10479PX6              Original  A
+  1884-FF11236AU                       FF11236AU               Original  A
+  1884-FF11348AU                       FF11348AU               Original  A
+  1884-FF11349AU                       FF11349AU               Original  A
+  1884-FF11899AU                       FF11899AU               Original  A
+  1864-FF12301/24AU                    FF12301/24AU            Original  A
+  1884-FF12302AU                       FF12302AU               Original  A
+  1884-FF12375AU                       FF12375AU               Original  A: AU
+  1884-FF12376AU                       FF12376AU               Original  A: AU
+  1864-FF12655AU                       FF12655AU               Original  A
+  1884-FF12805AU                       FF12805AU               Original  A: AU
+  1884-FF12806AU                       FF12806AU               Original  A: AU
+  1864-FF12823PX12                     FF12823PX12             Original  A
+  1864-FF12824PX12                     FF12824PX12             Original  A
+  1884-FF12837AU                       FF12837AU               Original  A
+  1864-FF13421AU                       FF13421AU               Original  A
+  1884-FF13874AU                       FF13874AU               Original  A
+  1864-FF13874PX6                      FF13874PX6              Original  A
+  1884-FF13875AU                       FF13875AU               Original  A
+  1864-FF13875PX6                      FF13875PX6              Original  A
+  1884-FF13876AU                       FF13876AU               Original  A: Repl Commt
+  1864-FF13876PX6                      FF13876PX6              Original  A
+  1884-FF13877AU                       FF13877AU               Original  A
+  1884-FF13878AU                       FF13878AU               Original  A
+  1864-FF13878PX6                      FF13878PX6              Original  A
+  1884-FF13879AU                       FF13879AU               Original  A: Repl Commt
+  1884-FF13880AU                       FF13880AU               Original  A
+  1884-FF13881AU                       FF13881AU               Original  A: Repl Commt
+  1884-FF15585AU                       FF15585AU               Original  A
+  1884-FF15588AU                       FF15588AU               Original  A
+  1884-FF15589AU                       FF15589AU               Original  A
+  1884-FF16704AU                       FF16704AU               Original  A
+  1884-FF16705AU                       FF16705AU               Original  A
+  1864-FF18959AU                       FF18959AU               Original  A
+  1864-FF19081CA                       FF19081CA               Original  A
+  1884-FF20206AU                       FF20206AU               Original  A
+  1864-FF20208AU                       FF20208AU               Original  A
+  1884-FF20209AU                       FF20209AU               Original  A
+  1864-FF28039AU                       FF28039AU               Original  A
+  1884-FF31063AU                       FF31063AU               Original  A
+  1864-FF31324AU                       FF31324AU               Original  A
+  1884-FF31327AU                       FF31327AU               Original  A
+  1864-FF33135AU                       FF33135AU               Original  A
+  1884-FF33135AU                       FF33135AU               Original  A
+  1864-FF33137AU                       FF33137AU               Original  A
+  1864-FF33139AU                       FF33139AU               Original  A
+  1864-FF38640                         FF38640                 Original  A
+  1864-FF38641                         FF38641                 Original  A
+  1864-FF38642                         FF38642                 Original  A
+  1864-FF4517AU                        FF4517AU                Original  A
+  1864-FF4537AU                        FF4537AU                Original  A
+  1884-FF4577AU                        FF4577AU                Original  A: Repl Commt
+  1864-FF4771AMZ3                      FF4771AMZ3              Original  A
+  1884-FF4775AU                        FF4775AU                Original  A
+  1884-FF4776AU                        FF4776AU                Original  A
+  1884-FF4849AU                        FF4849AU                Original  A
+  1864-FF4849PX2                       FF4849PX2               Original  A
+  1864-FF4849PX6                       FF4849PX6               Original  A
+  1864-FF4933AU                        FF4933AU                Original  A
+  1884-FF4935AU                        FF4935AU                Original  A
+  1864-FF4935PX2                       FF4935PX2               Original  A
+  1884-FF4936AU                        FF4936AU                Original  A
+  1864-FF4936PX2                       FF4936PX2               Original  A
+  1884-FF5715AU                        FF5715AU                Original  A
+  1884-FF5716AU                        FF5716AU                Original  A
+  1884-FF5766AU                        FF5766AU                Original  A
+  1884-FF5807AU                        FF5807AU                Original  A
+  1864-FF6305AU                        FF6305AU                Original  A
+  1884-FF6989AU                        FF6989AU                Original  A
+  1864-FF7110AU                        FF7110AU                Original  A
+  1884-FF7120AU                        FF7120AU                Original  A: AU
+  1864-FF7217AU                        FF7217AU                Original  A
+  1884-FF7258AU                        FF7258AU                Original  A
+  1864-FF7266PX2                       FF7266PX2               Original  A
+  1884-FF7297AU                        FF7297AU                Original  A
+  1884-FF7372AU                        FF7372AU                Original  A: Repl Commt
+  1864-FF7942AU                        FF7942AU                Original  A
+  1864-FF8423PCS4                      FF8423PCS4              Original  A
+  1864-FF8424PCS3                      FF8424PCS3              Original  A
+  1864-FF8424PCS4                      FF8424PCS4              Original  A
+  1864-FF8608AU                        FF8608AU                Original  A
+  1864-FF8653PX4                       FF8653PX4               Original  A
+  1864-FF8654PX2                       FF8654PX2               Original  A
+  1864-FF8882PX2                       FF8882PX2               Original  A
+  1864-FF8882PX6                       FF8882PX6               Original  A
+  1864-FF8991PCS3                      FF8991PCS3              Original  A
+  1864-FF9281AU                        FF9281AU                Original  A
+  1884-FF9290AU                        FF9290AU                Original  A
+  1884-FF9291AU                        FF9291AU                Original  A
+  1864-FF9291CA                        FF9291CA                Original  A
+  1884-FF9297AU                        FF9297AU                Original  A
+  1864-FF9297PDQ                       FF9297PDQ               Original  A
+  1884-FF9298AU                        FF9298AU                Original  A
+  1864-FF9314AU                        FF9314AU                Original  A
+  1864-FF9315AU                        FF9315AU                Original  A
+  1864-FF9318AU                        FF9318AU                Original  A
+  1864-FF9721AU                        FF9721AU                Original  A
+  1884-FF9756AU                        FF9756AU                Original  A
+  1864-SF8167AU                        SF8167AU                Original  A
+  1884-SF8169AU                        SF8169AU                Original  A
+  1884-SF8170AU                        SF8170AU                Original  A
+  1884-SF8173AU                        SF8173AU                Original  A
+  1884-SF8174AU                        SF8174AU                Original  A

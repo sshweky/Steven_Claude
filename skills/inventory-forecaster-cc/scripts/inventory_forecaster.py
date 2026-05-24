@@ -9336,7 +9336,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             # other months.  Guard: disable variability pattern for EC-transitioned
             # records when ATS data is absent or all-zero (normalizers couldn't
             # run → history may still contain uncapped catch-up orders).
-            if _rpl_var_ratios and row.get("_ec_transition") and not any(ats_hist_l26 or []):
+            if _rpl_var_ratios and row.get("_ec_transition") and not any(ats_hist or []):
                 _rpl_var_ratios = None   # safer flat baseline than cycling bad ratios
             if _rpl_var_ratios:
                 for _wi in range(_rpl_dc_end, 26):
