@@ -7244,7 +7244,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #   ratio 13.1× → fires.  blended_pos = 236×0.4+249×0.4+274×0.2 = 248.6
     #   target = 248.6 × 1.3 = 323/wk.  scale ≈ 0.099 → ~8,400 over 26w
     #   (vs user's "around 7-8k" expectation given 250/wk POS).
-    if (model == "Heuristic" and is_amazon and pos_data
+    # 2026-05-24: extended from Heuristic-only to also cover Croston's.
+    # Same POS-over-projection failure mode applies when Croston's z parameter
+    # is anchored to inflated order history (stock-up, phantom POs).
+    if (model in ("Heuristic", "Croston's") and is_amazon and pos_data
             and isinstance(fcst, list) and len(fcst) >= 26
             and isinstance(meta, dict)
             and not meta.get("stockup_burnoff")
