@@ -591,7 +591,7 @@ Phase 3 — Forecast (pure Python, no API calls)
   ├── Croston's: α=0.3 over 78-obs weighted series
   │   z and p refined 70% L13W / 30% smoothed model output
   │   Quantities scaled by L52W seasonal profile + category blend
-  │   Event calendar: calendar-based insertions (Prime Day May 1/15/29, Fall Prime Day Tue after Memorial Day)
+  │   Event calendar: calendar-based insertions (Prime Day May 1/15/29, Fall Prime Day Tue after Labor Day)
   │   [Fix 5] Rescaling cap: if AI 26w avg > L13W all-weeks avg × 1.10
   │     → scale down (floor 0.5×) to prevent over-projection vs true weekly rate
   │
