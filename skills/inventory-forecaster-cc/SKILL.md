@@ -759,7 +759,7 @@ Top 104 high-volume acct 1864 records: AI total **2.73M units** vs manual **3.73
 **Workflow for applying queued fixes:**
 1. Pick highest-gap bucket (F6/F7/F8 first).
 2. Implement in `inventory_forecaster.py`, add reference to this table.
-3. Re-run `--validate --acct 1864` → `gap_analysis.py` to verify the bucket narrowed.
+3. Re-run `--validate --dry-run --acct 1864` → `gap_analysis.py` to verify the bucket narrowed.
 4. Move the fix from Queued → applied (Fix N).
 5. Update SKILL.md with the diff in impact.
 
