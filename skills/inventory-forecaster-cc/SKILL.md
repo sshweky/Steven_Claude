@@ -544,25 +544,24 @@ EDA (if --analyze or --analyze-only)
 Phase 3 — Forecast (pure Python, no API calls)
   For each record:
   ├── Classify: Zero L13W → Inactive (forecast = 0)
-  │             Steady (CV≤0.5, zeros≤20%) → Holt-Winters
-  │             Intermittent (CV>0.5 or zeros>20%) → Croston's
-  │             Sparse (<13 active weeks) → Heuristic
+  │             Dense (≥50% non-zero) → Seasonal Baseline
+  │             Intermittent (25-50% non-zero) → Croston's
+  │             Sparse (<13 active weeks or <25% non-zero) → Heuristic
   │
   ├── [Fix 2] ISO routing override: if detect_iso() finds a stocking spike
-  │   within L26W and pattern ≠ inactive → force Heuristic regardless of CV/zeros
+  │   within L26W and pattern != inactive → force Heuristic regardless of CV/zeros
   │   (prevents Croston's from projecting repeat stocking spikes as recurring demand)
   │
   ├── Build 78-obs weighted series (3x L13W weight)
   │   Appends L13W twice to history so recent 13 weeks
-  │   have 3× influence on level and trend estimates
+  │   have 3x influence on level and trend estimates
   │
-  ├── Holt-Winters: recursive α=0.3/β=0.1 over 78-obs series
-  │   Level L and trend T converge with 3x weight on L13W
+  ├── Seasonal Baseline (Dense branch — >=50% non-zero weeks):
   │   26 unique seasonal factors from L52W active history
   │   (70% recent cycle / 30% prior cycle, normalized, floor 0.25)
-  │   Cap: L13W avg×1.25 normal, ×1.50 event weeks (downward only)
+  │   Damped + category-blended profile applied to order-history baseline
   │   Post-forecast: bi-weekly cadence enforcement if detected
-  │   (≥70% zero on one parity over L26W → merge pairs, zero off-weeks)
+  │   (>=70% zero on one parity over L26W → merge pairs, zero off-weeks)
   │
   ├── seasonal_baseline() (Dense branch — ≥50% non-zero weeks):
   │   [Fix 3] Outlier cap: if max(L13W non-zero) > 3× median(L13W non-zero),
