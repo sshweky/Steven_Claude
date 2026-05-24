@@ -395,12 +395,14 @@ async function discoverInvFlowTextFids() {
       else if (lbl === 'ats_oh')             INV_FLOW_ATS_OH_FID    = f.id;
       else if (lbl === 'ats_oh_oo')          INV_FLOW_ATS_OO_FID    = f.id;
       else if (lbl === 'ats_wos_oh')         INV_FLOW_ATS_OH_WOS_FID = f.id;
-      else if (lbl === 'ats_wos_oh_oo')      INV_FLOW_ATS_OO_WOS_FID = f.id;
+      else if (lbl === 'ats_wos_oh_oo')      INV_FLOW_ATS_OO_WOS_FID  = f.id;
+      else if (lbl === '1st_shpd_date')      INV_FLOW_FIRST_SHPD_FID  = f.id;
     }
     console.info('[InvFlow] text/ATS FIDs discovered:',
       { supp_pos: INV_FLOW_SUPP_PO_FID, ats_now: INV_FLOW_ATS_NOW_FID,
         ats_oh: INV_FLOW_ATS_OH_FID, ats_oo: INV_FLOW_ATS_OO_FID,
-        ats_oh_wos: INV_FLOW_ATS_OH_WOS_FID, ats_oo_wos: INV_FLOW_ATS_OO_WOS_FID });
+        ats_oh_wos: INV_FLOW_ATS_OH_WOS_FID, ats_oo_wos: INV_FLOW_ATS_OO_WOS_FID,
+        first_shpd: INV_FLOW_FIRST_SHPD_FID });
   } catch (e) {
     console.warn('[InvFlow] discoverInvFlowTextFids failed:', e.message || e);
   }
