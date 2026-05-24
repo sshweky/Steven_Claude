@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "A1: Delete METHODOLOGY.md (stale)",
+  "description": "Verify no script/doc references METHODOLOGY.md, then delete it. Add a CHANGELOG entry. The file contradicts current code in 9+ places (HW routing, 5% threshold, DAMP=0.1, Prime Day W7-W9, VP-Q2/Q3 wrong descriptions, etc.).",
+  "activeForm": "Deleting stale METHODOLOGY.md",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

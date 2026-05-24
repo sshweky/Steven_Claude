@@ -1,6 +1,6 @@
 """
-Builds the Inventory Forecaster — VP Review Deck (.pptx).
-Source of truth = METHODOLOGY.md + recent back-test outputs.
+Builds the Inventory Forecaster -- VP Review Deck (.pptx).
+Source of truth = SKILL.md + RULES.md + recent back-test outputs.
 """
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu

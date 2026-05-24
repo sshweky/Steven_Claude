@@ -1,0 +1,9 @@
+{
+  "id": "7",
+  "subject": "C2: Build scripts/audit_rules.py drift checker",
+  "description": "Static analyzer that: (1) greps all _fire(\"...\") calls in inventory_forecaster.py with line numbers, (2) cross-references RULES.md table entries, (3) reports any rule code in code-but-not-docs or docs-but-not-code, (4) lists rules with no narrative driver string. Exit code 1 if drift found. Can be wired into pre-commit later.",
+  "activeForm": "Building audit_rules.py drift checker",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

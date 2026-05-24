@@ -1,0 +1,9 @@
+{
+  "id": "6",
+  "subject": "C1: Move outer retry policy into run_forecast.py",
+  "description": "Right now run_forecast.py has 3 inner watchdog restarts and SKILL.md documents 10 outer retries with escalating cool-offs (3-min x3, then +5min each up to 38min). Promote the outer retry schedule into run_forecast.py as a --max-outer-retries flag (default 10) and remove the manual workflow from SKILL.md. One retry policy, in code.",
+  "activeForm": "Unifying retry policy in run_forecast.py",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

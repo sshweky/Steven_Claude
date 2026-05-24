@@ -1,0 +1,9 @@
+{
+  "id": "8",
+  "subject": "D7: Build scripts/rule_dependency_graph.py",
+  "description": "Static analysis: parse inventory_forecaster.py AST to extract (a) every _fire(\"Fxx\") call site with surrounding line range, (b) every meta[...] read and write per rule, (c) every fcst[...] write per rule. Emit a DOT graph file and a markdown table showing which rules depend on which meta keys. Surfaces hidden ordering dependencies (e.g. F59a reads meta[\"f18_capped_down\"] set by crostens()).",
+  "activeForm": "Building rule_dependency_graph.py",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}
