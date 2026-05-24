@@ -10871,6 +10871,102 @@ def _friendly_cust_name(cust):
     return first.title()
 
 
+def compute_forecast_confidence(model, meta, hist, manual, pct_diff,
+                                is_new_launch=False, is_otb=False,
+                                season=None):
+    """Compute a 0-100 confidence score for an AI forecast record.
+
+    Five components of 20 points each:
+      C1  History depth     -- L13W non-zero week count
+      C2  Model quality     -- model type hierarchy
+      C3  Trend stability   -- penalty for decline/surge corrections
+      C4  Seasonal signal   -- quality of seasonal profile match
+      C5  Planner alignment -- how close AI is to the manual projection
+
+    Special caps: new launches <= 55, OTB items <= 40, Inactive models <= 25.
+    Returns int in [0, 100].
+    """
+    drivers  = (meta.get("drivers", [])    if isinstance(meta, dict) else [])
+    rf_list  = (meta.get("rule_fires", []) if isinstance(meta, dict) else [])
+    drv_text = " ".join(str(d) for d in drivers)
+    rf_text  = " ".join(str(f) for f in rf_list)
+    all_text = drv_text + " " + rf_text
+
+    # C1: History depth (0-20) ------------------------------------------------
+    l13    = hist[-13:] if len(hist) >= 13 else hist
+    l13_nz = sum(1 for v in l13 if float(v or 0) > 0)
+    if   l13_nz >= 10: c1 = 20
+    elif l13_nz >=  7: c1 = 16
+    elif l13_nz >=  4: c1 = 11
+    elif l13_nz >=  2: c1 =  6
+    elif l13_nz ==  1: c1 =  3
+    else:              c1 =  0
+
+    # C2: Model quality (0-20) ------------------------------------------------
+    _model_pts = [
+        ("Seasonal Baseline",                   20),
+        ("Croston's",                           17),
+        ("Sparse Intermittent",                 14),
+        ("Heuristic (F72 new-launch ramp)",      8),
+        ("Heuristic",                           10),
+        ("Reactivating",                         6),
+        ("Inactive+Floor",                       5),
+        ("Inactive+S6 (off-price)",              5),
+        ("OTB (zero)",                           5),
+        ("Pre-launch NEW (manual passthrough)",  4),
+    ]
+    c2 = 2  # default: any Inactive variant
+    for prefix, pts in _model_pts:
+        if model.startswith(prefix):
+            c2 = pts
+            break
+
+    # C3: Trend stability (0-20) ----------------------------------------------
+    c3 = 20
+    if "F77" in all_text:   c3 -= 15   # severe decline blend
+    elif "F10" in all_text: c3 -= 8    # YoY-gated decline blend
+    if "F79" in all_text:   c3 -= 4    # growth acceleration (uncertain)
+    if "F81" in all_text:   c3 -= 3    # APL recency divergence
+    if "F78" in drv_text:   c3 -= 3    # peak-anchor fallback (no keyword match)
+    c3 = max(0, c3)
+
+    # C4: Seasonal signal quality (0-20) --------------------------------------
+    if season:
+        c4 = 20                            # planner-curated Season tag
+    elif ("empirical" in drv_text.lower()
+          or "derived" in drv_text.lower()
+          or "F64" in drv_text):
+        c4 = 17                            # empirical derived category profile
+    elif ("category profile" in drv_text.lower()
+          or "keyword" in drv_text.lower()):
+        c4 = 13                            # CATEGORY_PROFILES keyword match
+    elif "F78" in drv_text:
+        c4 = 8                             # peak-anchor fallback (no keyword)
+    else:
+        c4 = 11                            # no profile -- flat/neutral item
+
+    # C5: Planner alignment (0-20) --------------------------------------------
+    manual_total = sum(float(v or 0) for v in (manual or []))
+    if manual_total == 0:
+        c5 = 10                            # no manual plan -- neutral
+    else:
+        ap = abs(pct_diff or 0)
+        if   ap <=  5: c5 = 20
+        elif ap <= 15: c5 = 16
+        elif ap <= 30: c5 = 10
+        elif ap <= 60: c5 =  5
+        else:          c5 =  0
+
+    score = c1 + c2 + c3 + c4 + c5
+
+    # Special caps ------------------------------------------------------------
+    if is_new_launch:          score = min(score, 55)
+    if is_otb:                 score = min(score, 40)
+    if model.startswith("Inactive"): score = min(score, 25)
+
+    return max(0, min(100, score))
+
+
 def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
     """Build a 2-sentence data-backed Order trend explanation from order history.
 
