@@ -2201,15 +2201,24 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # rather than true consumer demand seasonality.  When:
     #   (a) the relief would fire from order history alone (no category profile), AND
     #   (b) the item is Amazon with healthy POS data, AND
-    #   (c) POS L13W is within 30% of POS L26W  (consumer demand is stable)
+    #   (c) POS L4W / L13W ratio is within 0.75-1.35 (consumer demand is stable)
     # ... override back to DAMP_NORMAL.  Category-tagged items are always allowed
     # full relief since the tag confirms genuine seasonality.
+    #
+    # L4/L13 ratio is used as the primary stability signal (always available).
+    # L26W is used as a secondary check when available.  If L4/L13 shows strong
+    # trend (< 0.75 or > 1.35 -- e.g. Halloween in peak season), relief is kept.
     _f16_amz_pos_gate_fired = False
     if _f16_relief and not bool(_seasonal_cat) and is_amazon and pos_data:
+        _pos_l4_f16g  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
         _pos_l26_f16g = float(pos_data.get("Avg_Units_Wk_L26w") or 0)
-        if _pos_l13_f16 > 0 and _pos_l26_f16g > 0:
-            _pos_ratio_f16g = _pos_l13_f16 / _pos_l26_f16g
-            if 0.70 <= _pos_ratio_f16g <= 1.40:   # POS stable -- order lumps are cadence noise
+        if _pos_l13_f16 > 0 and _pos_l4_f16g > 0:
+            _l4_l13_f16g   = _pos_l4_f16g / _pos_l13_f16    # primary: recent vs L13
+            _l13_l26_f16g  = (_pos_l13_f16 / _pos_l26_f16g
+                              if _pos_l26_f16g > 0 else _l4_l13_f16g)  # secondary or fallback
+            _pos_stable_f16 = (0.75 <= _l4_l13_f16g  <= 1.35 and
+                               0.70 <= _l13_l26_f16g  <= 1.40)
+            if _pos_stable_f16:  # POS stable -- order lumps are cadence noise, not seasonality
                 _f16_relief = False
                 _f16_amz_pos_gate_fired = True
     # Eased 2026-05-06: 0.4 → 0.85 (relief), 0.1 → 0.3 (base).  Allows post-cap
