@@ -9287,12 +9287,22 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _rpl_corr_demand = _rpl_pos_l4w if _rpl_pos_l4w >= 50 else _rpl_pos_l13
 
             _rpl_wos = float(amz_catalog.get("Inv_WOS") or 0)
-            if _rpl_wos <= 0:
+            _rpl_soh = float(amz_catalog.get("Inv_SOH") or 0)
+            _rpl_opo = float(amz_catalog.get("Inv_OPO") or 0)
+            if _rpl_wos <= 0 and _rpl_pos_l13 > 0:
                 # Fallback: compute from SOH + OPO when Inv_WOS is absent
-                _rpl_soh = float(amz_catalog.get("Inv_SOH") or 0)
-                _rpl_opo = float(amz_catalog.get("Inv_OPO") or 0)
-                if _rpl_pos_l13 > 0:
-                    _rpl_wos = (_rpl_soh + _rpl_opo) / _rpl_pos_l13
+                _rpl_wos = (_rpl_soh + _rpl_opo) / _rpl_pos_l13
+            # Fix B (2026-05-24): DC depletion inference.
+            # When WOS=0, SOH=0, OPO=0, the ASIN is absent from
+            # Amazon_Invtry_Health -- strong signal DC is fully depleted.
+            # Amazon throttles replenishment orders after long OOS periods
+            # because it doesn't trust supplier availability. In this state
+            # we treat WOS=0.0 (fully depleted) so the W1+W2 catch-up fires.
+            _rpl_dc_depleted = (
+                _rpl_wos == 0.0
+                and _rpl_soh == 0.0
+                and _rpl_opo == 0.0
+            )
 
             # Step 2a -- Pipeline adjustment: if last week's actual orders exceed
             # the baseline rate, the excess is likely a DC fill order still in
