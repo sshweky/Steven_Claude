@@ -12299,7 +12299,8 @@ def main():
                                      open_pos_data=open_pos_data,
                                      ats_data=ats_data,
                                      switchover_weeks=switchover_index,
-                                     acct_cadences=acct_cadences)
+                                     acct_cadences=acct_cadences,
+                                     retailer_pos=retailer_pos)
         elapsed_val = time.time() - t_val
         print(f"      Validation complete in {elapsed_val:.1f}s")
 
