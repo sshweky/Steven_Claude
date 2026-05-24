@@ -109,6 +109,8 @@ def main():
     with open(RESULTS_PATH, "r", encoding="utf-8") as f:
         results = json.load(f)
 
+    if isinstance(results, dict):
+        results = results.get("records", [])
     print(f"  {len(results)} total records")
 
     # Find records where Opn_W2 > 0 (those had MAN PRJ W2 zeroed)
