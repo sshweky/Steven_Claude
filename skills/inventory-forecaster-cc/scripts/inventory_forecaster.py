@@ -10997,8 +10997,24 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                 _ih_parts.append(_wos_str)
             if _ih_parts:
                 pinned_last.append(
-                    f"<b>Amazon DC inventory:</b> " + " · ".join(_ih_parts) + "."
+                    f"<b>Amazon DC inventory:</b> " + " &nbsp;&middot;&nbsp; ".join(_ih_parts) + "."
                 )
+        else:
+            # amz_catalog exists but all SOH/OPO/WOS fields are zero or missing.
+            # This can happen when Amazon_Invtry_Health had no row for this ASIN.
+            # Fix 3 (2026-05-24): surface a note so planners know the data gap.
+            if is_amazon and (rec.get("model") or "").strip() not in ("Inactive",):
+                pinned_last.append(
+                    "<b>Amazon DC inventory:</b> data not available in health feed "
+                    "-- WOS-based adjustments skipped."
+                )
+    elif is_amazon and (rec.get("model") or "").strip() not in ("Inactive",):
+        # Fix 3 (2026-05-24): no amz_catalog entry at all for this mstyle/ASIN.
+        # Tell the planner explicitly so they know DC position is unknown.
+        pinned_last.append(
+            "<b>Amazon DC inventory:</b> data unavailable for this ASIN "
+            "-- WOS-based adjustments skipped."
+        )
 
     # ── Amazon AUR (Average Unit Revenue) ─────────────────────────────────────
     # Pinned last so planners see pricing context on every Amazon record.
