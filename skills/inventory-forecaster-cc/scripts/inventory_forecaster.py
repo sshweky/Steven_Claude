@@ -9941,7 +9941,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 meta.setdefault("drivers", []).append(
                     f"F_AMZ_RPL Active Replen override: "
                     f"demand={_rpl_demand:.0f}/wk "
-                    f"(POS L13W={_rpl_pos_l13:.0f}/wk, "
+                    f"({'POS-primary 65/35 blend' if _rpl_pos_primary else 'max(POS,Ord)'}; "
+                    f"POS L13W={_rpl_pos_l13:.0f}/wk, "
                     f"POS L4W={_rpl_pos_l4w:.0f}/wk, "
                     f"Ord L13W all-wks={_rpl_ord_l13:.0f}/wk); "
                     f"corr basis={_rpl_corr_demand:.0f}/wk; "
