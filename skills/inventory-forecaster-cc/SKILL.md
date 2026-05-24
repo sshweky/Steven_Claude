@@ -225,7 +225,7 @@ python run_forecast.py --acct 1864
 
 **Validate only (no forecast run):**
 ```bash
-python run_forecast.py --acct 1864 --validate --no-writeback
+python run_forecast.py --acct 1864 --validate --dry-run
 ```
 
 **Validate with custom threshold (default 2.0x):**
