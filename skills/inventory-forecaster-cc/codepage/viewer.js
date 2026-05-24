@@ -5212,17 +5212,19 @@ function onManEdit(inputEl) {
     DIRTY_EDITS.set(dirtyKey, { key, weekIdx, oldVal: origVal, newVal });
     inputEl.classList.add('dirty');
   }
+  // Update in-memory record so _refreshRowMetrics has correct data
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (rec && rec.weeks_slim && rec.weeks_slim[weekIdx] !== undefined) {
+    rec.weeks_slim[weekIdx].projection = newVal;
+    rec.proj_total = rec.weeks_slim.reduce((a, w) => a + (w.projection || 0), 0);
+    rec.proj_wk    = Math.round(((rec.proj_total + (rec.opn_total || 0)) / 26) * 10) / 10;
+  }
   // Live-update the detail-pane Total cell for this record
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   const totEl  = document.getElementById('man-total-' + safeId);
-  if (totEl) {
-    let sum = 0;
-    document.querySelectorAll(`.man-edit[data-key="${key.replace(/"/g,'\\"')}"]`).forEach(el => {
-      const v = parseInt(el.value, 10);
-      sum += (isFinite(v) && v >= 0) ? v : 0;
-    });
-    totEl.textContent = fmtN(sum);
-  }
+  if (totEl) totEl.textContent = fmtN(rec ? rec.proj_total : 0);
+  // Refresh all row metrics (AI vs Proj, Fcst Status, AI vs L13, Man vs L13)
+  if (rec) _refreshRowMetrics(key);
   updateSaveAllBadge();
 }
 
