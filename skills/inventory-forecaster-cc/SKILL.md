@@ -601,7 +601,7 @@ Phase 3 — Forecast (pure Python, no API calls)
   │
   ├── Snap all non-zero qtys to master pack multiple
   │
-  └── Variance vs manual projections (ORIG_PRJ_COLS) → AI_ALERT if >5%
+  └── Variance vs manual projections (ORIG_PRJ_COLS) → AI_ALERT if >7.5%
       Alert includes model name, key drivers, seasonal/event notes
 
 Phase 4 — Write-back
