@@ -9137,13 +9137,18 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
             fcst[:] = _rpl_new
             _fire("F_AMZ_RPL")
+            _rpl_t5_note = (
+                f" T5/seasonal boost applied on W{',W'.join(str(w) for w in sorted(_rpl_t5_applied))}"
+                f" (Season={season or 'standard'});"
+                if _rpl_t5_applied else ""
+            )
             if isinstance(meta, dict):
                 meta.setdefault("drivers", []).append(
                     f"F_AMZ_RPL Active Replen override: "
                     f"demand={_rpl_demand:.0f}/wk "
                     f"(POS L13W={_rpl_pos_l13:.0f}/wk, "
                     f"Ord L13W all-wks={_rpl_ord_l13:.0f}/wk); "
-                    f"{_rpl_inv_note}. "
+                    f"{_rpl_inv_note}.{_rpl_t5_note} "
                     f"Supersedes prior model ({model})."
                 )
 
