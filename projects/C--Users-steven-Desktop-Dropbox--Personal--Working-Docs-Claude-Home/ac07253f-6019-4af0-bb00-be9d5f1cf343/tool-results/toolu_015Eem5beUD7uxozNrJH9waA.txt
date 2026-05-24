@@ -1,0 +1,252 @@
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\feedback_loop.py:16:       direction >75% of the time on >= 20 events). Writes a markdown report
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\feedback_loop.py:201:    md.append(f"**Required directional bias:** 75%")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\feedback_loop.py:218:            md.append("\n_No findings above threshold._\n")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\feedback_loop.py:232:                hint = f"  - Rule `{f['key']}` fires when planners disagree -- review its threshold or skip-conditions."
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\config.py:4:Single source of truth for thresholds, window sizes, event calendar, retailer
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\config.py:7:Every constant supports env-var override so tune_thresholds.py can A/B-test
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\config.py:8:threshold changes without code edits:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\config.py:58:ALERT_THRESHOLD = float(os.environ.get("ALERT_THRESHOLD", "0.075"))
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\backtest_ci.py:14:    python scripts/backtest_ci.py --tolerance 0.05   # allow 5% aggregate drift (default 2%)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\audit_rules.py:82:        Priority\s*\d+                # Priority 1..Priority 8 (legacy)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:81:# Polish thresholds (Phase 1 → Phase 2 refinements)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:144:    priority:        str               # CRITICAL / HIGH / MEDIUM / LOW
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:266:    oos_priority_notes:    str = ""
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:298:    priority:             str = "LOW"   # rollup: CRITICAL > HIGH > MEDIUM > LOW
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:431:    # Inventory_Notes_, Style_Alert_Message, OOS_Priority_Notes) have been
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:441:    "Style_Alert_Message", "OOS_Priority_Notes",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:675:            "oos_priority_notes": "",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:764:                    "oos_priority_notes": _as_str(_get_col(r, "OOS_Priority_Notes")),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1006:    # Filter out gap weeks with sub-threshold deficits (small dips not worth fixing)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1083:                priority="HIGH",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1097:                priority="HIGH",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1110:            priority="HIGH",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1132:                    priority="MEDIUM",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1156:                    priority="MEDIUM",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1175:                    priority="MEDIUM",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1182:    # 3) Priority roll-up
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1183:    if any(r.priority == "CRITICAL" for r in rec.recommendations):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1184:        rec.priority = "CRITICAL"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1186:        rec.priority = "HIGH"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1188:        rec.priority = "MEDIUM"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1190:        rec.priority = "LOW"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1301:            oos_priority_notes=ivf.get("oos_priority_notes", ""),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1325:    # Sort: priority desc → gap count desc → mstyle asc
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1327:    records.sort(key=lambda r: (pri_order.get(r.priority, 9), -len(r.gap_weeks), r.mstyle))
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1337:        print(f"  {r.mstyle:<15} {r.country[:10]:<10} {r.priority:<8} "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1420:                "priority":       rc.priority,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1433:        "priority":           r.priority,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1503:        "oos_priority_notes": r.oos_priority_notes,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1600:  .rec-box.priority-HIGH { border-color:#e65100; background:#fff8e1; }
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1601:  .rec-box.priority-CRITICAL { border-color:#b71c1c; background:#ffebee; }
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1716:let priorityFilter = '';   // '' = all, else 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1822:      // because applyFilters() → renderStats() just populated it with priority buttons.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1856:  { id:'priority',         label:'Pri',          align:'left',  get: r => ({CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3}[r.priority] ?? 9), filterValue: r => r.priority,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1857:    render: r => `<td class="pri-${r.priority}">${r.priority}</td>` },
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2035:    // Priority button filter (top banner)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2036:    if (priorityFilter && r.priority !== priorityFilter) return false;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2080:  // Always count from the post-NON-priority-filter set so the priority button
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2082:  // a priority button shows exactly that count of rows.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2086:  // Priority bucket counts (computed against ALL with non-priority filters applied
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2087:  // — but for simplicity we use FILTERED, which excludes priority filter applied
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2090:  // We need pre-priority-filter counts; recompute against ALL with same non-pri filters
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2092:  for (const r of nonPriFiltered) pri[r.priority] = (pri[r.priority] || 0) + 1;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2102:    const active = priorityFilter === key;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2109:  const allBtn = `<button class="pri-btn ${priorityFilter === '' ? 'active' : ''}" data-pri=""
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2110:      title="All priorities — click a priority button to filter."
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2111:      style="background:${priorityFilter === '' ? '#37474f' : '#ffffff'};color:${priorityFilter === '' ? '#fff' : '#37474f'};border:1.5px solid #37474f;">
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2125:  // Wire up priority buttons
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2129:      priorityFilter = (priorityFilter === key) ? '' : key;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2135:// Helper: re-apply all filters EXCEPT priority, used to compute priority-bucket counts
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2136:function _filterRecords(skipPriority) {
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2165:    if (!skipPriority && priorityFilter && r.priority !== priorityFilter) return false;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2317:  // week_idx -> action (PULL_UP takes priority if both in same week)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2373:      const cls = `priority-${rc.priority} action-${rc.action}`;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2566:  // a small block: label / value / color-coded relative to thresholds.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2685:  // Clear priority button selection
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2686:  priorityFilter = '';
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\gap_analysis.py:225:            "Tighten Fix 3 outlier cap: lower the threshold from 3.0x median to 2.5x "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\gap_analysis.py:389:    # Priority-ordered fix list
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\gap_analysis.py:390:    lines.append("## Priority-ordered model fixes")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\gap_analysis.py:392:    priority_order = [
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\gap_analysis.py:402:    for b in priority_order:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\analyze_manual_vs_ai.py:323:        pr(f"| UP (MAN > AI by >5%) | {up:,} | {up/nb*100:.1f}% |")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\analyze_manual_vs_ai.py:324:        pr(f"| DOWN (MAN < AI by >5%) | {dn:,} | {dn/nb*100:.1f}% |")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\analyze_manual_vs_ai.py:325:        pr(f"| FLAT (within 5%) | {fl:,} | {fl/nb*100:.1f}% |")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\analyze_manual_vs_ai.py:410:    pr("| Tier | Threshold | N | UP% | DN% | Avg Δ% | Agg Bias% |")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\analyze_manual_vs_ai.py:533:    pr("| Priority | Finding | Proposed Change | Effort |")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\push_validation_qb.py:29:FID_PRIORITY  = 1574
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\push_validation_qb.py:50:        str(FID_PRIORITY):  {"value": rec.get("priority") or "LOW"},
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:457:    Bucket-date selection (in priority order):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:605:OOS_HARD_THRESHOLD    = 0.50  # >=50% of week's demand cancelled = hard OOS
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:606:OOS_PARTIAL_THRESHOLD = 0.15  # 15-50% = partial OOS
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:611:    if oos_severity >= OOS_HARD_THRESHOLD:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:613:    if oos_severity >= OOS_PARTIAL_THRESHOLD:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:618:def neutralize_compounding(clean_ord, oos_severity, l13_threshold=1.5):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:637:        if out[i + 1] > l13_threshold * l13_nz_avg:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:663:        any_oos = any(s >= OOS_PARTIAL_THRESHOLD for s in e["oos_severity"])
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\oos_history.py:664:        any_hard = any(s >= OOS_HARD_THRESHOLD for s in e["oos_severity"])
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:46:# source of truth for thresholds and supports env-var override for A/B testing
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:56:    ALERT_THRESHOLD, CR_ALPHA, DAMP_NORMAL, DAMP_F16_RELIEF,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:94:# in the same direction >75% of the time get a post-model calibration multiplier.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:377:# tag per SKU.  When present, this takes priority over description/brand keyword
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:440:#      considered too noisy and we fall through to next-priority match.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:453:    (signaling the caller to fall through to next-priority match).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:458:        return None  # SKU gate failed — let caller try next priority
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:466:    Match priority:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:475:      - Skip if consistent_skus <= SEASONAL_MIN_SKU_COUNT  (fall to next priority)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:480:    # Priority 1 — explicit Season tag from Quickbase.ProductTrack.Styles.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:487:    # Priority 2 + 3 — empirical profiles built from invoice history,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:508:    # Priority 4 — keyword fallback for items missing structured category tags.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:556:# Projection validation thresholds
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:561:# Demand pattern thresholds (based on L26W non-zero rate).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:562:# ≥ DENSE_THRESHOLD    → Seasonal Baseline  (orders most weeks)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:563:# ≥ CROSTON_THRESHOLD  → Croston's          (intermittent, every 2–5 weeks)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:564:# <  CROSTON_THRESHOLD → Sparse Intermittent (truly lumpy, every 6–12 weeks)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:565:DENSE_THRESHOLD   = 0.35   # ≥  9 active weeks in L26W
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:566:CROSTON_THRESHOLD = 0.25   # ≥  7 active weeks in L26W
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:731:    Lookup priority:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1126:    pri   = (rec.get("priority") or "LOW").replace("'", "''")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1134:        f"[Validation_Priority]     = '{pri}', "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1213:    # blend math doesn't put 45% weight on a phantom zero (the "stable"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1335:    #       If shipments under-ran orders by ≥ 15% over a meaningful order
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1368:    # doesn't trigger.  Also raise the OOS threshold from 0.85 → 0.70 to be
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1442:    # rebound, not a 35% baseline cut.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1454:    # demand.  Threshold: < 10% of the healthy L13 nz-avg.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1543:    # differs from current baseline by < 5% (no-op), or when the recency
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1558:            if abs(_new_baseline_overlay - ord_baseline) / ord_baseline >= 0.05:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1595:    #   1.0–2.0: 75% POS / 25% ord — moderately above POS; POS primary
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1596:    #   < 1.0  : 65% POS / 35% ord — orders below POS (depleting); POS anchors
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1681:    #       exceeds the account's order-to-us rate (l13 all-weeks avg) by 15%+ —
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1811:    # Relief DAMP=0.85 → ~85% historical shape (was 0.4).  Items with a known
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1873:    #   1864-BB30930 (Amazon): F38b lifted baseline +55% (POS L4=2616 vs
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1908:    # F16 relief threshold lowered 2026-05-03 from 2.5x → 1.8x.  Items with
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2175:    # Below that threshold, F10 applies normally.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2456:        Week 1 of stockout:  25% lost,  75% recoverable as backlog
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2458:        Week 3:              75% lost,  25% recoverable
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2549:      2. ATS constrained:  ats_l26[i-26] < max(10, 25% of prior L13 nz-avg)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2672:        # Current week: ATS must have meaningfully restored (2× threshold)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2724:      • If hist[j] within ±15% of hist[i] → phantom reorder, zero hist[j]
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2726:    More permissive than F39 (±15% vs ±5%) because shipment evidence is
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2731:      LW_16: Ord 14328, Ship 432   → ship_window = 432+72 = 504 = 3.5%
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2978:    cap_threshold = 2.5 * median_pre
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2984:    # exceed cap_threshold, that's not a spike — it's a sustained run-rate
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2991:    #     down to ~2200 each, killing the +55% L4-vs-L13 acceleration that
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3001:                      if float(out[i] or 0) > cap_threshold)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3005:        # threshold, it may still contain an internal outlier: one week that is far
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3050:        if v > cap_threshold:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3082:      • Run length:    ≥ 2 consecutive non-zero weeks with values within ±5%
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3084:          - Sparse customer  (<35% of L26 weeks have orders):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3087:          - Continuous customer (≥35% nz):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3121:        # Find run extent: consecutive weeks within ±5% of v
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3130:            # Within ±5% tolerance (use the run's first value as anchor)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3131:            if abs(vj - v) / max(v, 1.0) <= 0.05:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3144:            # itself is the anomaly.  Solution: cadence-aware threshold —
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3145:            # for sparse customers (< 35% of L26 weeks have orders), the
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3147:            # continuous customers (≥ 35% nz), keep the strict 2.0× gate
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3159:            # Sparse customer (<35% of weeks have orders): repetition
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3161:            # Continuous customer (≥35% nz): repetition is normal →
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3163:            mag_threshold = 1.0 if nz_fraction < 0.35 else 2.0
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3164:            if median_excl > 0 and v >= mag_threshold * median_excl:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3174:                    "mag_thresh":  mag_threshold,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3216:    # Most-recent rate gets priority; fall back to broader windows
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3244:    # Identify the LAST "big" shipment week.  Threshold: big_mult × POS rate
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3246:    big_threshold = big_mult * pos_rate
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3249:        if shipments[i] >= big_threshold:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3256:    # elevated (≥ big_threshold/2) — handles split shipments across 2-3 weeks.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3259:           shipments[cluster_start - 1] >= big_threshold * 0.5):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3314:      • Decay schedule (matches F34/F35): each cohort loses 25% of its
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3316:            age 1: 75% recoverable
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3318:            age 3: 25% recoverable
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3527:        if nz_rate(hist, 26) >= DENSE_THRESHOLD:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3722:    For items that order infrequently (non-zero rate < DENSE_THRESHOLD):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3736:      3 events → 55% item / 45% account
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3737:      4 events → 65% item / 35% account
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3829:            if abs(_new_avg_qty - avg_qty) / avg_qty >= 0.05:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:3850:            if abs(_new_interval - avg_interval) / avg_interval >= 0.05:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:4153:        # avg runs ≥5% above L26 non-zero avg (was ≥15%), the account's order
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:4157:        # Threshold relaxed after 36-key review showed international /
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:4185:            if abs(_new_z_cr - z) / z >= 0.05:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:4207:            if abs(_new_p_cr - p) / p >= 0.05:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:4222:    # Post-spike drawdown guard: if L13W weekly rate is <65% of L26W rate
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:4254:    # -15% vs L13W — the model systematically under-forecasts because every-
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:4282:    #   Moderate above-POS (POS × 1.0–2.0): blend 75% POS / 25% Croston's.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5065:      - Top 1 order accounts for ≥ 55% of L52W total
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5071:      - Top 2 orders account for ≥ 75% of L52W total
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5230:    # it catches duplicates F39 would miss (>5% qty drift) and prevents
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5279:# preview — so the saved comment "+25% in May for grooming" gets re-applied
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5619:    # Layer 1e: pct-first percent + week ("+25% W8-W26")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5951:    is_dense   = nz_rate_ >= DENSE_THRESHOLD    # ≥ 35%: semi-regular ordering
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5952:    is_croston = nz_rate_ >= CROSTON_THRESHOLD  # ≥ 25%: intermittent (every 2–5 wks)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5955:    # Original intent: catch lumpy accounts sitting at the 50% L26W threshold
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5957:    # Updated for DENSE_THRESHOLD=0.35: items in the 35-49% range naturally
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5958:    # carry off-season zeros; the old >=4 threshold would always downgrade
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5959:    # them to Croston's, defeating the new threshold.  Raised to >=8 zeros
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5967:        # nz_rate_ is still >= DENSE_THRESHOLD so is_croston=True if >= CROSTON_THRESHOLD
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:6067:        # R3 widened thresholds (2026-04-22): was L26_nz>=4 AND L52_nz>=8 —
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:6218:            # Pick base rate, in priority order -- all history/cross-record derived:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:6365:                # Truly sparse buyer (< 25% non-zero = typically every 6–12 weeks).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:6459:                    f"{_first['spike_count']}/4 recent weeks > cap_threshold AND "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:6710:    # OR Amazon POS L13 ≥ 50.  Below that threshold, keep the original 0-seed
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:6809:    # For customers where planners systematically override AI >75% of the time
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7246:    # accumulated backlog into W5 using the F35-style 25%/wk decay schedule:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7248:    #   W2 missed at age 3 → 25%
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7250:    #   W4 missed at age 1 → 75%
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7281:                        f"{_f38_baseline_wk:.0f}/wk × 2.50 catch-up via 25%/wk "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7314:    # the unmet portion forward as a backlog cohort that decays 25% per
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7342:                    f"rolled forward with 25%/wk decay until age 4 (fully lost)"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7365:    # Threshold rationale:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7503:    # PO signal priority (2026-05-17 fix):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7649:    # leading up to it (full → ~25% over the last 4 ordering weeks),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7913:        # L4W velocity when momentum is holding (L4W ≥ 85% of L8W).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8015:        # Response: apply +15% lift on all non-zero forecast weeks.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8046:                        f"→ +15% velocity buffer applied"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8078:        #   WOS > 12   → trim W1-W8 gently: each wk above 12 = ~1.5%, cap 20%
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8134:                        # 1.5%/wk taper is not meaningful at this level.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8161:                        # 1.5% per week above 12, cap 20%.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8194:        # When the near-term forecast (W1-W4 non-zero avg) runs >15% above POS
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8218:            # ratio is above the moderate threshold.  Use moderate blend only
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8287:                    #                                 75% threshold: price was
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8306:                                f"AUR {_f59i_aur:.2f} >= MAP {_f59i_map:.2f} * 75%"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8469:        # Planners historically project 40-55% of L13W when facing this pattern
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9278:    elif prior > 0 and pct > ALERT_THRESHOLD:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9379:    is_dense   = nz_rate_ >= DENSE_THRESHOLD    # ≥ 35%: semi-regular ordering (Seasonal Baseline)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9380:    is_croston = nz_rate_ >= CROSTON_THRESHOLD  # ≥ 25%: intermittent (Croston's)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9453:        # F70 -- Switchover conflict check (highest priority; overrides other flags).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9560:    # Volume-based priority: how critical is it to fix this record?
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9561:    # On-Plan override (AI vs Man <= 7.5%, plan entered) is applied at the
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9564:        priority = "CRITICAL"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9566:        priority = "HIGH"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9568:        priority = "MID"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9570:        priority = "LOW"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9584:        qb_pattern = "sparse_intermittent" # < 25% non-zero: truly lumpy (every 6-12 wks)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9615:        "priority":         priority,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9800:    # Threshold: >= 6 trailing zero weeks (anything less could be natural
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9843:    high = getattr(args, "threshold", VALID_HIGH_MULT)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9878:        # Two cases: (1) both zero; (2) plan entered and gap <= 7.5%.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9884:            r["priority"] = "On-Plan"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9891:    # Sort: CRITICAL priority first, then by severity, then by flag count
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:9894:    results.sort(key=lambda r: (pri_order.get(r["priority"], 2),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10093:            if nz_rate(hist, window=26) >= DENSE_THRESHOLD:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10292:  <li><strong>Alert threshold:</strong> {ALERT_THRESHOLD*100:.4g}% variance vs manual projections.</li>
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10375:    discriminator from a priority-ordered list (gap-week vs cadence-drop vs
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10418:    # Priority-ordered discriminators — first match wins.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10645:    # Four priority buckets — filled in order until MAX_BULLETS is reached.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10648:    gap_pill    = []   # Plan vs AI gap summary — only if >= 15% gap; lowest priority
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10964:    # Only surfaced when the gap is ≥ 15% (enough to warrant a review) or when
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10965:    # there is no manual plan at all. It's the lowest-priority bullet because
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10990:    # ── Assemble in priority order: critical → specific → gap_pill → pinned ──
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11112:    p.add_argument("--threshold",     type=float, default=VALID_HIGH_MULT,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11578:        pri_crit    = sum(1 for r in val_results if r["priority"] == "CRITICAL")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11579:        pri_high    = sum(1 for r in val_results if r["priority"] == "HIGH")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11580:        pri_mid     = sum(1 for r in val_results if r["priority"] == "MID")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11581:        pri_low     = sum(1 for r in val_results if r["priority"] == "LOW")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11582:        pri_onplan  = sum(1 for r in val_results if r["priority"] == "On-Plan")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11589:                "thresholds":   {
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11590:                    "high":  args.threshold,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11602:                "priority_critical": pri_crit,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11603:                "priority_high":     pri_high,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11604:                "priority_mid":      pri_mid,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11605:                "priority_low":      pri_low,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11606:                "priority_on_plan":  pri_onplan,
+
+[Showing results with pagination = limit: 250]
