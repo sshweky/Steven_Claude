@@ -74,8 +74,9 @@ CR_ALPHA = 0.3   # Croston's demand + interval smoothing
 #   May 29 x1.50  final (largest) pre-buy
 #
 # Fall Prime Day (first Tuesday of October) ordering bump — CALENDAR-BASED:
-#   Tuesday after Memorial Day (last Monday of May + 1 day) x1.30
+#   Tuesday after Labor Day (first Monday of September + 1 day) x1.30
 #   Much smaller than Prime Day; single discrete order event.
+#   ~4-5 weeks before the October consumer event.
 #
 # Week-to-boost mappings are computed at runtime by _get_event_boosts() because
 # the 26-week projection window shifts each week — hard-coded week numbers become
@@ -85,7 +86,7 @@ PRIME_DAY_BUMPS = [
     (5, 15, 1.25),   # May 15   — second pre-buy
     (5, 29, 1.50),   # May 29   — peak pre-buy
 ]
-FALL_PRIME_DAY_LIFT = 1.30   # Tuesday after Memorial Day
+FALL_PRIME_DAY_LIFT = 1.30   # Tuesday after Labor Day (first Monday of September + 1)
 PRIME_DAY_LIFT      = 1.25   # representative lift (EDA / messaging)
 FALL_DEAL_LIFT      = 1.12   # legacy (retained for TRADE_FALL reference)
 # F64 — Trade fall calendar events (2026-05-17).  Based on manual-vs-AI analysis:
