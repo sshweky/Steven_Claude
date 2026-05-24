@@ -10823,7 +10823,8 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
                         f"are both off baseline — this is a broader cooling "
                         f"pattern at {cl}, not just last 4 weeks. Worth "
                         f"checking POS or distribution for what changed.")
-    return f"{header} {expl}"
+    return (f"{header} {arrow} {direction} {abs(short_pct):.0f}% (L4W vs L13W). {expl}"
+            if expl else header)
 
 
 def _smart_pos_trend(l4, l13, l26, l52, ord_lw=0, ord_pw=0, l13_anomaly=False,
