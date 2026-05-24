@@ -4392,16 +4392,27 @@ def crostens(history, mp, is_amazon=False, description=None,
         forecast[w] = qty
         w += p_final
 
-    # Fix 5 — Rescale 26w total toward L13W all-weeks avg.
+    # Fix 5 — Rescale 26w total toward L13W avg.
     # Croston's z/p over-forecasts when non-zero avg >> all-weeks avg, e.g. ISO
     # post-spike items where z is inflated by large spike values. Only scale
     # DOWN (never up) — the L26W volume floor already handles under-projection.
+    #
+    # Amazon exception (2026-05-24): F59o will subsequently apply a seasonal
+    # overlay whose floor is derived from the Croston's non-zero mean.  Using
+    # the all-weeks avg here (which includes off-season zeros) as the cap
+    # reference decimates that flat_ref, making F59o's peak lifts proportionally
+    # too small.  For Amazon items, compare against the L13W NON-ZERO avg so the
+    # seasonal baseline that F59o builds from is not artificially suppressed.
     _l13_all_avg = sum(float(v) for v in history[-13:]) / 13
-    if _l13_all_avg > 0 and sum(forecast) > 0:
+    _l13_nz_list_f5 = [float(v) for v in history[-13:] if v > 0]
+    _l13_nz_avg_f5  = (sum(_l13_nz_list_f5) / len(_l13_nz_list_f5)
+                       if _l13_nz_list_f5 else _l13_all_avg)
+    _fix5_ref = _l13_nz_avg_f5 if is_amazon else _l13_all_avg
+    if _fix5_ref > 0 and sum(forecast) > 0:
         _ai_avg = sum(forecast) / 26
-        if _ai_avg > _l13_all_avg * 1.10:
-            _scale = _l13_all_avg / _ai_avg
-            _scale = max(0.5, _scale)    # cap at 2× reduction
+        if _ai_avg > _fix5_ref * 1.10:
+            _scale = _fix5_ref / _ai_avg
+            _scale = max(0.5, _scale)    # cap at 2x reduction
             forecast = [snap(v * _scale, mp) if v > 0 else 0 for v in forecast]
 
     # Ensure each event window gets at least one order -- but only if the
