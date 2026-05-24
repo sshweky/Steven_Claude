@@ -148,7 +148,8 @@ Snapshot 2026-05-21.  Every rule that fires in `forecast_record()` or
 | F69-WOS | F69 with POS anchor when WOS high |
 | F69-shift | F69 declining channel -> boost domestic |
 | F58  | Tell-AI comment replay (planner-driven overrides) |
-| F_PO_CUTOFF | Amazon Fetch/BrandBuzz no-PO-by-cutoff W1 zero |
+| F_PO_CUTOFF     | Amazon Fetch/BrandBuzz no-PO-by-cutoff W1 zero (fires Wed-Sat FF / Thu-Sat BB) |
+| F_PO_CUTOFF_ALL | Non-Amazon no-orders-by-Wed-9am-EST W1 zero (fires Wed 14:00 UTC onward through Sat) |
 | F70  | Switchover variant conflict (EC/COS/AMZ has activity -> zero base) |
 | G2   | All-zero-by-guards safety demotion (model -> Inactive when all 26w zeroed) |
 
