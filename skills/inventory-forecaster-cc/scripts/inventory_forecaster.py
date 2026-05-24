@@ -314,13 +314,20 @@ CATEGORY_PROFILES = {
     "cutlery set":   [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
     "cutlery":       [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
 
-    # ── Home fragrance / air-care — mild broad lift Apr–Aug ──────────────────
-    # air freshener and scent booster have mild warm-weather lift.
-    # fraganzia removed 2026-05-20 (planner feedback: no significant seasonality;
-    #   gap cases addressed by sparse MAX-baseline fix instead).
+    # ── Air cae (air care / home fragrance) — mild warm-weather lift Apr–Aug ───
+    # Mild broad seasonal lift in warm months; falls off Oct-Dec.
     # deodorizing ball removed 2026-05-20 (planner feedback: everyday flat use).
+    # Fix A (2026-05-24): renamed section "Air cae"; added fraganzia (brand keyword),
+    #   air care, odor elim, room spray, linen spray.  fraganzia had been removed
+    #   2026-05-20 for "no seasonality" but user confirmed it IS a brand that belongs
+    #   in this profile group.
     "air freshener":      [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
     "scent booster":      [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
+    "fraganzia":          [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
+    "air care":           [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
+    "odor elim":          [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
+    "room spray":         [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
+    "linen spray":        [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
 
     # ── Holiday / gifting — peak Sep–Nov retailer orders for Q4 sell-through ─
     # Retailer orders Aug–Nov so consumers can buy through Dec.
