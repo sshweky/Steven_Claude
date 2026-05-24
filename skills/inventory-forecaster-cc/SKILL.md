@@ -255,27 +255,28 @@ python run_forecast.py --acct 1864 --resume forecast_results.completed.json
 
 ### Watchdog auto-restart behavior
 
-`run_forecast.py` monitors the child process and restarts it automatically
-up to **3 times** if:
+`run_forecast.py` has a two-layer retry stack (no manual workflow needed):
+
+**Inner watchdog (per-session, up to 3 restarts):**
 - No output for 1200s (20 min) → process hung, kill and restart
 - Process exits with non-zero return code → restart after 5s
 
-If all 3 watchdog attempts are exhausted, Claude should **wait 5 minutes
-then restart the whole watchdog** — up to 3 such outer retries before
-escalating to the user. Total maximum attempts = 9 (3 watchdog × 3 outer).
+**Outer cool-off (up to 10 attempts by default):**
+- If the inner watchdog gives up, waits a cool-off period and restarts
+  the whole watchdog session.
+- Schedule (minutes between attempts): 3, 3, 8, 13, 18, 23, 28, 33, 38.
+- Override with `--max-outer-retries N` or disable with `--no-outer-retry`.
 
-Track outer retries explicitly:
-```
-Outer attempt 1/3 → python run_forecast.py --all --validate (watchdog handles inner 3)
-Outer attempt 2/3 → (after 5 min wait)
-Outer attempt 3/3 → (after 5 min wait)
-```
+Total max attempts = 3 inner x 10 outer = 30. Claude does NOT need to wrap
+this script in a bash retry loop; the wrapper handles everything in code.
 
 A run is **successful** when the log contains both:
 - `Validation complete` (step 3/3 finished)
-- `COMPLETE` (step 4/4 writeback finished — the watchdog summary line)
+- `COMPLETE` (step 4/4 writeback finished -- the watchdog summary line)
 
 For `--analyze-only` runs, success marker is: `[analyze-only] Done`
+
+The wrapper detects these markers and only retries when one is missing.
 
 ### Step 4 — Report results to the user
 
