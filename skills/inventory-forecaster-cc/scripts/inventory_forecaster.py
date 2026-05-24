@@ -4246,11 +4246,13 @@ def crostens(history, mp, is_amazon=False, description=None,
     event_inserts = []
     while w < 26:
         week_num    = w + 1
-        # Prime Day is Amazon-only. F11: per-week tapered lift schedule.
-        prime_boost = (PRIME_DAY_LIFT_SCHEDULE[week_num]
-                       if (is_amazon and week_num in PRIME_DAY_LIFT_SCHEDULE) else 1.0)
-        # R7 — Fall Deal Amazon-only (2026-04-22).
-        fall_boost  = FALL_DEAL_LIFT if (is_amazon and week_num in FALL_DEAL_WEEKS) else 1.0
+        # F11 — Prime Day / Fall Prime Day ordering lift (Amazon-only, calendar-based).
+        if is_amazon:
+            _cb_prime, _cb_fall = _get_event_boosts()
+            prime_boost = _cb_prime.get(week_num, 1.0)
+            fall_boost  = _cb_fall.get(week_num, 1.0)
+        else:
+            prime_boost = fall_boost = 1.0
         event_boost = max(prime_boost, fall_boost)
         cat_mult    = _cat_mults_c[w] if _cat_mults_c else 1.0
         # Croston's: use z directly (no seasonal profile — intermittent buyers
