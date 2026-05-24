@@ -329,6 +329,17 @@ CATEGORY_PROFILES = {
     "room spray":         [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
     "linen spray":        [0.70, 0.75, 0.90, 1.15, 1.30, 1.35, 1.30, 1.20, 1.05, 0.90, 0.75, 0.65],
 
+    # ── Cleaning tools / household cleaners — spring cleaning peak Mar–Apr ─────
+    # Multi-purpose cleaners, floor cleaners, surface sprays.  Year-round with
+    # a mild spring-cleaning bump (Feb-Apr) and modest holiday uptick (Nov-Dec).
+    # Fix A (2026-05-24): added per planner feedback — Fabuloso is a cleaning
+    #   product brand, not an air-care item.
+    "fabuloso":           [0.80, 0.90, 1.25, 1.30, 1.05, 0.95, 0.90, 0.85, 0.90, 0.95, 1.05, 1.10],
+    "cleaning spray":     [0.80, 0.90, 1.25, 1.30, 1.05, 0.95, 0.90, 0.85, 0.90, 0.95, 1.05, 1.10],
+    "all purpose clean":  [0.80, 0.90, 1.25, 1.30, 1.05, 0.95, 0.90, 0.85, 0.90, 0.95, 1.05, 1.10],
+    "floor cleaner":      [0.80, 0.90, 1.25, 1.30, 1.05, 0.95, 0.90, 0.85, 0.90, 0.95, 1.05, 1.10],
+    "multi purpose clean":[0.80, 0.90, 1.25, 1.30, 1.05, 0.95, 0.90, 0.85, 0.90, 0.95, 1.05, 1.10],
+
     # ── Holiday / gifting — peak Sep–Nov retailer orders for Q4 sell-through ─
     # Retailer orders Aug–Nov so consumers can buy through Dec.
     "holiday":       [1.50, 0.60, 0.40, 0.40, 0.50, 0.60, 0.70, 1.10, 1.70, 2.20, 2.30, 1.50],
