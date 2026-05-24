@@ -638,7 +638,7 @@ Phase 4 — Write-back
 | POS fields | `Ordered_Units_LW`, `Avg_Units_Wk_L4w`, `Avg_Units_Wk_L13w`, `Avg_Units_Wk_L26w`, `Avg_Units_Wk_L52w` |
 | Event windows | Prime Day: **W7-W9** (+25% lift, Amazon only — May ordering) · Fall Deal: W23-W25 (+12% lift) |
 | Amazon gate | `AMAZON_CUST_SUBSTR = "AMAZON"` — all Prime Day lifts and POS pulls conditioned on this |
-| Alert threshold | >5% variance vs manual projections |
+| Alert threshold | >7.5% variance vs manual projections |
 
 ---
 
