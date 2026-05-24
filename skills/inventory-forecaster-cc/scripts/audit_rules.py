@@ -41,12 +41,15 @@ from collections import defaultdict
 # _fire("F18"), _fire('F59a'), _fire("VP-Q1")
 _FIRE_PATTERN = re.compile(r'''_fire\(\s*["']([A-Za-z][A-Za-z0-9_\-]*)["']''')
 
-# meta["drivers"].append(f"F70 Switchover ...") or
-# meta.setdefault("drivers", []).append(f"F70 ...") or
-# Capture the rule code at the start of any .append() call (drivers/alerts/etc).
-# We restrict to is_rule_code() downstream so non-rule .append() calls are filtered.
+# Driver / alert / message strings often start with the rule code, e.g.:
+#     f"F70 Switchover variant ..."
+#     "VP-Q4 zeroed W{w}: confirmed PO ..."
+#     f"R5 International liveness extended ..."
+# These can be on a different line than the .append() call, so we scan ANY
+# quoted string starting with a token followed by space. is_rule_code()
+# filters out non-rule words.
 _DRIVER_PATTERN = re.compile(
-    r'''\.append\s*\(\s*[fF]?\s*["']([A-Za-z][A-Za-z0-9\-_]*)\b'''
+    r'''[fF]?["']([A-Za-z][A-Za-z0-9_\-]*?)\s'''
 )
 
 # RULES.md table row: starts with "|", second cell may contain a rule code
