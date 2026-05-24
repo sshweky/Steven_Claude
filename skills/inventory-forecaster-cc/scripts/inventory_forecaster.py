@@ -5852,6 +5852,22 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 break
     _f34_active_weeks = (len(hist) - _f34_first_nz_idx) if _f34_first_nz_idx is not None else 0
 
+    # F73 (2026-05-24) — New-launch recency anchor.
+    # F34 only fires when weeks 27-51 are < 1% of the L26 sum (i.e., item
+    # launched within the last ~26 weeks with nearly empty prior-year history).
+    # F73 broadens the new-launch flag to also cover items where Status_Cust
+    # contains 'NEW' and the item still has <= 13 active non-zero weeks, so
+    # mid-ramp items that cleared the F34 threshold still get the same
+    # recency treatment.  Both paths share the same downstream effect: Fix 5
+    # inside crostens() anchors against the L13W nz-avg instead of the
+    # all-weeks avg (which is zero-diluted and pulls the forecast too low).
+    _f73_l26_nz_wks  = sum(1 for v in hist[-26:] if float(v or 0) > 0)
+    _f73_sc_new      = "NEW" in (row.get("Status_Cust") or "").upper()
+    _f73_new_ramp    = (
+        _f34_is_new_launch                                  # F34: leading-zero pattern
+        or (_f73_sc_new and _f73_l26_nz_wks <= 13)         # Status=NEW, still ramping
+    )
+
     # R1 — One-Time-Buy detection (2026-04-22).  Off-price / closeout retailers
     # (Burlington, Ross, Kohl's, CVS closeout, Variety Wholesalers, etc.) often
     # have L52W history of 1-4 big orders with nothing in between.  Sparse
