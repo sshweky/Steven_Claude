@@ -561,7 +561,7 @@ VALID_SPIKE_MULT = 5.0   # projection > baseline*seasonal*this → CRITICAL
 # ≥ DENSE_THRESHOLD    → Seasonal Baseline  (orders most weeks)
 # ≥ CROSTON_THRESHOLD  → Croston's          (intermittent, every 2–5 weeks)
 # <  CROSTON_THRESHOLD → Sparse Intermittent (truly lumpy, every 6–12 weeks)
-DENSE_THRESHOLD   = 0.50   # ≥ 13 active weeks in L26W
+DENSE_THRESHOLD   = 0.35   # ≥  9 active weeks in L26W
 CROSTON_THRESHOLD = 0.25   # ≥  7 active weeks in L26W
 
 # Initial Stocking Order (ISO) detection.
