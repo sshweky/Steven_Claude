@@ -6164,6 +6164,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     if _f_ats_catch_corrections:
         _fire("VP-ATS-Catch")
     l13w             = float(row.get("Shpd_Wk_L13W_cust_") or 0)
+    rtl_pos          = _sig.get("rtl_pos")
 
     # R4 (Amazon Private Label skip) removed 2026-05-05.  APL items ARE shipped;
     # they now flow through the standard classification path below like any
