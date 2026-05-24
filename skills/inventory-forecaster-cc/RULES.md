@@ -133,7 +133,10 @@ Snapshot 2026-05-21.  Every rule that fires in `forecast_record()` or
 | F32  | Sparse-intermittent per-week + tiny-signal clamp |
 | F36  | Stock-up burn-off suppression (Amazon-only WOS-based front-zeroing) |
 | F40  | Order-rate deceleration scaling (L3_nz_avg / L13_nz_avg <= 0.30) |
-| F42  | POS-anchored Heuristic-baseline cap (Amazon-only, >3x POS) |
+| F42  | POS-anchored baseline cap (Amazon-only, >3x POS) -- extended to Croston's 2026-05-24; now tracked in rule_fires |
+| F74  | Amazon Heuristic initial-stock-up exclusion (2026-05-24): when F9 fired AND baseline >3x POS L13w AND L13nz avg < L26nz avg x0.5, cap baseline = max(L13nz avg, POS x1.5) |
+| F75  | POS fallback ceiling when DC data absent (2026-05-24): Heuristic/Croston's, Amazon, no amz_catalog, pos_l13w available, 26w avg >2x POS -> scale to POS x2.0 |
+| F76  | Seasonal Baseline thin-history ceiling guard (2026-05-24): when L26 has <=13 active weeks, cap each forecast week at baseline x2.0 to prevent category seasonal profile over-amplification |
 | F38f | Suppressed/Not-Buyable hard zero (Amazon, W1-W4=0 + W5 catchup) |
 | F67  | Amazon buy-box = $0 near-term dampener (W1-W4 cut 70%) |
 | F37  | Forward inventory-shortfall adjustment (Inv_WkN-based capping + backlog) |
