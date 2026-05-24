@@ -4684,7 +4684,7 @@ async function _loadRtlPos(r, safeId) {
     const rtlResp = await qb('/records/query', {
       from:    CFG.RTL_POS_TID,
       select:  selectFids,
-      where:   `{${RF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}AND{${RF.ACCT}.EX.'${acctStr}'}`,
+      where:   `{${RF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}AND{${RF.ACCT}.EX.${acctStr}}`,
       sortBy:  [{ fieldId: RF.DATE, order: 'DESC' }],
       options: { top: 120 },
     });
