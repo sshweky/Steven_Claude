@@ -6149,6 +6149,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     hist             = _sig["hist"]
     cust_name        = _sig["cust_name"]
     is_amazon        = _sig["is_amazon"]
+    is_apl           = _sig.get("is_apl", False)
     is_international = _sig["is_international"]
     pos_data         = _sig["pos_data"]
     amz_catalog      = _sig["amz_catalog"]
