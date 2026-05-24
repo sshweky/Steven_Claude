@@ -725,118 +725,31 @@ Matching logic: `(description or "").lower()` -- first keyword found wins (also 
 
 ---
 
-## Queued Model Fixes (surfaced by gap_analysis.py — 2026-04-21 run)
-
-Top 104 high-volume acct 1864 records: AI total **2.73M units** vs manual **3.73M units**
-= **-26.8%** (-1.0M unit gap). Root-cause buckets ranked by absolute gap:
-
-| # | Bucket | Records | Unit Gap | Proposed Fix |
-|---|---|---:|---:|---|
-| **F6** | Inactive-with-Activity (misclassification) | 4 | 131,600 | In `classify()`: don't return "inactive" if L26W non-zero weeks ≥ 4 OR L52W non-zero weeks ≥ 8. Route to Heuristic with `baseline = MAX(L26W nz avg, L52W nz avg)`. Keep true zero-activity SKUs (whole L52W zero) inactive. |
-| **F7** | Seasonal-ramp under-forecast (peak >> trough) | 13 | 164,874 | Add peak-anchored baseline: when category profile matches AND L52 peak > 3× L13 non-zero avg, compute `peak_baseline = avg(L52 weeks in category peak months)` and anchor seasonal curve: `week_qty = peak_baseline × cat_mult[w] / max(cat_mult)`. |
-| **F8** | Seasonal category not in CATEGORY_PROFILES | 9 | 102,281 | Expand match inputs to include `Product_Category`, `Product_Subcategory`, `Brand`, `Brand_PT_`. Add new profiles: `kingsford` / `fabuloso` / `fraganzia` / `air freshener` / `deodorizing ball` / `scent booster` / `paper bowl` / `snack bowl` / `grill cleaner` / `wooden fire`. |
-| **F9** | Sparse/intermittent baseline too conservative | 6 | 93,221 | For `sparse_intermittent` & `intermittent` with annual_volume > 15K: baseline = `MAX(L13 nz avg, L26 nz avg, L52 nz avg)` instead of L13-first-fallback chain. |
-| **F10** | Declining item over-forecast | 5 | 74,729 | Detect end-of-life: if L4W avg < L13W nz avg × 0.7, blend 26w forecast = 0.5×model + 0.5×L4W avg. Further down-weight W14-W26 by 0.85×. |
-| **F11** | Amazon Prime Day pre-buy gap (calendar-based) | 3 | 36,350 | IMPLEMENTED (2026-05-23): replaced static week-number schedule with calendar-date bumps: May 1 x1.25, May 15 x1.25, May 29 x1.50. Fall Prime Day added: Tuesday after Labor Day x1.30. Week mapping computed at runtime from ORIG_PRJ_COLS[0] via _get_event_boosts(). |
-| **F12** | Isolated spike over-forecast (outlier cap) | 2 | 14,878 | Tighten Fix 3: lower cap from 3.0× → 2.5× median. Add secondary check: if max(L13 nz) > 2× L13_all_avg AND max occurs only once, cap at 2× L13_all_avg. |
-
-**Workflow for applying queued fixes:**
-1. Pick highest-gap bucket (F6/F7/F8 first).
-2. Implement in `inventory_forecaster.py`, add reference to this table.
-3. Re-run `--validate --dry-run --acct 1864` → `gap_analysis.py` to verify the bucket narrowed.
-4. Move the fix from Queued → applied (Fix N).
-5. Update SKILL.md with the diff in impact.
-
----
-
-## Model Fixes (applied 2026-05-17 — 8-priority algorithm improvements)
-
-Sourced from `scripts/analyze_manual_vs_ai.py` run on 2,000 active projections.
-
-| Fix | Rule Code | Description |
-|---|---|---|
-| **Priority 1 — Order-cadence for all branches** | `apply_ordering_pattern` | Previously only called for dense (Seasonal Baseline) items. Now also called for Croston's and Sparse Intermittent branches, so monthly+ cadence items get demand clustered into order-week chunks across ALL model paths. Bi-weekly (gap=2) is still smoothed to weekly per VP-Q3. |
-| **Priority 2 — Horizon confidence decay** | `F61` | W9-W26 forecast weeks multiplied by ×0.88 for non-Amazon, non-seasonal, non-new-launch items. Planners systematically trim the back half of AI forecasts; this matches observed behavior without cutting near-term W1-W8 signal. |
-| **Priority 3 — Channel suppression** | OFFPRICE_CUST_SUBSTRS | Added DD'S DISCOUNTS, DD'S DISCOUNT, GABRIEL BROTHERS to the off-price customer list. These now get R1/OTB-zero routing (same as Ross, Burlington, etc.). |
-| **Priority 4 — Soft L4W/L13W trend blend** | `F62` | Fills the gap between F26 (hard ×0.85 at 50-70%) and no-action. Ratio 0.70-0.88 → proportional blend ×(0.6×ratio+0.4) ≈ ×0.82 to ×0.93. Ratio 1.12-1.30 → proportional uplift. Skips Amazon (POS blend handles it). |
-| **Priority 5 — Multi-pack baseline floor** | `F63` | For Multi-Pk Replen items where L26W nz avg is ≥1.5× L13W nz avg, lifts the forecast to at least 40% of L26W nz avg × 26w. Addresses the 743% avg delta gap on multi-pack items. |
-| **Priority 6 — Trade calendar fall events** | `F64` | W17-W18 (early Sept fall replenishment) ×1.10; W21-W22 (early Oct holiday pre-order) ×1.08 for all non-Amazon items. Most common planner spike weeks in manual projections. |
-| **Priority 7 — Zero-velocity suppression** | `F65` | When BOTH L4W and L13W are completely zero (not new launch, not international), skips R3/S6/F19 floors entirely. Prevents the AI from inventing demand with no recent signal. |
-| **Priority 8 — Per-customer bias correction** | `F66`, `CUSTOMER_BIAS_CORRECTIONS` | Applies a calibration multiplier for customers where planners override AI >75% of the time in the same direction. PSP Distribution/Theis ×1.25 (AI under-projects); Imperial Distributors ×1.35; Army-Air-Force Exch ×1.40; Pet Pharm ×0.55; H G Buying ×0.45; Petco Mexico ×0.45. |
-
----
-
-## Model Fixes (applied 2026-05-17 — Kingsford lead-time + Amazon buybox)
-
-| Fix | Rule Code | Description |
-|---|---|---|
-| **Kingsford profile shift** | `CATEGORY_PROFILES["kingsford"]` | Shifted all grilling profiles (kingsford, charcoal, chimney, fire starter, grill brush, etc.) from consumer-demand peak (May–Jun) to **retail ordering peak (Feb–Apr)**. Retailers place orders 8–10 weeks before consumer grilling season. Prior profile over-projected May–Aug; planners were cutting AI by -45.8% aggregate. New profile: Jan 0.50 → Feb 1.20 → Mar 1.90 → **Apr 2.10** → May 1.70 → Jun 1.30 → Jul 0.70 → Aug 0.40 → Sep–Nov 0.22–0.25. |
-| **F61 category-profile guard** | `F61` | Added `not _f61_has_cat_prof` to F61 horizon-decay condition. Category-profiled items (Kingsford, charcoal, sunscreen, holiday, ice melt, etc.) are already getting the correct seasonal shape — F61's ×0.88 back-half decay should not overwrite a known seasonal curve. |
-| **F67 — Amazon buy-box $0 dampener** | `F67` | When `Amazon_Buybox == 0` (listing live but no active buy-box price — pricing hold, compliance review, 3P flush) and the item is NOT already in F38f's "Not Buyable" path: W1–W4 cut by 70% (×0.30), W5–W26 unchanged. Assumes buybox restoration within ~4 weeks. Item flagged with driver note. |
-| **F68 — Amazon inactive-channel long-term zero** | `F68`, `ASIN_Status` fetched | Two-gate hybrid. Gate 1: if `ASIN_Status` contains "active" or "FD" (Forecasted Demand), Amazon's buying system confirms the item should be ordering — skip F68 regardless of order silence. Gate 2: if not confirmed active AND L13W all-weeks = 0 AND L26W ≤ 2 non-zero weeks → zero out AI (long-term channel issue assumed: brand-Amazon fit, listing compliance, VC program ended). Catches brands like Fraganzia/Fabuloso (multicultural market brands that don't convert on Amazon) and hyper-competitive pet grooming categories where the ASIN lost search position and the buyer stopped ordering. `ASIN_Status` added to Phase 2.6 catalog fetch. |
-
----
-
-## Model Fixes (applied 2026-05-17 — ATS catch-up spike cap)
-
-| Fix | Description |
-|---|---|
-| **VP-ATS-Catch** | Companion to VP-ATS. After ATS restores from an OOS period (≥2 prior weeks near-zero ATS), caps orders in the 1–3 weeks following restoration to the pre-OOS baseline when they exceed 1.5× that baseline. Prevents duplicate / pent-up catch-up orders from inflating the L13W nz-avg and over-projecting. Per planner feedback: 1864-FF9297/24, weeks 2/15 & 2/22. |
-
----
-
-## Model Fixes (applied 2026-04-22/23 — cadence & over-projection control)
-
-These supplement the `Fix 1`–`Fix 5` table above. All live in
-`scripts/inventory_forecaster.py`.
-
-| Fix | Where | Rule |
-|---|---|---|
-| **F-A — L13 burst baseline** | `seasonal_baseline()` (just after L13 non-zero avg computed) | When L13 has ≥ 4 zero weeks (≥ 25% L13 zero-rate), switch the baseline from **L13 non-zero avg** to **L13 all-weeks avg**. The non-zero avg captures order SIZE, not the weekly rate, and × 26 over-projects for burst/drawdown accounts (Amazon pre-buy cycles, promo-driven retailers). |
-| **F-B — Burst-cadence override** | `classify()` / dense-route branch in `forecast_record()` | When `is_dense` (L26 nz-rate ≥ 50%) AND L13 has ≥ 4 zero weeks AND not ISO: downgrade to Croston's path. Forces international / distributor accounts (Loblaws, Wakefern, Petbarn) off the smooth weekly-rate model onto lumpy order-size × cadence. |
-| **M1 — L52/L26 ceiling** | End of `forecast_record()` before prior/pct | `26w total ≤ max(L52 × 1.25, L26 × 1.25)`. Prevents runaway over-projection on items with thin long-run history or items where recent acceleration + POS blend + event lifts compound. Skipped for `model == "Inactive"` and for items with L52 total < 1,000 units (legitimate ramps need headroom). Scales all weeks proportionally and re-snaps to master pack. |
-| **M2 — Phase-out / EOL dampening** | After M1 in `forecast_record()` | Three OR-signals fire dampening:<br>• `Status_Cust` / `PT_Item_Status` contains one of: `DISC` / `DEL` / `LIQ` / `END` / `OBSOLETE` / `PHASE`<br>• **Stale-order**: L13 orders = 0 AND last non-zero order ≥ 26 weeks ago<br>When any signal fires (and model ≠ Inactive), cut forecast to `max(AI × 30%, manual)` and re-snap. Requires `PT_Item_Status` in the Projections SELECT (see `build_prj_select`). |
-| **M3 — Croston's acceleration-aware z blend** | Inside `crostens()` at z refinement | Default blend is 70% L13 actuals / 30% smoothed. When **L13 non-zero avg ≥ 1.05× L26 non-zero avg** (mild acceleration), shift to **90% L13 / 10% smoothed** so order sizes reflect the newer, larger orders instead of being pulled down by older smoothed values. |
-
-**Order of operations inside `forecast_record()` after the model produces `fcst`:**
-1. Cadence shaping (bi-weekly, ISO, etc.)
-2. **M1 ceiling** (scales + snaps to MP)
-3. **M2 EOL dampening** (scales + snaps to MP)
-4. `prior`, `new`, `pct` computed
-5. Business-voice narrative built via `_build_alert()` (new short-form retailer language, replaces the old algorithmic-jargon alert)
-
-### Projections table SELECT additions
-
-`build_prj_select()` must pull these fields for M2 and for viewer enrichment:
-
-- `Status_Cust` (already present — used for M2 EOL-token match)
-- `PT_Item_Status` (**added** — item-level status for M2)
-
-### Narrative voice (new `_build_alert()`)
+## Narrative voice (`_build_alert()`)
 
 Two-to-three short sentence retailer-planning style:
 ```
-AI reads 30,468 units vs 1,920 planned (+1487%). Plan looks light — risk of
+AI reads 30,468 units vs 1,920 planned (+1487%). Plan looks light - risk of
 out-of-stock if orders hold pace. Plan is back-loaded (0% in first 13w vs 40%
 implied).
 ```
-Drops all algorithmic jargon (no α/β, no "78-obs series", no model names).
-Helper `_describe_manual_defects()` → `_top_manual_defect()` surfaces the
+Drops all algorithmic jargon (no alpha/beta, no "78-obs series", no model names).
+Helper `_describe_manual_defects()` -> `_top_manual_defect()` surfaces the
 single biggest defect in the manual plan (flat-line placeholder, front/back-
 load skew, zero-plan weeks, unsupported spike, or under-plan gap) and appends
 it as the final sentence.
 
-### Viewer enrichment (scripts/viewer.py)
+## Viewer enrichment (`scripts/viewer.py`)
 
 - `_enrich_from_quickbase()` fires at viewer load. One CData query pulls:
   Description, `Status_Cust`, `PT_Item_Status`, `Inventory_Manager`, and
-  `Ord_LW`…`Ord_LW_25` (26 weeks). Results merged by `Acct_MStyle_Key_`.
+  `Ord_LW`...`Ord_LW_25` (26 weeks). Results merged by `Acct_MStyle_Key_`.
 - Viewer CData parser matches `inventory_forecaster._parse_cdata_result()`
-  (unwraps `results[0].rows` — important).
+  (unwraps `results[0].rows` -- important).
 - Columns added: Description, Status @ Cust (pulled from `Status_Cust`),
   Item Status (from `PT_Item_Status`), Ord/Wk L13W, AI vs L13, Man vs L13.
-- Volume tier (HIGH ≥ 500 prj/wk · MEDIUM 200-499 · LOW < 200) and layered
-  priority (CRITICAL = HIGH vol + |Δ|>10% · MEDIUM = MEDIUM vol + |Δ|>10% ·
+- Volume tier (HIGH >= 500 prj/wk, MEDIUM 200-499, LOW < 200) and layered
+  priority (CRITICAL = HIGH vol + |Delta|>10%, MEDIUM = MEDIUM vol + |Delta|>10%,
   LOW = rest).
 - Detail row shows full 26-week ord + shp history (fields `history_l26_ord`
   and `history_l26_shp`).
