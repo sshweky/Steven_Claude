@@ -12844,9 +12844,10 @@ def main():
                      "(tried 'Acct# - MStyle (Key)', 'Acct - MStyle Key', 'Acct_MStyle_Key_'). "
                      "Cannot upsert.")
         # Compose payload — QB labels use spaces, not underscores
-        ai_alert_fid    = fmap.get("AI ALERT") or fmap.get("AI_ALERT")
-        ai_analysis_fid = fmap.get("AI Analysis")  # fid 1590 — rich-text narrative
-        wk_fids         = [fmap.get(f"AI PRJ W{i}") or fmap.get(f"AI_PRJ_W{i}")
+        ai_alert_fid      = fmap.get("AI ALERT") or fmap.get("AI_ALERT")
+        ai_analysis_fid   = fmap.get("AI Analysis")  # fid 1590 — rich-text narrative
+        ai_confidence_fid = fmap.get("AI_Confidence") or fmap.get("AI Confidence") or 1612
+        wk_fids           = [fmap.get(f"AI PRJ W{i}") or fmap.get(f"AI_PRJ_W{i}")
                            for i in range(1, 27)]
         if not all(wk_fids) or not ai_alert_fid:
             sys.exit("\n[ABORT] Projections table is missing one or more AI_PRJ_W*/AI_ALERT fields. "
