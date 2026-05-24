@@ -275,6 +275,8 @@ A run is **successful** when the log contains both:
 - `Validation complete` (step 3/3 finished)
 - `COMPLETE` (step 4/4 writeback finished — the watchdog summary line)
 
+For `--analyze-only` runs, success marker is: `[analyze-only] Done`
+
 ### Step 4 — Report results to the user
 
 After the script completes, summarize:
