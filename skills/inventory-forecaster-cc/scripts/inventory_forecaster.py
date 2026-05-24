@@ -4722,7 +4722,43 @@ def heuristic(history, mp, l13w, is_amazon=False, description=None,
                 src = f"{src} + F9 MAX(L13/L26/L52 nz avg)"
                 _f9_applied = True
 
-    # F23b — Trailing-zero drawdown discount for Heuristic (2026-04-22).
+    # F74 -- Amazon Heuristic initial-stock-up exclusion (2026-05-24).
+    #
+    # F9 boosts the Heuristic baseline to MAX(L13/L26/L52 nz avg) for high-
+    # volume items (L52 total > 15k).  When the MAX comes from L26 or L52
+    # because large early stock-up POs inflated those windows, but the most
+    # recent 13 weeks show a much lower run rate AND POS confirms that lower
+    # rate, the F9 boost is anchored against stale stock-up volume rather
+    # than true replenishment demand.
+    #
+    # Trigger:
+    #   is_amazon AND pos_data available AND F9 was applied
+    #   current baseline > 3x POS L13w rate (over-anchored)
+    #   L13 nz avg < L26 nz avg x 0.5 (recent demand settled below stock-up level)
+    #
+    # Action: cap baseline = max(L13_nz_avg, POS_L13w x 1.5)
+    if is_amazon and pos_data and _f9_applied:
+        _f74_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        if _f74_pos_l13 > 0:
+            _f74_l13_nz = [float(v) for v in history[-13:] if float(v) > 0]
+            _f74_l26_nz = [float(v) for v in history[-26:] if float(v) > 0]
+            _f74_l13_avg = (sum(_f74_l13_nz) / len(_f74_l13_nz)) if _f74_l13_nz else 0.0
+            _f74_l26_avg = (sum(_f74_l26_nz) / len(_f74_l26_nz)) if _f74_l26_nz else 0.0
+            if (baseline > 3.0 * _f74_pos_l13
+                    and _f74_l13_avg < _f74_l26_avg * 0.5):
+                _f74_cap = max(
+                    _f74_l13_avg if _f74_l13_avg > 0 else _f74_pos_l13 * 1.5,
+                    _f74_pos_l13 * 1.5
+                )
+                if baseline > _f74_cap:
+                    _f74_prev = baseline
+                    baseline = _f74_cap
+                    src = (f"{src} + F74 stock-up exclusion "
+                           f"(F9 was {_f74_prev:.0f}/wk; L26nz avg "
+                           f"{_f74_l26_avg:.0f} >> L13nz avg {_f74_l13_avg:.0f}; "
+                           f"POS {_f74_pos_l13:.0f}/wk; capped to {_f74_cap:.0f}/wk)")
+
+    # F23b -- Trailing-zero drawdown discount for Heuristic (2026-04-22).
     # Same pure-order-history signal used by F22a in seasonal_baseline.
     # Heuristic items that routed away from Inactive (F20 kept planner-nonzero
     # items here) can still be mid-drawdown; scale baseline by the trailing-
