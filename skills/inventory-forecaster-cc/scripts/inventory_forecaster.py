@@ -4279,6 +4279,43 @@ def crostens(history, mp, is_amazon=False, description=None,
                 _f18_applied     = True
                 _f18_capped_down = True   # R6 must not re-lift
 
+    # P2 / F18b (2026-05-24): Burst carve-out for Amazon Croston's.
+    # Variance deep-dive: items where the LAST 4 weeks of L13 dominate (e.g.
+    # Prime Day pre-buy burst at the end of L13) but F18 didn't fire because
+    # the lumpy earlier weeks in L13 muddled the implied rate. The burst
+    # weeks aren't repeating soon - they were one-time event-driven.
+    # Trigger:
+    #   L4W_avg > L13W_avg * 1.8  (recent burst >> baseline)
+    #   AND POS_L13W > 0  AND  L4W_avg > POS_L13W * 1.5  (burst not driven by POS)
+    # Action: cap z to L13W average EXCLUDING the L4W burst weeks * 1.2
+    if pos_data and not _f18_applied:
+        _f18b_l4 = [float(v or 0) for v in history[-4:]]
+        _f18b_l13 = [float(v or 0) for v in history[-13:]]
+        _f18b_l4_avg  = sum(_f18b_l4)  / max(len(_f18b_l4),  1) if _f18b_l4  else 0
+        _f18b_l13_avg = sum(_f18b_l13) / max(len(_f18b_l13), 1) if _f18b_l13 else 0
+        _f18b_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _f18b_burst_vs_baseline = (_f18b_l13_avg > 0
+                                     and _f18b_l4_avg > _f18b_l13_avg * 1.8)
+        _f18b_burst_vs_pos = (_f18b_pos_l13 > 0
+                                and _f18b_l4_avg > _f18b_pos_l13 * 1.5)
+        if _f18b_burst_vs_baseline and _f18b_burst_vs_pos and z > 0:
+            # Compute pre-burst L13 average (exclude the recent 4 weeks)
+            _f18b_l13_prior9 = _f18b_l13[:9] if len(_f18b_l13) >= 9 else []
+            _f18b_l13_prior_nz = [v for v in _f18b_l13_prior9 if v > 0]
+            if _f18b_l13_prior_nz:
+                _f18b_baseline = sum(_f18b_l13_prior_nz) / len(_f18b_l13_prior_nz)
+                _f18b_new_wk = _f18b_baseline * 1.2
+                _f18b_p_use = max(1.0, p)
+                _f18b_z_new = _f18b_new_wk * _f18b_p_use
+                _f18_driver  = (f"F18b Burst carve-out: L4 avg {_f18b_l4_avg:.0f} vs "
+                                f"L13 avg {_f18b_l13_avg:.0f} (burst {_f18b_l4_avg/_f18b_l13_avg:.1f}x); "
+                                f"POS L13 {_f18b_pos_l13:.0f}; capped to pre-burst "
+                                f"L13[:9]_nz_avg {_f18b_baseline:.0f} * 1.2 = {_f18b_new_wk:.0f}/wk; "
+                                f"z {z:.0f} -> {_f18b_z_new:.0f}")
+                z = _f18b_z_new
+                _f18_applied = True
+                _f18_capped_down = True
+
     # Fix 1 — Category seasonality for Croston's: precompute per-week multipliers.
     # Croston's normally uses z directly (no seasonal profile) to avoid noisy
     # position-based distortion.  Category profiles are reliable known curves, so

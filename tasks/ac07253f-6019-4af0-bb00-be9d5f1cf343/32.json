@@ -3,7 +3,7 @@
   "subject": "P2: F18b burst carve-out",
   "description": "After F18: if L4W_avg > L13W_avg * 1.8 AND L4W_avg > POS_L13W * 1.5 (burst not explained by POS), treat burst as one-time and cap z to L13W avg excluding burst weeks * 1.2.",
   "activeForm": "Implementing P2 F18b burst carve-out",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
