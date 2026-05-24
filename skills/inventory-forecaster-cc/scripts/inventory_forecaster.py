@@ -9177,7 +9177,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             and isinstance(fcst, list) and len(fcst) >= 26):
 
         _rpl_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-        _rpl_ord_l13 = sum(float(row.get(c) or 0) for c in ORD_COLS[-13:]) / 13  # all-weeks avg
+        # Fix A (2026-05-24): use normalized hist (post F41/F35/F43) so phantom
+        # stock-up orders removed by F41 are not counted in the demand baseline.
+        _rpl_ord_l13 = sum(float(v) for v in hist[-13:]) / 13  # all-weeks avg (normalized)
         _rpl_demand  = max(_rpl_pos_l13, _rpl_ord_l13)
 
         if _rpl_demand >= 50:
