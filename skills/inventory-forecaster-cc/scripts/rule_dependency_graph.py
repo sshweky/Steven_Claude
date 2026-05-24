@@ -180,14 +180,22 @@ def attribute_meta_to_rule(visitor: RuleScopeVisitor, window: int = 30):
                     visitor.fcst_writes[rule] += count
 
 
+# Keys that every rule reads/writes (just for narrative). Excluding these
+# removes ~99% of edges and leaves only the semantically interesting ones.
+_TRIVIAL_META_KEYS = {"drivers", "rule_fires", "baseline_mode"}
+
+
 def build_edges(visitor: RuleScopeVisitor) -> list[tuple[str, str, str]]:
-    """Edge = (writer_rule, reader_rule, shared_meta_key)."""
+    """Edge = (writer_rule, reader_rule, shared_meta_key). Filters trivial keys."""
     edges = []
     for reader, read_keys in visitor.reads.items():
+        interesting_reads = read_keys - _TRIVIAL_META_KEYS
+        if not interesting_reads:
+            continue
         for writer, write_keys in visitor.writes.items():
             if writer == reader:
                 continue
-            shared = read_keys & write_keys
+            shared = interesting_reads & (write_keys - _TRIVIAL_META_KEYS)
             for k in shared:
                 edges.append((writer, reader, k))
     return edges
