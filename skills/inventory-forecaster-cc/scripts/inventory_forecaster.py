@@ -1322,7 +1322,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if len(l26_nz) >= 3:
         _sorted_l26 = sorted(l26_nz)
         _median_l26 = _sorted_l26[len(_sorted_l26) // 2]
-        _spike_cap26 = 3.0 * _median_l26
+        _spike_cap26 = 2.5 * _median_l26
         if max(l26_nz) > _spike_cap26:
             l26_nz = [min(v, _spike_cap26) for v in l26_nz]
 
