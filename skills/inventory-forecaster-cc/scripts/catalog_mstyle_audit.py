@@ -58,11 +58,15 @@ def cell(row, fid):
     return str(v).strip() if v is not None else ""
 
 
-# ── 1. Amazon Catalog: active/FD records with ASIN + Mstyle + Style# ─────────
-print("\nFetching Amazon Catalog (active/FD) ...", flush=True)
-# Filter: Item Status (fid 51) starts with A or FD
-cat_where = "{'51'.SW.'A'}OR{'51'.SW.'FD'}"
-cat_rows  = qb_query_all("bqp8vz625", cat_where, [7, 33, 34, 51], "catalog")
+# ── 1. Amazon Catalog: all records (filter in Python by status) ───────────────
+# Pull everything -- the catalog uses "Future Delete" (not "FD") so a SW filter
+# on "FD" misses those entries.  We keep Active* and Future Delete* entries.
+print("\nFetching Amazon Catalog (all records) ...", flush=True)
+cat_rows  = qb_query_all("bqp8vz625", "{3.GT.0}", [7, 33, 34, 51], "catalog")
+
+def is_active_or_fd(status):
+    s = status.upper()
+    return s.startswith("A") or s.startswith("FUTURE") or s == "FD"
 
 catalog = {}   # asin -> {mstyle, style_num, status}
 for row in cat_rows:
@@ -70,10 +74,10 @@ for row in cat_rows:
     mstyle = cell(row, 34)
     model  = cell(row, 33)   # Style #
     status = cell(row, 51)
-    if asin and mstyle:
+    if asin and mstyle and is_active_or_fd(status):
         catalog[asin] = {"mstyle": mstyle, "model": model, "status": status}
 
-print(f"  {len(catalog)} active/FD catalog entries with ASIN + Mstyle", flush=True)
+print(f"  {len(catalog)} active/Future-Delete catalog entries with ASIN + Mstyle", flush=True)
 
 
 # ── 2. Projections: active + FD, Amazon, acct 1864 ───────────────────────────
