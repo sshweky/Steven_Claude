@@ -10532,9 +10532,10 @@ def main():
     print("=" * 66)
 
     # Auto-discover the 26 date-stamped projection columns from QB schema
-    global ORIG_PRJ_COLS
+    global ORIG_PRJ_COLS, _EVENT_BOOSTS_CACHE
     ORIG_PRJ_COLS = _discover_prj_cols()
-    print(f"  Manual projection columns: {ORIG_PRJ_COLS[0]} → {ORIG_PRJ_COLS[-1]}")
+    _EVENT_BOOSTS_CACHE = None   # invalidate so _get_event_boosts() recomputes from real W1 date
+    print(f"  Manual projection columns: {ORIG_PRJ_COLS[0]} -> {ORIG_PRJ_COLS[-1]}")
 
     # ── Resolve brand filter to mstyle list ───────────────────────
     if args.brand:
