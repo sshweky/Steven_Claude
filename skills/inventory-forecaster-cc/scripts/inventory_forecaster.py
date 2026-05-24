@@ -1310,7 +1310,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         _f38pre_map = float((amz_catalog or {}).get("MAP_Price") or 0)
         _bb_event   = (is_amazon and _f38pre_aur > 0 and _f38pre_map > 0
                        and _f38pre_aur < _f38pre_map)
-        _spike_cap = (2.0 if _bb_event else 3.0) * _median_nz
+        _spike_cap = (2.0 if _bb_event else 2.5) * _median_nz
         if max(l13_nz) > _spike_cap:
             l13_nz = [min(v, _spike_cap) for v in l13_nz]
     if len(l26_nz) >= 5:
