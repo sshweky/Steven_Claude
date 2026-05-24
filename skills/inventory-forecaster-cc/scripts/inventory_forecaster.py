@@ -10846,10 +10846,26 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                 )
 
     # ── Amazon AUR (Average Unit Revenue) ─────────────────────────────────────
-    # REMOVED 2026-05-24: The codepage viewer JS renders a richer AUR bullet
-    # (LW + L4W avg + L26W avg + L52W avg) live from amz_catalog data, so the
-    # Python-generated bullet here was a duplicate. The codepage version is
-    # canonical because it includes LW which is only available client-side.
+    # Pinned last so planners see pricing context on every Amazon record.
+    # Python writes L4W / L13W / L26W / L52W (LW is computed live by codepage JS).
+    if is_amazon and amz_catalog:
+        _aur_l4  = float(amz_catalog.get("AUR_L4w")  or 0)
+        _aur_l13 = float(amz_catalog.get("AUR_L13w") or 0)
+        _aur_l26 = float(amz_catalog.get("AUR_L26w") or 0)
+        _aur_l52 = float(amz_catalog.get("AUR_L52w") or 0)
+        # Interpolate L13W from L4W + L26W when catalog value is missing
+        # (same logic as codepage JS fallback).
+        if _aur_l13 == 0 and _aur_l4 > 0 and _aur_l26 > 0:
+            _aur_l13 = (_aur_l4 + _aur_l26) / 2.0
+        _aur_parts = []
+        if _aur_l4  > 0: _aur_parts.append(f"<b>L4W avg</b> ${_aur_l4:.2f}")
+        if _aur_l13 > 0: _aur_parts.append(f"<b>L13W avg</b> ${_aur_l13:.2f}")
+        if _aur_l26 > 0: _aur_parts.append(f"<b>L26W avg</b> ${_aur_l26:.2f}")
+        if _aur_l52 > 0: _aur_parts.append(f"<b>L52W avg</b> ${_aur_l52:.2f}")
+        if _aur_parts:
+            pinned_last.append(
+                "<b>Amazon AUR:</b> " + " &nbsp;|&nbsp; ".join(_aur_parts) + "."
+            )
 
     # ── Gap pill: Plan vs AI summary ──────────────────────────────────────────
     # Only surfaced when the gap is ≥ 15% (enough to warrant a review) or when

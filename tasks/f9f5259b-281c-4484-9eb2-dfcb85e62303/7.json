@@ -1,0 +1,9 @@
+{
+  "id": "7",
+  "subject": "Run --all --validate + push with T5/seasonal boosts",
+  "description": "Full forecast + validate run with the new T5/Holiday/Halloween boost system in F_AMZ_RPL. Then push_validation_qb.py.",
+  "activeForm": "Running forecast with T5/seasonal boosts",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
