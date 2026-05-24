@@ -9685,7 +9685,18 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Fix A (2026-05-24): use normalized hist (post F41/F35/F43) so phantom
         # stock-up orders removed by F41 are not counted in the demand baseline.
         _rpl_ord_l13 = sum(float(v) for v in hist[-13:]) / 13  # all-weeks avg (normalized)
-        _rpl_demand  = max(_rpl_pos_l13, _rpl_ord_l13)
+        # POS-primary demand (2026-05-24): when Amazon is ordering ABOVE consumer
+        # POS, the excess reflects inventory build/management, not true sell-through.
+        # Use a 65/35 POS/ord blend so the 26-week forecast anchors to what is
+        # actually selling, not to elevated order history.
+        # When ord <= POS (orders lagging POS -- stockout or demand catch-up),
+        # keep max() so we don't under-forecast a genuinely accelerating item.
+        if _rpl_pos_l13 >= 50 and _rpl_ord_l13 > _rpl_pos_l13:
+            _rpl_demand     = _rpl_pos_l13 * 0.65 + _rpl_ord_l13 * 0.35
+            _rpl_pos_primary = True
+        else:
+            _rpl_demand     = max(_rpl_pos_l13, _rpl_ord_l13)
+            _rpl_pos_primary = False
 
         if _rpl_demand >= 50:
             # Step 1 -- build week-level rates: apply seasonal/event lifts on top
