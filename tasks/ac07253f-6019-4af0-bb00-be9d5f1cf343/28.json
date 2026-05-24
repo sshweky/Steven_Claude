@@ -3,7 +3,7 @@
   "subject": "P3: Off-price hard-zero (R1 expansion + F65)",
   "description": "For OFFPRICE_CUST_SUBSTRS customers, tighten R1 to catch more OTBs and force F65 to zero regardless of M1/R3 floors.",
   "activeForm": "Implementing P3 off-price hard-zero",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }

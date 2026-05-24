@@ -4880,7 +4880,7 @@ def _is_ecom_cust(cust_name):
     return any(sub in cu for sub in ECOM_CUST_SUBSTRS)
 
 
-def _detect_otb(history, is_amazon=False):
+def _detect_otb(history, is_amazon=False, is_offprice=False, manual_total=None):
     """
     R1 — One-Time-Buy pattern detector.  Pure order-history signal.
     Returns (is_otb, meta_dict) where meta describes the pattern.
@@ -4892,7 +4892,7 @@ def _detect_otb(history, is_amazon=False):
       that look "OTB-shaped" route through the standard Inactive recipe
       instead, which restarts forecasting the moment orders resume.
 
-    Two detection paths (2026-04-22):
+    Three detection paths:
 
     PATH A (tight, original R1):
       - L52W has ≤ 3 non-zero weeks
@@ -4906,10 +4906,29 @@ def _detect_otb(history, is_amazon=False):
       - Most-recent order is ≥ 12 weeks old
       - Catches seasonal one-time buys at off-price / closeout retailers
         whose nz count exceeds 3 but whose orders all clustered in one window.
+
+    PATH C (P3 off-price hard-zero, 2026-05-24):
+      - Customer is in OFFPRICE_CUST_SUBSTRS (Ross, Burlington, DD's, etc.)
+      - L4W = 0  AND
+      - manual_total <= 100  (planner already zeroed/near-zeroed it)
+      - Off-price = closeout channel; once planner stops projecting, no
+        replenishment.  Catches the long tail where PATH A/B didn't fire
+        but the off-price channel is clearly closed.
     """
     # Amazon gate — Amazon items NEVER get the OTB recipe.
     if is_amazon:
         return False, {}
+
+    # PATH C — off-price closeout (very fast, doesn't even compute nz)
+    if is_offprice and manual_total is not None and manual_total <= 100:
+        if len(history) >= 4 and sum(float(v) for v in history[-4:]) == 0:
+            return True, {
+                "nz_count":         sum(1 for v in history[-52:] if float(v) > 0),
+                "weeks_since_last": 99,
+                "l4_avg":           0,
+                "path":             "C",
+                "reason":           "off-price closeout (L4=0, manual<=100)",
+            }
 
     h52 = [float(v) for v in history[-52:]]
     nz  = [v for v in h52 if v > 0]
