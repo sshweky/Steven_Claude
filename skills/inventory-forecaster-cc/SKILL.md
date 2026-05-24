@@ -818,9 +818,3 @@ Changes to `codepage/viewer.js` and `codepage/viewer.html`:
 
 ---
 
-## Model Fixes (applied 2026-05-21 -- Option A: seasonal overlay for Heuristic/Croston's)
-
-| Fix | Rule / Location | Description |
-|---|---|---|
-| **F59o seasonal overlay** | `forecast_record()` -- inserted before F59/F60 block | Applies the category profile as an additive floor to Amazon Heuristic and Croston's forecasts (Option A). The existing heuristic()/crostens() category blend normalizes to mean=1.0, which can pull off-months BELOW the flat baseline. F59o uses `_get_category_profile()` (profile already floored at SEASONAL_FLOOR=1.0), computes a damped per-week uplift (DAMP_O=0.50), and sets each week to `max(fcst[w], snap(flat_ref * damped_mult, mp))`. Off-months stay at flat rate; peak months (e.g. Q4 holiday ramp) get lifted. VP-Q4-zeroed weeks are skipped. Fired on 228/880 Heuristic+Croston's Amazon records in first test run. |
-| **F59n + F59i EC-override + F59m steady-rate** | `forecast_record()` | Three fixes for FF35147EC case (documented in previous session): F59n normalizes post-restock spike (LW order >= 5x L13W avg, AUR >= MAP); F59i EC-override anchors EC-transition items to POS_LW when WOS < 6 (bypasses the WOS >= 6 gate); F59m uses POS_LW as steady-rate when AUR >= MAP and demand is accelerating, spreads gap-fill over W1-W3 when gap > 4 weeks. |
