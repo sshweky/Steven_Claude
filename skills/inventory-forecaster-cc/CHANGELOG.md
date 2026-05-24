@@ -6,6 +6,15 @@ be moved here.
 
 ---
 
+## 2026-05-23 - Deep audit Phase 1 (doc consolidation + dead code)
+
+- **Deleted `METHODOLOGY.md`**: contradicted live code in 9+ places (still
+  referenced removed Holt-Winters routing, stale 5% alert threshold instead of
+  7.5%, DAMP=0.1 instead of 0.3/0.85, week-number Prime Day schedule, wrong
+  VP-Q2/Q3 descriptions). Three docs remain as authoritative: `SKILL.md`
+  (operational), `RULES.md` (rule registry), `CHANGELOG.md` (history).
+- **`build_deck.py` footers updated** to reference SKILL.md + RULES.md.
+
 ## 2026-05-21 - Tier 1+2 audit cleanup
 
 - **Removed `holt_winters()` function**: defined but never called anywhere.
