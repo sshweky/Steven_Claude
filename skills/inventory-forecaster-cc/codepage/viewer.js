@@ -1993,26 +1993,14 @@ function adaptRow(row) {
   // contains a "Sales trend" or "Order trend" line.
   let narrative = str(row, F.AI_ANALYSIS) || str(row, F.AI_ALERT);
   const _custLabel = _friendlyCustName(_stripHtml(str(row, F.CUST)));
-  // Append the ordered-units WoW line for non-POS records (i.e. when the QB
-  // narrative doesn't already contain POS or Recent orders info).
-  // Idempotent  -  skipped if the line is already in AI_ANALYSIS.
-  if (narrative.indexOf('POS run rate') === -1 &&
-      narrative.indexOf('Amazon POS Sales') === -1 &&
-      narrative.indexOf('Consumer demand (POS)') === -1 &&
-      narrative.indexOf('ordered units:') === -1 &&
-      narrative.indexOf('Recent orders:') === -1 &&
-      narrative.indexOf('Recent ordering:') === -1) {
-    const wowLine = _buildOrderedUnitsWow(histOrd, _custLabel);
-    if (wowLine) {
-      const sep = narrative ? '<br><br>' : '';
-      narrative = narrative + sep + wowLine;
-    }
-  }
-  // Pass LY order history for the L52 YoY comparison (smart insight uses it
-  // when available; gracefully degrades when not).
+  // Append order history trend insight if not already in the stored narrative.
+  // Idempotent -- skipped if AI_ANALYSIS already contains any of the known
+  // header variants (Order History, Order trend, Order Trends, Sales trend).
   const orderTrend = _buildOrderTrendInsight(histOrd, lyOrd, _custLabel);
   if (orderTrend &&
+      narrative.indexOf('Order History:') === -1 &&
       narrative.indexOf('Order trend:') === -1 &&
+      narrative.indexOf('Order Trends:') === -1 &&
       narrative.indexOf('Sales trend:') === -1) {
     const sep = narrative ? '<br><br>' : '';
     narrative = narrative + sep + orderTrend;
