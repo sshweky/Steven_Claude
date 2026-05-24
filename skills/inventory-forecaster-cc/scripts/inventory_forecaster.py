@@ -2299,6 +2299,10 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         meta.setdefault("drivers", []).append(
             f"declining: L4W avg {_l4_avg_f10:.0f} < 70% L13 nz avg {_l13_nz_avg_f10:.0f}"
         )
+    if _f77_applied and _f77_driver:
+        meta.setdefault("drivers", []).append(_f77_driver)
+    if _f79_driver:
+        meta.setdefault("drivers", []).append(_f79_driver)
     if _f14a_override:
         _pos_l4_m = float(pos_data.get("Avg_Units_Wk_L4w")  or 0) if pos_data else 0
         _pos_l13_m = float(pos_data.get("Avg_Units_Wk_L13w") or 0) if pos_data else 0
