@@ -9933,7 +9933,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _rpl_var_note = (
                 " L13W variability pattern applied (W3+)."
                 if _rpl_var_ratios else
-                " L13W variability not applied (sparse history -- flat baseline)."
+                (" L13W variability suppressed (POS-primary demand -- order-history spikes excluded)."
+                 if _rpl_pos_primary else
+                 " L13W variability not applied (sparse history -- flat baseline).")
             )
             if isinstance(meta, dict):
                 meta.setdefault("drivers", []).append(
