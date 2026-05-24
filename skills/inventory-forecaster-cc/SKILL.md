@@ -680,19 +680,25 @@ The **effective week** is the boundary: orders before that week follow the prior
 ## Key Model Constants
 
 ```python
-PRIME_DAY_WEEKS    = {7, 8, 9}      # mid-May pre-order (Amazon only — orders ~6-8 wks before July consumer event)
-FALL_DEAL_WEEKS    = {23, 24, 25}   # early-Sep pre-order
-EVENT_WEEKS        = PRIME_DAY_WEEKS | FALL_DEAL_WEEKS
-PRIME_DAY_LIFT     = 1.25
-FALL_DEAL_LIFT     = 1.12
-AMAZON_CUST_SUBSTR = "AMAZON"
+# Prime Day (last Tuesday of June) — 3 ordering bumps at fixed calendar dates
+PRIME_DAY_BUMPS = [
+    (5, 1,  1.25),   # May 1    first pre-buy
+    (5, 15, 1.25),   # May 15   second pre-buy
+    (5, 29, 1.50),   # May 29   peak pre-buy
+]
+FALL_PRIME_DAY_LIFT = 1.30   # Tuesday after Memorial Day (last Monday of May + 1 day)
+AMAZON_CUST_SUBSTR  = "AMAZON"
 ```
 
+Week-to-boost mappings are computed at runtime by `_get_event_boosts()` using `ORIG_PRJ_COLS[0]`
+as the W1 anchor date. This makes Prime Day and Fall Prime Day self-correcting as the projection
+window shifts each week.
+
 **seasonal_baseline() profile dampening:**
-- `DAMP = 0.1` → profile stays within ±20% of 1.0
+- `DAMP = 0.3` (normal path) or `DAMP = 0.85` (F16-relief path for high-seasonality items)
 - Prevents position-based distortion (e.g. holiday pre-buys in Oct/Nov history
-  landing in W1-W5 forecast slots and inflating front-weeks to 3-4×)
-- Explicit Prime Day and Fall Deal event lifts are applied on top of the dampened profile
+  landing in W1-W5 forecast slots and inflating front-weeks to 3-4x)
+- Explicit Prime Day and Fall Prime Day event lifts are applied on top of the dampened profile
 
 **Baseline logic (seasonal_baseline):**
 - Order-history baseline = **L13W non-zero avg** (excludes post-event drawdown zeros
