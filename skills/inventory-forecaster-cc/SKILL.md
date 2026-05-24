@@ -134,7 +134,7 @@ Rules:
 - After try 3, every subsequent retry adds **5 minutes** to the previous wait.
 - Only stop earlier than try 10 if the user explicitly cancels.
 - A successful run = log shows `Phase 2:` reached or higher (i.e. records
-  were pulled), or the run prints a Holt-Winters / Croston / Heuristic split
+  were pulled), or the run prints a Seasonal Baseline / Croston's / Heuristic split
   summary at the end. Anything ending with the `No records returned` error or
   any other Phase-1 abort counts as a failure that triggers another retry.
 - Recommended implementation: wrap the run in a small bash retry loop that
