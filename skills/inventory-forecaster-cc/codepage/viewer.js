@@ -4770,8 +4770,8 @@ async function _loadRtlPos(r, safeId) {
     invItems.push(`<b>Instock</b> ${instHtml}`);
   }
   const rtlInvBulletHtml = invItems.length
-    ? '<b>Retailer inventory:</b> ' + invItems.join(sep)
-    : '<b>Retailer inventory:</b> <span style="color:#999;font-style:italic">no data</span>';
+    ? '<b>' + custName + ' inventory:</b> ' + invItems.join(sep)
+    : '<b>' + custName + ' inventory:</b> <span style="color:#999;font-style:italic">no data</span>';
 
   // -- Bullet 3: Distribution -----------------------------------------------
   const trtDelta = rtlTrtStLw - rtlTrtStPrior;
