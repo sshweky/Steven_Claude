@@ -5215,6 +5215,13 @@ def _detect_otb(history, is_amazon=False, is_offprice=False, manual_total=None):
                 "reason":           "off-price closeout (L4=0, manual<=100)",
             }
 
+    # Fix E (2026-05-24): Off-price accounts — skip PATH A/B when planner
+    # has a meaningful forward projection (manual_total > 100).  These customers
+    # buy opportunistically; historical lumpiness triggers false OTB positives.
+    # PATH C (L4W=0, manual<=100) already ran above and handles true closeouts.
+    if is_offprice and manual_total is not None and manual_total > 100:
+        return False, {}
+
     h52 = [float(v) for v in history[-52:]]
     nz  = [v for v in h52 if v > 0]
     if not nz:
