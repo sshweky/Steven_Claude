@@ -1284,11 +1284,13 @@ def build_scope_filter(args):
     return " AND ".join(clauses) if clauses else None
 
 
-def build_update_sql(key, forecast, alert):
+def build_update_sql(key, forecast, alert, confidence=None):
     k = key.replace("'", "''")
     a = alert.replace("'", "''")
     sets = ", ".join(f"[AI_PRJ_W{w}] = {forecast[w-1]}" for w in range(1, 27))
     sets += f", [AI_ALERT] = '{a}'"
+    if confidence is not None:
+        sets += f", [AI_Confidence] = {int(confidence)}"
     return (
         f"UPDATE [Quickbase1].[InventoryTrack].[Projections] "
         f"SET {sets} WHERE [Acct_MStyle_Key_] = '{k}'"
