@@ -1581,7 +1581,18 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # not the baseline scalar.
     _f38_driver = None
     if is_amazon and amz_catalog and pos_data and baseline > 0:
-        try:
+        # F15 ord-primary: skip F38b entirely.  The L13W order rate used as
+        # baseline already captures recent POS acceleration -- the rolling
+        # 13-week window includes the recent up-trend weeks.  Applying F38b
+        # on top would double-count the growth.
+        if _f15_amazon_ord_primary:
+            _f38_driver = (
+                f"F38 skipped -- F15 ord-primary "
+                f"(baseline = L13W ord {ord_baseline:.0f}; "
+                f"POS trend already reflected in rolling L13W ord avg)"
+            )
+        else:
+          try:
             _f38_l4   = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
             _f38_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
             _f38_bb   = float(amz_catalog.get("Amazon_Buybox") or 0)
