@@ -12120,6 +12120,17 @@ def main():
             _opn_w1 = float((rec.get("opn_w") or [0])[0] if rec.get("opn_w") else 0)
             if _man_w1_fid and (_opn_w1 > 0 or rec.get("zero_man_w1_cutoff")):
                 row[_man_w1_fid] = 0
+            # POG End Date default: if pog_launch is set but pog_end is empty,
+            # write pog_end = pog_launch + 364 days so planners always have an
+            # end date without having to fill it in manually.
+            _pl = (rec.get("pog_launch") or "").strip()
+            _pe = (rec.get("pog_end") or "").strip()
+            if _pl and not _pe:
+                try:
+                    _default_pog_end = (date.fromisoformat(_pl) + timedelta(days=364)).isoformat()
+                    row[pog_end_fid] = _default_pog_end
+                except ValueError:
+                    pass  # malformed date — skip silently
             payload.append(row)
         n_ok, n_fail, errors = qb_bulk_update(QB_PROJ_TABLE, payload, merge_fid)
         # Track completed keys: assume in-order success for the batches that returned OK.
