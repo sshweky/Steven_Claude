@@ -5350,9 +5350,6 @@ async function saveRecordEdits(key) {
     alert('No unsaved edits for this record.');
     return;
   }
-  const msg = `Save ${myEdits.length} edit(s) for ${key} to Quickbase?\n\nThis writes the new MAN projection values immediately and cannot be undone from this screen.`;
-  if (!confirm(msg)) return;
-
   const fields = {};
   fields[CFG.FID.KEY] = { value: key };
   for (const { weekIdx, newVal } of myEdits) {
