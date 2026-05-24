@@ -635,7 +635,7 @@ Phase 4 — Write-back
 | Master pack | `Master_Pack` on `Quickbase1.ProductTrack.Styles` |
 | Amazon Catalog | `Quickbase1.InventoryTrack.Amazon_Catalog` (join on `Mstyle`) |
 | POS fields | `Ordered_Units_LW`, `Avg_Units_Wk_L4w`, `Avg_Units_Wk_L13w`, `Avg_Units_Wk_L26w`, `Avg_Units_Wk_L52w` |
-| Event windows | Prime Day: **W7-W9** (+25% lift, Amazon only — May ordering) · Fall Deal: W23-W25 (+12% lift) |
+| Event windows | Prime Day (calendar): May 1 x1.25, May 15 x1.25, May 29 x1.50 (Amazon-only) · Fall Prime Day: Tuesday after Memorial Day x1.30 (Amazon-only) |
 | Amazon gate | `AMAZON_CUST_SUBSTR = "AMAZON"` — all Prime Day lifts and POS pulls conditioned on this |
 | Alert threshold | >7.5% variance vs manual projections |
 
