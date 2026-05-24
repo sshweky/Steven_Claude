@@ -2567,8 +2567,12 @@ function autoFlagOnComment(key) {
   const txt = document.getElementById('cmt-text-' + key);
   const isEmpty = !txt || !txt.value.trim();
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
-  if (isEmpty) {
-    // Comment cleared — undo the pre-flag (UI only; no QB call since we haven't
+  // FYI comments are informational — undo auto-flag when textarea is cleared OR FYI is checked
+  const _fyiChkAuto = document.getElementById('cmt-fyi-' + key);
+  const flagSel     = document.getElementById('cmt-flag-' + key);
+  const _isFyi      = (_fyiChkAuto && _fyiChkAuto.checked) || (flagSel && flagSel.value === 'FYI');
+  if (isEmpty || _isFyi) {
+    // Comment cleared or marked FYI — undo the pre-flag (UI only; no QB call since we haven't
     // written to QB yet — that only happens on Save).
     if (rec._auto_flagged) {
       rec._auto_flagged = false;
@@ -2583,11 +2587,6 @@ function autoFlagOnComment(key) {
     }
     return;
   }
-  // FYI comments are informational — don't auto-flag the row
-  const _fyiChkAuto = document.getElementById('cmt-fyi-' + key);
-  if (_fyiChkAuto && _fyiChkAuto.checked) return;
-  const flagSel = document.getElementById('cmt-flag-' + key);
-  if (flagSel && flagSel.value === 'FYI') return;
   if (rec.flagged) return;       // already flagged (QB or manual) — leave alone
   if (rec._auto_flagged) return; // already pre-flagged this session
   // Update UI immediately so the row tints and counter increments while typing.
