@@ -341,10 +341,9 @@ python scripts/gap_analysis.py --results forecast_results.json --top 104 \
 1. Inactive-with-Activity — classified inactive but L26/L52 shows orders
 2. Seasonal-ramp under-forecast — category items where L52 peak >> L13 trough
 3. Seasonal category not in CATEGORY_PROFILES — missing keyword coverage
-4. Amazon Prime Day pre-buy gap — manual front-loads W5-W9, AI only lifts W7-W9
+4. Amazon Prime Day pre-buy gap — manual front-loads May ordering weeks, AI under-projects
 5. Sparse/intermittent baseline too conservative — use MAX(L13, L26, L52) non-zero avg
 6. Declining item over-forecast — L4W << L13 avg, AI held baseline
-7. Isolated spike over-forecast — outlier cap didn't neutralize
 
 **Feeding fixes back:** when the gap report surfaces a new pattern, update
 `inventory_forecaster.py` (models and/or CATEGORY_PROFILES) and this SKILL.md
