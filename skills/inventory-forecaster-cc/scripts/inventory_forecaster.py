@@ -1915,14 +1915,26 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # Raw forecast: damped profile + explicit event lifts
     raw = []
     _f66_floored = 0
+    # F66 (2026-05-21) — Seasonal floor: the seasonal profile can only
+    # INCREASE demand, never reduce it.  Any week where the multiplier
+    # would fall below 1.0 is held at 1.0 (flat baseline).
+    #
+    # GATE: only applies when a category profile was blended in (_cat_mults
+    # is set).  Category profiles are curated seasonal shapes (charcoal,
+    # holiday, paper goods, etc.) that should only LIFT demand above the
+    # flat baseline — a trough in those profiles is a modelling artefact,
+    # not a real demand signal.
+    #
+    # Without a category match the profile is built purely from order history,
+    # which for pulsed / Amazon accounts reflects ordering CADENCE (high in
+    # order weeks, low in gap weeks).  Raising gap weeks to 1.0 there creates
+    # phantom demand in weeks the customer won't order, producing an
+    # artificially flat and elevated forecast.
+    _f66_eligible = bool(_cat_mults)
     for i in range(26):
         wnum = i + 1
         s = S[i]
-        # F66 (2026-05-21) — Seasonal floor: the seasonal profile can only
-        # INCREASE demand, never reduce it.  Any week where the multiplier
-        # would fall below 1.0 is held at 1.0 (flat baseline).  A historical
-        # order trough never pulls a forward forecast below the baseline rate.
-        if s < 1.0:
+        if _f66_eligible and s < 1.0:
             s = 1.0
             _f66_floored += 1
         # F11 — tapered Prime Day lift (Amazon-only) via per-week schedule.
