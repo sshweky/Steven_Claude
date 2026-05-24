@@ -203,15 +203,20 @@ def main():
 
     # ── Summary ──────────────────────────────────────────────────────────────
     print(f"\n  {len(parsed)} Amazon active records total", flush=True)
-    print(f"  {len(source)} records have an ASIN  (source pool)", flush=True)
-    print(f"  {len(parsed) - len(source) - len(targets) - len(skipped_no_base)} "
-          f"records missing ASIN but not a variant suffix", flush=True)
+    print(f"  {len(source)} records have a valid ASIN  (source pool)", flush=True)
+    print(f"  {len(bad_asins)} records have a non-ASIN value in the ASIN field "
+          f"(will NOT be propagated)", flush=True)
     print(f"  {len(skipped_no_base)} variant records skipped "
           f"(base style also has no ASIN)", flush=True)
     print(f"  {len(targets)} variant records will receive inherited ASIN", flush=True)
 
+    if bad_asins:
+        print(f"\n  WARNING -- non-ASIN values in Cust SKU# field (fix manually):", flush=True)
+        for key, ms, val in bad_asins:
+            print(f"    {key:<35}  {ms:<22}  value='{val}'", flush=True)
+
     if skipped_no_base:
-        print(f"\n  Skipped (base has no ASIN):", flush=True)
+        print(f"\n  Skipped (base has no valid ASIN):", flush=True)
         for key, ms, base, sfx in skipped_no_base:
             print(f"    {key:<35}  {ms}  (base={base}, sfx={sfx})", flush=True)
 
