@@ -4487,6 +4487,14 @@ async function _loadAmzDcInv(r, safeId) {
         aurL4w  = anv(AA.AUR_L4W);
         aurL13w = anv(AA.AUR_L13W);
         aurL26w = anv(AA.AUR_L26W);
+        // FALLBACK (2026-05-24): the Catalog's AUR L13w field (FID 1052) is
+        // unpopulated for ~45% of mstyles, so when L13W is missing but L4W
+        // and L26W are both present, interpolate L13W as their mean. AUR is
+        // a slowly-changing metric (consumer price); the linear estimate is
+        // accurate within a few percent when L4W and L26W are within ~10%.
+        if (aurL13w === 0 && aurL4w > 0 && aurL26w > 0) {
+          aurL13w = (aurL4w + aurL26w) / 2;
+        }
         aurL52w = anv(AA.AUR_L52W);
         aurFetchOk = true;
       }
