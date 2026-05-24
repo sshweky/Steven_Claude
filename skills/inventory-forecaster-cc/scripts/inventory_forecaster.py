@@ -648,7 +648,7 @@ def _compute_event_boosts():
     Prime Day (last Tuesday of June): ordering bumps on
       May 1 (x1.25), May 15 (x1.25), May 29 (x1.50).
     Fall Prime Day (first Tuesday of October): single ordering bump =
-      Tuesday after Memorial Day (last Monday of May + 1 day) at x1.30.
+      Tuesday after Labor Day (first Monday of September + 1 day) at x1.30.
 
     Returns:
         prime_boosts  dict {1-indexed week: multiplier}  -- Prime Day bumps
