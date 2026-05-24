@@ -1667,6 +1667,14 @@ async function lookupInvRequest(key, requestIdStr) {
     if (pogSet) {
       const el = document.getElementById('pog-launch-' + safeKey);
       if (el) { el.value = pogSet; await savePogDate(key, 'launch', pogSet, el); filled.push('POG Set'); }
+      // Default POG End = launch + 364 days when the request has no end date
+      if (!pogEnd) {
+        const _d = new Date(pogSet);
+        _d.setDate(_d.getDate() + 364);
+        const _defaultEnd = _d.toISOString().slice(0, 10);
+        const endEl = document.getElementById('pog-end-' + safeKey);
+        if (endEl) { endEl.value = _defaultEnd; await savePogDate(key, 'end', _defaultEnd, endEl); filled.push('POG End (default)'); }
+      }
     }
     if (pogEnd) {
       const el = document.getElementById('pog-end-' + safeKey);
