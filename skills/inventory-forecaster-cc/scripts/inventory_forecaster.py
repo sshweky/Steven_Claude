@@ -8696,6 +8696,38 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"forward supply — near-term gap pre-covered"
                 )
 
+    # ── F_RTL_WOS — Retailer OH inventory WOS adjustment ─────────────────────
+    # When a retailer's on-hand WOS deviates from the normal 8-week target,
+    # adjust the forecast proportionally.  Understocked retailers will reorder
+    # more aggressively; overstocked retailers will slow replenishment until
+    # inventory burns down.  Adjustment is gradual and capped:
+    #   WOS < 8 : +4% per wk below target, max +20% (at WOS <= 3)
+    #   WOS > 8 : -3.5% per wk above target, max -30% (at WOS >= 16.6)
+    # Applied as a uniform multiplier across all non-zero forecast weeks.
+    if rtl_pos and not is_amazon and model not in ("Inactive", "OTB (zero)",
+                                                    "Pre-launch NEW (manual passthrough)"):
+        _rtl_oh_wos = float(rtl_pos.get("OH_WOS") or 0)
+        _rtl_oh_lw  = float(rtl_pos.get("OH_Units_LW") or 0)
+        _rtl_l4w    = float(rtl_pos.get("Avg_Units_Wk_L4w") or 0)
+        if _rtl_oh_wos > 0:
+            if _rtl_oh_wos < 8.0:
+                # Understocked: retailer will accelerate reorders
+                _rtl_wos_mult = min(1.20, 1.0 + 0.04 * (8.0 - _rtl_oh_wos))
+            else:
+                # Overstocked: retailer will slow replenishment
+                _rtl_wos_mult = max(0.70, 1.0 - 0.035 * (_rtl_oh_wos - 8.0))
+            if abs(_rtl_wos_mult - 1.0) >= 0.02:   # only fire if >= 2% adjustment
+                fcst = [snap(max(0, v * _rtl_wos_mult), mp) if v > 0 else 0
+                        for v in fcst]
+                _fire("F_RTL_WOS")
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F_RTL_WOS retailer OH WOS: {_rtl_oh_wos:.1f}wks "
+                        f"(target 8wks) -> {_rtl_wos_mult:.0%} uniform adjust; "
+                        f"OH={_rtl_oh_lw:,.0f}u "
+                        f"POS_L4W={_rtl_l4w:,.0f}/wk"
+                    )
+
         # ── F59i — POS anchor for Amazon items with healthy DC WOS ───────────
         # EC = "Ecomm Ready" -- standard Amazon DC items in poly-bag packaging.
         # They have their own ASINs, own order history, own DC inventory.
