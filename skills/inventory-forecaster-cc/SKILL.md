@@ -725,6 +725,35 @@ Matching logic: `(description or "").lower()` -- first keyword found wins (also 
 
 ---
 
+## Model Fix History
+
+**The authoritative active-rule registry is [`RULES.md`](RULES.md).**
+Reverted/superseded rules: [`CHANGELOG.md`](CHANGELOG.md).
+
+This section is a chronological breadcrumb of when each rule family was added,
+for context only. For current behavior and fire location, always check RULES.md.
+
+| Date | Rules added | Theme |
+|---|---|---|
+| 2026-05-23 | (audit Phase 1) | Deleted stale METHODOLOGY.md; centralized constants in `scripts/config.py`; added `audit_rules.py` + `rule_dependency_graph.py`; promoted retry policy into `run_forecast.py`; schema-versioned output JSONs. |
+| 2026-05-21 | F59o, F59i EC-override, F59m, F59n, F60, VP-Q4 false-abort fix | Seasonal overlay for Heuristic/Croston's; EC parent POS lookup; open-PO guard. |
+| 2026-05-21 | (cleanup) | Removed `holt_winters()` function; renamed F31->F71, F6->F6a/b/c. |
+| 2026-05-17 | F69, F69-WOS | Amazon direct-import sibling history blend + WOS-excess correction. |
+| 2026-05-17 | F61, F62, F63, F64, F65, F66 | 8-priority sweep: horizon decay, soft trend blend, multi-pack floor, trade fall, zero-vel suppression, per-customer bias. |
+| 2026-05-17 | F67, F68, Kingsford profile shift | Amazon buy-box $0 dampener, ASIN inactive-channel zero, retail-ordering peak shift for grilling. |
+| 2026-05-17 | VP-ATS-Catch | Post-OOS catch-up spike cap. |
+| 2026-04-22/23 | F-A, F-B, M1, M2, M3 | L13 burst baseline; burst-cadence Croston override; L52/L26 ceiling; EOL dampening; Croston acceleration-aware z blend. |
+| 2026-04-21 | Fix 1, Fix 2, Fix 3, Fix 4, Fix 5 | Initial calibration: category seasonality, ISO routing, outlier cap, biweekly substitution, Croston rescale. |
+
+When adding a new rule:
+1. Add `_fire("...")` (or driver string) in `inventory_forecaster.py`.
+2. Add a row to `RULES.md` describing what it does + where it fires.
+3. Add a one-line entry to this table.
+4. Run `python scripts/audit_rules.py` to verify no drift.
+5. Add a unit test in `scripts/tests/` (Phase 2 -- once that scaffold exists).
+
+---
+
 ## Narrative voice (`_build_alert()`)
 
 Two-to-three short sentence retailer-planning style:
