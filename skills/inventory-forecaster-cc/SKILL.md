@@ -273,7 +273,7 @@ Outer attempt 3/3 → (after 5 min wait)
 
 A run is **successful** when the log contains both:
 - `Validation complete` (step 3/3 finished)
-- `Done in` or `records written` (step 4/4 writeback finished)
+- `COMPLETE` (step 4/4 writeback finished — the watchdog summary line)
 
 ### Step 4 — Report results to the user
 
