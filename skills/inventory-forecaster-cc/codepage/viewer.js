@@ -4393,6 +4393,9 @@ async function _loadAmzDcInv(r, safeId) {
   let atsNow = 0, atsOh = 0, atsOo = 0;
   let posL4w = 0, posL13w = 0, posL26w = 0, posL52w = 0, posLw = 0;
   let fetchOk = false;
+  // AUR fields (fetched from bqkdjaqi7)
+  let aurLw = 0, aurL4w = 0, aurL13w = 0, aurL26w = 0, aurL52w = 0;
+  let aurFetchOk = false;
   try {
     const selectFids = [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH,
                         AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
