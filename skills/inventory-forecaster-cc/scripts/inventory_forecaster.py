@@ -7507,6 +7507,42 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"4-week taper applied; total {_f52_pre_total:,} → {_f52_post_total:,}"
             )
 
+        # P4 (2026-05-24): F52 planner-residual anchor.
+        # Variance deep-dive showed F52 wind-down still over-projecting vs
+        # planner's stable residual rate (#8 BB13437CLR/12: AI 69k vs Man
+        # 7.5k flat at 300/wk). When the planner has a flat low residual
+        # they're signaling "this is the wind-down rate" -- cap AI to
+        # [planner_rate * 1.5, planner_rate * 2.5] band per week.
+        _f52_man_nz = [float(v or 0) for v in manual_wks if float(v or 0) > 0]
+        if _f52_man_nz and len(_f52_man_nz) >= 4:
+            _f52_planner_rate = sum(_f52_man_nz) / len(_f52_man_nz)
+            # Only fire when planner residual is meaningful (rate <= 2000/wk
+            # = wind-down territory) AND most planner weeks cluster within
+            # 50% of the mean (stable residual signal).
+            _f52_planner_cv = (max(_f52_man_nz) - min(_f52_man_nz)) / max(_f52_planner_rate, 1)
+            if _f52_planner_rate <= 2000 and _f52_planner_cv <= 1.5:
+                _f52_floor = _f52_planner_rate * 0.5
+                _f52_ceil  = _f52_planner_rate * 2.5
+                _f52_anchored_changes = 0
+                for _i in range(len(fcst)):
+                    if fcst[_i] <= 0:
+                        continue
+                    if fcst[_i] > _f52_ceil:
+                        _f52_capped = _f52_ceil
+                        if mp and mp > 0:
+                            fcst[_i] = int(round(_f52_capped / mp)) * int(mp)
+                        else:
+                            fcst[_i] = int(round(_f52_capped))
+                        _f52_anchored_changes += 1
+                if _f52_anchored_changes > 0 and isinstance(meta, dict):
+                    _post_anchor = sum(fcst)
+                    meta.setdefault("drivers", []).append(
+                        f"P4 F52 planner-residual anchor: planner rate "
+                        f"{_f52_planner_rate:.0f}/wk (n={len(_f52_man_nz)} nz wks); "
+                        f"capped {_f52_anchored_changes} AI weeks at "
+                        f"{_f52_ceil:.0f}/wk ceiling; total {_f52_post_total:,} -> {_post_anchor:,}"
+                    )
+
     # ── F59o — Amazon seasonal overlay for Heuristic / Croston's (2026-05-21) ──
     # Heuristic and Croston's blend the category profile normalized to mean=1.0,
     # which pulls off-month weeks BELOW the flat baseline to make room for peaks.
