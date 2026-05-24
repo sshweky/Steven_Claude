@@ -247,7 +247,7 @@ def _enrich_from_quickbase(recs):
             "[Last_Comment], [Last_Comment_Date], [Flagged], "
             f"[Store_Count], [POG_Launch_Date], [POG_End_Date], {opn_cols}"
         )
-        BATCH = 20
+        BATCH = 150
         n_batches = (len(missing) + BATCH - 1) // BATCH
         consecutive_fails = 0
         for i in range(0, len(missing), BATCH):
