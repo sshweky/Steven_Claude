@@ -7279,6 +7279,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                  for v in fcst]
                 _new_total_f42 = sum(_new_fcst_f42)
                 fcst = _new_fcst_f42
+                _fire("F42")  # 2026-05-24: now tracked in rule_fires
                 meta["f42_pos_anchor"] = {
                     "pos_l4":      round(_pos_l4_f42, 1),
                     "pos_l13":     round(_pos_l13_f42, 1),
@@ -7291,12 +7292,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     "after":       int(_new_total_f42),
                 }
                 meta.setdefault("drivers", []).append(
-                    f"F42 POS-anchor: Heuristic 26w avg {_curr_avg_f42:.0f}/wk "
-                    f"= {_curr_avg_f42 / _blended_pos_f42:.1f}× blended POS "
+                    f"F42 POS-anchor ({model}): 26w avg {_curr_avg_f42:.0f}/wk "
+                    f"= {_curr_avg_f42 / _blended_pos_f42:.1f}x blended POS "
                     f"({_blended_pos_f42:.0f}/wk = L4 {_pos_l4_f42:.0f}/L13 "
                     f"{_pos_l13_f42:.0f}/L26 {_pos_l26_f42:.0f}); scaled "
-                    f"forecast ×{_scale_f42:.2f} to POS×1.3 buffer = "
-                    f"{_target_avg_f42:.0f}/wk ({_curr_total_f42:,} → "
+                    f"forecast x{_scale_f42:.2f} to POS x1.3 buffer = "
+                    f"{_target_avg_f42:.0f}/wk ({_curr_total_f42:,} -> "
                     f"{_new_total_f42:,} units over 26 wks)"
                 )
 
