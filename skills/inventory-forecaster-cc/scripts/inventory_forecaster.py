@@ -128,10 +128,76 @@ import threading as _threading_for_rule_fires
 _RULE_FIRES = _threading_for_rule_fires.local()
 
 def _fire(code):
-    """Tag the current record with a rule-firing code (e.g. 'F19', 'R5')."""
+    """Tag the current record with a rule-firing code (e.g. 'F19', 'R5').
+    LEGACY API: untyped, string-only. Prefer fire() (below) for new rules.
+    """
     bucket = getattr(_RULE_FIRES, "bucket", None)
     if bucket is not None:
         bucket.add(code)
+
+
+# ─── Structured rule fire (Phase 3 -- B2/C3) ─────────────────────────────────
+# New rules should use this API. It records:
+#   - The rule code (same as _fire())
+#   - A typed payload (numbers/strings/dicts useful for downstream analysis)
+#   - A narrative template that the AI_ALERT and AI_ANALYSIS renderers can use
+#   - The phase the rule belongs to (one of HIS, CLS, BAS, GAT, HRD, FIN)
+#   - Severity (info / warn / critical)
+# Old _fire("Fxx") calls continue to work; the regex scanner picks them up.
+# Migration is gradual: any rule can switch from _fire() to fire() incrementally.
+
+_RULE_PHASES = {"HIS", "CLS", "BAS", "GAT", "HRD", "FIN"}
+
+def fire(code, meta=None, phase=None, severity="info",
+         narrative=None, **payload):
+    """Structured rule fire. Records both the rule code AND a typed entry in
+    meta['structured_drivers']. Also calls _fire(code) so the legacy regex
+    scanner still picks it up.
+
+    Args:
+        code: rule code (e.g. "F18", "VP-Q4", "HRD-001")
+        meta: the rule meta dict from forecast_record() / model body
+        phase: one of {"HIS", "CLS", "BAS", "GAT", "HRD", "FIN"} (optional)
+        severity: "info", "warn", or "critical"
+        narrative: format string used by AI_ALERT/AI_ANALYSIS renderers,
+                   e.g. "F18 POS-cap fired: implied {implied}/wk > 2x POS {pos}/wk"
+        **payload: arbitrary structured data attached to this fire event
+                   (e.g. implied=2693, pos=480, cap_to=540)
+
+    Returns:
+        The created structured_drivers entry dict (caller may mutate further).
+
+    Example:
+        fire("F18", meta, phase="BAS", severity="warn",
+             narrative="F18 POS-anchored cap: implied {implied}/wk vs POS {pos}/wk",
+             implied=2693.5, pos=480.0, cap_to=540.0)
+    """
+    # Always tag the legacy bucket so existing _scan_rule_fires() still works
+    _fire(code)
+
+    if not isinstance(meta, dict):
+        return None
+
+    entry = {
+        "code":      code,
+        "phase":     phase,
+        "severity":  severity,
+        "narrative": narrative,
+        "payload":   payload,
+    }
+    meta.setdefault("structured_drivers", []).append(entry)
+
+    # Also append a human-readable string to drivers[] for back-compat with the
+    # text-scanning narrative renderer.  Skip if no narrative template.
+    if narrative:
+        try:
+            rendered = narrative.format(**payload)
+        except (KeyError, IndexError):
+            rendered = f"{code} (payload: {payload})"
+        meta.setdefault("drivers", []).append(rendered)
+
+    return entry
+
 
 def _start_rule_fires():
     _RULE_FIRES.bucket = set()
