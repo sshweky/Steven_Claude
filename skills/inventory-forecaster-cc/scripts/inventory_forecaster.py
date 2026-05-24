@@ -5694,11 +5694,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # of L52 total, ≤ 4 non-zero weeks) and route to:
     #   - Zero forecast if most-recent order is ≥ 8 weeks old
     #   - Single L4W-avg order at W1-W4 if recent order happened
-    _otb_is, _otb_meta = _detect_otb(hist, is_amazon=is_amazon)
+    # P3 (2026-05-24): pass is_offprice + manual_total so PATH C off-price
+    # hard-zero can fire on records that PATH A/B miss.
+    _otb_is_offprice = _is_offprice_cust(cust_name)
+    _otb_manual_total = sum(float(row.get(c) or 0) for c in ORIG_PRJ_COLS)
+    _otb_is, _otb_meta = _detect_otb(hist, is_amazon=is_amazon,
+                                     is_offprice=_otb_is_offprice,
+                                     manual_total=_otb_manual_total)
     if _otb_is:
         _otb_forecast = [0] * 26
         _otb_model = "OTB (zero)"
-        if _otb_meta["weeks_since_last"] < 8 and _otb_meta["l4_avg"] > 0:
+        if (_otb_meta.get("weeks_since_last", 0) < 8
+                and _otb_meta.get("l4_avg", 0) > 0
+                and _otb_meta.get("path") != "C"):
             _otb_forecast[0] = snap(_otb_meta["l4_avg"], mp)
             _otb_model = "OTB (W1 single)"
         _otb_manual = [float(row.get(c) or 0) for c in ORIG_PRJ_COLS]
