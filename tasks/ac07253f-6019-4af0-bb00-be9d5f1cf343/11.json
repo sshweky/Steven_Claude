@@ -3,7 +3,7 @@
   "subject": "D6: Wire backtest into CI runner with baseline",
   "description": "scripts/backtest_ci.py runs both backtests, compares aggregate metrics (total units, MAPE, alert count) to baseline JSON, fails build if drift > 2%. New file; doesn't change forecaster.",
   "activeForm": "Building backtest CI runner",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
