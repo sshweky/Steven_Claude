@@ -9506,9 +9506,12 @@ def build_html_report(findings, scope_desc, results=None):
     for o in findings["outliers"][:20]:
         out_rows += tbl_row(o["key"], o["week"], f"{o['value']:,}", f"{o['upper_fence']:,}", o["note"])
 
-    # Calendar lift table
-    prime_weeks_str = ", ".join(f"W{w}" for w in sorted(PRIME_DAY_WEEKS))
-    fall_weeks_str  = ", ".join(f"W{w}" for w in sorted(FALL_DEAL_WEEKS))
+    # Calendar lift table -- use actual window weeks from _get_event_boosts()
+    _html_prime_wks, _html_fall_wks = _get_event_boosts()
+    prime_weeks_str = (", ".join(f"W{w}" for w in sorted(_html_prime_wks))
+                       if _html_prime_wks else "none in window")
+    fall_weeks_str  = (", ".join(f"W{w}" for w in sorted(_html_fall_wks))
+                       if _html_fall_wks else "none in window")
 
     # Forecast results table (if provided)
     fcst_section = ""
