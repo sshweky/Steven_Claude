@@ -7301,7 +7301,49 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"{_new_total_f42:,} units over 26 wks)"
                 )
 
-    # F38f — Suppressed / Not-Buyable hard zero (Amazon-only, 2026-05-06).
+    # F75 -- POS fallback ceiling when Amazon DC inventory data is absent (2026-05-24).
+    #
+    # When amz_catalog is None (ASIN absent from Amazon_Invtry_Health or catalog
+    # data not loaded for this item), the WOS-based corrections in F59h and
+    # F_AMZ_RPL were skipped.  Without a DC inventory anchor, the Heuristic or
+    # Croston model can produce an unconstrained forecast that significantly
+    # over-projects relative to consumer pull rate.
+    #
+    # If POS data is available, use it as a conservative upper-bound: an Amazon
+    # item should not need to order more than 2x its consumer sell-through rate
+    # on a sustained basis, even accounting for DC safety stock.
+    #
+    # Trigger: is_amazon AND amz_catalog is None AND pos_data (L13w > 0)
+    #          AND model in (Heuristic, Croston's)
+    #          AND 26w forecast avg > 2.0 x POS L13w
+    # Action:  scale forecast to POS_L13w x 2.0
+    if (is_amazon and amz_catalog is None and pos_data
+            and model in ("Heuristic", "Croston's")
+            and isinstance(fcst, list) and len(fcst) >= 26):
+        _f75_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        if _f75_pos_l13 > 0:
+            _f75_curr_avg = sum(fcst) / 26.0
+            if _f75_curr_avg > 2.0 * _f75_pos_l13:
+                _f75_target  = _f75_pos_l13 * 2.0
+                _f75_scale   = _f75_target / max(_f75_curr_avg, 0.001)
+                _f75_before  = sum(fcst)
+                _f75_new     = [(int(round(v * _f75_scale / mp)) * int(mp))
+                                if v > 0 and mp > 0 else int(v * _f75_scale)
+                                for v in fcst]
+                _f75_after   = sum(_f75_new)
+                fcst = _f75_new
+                _fire("F75")
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F75 POS fallback ceiling (DC data absent): "
+                        f"26w avg {_f75_curr_avg:.0f}/wk = "
+                        f"{_f75_curr_avg / _f75_pos_l13:.1f}x POS L13w "
+                        f"{_f75_pos_l13:.0f}/wk; scaled x{_f75_scale:.2f} to "
+                        f"POS x2.0 = {_f75_target:.0f}/wk "
+                        f"({_f75_before:,} -> {_f75_after:,} over 26wks)"
+                    )
+
+    # F38f -- Suppressed / Not-Buyable hard zero (Amazon-only, 2026-05-06).
     # When ASIN_Buyability_Flag is "Not Buyable" (no buybox) or "ASIN Suppressed"
     # the listing is unavailable to consumers — orders won't come in for ~4 weeks
     # while the listing is restored.  Force AI W1-W4 to zero, then dump the
