@@ -3112,7 +3112,7 @@ function toggleDetail(key) {{
     // with no POG/Store data yet (e.g. new setups).
     const toIsoDate = s => {{
       if (!s) return '';
-      const m = String(s).match(/^(\d{{4}}-\d{{2}}-\d{{2}})/);
+      const m = String(s).match(/^(\\d{{4}}-\\d{{2}}-\\d{{2}})/);
       return m ? m[1] : '';
     }};
     const addDays = (iso, days) => {{
