@@ -1889,5 +1889,13 @@ document.addEventListener('DOMContentLoaded', function() {
     buildTableHead();applyFilters();
   };
 
-  boot();
+  boot().then(function() {
+    // If the page was opened with ?mstyle=XX (e.g. from the "View in Inventory Manager"
+    // link in the Forecast Manager), pre-populate the search box and filter to that mstyle.
+    var ms = new URLSearchParams(window.location.search).get('mstyle');
+    if (ms) {
+      var si = document.getElementById('searchInput');
+      if (si) { si.value = ms; applyFilters(); }
+    }
+  });
 });
