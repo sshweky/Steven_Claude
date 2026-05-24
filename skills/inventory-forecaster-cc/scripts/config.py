@@ -198,6 +198,10 @@ TRADE_FALL_SEASON2_LIFT  = float(os.environ.get("TRADE_FALL_SEASON2_LIFT", "1.08
 # AMAZON / RETAILER SUBSTRING LISTS
 # ─────────────────────────────────────────────────────────────────────────────
 AMAZON_CUST_SUBSTR = "AMAZON"
+# Amazon Private Label: orders placed by Amazon for their own branded products.
+# No POS or DC inventory data is available for APL accounts.
+# Forecast uses order history + seasonal/category profiles only.
+APL_CUST_SUBSTR    = "PRIVATE LABEL"
 
 AMZ_DIV_PO_CUTOFF = {
     "FF": 2,   # Fetch: cutoff = Tuesday night  -- zero W1 on Wed (weekday >= 2)
