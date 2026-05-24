@@ -105,11 +105,6 @@ def discover_man_w2_fid():
 # ---------------------------------------------------------------------------
 
 def main():
-    if not QB_USER_TOKEN:
-        print("ERROR: set QB_USER_TOKEN environment variable to your QB user token.")
-        print("  e.g.  set QB_USER_TOKEN=b6ur8b_your_token_here")
-        sys.exit(1)
-
     print(f"Loading {RESULTS_PATH} ...")
     with open(RESULTS_PATH, "r", encoding="utf-8") as f:
         results = json.load(f)
