@@ -269,9 +269,9 @@ def main():
     p.add_argument("--source", default=str(here / "inventory_forecaster.py"))
     p.add_argument("--md-out", default=str(here.parent / "rule_deps.md"))
     p.add_argument("--dot-out", default=str(here.parent / "rule_deps.dot"))
-    p.add_argument("--window", type=int, default=30,
+    p.add_argument("--window", type=int, default=15,
                    help="Line window (each side of fire site) for attributing "
-                        "meta reads/writes to a rule. Default 30.")
+                        "meta reads/writes to a rule. Default 15.")
     p.add_argument("--top", type=int, default=None,
                    help="Only include the N highest-degree rules in the output.")
     args = p.parse_args()
