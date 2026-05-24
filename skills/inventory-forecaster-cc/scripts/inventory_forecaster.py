@@ -1983,6 +1983,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # forecast higher.  Skip F13 to prevent the replen floor from pushing the
     # baseline above what POS supports over the forward 26-week horizon.
     _f13_pos_overstocked = (pos_rate > 0 and l13_avg > 0 and pos_rate < l13_avg * 0.95)
+    import sys as _sys_f13d; print(f"[F13-DBG] pos_rate={pos_rate:.1f} l13_avg={l13_avg:.1f} overstocked={_f13_pos_overstocked} shpd={shpd_l13:.1f}", file=_sys_f13d.stderr, flush=True)  # TEMP
     if (is_amazon and _pos_healthy and shpd_l13 > 0 and l13_avg > 0
             and shpd_l13 > l13_avg * 1.15 and ord_baseline > 0
             and not _f13_pos_overstocked):
