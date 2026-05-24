@@ -9497,7 +9497,7 @@ historical data shows materially different values.</em></p>
       Event calendar insertions applied at Prime Day and Fall Deal windows.</li>
   <li><strong>Heuristic:</strong> Ramp weeks 1-6 post-launch excluded. Post-ramp avg → L13W → L52W fallback chain.</li>
   <li><strong>Inactive:</strong> Zero forecast. Alert written if prior projection &gt; 0.</li>
-  <li><strong>Alert threshold:</strong> {ALERT_THRESHOLD*100:.0f}% variance vs manual projections.</li>
+  <li><strong>Alert threshold:</strong> {ALERT_THRESHOLD*100:.4g}% variance vs manual projections.</li>
   <li><strong>Risk flags:</strong> {bad_q} records with sparse history | {len(outliers)} outlier weeks detected |
       {non_stationary} non-stationary series.</li>
 </ul>
@@ -11128,7 +11128,7 @@ def main():
     print(f"      {len(results)} forecasts complete in {elapsed_fcst:.1f}s")
     model_summary = "  ".join(f"{k}: {v}" for k, v in sorted(pat_counts.items()))
     print(f"      {model_summary}  Bi-weekly enforced: {biweekly_ct}  "
-          f"Alerts (>{ALERT_THRESHOLD*100:.0f}%): {alert_count}")
+          f"Alerts (>{ALERT_THRESHOLD*100:.4g}%): {alert_count}")
 
     # Save forecast JSON — wrapped with meta so viewer.py knows the prj_cols
     out_path = Path(args.out)
@@ -11395,7 +11395,7 @@ def _print_summary(results, elapsed_wb, failed):
     if elapsed_wb:
         print(f"  Write-back: {elapsed_wb/60:.1f} min  |  ok={_ok}  fail={failed}")
     if alerts:
-        print(f"\n  ALERTS ({len(alerts)} records — >{ALERT_THRESHOLD*100:.0f}% variance or inactive):")
+        print(f"\n  ALERTS ({len(alerts)} records — >{ALERT_THRESHOLD*100:.4g}% variance or inactive):")
         hdr = f"  {'Key':<32} {'Δ%':>7}  {'Model':<14}  {'AI 26w':>10}  {'Manual':>10}"
         print(hdr)
         print("  " + "-" * (len(hdr) - 2))
