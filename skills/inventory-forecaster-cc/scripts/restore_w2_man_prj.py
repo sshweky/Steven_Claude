@@ -92,7 +92,7 @@ def discover_man_w2_fid():
     man_w2_fid = None
     for f in fields:
         label = f.get("label", "")
-        if re.match(r"^\d{2}_\d{2}_W2$", label):
+        if re.match(r"^\d{2} \d{2} W2$", label):
             man_w2_fid = f["id"]
             print(f"   Found MAN PRJ W2 field: '{label}' -> FID {man_w2_fid}")
             break
