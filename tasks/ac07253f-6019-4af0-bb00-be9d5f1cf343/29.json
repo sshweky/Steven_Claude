@@ -3,7 +3,7 @@
   "subject": "P4: F52 FD wind-down anchor to planner",
   "description": "When Status_Cust starts with FD AND planner has non-zero residual rate, cap AI to within [planner * 1.5, planner * 2.5].",
   "activeForm": "Implementing P4 F52 FD anchor",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }

@@ -6162,17 +6162,49 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 "batch ordering is MOQ/pallet-driven, not true intermittent demand"
             )
         else:
-            # Truly sparse buyer (< 25% non-zero = typically every 6–12 weeks).
-            # Mimic the historical batch cadence, anchored to account-level cadence.
-            _is_offprice_s1 = _is_offprice_cust(cust_name)
-            fcst, cap, meta = sparse_intermittent_forecast(hist_for_model, mp,
-                                                           account_interval=account_interval,
-                                                           is_offprice=_is_offprice_s1)
-            model    = "Sparse Intermittent"
-            biweekly = False   # sparse items never get biweekly enforcement
-            _cadence_gap_si = detect_biweekly(hist_for_model)
-            biweekly = bool(_cadence_gap_si)
-            fcst = apply_ordering_pattern(fcst, hist_for_model, mp)
+            # P1 / F72 (2026-05-24): New-launch ramp detection.
+            # Variance deep-dive showed Walmart "PDQ" items launching with 6
+            # consecutive non-zero weeks (avg 10-30k/wk) were getting routed
+            # to Sparse Intermittent and getting ONE order placed at W14.
+            # The actual pattern is a new-launch ramp -- 18+ leading zeros
+            # (item didn't exist) then dense recent ordering.
+            # Detect: L26 has >=4 nz in last 6 weeks AND >=5 zeros in weeks 14-20.
+            # Reroute to Heuristic which projects flat L13_nz_avg.
+            _f72_l26 = list(hist_for_model[-26:]) if len(hist_for_model) >= 26 else list(hist_for_model)
+            _f72_recent6_nz = sum(1 for v in _f72_l26[-6:] if float(v or 0) > 0)
+            _f72_prior6_zero = sum(1 for v in _f72_l26[-12:-6] if float(v or 0) == 0) if len(_f72_l26) >= 12 else 0
+            _f72_is_new_launch_ramp = (
+                _f72_recent6_nz >= 4
+                and _f72_prior6_zero >= 5
+            )
+            if _f72_is_new_launch_ramp:
+                # Route to Heuristic with the recent dense data as the signal
+                fcst, cap, meta = heuristic(hist_for_model, mp, l13w, is_amazon=is_amazon,
+                                            description=description,
+                                            product_category=product_category,
+                                            product_subcategory=product_subcategory,
+                                            brand=brand, brand_pt=brand_pt,
+                                            pos_data=pos_data, season=season,
+                                            is_new_launch=True)
+                model    = "Heuristic (F72 new-launch ramp)"
+                biweekly = False
+                meta.setdefault("drivers", []).append(
+                    f"F72 New-launch ramp detected: L26[-6:] has {_f72_recent6_nz} "
+                    f"non-zero (recent), L26[-12:-6] has {_f72_prior6_zero} zeros "
+                    f"(pre-launch); rerouted from Sparse Intermittent to Heuristic"
+                )
+            else:
+                # Truly sparse buyer (< 25% non-zero = typically every 6–12 weeks).
+                # Mimic the historical batch cadence, anchored to account-level cadence.
+                _is_offprice_s1 = _is_offprice_cust(cust_name)
+                fcst, cap, meta = sparse_intermittent_forecast(hist_for_model, mp,
+                                                               account_interval=account_interval,
+                                                               is_offprice=_is_offprice_s1)
+                model    = "Sparse Intermittent"
+                biweekly = False   # sparse items never get biweekly enforcement
+                _cadence_gap_si = detect_biweekly(hist_for_model)
+                biweekly = bool(_cadence_gap_si)
+                fcst = apply_ordering_pattern(fcst, hist_for_model, mp)
 
     elif not is_dense:
         # Intermittent buyer (25–50% non-zero = every 2–5 weeks).
