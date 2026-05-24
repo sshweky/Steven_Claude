@@ -11222,17 +11222,24 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         if _smart:
             specific.append(_smart)
     else:
-        # No POS data: for Amazon records surface a plain notice so planners
-        # know why the POS bullets are absent.  For non-Amazon fall through to
-        # the order-trend bullet (which uses shipment/order history).
-        if is_amazon:
+        # No POS data.  Three cases:
+        #   1) APL (Amazon Private Label) — no POS/DC data by design; use order history.
+        #   2) Standard Amazon mstyle not found in Amazon Catalog — surface a warning.
+        #   3) Non-Amazon — fall through to the Order Trends bullet.
+        if is_apl:
+            specific.append(
+                "<b>Amazon Private Label:</b> POS and DC inventory data are not "
+                "available for Private Label accounts. Forecast is based on "
+                "order history + seasonal/category profiles."
+            )
+        elif is_amazon:
             critical.append(
                 "Amazon POS / DC data not available for this mstyle "
                 "(not found in Amazon Catalog). "
                 "Forecast uses order history only -- "
                 "verify item is set up in the Amazon Catalog table in QB."
             )
-        elif len(hist) >= 4:
+        if is_apl or (not is_amazon and len(hist) >= 4):
             _ly_hist = rec.get("history_ly_ord") or []
             _smart_ord = _smart_order_trend(hist,
                                             ly_hist_26=_ly_hist if _ly_hist else None,
