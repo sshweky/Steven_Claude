@@ -9782,6 +9782,18 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         alert = _build_alert(model, new, prior, pct, cap, mp, meta,
                              fcst=fcst, manual=manual_wks, row=row, history=hist)
 
+    # Confidence score (0-100) ------------------------------------------------
+    _confidence = compute_forecast_confidence(
+        model        = model,
+        meta         = meta,
+        hist         = hist,
+        manual       = manual_wks,
+        pct_diff     = round(pct * 100, 1),
+        is_new_launch= _f34_is_new_launch,
+        is_otb       = (model == "OTB (zero)"),
+        season       = season,
+    )
+
     return {
         "key":         row["Acct_MStyle_Key_"],
         "mstyle":      row.get("Mstyle", ""),
