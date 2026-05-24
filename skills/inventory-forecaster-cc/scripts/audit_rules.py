@@ -21,6 +21,13 @@ Exit code:
   0 = no drift
   1 = drift found (suitable for pre-commit hook)
 
+Known limitations (false positives in "docs-only" section):
+  - Rules that fire via _scan_rule_fires() baseline_mode signatures
+    (e.g. F25/F26/F27 detected by string match on baseline_mode) are not
+    picked up by this scanner. After B2 (structured fire() refactor in
+    Phase 3) those will route through _fire() and this tool will be
+    accurate without exceptions.
+
 Usage:
     python scripts/audit_rules.py                  # default paths
     python scripts/audit_rules.py --strict         # exit 1 on any warning
