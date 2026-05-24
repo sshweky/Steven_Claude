@@ -5862,6 +5862,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # new launch or international account, skip R3/S6/F19 floors entirely.
         # These items have no recent demand signal whatsoever; projecting any
         # floor volume adds noise without evidence of continued need.
+        # P3 (2026-05-24): also force-zero for off-price customers when
+        # zero-velocity, regardless of M1/R3/F19 floors that would otherwise
+        # backfill. Off-price = closeout channel; no floor needed.
         _zero_velocity = (
             sum(float(v or 0) for v in hist_for_model[-13:]) == 0 and
             sum(float(v or 0) for v in hist_for_model[-4:])  == 0 and
