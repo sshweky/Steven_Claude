@@ -2252,6 +2252,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # the static baseline misses.  Only fires on Seasonal Baseline (this function),
     # not Croston's/Heuristic (they have their own trend handling).
     # Guard: skip if F10 or F77 already applied a decline correction.
+    _f79_driver = None
     if (is_amazon
             and not _f10_applied
             and not _f77_applied
@@ -2260,7 +2261,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20):
         _f79_ratio  = min(_l4_avg_f10 / _l13_nz_avg_f10, 1.50)
         forecast    = [snap(v * _f79_ratio, mp) if v > 0 else 0 for v in forecast]
-        meta.setdefault("drivers", []).append(
+        _f79_driver = (
             f"F79 Amazon growth: L4W avg {_l4_avg_f10:.0f} = "
             f"{_f79_ratio:.2f}x L13W nz avg {_l13_nz_avg_f10:.0f}; "
             f"forecast scaled up x{_f79_ratio:.2f}"
