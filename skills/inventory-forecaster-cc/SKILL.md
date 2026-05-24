@@ -278,7 +278,7 @@ A run is **successful** when the log contains both:
 ### Step 4 — Report results to the user
 
 After the script completes, summarize:
-- Total records processed and model split (Holt-Winters / Croston's / Heuristic / Inactive)
+- Total records processed and model split (Seasonal Baseline / Croston's / Heuristic / Inactive)
 - Number of bi-weekly cadence records enforced
 - Total 26-week demand volume
 - Number of ALERT records (>7.5% variance vs manual projections)
