@@ -10456,6 +10456,10 @@ def main():
     p.add_argument("--no-bulk-writeback", dest="bulk_writeback", action="store_false",
                    help="Force per-record SQL UPDATE writeback (legacy path).")
     p.add_argument("--dry-run",       action="store_true", help="Forecast only, no write-back")
+    p.add_argument("--pipeline",      action="store_true",
+                   help="Route through the new explicit-phase pipeline (scripts/pipeline.py). "
+                        "Currently delegates Phases C-F to the legacy code path; only "
+                        "Phase A/B/G are fully lifted. Use for A/B testing.")
     p.add_argument("--analyze",       action="store_true", help="Run EDA and generate HTML report")
     p.add_argument("--analyze-only",  action="store_true", help="Run EDA only, skip forecasting")
     p.add_argument("--validate",      action="store_true", help="Validate manual projections against history")
