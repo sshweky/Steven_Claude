@@ -1416,6 +1416,96 @@ def amazon_pos_rate(pos):
     return round(pos_rate, 1), trend, round(trend_ratio, 2)
 
 
+def _burst_postprocess(forecast, history, mp, l13_zero_count):
+    """F_BURST (2026-05-24): Re-cluster a smooth Seasonal Baseline forecast
+    into burst POs that match the customer's historical ordering cadence.
+
+    Called from seasonal_baseline() when the pulsed-pattern flag fires
+    (>=4 L13W zero weeks) AND the non-zero avg order size is >=1.5x the
+    smooth weekly all-weeks avg — confirming the customer buys in large,
+    infrequent chunks rather than steady weekly replenishment.
+
+    Algorithm:
+      1. Derive avg order interval (avg_gap) and avg order size from L26W history.
+      2. Estimate n_bursts two ways: round(26/avg_gap) and round(total/avg_order).
+         Take the conservative midpoint, clamped to [2, 13].
+      3. Divide the 26-week horizon into n_bursts equal-demand buckets using
+         the smooth forecast's seasonal distribution as weights.
+      4. In each bucket, assign ALL demand to the highest-weight week (the
+         seasonal peak within that window) and zero every other week.
+      5. Snap to min pack; reconcile total on the largest burst so the 26w
+         total is preserved exactly.
+
+    Returns (new_forecast, driver_str) or (None, None) when guards fail.
+    """
+    n     = len(forecast)
+    total = sum(forecast)
+    if total <= 0 or n < 26:
+        return None, None
+
+    # Cadence analysis from raw L26W (not spike-capped — want real order sizes)
+    hist26   = [float(v or 0) for v in history[-26:]]
+    nz_weeks = [i for i, v in enumerate(hist26) if v > 0]
+    nz_qtys  = [hist26[i] for i in nz_weeks]
+    if len(nz_weeks) < 2:
+        return None, None
+
+    gaps    = [nz_weeks[j + 1] - nz_weeks[j] for j in range(len(nz_weeks) - 1)]
+    avg_gap = sum(gaps) / len(gaps)
+    avg_qty = sum(nz_qtys) / len(nz_qtys)
+
+    # Guard: avg gap < 1.5w means near-weekly ordering -- no meaningful burst
+    if avg_gap < 1.5:
+        return None, None
+
+    # Estimate burst count two ways; take the conservative midpoint
+    n_by_gap = max(1, round(26.0 / avg_gap))
+    n_by_qty = max(1, round(total / avg_qty)) if avg_qty > 0 else n_by_gap
+    n_bursts = max(2, min(13, round((n_by_gap + n_by_qty) / 2.0)))
+
+    # Divide the 26-week horizon into n_bursts equal-demand buckets using
+    # the smooth forecast's distribution as the seasonal weight.
+    target  = total / n_bursts
+    buckets = {}   # bucket_idx -> [(week_idx, weight), ...]
+    cum     = 0.0
+    for w in range(n):
+        bkt = min(int(cum / target) if target > 0 else 0, n_bursts - 1)
+        buckets.setdefault(bkt, []).append((w, forecast[w]))
+        cum += forecast[w]
+
+    # In each bucket, assign all demand to the highest-weight (seasonal peak) week
+    burst = [0.0] * n
+    for bkt_idx in range(n_bursts):
+        entries = buckets.get(bkt_idx)
+        if not entries:
+            continue
+        bkt_total = sum(wt for _, wt in entries)
+        if bkt_total <= 0:
+            continue
+        best_w = max(entries, key=lambda x: x[1])[0]
+        burst[best_w] = bkt_total
+
+    # Snap to min pack
+    snapped = [snap(v, mp) if v > 0 else 0 for v in burst]
+
+    # Reconcile: absorb any rounding delta on the largest burst
+    delta = round(total) - sum(snapped)
+    if delta != 0:
+        nz_idx = [i for i in range(n) if snapped[i] > 0]
+        if nz_idx:
+            biggest = max(nz_idx, key=lambda i: snapped[i])
+            snapped[biggest] = max(0, snapped[biggest] + delta)
+            if mp > 1:
+                snapped[biggest] = snap(snapped[biggest], mp)
+
+    driver = (
+        f"F_BURST burst post-process: {l13_zero_count}/13 L13W zero weeks; "
+        f"L26W avg gap {avg_gap:.1f}w, avg order {avg_qty:.0f}u -> "
+        f"{n_bursts} bursts (26w total {round(total):,}u preserved)"
+    )
+    return [int(v) for v in snapped], driver
+
+
 def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=None,
                       product_category=None, product_subcategory=None,
                       brand=None, brand_pt=None, shpd_l13=0.0, season=None,
