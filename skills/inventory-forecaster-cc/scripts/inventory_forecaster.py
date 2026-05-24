@@ -12070,6 +12070,9 @@ def main():
                      "Field map fetched but could not resolve required fids.")
         if not ai_analysis_fid:
             print("      [WARN] [AI Analysis] field not found in Projections — narratives will not be written.")
+        # POG End Date default (2026-05-24): write pog_end = pog_launch + 364 days for
+        # records that have a launch date but no end date.  FID 1595 on Projections table.
+        pog_end_fid = fmap.get("POG End Date") or fmap.get("POG_End_Date") or 1595
         # Auto Project: discover MAN PRJ FIDs dynamically (date-stamped labels like "05 19 W1").
         # Used to copy AI forecast values into manual projection columns for auto-project records.
         import re as _re
