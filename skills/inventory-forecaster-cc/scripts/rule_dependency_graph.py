@@ -45,15 +45,15 @@ from collections import defaultdict
 # ─────────────────────────────────────────────────────────────────────────────
 _RULE_CODE_FAMILIES = re.compile(
     r'''^(?:
-        F\d+[a-z]?            |
-        F\d+-[A-Za-z]+        |
-        F_[A-Z_]+             |
-        R\d+                  |
-        M\d+                  |
-        S\d+                  |
-        T\d+                  |
-        VP-Q\d+               |
-        VP-[A-Z]+(?:-[A-Z]+)? |
+        F\d+[a-z]?                |
+        F\d+-[A-Za-z]+            |
+        F_[A-Z_]+                 |
+        R\d+                      |
+        M\d+                      |
+        S\d+                      |
+        T\d+                      |
+        VP-Q\d+                   |
+        VP-[A-Z]+(?:-[A-Za-z]+)?  |
         G\d+
     )$''',
     re.VERBOSE,
