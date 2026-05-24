@@ -901,11 +901,12 @@ async function attachInvFlow(records) {
   const ATS_NOW    = INV_FLOW_ATS_NOW_FID;
   const ATS_OH     = INV_FLOW_ATS_OH_FID;
   const ATS_OO     = INV_FLOW_ATS_OO_FID;
-  const ATS_OH_WOS = INV_FLOW_ATS_OH_WOS_FID;
-  const ATS_OO_WOS = INV_FLOW_ATS_OO_WOS_FID;
-  const sel        = [FK, ...BIDS, ...RIDS, ...PIDS, ...(OIDS||[]), OPT_WOS, OPT_FINAL, NEXT_RCPT, LT_WKS, MOQ,
-                      ...[SUPP_PO, ATS_NOW, ATS_OH, ATS_OO, ATS_OH_WOS, ATS_OO_WOS].filter(Boolean)];
-  const TOP        = 5000;
+  const ATS_OH_WOS  = INV_FLOW_ATS_OH_WOS_FID;
+  const ATS_OO_WOS  = INV_FLOW_ATS_OO_WOS_FID;
+  const FIRST_SHPD  = INV_FLOW_FIRST_SHPD_FID;
+  const sel         = [FK, ...BIDS, ...RIDS, ...PIDS, ...(OIDS||[]), OPT_WOS, OPT_FINAL, NEXT_RCPT, LT_WKS, MOQ,
+                       ...[SUPP_PO, ATS_NOW, ATS_OH, ATS_OO, ATS_OH_WOS, ATS_OO_WOS, FIRST_SHPD].filter(Boolean)];
+  const TOP         = 5000;
   const map        = {};
   let totalFetched = 0;
 
