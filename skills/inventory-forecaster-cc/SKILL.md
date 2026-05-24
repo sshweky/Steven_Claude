@@ -625,6 +625,21 @@ Phase 4 — Write-back
 
 ---
 
+## Writeback channels
+
+Two paths are wired; `--all` scope picks the bulk path by default:
+
+| Channel | Flag | When | Speed |
+|---|---|---|---|
+| QB REST bulk (`/v1/records` upsert) | `--bulk-writeback` (default for `--all`) | Hundreds of records | ~50x fewer HTTP hits |
+| CData per-record `UPDATE` | `--no-bulk-writeback` | Single-record scope, debugging | Slower; matches read channel |
+
+Both write to the same fields (`AI_PRJ_W1..W26`, `AI_ALERT`, `AI_ANALYSIS`).
+Validation results (`Validation_*` fields) push via the separate
+`scripts/push_validation_qb.py` script, always QB REST.
+
+---
+
 ## Quickbase Schema Reference
 
 | Detail | Value |

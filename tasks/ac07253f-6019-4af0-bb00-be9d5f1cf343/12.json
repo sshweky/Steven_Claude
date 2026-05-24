@@ -3,7 +3,7 @@
   "subject": "C4: --writeback-channel flag (safe, CData stays default)",
   "description": "Add --writeback-channel {cdata,qb-rest} flag to forecaster. Default = current behavior (cdata). Doesn't switch the default; user can flip later. RISKY production change avoided.",
   "activeForm": "Adding writeback channel flag",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
