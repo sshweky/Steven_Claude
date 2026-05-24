@@ -1360,6 +1360,40 @@ function _friendlyCustName(cust) {
   return first.charAt(0).toUpperCase() + first.slice(1);
 }
 
+// -- Amazon Listing Info block -----------------------------------------------
+// Shown in the detail panel for Amazon records INSTEAD of the POG block.
+// Displays ASIN + link + 1st Shpd Date (from Inventory Flow, mstyle-level).
+function _buildAmzInfoBlockHtml(r) {
+  const asin = (r.cust_sku || '').trim();
+  // 1st_Shpd_Date arrives as ISO YYYY-MM-DD (or YYYY-MM-DDThh:mm:ssZ)
+  const rawDate = r.inv_flow_first_shpd || '';
+  const fmtDate = iso => {
+    if (!iso) return '-';
+    const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!m) return iso;
+    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+      .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+  const amzUrl  = asin ? `https://www.amazon.com/dp/${asin}` : '';
+  const asinHtml = asin
+    ? `<span style="font-family:monospace;font-size:12px;font-weight:600;">${asin}</span>`
+    : '<span style="color:#999">-</span>';
+  const linkHtml = amzUrl
+    ? `<a href="${amzUrl}" target="_blank" rel="noopener noreferrer"
+          style="color:#1565c0;text-decoration:none;font-weight:600;white-space:nowrap;">
+         View on Amazon &#8594;</a>`
+    : '';
+  return `
+    <div style="margin:8px 12px 0 12px;padding:10px 12px;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;font-size:11px;color:#3e2723;">
+      <div style="font-weight:700;margin-bottom:6px;color:#e65100;"> Amazon Listing</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px 28px;align-items:center;">
+        <div><b>ASIN:</b> ${asinHtml}</div>
+        ${linkHtml ? `<div>${linkHtml}</div>` : ''}
+        <div><b>1st Shpd Date:</b> ${fmtDate(rawDate)}</div>
+      </div>
+    </div>`;
+}
+
 // -- POG / ISO Inventory Plan block -----------------------------------------
 // Renders POG dates + computed ISO order context.  Customers typically order
 // the ISO (in-store opening) shipment 4-6 weeks before POG Start, sized at
