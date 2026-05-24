@@ -281,7 +281,7 @@ After the script completes, summarize:
 - Total records processed and model split (Holt-Winters / Croston's / Heuristic / Inactive)
 - Number of bi-weekly cadence records enforced
 - Total 26-week demand volume
-- Number of ALERT records (>5% variance vs manual projections)
+- Number of ALERT records (>7.5% variance vs manual projections)
 - Path to HTML report (if `--analyze` was used)
 - Any failures and how to retry
 
