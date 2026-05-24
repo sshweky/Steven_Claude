@@ -687,7 +687,7 @@ PRIME_DAY_BUMPS = [
     (5, 15, 1.25),   # May 15   second pre-buy
     (5, 29, 1.50),   # May 29   peak pre-buy
 ]
-FALL_PRIME_DAY_LIFT = 1.30   # Tuesday after Memorial Day (last Monday of May + 1 day)
+FALL_PRIME_DAY_LIFT = 1.30   # Tuesday after Labor Day (first Monday of September + 1 day)
 AMAZON_CUST_SUBSTR  = "AMAZON"
 ```
 
