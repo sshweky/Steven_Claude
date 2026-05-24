@@ -1302,6 +1302,10 @@ function _refreshRowMetrics(key) {
     manL13El.style.color = !l13Avail ? '#888' : manVsL13 > 0 ? '#2e7d32' : manVsL13 < 0 ? '#c62828' : '#888';
   }
 
+  // Patch detail-pane Avg/Wk cell (uses proj_total only, no opn_total)
+  const avgWkEl = document.getElementById('man-avgwk-' + sid);
+  if (avgWkEl) avgWkEl.textContent = fmtN(Math.round(projTotal / 26));
+
   // Recompute PO/PRJ conflict from updated projection values and refresh badge
   const _updatedManProj = (rec.weeks_slim || []).map(w => w.projection || 0);
   const { conflicts: _newCfls, hasConflict: _newHasCfl } =
