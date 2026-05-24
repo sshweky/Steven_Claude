@@ -3996,6 +3996,27 @@ def crostens(history, mp, is_amazon=False, description=None,
     Event calendar lifts applied at scheduled order weeks.
     Category seasonality applied when item description matches a known profile.
     """
+    # P8 (2026-05-24): Pre-launch history trim.  For new-launch items, the
+    # leading 18+ zero weeks in L26 are "item didn't exist", not "infrequent
+    # buyer".  Including them inflates p (period) and z gets diluted by the
+    # large prepended zero stretch in the weighted series.  When we detect
+    # 8+ consecutive leading zeros in L26 followed by activity, trim the
+    # history to start at the first non-zero week in L26.  This gives Croston
+    # the correct cadence interpretation for the item's actual lifetime.
+    _p8_l26 = list(history[-26:]) if len(history) >= 26 else list(history)
+    _p8_first_nz_in_l26 = None
+    for _i, _v in enumerate(_p8_l26):
+        if float(_v or 0) > 0:
+            _p8_first_nz_in_l26 = _i
+            break
+    _p8_trimmed = False
+    if _p8_first_nz_in_l26 is not None and _p8_first_nz_in_l26 >= 8:
+        # Leading 8+ zeros in L26 (item launched within last 18 weeks).
+        # Trim full history at that point.
+        _p8_trim_idx = len(history) - 26 + _p8_first_nz_in_l26
+        history = history[_p8_trim_idx:]
+        _p8_trimmed = True
+
     ws = make_weighted_series(history)   # 78 obs: 3x weight on L13W
 
     z, p, last_t = None, None, None
