@@ -19,6 +19,14 @@ Why this matters:
   reordered to fire later, F59a silently uses stale state. This graph
   surfaces those edges so any reordering can be cross-checked first.
 
+Known limitation:
+  Edge detection uses a line-window heuristic (default +/- 15 lines around
+  each fire site). Reads outside that window are missed. A proper AST
+  scope analysis (track if/elif blocks per rule) is a Phase 2 follow-up.
+  The rule-to-meta-key matrix is still valuable on its own -- it tells
+  you which keys each rule WRITES, which is the harder half of the
+  dependency question.
+
 Usage:
     python scripts/rule_dependency_graph.py
     python scripts/rule_dependency_graph.py --top 20   # only show top 20 highest-degree rules
