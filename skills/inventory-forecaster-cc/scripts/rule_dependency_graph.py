@@ -116,6 +116,26 @@ class RuleScopeVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Call(self, node):
+        # meta.get("key") / meta.setdefault("key", ...) — both count as a read.
+        # meta.setdefault(...) ALSO counts as a write (it may insert the key).
+        # meta.update({...}) — count keys as writes.
+        if isinstance(node.func, ast.Attribute):
+            if (isinstance(node.func.value, ast.Name)
+                    and node.func.value.id == "meta"):
+                attr = node.func.attr
+                if attr in ("get", "setdefault", "pop") and node.args:
+                    a0 = node.args[0]
+                    if isinstance(a0, ast.Constant) and isinstance(a0.value, str):
+                        self._meta_reads_by_line[node.lineno].add(a0.value)
+                        if attr == "setdefault":
+                            self._meta_writes_by_line[node.lineno].add(a0.value)
+                if attr == "update" and node.args:
+                    a0 = node.args[0]
+                    if isinstance(a0, ast.Dict):
+                        for k in a0.keys:
+                            if isinstance(k, ast.Constant) and isinstance(k.value, str):
+                                self._meta_writes_by_line[node.lineno].add(k.value)
+
         # _fire("Fxx")
         if (isinstance(node.func, ast.Name) and node.func.id == "_fire"
                 and node.args and isinstance(node.args[0], ast.Constant)
