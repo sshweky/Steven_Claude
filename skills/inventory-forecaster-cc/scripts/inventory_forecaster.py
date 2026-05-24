@@ -11268,6 +11268,7 @@ def main():
     # Save forecast JSON — wrapped with meta so viewer.py knows the prj_cols
     out_path = Path(args.out)
     output = {
+        "_schema_version": SCHEMA_VERSION,
         "meta": {
             "generated_at": datetime.now().isoformat(timespec="seconds"),
             "scope":        scope_desc,
