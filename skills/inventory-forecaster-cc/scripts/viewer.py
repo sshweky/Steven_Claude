@@ -4347,8 +4347,6 @@ def main():
     skill_dir = Path(__file__).parent.parent
     RESULTS_PATH = str(Path(args.results) if Path(args.results).is_absolute()
                         else skill_dir / args.results)
-    LOG_PATH     = str(Path(args.log) if Path(args.log).is_absolute()
-                        else skill_dir / args.log)
 
     if not Path(RESULTS_PATH).exists():
         sys.exit(f"ERROR: Results file not found: {RESULTS_PATH}")
