@@ -7059,7 +7059,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # week of non-shipment (matches F34/F35 schedule; fully lost at age 4+).
     # apply_oh_shortfall_adjustment returns int-rounded values; we snap to
     # MP here in the orchestrator (single snap pass).
-    if model not in ("Inactive",):
+    # P6 (2026-05-24): Skip F37 OH-shortfall capping on NEW-launch items and
+    # items in active growth.  Variance deep-dive showed F37 zeroing W1-W2 on
+    # Walmart "A: NEW" Croston's records (#4, 5, 9, 10) when planner has
+    # 7,000-10,000 in those weeks.  Warehouse SOH being high doesn't mean
+    # demand is satisfied -- new-launch ordering happens concurrently.
+    _f37_status_new = "NEW" in (row.get("Status_Cust") or "").upper()
+    _f37_l4_avg     = sum(float(v or 0) for v in hist[-4:])  / 4  if len(hist) >= 4  else 0
+    _f37_l13_avg    = sum(float(v or 0) for v in hist[-13:]) / 13 if len(hist) >= 13 else 0
+    _f37_active_growth = (_f37_l13_avg > 0 and _f37_l4_avg >= _f37_l13_avg * 0.80)
+    _f37_skip       = _f37_status_new or _f37_active_growth
+    if model not in ("Inactive",) and not _f37_skip:
         _adjusted_f37, _f37_adjustments = apply_oh_shortfall_adjustment(row, fcst)
         if _f37_adjustments:
             # Snap to master pack to keep ship qty consistent with cadence

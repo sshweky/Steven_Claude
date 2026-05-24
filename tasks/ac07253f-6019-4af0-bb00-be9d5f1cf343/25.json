@@ -3,7 +3,7 @@
   "subject": "P5: F61 NEW guard",
   "description": "Add status_cust != 'NEW' guard to F61 horizon decay condition. F61 should not decay new-launch back half.",
   "activeForm": "Implementing P5 F61 NEW guard",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
