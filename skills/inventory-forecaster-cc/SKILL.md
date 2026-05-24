@@ -55,7 +55,7 @@ When the user says **"analyze manual vs AI"**, **"compare manual projections to 
 2. The script does everything end-to-end:
    - **Step 1 — Discover MAN PRJ field IDs** via `GET /v1/fields` on the Projections table. Finds all 26 weekly manual projection columns by matching the regex `^\d{2} \d{2} W(\d+)` against field labels. This is dynamic — no hard-coded FIDs.
    - **Step 2 — Fetch projections** via paginated `POST /v1/records/query`, filter `{F_STATUS LIKE 'A%'}`. Pulls AI_PRJ_W1-W26, all 26 MAN PRJ columns, L13W order history cols, plus metadata (Customer, MStyle, Brand, Description, Manager, Item_Status). Processes up to `--limit` records.
-   - **Step 3 — Enrich** each record with computed metrics: `delta_pct` (manual vs AI % gap), `direction` (UP/DOWN/FLAT), `man_zeros` (zero-week count in manual plan), `killed` (manual plan is all zeros), `front_load_score` (what % of demand is in first 13 weeks), `spike_weeks` (weeks where manual is ≥3× median), `man_vs_l13` and `ai_vs_l13` (each plan total relative to L13W avg × 26), `trend_ratio` (L4W/L13W), `vol_tier` (HIGH ≥ 1,000/wk · MEDIUM 200-999 · LOW < 200).
+   - **Step 3 — Enrich** each record with computed metrics: `delta_pct` (manual vs AI % gap), `direction` (UP/DOWN/FLAT), `man_zeros` (zero-week count in manual plan), `killed` (manual plan is all zeros), `front_load_score` (what % of demand is in first 13 weeks), `spike_weeks` (weeks where manual is ≥3× median), `man_vs_l13` and `ai_vs_l13` (each plan total relative to L13W avg × 26), `trend_ratio` (L4W/L13W), `vol_tier` (HIGH ≥ 500/wk · MEDIUM 200-499 · LOW < 200).
    - **Step 4 — Build a 12-section markdown report** (see report structure below).
    - **Step 5 — Save outputs** to the `analysis/` directory.
 
