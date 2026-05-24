@@ -11950,6 +11950,30 @@ def main():
             print(f"\n[2.6b] Amazon Inventory Health skipped "
                   f"(no ASINs in Catalog US -- field may not exist in that table)")
 
+    # ── Phase 2.6c: Retailer POS + OH data (non-Amazon customers) ──────
+    # Fetch consumer POS sell-through and retailer on-hand inventory from
+    # the Retailer Sales table (bv2izcn5b) for all non-Amazon projection
+    # records.  The same pos_data mechanism used for Amazon (F15 blend,
+    # F18 Croston z-adjustment) is reused; the retailer WOS rule (F_RTL_WOS)
+    # is then applied post-model in forecast_record().
+    retailer_pos = {}
+    _rtl_rows = [r for r in rows if AMAZON_CUST_SUBSTR not in
+                 (r.get("Customr_Name") or "").upper()]
+    if _rtl_rows:
+        print(f"\n[2.6c] Retailer POS + OH: fetching for "
+              f"{len({r.get('Mstyle') for r in _rtl_rows})} non-Amazon mstyles ...",
+              flush=True)
+        try:
+            retailer_pos = _fetch_retailer_pos(_rtl_rows)
+            print(f"      {len(retailer_pos)} acct-mstyle combos with retailer POS data")
+        except Exception as _e:
+            print(f"      [WARN] retailer_pos fetch failed: {_e} -- "
+                  f"F15 POS blend and F_RTL_WOS disabled this run", flush=True)
+    else:
+        print(f"\n[2.6c] Retailer POS skipped (no non-Amazon records in scope)",
+              flush=True)
+        retailer_pos = {}
+
     # ── Save Amazon catalog viewer cache (AUR + DC inv for viewer.py) ──────────
     # Written after Phase 2.6b so Inv_SOH/OPO/WOS are already merged in.
     # viewer.py reads this at launch to add DC inv + AUR bullets to the narrative.
