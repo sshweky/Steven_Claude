@@ -3,7 +3,7 @@
   "subject": "B4: Unified scripts/cache.py",
   "description": "Single Cache(name, ttl_hours) class with auto-versioning via producer-code hash, TTL invalidation, uniform get/set/has API. New file; existing caches keep working.",
   "activeForm": "Building unified cache module",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
