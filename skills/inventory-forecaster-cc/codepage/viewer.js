@@ -4533,11 +4533,29 @@ async function _loadAmzDcInv(r, safeId) {
         wosHtml
     : '<b>Amazon DC inventory:</b> <span style="color:#999;font-style:italic">not in catalog (no data)</span>';
 
+  // AUR bullet
+  let aurBulletHtml;
+  if (!aurFetchOk) {
+    aurBulletHtml = '<b>Amazon AUR:</b> <span style="color:#999;font-style:italic">no pricing data</span>';
+  } else {
+    const aurItems = [];
+    if (aurLw  > 0) aurItems.push(`<b>LW</b> ${fmtAur(aurLw)}`);
+    if (aurL4w  > 0) aurItems.push(`<b>L4W avg</b> ${fmtAur(aurL4w)}`);
+    if (aurL13w > 0) aurItems.push(`<b>L13W avg</b> ${fmtAur(aurL13w)}`);
+    if (aurL26w > 0) aurItems.push(`<b>L26W avg</b> ${fmtAur(aurL26w)}`);
+    if (aurL52w > 0) aurItems.push(`<b>L52W avg</b> ${fmtAur(aurL52w)}`);
+    aurBulletHtml = aurItems.length
+      ? '<b>Amazon AUR:</b> ' + aurItems.join(sep)
+      : '<b>Amazon AUR:</b> <span style="color:#999;font-style:italic">no pricing data</span>';
+  }
+
   const ul = document.getElementById('ai-bullets-' + safeId);
   if (ul) {
-    // Remove any stale versions of both bullets
+    // Remove stale versions of all three live bullets
     Array.from(ul.querySelectorAll('li')).forEach(li => {
-      if (/amazon dc inventory/i.test(li.textContent) || /amazon pos sales/i.test(li.textContent)) li.remove();
+      if (/amazon dc inventory/i.test(li.textContent)
+          || /amazon pos sales/i.test(li.textContent)
+          || li.hasAttribute('data-amz-aur')) li.remove();
     });
 
     const mkLi = (html, attr) => {
@@ -4548,16 +4566,18 @@ async function _loadAmzDcInv(r, safeId) {
       return li;
     };
 
-    const dcLi  = mkLi(dcBulletHtml,  'data-amz-dc-inv');
     const posLi = mkLi(posBulletHtml, 'data-amz-pos');
+    const dcLi  = mkLi(dcBulletHtml,  'data-amz-dc-inv');
+    const aurLi = mkLi(aurBulletHtml, 'data-amz-aur');
 
-    // Insert POS then DC inv at end (they appear together in order)
+    // Insert order: POS, DC inv, AUR (AUR always immediately below DC inv)
     ul.appendChild(posLi);
     ul.appendChild(dcLi);
+    ul.appendChild(aurLi);
   }
 
   // ATS cards are now sourced from Inventory Flow and rendered inline —
-  // nothing left for _loadAmzDcInv to do after the DC inventory bullet above.
+  // nothing left for _loadAmzDcInv to do after the bullets above.
 }
 
 // -- Comment history loader --------------------------------------------------
