@@ -10,6 +10,43 @@ The script calls the CData MCP server directly (Basic auth) for all Quickbase I/
 
 ---
 
+## Menu
+
+When the user types **"menu"** (exact word, any case), respond with exactly this text — no preamble, no extra commentary:
+
+---
+
+**Core Forecasting**
+- **Forecast + Validate (default)** -- `run_forecast.py --all --validate` -- AI projections + write-back, then validates manual projections. Default when you say "run the forecaster."
+- **Forecast only** -- `run_forecast.py --all` -- AI projections + write-back, no validation pass
+- **Validate only** -- `run_forecast.py --all --validate --dry-run` -- checks manual projections for anomalies; read-only
+- **Dry run** -- `run_forecast.py --all --dry-run` -- computes forecasts but does not write back
+- **EDA + Forecast** -- `run_forecast.py --all --analyze` -- exploratory data analysis report, then forecasts
+- **EDA only** -- `run_forecast.py --all --analyze-only` -- HTML report only, no forecasting or write-back
+- **Resume** -- `run_forecast.py --acct X --resume forecast_results.completed.json` -- picks up after an interruption
+
+All of the above accept scope filters: `--acct`, `--customer`, `--mstyle`, `--brand`, or `--all`
+
+**Post-Forecast**
+- **Push validation results** -- `push_validation_qb.py` -- pushes Priority/Pattern/Narrative to QB after a validate run (~15 sec)
+- **Open local viewer** -- `viewer.py --results validation_results.json` -- launches projection review tool at http://127.0.0.1:8765
+
+**Analysis & Reporting**
+- **Gap analysis** -- `gap_analysis.py --results validation_results.json` -- top-volume manual vs AI gaps, root-cause buckets, model fix proposals
+- **Manual vs AI analysis** -- `analyze_manual_vs_ai.py` -- 12-section audit by customer/brand/manager/vol-tier; outputs markdown + CSV + JSON
+- **Summary dashboard** -- `build_dashboard.py` -- Manual vs AI vs Suggested vs L26 actuals rolled up to `dashboard.html`
+- **Ad-hoc key-set analysis** -- `analyze_36_keys.py` -- drill into a specific list of Acct_MStyle_Key_ values; edit KEYS list before running
+
+**Calibration**
+- **Update Sales Index** -- `build_category_profiles_from_report.py` -- rebuilds seasonal category profiles from invoice history; forecaster picks up on next run
+
+**One-time / Dev**
+- **Create AI Comments table** -- `create_ai_comments_table.py` -- idempotent bootstrap of the AI Comments QB table
+- **Audit rules** -- `audit_rules.py` -- verifies no drift between SKILL.md rule registry and code
+- **Rule dependency graph** -- `rule_dependency_graph.py` -- generates a visual map of rule firing dependencies
+
+---
+
 ## Trigger: "Update Sales Index"
 
 When the user says **"Update Sales Index"** (or "refresh seasonal indexes", "rebuild category profiles", "recompute sales seasonality"):
