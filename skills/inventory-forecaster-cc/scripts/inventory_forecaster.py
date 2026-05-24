@@ -1993,6 +1993,39 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                             f"replaces L13 trough {_l13_nz_avg:.0f}"
                         )
 
+    # F78 (2026-05-24): Peak-anchor fallback for items with no category profile.
+    # When _cat_mults is absent (no profile keyword match) but L52W peak month
+    # avg is 3x+ the L13W nz avg, re-anchor the baseline to the historical peak.
+    # Catches seasonal items like fire starters, dental kits, air fresheners,
+    # Fraganzia deodorizers that lack a CATEGORY_PROFILES entry.
+    if not _peak_anchor_driver and not _cat_mults and len(history) >= 26:
+        from datetime import date as _dt_f78, timedelta as _td_f78
+        _today_f78 = _dt_f78.today()
+        _f78_month_vals = {}
+        for _i_f78 in range(min(52, len(history))):
+            _wk_date_f78 = _today_f78 - _td_f78(weeks=_i_f78 + 1)
+            _m_f78 = _wk_date_f78.month - 1   # 0-indexed
+            _v_f78 = float(history[-1 - _i_f78] or 0)
+            if _v_f78 > 0:
+                _f78_month_vals.setdefault(_m_f78, []).append(_v_f78)
+        if len(_f78_month_vals) >= 2:
+            _f78_month_avgs = {m: sum(v) / len(v) for m, v in _f78_month_vals.items()}
+            _f78_peak_m  = max(_f78_month_avgs, key=_f78_month_avgs.get)
+            _f78_peak_avg = _f78_month_avgs[_f78_peak_m]
+            _f78_l13_nz  = [v for v in history[-13:] if v > 0]
+            _f78_l13_avg = sum(_f78_l13_nz) / len(_f78_l13_nz) if _f78_l13_nz else 0
+            if (_f78_l13_avg > 0
+                    and _f78_peak_avg > _f78_l13_avg * 3.0
+                    and _f78_peak_avg > baseline * 1.3):
+                _f78_max_S = max(S) if S else 1.0
+                if _f78_max_S > 0:
+                    baseline = _f78_peak_avg / _f78_max_S
+                    _peak_anchor_driver = (
+                        f"F78 peak-anchor (no profile): L52 peak-month avg "
+                        f"{_f78_peak_avg:.0f} = {_f78_peak_avg/_f78_l13_avg:.1f}x "
+                        f"L13 trough {_f78_l13_avg:.0f}"
+                    )
+
     # F24 — Final-baseline L13-all-weeks ceiling (placed AFTER F7 peak-anchor
     # so F7's baseline reassignment is also capped).  Observed pattern in
     # Seasonal Baseline top overshooters (BB13437, BB0098, BB11917, FF4934AMZ2):
