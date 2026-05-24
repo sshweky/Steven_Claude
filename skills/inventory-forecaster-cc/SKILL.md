@@ -718,34 +718,21 @@ window shifts each week.
 | **Fix 4 — Bi-weekly baseline** | If `detect_biweekly()` and non-zero avg > all-weeks avg × 1.05, substitute all-weeks avg. Non-zero avg is ~2× the true weekly rate for bi-weekly cadence items. |
 | **Fix 5 — Croston's rescaling** | After Croston's produces 26 forecast values: if AI avg > L13W all-weeks avg × 1.10, scale down (floor 0.5×) to keep total demand grounded to observed weekly rate. |
 
-**CATEGORY_PROFILES keywords → monthly multipliers [Jan…Dec]:**
+**CATEGORY_PROFILES — see `scripts/derived_category_profiles.json` for current values.**
 
-```python
-CATEGORY_PROFILES = {
-    # Outdoor cooking / grilling — peak Apr–Aug
-    "charcoal":      [0.20, 0.25, 0.65, 1.50, 1.90, 2.05, 1.80, 1.50, 0.80, 0.40, 0.22, 0.20],
-    "chimney":       [0.20, 0.25, 0.65, 1.50, 1.90, 2.05, 1.80, 1.50, 0.80, 0.40, 0.22, 0.20],
-    "fire starter":  [0.20, 0.25, 0.65, 1.45, 1.85, 2.00, 1.75, 1.45, 0.80, 0.40, 0.22, 0.20],
-    "firestarter":   [0.20, 0.25, 0.65, 1.45, 1.85, 2.00, 1.75, 1.45, 0.80, 0.40, 0.22, 0.20],
-    "lighter fluid": [0.20, 0.25, 0.65, 1.45, 1.85, 2.00, 1.75, 1.45, 0.80, 0.40, 0.22, 0.20],
-    "grill brush":   [0.25, 0.30, 0.70, 1.40, 1.80, 1.95, 1.70, 1.40, 0.80, 0.40, 0.25, 0.22],
-    # Insect / sun — peak May–Sep
-    "mosquito":      [0.20, 0.20, 0.45, 1.10, 1.65, 1.95, 2.05, 1.80, 1.40, 0.60, 0.25, 0.20],
-    "insect repel":  [0.20, 0.20, 0.45, 1.05, 1.60, 1.90, 2.00, 1.75, 1.35, 0.60, 0.25, 0.20],
-    "bug repel":     [0.20, 0.20, 0.45, 1.05, 1.60, 1.90, 2.00, 1.75, 1.35, 0.60, 0.25, 0.20],
-    "sunscreen":     [0.20, 0.25, 0.60, 1.25, 1.75, 2.05, 2.05, 1.65, 0.90, 0.40, 0.25, 0.20],
-    "sun care":      [0.20, 0.25, 0.60, 1.25, 1.75, 2.05, 2.05, 1.65, 0.90, 0.40, 0.25, 0.20],
-    "sunblock":      [0.20, 0.25, 0.60, 1.25, 1.75, 2.05, 2.05, 1.65, 0.90, 0.40, 0.25, 0.20],
-    # Holiday — peak Nov–Jan
-    "holiday":       [1.50, 0.60, 0.40, 0.40, 0.50, 0.60, 0.70, 0.80, 1.20, 1.85, 2.30, 2.50],
-    "christmas":     [1.50, 0.60, 0.40, 0.40, 0.50, 0.60, 0.70, 0.80, 1.20, 1.85, 2.30, 2.50],
-    # Winter — peak Dec–Feb
-    "ice melt":      [1.80, 1.70, 0.90, 0.25, 0.15, 0.15, 0.15, 0.20, 0.40, 1.00, 1.80, 2.00],
-    "de-icer":       [1.80, 1.70, 0.90, 0.25, 0.15, 0.15, 0.15, 0.20, 0.40, 1.00, 1.80, 2.00],
-}
-```
+> NOTE: The profile values previously listed here are stale (2026-05-23 audit). The live
+> profiles are generated empirically by `build_category_profiles_from_report.py` from invoice
+> history and stored in `scripts/derived_category_profiles.json`. The forecaster loads from
+> that file at startup. Do not rely on hardcoded values here.
+>
+> Categories covered: outdoor grilling (charcoal, kingsford, chimney, lighter fluid, grill
+> brush), insect/sun (mosquito, sunscreen, sun care), holiday/winter (christmas, ice melt,
+> de-icer), air freshener, deodorizing, paper tableware, disposable tableware, and 40+ more.
+> Run `python build_category_profiles_from_report.py` to rebuild from latest invoice data.
 
-Matching logic: `(description or "").lower()` — first keyword found wins. No match → no category blend (pure historical + DAMP).
+Matching logic: `(description or "").lower()` -- first keyword found wins (also checks
+`product_category`, `product_subcategory`, `brand`, `brand_pt`). No match → no category blend
+(pure historical + DAMP).
 
 **Always consult these QB fields for seasonality context when forecasting a record:**
 - `Description` / `Product_Title` — primary keyword source
