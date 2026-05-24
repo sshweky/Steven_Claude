@@ -9317,10 +9317,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
             # Fix 1 ensures W1 is always set, so correction window is always W1+W2.
             _rpl_dc_end = 2   # steady-state starts at W3 (index 2)
-            if _rpl_wos > 0:
+            if _rpl_wos > 0 or _rpl_dc_depleted:
                 _rpl_adj1, _rpl_adj2 = 0, 1
 
-                if _rpl_wos > 12:
+                if not _rpl_dc_depleted and _rpl_wos > 12:
                     # Overstocked: zero the correction window -- let DC drain
                     # naturally to 12 WOS via ongoing consumer sell-through.
                     _rpl_new[_rpl_adj1] = 0
@@ -9329,19 +9329,30 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"DC WOS={_rpl_wos:.1f} > 12 (overstocked) -- "
                         f"W{_rpl_adj1+1}+W{_rpl_adj2+1} zeroed to drain to 12 WOS"
                     )
-                elif _rpl_wos < 10:
-                    # Understocked: simple gap fill -- order exactly enough to bridge
-                    # current WOS to 10 WOS target (no sell-through offset per rule).
+                elif _rpl_dc_depleted or _rpl_wos < 10:
+                    # Understocked or DC fully depleted (WOS=0, SOH=0, OPO=0):
+                    # simple gap fill -- order exactly enough to bridge current
+                    # WOS to 10 WOS target.  _rpl_wos=0.0 when depleted, so
+                    # fill = 10 * corr_demand split over W1+W2.
                     _rpl_window = max(0.0, (10.0 - _rpl_wos) * _rpl_corr_demand)
                     _rpl_each   = snap(_rpl_window / 2.0, mp)
                     _rpl_new[_rpl_adj1] = _rpl_each
                     _rpl_new[_rpl_adj2] = _rpl_each
-                    _rpl_inv_note = (
-                        f"DC WOS={_rpl_wos:.1f} < 10 (understocked) -- "
-                        f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
-                        f"{_rpl_each:.0f}/ea (gap fill to 10 WOS; "
-                        f"corr basis={_rpl_corr_demand:.0f}/wk)"
-                    )
+                    if _rpl_dc_depleted:
+                        _rpl_inv_note = (
+                            f"DC WOS=0.0 (depleted/inferred; SOH=0 OPO=0 -- "
+                            f"no Inventory Health record) -- "
+                            f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
+                            f"{_rpl_each:.0f}/ea (gap fill to 10 WOS; "
+                            f"corr basis={_rpl_corr_demand:.0f}/wk)"
+                        )
+                    else:
+                        _rpl_inv_note = (
+                            f"DC WOS={_rpl_wos:.1f} < 10 (understocked) -- "
+                            f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
+                            f"{_rpl_each:.0f}/ea (gap fill to 10 WOS; "
+                            f"corr basis={_rpl_corr_demand:.0f}/wk)"
+                        )
                 else:
                     _rpl_inv_note = (
                         f"DC WOS={_rpl_wos:.1f} in target range (10-12) -- "
