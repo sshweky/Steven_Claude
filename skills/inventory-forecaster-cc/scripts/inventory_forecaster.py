@@ -720,6 +720,62 @@ def _get_event_boosts():
     return _EVENT_BOOSTS_CACHE
 
 
+_T5_SEASONAL_BOOSTS_CACHE = {}   # season_key -> {1-indexed week: multiplier}
+
+
+def _compute_t5_seasonal_boosts(season_key):
+    """
+    Map AMZ_T5_HOLIDAY_BOOSTS calendar dates to 1-indexed projection weeks for
+    the given Season tag.
+
+    Lookup priority:
+      1. Exact match on season_key in AMZ_T5_HOLIDAY_BOOSTS
+      2. Fall back to standard ("") if season_key is not a recognised key
+         (unknown / new Season tags get the standard T5 ramp as a safe default).
+
+    Returns dict {1-indexed week: multiplier}.  Empty dict = no boosts.
+    """
+    from datetime import date, timedelta
+    if not ORIG_PRJ_COLS:
+        return {}
+    col = ORIG_PRJ_COLS[0]           # e.g. "05_17_W1"
+    m, d = int(col[0:2]), int(col[3:5])
+    today = date.today()
+    prj_start = date(today.year, m, d)
+    if (prj_start - today).days < -180:
+        prj_start = date(today.year + 1, m, d)
+
+    if season_key in AMZ_T5_HOLIDAY_BOOSTS:
+        bumps = AMZ_T5_HOLIDAY_BOOSTS[season_key]
+    else:
+        # Unknown season tag: use standard ramp as safe default
+        bumps = AMZ_T5_HOLIDAY_BOOSTS.get("", [])
+
+    boosts = {}
+    for bump_month, bump_day, mult in bumps:
+        for yr_off in (0, 1):
+            try:
+                bump = date(prj_start.year + yr_off, bump_month, bump_day)
+            except ValueError:
+                continue
+            delta = (bump - prj_start).days
+            if 0 <= delta < 26 * 7:
+                wk = delta // 7 + 1           # 1-indexed
+                boosts[wk] = max(boosts.get(wk, 1.0), mult)
+                break
+    return boosts
+
+
+def _get_t5_seasonal_boosts(season):
+    """Return cached T5/Holiday boost dict for the given Season tag.
+    Cache is per season_key; invalidated when ORIG_PRJ_COLS changes (main())."""
+    global _T5_SEASONAL_BOOSTS_CACHE
+    season_key = (season or "").strip()
+    if season_key not in _T5_SEASONAL_BOOSTS_CACHE:
+        _T5_SEASONAL_BOOSTS_CACHE[season_key] = _compute_t5_seasonal_boosts(season_key)
+    return _T5_SEASONAL_BOOSTS_CACHE[season_key]
+
+
 # ─── CData helpers ────────────────────────────────────────────────────────────
 
 def _cdata_auth():
