@@ -1,0 +1,9 @@
+{
+  "id": "13",
+  "subject": "B2+C3: Add structured fire() alongside existing _fire()",
+  "description": "New fire(code, category, severity, narrative_template, **payload) API. Adds structured entry to meta['structured_drivers']. Old _fire() remains untouched - new rules use new API. Migration is gradual.",
+  "activeForm": "Building structured fire() API",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

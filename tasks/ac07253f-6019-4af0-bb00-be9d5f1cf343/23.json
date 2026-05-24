@@ -1,0 +1,9 @@
+{
+  "id": "23",
+  "subject": "Algorithm improvement suggestions list",
+  "description": "Prioritized list of model improvements derived from variance analysis. Each suggestion: pattern observed, planners doing X, AI doing Y, root cause hypothesis, proposed fix, expected impact.",
+  "activeForm": "Writing improvement suggestions",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

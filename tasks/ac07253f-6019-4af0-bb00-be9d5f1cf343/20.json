@@ -1,0 +1,9 @@
+{
+  "id": "20",
+  "subject": "D3: Confidence intervals on each forecast week",
+  "description": "Residual-bootstrap CIs. Adds AI_PRJ_LOW_W1..W26 (10th pct) and AI_PRJ_HIGH_W1..W26 (90th pct) to output JSON. Behind --confidence-intervals flag initially.",
+  "activeForm": "Adding confidence intervals",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

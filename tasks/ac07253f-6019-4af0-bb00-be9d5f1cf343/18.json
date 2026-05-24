@@ -1,0 +1,9 @@
+{
+  "id": "18",
+  "subject": "A3: Pipeline refactor behind --pipeline flag",
+  "description": "Add pipeline.py with PhaseA-G structure. forecast_record_v2() reuses model bodies but routes through explicit phases. Old forecast_record() remains default. New flag --pipeline opts into new path.",
+  "activeForm": "Scaffolding pipeline refactor",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

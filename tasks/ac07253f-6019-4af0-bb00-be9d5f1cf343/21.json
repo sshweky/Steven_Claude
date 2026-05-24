@@ -1,0 +1,9 @@
+{
+  "id": "21",
+  "subject": "Run full --all --validate forecast",
+  "description": "After all refactors land, run python run_forecast.py --all --validate. Capture forecast_results.json + validation_results.json. Then push validation via push_validation_qb.py.",
+  "activeForm": "Running full forecast",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

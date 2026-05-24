@@ -1,0 +1,9 @@
+{
+  "id": "15",
+  "subject": "D2: Per-rule attribution report",
+  "description": "scripts/rule_attribution.py reads forecast_results.json, computes per-rule: fire count, median |delta|, aggregate effect on AI total, avg seconds saved. Output: markdown + CSV.",
+  "activeForm": "Building rule attribution report",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

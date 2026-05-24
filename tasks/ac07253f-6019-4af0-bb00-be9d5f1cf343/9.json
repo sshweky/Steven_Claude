@@ -1,0 +1,9 @@
+{
+  "id": "9",
+  "subject": "A4: Build scripts/tests/ scaffold + 15 unit tests",
+  "description": "pytest-style harness in scripts/tests/. First batch covers F18, F59a (FF7297 case), G2 demotion, VP-Q4 PO-zero, F70 switchover, R1 OTB detection, F30 zero-history guard, F66 customer bias, calendar event boosts, classify() routing, snap() rounding, F58 comment parsing, F19 inactive floor, F38f buyability, _get_event_boosts.",
+  "activeForm": "Building unit test scaffold",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}
