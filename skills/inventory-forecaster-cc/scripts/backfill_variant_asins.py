@@ -37,6 +37,10 @@ FID_ASIN   = 821   # Cust SKU# (ASIN for Amazon records)
 # Ordered longest-first so "DTC" matches before a hypothetical "C" etc.
 SWITCHOVER_SUFFIXES = ("DTC", "COS", "AMZ", "DS", "EC")
 
+# Valid Amazon ASIN: exactly 10 uppercase alphanumeric characters starting with B
+import re as _re
+_ASIN_RE = _re.compile(r'^B[A-Z0-9]{9}$')
+
 HEADERS = {
     "QB-Realm-Hostname": QB_REALM,
     "Authorization":     f"QB-USER-TOKEN {QB_TOKEN}",
