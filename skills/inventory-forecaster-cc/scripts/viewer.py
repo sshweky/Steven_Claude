@@ -3191,7 +3191,7 @@ function toggleDetail(key) {{
   // is "MM DD W1" — the most recent Sunday — so historical week N (1-indexed
   // back from Last Wk) started (N) weeks before W1.  Display as "M/D" (e.g. "4/27")
   // since planners think in calendar dates, not "N weeks ago".
-  const _w1Match = (PRJ_COLS && PRJ_COLS[0] || '').match(/(\d{{2}})\s+(\d{{2}})/);
+  const _w1Match = (PRJ_COLS && PRJ_COLS[0] || '').match(/(\\d{{2}})\\s+(\\d{{2}})/);
   const _w1Year  = new Date().getFullYear();
   const _W1_DATE = _w1Match
     ? new Date(_w1Year, parseInt(_w1Match[1], 10) - 1, parseInt(_w1Match[2], 10))
