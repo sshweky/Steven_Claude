@@ -4277,26 +4277,32 @@ def crostens(history, mp, is_amazon=False, description=None,
             _scale = max(0.5, _scale)    # cap at 2× reduction
             forecast = [snap(v * _scale, mp) if v > 0 else 0 for v in forecast]
 
-    # Ensure each event WINDOW gets at least one order — but only if the
+    # Ensure each event window gets at least one order -- but only if the
     # entire window is empty.  If the cadence already landed anywhere in the
     # window, it got the boost in the loop above; don't also force-insert
     # z-sized orders into the remaining zero weeks (that double/triple-counts).
     if is_amazon:
-        prime_covered = any(forecast[ew - 1] > 0 for ew in PRIME_DAY_WEEKS if ew <= 26)
-        if not prime_covered:
-            ew = min(PRIME_DAY_WEEKS)   # insert at W11 (start of window)
-            forecast[ew - 1] = snap(z * PRIME_DAY_LIFT, mp)
-            event_inserts.append({"week": ew, "boost": PRIME_DAY_LIFT,
-                                   "qty": forecast[ew - 1], "inserted": True})
-
-    # R7 — Fall Deal insertion Amazon-only (2026-04-22).
-    if is_amazon:
-        fall_covered = any(forecast[ew - 1] > 0 for ew in FALL_DEAL_WEEKS if ew <= 26)
-        if not fall_covered:
-            ew = min(FALL_DEAL_WEEKS)   # insert at W23 (start of window)
-            forecast[ew - 1] = snap(z * FALL_DEAL_LIFT, mp)
-            event_inserts.append({"week": ew, "boost": FALL_DEAL_LIFT,
-                                   "qty": forecast[ew - 1], "inserted": True})
+        _ins_prime, _ins_fall = _get_event_boosts()
+        # Prime Day insertion
+        if _ins_prime:
+            prime_covered = any(forecast[ew - 1] > 0
+                                for ew in _ins_prime if ew <= 26)
+            if not prime_covered:
+                ew   = min(ew for ew in _ins_prime if ew <= 26)
+                bst  = _ins_prime[ew]
+                forecast[ew - 1] = snap(z * bst, mp)
+                event_inserts.append({"week": ew, "boost": bst,
+                                       "qty": forecast[ew - 1], "inserted": True})
+        # Fall Prime Day insertion (Tuesday after Memorial Day)
+        if _ins_fall:
+            fall_covered = any(forecast[ew - 1] > 0
+                               for ew in _ins_fall if ew <= 26)
+            if not fall_covered:
+                ew  = min(ew for ew in _ins_fall if ew <= 26)
+                bst = _ins_fall[ew]
+                forecast[ew - 1] = snap(z * bst, mp)
+                event_inserts.append({"week": ew, "boost": bst,
+                                       "qty": forecast[ew - 1], "inserted": True})
 
     # F10 — Declining-item end-of-life scale-down for Croston's (YoY-gated).
     _l4_avg_f10c   = sum(history[-4:]) / 4 if len(history) >= 4 else 0
