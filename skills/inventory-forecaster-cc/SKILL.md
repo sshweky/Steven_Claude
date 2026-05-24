@@ -29,7 +29,7 @@ All of the above accept scope filters: `--acct`, `--customer`, `--mstyle`, `--br
 
 **Post-Forecast**
 - **Push validation results** -- `push_validation_qb.py` -- pushes Priority/Pattern/Narrative to QB after a validate run (~15 sec)
-- **Open local viewer** -- `viewer.py --results validation_results.json` -- launches projection review tool at http://127.0.0.1:8765
+- **Review results** -- use the QB codepage (never launch viewer.py)
 
 **Analysis & Reporting**
 - **Gap analysis** -- `gap_analysis.py --results validation_results.json` -- top-volume manual vs AI gaps, root-cause buckets, model fix proposals
@@ -325,28 +325,13 @@ After the script completes, summarize:
 - Path to HTML report (if `--analyze` was used)
 - Any failures and how to retry
 
-After a **validate** run, immediately launch the Projection Validation Viewer:
+After a **validate** run, results are available in the QB codepage (the team-facing viewer).
+**NEVER launch `viewer.py`** — the user always uses the QB codepage, not the local Python viewer.
 
-```bash
-cd <skill_directory>
-python scripts/viewer.py --results validation_results.json
-```
+### Step 5 — QB Codepage Viewer
 
-The viewer opens automatically in the browser at `http://127.0.0.1:8765`.
-
-### Step 5 — Projection Validation Viewer (viewer.py)
-
-The viewer is read-only — it displays validation flags only, no write-back.
-
-- Compact review table showing Projected vs Expected totals per record with severity (CRITICAL / WARNING / CLEAN)
-- Click any row to expand the full W1–W26 week-by-week flag detail
-- Filter by severity, search by key/mstyle
-- **Does not** have Accept / Accept All / Email Summary — those have been removed
-
-```bash
-# Re-open the viewer at any time against a prior results file:
-python scripts/viewer.py --results validation_results.json
-```
+Results are reviewed via the QB codepage (`codepage/viewer.html` + `viewer.js`).
+Do not launch `viewer.py` or reference `http://127.0.0.1:8765` — the codepage is the only viewer used.
 
 ### Step 6 — Gap Analysis (scripts/gap_analysis.py)
 
