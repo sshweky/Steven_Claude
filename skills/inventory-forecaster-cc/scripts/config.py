@@ -83,8 +83,10 @@ PRIME_DAY_BUMPS = [
     (5, 15, float(os.environ.get("PRIME_DAY_BUMP_MAY15", "1.25"))),
     (5, 29, float(os.environ.get("PRIME_DAY_BUMP_MAY29", "1.50"))),
 ]
-"""Prime Day (last Tuesday of June) ordering bump dates + multipliers.
-Each tuple = (month, day, multiplier). May 29 is the peak pre-buy."""
+"""DC ORDERING bumps ahead of Prime Day consumer event (end of June / last Tuesday of June).
+Ramp window = May. May 29 is peak pre-buy. NO July dates -- any July spike in
+F_AMZ_RPL output is a data artifact (e.g. post-OOS variability cycling), NOT Prime Day.
+Each tuple = (month, day, multiplier)."""
 
 FALL_PRIME_DAY_LIFT = float(os.environ.get("FALL_PRIME_DAY_LIFT", "1.30"))
 """Fall Prime Day (first Tuesday of October) ordering bump.
