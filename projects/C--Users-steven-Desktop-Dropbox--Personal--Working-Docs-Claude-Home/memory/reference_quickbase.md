@@ -177,7 +177,7 @@ Content-Type: application/json
 | bphc3vs5h | Orders and Shipments |
 | bptt4t9ef | Customers |
 | brynsaud5 | Petsmart Sales |
-| bp4rr2ckt | Retailer Sales |
+| bv2izcn5b | Retailer Sales |
 | bpx7i23si | Retailer Forecasts |
 | bptcjvybr | Retailer Promotions |
 | bpvkc7cje | Allowed Accounts for Exclusive Mstyles |
