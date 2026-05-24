@@ -180,5 +180,39 @@ F59J_POS_FLOOR          = float(os.environ.get("F59J_POS_FLOOR",          "50"))
 SCHEMA_VERSION = "2026.05.23"
 """Stamped on forecast_results.json + validation_results.json output.
 Bump when output structure changes (new fields, renamed fields).
-Tooling that loads these JSONs should compare against the schema version
-they were built for."""
+Tooling that loads these JSONs should call check_schema_version() below."""
+
+
+def check_schema_version(loaded_json, source_path="(unknown)", strict=False):
+    """Compare a loaded results JSON's _schema_version against current code.
+
+    Args:
+        loaded_json:  the dict returned by json.load()
+        source_path:  filename for the warning message
+        strict:       if True, raises ValueError on mismatch; else just warns
+
+    Returns:
+        True if version matches current, False otherwise.
+
+    Caller pattern (in viewer.py / gap_analysis.py):
+        with open(path) as f:
+            data = json.load(f)
+        from config import check_schema_version
+        check_schema_version(data, path)        # warn-only
+    """
+    import sys
+    found = loaded_json.get("_schema_version") if isinstance(loaded_json, dict) else None
+    if found == SCHEMA_VERSION:
+        return True
+    if found is None:
+        msg = (f"[WARN] {source_path}: no _schema_version found "
+               f"(pre-2026.05.23 output). Some fields may be missing or "
+               f"have different semantics.")
+    else:
+        msg = (f"[WARN] {source_path}: schema version mismatch -- "
+               f"file is {found!r}, code expects {SCHEMA_VERSION!r}. "
+               f"Re-run the forecaster to refresh.")
+    if strict:
+        raise ValueError(msg)
+    print(msg, file=sys.stderr, flush=True)
+    return False
