@@ -161,6 +161,13 @@ Snapshot 2026-05-21.  Every rule that fires in `forecast_record()` or
 | F60-ATS | (2026-05-24) EC variants that inherit parent order history via F60 now also inherit parent ATS data in ats_data and parent OOS data in oos_data. Previously VP-ATS-Catch silently skipped all EC variants (ats_data keyed by Mstyle; Inventory History - Weekly has parent record, not EC variant). Result: post-OOS catch-up spikes were uncapped in L13W, inflating _rpl_ord_l13 and causing _rpl_var_ratios to cycle contaminated ratios into steady-state weeks (e.g. July W8 spike). Propagation runs immediately after F60 history copy in main(). |
 | F60-ATS safety | (2026-05-24) If EC variant still has all-zero ATS after parent propagation (rare -- parent has no Inventory History record), _rpl_var_ratios is disabled (set None) so contaminated history cannot cycle into forecast weeks. Falls back to flat baseline. |
 | Prime Day calendar | Consumer event = last Tuesday of June. ORDERING bumps = May 1/15/29. NO July boosts exist. Any July spike in F_AMZ_RPL output is a data artifact (post-OOS variability cycling or contaminated history), never a Prime Day boost. |
+| Fix B (2026-05-24) | Outlier cap tightened 3.0x->2.5x. Added single-occurrence check: if max appears once and > 2x mean of remaining values, cap at 2x mean instead. |
+| Fix C (2026-05-24) | Sparse Intermittent F9 MAX baseline now always applies (was: L52 total > 15000). All sparse items use MAX(L13nz, L26nz, L52nz) as event qty. |
+| F77 (2026-05-24) | Severe-decline blend without YoY gate. When F10 skipped (YoY gate blocked) but L4W < L13W_nz x 0.65 AND seasonal profile variance < 2.5, blend 30% L4W / 70% model; W14+ x 0.90. |
+| Fix E (2026-05-24) | OTB PATH A/B suppressed for off-price accounts when manual_total > 100. Only PATH C (L4W=0, man<=100 closeout) applies. Prevents false OTB on opportunistic buyers. |
+| F78 (2026-05-24) | Peak-anchor fallback for items with no CATEGORY_PROFILES match. When L52 peak-month avg > 3x L13 trough, re-anchors baseline to peak avg / max(S). |
+| F79 (2026-05-24) | Amazon growth multiplier on Seasonal Baseline. When L4W/L13W_nz >= 1.20 and Amazon, scale forecast x min(L4W/L13W_nz, 1.50). Skips if F10/F77 already applied. |
+| F80 (2026-05-24) | Active:Replen zero-L13W fallback. When F30 zeroed an item but PT_Item_Status=Replen and L26W has activity, recover with L26W nz avg x 0.5 floor (model=Reactivating). |
 
 ## VP-ATS rules (history normalization)
 
