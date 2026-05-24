@@ -5826,12 +5826,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             "prior_total": _otb_prior,
             "pct_diff":    abs(_otb_new - _otb_prior) / _otb_prior * 100 if _otb_prior > 0 else 0,
             "alert":       (
-                f"R1 OTB (path {_otb_meta.get('path','A')}): {_otb_meta['nz_count']} nz weeks, "
-                + (f"top1 {_otb_meta['top1_share']*100:.0f}% of L52"
-                   if _otb_meta.get('path') == 'A'
-                   else f"top2 {_otb_meta['top2_share']*100:.0f}% of L52, "
-                        f"{_otb_meta['span_weeks']}w span")
-                + f", last order {_otb_meta['weeks_since_last']}w ago"
+                f"R1 OTB (path {_otb_meta.get('path','A')}): {_otb_meta.get('nz_count', 0)} nz weeks, "
+                + (
+                    f"top1 {_otb_meta.get('top1_share', 0)*100:.0f}% of L52"
+                    if _otb_meta.get('path') == 'A'
+                    else f"top2 {_otb_meta.get('top2_share', 0)*100:.0f}% of L52, "
+                         f"{_otb_meta.get('span_weeks', 0)}w span"
+                    if _otb_meta.get('path') == 'B'
+                    else _otb_meta.get('reason', 'off-price closeout')   # PATH C
+                )
+                + f", last order {_otb_meta.get('weeks_since_last', 0)}w ago"
             ),
         }
 
