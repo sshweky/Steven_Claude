@@ -1269,24 +1269,6 @@ def load_results(path):
               f"On-Plan={validation_summary.get('priority_on_plan', 0)}")
 
 
-def load_log():
-    """Load or initialise changes_log.json."""
-    if Path(LOG_PATH).exists():
-        with open(LOG_PATH) as f:
-            return json.load(f)
-    return {"prj_cols": prj_cols, "changes": []}
-
-
-def save_log(log):
-    with open(LOG_PATH, "w") as f:
-        json.dump(log, f, indent=2)
-
-
-def accepted_keys():
-    """Return set of keys already accepted (in the log)."""
-    log = load_log()
-    return {c["key"] for c in log.get("changes", [])}
-
 
 # ─── Manager email builder ─── REMOVED (email-summary feature deleted) ───────
 # build_email_html, build_manager_email_html, create_outlook_draft, the
