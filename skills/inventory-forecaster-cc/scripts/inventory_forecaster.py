@@ -7085,6 +7085,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"{'…' if len(_changed_weeks) > 8 else ''}); unmet demand "
                     f"rolled forward with 25%/wk decay until age 4 (fully lost)"
                 )
+    elif _f37_skip and isinstance(meta, dict):
+        _f37_skip_reason = "Status_Cust=NEW" if _f37_status_new else "active-growth (L4>=0.8*L13)"
+        meta.setdefault("drivers", []).append(
+            f"F37 skipped: {_f37_skip_reason} -- new-launch / growth items "
+            f"should not have W1-W2 zeroed by warehouse OH"
+        )
 
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
     #
