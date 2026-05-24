@@ -2200,6 +2200,9 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # F34: skip F10 entirely on new-launch items — pre-launch zeros aren't a
     # decline reference; the YoY check is meaningless against an empty window.
     _f10_applied = False
+    _f77_applied = False
+    _f77_driver  = None
+    _f79_ratio   = 1.0
     if (_drop_vs_l13 and (_drop_yoy or not _yoy_avail)
             and not _f14a_override and not is_new_launch):
         _new_fcst = []
