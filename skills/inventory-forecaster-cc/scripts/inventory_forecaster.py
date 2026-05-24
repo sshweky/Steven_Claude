@@ -5336,7 +5336,7 @@ def _top_manual_defect(manual, fcst, cust_label="this account"):
     if 0 < len(blanks) <= 10:
         gap_vol = sum(int(fcst[i]) for i in blanks)
         return (f"{len(blanks)} weeks have nothing planned even though {cl} "
-                f"is actively ordering — that's roughly {gap_vol:,} units of "
+                f"is actively ordering -- that's roughly {gap_vol:,} units of "
                 f"demand the plan isn't budgeting for.")
 
     # Front/back-loaded skew.
@@ -5346,12 +5346,12 @@ def _top_manual_defect(manual, fcst, cust_label="this account"):
         if m_front - a_front > 0.15:
             return (f"The plan is leaning heavy on the first half "
                     f"({int(m_front*100)}% in W1-W13 vs {int(a_front*100)}% "
-                    f"in the model) — make sure that frontload matches a real "
+                    f"in the model) -- make sure that frontload matches a real "
                     f"event at {cl}.")
         if a_front - m_front > 0.15:
             return (f"The plan is leaning light on the first half "
                     f"({int(m_front*100)}% in W1-W13 vs {int(a_front*100)}% "
-                    f"in the model) — possible miss on near-term demand.")
+                    f"in the model) -- possible miss on near-term demand.")
     return ""
 
 
