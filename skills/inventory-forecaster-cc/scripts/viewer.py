@@ -1046,6 +1046,36 @@ def load_results(path):
                 print(f"  Amazon POS: {n_pos} records enriched")
         except Exception as e:
             print(f"  [WARN] Could not load POS cache: {e}")
+        # Inject Amazon catalog data (AUR + DC inv) for narrative context.
+        # Written by inventory_forecaster.py after Phase 2.6b.
+        try:
+            amz_path = Path(__file__).parent.parent / "viewer_amz_cache.json"
+            if amz_path.exists():
+                amz_cache = json.load(open(amz_path))
+                n_amz = 0
+                for r in recs:
+                    if "AMAZON" in (r.get("cust", "") or "").upper():
+                        m = r.get("mstyle", "")
+                        if m and m in amz_cache:
+                            r["_amz"] = amz_cache[m]
+                            n_amz += 1
+                        elif m:
+                            # EC parent / variant fallback (mirrors forecaster logic)
+                            _m_up = m.upper()
+                            _parent = (m[:-2] if _m_up.endswith("EC") else
+                                       m[:-3] if _m_up.endswith("COS") or _m_up.endswith("AMZ") else m)
+                            if _parent != m and _parent in amz_cache:
+                                r["_amz"] = amz_cache[_parent]
+                                n_amz += 1
+                            else:
+                                for _sfx in ("AMZ", "EC", "COS", "DS"):
+                                    if (m + _sfx) in amz_cache:
+                                        r["_amz"] = amz_cache[m + _sfx]
+                                        n_amz += 1
+                                        break
+                print(f"  Amazon catalog (AUR + DC inv): {n_amz} records enriched")
+        except Exception as e:
+            print(f"  [WARN] Could not load Amazon catalog cache: {e}")
         # EC-supersession guard: when an item has been switched to an EC variant
         # ({mstyle}EC = "prepped in bags & ecomm ready"), the original non-EC
         # mstyle is being phased out.  Zero the AI forecast on the parent so we
