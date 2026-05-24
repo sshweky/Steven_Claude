@@ -12,9 +12,9 @@ TABLE  = "bp4rr2ckt"   # Retailer Sales
 # ── fields ───────────────────────────────────────────────────────────────────
 req = urllib.request.Request(
     f"https://api.quickbase.com/v1/fields?tableId={TABLE}&includeFieldPerms=false",
-    headers=HDRS)
+    headers=HDRS, method="GET")
 with urllib.request.urlopen(req, timeout=30) as r:
-    fields = json.loads(r.read())
+    fields = json.loads(r.read().decode("utf-8"))
 
 print(f"Retailer Sales  ({TABLE})  --  {len(fields)} fields\n")
 for f in sorted(fields, key=lambda x: x["id"]):
