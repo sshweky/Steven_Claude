@@ -289,16 +289,31 @@ CATEGORY_PROFILES = {
     "wooden fire":   [0.50, 1.20, 1.90, 2.10, 1.70, 1.30, 0.70, 0.26, 0.25, 0.22, 0.22, 0.35],
     "kingsford":     [0.50, 1.20, 1.90, 2.10, 1.70, 1.30, 0.70, 0.26, 0.25, 0.22, 0.22, 0.35],
 
-    # ── Paper-goods / outdoor entertaining — dual peak: summer + holiday ────────
+    # ── Disposable Tabletop — dual peak: summer + holiday ────────────────────
+    # Plates, bowls, cups, cutlery (paper + plastic + foam).
     # Everyday use year-round with two clear seasonal lifts:
     #   Summer (consumer May-Aug): retailers order Apr-Jul for cookouts/picnics
     #   Holiday (consumer Nov-Dec): retailers order Oct-Nov for Thanksgiving/Christmas
     #   Sep is early holiday ramp.  Updated 2026-05-20 per planner feedback
     #   (previous profile was summer-only; Thanksgiving/Christmas are also peaks).
-    "snack bowl":    [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
-    "paper bowl":    [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
-    "paper plate":   [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
-    "paper cup":     [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55],
+    #   Fix A (2026-05-24): renamed from "Paper-goods"; added plastic/foam cutlery keywords.
+    _DT = [0.50, 0.55, 0.80, 1.25, 1.55, 1.65, 1.55, 1.35, 1.10, 1.20, 1.30, 0.55]
+    "snack bowl":       _DT,
+    "paper bowl":       _DT,
+    "paper plate":      _DT,
+    "paper cup":        _DT,
+    "plastic fork":     _DT,
+    "plastic knife":    _DT,
+    "plastic spoon":    _DT,
+    "plastic cup":      _DT,
+    "plastic bowl":     _DT,
+    "plastic plate":    _DT,
+    "foam plate":       _DT,
+    "foam bowl":        _DT,
+    "foam cup":         _DT,
+    "bath cup":         _DT,
+    "cutlery set":      _DT,
+    "cutlery":          _DT,
 
     # ── Home fragrance / air-care — mild broad lift Apr–Aug ──────────────────
     # air freshener and scent booster have mild warm-weather lift.
