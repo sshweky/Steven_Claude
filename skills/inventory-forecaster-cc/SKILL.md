@@ -803,15 +803,6 @@ running. Output: `analysis_36_keys.json`.
 
 ---
 
-## Model Fixes (applied 2026-05-21 -- EC parent lookup + VP-Q4 false abort)
-
-| Fix | Rule / Location | Description |
-|---|---|---|
-| **EC parent POS lookup** | Phase 2.5 -- `amazon_mstyles` set construction | EC and COS mstyle variants (e.g. "FF12302/24EC") have their POS and DC inventory data stored in Amazon_Catalog under the parent mstyle ("FF12302/24"). Fix: `amazon_mstyles` query set is expanded to include parent variants before the QB pull -- `amazon_mstyles = list(_amz_raw | {_ec_parent_for_query(m) for m in _amz_raw})` -- so the cache is keyed correctly and F59i / narrative can anchor to real POS data for EC items. |
-| **VP-Q4 false abort on zero open-PO items** | VP-Q4 guard at `len(open_pos_data) == 0` | VP-Q4 zero-out requires open-PO data to be present. When running a single-item scope for an item that genuinely has no open POs the old guard fired the abort incorrectly (treated "no matched keys" same as "CData returned nothing"). Fix: when `len(open_pos_data) == 0`, check `open_pos_report.json` cache for row count. If cache has rows, the pull was healthy -- item just has no POs, no abort needed. Only abort if cache itself is empty (real pull failure). |
-
----
-
 ## Codepage Viewer Fixes (applied 2026-05-21 -- Season column + inv flow header)
 
 Changes to `codepage/viewer.js` and `codepage/viewer.html`:
