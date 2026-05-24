@@ -4318,15 +4318,13 @@ class Handler(BaseHTTPRequestHandler):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    global RESULTS_PATH, LOG_PATH
+    global RESULTS_PATH
 
     p = argparse.ArgumentParser(description="Inventory Forecast Viewer")
     p.add_argument("--results", default="forecast_results.json",
                    help="Forecast JSON file (default: forecast_results.json)")
     p.add_argument("--port",    type=int, default=8765,
                    help="HTTP port (default: 8765)")
-    p.add_argument("--log",     default="changes_log.json",
-                   help="Changes log JSON (default: changes_log.json)")
     p.add_argument("--no-browser", action="store_true",
                    help="Don't auto-open browser")
     p.add_argument("--no-enrich", action="store_true",
