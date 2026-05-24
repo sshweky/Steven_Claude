@@ -68,18 +68,18 @@ _RULE_CODE_TOKEN = re.compile(r'\b([A-Z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*[a-z]?)\b'
 # the conventions in CHANGELOG.md.
 _RULE_CODE_FAMILIES = re.compile(
     r'''^(?:
-        F\d+[a-z]?            |   # F12, F38a, F59o
-        F\d+-[A-Za-z]+        |   # F69-WOS, F69-shift
-        F_[A-Z_]+             |   # F_PO_CUTOFF
-        R\d+                  |   # R1, R3, R9
-        M\d+                  |   # M1, M2, M3
-        S\d+                  |   # S1..S6
-        T\d+                  |   # T1..T4
-        VP-Q\d+               |   # VP-Q1..VP-Q4
-        VP-[A-Z]+(?:-[A-Z]+)? |   # VP-FL, VP-OP, VP-ATS, VP-ATS-Catch
-        G\d+                  |   # G2
-        Fix\s*\d+             |   # Fix 1..Fix 5 (legacy)
-        Priority\s*\d+            # Priority 1..Priority 8 (legacy)
+        F\d+[a-z]?                |   # F12, F38a, F59o
+        F\d+-[A-Za-z]+            |   # F69-WOS, F69-shift
+        F_[A-Z_]+                 |   # F_PO_CUTOFF
+        R\d+                      |   # R1, R3, R9
+        M\d+                      |   # M1, M2, M3
+        S\d+                      |   # S1..S6
+        T\d+                      |   # T1..T4
+        VP-Q\d+                   |   # VP-Q1..VP-Q4
+        VP-[A-Z]+(?:-[A-Za-z]+)?  |   # VP-FL, VP-OP, VP-ATS, VP-ATS-Catch
+        G\d+                      |   # G2
+        Fix\s*\d+                 |   # Fix 1..Fix 5 (legacy)
+        Priority\s*\d+                # Priority 1..Priority 8 (legacy)
     )$''',
     re.VERBOSE,
 )
