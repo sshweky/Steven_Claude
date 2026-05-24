@@ -39,14 +39,14 @@ def aggregate_metrics(results_json_path: Path) -> dict:
 
     n           = len(records)
     n_alert     = sum(1 for r in records if r.get("alert"))
-    ai_total    = sum(sum(r.get("fcst", [])) for r in records)
+    ai_total    = sum(sum(r.get("forecast", r.get("fcst", []))) for r in records)
     manual_total = sum(sum(r.get("manual", [])) for r in records)
 
     # Per-record absolute % delta (clamped at 200% to avoid div-by-zero blowups)
     deltas = []
     for r in records:
         m = sum(r.get("manual", []))
-        a = sum(r.get("fcst", []))
+        a = sum(r.get("forecast", r.get("fcst", [])))
         if m > 0:
             d = abs(a - m) / m
             deltas.append(min(d, 2.0))
