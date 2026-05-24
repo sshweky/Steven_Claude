@@ -8834,6 +8834,31 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _po_cutoff_zero_w1 = True
             _fire("F_PO_CUTOFF")
 
+    # ── F_PO_CUTOFF_ALL (2026-05-24) — Non-Amazon W1 zero when no orders by Wed 9am EST ──
+    # For all non-Amazon customers: if Wednesday 9am EST (14:00 UTC) or later and
+    # no confirmed open PO exists for W1, zero AI PRJ W1.  This mirrors F_PO_CUTOFF
+    # (Amazon FF/BB) but uses Wednesday as the universal order-received deadline.
+    # Sun/Mon/Tue are always protected -- orders may still arrive.
+    # MAN PRJ W1 is never auto-zeroed; planner sees the codepage warning instead.
+    if not is_amazon and not _po_cutoff_zero_w1:
+        _now_utc   = datetime.utcnow()
+        _pc_all_wd = _now_utc.weekday()
+        # Wednesday (wd=2) at 14:00 UTC = 9am EST / 10am EDT (conservative gate)
+        _pc_all_window = (
+            (_pc_all_wd >= 3)  # Thu-Sat: always in window
+            or (_pc_all_wd == 2 and _now_utc.hour >= 14)  # Wed past 9am EST
+        )
+        _pc_all_w1_qty = float(_effective_po_wk[0]) if _effective_po_wk else 0.0
+        if _pc_all_window and _pc_all_w1_qty == 0 and fcst[0] > 0:
+            if isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F_PO_CUTOFF_ALL: non-Amazon customer, no confirmed W1 PO "
+                    f"by Wed 9am EST (weekday={_pc_all_wd}, UTC hour={_now_utc.hour}); "
+                    f"zeroing AI W1={fcst[0]:.0f}"
+                )
+            fcst[0] = 0
+            _fire("F_PO_CUTOFF_ALL")
+
     # ── F70 — Switchover variant conflict (2026-05-21) ───────────────────────────
     # When a variant style (e.g. FF8654EC/COS/AMZ) at the same account has
     # manual projections > 0 or open customer POs in a given week, the retailer
