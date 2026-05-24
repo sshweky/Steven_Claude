@@ -371,7 +371,7 @@ add_table(s, prs, ["Constant", "Value", "Purpose"], [
     ["ALERT_THRESHOLD",    "0.05",        "5% variance triggers AI_ALERT"],
     ["MAX_RETRIES",        "5",           "CData retry budget (was 3 before May 2026)"],
 ], top=Inches(1.5), font_size=12)
-add_footer(s, prs, "Appendix · METHODOLOGY.md §9")
+add_footer(s, prs, "Appendix - SKILL.md (Configuration knobs)")
 
 
 out = r"C:\Users\steven\.claude\skills\inventory-forecaster-cc\inventory_forecaster_VP_review.pptx"
