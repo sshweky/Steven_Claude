@@ -681,10 +681,10 @@ def _compute_event_boosts():
     fall_boosts = {}
     for yr_off in (0, 1):
         yr = prj_start.year + yr_off
-        may31 = date(yr, 5, 31)
-        # Last Monday of May: walk back from May 31 to Monday
-        memorial_day = may31 - timedelta(days=may31.weekday())  # weekday()==0 is Mon
-        fall_bump = memorial_day + timedelta(days=1)            # Tuesday after
+        sep1 = date(yr, 9, 1)
+        # First Monday of September (Labor Day)
+        labor_day = sep1 + timedelta(days=(0 - sep1.weekday()) % 7)
+        fall_bump = labor_day + timedelta(days=1)               # Tuesday after Labor Day
         delta = (fall_bump - prj_start).days
         if 0 <= delta < 26 * 7:
             wk = delta // 7 + 1
