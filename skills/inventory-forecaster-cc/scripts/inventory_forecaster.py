@@ -10683,7 +10683,8 @@ def main():
     if amazon_mstyles:
         print(f"\n[2.6] Pulling Amazon Catalog US (F38 signals) for "
               f"{len(amazon_mstyles)} mstyles ...", flush=True)
-        AMZUS_COLS = ["Mstyle_model_", "Amazon_Buybox", "MAP_Price", "AUR_L4w",
+        AMZUS_COLS = ["Mstyle_model_", "Amazon_Buybox", "MAP_Price",
+                      "AUR_L4w", "AUR_L13w", "AUR_L26w", "AUR_L52w",
                       "Days_Amazon_OOS_L30d_", "Sellable_On_Hand_Units",
                       "ASIN_Buyability_Flag", "ASIN", "ASIN_Status"]
         amzus_sel = ", ".join(f"[{c}]" for c in AMZUS_COLS)
