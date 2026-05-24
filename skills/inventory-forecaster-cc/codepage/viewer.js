@@ -5212,7 +5212,7 @@ function onManEdit(inputEl) {
     DIRTY_EDITS.set(dirtyKey, { key, weekIdx, oldVal: origVal, newVal });
     inputEl.classList.add('dirty');
   }
-  // Live-update the detail-pane Total cell for this record
+  // Live-update the detail-pane Total and Avg/Wk cells for this record
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   const totEl  = document.getElementById('man-total-' + safeId);
   if (totEl) {
@@ -5222,6 +5222,8 @@ function onManEdit(inputEl) {
       sum += (isFinite(v) && v >= 0) ? v : 0;
     });
     totEl.textContent = fmtN(sum);
+    const avgWkEl = document.getElementById('man-avgwk-' + safeId);
+    if (avgWkEl) avgWkEl.textContent = fmtN(Math.round(sum / 26));
   }
   updateSaveAllBadge();
 }
