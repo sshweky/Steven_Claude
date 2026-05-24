@@ -11221,6 +11221,15 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                                   cust_label=_cust_label)
         if _smart:
             specific.append(_smart)
+        # Order Trends bullet: B2B order history run-rate alongside POS consumer signal.
+        # Shows LW / Avg L4W / L13W / L26W / L52W from order history for all records.
+        if len(hist) >= 4:
+            _ly_hist_pos = rec.get("history_ly_ord") or []
+            _smart_ord = _smart_order_trend(hist,
+                                            ly_hist_26=_ly_hist_pos if _ly_hist_pos else None,
+                                            cust_label=_cust_label)
+            if _smart_ord:
+                specific.append(_smart_ord)
     else:
         # No POS data.  Three cases:
         #   1) APL (Amazon Private Label) — no POS/DC data by design; use order history.
