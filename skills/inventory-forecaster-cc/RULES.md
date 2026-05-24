@@ -158,6 +158,9 @@ Snapshot 2026-05-21.  Every rule that fires in `forecast_record()` or
 | G2   | All-zero-by-guards safety demotion (model -> Inactive when all 26w zeroed) |
 | F_AMZ_RPL Fix A | (2026-05-24) _rpl_ord_l13 and variability raw data now use normalized hist[-13:] instead of raw QB row columns -- phantom stock-up orders removed by F41/F35/F43 are no longer counted in the demand baseline |
 | F_AMZ_RPL Fix B | (2026-05-24) DC depletion inference: when WOS=0, SOH=0, OPO=0 (ASIN absent from Inventory Health), treat as fully depleted (WOS=0.0) so W1+W2 catch-up order fires at 10-WOS gap fill; previously silently skipped as "DC WOS unknown" |
+| F60-ATS | (2026-05-24) EC variants that inherit parent order history via F60 now also inherit parent ATS data in ats_data and parent OOS data in oos_data. Previously VP-ATS-Catch silently skipped all EC variants (ats_data keyed by Mstyle; Inventory History - Weekly has parent record, not EC variant). Result: post-OOS catch-up spikes were uncapped in L13W, inflating _rpl_ord_l13 and causing _rpl_var_ratios to cycle contaminated ratios into steady-state weeks (e.g. July W8 spike). Propagation runs immediately after F60 history copy in main(). |
+| F60-ATS safety | (2026-05-24) If EC variant still has all-zero ATS after parent propagation (rare -- parent has no Inventory History record), _rpl_var_ratios is disabled (set None) so contaminated history cannot cycle into forecast weeks. Falls back to flat baseline. |
+| Prime Day calendar | Consumer event = last Tuesday of June. ORDERING bumps = May 1/15/29. NO July boosts exist. Any July spike in F_AMZ_RPL output is a data artifact (post-OOS variability cycling or contaminated history), never a Prime Day boost. |
 
 ## VP-ATS rules (history normalization)
 
