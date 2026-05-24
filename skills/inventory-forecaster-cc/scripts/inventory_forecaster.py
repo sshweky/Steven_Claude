@@ -3900,10 +3900,8 @@ def seasonal_profile(history, n=26):
 # defined but NEVER CALLED anywhere.  Dense buyers route through
 # seasonal_baseline() which applies all the same concepts (level baseline,
 # seasonal profile, caps) plus all the post-2025 calibration rules.
-# HW_ALPHA / HW_BETA constants remain in the config block because they
-# document the original level/trend smoothing intent (not currently wired up).
-# If a true HW trend extrapolator is needed in the future, restore from git:
-# commit before 2026-05-21.
+# HW_ALPHA / HW_BETA constants also removed (2026-05-23 audit) -- dead code.
+# Restore from git commit before 2026-05-21 if needed.
 
 
 def crostens(history, mp, is_amazon=False, description=None,
