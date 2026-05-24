@@ -9321,13 +9321,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _rpl_adj1, _rpl_adj2 = 0, 1
 
                 if not _rpl_dc_depleted and _rpl_wos > 12:
-                    # Overstocked: zero the correction window -- let DC drain
-                    # naturally to 12 WOS via ongoing consumer sell-through.
-                    _rpl_new[_rpl_adj1] = 0
-                    _rpl_new[_rpl_adj2] = 0
+                    # Overstocked: W1+W2 already hold the steady-state demand
+                    # from Fix 1 (_rpl_rates[0/1]).  Do NOT zero them -- planner
+                    # must always see the ongoing demand signal and decide whether
+                    # to actually place an order.  No extra fill is added.
                     _rpl_inv_note = (
                         f"DC WOS={_rpl_wos:.1f} > 12 (overstocked) -- "
-                        f"W{_rpl_adj1+1}+W{_rpl_adj2+1} zeroed to drain to 12 WOS"
+                        f"steady-state demand shown in W1+W2; no fill order added"
                     )
                 elif _rpl_dc_depleted or _rpl_wos < 10:
                     # Understocked or DC fully depleted (WOS=0, SOH=0, OPO=0):
