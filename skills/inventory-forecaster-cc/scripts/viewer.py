@@ -3401,7 +3401,7 @@ async function loadCommentHistory(key, force) {{
       }} else {{
         aiCont.innerHTML = rows.map(c => {{
           const noteRaw = c.note || '';
-          const note    = noteRaw.replace(/\s*\[ai-intent[^\]]*\]/g, '').trim();
+          const note    = noteRaw.replace(/\\s*\[ai-intent[^\]]*\]/g, '').trim();
           const author  = c.author || '';
           const ignored = !!c.ignored;
           const rid     = c.rid || 0;
