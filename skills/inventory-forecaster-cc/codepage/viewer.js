@@ -5192,8 +5192,7 @@ async function copyToMan(key, source, btn) {
 // -- Editable MAN projection cells ------------------------------------------
 // Wired from the inline `oninput="onManEdit(this)"` on each editable cell.
 // Updates DIRTY_EDITS state, paints the cell, recomputes the detail-pane
-// total live, refreshes all row metrics (AI vs Proj, Fcst Status, AI vs L13,
-// Man vs L13) immediately, and refreshes the Save All / Discard buttons.
+// total live, and refreshes the Save All / Discard buttons.
 function onManEdit(inputEl) {
   const key      = inputEl.dataset.key;
   const weekIdx  = parseInt(inputEl.dataset.week, 10);
