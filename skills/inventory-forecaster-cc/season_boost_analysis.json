@@ -57,15 +57,134 @@
     "2026-05-10"
   ],
   "season_item_counts": {
-    "": 0,
+    "": 862,
     "Easter": 0,
-    "Fall/Winter": 0,
+    "Fall/Winter": 2,
     "Halloween": 0,
-    "Holiday": 0,
-    "July 4th": 0,
+    "Holiday": 3,
+    "July 4th": 2,
     "Pride": 0,
-    "Spring/Summer": 0,
+    "Spring/Summer": 2,
     "St Patrick's Day": 0
   },
-  "boosts": {}
+  "boosts": {
+    "": {
+      "ly": {
+        "17": {
+          "week_date": "2025-09-14",
+          "median": 0.309,
+          "mean": 2.354,
+          "n": 617
+        },
+        "18": {
+          "week_date": "2025-09-21",
+          "median": 0.012,
+          "mean": 1.245,
+          "n": 617
+        },
+        "19": {
+          "week_date": "2025-09-28",
+          "median": 0.0,
+          "mean": 0.889,
+          "n": 617
+        },
+        "20": {
+          "week_date": "2025-10-05",
+          "median": 0.0,
+          "mean": 0.8,
+          "n": 617
+        },
+        "21": {
+          "week_date": "2025-10-12",
+          "median": 0.0,
+          "mean": 0.653,
+          "n": 617
+        },
+        "22": {
+          "week_date": "2025-10-19",
+          "median": 0.361,
+          "mean": 1.751,
+          "n": 617
+        },
+        "23": {
+          "week_date": "2025-10-26",
+          "median": 0.168,
+          "mean": 1.279,
+          "n": 617
+        },
+        "24": {
+          "week_date": "2025-11-02",
+          "median": 0.411,
+          "mean": 1.957,
+          "n": 617
+        },
+        "25": {
+          "week_date": "2025-11-09",
+          "median": 0.644,
+          "mean": 1.979,
+          "n": 617
+        }
+      },
+      "l26w_extra": {
+        "0": {
+          "week_date": "2025-11-16",
+          "median": 0.09,
+          "mean": 1.137,
+          "n": 617
+        },
+        "1": {
+          "week_date": "2025-11-23",
+          "median": 0.219,
+          "mean": 1.282,
+          "n": 617
+        },
+        "2": {
+          "week_date": "2025-11-30",
+          "median": 0.279,
+          "mean": 1.396,
+          "n": 617
+        },
+        "3": {
+          "week_date": "2025-12-07",
+          "median": 0.438,
+          "mean": 2.422,
+          "n": 617
+        },
+        "4": {
+          "week_date": "2025-12-14",
+          "median": 0.175,
+          "mean": 1.374,
+          "n": 617
+        },
+        "5": {
+          "week_date": "2025-12-21",
+          "median": 0.258,
+          "mean": 1.332,
+          "n": 617
+        },
+        "6": {
+          "week_date": "2025-12-28",
+          "median": 0.821,
+          "mean": 2.089,
+          "n": 617
+        }
+      }
+    },
+    "Fall/Winter": {
+      "ly": {},
+      "l26w_extra": {}
+    },
+    "Holiday": {
+      "ly": {},
+      "l26w_extra": {}
+    },
+    "July 4th": {
+      "ly": {},
+      "l26w_extra": {}
+    },
+    "Spring/Summer": {
+      "ly": {},
+      "l26w_extra": {}
+    }
+  }
 }
