@@ -4759,9 +4759,19 @@ async function _loadRtlPos(r, safeId) {
     ? '<b>Retailer POS sales:</b> ' + posItems.join(sep)
     : '<b>Retailer POS sales:</b> <span style="color:#999;font-style:italic">no POS data</span>';
 
-  // -- Bullet 2: Retailer inventory -----------------------------------------
+  // -- Bullet 2: Retailer inventory + OH WOS --------------------------------
+  const fmtWos = n => n.toFixed(1);
+  const ohWos  = rtlPosL4w > 0 ? rtlOhLw / rtlPosL4w : 0;
   const invItems = [];
   if (rtlOhLw > 0) invItems.push(`<b>OH</b> ${fmt(rtlOhLw)} u`);
+  if (ohWos > 0) {
+    let wosHtml;
+    if      (ohWos < 4)  wosHtml = `<b>OH WOS</b> <span style="color:#c62828;font-weight:600">${fmtWos(ohWos)} wks &#9888;</span>`;
+    else if (ohWos < 6)  wosHtml = `<b>OH WOS</b> <span style="color:#e65100">${fmtWos(ohWos)} wks</span>`;
+    else if (ohWos < 12) wosHtml = `<b>OH WOS</b> ${fmtWos(ohWos)} wks`;
+    else                 wosHtml = `<b>OH WOS</b> <span style="color:#f57f17">${fmtWos(ohWos)} wks (overstocked)</span>`;
+    invItems.push(wosHtml);
+  }
   if (rtlInstockLw > 0) {
     const instPct   = fmtPct(rtlInstockLw);
     const instColor = rtlInstockLw < 0.90 ? '#c62828' : rtlInstockLw < 0.95 ? '#e65100' : '';
