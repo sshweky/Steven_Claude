@@ -1592,67 +1592,67 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                 f"POS trend already reflected in rolling L13W ord avg)"
             )
         else:
-          try:
-            _f38_l4   = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
-            _f38_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-            _f38_bb   = float(amz_catalog.get("Amazon_Buybox") or 0)
-            _f38_aur  = float(amz_catalog.get("AUR_L4w") or 0)
-            _f38_map  = float(amz_catalog.get("MAP_Price") or 0)
-            _f38_oos  = float(amz_catalog.get("Days_Amazon_OOS_L30d_") or 0)
-            _f38_soh  = float(amz_catalog.get("Sellable_On_Hand_Units") or 0)
-        except (TypeError, ValueError):
-            _f38_l4 = _f38_l13 = _f38_bb = _f38_aur = _f38_map = _f38_oos = _f38_soh = 0.0
-        if _f38_l13 > 0:
-            _f38_trend = (_f38_l4 / _f38_l13) - 1.0
-            if _f38_trend >= 0.10:
-                # Positive branch — check temp-discount caveat first.
-                _temp_discount = False
-                if _f38_bb > 0 and _f38_aur > 0:
-                    _price_chg = (_f38_bb / _f38_aur) - 1.0
-                    if _price_chg <= -0.10 and _f38_map > 0 and _f38_bb < _f38_map:
-                        _temp_discount = True
-                if _temp_discount:
-                    # F38a — temporary discount-driven uptick, ignore trend.
-                    _f38_driver = (
-                        f"F38a POS trend +{_f38_trend*100:.0f}% but buybox "
-                        f"${_f38_bb:.2f} down {_price_chg*100:.0f}% vs AUR_L4w "
-                        f"${_f38_aur:.2f} AND below MAP ${_f38_map:.2f} — "
-                        f"temporary discount; ignoring trend"
-                    )
-                else:
-                    # F38b — legitimate uptick, full-pct lift.
-                    _pre_f38 = baseline
-                    baseline = baseline * (1.0 + _f38_trend)
-                    _f38_driver = (
-                        f"F38b POS trend +{_f38_trend*100:.0f}% (L4w {_f38_l4:.0f}/wk "
-                        f"vs L13w {_f38_l13:.0f}/wk); price stable/above-MAP — "
-                        f"baseline lifted {_pre_f38:.0f} → {baseline:.0f} "
-                        f"(full-pct passthrough)"
-                    )
-            elif _f38_trend <= -0.10:
-                # Negative branch — check OOS / low-stock guards first.
-                _wos = (_f38_soh / _f38_l4) if _f38_l4 > 0 else 999.0
-                if _f38_oos > 0:
-                    # F38c — OOS-driven dip, ignore.
-                    _f38_driver = (
-                        f"F38c POS trend {_f38_trend*100:.0f}% but "
-                        f"Days_OOS_L30d={_f38_oos:.0f} — OOS-driven, ignoring"
-                    )
-                elif _wos < 4.0:
-                    # F38d — low-stock dip, ignore.
-                    _f38_driver = (
-                        f"F38d POS trend {_f38_trend*100:.0f}% but Sellable WOS "
-                        f"{_wos:.1f} (<4) — low stock, ignoring"
-                    )
-                else:
-                    # F38e — permanent decrease, full-pct cut.
-                    _pre_f38 = baseline
-                    baseline = baseline * (1.0 + _f38_trend)
-                    _f38_driver = (
-                        f"F38e POS trend {_f38_trend*100:.0f}% (L4w {_f38_l4:.0f}/wk "
-                        f"vs L13w {_f38_l13:.0f}/wk); WOS {_wos:.1f}, no OOS — "
-                        f"baseline cut {_pre_f38:.0f} → {baseline:.0f}"
-                    )
+            try:
+                _f38_l4   = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
+                _f38_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+                _f38_bb   = float(amz_catalog.get("Amazon_Buybox") or 0)
+                _f38_aur  = float(amz_catalog.get("AUR_L4w") or 0)
+                _f38_map  = float(amz_catalog.get("MAP_Price") or 0)
+                _f38_oos  = float(amz_catalog.get("Days_Amazon_OOS_L30d_") or 0)
+                _f38_soh  = float(amz_catalog.get("Sellable_On_Hand_Units") or 0)
+            except (TypeError, ValueError):
+                _f38_l4 = _f38_l13 = _f38_bb = _f38_aur = _f38_map = _f38_oos = _f38_soh = 0.0
+            if _f38_l13 > 0:
+                _f38_trend = (_f38_l4 / _f38_l13) - 1.0
+                if _f38_trend >= 0.10:
+                    # Positive branch -- check temp-discount caveat first.
+                    _temp_discount = False
+                    if _f38_bb > 0 and _f38_aur > 0:
+                        _price_chg = (_f38_bb / _f38_aur) - 1.0
+                        if _price_chg <= -0.10 and _f38_map > 0 and _f38_bb < _f38_map:
+                            _temp_discount = True
+                    if _temp_discount:
+                        # F38a -- temporary discount-driven uptick, ignore trend.
+                        _f38_driver = (
+                            f"F38a POS trend +{_f38_trend*100:.0f}% but buybox "
+                            f"${_f38_bb:.2f} down {_price_chg*100:.0f}% vs AUR_L4w "
+                            f"${_f38_aur:.2f} AND below MAP ${_f38_map:.2f} -- "
+                            f"temporary discount; ignoring trend"
+                        )
+                    else:
+                        # F38b -- legitimate uptick, full-pct lift.
+                        _pre_f38 = baseline
+                        baseline = baseline * (1.0 + _f38_trend)
+                        _f38_driver = (
+                            f"F38b POS trend +{_f38_trend*100:.0f}% (L4w {_f38_l4:.0f}/wk "
+                            f"vs L13w {_f38_l13:.0f}/wk); price stable/above-MAP -- "
+                            f"baseline lifted {_pre_f38:.0f} -> {baseline:.0f} "
+                            f"(full-pct passthrough)"
+                        )
+                elif _f38_trend <= -0.10:
+                    # Negative branch -- check OOS / low-stock guards first.
+                    _wos = (_f38_soh / _f38_l4) if _f38_l4 > 0 else 999.0
+                    if _f38_oos > 0:
+                        # F38c -- OOS-driven dip, ignore.
+                        _f38_driver = (
+                            f"F38c POS trend {_f38_trend*100:.0f}% but "
+                            f"Days_OOS_L30d={_f38_oos:.0f} -- OOS-driven, ignoring"
+                        )
+                    elif _wos < 4.0:
+                        # F38d -- low-stock dip, ignore.
+                        _f38_driver = (
+                            f"F38d POS trend {_f38_trend*100:.0f}% but Sellable WOS "
+                            f"{_wos:.1f} (<4) -- low stock, ignoring"
+                        )
+                    else:
+                        # F38e -- permanent decrease, full-pct cut.
+                        _pre_f38 = baseline
+                        baseline = baseline * (1.0 + _f38_trend)
+                        _f38_driver = (
+                            f"F38e POS trend {_f38_trend*100:.0f}% (L4w {_f38_l4:.0f}/wk "
+                            f"vs L13w {_f38_l13:.0f}/wk); WOS {_wos:.1f}, no OOS -- "
+                            f"baseline cut {_pre_f38:.0f} -> {baseline:.0f}"
+                        )
 
     # 26-week seasonal shape with eased dampening (2026-05-06).  Updated to
     # let strong seasonals (Halloween, Holiday, July 4th, Easter) come through
