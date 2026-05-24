@@ -156,6 +156,8 @@ Snapshot 2026-05-21.  Every rule that fires in `forecast_record()` or
 | F_PO_CUTOFF_ALL | Non-Amazon no-orders-by-Wed-9am-EST W1 zero (fires Wed 14:00 UTC onward through Sat) |
 | F70  | Switchover variant conflict (EC/COS/AMZ has activity -> zero base) |
 | G2   | All-zero-by-guards safety demotion (model -> Inactive when all 26w zeroed) |
+| F_AMZ_RPL Fix A | (2026-05-24) _rpl_ord_l13 and variability raw data now use normalized hist[-13:] instead of raw QB row columns -- phantom stock-up orders removed by F41/F35/F43 are no longer counted in the demand baseline |
+| F_AMZ_RPL Fix B | (2026-05-24) DC depletion inference: when WOS=0, SOH=0, OPO=0 (ASIN absent from Inventory Health), treat as fully depleted (WOS=0.0) so W1+W2 catch-up order fires at 10-WOS gap fill; previously silently skipped as "DC WOS unknown" |
 
 ## VP-ATS rules (history normalization)
 
