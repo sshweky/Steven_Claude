@@ -53,7 +53,7 @@ def per_rule_stats(records: list[dict]) -> dict:
         models = defaultdict(int)
         for r in recs:
             m = sum(r.get("manual", []))
-            a = sum(r.get("fcst", []))
+            a = sum(r.get("forecast", r.get("fcst", [])))
             ai_sum += a
             manual_sum += m
             unit_gap_sum += (a - m)
