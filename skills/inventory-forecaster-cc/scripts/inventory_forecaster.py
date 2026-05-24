@@ -5317,8 +5317,8 @@ def _top_manual_defect(manual, fcst, cust_label="this account"):
     if spikes:
         over = sum(mv - av for _, mv, av in spikes)
         wks  = ", ".join(f"W{i+1}" for i, _, _ in spikes[:3])
-        return (f"There's a planned bump in {wks} that's roughly {over:,}+ "
-                f"units above what {cl}'s order pattern supports — make sure "
+        return (f"There's a planned bump in {wks} that's roughly {int(round(over)):,}+ "
+                f"units above what {cl}'s order pattern supports -- make sure "
                 f"a promo, feature, or new-store build is locked in for that "
                 f"window.")
 
