@@ -2061,12 +2061,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         if _f66_eligible and s < 1.0:
             s = 1.0
             _f66_floored += 1
-        # F11 — tapered Prime Day lift (Amazon-only) via per-week schedule.
-        if is_amazon and wnum in PRIME_DAY_LIFT_SCHEDULE:
-            s *= PRIME_DAY_LIFT_SCHEDULE[wnum]
-        # R7 — Fall Deal Amazon-only (2026-04-22).
-        elif is_amazon and wnum in FALL_DEAL_WEEKS:
-            s *= FALL_DEAL_LIFT
+        # F11 — Prime Day / Fall Prime Day ordering lift (Amazon-only, calendar-based).
+        if is_amazon:
+            _pb, _fb = _get_event_boosts()
+            _ev = max(_pb.get(wnum, 1.0), _fb.get(wnum, 1.0))
+            if _ev > 1.0:
+                s *= _ev
         raw.append(baseline * s)
 
     # Light smoothing (smooth_forecast rescales internally to preserve total)
