@@ -577,15 +577,15 @@ Phase 3 — Forecast (pure Python, no API calls)
   │       ≥1.15 → accelerating: pos_rate = L4×0.55 + L13×0.30 + L26×0.15
   │       ≤0.85 → decelerating: pos_rate = L4×0.35 + L13×0.45 + L26×0.20
   │       else  → stable:       pos_rate = L4×0.25 + L13×0.45 + L26×0.20 + L52×0.10
-  │   Damped seasonal profile: DAMP=0.1 → profile stays within ±20% of 1.0
+  │   Damped seasonal profile: DAMP=0.3 (normal) / DAMP=0.85 (F16-relief path)
   │     (prevents position-based distortion from e.g. holiday pre-buys
   │      landing in the wrong forecast-week slots)
   │   [Fix 1] Category seasonality blend (after DAMP, before event lifts):
-  │     S = 0.30×historical_S + 0.70×category_profile (re-normalized)
+  │     S = 0.30xhistorical_S + 0.70xcategory_profile (re-normalized)
   │     Applied in seasonal_baseline(), crostens(), and heuristic()
-  │   Explicit event lifts applied on top of damped+category profile:
-  │     Prime Day W7-W9 ×1.25 (Amazon only — May ordering, ~6-8 wks before July event)
-  │     Fall Deal  W23-W25 ×1.12
+  │   Explicit event lifts (Amazon-only, calendar-date-based):
+  │     Prime Day (last Tue of June): ordering bumps May 1 x1.25, May 15 x1.25, May 29 x1.50
+  │     Fall Prime Day (first Tue of Oct): ordering bump Tuesday after Memorial Day x1.30
   │
   ├── Croston's: α=0.3 over 78-obs weighted series
   │   z and p refined 70% L13W / 30% smoothed model output
