@@ -6,6 +6,47 @@ be moved here.
 
 ---
 
+## 2026-05-24 - P1..P9 algorithm fixes (variance deep-dive remediation)
+
+Nine targeted fixes from `ALGORITHM_IMPROVEMENTS.md` (priority 10 was tuning
+investigation only -- not a code change).  Full --all run + push completed.
+
+| Priority | Rule code  | Description |
+|---|---|---|
+| P1 | F72       | New-launch ramp detection: reroute Sparse Intermittent -> Heuristic when L26[-6:] has >=4 nz AND L26[-12:-6] has >=5 zeros (Walmart "PDQ" pattern). |
+| P2 | F18b      | Croston burst carve-out: when L4W_avg > L13W_avg * 1.8 AND L4W not explained by POS, cap z to L13[:9]_nz_avg * 1.2. |
+| P3 | R1 path C | Off-price hard-zero: customers in OFFPRICE_CUST_SUBSTRS with L4=0 AND manual<=100 -> OTB(zero). |
+| P4 | F52       | FD wind-down planner anchor: when planner has a stable low residual rate (CV<=1.5, rate<=2000/wk), cap each AI week at planner_rate * 2.5. |
+| P5 | F61       | NEW guard: skip F61 horizon decay when Status_Cust contains "NEW" OR L4W avg >= 0.8 * L13W avg (active growth). |
+| P6 | F37       | NEW + active-growth guard: skip OH-shortfall capping on new-launch items and items in growth phase. |
+| P7 | -         | Croston event-aware z: for Amazon, exclude L13 weeks within +/-14 days of past Prime Day / Labor Day from z computation. |
+| P8 | -         | Croston pre-launch history trim: when L26 has >=8 leading zeros, trim history to first non-zero week before z/p computation. |
+| P9 | (config)  | Added `TARGET CTRL INV PRCSNG` to CUSTOMER_BIAS_CORRECTIONS at 1.40 (planner UP-bias on 13/15 records). |
+
+**Aggregate impact:**
+
+| Metric | Before | After | Delta |
+|---|---|---|---|
+| AI vs Manual aggregate | -13.3% | -11.9% | +1.4pp (closer) |
+| Total \|unit gap\| (>5% delta records) | 5,938,902 | 5,646,494 | -292,408 (-4.9%) |
+| OTB(zero) records | 387 | 595 | +208 (P3 off-price firing) |
+| Inactive | 1,229 | 1,093 | -136 |
+| Sparse Intermittent | 1,214 | 1,129 | -85 (P1/F72 rerouting) |
+| F72 Heuristic | 0 | 7 | +7 new-launch ramps caught |
+| Alert count | 3,808 | 4,006 | +198 (more rules now flagged) |
+
+Per-rule changes:
+- F10 declining: gap improved by +131K
+- F34 new-launch: gap improved by +242K
+- F52 wind-down: gap improved by +83K
+- F59 family: multiple rules closer to zero (less Amazon over-projection)
+- VP-OP off-price: gap improved by +96K
+
+64/64 unit tests pass.  New tests for P1, P2, P3, P7, P8 in
+`scripts/tests/test_priority_fixes.py`.
+
+---
+
 ## 2026-05-23 - Deep audit Phase 1 (doc consolidation + dead code)
 
 - **Deleted `METHODOLOGY.md`**: contradicted live code in 9+ places (still

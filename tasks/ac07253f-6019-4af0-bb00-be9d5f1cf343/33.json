@@ -3,7 +3,7 @@
   "subject": "Verify fixes: rerun --all --validate + variance deep-dive",
   "description": "After all 9 code fixes land, rerun full forecast and variance analysis to confirm aggregate gap narrowed.",
   "activeForm": "Verifying all fixes via full rerun",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
