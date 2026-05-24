@@ -7479,7 +7479,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _po_zeroed = []
         for _i in range(0, min(26, len(fcst))):   # W1 included (index 0)
             _po_qty = float(_effective_po_wk[_i]) if _i < len(_effective_po_wk) else 0.0
-            if _po_qty > 0 and fcst[_i] > 0:
+            if _po_qty > 0 and fcst[_i] > 0 and not (_i == 0 and _vp_w1_before_cutoff):
                 _po_zeroed.append((_i + 1, fcst[_i], _po_qty))
                 fcst[_i] = 0
                 _vp_q4_zeroed_idx.add(_i)   # guard: F59d must not restore these
