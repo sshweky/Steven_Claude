@@ -6903,6 +6903,39 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             f"signal regardless of warehouse ship activity)"
         )
 
+    # F80 (2026-05-24): Active:Replen zero-L13W fallback.
+    # When an item has Active:Replen status but zero L13W AND zero L26W order
+    # history, and has been zeroed to "Inactive (zero order history)" by F30,
+    # try to recover the forecast using:
+    #   1. L26W non-zero avg (if any L26W orders exist)  -- unlikely since L26=0
+    #   2. Sibling mstyle history already propagated into hist_for_model by F60/F69
+    #      (those fill the history arrays before forecast_record runs this logic)
+    # The key case this fixes: NEW DC placements and EC variants where order
+    # history is zero because the item just activated.  item_status=Active:Replen
+    # signals the planner intends to stock this item going forward.
+    _f80_applied = False
+    _pt_status_f80 = (row.get("PT_Item_Status") or "").strip().upper()
+    _is_replen_f80 = "REPLEN" in _pt_status_f80
+    _l26_total_f80 = sum(float(v or 0) for v in hist_for_model[-26:]) if hist_for_model else 0
+    _l26_nz_f80    = [v for v in hist_for_model[-26:] if float(v or 0) > 0]
+    if (model == "Inactive (zero order history)"
+            and _is_replen_f80
+            and sum(fcst) == 0
+            and _l26_total_f80 > 0
+            and _l26_nz_f80):
+        # L26W has some activity -- build a small floor from it
+        _f80_l26_avg = sum(_l26_nz_f80) / len(_l26_nz_f80)
+        _f80_floor   = snap(_f80_l26_avg * 0.5, mp)   # conservative 50% of L26 nz avg
+        if _f80_floor > 0:
+            fcst  = [_f80_floor] * 26
+            cap   = round(_f80_floor, 1)
+            model = "Reactivating"
+            _f80_applied = True
+            meta.setdefault("drivers", []).append(
+                f"F80 Active:Replen L26W fallback: L26W nz avg {_f80_l26_avg:.0f} "
+                f"x 0.5 = {_f80_floor:.0f}/wk floor (item_status=Replen, L13W=0)"
+            )
+
     # F17 — Sparse cadence W1 seed (2026-04-22).  When the Sparse Intermittent
     # model places its first non-zero slot several weeks out but the planner
     # expects an order in W1, the cadence phase is off.  Shift the AI cadence
