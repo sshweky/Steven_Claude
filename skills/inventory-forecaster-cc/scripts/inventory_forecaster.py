@@ -42,88 +42,34 @@ except ImportError:
     sys.exit("ERROR: pip install numpy")
 
 # ─── Config ───────────────────────────────────────────────────────────────────
-CDATA_MCP_URL   = "https://mcp.cloud.cdata.com/mcp"
-CDATA_EMAIL     = os.environ.get("CDATA_EMAIL", "steven@skaffles.com")
-CDATA_PAT       = os.environ.get("CDATA_PAT",   "VaTIPqklo14D1yMkfqKRi1punowIvp/6XEHtBSgybad2Jbyl")
-MAX_RETRIES     = 5
-
-# Direct Quickbase REST API — bypasses CData for bulk write-back.
-# Used when --bulk-writeback (default ON for --all scope).
-QB_REALM        = os.environ.get("QB_REALM",       "pim.quickbase.com")
-QB_USER_TOKEN   = os.environ.get("QB_USER_TOKEN",  "b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s")
-QB_PROJ_TABLE   = os.environ.get("QB_PROJ_TABLE",  "bpd237tvm")
-QB_BULK_BATCH   = int(os.environ.get("QB_BULK_BATCH", "500"))   # records per POST
-
-# Saved QB report for VP-Q4 open-PO data — bulk fetch in 1 API call.
-# Source: https://pim.quickbase.com/nav/app/bn458t5nz/table/bp8r4dejr/action/q?qid=27
-# Replaces 119 per-account API_DoQuery calls with a single /reports/{id}/run.
-QB_OPEN_POS_TABLE  = os.environ.get("QB_OPEN_POS_TABLE",  "bp8r4dejr")
-QB_OPEN_POS_REPORT = int(os.environ.get("QB_OPEN_POS_REPORT", "27"))
-QB_OPEN_POS_CACHE_HOURS = int(os.environ.get("QB_OPEN_POS_CACHE_HOURS", "24"))
-ALERT_THRESHOLD = 0.075  # 7.5% variance vs prior triggers AI_ALERT write
-
-CR_ALPHA = 0.3   # Croston's demand + interval smoothing
-
-# Event calendar — Amazon-ONLY promotions (Prime Day and Fall Prime Day).
-# NOTE: Apply event lifts ONLY when customer name contains "AMAZON" (case-insensitive).
-# Other retailers don't run these events; lifting their forecast over-projects.
-#
-# F11 — Prime Day (last Tuesday of June) ordering bump schedule — CALENDAR-BASED:
-#   May 1  x1.25  first pre-buy wave
-#   May 15 x1.25  second pre-buy wave
-#   May 29 x1.50  final (largest) pre-buy
-#
-# Fall Prime Day (first Tuesday of October) ordering bump — CALENDAR-BASED:
-#   Tuesday after Labor Day (first Monday of September + 1 day) x1.30
-#   Much smaller than Prime Day; single discrete order event.
-#   ~4-5 weeks before the October consumer event.
-#
-# Week-to-boost mappings are computed at runtime by _get_event_boosts() because
-# the 26-week projection window shifts each week — hard-coded week numbers become
-# wrong as soon as the run date moves past the bump dates.
-PRIME_DAY_BUMPS = [
-    (5, 1,  1.25),   # May 1    — first pre-buy
-    (5, 15, 1.25),   # May 15   — second pre-buy
-    (5, 29, 1.50),   # May 29   — peak pre-buy
-]
-FALL_PRIME_DAY_LIFT = 1.30   # Tuesday after Labor Day (first Monday of September + 1)
-PRIME_DAY_LIFT      = 1.25   # representative lift (EDA / messaging)
-FALL_DEAL_LIFT      = 1.12   # legacy (retained for TRADE_FALL reference)
-# F64 — Trade fall calendar events (2026-05-17).  Based on manual-vs-AI analysis:
-# W17-W18 = early September fall replenishment (most common planner spike week);
-# W21-W22 = early October holiday pre-order wave (2nd most common spike week).
-# Applied to non-Amazon items only (Amazon has its own Prime Day / Fall Deal lifts).
-TRADE_FALL_REPLEN_WEEKS  = {17, 18}
-TRADE_FALL_SEASON2_WEEKS = {21, 22}
-TRADE_FALL_REPLEN_LIFT   = 1.10
-TRADE_FALL_SEASON2_LIFT  = 1.08
-AMAZON_CUST_SUBSTR = "AMAZON"      # substring match on Customr_Name (case-insensitive)
-# F_PO_CUTOFF (2026-05-21) -- Amazon division PO receipt cutoff.
-# If no confirmed W1 open PO is found by the cutoff weekday, zero AI+MAN PRJ W1.
-# Rationale: past the cutoff there is no time to receive and ship in the current week.
-# weekday: Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
-AMZ_DIV_PO_CUTOFF = {
-    "FF": 2,   # Fetch: cutoff = Tuesday night  -- zero W1 on Wed (weekday >= 2)
-    "BB": 3,   # Brand Buzz: cutoff = Wed night -- zero W1 on Thu (weekday >= 3)
-}
+# All constants imported from scripts/config.py.  That module is the single
+# source of truth for thresholds and supports env-var override for A/B testing
+# (e.g. F59I_WOS_HEALTHY_GATE=7.0 python run_forecast.py --all --validate).
+from config import (
+    # Connection
+    CDATA_MCP_URL, CDATA_EMAIL, CDATA_PAT, MAX_RETRIES,
+    QB_REALM, QB_USER_TOKEN, QB_PROJ_TABLE, QB_BULK_BATCH,
+    QB_OPEN_POS_TABLE, QB_OPEN_POS_REPORT, QB_OPEN_POS_CACHE_HOURS,
+    # Window sizes
+    HORIZON_WEEKS, L52_WEEKS, L26_WEEKS, L13_WEEKS, L8_WEEKS, L4_WEEKS,
+    # Model tuning
+    ALERT_THRESHOLD, CR_ALPHA, DAMP_NORMAL, DAMP_F16_RELIEF,
+    # Event calendar
+    PRIME_DAY_BUMPS, FALL_PRIME_DAY_LIFT, PRIME_DAY_LIFT, FALL_DEAL_LIFT,
+    TRADE_FALL_REPLEN_WEEKS, TRADE_FALL_SEASON2_WEEKS,
+    TRADE_FALL_REPLEN_LIFT, TRADE_FALL_SEASON2_LIFT,
+    # Retailer lists
+    AMAZON_CUST_SUBSTR, AMZ_DIV_PO_CUTOFF,
+    INTERNATIONAL_CUST_SUBSTRS, OFFPRICE_CUST_SUBSTRS,
+    # Amazon F59 inventory-health gates
+    F59I_WOS_HEALTHY_GATE, F59J_WOS_RESTOCK_GATE,
+    F59I_POS_ANCHOR_STRONG, F59I_POS_ANCHOR_BLEND, F59I_POS_FLOOR_FRAC,
+    F59K_EOL_POS_DECLINE, F59K_REAL_HISTORY_THRESH, F59K_POS_CREDIBILITY,
+    F59J_POS_FLOOR,
+    # Writeback
+    SCHEMA_VERSION,
+)
 # R4 removed 2026-05-05 -- see CHANGELOG.md
-# R5 — International bulk-buyer retailers (non-US).  These accounts order in
-# lumps seasonally or quarterly, so L13W=0 is common and misleading; relax the
-# Inactive classification to require L26W=0 instead.
-INTERNATIONAL_CUST_SUBSTRS = [
-    "PETBARN",              # Australia
-    "LOBLAWS",              # Canada
-    "COMERCIALIZADORA",     # Mexico
-    "GRUP CONOCIDO",        # Mexico
-    "GRUP ",                # generic Mexico retail group prefix
-]
-# Off-price / one-time-buy retailers (R1 detection also uses pattern-based gate)
-OFFPRICE_CUST_SUBSTRS = [
-    "BURLINGTON", "ROSS STORES", "TJ MAXX", "T J MAXX", "MARSHALLS",
-    "KOHL", "SAM'S CLUB", "VARIETY WHOLESALERS", "OLLIE", "BIG LOTS",
-    "FIVE BELOW", "FRAGRANCENET", "DD'S DISCOUNTS", "DD'S DISCOUNT",
-    "GABRIEL BROTHERS",
-]
 # T4 — E-commerce retailers (non-Amazon) where the planner has forward-looking
 # POS insight that isn't visible in raw order history.  For Seasonal Baseline
 # items at these accounts, shift baseline toward L4/L13 non-zero averages to
