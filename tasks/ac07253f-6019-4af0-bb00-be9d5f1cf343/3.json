@@ -3,7 +3,7 @@
   "subject": "B1: Create scripts/config.py with named constants",
   "description": "Promote ~30 buried magic numbers to a typed config module. F59i/j WOS gates (6.0/8.0), POS anchor thresholds (1.40/1.15), POS floors, EOL gates, horizon constants (HORIZON_WEEKS=26, L52=52, L13=13, L4=4), Prime Day bumps. Each constant overridable via env var. Forecaster imports from config.py. Unblocks D1 (auto-tuning).",
   "activeForm": "Building scripts/config.py",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
