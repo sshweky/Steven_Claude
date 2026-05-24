@@ -6465,13 +6465,45 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                             is_new_launch=_f73_new_ramp,
                                             amz_catalog=amz_catalog)
         model    = "Seasonal Baseline"
-        # VP-Q3: detect_biweekly() now returns the cadence gap (≥3 for monthly+)
+        # VP-Q3: detect_biweekly() now returns the cadence gap (>=3 for monthly+)
         # or 0; cast to bool for backward-compat with JSON consumers expecting bool.
         _cadence_gap = detect_biweekly(hist_for_model)
         biweekly = bool(_cadence_gap)
         fcst     = apply_ordering_pattern(fcst, hist_for_model, mp)
 
-    # F34 — annotate meta when item was detected as a new launch so reviewers
+        # F76 -- Seasonal Baseline thin-history ceiling guard (2026-05-24).
+        #
+        # EC items that inherit order history via F60 (or items reclassified
+        # Dense by F6a but with only a few active weeks) have a small sample
+        # of non-zero weeks in L26.  The category seasonal profile can then
+        # amplify the baseline dramatically in peak weeks (e.g. 5x a modest
+        # per-week baseline producing an enormous peak-month value).
+        #
+        # Guard: when active L26 weeks <= 13 (thin history), cap each forecast
+        # week at the uncapped per-week baseline x 2.0.  This limits the
+        # worst-case seasonal amplification to 2x rather than an unbounded
+        # multiple.  Items with >= 14 active L26 weeks have enough history
+        # for the seasonal profile to be meaningful; no cap is applied.
+        _f76_l26_nz_wks = sum(1 for v in hist_for_model[-26:] if float(v or 0) > 0)
+        if _f76_l26_nz_wks <= 13 and cap > 0:
+            _f76_ceil = cap * 2.0
+            _f76_any  = False
+            for _fi in range(len(fcst)):
+                if fcst[_fi] > _f76_ceil:
+                    fcst[_fi] = (int(round(_f76_ceil / mp)) * int(mp)
+                                 if mp > 0 else int(_f76_ceil))
+                    _f76_any = True
+            if _f76_any:
+                _fire("F76")
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F76 thin-history SB ceiling: L26 has only "
+                        f"{_f76_l26_nz_wks} active weeks; per-week cap = "
+                        f"baseline {cap:.0f}/wk x2.0 = {_f76_ceil:.0f}/wk "
+                        f"to prevent seasonal profile over-amplification"
+                    )
+
+    # F34 -- annotate meta when item was detected as a new launch so reviewers
     # see why decline rules (F10) and the M1 ceiling were skipped.
     if _f34_is_new_launch and isinstance(meta, dict):
         meta["new_launch"] = True
