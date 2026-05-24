@@ -10746,7 +10746,30 @@ def main():
             print(f"      {_n_ih} mstyles enriched with DC inventory health data")
         else:
             print(f"\n[2.6b] Amazon Inventory Health skipped "
-                  f"(no ASINs in Catalog US — field may not exist in that table)")
+                  f"(no ASINs in Catalog US -- field may not exist in that table)")
+
+    # ── Save Amazon catalog viewer cache (AUR + DC inv for viewer.py) ──────────
+    # Written after Phase 2.6b so Inv_SOH/OPO/WOS are already merged in.
+    # viewer.py reads this at launch to add DC inv + AUR bullets to the narrative.
+    if amazon_catalog_us:
+        try:
+            from pathlib import Path as _Path2
+            _viewer_amz_cache = {}
+            for _mst, _r in amazon_catalog_us.items():
+                _viewer_amz_cache[_mst] = {
+                    "aur_l4w":  float(_r.get("AUR_L4w")  or 0),
+                    "aur_l13w": float(_r.get("AUR_L13w") or 0),
+                    "aur_l26w": float(_r.get("AUR_L26w") or 0),
+                    "aur_l52w": float(_r.get("AUR_L52w") or 0),
+                    "inv_soh":  float(_r.get("Inv_SOH")  or 0),
+                    "inv_opo":  float(_r.get("Inv_OPO")  or 0),
+                    "inv_wos":  float(_r.get("Inv_WOS")  or 0),
+                }
+            _vamz_path = _Path2(__file__).parent.parent / "viewer_amz_cache.json"
+            json.dump(_viewer_amz_cache, open(_vamz_path, "w"))
+            print(f"      viewer_amz_cache.json refreshed ({len(_viewer_amz_cache)} mstyles)")
+        except Exception as _e:
+            print(f"      [WARN] could not refresh viewer_amz_cache: {_e}")
 
     # ── Phase 2.7: VP-Q2 OOS-aware demand reconstruction ────────────
     oos_data = {}
