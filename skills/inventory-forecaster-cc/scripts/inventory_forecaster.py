@@ -4487,6 +4487,12 @@ def crostens(history, mp, is_amazon=False, description=None,
             f"P8 Pre-launch history trim: detected {_p8_first_nz_in_l26}-wk leading-zero gap "
             f"in L26; trimmed to {len(history)}w post-launch for z/p computation"
         )
+    if _p7_burst_weeks_excluded > 0:
+        meta.setdefault("drivers", []).append(
+            f"P7 Croston event-aware z: excluded {_p7_burst_weeks_excluded} L13 week(s) "
+            f"within +/-14 days of past Prime Day / Labor Day events from z computation "
+            f"(future event boosts re-add them at correct calendar time)"
+        )
     if _r6_applied:
         _hv_tag = " [S3 high-vol ×1.0]" if _r6_high_vol else ""
         meta.setdefault("drivers", []).append(
