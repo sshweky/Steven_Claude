@@ -4227,6 +4227,9 @@ async function toggleDetail(key) {
   // Amazon Catalog table and injects/refreshes the bullet in AI Analysis.
   // Runs after innerHTML is set so the target <ul> already exists in the DOM.
   if (CFG.AMZ_CATALOG_TID && r.mstyle && isAmazonRec) _loadAmzDcInv(r, safeId);
+  // Live retailer POS data  -  fetches POS sales, OH/instock, and distribution
+  // metrics from the Retailer Sales table for non-Amazon customers.
+  if (CFG.RTL_POS_TID && r.mstyle && !isAmazonRec) _loadRtlPos(r, safeId);
   // Only fetch cxld data once inv flow is done loading (avoids concurrent QB
   // calls that can stall the inv flow bulk scan).  If inv flow is already
   // attached (_hasInvFlow) or already resolved/null, start immediately.
