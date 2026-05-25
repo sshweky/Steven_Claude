@@ -1553,6 +1553,125 @@ def fetch_projections_qb_rest(prj_cols, args):
     return all_rows
 
 
+# ── QB REST API -- Phase 2 Styles master-pack/Season fetch ────────────────────
+# Same anti-pattern as Phase 1: a CData `IN (...)` query against Styles looks
+# narrow but CData ignores the WHERE and pulls the entire Styles table (423
+# fields, ~30K rows) per batch -- 28 back-to-back full scans for an --all run,
+# which throttled the realm.  Direct REST sends the WHERE to QB so we get only
+# the matching rows × 3 fields.
+
+_QB_STYLES_FIELD_MAP_CACHE    = None
+_QB_STYLES_FID_TO_LABEL_CACHE = {}
+
+
+def _get_styles_field_map():
+    """Fetch and cache the Styles table field map via QB REST API."""
+    global _QB_STYLES_FIELD_MAP_CACHE, _QB_STYLES_FID_TO_LABEL_CACHE
+    if _QB_STYLES_FIELD_MAP_CACHE is not None:
+        return _QB_STYLES_FIELD_MAP_CACHE, _QB_STYLES_FID_TO_LABEL_CACHE
+    url = f"https://api.quickbase.com/v1/fields?tableId={QB_STYLES_TABLE}"
+    req = urllib.request.Request(url, headers=_QB_PROJ_HEADERS)
+    for attempt in range(1, 4):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                fields = json.loads(resp.read())
+            l2f, f2l = {}, {}
+            for f in fields:
+                label = f.get("label", "")
+                fid   = f.get("id")
+                norm  = re.sub(r'[^a-zA-Z0-9]+', '_', label)
+                l2f[norm] = fid
+                f2l[fid]  = norm
+            _QB_STYLES_FIELD_MAP_CACHE    = l2f
+            _QB_STYLES_FID_TO_LABEL_CACHE = f2l
+            return l2f, f2l
+        except Exception as e:
+            if attempt == 3:
+                raise RuntimeError(f"[QB REST] Failed to fetch Styles field map: {e}")
+            time.sleep(2 ** attempt)
+
+
+def fetch_master_pack_qb_rest(mstyles):
+    """Pull Master_Pack + Season for the given mstyles via QB direct REST API.
+
+    Returns (master_pack_dict, season_map_dict) where:
+        master_pack[mstyle] = float master_pack value (default 1.0)
+        season_map[mstyle]  = season string (only present if non-empty)
+
+    Replaces the legacy CData per-batch query against Styles which was a 28x
+    full-table scan against a 423-field table -- the root cause of Phase 2
+    realm throttling on --all runs.
+    """
+    l2f, f2l = _get_styles_field_map()
+
+    # Known fallback FIDs (verified 2026-05-25 via GET /v1/fields)
+    mstyle_fid = l2f.get("Mstyle")      or 6
+    mp_fid     = l2f.get("Master_Pack") or 110
+    season_fid = l2f.get("Season")      or 437
+
+    select_fids = [mstyle_fid, mp_fid, season_fid]
+    url         = "https://api.quickbase.com/v1/records/query"
+    master_pack = {}
+    season_map  = {}
+
+    # Batch the WHERE clause -- 500 mstyles per call to keep payload sane.
+    BATCH = 500
+    uniq  = sorted({m for m in mstyles if m})
+    for i in range(0, len(uniq), BATCH):
+        batch    = uniq[i:i + BATCH]
+        or_parts = "OR".join(f"{{{mstyle_fid}.EX.'{m}'}}" for m in batch)
+        where    = f"({or_parts})"
+        skip     = 0
+        page_sz  = 1000
+        while True:
+            payload = json.dumps({
+                "from":    QB_STYLES_TABLE,
+                "select":  select_fids,
+                "where":   where,
+                "options": {"skip": skip, "top": page_sz},
+            }).encode("utf-8")
+            req = urllib.request.Request(url, data=payload,
+                                         headers=_QB_PROJ_HEADERS, method="POST")
+            resp_data = None
+            for attempt in range(1, 4):
+                try:
+                    with urllib.request.urlopen(req, timeout=90) as resp:
+                        resp_data = json.loads(resp.read())
+                    break
+                except Exception as e:
+                    if attempt == 3:
+                        raise
+                    time.sleep(2 ** attempt)
+
+            records = resp_data.get("data", [])
+            for record in records:
+                ms = None
+                mp = None
+                sv = None
+                for fid_str, cell in record.items():
+                    fid = int(fid_str)
+                    val = cell.get("value") if isinstance(cell, dict) else cell
+                    if fid == mstyle_fid:
+                        ms = val
+                    elif fid == mp_fid:
+                        mp = val
+                    elif fid == season_fid:
+                        sv = val
+                if ms:
+                    try:
+                        master_pack[ms] = float(mp) if mp not in (None, "", 0) else 1.0
+                    except (TypeError, ValueError):
+                        master_pack[ms] = 1.0
+                    if isinstance(sv, str) and sv.strip():
+                        season_map[ms] = sv.strip()
+
+            if len(records) < page_sz:
+                break
+            skip += page_sz
+
+    return master_pack, season_map
+
+
 def build_scope_filter(args):
     clauses = []
     if args.acct:
