@@ -1,9 +1,0 @@
-{
-  "id": "34",
-  "subject": "--all --dry-run after threshold=6 (>=7 passes)",
-  "description": "Verify global impact of lowering SKU gate to >=7 (rejection rule n_skus<=6)",
-  "activeForm": "Running dry-run with threshold=6",
-  "status": "in_progress",
-  "blocks": [],
-  "blockedBy": []
-}
