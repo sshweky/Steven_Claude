@@ -11777,6 +11777,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "po_zeroed_weeks":   (meta.get("po_zeroed_weeks", []) if isinstance(meta, dict) else []),
         "po_total_qty":      (meta.get("po_total_qty", 0)    if isinstance(meta, dict) else 0),
         "po_total_removed":  (meta.get("po_total_removed",0) if isinstance(meta, dict) else 0),
+        # F37 v2 cap detail (2026-05-26): list of weeks where AI demand was
+        # capped by inventory shortfall, with original/adjusted/capacity per
+        # week.  Surfaced for the codepage viewer so it can render the capped
+        # cells with a red background + hover tooltip.
+        "f37_adjustments":   (meta.get("oh_shortfall_adjustments", []) if isinstance(meta, dict) else []),
         "alert":       alert,
         "baseline_mode": (meta.get("baseline_mode", "") if isinstance(meta, dict) else ""),
         # Per-rule fire tags for deck-builder harvest (added 2026-05-06).

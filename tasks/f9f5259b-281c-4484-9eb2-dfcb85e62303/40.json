@@ -1,0 +1,9 @@
+{
+  "id": "40",
+  "subject": "F37 capped weeks: surface to viewer.js with red highlight",
+  "description": "Option B: pack hidden span in AI_ANALYSIS HTML with capped weeks + detail; viewer.js parses and renders red bg on F37-capped AI cells",
+  "activeForm": "Wiring F37 capped weeks to codepage",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

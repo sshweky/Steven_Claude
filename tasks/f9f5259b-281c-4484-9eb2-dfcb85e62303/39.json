@@ -3,7 +3,7 @@
   "subject": "Remove F37 active-growth bypass + re-run dry-run",
   "description": "Active-growth bypass was v1 workaround for staleness; with v2 fresh cascade, it suppresses F37 on the highest-volume records.",
   "activeForm": "Removing F37 active-growth bypass",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
