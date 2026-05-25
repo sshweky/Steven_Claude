@@ -78,7 +78,7 @@ for r in per_key:
     bucket_new[b] += abs(r['new_gap'])
     bucket_n[b]   += 1
 print("Per-bucket improvement:")
-print(f"  {'Bucket':40s} {'n':>3s} {'|gap| before':>14s} {'|gap| after':>14s} {'Δ':>14s} {'%':>7s}")
+print(f"  {'Bucket':40s} {'n':>3s} {'|gap| before':>14s} {'|gap| after':>14s} {'Delta':>14s} {'%':>7s}")
 for b in sorted(bucket_old.keys(), key=lambda b: -bucket_old[b]):
     delta = bucket_old[b] - bucket_new[b]
     pct = (delta / bucket_old[b] * 100) if bucket_old[b] > 0 else 0
