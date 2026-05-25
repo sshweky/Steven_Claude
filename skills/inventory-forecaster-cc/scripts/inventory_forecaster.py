@@ -1316,7 +1316,7 @@ def _get_proj_field_map():
             _QB_PROJ_FID_TO_LABEL_CACHE = f2l
             return l2f, f2l
         except Exception as e:
-            if attempt == 3:
+            if attempt == QB_REST_MAX_RETRIES:
                 raise RuntimeError(f"[QB REST] Failed to fetch Projections field map: {e}")
             time.sleep(2 ** attempt)
 
