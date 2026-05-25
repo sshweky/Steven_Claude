@@ -2801,13 +2801,18 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     #
     # Gate: POS must be healthy (L4W >= 50% of L13W) to avoid inflating dying items.
     # Only activates when no Amazon POS is already supplied (pos_data is None).
-    _f15_rtl_active = False   # True when F15_RTL fires (non-Amazon POS anchor)
+    # _f15_rtl_active: True when this record's POS blend is anchored to a
+    # non-Amazon retailer's consumer sell-through (rtl_pos).  Covers BOTH paths:
+    # (a) forecast_record() injected pos_data = rtl_pos before calling us, or
+    # (b) pos_data was None and the F15_RTL block below promotes rtl_pos.
+    # Used downstream to bypass F30 / F24 caps that are anchored on the
+    # suppressed order-history average rather than true demand.
+    _f15_rtl_active = (rtl_pos is not None and not is_amazon)
     if not pos_data and rtl_pos and not is_amazon:
         _f15_rtl_l4  = float(rtl_pos.get("Avg_Units_Wk_L4w")  or 0)
         _f15_rtl_l13 = float(rtl_pos.get("Avg_Units_Wk_L13w") or 0)
         if _f15_rtl_l13 > 0 and _f15_rtl_l4 >= _f15_rtl_l13 * 0.50:
             pos_data = rtl_pos   # shadow parameter for F15 block below
-            _f15_rtl_active = True
     if pos_data:
         pos_rate, pos_trend, pos_trend_ratio = amazon_pos_rate(pos_data)
         # F15_RTL_ESC -- Non-Amazon POS escalation forward-lean (2026-05-25).
