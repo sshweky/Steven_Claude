@@ -36,6 +36,30 @@ QB_REST_MAX_RETRIES = int(os.environ.get("QB_REST_MAX_RETRIES", "3"))  # QB REST
 # (2026-05-25): previously a bare time.sleep(0.15) literal.
 RETAILER_POS_PAGE_DELAY_S = float(os.environ.get("RETAILER_POS_PAGE_DELAY_S", "0.15"))
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RULE THRESHOLDS (Audit Finding #17, 2026-05-25)
+# Skeleton/registry for inline magic numbers in F40/F42/F45/F61/F75 and similar.
+# Anyone adding a new threshold should put it here with: name, owning rule
+# code, default, env-var override, one-line description.  Migration of EXISTING
+# inline thresholds is deferred -- too many sites to migrate safely without a
+# test suite, and most are already conservative defaults that don't need
+# real-time tuning.  Add to this dict as you touch the relevant rule.
+# ─────────────────────────────────────────────────────────────────────────────
+RULE_THRESHOLDS = {
+    # F40 -- baseline-ratio guard (active growth detection)
+    "F40_BASELINE_RATIO":   float(os.environ.get("F40_BASELINE_RATIO",  "0.30")),
+    # F42 -- spike trigger (median multiplier)
+    "F42_SPIKE_MULT":       float(os.environ.get("F42_SPIKE_MULT",      "3.0")),
+    "F42_BUFFER_MULT":      float(os.environ.get("F42_BUFFER_MULT",     "1.3")),
+    # F45 -- per-week cap factor (vs L26 nz-mean)
+    "F45_CAP_FACTOR":       float(os.environ.get("F45_CAP_FACTOR",      "2.5")),
+    # F61 -- horizon decay multiplier per week
+    "F61_DECAY":            float(os.environ.get("F61_DECAY",           "0.88")),
+    # F75 -- end-of-window dampener trigger
+    "F75_TRIGGER_MULT":     float(os.environ.get("F75_TRIGGER_MULT",    "2.0")),
+}
+
 # Direct Quickbase REST API -- bypasses CData for bulk write-back.
 QB_REALM        = os.environ.get("QB_REALM",      "pim.quickbase.com")
 QB_USER_TOKEN   = os.environ.get("QB_USER_TOKEN", "b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s")

@@ -3,7 +3,7 @@
   "subject": "F17: Hoist magic numbers to RULE_THRESHOLDS in config",
   "description": "F40/F42/F45/F61/F75 thresholds inline — move to config.py as a single RULE_THRESHOLDS dict for tunability",
   "activeForm": "Centralizing rule thresholds",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }

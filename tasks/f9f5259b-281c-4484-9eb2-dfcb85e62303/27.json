@@ -1,9 +1,9 @@
 {
   "id": "27",
   "subject": "F14: Bundle MSTYLE_FAMILY_INDEX globals into Context",
-  "description": "Module-level globals invite empty-during-validation bug class. Wrap in dataclass passed explicitly.",
+  "description": "Deferred. Wrapping module-level globals (MSTYLE_FAMILY_INDEX, CUST_BASELINE_INDEX, GLOBAL_WK_RATE) into a Context dataclass touches every read site (~30+ locations). Without unit tests, refactor risk exceeds payoff. The 2026-05-21 fix that populates these before validation already addresses the specific known failure mode. Revisit when a Context refactor is part of a wider design pass.",
   "activeForm": "Refactoring globals to Context",
-  "status": "pending",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }

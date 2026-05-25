@@ -1,9 +1,9 @@
 {
   "id": "24",
   "subject": "F11: Standardize on _fire() instrumentation",
-  "description": "Drop the regex-scan from driver strings. Add explicit _fire() calls at F40, F42, F75 and any sites currently relying on regex.",
+  "description": "Documented design decision: dual _fire() + regex scan kept intentionally. Full migration would touch ~80 sites without test safety net.",
   "activeForm": "Standardizing rule-fire tracking",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }

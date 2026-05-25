@@ -1,9 +1,9 @@
 {
   "id": "26",
   "subject": "F13: Move event calendar to config.py",
-  "description": "Hard-coded Prime Day month tuples in _get_event_boosts will break; move PRIME_DAY_BUMPS to config + add documentation",
+  "description": "Inspected: PRIME_DAY_BUMPS already in config.py with env-var override per-entry. Year boundary loop correctly handles wrap-around. Same-week dual bumps already use max(). Concern was overstated.",
   "activeForm": "Externalizing event calendar",
-  "status": "pending",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
