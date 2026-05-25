@@ -8205,6 +8205,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # item look like it's accelerating when it's actually stable.  Skip F62 for
     # these accounts; the L4/L13 trend was already incorporated via F_ORD_BLEND
     # in seasonal_baseline() using all-weeks L4W which is more reliable.
+    # F62 spike gate (2026-05-25): for the acceleration branch, skip if any
+    # single L4W week exceeds 2.5x the L13W non-zero avg -- that's an isolated
+    # DC inventory-build order, not a genuine demand trend.
     if (model != "Inactive" and sum(fcst) > 0 and not is_amazon
             and not _f34_is_new_launch
             and not (isinstance(meta, dict) and meta.get("steady_buyer"))):
@@ -8214,6 +8217,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f62_l4_avg  = sum(_f62_l4_nz) / len(_f62_l4_nz)
             _f62_l13_avg = sum(_f62_l13_nz) / len(_f62_l13_nz)
             _f62_ratio   = _f62_l4_avg / _f62_l13_avg if _f62_l13_avg > 0 else 1.0
+            # Spike guard for acceleration: if any single L4W week is >= 2.5x
+            # the L13W nz avg, the L4W average is spike-inflated, not a real trend.
+            _f62_l4_all = [float(v or 0) for v in hist[-4:]]
+            _f62_has_spike = (_f62_l13_avg > 0 and
+                              any(w >= _f62_l13_avg * 2.5 for w in _f62_l4_all))
             # Mild decline: 0.70 <= ratio < 0.88 (F6b/F26 already cover < 0.70)
             if 0.70 <= _f62_ratio < 0.88:
                 # Blend scale: at ratio=0.70 → ×0.82, at ratio=0.88 → ×0.93
@@ -8221,11 +8229,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 fcst = [snap(v * _f62_scale, mp) if v > 0 else 0 for v in fcst]
                 meta.setdefault("drivers", []).append(
                     f"F62 Soft trend blend: L4W nz avg {_f62_l4_avg:.0f} vs L13W nz "
-                    f"{_f62_l13_avg:.0f} (ratio {_f62_ratio:.2f}) → ×{_f62_scale:.2f} "
+                    f"{_f62_l13_avg:.0f} (ratio {_f62_ratio:.2f}) x{_f62_scale:.2f} "
                     f"(mild decline; fills F26 gap)"
                 )
-            # Mild acceleration: 1.12 ≤ ratio < 1.30 (F27 already covers 1.30+)
-            elif 1.12 <= _f62_ratio < 1.30:
+            # Mild acceleration: 1.12 <= ratio < 1.30 (F27 already covers 1.30+)
+            # Gate: skip if any L4W week is a DC inventory-build spike (>= 2.5x L13W nz)
+            elif 1.12 <= _f62_ratio < 1.30 and not _f62_has_spike:
                 _f62_scale = 0.6 * _f62_ratio + 0.4
                 fcst = [snap(v * _f62_scale, mp) if v > 0 else 0 for v in fcst]
                 meta.setdefault("drivers", []).append(
