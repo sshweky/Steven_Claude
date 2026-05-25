@@ -1616,8 +1616,10 @@ def fetch_master_pack_qb_rest(mstyles):
     master_pack = {}
     season_map  = {}
 
-    # Batch the WHERE clause -- 500 mstyles per call to keep payload sane.
-    BATCH = 500
+    # Batch the WHERE clause -- 100 mstyles per call.  500-item OR chains
+    # return HTTP 400 from QB REST (payload too large / query too complex).
+    # SKILL.md says 500 but 100 is the confirmed working limit. (2026-05-25)
+    BATCH = 100
     uniq  = sorted({m for m in mstyles if m})
     for i in range(0, len(uniq), BATCH):
         batch    = uniq[i:i + BATCH]
