@@ -2601,6 +2601,33 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         forecast = _new_fcst
         _f10_applied = True
 
+    # F10b (2026-05-24): Monotonic-decline secondary detector.
+    # Catches items in clean multi-year decline that F10's YoY-gate misses
+    # because L4 is at the same level as last year's L4 (both in decline).
+    # Pattern: L52 > L26 > L13 strictly monotonic AND L13 < 0.80 x L52.
+    # Example caught by the deep-dive: 23011-FF12858 L4=3312, L13=2614,
+    # L26=3839, L52=5004 -- L52->L13 is a -48% slide over 12 months; F10 did
+    # not fire because L4 = 3312 ~= last-year's L4 (both items already
+    # mid-decline).  Scale-down factor = L13 / L52, capped at [0.60, 0.95]
+    # (don't scale to nothing -- this is a slow decline, not collapse).
+    _f10b_applied = False
+    _f10b_driver  = None
+    if (not _f10_applied and not is_new_launch and len(history) >= 52):
+        _l13_all = sum(history[-13:]) / 13.0
+        _l26_all = sum(history[-26:]) / 26.0
+        _l52_all = sum(history[-52:]) / 52.0
+        if (_l52_all > _l26_all > _l13_all > 0
+                and _l13_all < _l52_all * 0.80):
+            _f10b_scale = max(0.60, min(_l13_all / _l52_all, 0.95))
+            forecast    = [snap(v * _f10b_scale, mp) if v > 0 else 0
+                           for v in forecast]
+            _f10b_applied = True
+            _f10b_driver  = (
+                f"F10b monotonic decline (no YoY): L52 {_l52_all:.0f} > "
+                f"L26 {_l26_all:.0f} > L13 {_l13_all:.0f} (L13 = "
+                f"{(_l13_all/_l52_all)*100:.0f}% of L52); forecast x{_f10b_scale:.2f}"
+            )
+
     # F77 (2026-05-24): Severe-decline blend without YoY gate.
     # F10 requires YoY confirmation, which blocks it on items declining within
     # their product lifecycle at the same seasonal stage as last year.
