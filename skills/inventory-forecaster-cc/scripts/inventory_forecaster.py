@@ -13506,26 +13506,21 @@ def main():
     print(f"      {len(rows)} records retrieved (QB REST API)", flush=True)
 
     # ── Phase 2: Pull master pack + Season ─────────────────────────
+    # 2026-05-25: migrated from CData to QB direct REST API.  The legacy CData
+    # query "SELECT ... FROM Styles WHERE Mstyle IN (...)" looked narrow but
+    # CData ignores the WHERE and fetches the entire 423-field Styles table
+    # per batch -- 28 back-to-back full-table scans on --all runs, which
+    # throttled the realm.  REST sends the WHERE server-side so QB returns only
+    # the matching ~5,500 rows × 3 fields total.
     print(f"\n[2/4] Pulling master pack + Season from Styles ...", flush=True)
-    # Filter to only mstyles in our projection rows to avoid large response timeouts
-    mstyles_needed = list({r["Mstyle"] for r in rows if r.get("Mstyle")})
-    master_pack = {}
-    season_map  = {}   # Mstyle -> Season string (or missing if null/blank)
-    BATCH = 200
-    for i in range(0, len(mstyles_needed), BATCH):
-        batch = mstyles_needed[i:i + BATCH]
-        in_clause = ", ".join(f"'{m}'" for m in batch)
-        mp_rows = cdata_query(
-            f"SELECT [Mstyle], [Master_Pack], [Season] FROM [Quickbase1].[ProductTrack].[Styles] WHERE [Mstyle] IN ({in_clause})",
-            f"master_pack batch {i//BATCH + 1}")
-        for r in mp_rows:
-            if r.get("Mstyle"):
-                master_pack[r["Mstyle"]] = float(r.get("Master_Pack") or 1)
-                _sv = (r.get("Season") or "").strip()
-                if _sv:
-                    season_map[r["Mstyle"]] = _sv
+    print(f"      [QB REST] fetching Styles field map ...", flush=True)
+    mstyles_needed = sorted({r["Mstyle"] for r in rows if r.get("Mstyle")})
+    try:
+        master_pack, season_map = fetch_master_pack_qb_rest(mstyles_needed)
+    except Exception as _p2_err:
+        sys.exit(f"ERROR: Phase 2 QB REST fetch failed: {_p2_err}")
     print(f"      {len(master_pack)} master pack records loaded "
-          f"({len(season_map)} with Season tag)")
+          f"({len(season_map)} with Season tag) (QB REST API)")
 
     # ── Phase 2.5: Pull Amazon Catalog POS data (Amazon items only) ──
     amazon_pos = {}
