@@ -31,6 +31,11 @@ QB_REST_MAX_RETRIES = int(os.environ.get("QB_REST_MAX_RETRIES", "3"))  # QB REST
 # Audit Finding #15+16 (2026-05-25): REST sites previously used hard-coded 3;
 # centralised here.  Total backoff budget per CLAUDE.md = 2+4+8 = 14s.
 
+# Pacer for paginated retailer-POS reads.  Keeps the realm from saturating
+# while iterating Retailer Sales (bv2izcn5b) pages.  Audit Finding #18
+# (2026-05-25): previously a bare time.sleep(0.15) literal.
+RETAILER_POS_PAGE_DELAY_S = float(os.environ.get("RETAILER_POS_PAGE_DELAY_S", "0.15"))
+
 # Direct Quickbase REST API -- bypasses CData for bulk write-back.
 QB_REALM        = os.environ.get("QB_REALM",      "pim.quickbase.com")
 QB_USER_TOKEN   = os.environ.get("QB_USER_TOKEN", "b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s")

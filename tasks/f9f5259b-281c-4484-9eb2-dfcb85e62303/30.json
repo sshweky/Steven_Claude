@@ -3,7 +3,7 @@
   "subject": "F18+19+20: Named constants, module-top imports, central paths",
   "description": "Name the 0.15s retailer POS sleep; lift `from oos_history import` to top; centralize cache paths in paths.py",
   "activeForm": "Cleanup polish",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
