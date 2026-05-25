@@ -13648,10 +13648,28 @@ def main():
         args.rate_limit_ms = 150 if _is_wide_scope else 0
     if args.bulk_writeback is None:
         args.bulk_writeback = _is_wide_scope    # True for --all, False otherwise
+    # Audit Finding #8 (2026-05-25) safety gate: refuse the legacy per-record
+    # CData UPDATE path unless the user explicitly opts in.  The legacy path
+    # issues one UPDATE per record (5,500 calls for --all) which is the #1
+    # cause of QB realm throttle.  Bulk REST writeback is preferred at every
+    # scope.  Anyone genuinely needing per-record can pass
+    # --allow-per-record-write to acknowledge the risk.
+    if (not args.bulk_writeback
+            and not getattr(args, "allow_per_record_write", False)
+            and not getattr(args, "dry_run", False)):
+        sys.exit(
+            "ERROR: --no-bulk-writeback selects the legacy per-record CData "
+            "UPDATE path which causes realm-wide throttle. "
+            "Pass --allow-per-record-write to explicitly opt in, or drop "
+            "--no-bulk-writeback to use the safe REST bulk path.")
     if _is_wide_scope:
         print(f"  [auto-throttle] --all detected → workers={args.workers}, "
               f"rate_limit_ms={args.rate_limit_ms}, "
               f"bulk_writeback={'on' if args.bulk_writeback else 'off'}")
+    if not args.bulk_writeback and getattr(args, "allow_per_record_write", False):
+        print(f"  [WARN] Legacy per-record CData UPDATE writeback enabled by "
+              f"--allow-per-record-write -- this path is the #1 cause of "
+              f"realm throttle.  Use only for tiny scope work.", flush=True)
 
     # F19 — expose flag globally so forecast_record can consult it.
     # 2026-05-06: F19 is now ON by default (CONSERVATIVE_INACTIVE = True at
