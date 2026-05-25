@@ -109,11 +109,11 @@ SWITCHOVER_SUFFIXES = ("EC", "COS", "AMZ", "DS", "DTC")
 # Multipliers: > 1.0 = AI under-projects, < 1.0 = AI over-projects.
 # International accounts (Mexico) handled separately by is_international flag.
 CUSTOMER_BIAS_CORRECTIONS = {
-    "PSP DISTRIBUTION":          1.25,
-    "THEIS DISTRIBUTING":        1.25,
-    "IMPERIAL DISTRIBUTORS":     1.35,
-    "ARMY-AIR-FORCE EXCH":       1.40,
     "TARGET CTRL INV PRCSNG":    1.40,  # P9 (2026-05-24): manual UP-bias on 13/15 records, $103K gap
+    # ── Downward corrections — pending planner review ──────────────────────
+    # Auto-derived from analyze_manual_vs_ai.py; planners consistently set
+    # manual projections BELOW AI for these accounts.  Needs vetting before
+    # treating as permanent calibration.  See explanation in SKILL.md.
     "PET PHARM":                 0.55,
     "H G BUYING":                0.45,
     "PETCO MEXICO":              0.45,
