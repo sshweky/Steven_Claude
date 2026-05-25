@@ -10983,7 +10983,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #   NEAR-TARGET (7.5-10.5 WOS): no adjustment.
     _RTL_WOS_TARGET_HIGH = 10.0
     if rtl_pos and not is_amazon and model not in ("Inactive", "OTB (zero)",
-                                                    "Pre-launch NEW (manual passthrough)"):
+                                                    "Pre-launch NEW (manual passthrough)",
+                                                    "Retailer WOS (POS)"):
         _rtl_oh_wos  = float(rtl_pos.get("OH_WOS")           or 0)
         _rtl_oh_lw   = float(rtl_pos.get("OH_Units_LW")       or 0)
         _rtl_pos_l4w = float(rtl_pos.get("Avg_Units_Wk_L4w") or 0)
