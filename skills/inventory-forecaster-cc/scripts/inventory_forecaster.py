@@ -1072,6 +1072,12 @@ def _fetch_retailer_pos(rows):
     for row in raw_rows:
         ms_v    = str(_sv(row, F_MSTYLE) or "").strip()
         acct_v  = str(_sv(row, F_ACCT)   or "").strip()
+        # Normalize "16553.0" -> "16553" so the result key matches
+        # row.get("Acct_MStyle_Key_") which is built as int-string acct.
+        # Fixes silent retailer POS misses on every record (callout
+        # 16553-FF30784 2026-05-24).
+        if acct_v.endswith(".0"):
+            acct_v = acct_v[:-2]
         date_v  = str(_sv(row, F_DATE)   or "")[:10]   # YYYY-MM-DD
         if not ms_v or not acct_v or not date_v:
             continue
