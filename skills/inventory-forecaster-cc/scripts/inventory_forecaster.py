@@ -2234,7 +2234,16 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # squashed to ±20% by DAMP=0.1.  1.8x still represents a clear seasonal
     # signal (e.g. summer-skewed grilling adjacents, mild fall lift items)
     # but no longer compresses items the planners haven't tagged.
-    _f16_relief  = (bool(_seasonal_cat) or _raw_peak_trough >= 1.8) and _f16_vol_ok
+    # F16 steady-buyer gate (2026-05-25): for steady non-Amazon buyers (CV<=0.50,
+    # 0-1 zero L13W weeks), the raw order history peak/trough often reflects
+    # order-TIMING noise (one big LY order in a given position, not real seasonal
+    # demand variation).  Suppress raw-peak-trough relief for these accounts;
+    # category-tagged items still get full relief since those profiles are curated
+    # and represent genuine demand seasonality.
+    _f16_relief  = (
+        (bool(_seasonal_cat) or (_raw_peak_trough >= 1.8 and not _is_steady_buyer))
+        and _f16_vol_ok
+    )
     # F16 Amazon POS-stability gate (2026-05-24).
     # F16 relief fires when order history shows a 1.8x+ peak/trough ratio.  For
     # Amazon items this often reflects ORDERING CADENCE (bulk buys every 4-8 wks)
