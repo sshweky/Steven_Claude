@@ -2850,6 +2850,16 @@ def detect_biweekly(history):
     h = history[-26:]
     if len(h) < 10:
         return 0
+
+    # VP-Q4 (2026-05-24): Recent-activity guard.
+    # If the buyer has shifted to weekly (or near-weekly) ordering in the
+    # last 4 weeks (>= 3 of 4 recent weeks are non-zero), cadence enforcement
+    # based on older L26W history would incorrectly zero out the forecast.
+    # In this case the buyer has changed behavior -- honor the new pace.
+    _recent_nz = sum(1 for v in h[-4:] if float(v or 0) > 0)
+    if _recent_nz >= 3:
+        return 0
+
     nz_idx = [i for i, v in enumerate(h) if v > 0]
     if len(nz_idx) < 3:
         return 0  # too few orders to detect cadence
