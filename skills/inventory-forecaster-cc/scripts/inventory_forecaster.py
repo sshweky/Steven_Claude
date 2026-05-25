@@ -378,6 +378,12 @@ CATEGORY_PROFILES = {
     # ── Grooming season — consumer Mar–Aug; retailer Feb–Jul ─────────────────
     # Items: shampoo, conditioner, deshedding tools, brushes, grooming wipes,
     # detangling spray, paw care.
+    # Grooming TOOLS (gloves, brushes) also carry a secondary holiday bump in
+    # Oct-Nov because they are popular pet gifts.  Shampoos/conditioners do NOT
+    # get this bump -- only tool-type keywords use the dual-peak profile.
+    # "grooming glove" (13 chars) sorts before "shedding" (8 chars) so it
+    # takes priority for descriptions containing both terms.
+    "grooming glove":    [0.80, 1.10, 1.55, 1.70, 1.60, 1.40, 1.15, 0.95, 0.90, 1.15, 1.30, 1.00],
     "pet shampoo":       [0.65, 1.30, 1.65, 1.75, 1.65, 1.50, 1.30, 1.05, 0.75, 0.55, 0.45, 0.40],
     "dog shampoo":       [0.65, 1.30, 1.65, 1.75, 1.65, 1.50, 1.30, 1.05, 0.75, 0.55, 0.45, 0.40],
     "cat shampoo":       [0.65, 1.30, 1.65, 1.75, 1.65, 1.50, 1.30, 1.05, 0.75, 0.55, 0.45, 0.40],
