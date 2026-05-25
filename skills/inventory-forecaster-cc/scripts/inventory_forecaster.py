@@ -9757,20 +9757,27 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             and isinstance(fcst, list) and len(fcst) >= 26):
 
         _rpl_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _rpl_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
         # Fix A (2026-05-24): use normalized hist (post F41/F35/F43) so phantom
         # stock-up orders removed by F41 are not counted in the demand baseline.
         _rpl_ord_l13 = sum(float(v) for v in hist[-13:]) / 13  # all-weeks avg (normalized)
         # POS-primary demand (2026-05-24): when Amazon is ordering ABOVE consumer
-        # POS, the excess reflects inventory build/management, not true sell-through.
-        # Use a 65/35 POS/ord blend so the 26-week forecast anchors to what is
-        # actually selling, not to elevated order history.
-        # When ord <= POS (orders lagging POS -- stockout or demand catch-up),
-        # keep max() so we don't under-forecast a genuinely accelerating item.
-        if _rpl_pos_l13 >= 50 and _rpl_ord_l13 > _rpl_pos_l13:
-            _rpl_demand     = _rpl_pos_l13 * 0.65 + _rpl_ord_l13 * 0.35
+        # POS AND POS is flat/decelerating, the excess reflects inventory build /
+        # overfill against stable demand -- anchor to POS so we don't perpetuate
+        # inflated order history.
+        #
+        # Acceleration guard: if POS L4W/L13W >= 1.15 the item is growing and
+        # Amazon ordering ahead of POS is CORRECT (stocking up for rising demand).
+        # In that case fall back to max(POS, ord) -- the growth signal is real and
+        # anchoring to a stale L13W average would produce an artificially flat,
+        # under-forecast that ignores the upward trend.
+        _rpl_pos_accel  = (_rpl_pos_l4 / _rpl_pos_l13) if _rpl_pos_l13 > 0 else 1.0
+        _rpl_item_accel = (_rpl_pos_accel >= 1.15 and _rpl_pos_l4 >= 50)
+        if _rpl_pos_l13 >= 50 and _rpl_ord_l13 > _rpl_pos_l13 and not _rpl_item_accel:
+            _rpl_demand      = _rpl_pos_l13 * 0.65 + _rpl_ord_l13 * 0.35
             _rpl_pos_primary = True
         else:
-            _rpl_demand     = max(_rpl_pos_l13, _rpl_ord_l13)
+            _rpl_demand      = max(_rpl_pos_l13, _rpl_ord_l13)
             _rpl_pos_primary = False
 
         if _rpl_demand >= 50:
