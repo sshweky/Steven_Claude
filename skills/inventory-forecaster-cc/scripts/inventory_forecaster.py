@@ -8071,18 +8071,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     else:
         # Dense buyer (≥ 50% non-zero): seasonal baseline + ordering pattern shape.
         _is_ecom_t4 = _is_ecom_cust(cust_name)
-        _pos_rate_dbg = 0.0  # temp diagnostic
-        if pos_data:
-            try:
-                _l4p = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
-                _l13p = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-                _pos_rate_dbg = _l4p if _l4p > 0 else _l13p
-            except Exception:
-                pass
-        if _f73_new_ramp and is_amazon:
-            _dbg3_key = row.get("Acct_MStyle_Key_", "?")
-            print(f"  [DBG3] {_dbg3_key}: new_ramp={_f73_new_ramp} f34={_f34_is_new_launch} "
-                  f"is_amazon={is_amazon} pos_rate_approx={_pos_rate_dbg:.1f}", flush=True)
         fcst, cap, meta = seasonal_baseline(hist_for_model, mp, is_amazon=is_amazon,
                                             pos_data=pos_data, description=description,
                                             product_category=product_category,
@@ -8093,9 +8081,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                             is_new_launch=_f73_new_ramp,
                                             amz_catalog=amz_catalog,
                                             rtl_pos=rtl_pos)
-        if _f73_new_ramp and is_amazon:
-            _dbg3_key = row.get("Acct_MStyle_Key_", "?")
-            print(f"  [DBG4] {_dbg3_key}: sbaseline fcst[:4]={fcst[:4]} avg={sum(fcst)/26:.0f}", flush=True)
         model    = ("Seasonal Baseline (burst)"
                     if meta.get("model") == "seasonal_baseline_burst"
                     else "Seasonal Baseline")
@@ -8104,8 +8089,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _cadence_gap = detect_biweekly(hist_for_model)
         biweekly = bool(_cadence_gap)
         fcst     = apply_ordering_pattern(fcst, hist_for_model, mp)
-        if _f73_new_ramp and is_amazon:
-            print(f"  [DBG4] {_dbg3_key}: after aop gap={_cadence_gap} fcst[:4]={fcst[:4]}", flush=True)
 
         # F76 -- Seasonal Baseline thin-history ceiling guard (2026-05-24).
         #
