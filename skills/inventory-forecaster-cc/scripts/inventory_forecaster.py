@@ -2959,18 +2959,20 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # push W1-W4 to 2-3x the baseline.  POS sell-through velocity (captured via
     # F15 in the baseline) is the correct forward signal for these items, not
     # the order-position shape.
-    # Fix: re-damp the already DAMP=0.30-compressed S array toward flat using
-    # DAMP=0.20, so the combined effective suppression is much stronger.  Total
-    # 26-week volume is largely preserved (the seasonal distribution flattens,
-    # not the sum); explicit event lifts (Prime Day, Fall Deal) still apply after.
+    # Fix: re-damp the already-damped S array (whether from DAMP=0.30 or
+    # F16-amplified DAMP=0.85) toward flat using DAMP=0.20.  The combined
+    # suppression is much stronger.  Explicit event lifts apply after.
+    # NOTE: F16 gate intentionally absent.  For new launches, F16 may fire on a
+    # noisy LY order spike that doesn't represent real demand seasonality
+    # (e.g. one large bulk order in W1-W2 LY).  POS momentum is the correct
+    # forward signal, not the amplified order-position shape.
     # Gates:
     #   - is_new_launch (F34 leading-zero pattern OR Status=NEW AND sparse L26W)
     #   - is_amazon (DC replenishment; non-Amazon steady buyers use F_STEADY)
-    #   - not _f16_relief (genuine curated seasonal signal; don't suppress it)
     #   - pos_rate > 0 (POS data confirms demand level; without it, fall back)
     _f_new_amz_damp_applied = False
     _f_new_amz_damp_driver  = None
-    if is_new_launch and is_amazon and not _f16_relief and pos_rate > 0:
+    if is_new_launch and is_amazon and pos_rate > 0:
         DAMP_NEW_AMZ        = 0.20
         _sna_min_raw        = min(S)
         _sna_max_raw        = max(S)
