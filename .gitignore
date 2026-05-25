@@ -25,6 +25,10 @@ cache/
 **/cache/
 # QB chunk exports (can be > 100 MB)
 projects/amazon-trend-analyzer/qb_chunks/
+# Forecaster runtime outputs (large QB result sets, not source)
+skills/inventory-forecaster-cc/scripts/forecast_results*.json
+skills/inventory-forecaster-cc/scripts/validation_results*.json
+skills/inventory-forecaster-cc/scripts/critical_102_join.json
 
 # --- Python ---
 __pycache__/
