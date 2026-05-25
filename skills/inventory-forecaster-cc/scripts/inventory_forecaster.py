@@ -12062,10 +12062,9 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
             l52_avg = sum(full52) / len(full52)
 
     # Compact run-rate header — bolded labels with colons (2026-05-25 format).
-    # Format: "<cust> Order History: L4W: 5325/wk, L13W: 4566/wk, ..."
-    # Drops the legacy "LW {n}u" prefix (LW is reported elsewhere in narrative)
-    # and the "Avg" prefix on L4W.
+    # Format: "<cust> Order History: LW: 4800u, L4W: 5325/wk, L13W: 4566/wk, ..."
     _hdr_parts = []
+    _hdr_parts.append(f"<b>LW:</b> {int(lw)}u")
     if l4_avg > 0:
         _hdr_parts.append(f"<b>L4W:</b> {l4_avg:.0f}/wk")
     if l13_avg > 0:
