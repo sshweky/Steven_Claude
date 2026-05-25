@@ -152,9 +152,14 @@ Credentials are embedded in the script and can be overridden via environment var
 ## "No records returned" / transient QB pull failures — RETRY PROTOCOL
 
 If the forecaster prints `ERROR: No records returned. Check scope filters and
-CData connection.` (or any other transient pull failure), **do not assume the
-PAT expired** and **do not stop**. The PAT is permanent; the failure is almost
-always transient (CData rate-limit, QB hiccup, brief network blip).
+QB connection.` (or any other transient pull failure), **do not assume the
+PAT or token expired** and **do not stop**. Both the CData PAT and QB user token
+are permanent; the failure is almost always transient (QB hiccup, brief network
+blip, or realm load).
+
+**Phase 1 failures** (projections pull) are QB REST API errors -- look for
+`ERROR: Phase 1 QB REST fetch failed` in the log. These are QB-side issues,
+not CData throttle. The same retry protocol applies.
 
 Apply this retry protocol **automatically** without asking the user:
 
