@@ -3,7 +3,7 @@
   "subject": "Deploy viewer.js + run --all --validate + push",
   "description": "Deploy forecast viewer.js (pageID=49) to QB, run --all --validate write-back to populate AI_ANALYSIS with F37 capped-week markers, push validation",
   "activeForm": "Deploying viewer + running production",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
