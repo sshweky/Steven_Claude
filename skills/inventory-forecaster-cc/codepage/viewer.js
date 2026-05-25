@@ -3394,7 +3394,23 @@ async function toggleDetail(key) {
     const aiVal  = aiFcst[i] || 0;
     const aiDiff = aiVal - w.projection;
     const aiCls  = aiDiff > 0 ? 'color:#2e7d32' : aiDiff < 0 ? 'color:#c62828' : 'color:#888';
-    aiCells   += `<td style="${aiCls};font-weight:600">${fmtN(aiVal)}</td>`;
+    // F37 v2 (2026-05-26): if this week was capped by inventory shortfall,
+    // paint a red background and add a tooltip with the cap detail.  The
+    // text color (green/red/gray) continues to indicate AI-vs-Manual direction.
+    const _wk1Idx = i + 1;
+    const _isCapped = r.f37_capped_weeks && r.f37_capped_weeks.has(_wk1Idx);
+    let _aiBg = '';
+    let _aiTitle = '';
+    if (_isCapped) {
+      _aiBg = 'background:#ffebee;';   // light red tint
+      const _det = r.f37_capped_detail && r.f37_capped_detail[String(_wk1Idx)];
+      if (_det) {
+        _aiTitle = ` title="Inventory short: AI wanted ${fmtN(_det.orig)}, can ship ${fmtN(_det.adj)} (capacity ${fmtN(_det.cap)} this week). Unmet demand rolls forward, decaying 25%/week vs original; expires at age 4."`;
+      } else {
+        _aiTitle = ' title="F37 inventory-shortfall cap: AI demand exceeded available inventory this week."';
+      }
+    }
+    aiCells   += `<td style="${_aiBg}${aiCls};font-weight:600"${_aiTitle}>${fmtN(aiVal)}</td>`;
     const sugVal = sug[i] || 0;
     sugTot    += sugVal;
     sugCells  += `<td style="color:#555;font-size:10px">${fmtN(sugVal)}</td>`;
