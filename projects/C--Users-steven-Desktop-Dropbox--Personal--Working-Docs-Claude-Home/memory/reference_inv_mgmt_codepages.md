@@ -24,16 +24,27 @@ OOS gap analysis, PO recommendations, inventory flow.
 | `inv_mgmt_full.html` | 52 (HTML shell) |
 | `inv_mgmt.js` | 56 (JS logic, loaded by page 52 via pageID=56) |
 
-## Deploy Script
+## Deploy Method (updated 2026-05-25)
 
-`deploy_pages.py` -- supports targeted deploys:
-- `python deploy_pages.py forecast`  -> deploys viewer.js (49) + viewer.html (50)
-- `python deploy_pages.py invmgmt`   -> deploys inv_mgmt.js (56) + inv_mgmt_full.html (52)
-- `python deploy_pages.py all`       -> deploys all four pages
+**The legacy `API_AddReplaceDBPage` XML API is BROKEN** -- returns errcode=0 but saves nothing. QB REST API has no /v1/pages endpoint. Never use `deploy_pages.py` with the old API approach.
+
+### Working deploy procedure:
+1. Run `python codepage/deploy_pages.py` from the repo root -- starts a local CORS server on localhost:8743
+2. For each page (viewer.js p49, viewer.html p50):
+   a. Navigate to the QB page editor: `https://pim.quickbase.com/nav/app/bpd24h9wy/action/pageedit?pageID=49` (or 50)
+   b. Open DevTools console (F12)
+   c. Paste and run the JS snippet printed by the script
+   d. "Page saved" toast confirms success
+3. Ctrl-C the script when done
+
+**Alternative (Claude-automated):** Use the Chrome MCP to navigate to each editor, inject content via `fetch('http://localhost:8743/viewer.js')`, set Ace editor value, click Save.
+
+**Verify**: `fetch('https://pim.quickbase.com/db/bpd24h9wy?a=dbpage&pageID=49', {credentials:'include'})` from a QB tab -- check `.length > 0`.
 
 **NEVER run without explicit user instruction.**
 
 ## Notes
 
-- `API_GetDBPage` (legacy XML API) returns empty pagebody even for pages that have content -- do not use it to verify deploys.
+- `API_GetDBPage` (legacy XML API) always returns empty pagebody -- broken, do not use to verify.
+- Verification must be done via the `dbpage` endpoint from a logged-in browser session.
 - `viewer_qb_current.js` in the same folder is a stale backup snapshot -- not needed.
