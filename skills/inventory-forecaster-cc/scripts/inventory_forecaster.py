@@ -7218,7 +7218,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                  and _f83_l4 >= _f83_l13_nz_avg)
             _f83_l26_avg = sum(hist_for_model[-26:]) / 26 if len(hist_for_model) >= 26 else 0
             if _f83_l26_avg > 0 and not _f83_accelerating:
-                _f83_ceiling = _f83_l26_avg * 26 * 1.50
+                # Use max of L26 all x 2.5 or L4 x 26 -- gives headroom for
+                # genuinely large recent placements while preventing extreme
+                # extrapolation from short burst history.
+                _f83_ceiling = max(_f83_l26_avg * 26 * 2.5, _f83_l4 * 26 * 1.10)
                 _f83_total   = sum(fcst)
                 if _f83_total > _f83_ceiling:
                     _f83_scale = _f83_ceiling / _f83_total
@@ -7227,9 +7230,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"F83 PDQ Croston's cap: mstyle ends with PDQ "
                         f"(display placements, L4 {_f83_l4:.0f} <= L13 nz "
                         f"{_f83_l13_nz_avg:.0f} so not actively re-accelerating); "
-                        f"L26 all-wks avg {_f83_l26_avg:.0f} x 26 x 1.50 = "
-                        f"{_f83_ceiling:.0f} ceiling; total capped from "
-                        f"{_f83_total:.0f} to {sum(fcst):.0f}"
+                        f"ceiling = max(L26avg {_f83_l26_avg:.0f} x 26 x 2.5, "
+                        f"L4 {_f83_l4:.0f} x 26 x 1.10) = {_f83_ceiling:.0f}; "
+                        f"total capped from {_f83_total:.0f} to {sum(fcst):.0f}"
                     )
 
     else:
