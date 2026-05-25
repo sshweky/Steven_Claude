@@ -2091,6 +2091,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                         # F38b -- legitimate uptick, full-pct lift.
                         _pre_f38 = baseline
                         baseline = baseline * (1.0 + _f38_trend)
+                        _f38b_applied = True
                         _f38_driver = (
                             f"F38b POS trend +{_f38_trend*100:.0f}% (L4w {_f38_l4:.0f}/wk "
                             f"vs L13w {_f38_l13:.0f}/wk); price stable/above-MAP -- "
