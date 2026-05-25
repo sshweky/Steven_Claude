@@ -1193,6 +1193,16 @@ def _fetch_retailer_pos(rows):
             "OH_WOS":            oh_wos,
         }
 
+    # Audit Finding #4 (2026-05-25): surface partial-failure count to caller.
+    # failed_mstyles is populated when a batch exhausts its retry budget; the
+    # caller logs the count so silent data loss is visible (F15 blend and
+    # F_RTL_WOS will then see absent POS instead of stale/empty defaults).
+    if failed_mstyles:
+        print(f"      [WARN] retailer_pos: {len(failed_mstyles)} mstyles had "
+              f"failed batches and have NO POS data this run "
+              f"(out of {len(ms_list)} non-Amazon mstyles). "
+              f"F15 / F_RTL_WOS will see absent POS for those records.",
+              flush=True)
     return result
 
 
