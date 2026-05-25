@@ -1996,6 +1996,22 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     _f15_amazon_ord_primary = False
     if pos_data:
         pos_rate, pos_trend, pos_trend_ratio = amazon_pos_rate(pos_data)
+        # F15_RTL_ESC -- Non-Amazon POS escalation forward-lean (2026-05-25).
+        # amazon_pos_rate()'s "stable" tier (0.85-1.15x L4/L13) uses the blend
+        # 25% L4W + 45% L13W + 20% L26W + 10% L52W -- the L26W/L52W windows lag
+        # the forward trend when a retailer's consumer takeaway is growing.
+        # When non-Amazon B&M POS is escalating (L4W/L13W >= 1.10) but still
+        # classified "stable" (hasn't crossed the 1.15 threshold), replace pos_rate
+        # with a forward-leaning 40/60 L13W/L4W blend that drops the lagging
+        # historical windows and gives full credit to recent consumer acceleration.
+        if not is_amazon and pos_trend == "stable":
+            _rtl_l13_esc = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+            _rtl_l4_esc  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+            if _rtl_l13_esc > 0 and _rtl_l4_esc > 0:
+                _rtl_esc_ratio = _rtl_l4_esc / _rtl_l13_esc
+                if _rtl_esc_ratio >= 1.10:
+                    pos_rate  = _rtl_l13_esc * 0.40 + _rtl_l4_esc * 0.60
+                    pos_trend = "escalating"
         _pos_l4_f15  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
         _pos_l13_f15 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
         _pos_healthy_f15 = _pos_l13_f15 > 0 and _pos_l4_f15 >= _pos_l13_f15 * 0.5
