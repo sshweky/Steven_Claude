@@ -11711,6 +11711,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _rpl_l13w_raw  = [float(v) for v in hist[-13:]]
             _rpl_l13w_nz   = sum(1 for v in _rpl_l13w_raw if v > 0)
             _rpl_l13w_mean = sum(_rpl_l13w_raw) / 13   # all-weeks avg incl. zeros
+            # [DBG-RPL]
+            if row.get("Acct_MStyle_Key_", "") == "1864-FF7120EC":
+                print(f"  [DBG-RPL] l13w_raw={_rpl_l13w_raw}")
+                print(f"  [DBG-RPL] l13w_mean={_rpl_l13w_mean:.1f} l13w_nz={_rpl_l13w_nz}")
             if _rpl_pos_primary:
                 # POS-primary: order-history variability reflects Amazon's
                 # inventory-management decisions (builds/drawdowns) rather than
