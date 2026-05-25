@@ -4523,6 +4523,26 @@ def sparse_intermittent_forecast(history, mp, account_interval=None, is_offprice
             forecast = [snap(v * _scale_r2, mp) if v > 0 else 0 for v in forecast]
             _r2_applied = True
 
+    # F84 (2026-05-24): Sparse low-nz density cap.
+    # For very thin items (nz <= 4 of L26), prevent the forecast from
+    # projecting MORE non-zero events than the item has shown historically.
+    # Catches 12835-BB12022/12 type cases (nz=3 hist, AI projecting 5 events
+    # = +390% over manual).  Cap forecast nz_count to historical L26 nz_count;
+    # if forecast has more events, zero the smallest extras so quantity is
+    # preserved per event but cadence honors history.
+    _f84_l26_nz_count = sum(1 for v in _l26_all_r2 if float(v or 0) > 0)
+    _f84_applied = False
+    if _f84_l26_nz_count > 0 and _f84_l26_nz_count <= 4:
+        _f84_fcst_nz_idx = [i for i, v in enumerate(forecast) if v > 0]
+        if len(_f84_fcst_nz_idx) > _f84_l26_nz_count:
+            # Keep the largest _f84_l26_nz_count placements, zero the rest.
+            _f84_sorted = sorted(_f84_fcst_nz_idx,
+                                 key=lambda i: -forecast[i])
+            _f84_keep   = set(_f84_sorted[:_f84_l26_nz_count])
+            forecast    = [v if i in _f84_keep else 0
+                           for i, v in enumerate(forecast)]
+            _f84_applied = True
+
     meta = {
         "model":            "Sparse Intermittent",
         "avg_interval_wk":  round(avg_interval, 1),
