@@ -3809,7 +3809,7 @@ def get_history(row, oos_entry=None):
     """
     raw = [float(row.get(c) or 0) for c in ORD_COLS]
     if oos_entry and sum(oos_entry.get("raw_ord") or []) > 0:
-        # `neutralize_compounding` lifted to module-top import (Audit Finding #19).
+        from oos_history import neutralize_compounding  # inline by design -- see top of file (Finding #19 revert)
         clean = oos_entry["clean_ord"]
         sev   = oos_entry["oos_severity"]
         # Sanity-check coverage: if the Order_History total is far below
