@@ -6951,10 +6951,12 @@ function applyFilters() {
   // Reflect sticky-toggle state on the button each time filters re-apply
   // (also covers the initial render after the page hydrates).
   _syncFlaggedOnlyButton();
+  _syncSnoozedOnlyButton();
 
   FILTERED_RECORDS = ALL_RECORDS.filter(r => {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
     if (FLAGGED_ONLY       && !r.flagged)               return false;
+    if (SNOOZED_ONLY       && !r._snoozed)              return false;
     if (SHOW_REPLY_ONLY    && !r.planner_reply_pending) return false;
     if (SHOW_FOR_ME_ONLY && !_FOR_ME_KEYS.has(r.key)) return false;
     if (search) {
