@@ -2893,6 +2893,23 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                     _f15_driver = (f"F15 depleting {_ord_cov_ratio:.2f}x "
                                    f"-> 65/35 POS/ord "
                                    f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f}")
+                elif _f15_rtl_active and float(rtl_pos.get("OH_WOS") or 0) > 10.5:
+                    # F15_RTL WOS-overstocked: retailer is intentionally ordering
+                    # light to draw down excess inventory.  Order history is a
+                    # deliberately suppressed signal -- NOT the steady-state demand
+                    # rate.  Anchor the baseline to recent consumer sell-through
+                    # (L4W POS) which is what the retailer will reorder at once
+                    # WOS normalizes.  80% L4W + 20% blended pos_rate gives full
+                    # credit to current run-rate while blended pos_rate provides
+                    # smoothing against a single-week noise spike.
+                    _rtl_wos_f15  = float(rtl_pos.get("OH_WOS") or 0)
+                    baseline = _pos_l4_f15 * 0.80 + pos_rate * 0.20
+                    _f15_driver = (
+                        f"F15 RTL-WOS-overstock (non-Amazon) {_ord_cov_ratio:.2f}x "
+                        f"WOS={_rtl_wos_f15:.1f}wks "
+                        f"-> 80/20 L4W-POS/blended "
+                        f"({_pos_l4_f15:.0f}/{pos_rate:.0f}) = {baseline:.0f}"
+                    )
                 else:
                     baseline = pos_rate * 0.60 + ord_baseline * 0.40
                     _f15_driver = (f"F15 depleting (non-Amazon) {_ord_cov_ratio:.2f}x "
