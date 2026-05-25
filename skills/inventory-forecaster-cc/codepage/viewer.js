@@ -813,6 +813,30 @@ async function _lazyLoadDetail(r) {
     ? _diRaw.split(',').map(v => parseInt(v, 10) || 0)
     : [];
   r.narrative = str(row, CFG.FID.AI_ANALYSIS) || str(row, CFG.FID.AI_ALERT);
+  // F37 v2 capped-weeks (2026-05-26): parse the hidden span injected by the
+  // forecaster writeback step.  Format:
+  //   <span class="f37-capped" data-weeks="22,25,26"
+  //         data-detail='{"22":{"orig":15104,"adj":5269,"cap":5269},...}' hidden></span>
+  // Used by the detail-pane renderer to paint AI Forecast cells with a red
+  // background when the AI ask exceeded available inventory that week.
+  r.f37_capped_weeks  = new Set();
+  r.f37_capped_detail = {};
+  if (r.narrative) {
+    const _capMatch = r.narrative.match(/class=["']f37-capped["'][^>]*data-weeks=["']([0-9,]+)["'][^>]*data-detail=['"]([^'"]+)['"]/);
+    if (_capMatch) {
+      try {
+        _capMatch[1].split(',').forEach(w => {
+          const n = parseInt(w, 10);
+          if (n >= 1 && n <= 26) r.f37_capped_weeks.add(n);
+        });
+        // data-detail uses &lt; / &amp; HTML-escapes; unescape before JSON.parse
+        const _detailRaw = _capMatch[2]
+          .replace(/&lt;/g, '<')
+          .replace(/&amp;/g, '&');
+        r.f37_capped_detail = JSON.parse(_detailRaw) || {};
+      } catch (e) { /* malformed; ignore */ }
+    }
+  }
   // Re-compute weeks_slim (per-week AI vs manual severity).
   // Seasonal customers: 0-weeks between orders are normal — suppress those alerts.
   const _isSeasonal = r.is_seasonal || false;
