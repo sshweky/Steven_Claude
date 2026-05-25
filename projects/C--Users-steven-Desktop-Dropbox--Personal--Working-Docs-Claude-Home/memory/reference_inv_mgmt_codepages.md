@@ -6,7 +6,9 @@ originSessionId: 192e4f01-3664-463b-bda7-b157c0280869
 ---
 ## Two Viewers -- MEMORIZE THIS
 
-Both live in: `C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\codepage\`
+Both live in: `C:\Users\steven\.claude\skills\inventory-forecaster-cc\codepage\`
+
+**CANONICAL PATH -- the ONLY correct location. Never use the Dropbox path. The stale Dropbox copy at C:\Users\steven\Desktop\Dropbox (Personal)\Working Docs\Claude Home\inventory-forecaster-cc\ has been permanently deleted.**
 
 ### Forecast Manager Viewer
 Projections, flag comments, AI analysis, planner responses.
