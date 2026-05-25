@@ -3131,10 +3131,6 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # phantom demand in weeks the customer won't order, producing an
     # artificially flat and elevated forecast.
     _f85_eligible = bool(_cat_mults)
-    _dbg_raw_loop = is_new_launch and is_amazon and pos_rate > 0  # temp diagnostic gate
-    if _dbg_raw_loop:
-        print(f"  [DBG2] base={baseline:.1f} damp_applied={_f_new_amz_damp_applied} "
-              f"S[:3]={[round(x,3) for x in S[:3]]}", flush=True)
     for i in range(26):
         wnum = i + 1
         s = S[i]
