@@ -15,6 +15,7 @@ originSessionId: 7fd250e7-4824-4617-8d21-edaa141aab96
 |------|--------|
 | Amazon AdTrack | bqkdiemav |
 | InventoryTrack | bpd24h9wy |
+| ProductTrack   | bn458t5nz |
 - **User Token**: b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s
 
 ## Standard Headers
