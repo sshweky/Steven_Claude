@@ -1,114 +1,121 @@
 #!/usr/bin/env python3
 """
-Deploy BOTH viewers to QB InventoryTrack app (bpd24h9wy).
+Deploy viewer.html and viewer.js to QB InventoryTrack codepages.
 
-  FORECAST MANAGER VIEWER (projections, flag comments, AI analysis):
-    pageID=49  ->  viewer.js          (JS logic)
-    pageID=50  ->  viewer.html        (HTML shell, loads viewer.js via pageID=49)
+HOW IT WORKS (updated 2026-05-25):
+  The legacy API_AddReplaceDBPage endpoint is BROKEN -- returns errcode=0
+  but saves nothing (QB platform regression, May 2026). The QB REST API
+  has no /v1/pages endpoint.
 
-  INVENTORY MANAGEMENT VIEWER (OOS gap analysis, PO recommendations):
-    pageID=52  ->  inv_mgmt_full.html (HTML shell, loads inv_mgmt.js via pageID=56)
-    pageID=56  ->  inv_mgmt.js        (JS logic)
+  Working method:
+    1. Start a local CORS server on localhost:8743 that serves the files.
+    2. Chrome (logged in to QB) fetches them and injects into the Ace editor
+       on the QB page-editor UI, then clicks Save.
+  This matches exactly what QB's own UI does and is the only method that works.
 
-Handles U+FFFF (invalid in XML 1.0) by replacing with U+FFFD before upload.
+USAGE (Claude-automated):
+    python deploy_pages.py [forecast|invmgmt|all]
+    -> starts CORS server, prints JS snippets to run in each page editor
+    -> Claude uses Chrome MCP to navigate and inject automatically
+
+USAGE (manual):
+    1. Run this script to start the CORS server.
+    2. For each page, open the QB page editor URL printed below.
+    3. Open DevTools console (F12).
+    4. Paste and run the JS snippet printed for that page.
+    5. "Page saved" toast confirms success.
+    6. Ctrl-C this script when done.
+
+PAGE MAP:
+    viewer.js          -> pageID=49  (Forecast Manager JS logic)
+    viewer.html        -> pageID=50  (Forecast Manager HTML shell)
+    inv_mgmt.js        -> pageID=56  (Inventory Management JS logic)
+    inv_mgmt_full.html -> pageID=52  (Inventory Management HTML shell)
 """
-import urllib.request, urllib.error, re, datetime
+import http.server, socketserver, threading, time, sys, os, datetime
 from pathlib import Path
 
-TOKEN  = "b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s"
-REALM  = "pim.quickbase.com"
-APP_ID = "bpd24h9wy"
-URL    = f"https://{REALM}/db/{APP_ID}"
-HERE   = Path(__file__).parent
+PORT  = 8743
+HERE  = Path(__file__).parent
+REALM = "pim.quickbase.com"
+APP   = "bpd24h9wy"
 
-# Map filename -> production page ID
 PAGE_IDS = {
-    "viewer.js":          49,   # Forecast Manager Viewer - JS
-    "viewer.html":        50,   # Forecast Manager Viewer - HTML
-    "inv_mgmt_full.html": 52,   # Inventory Management Viewer - HTML
-    "inv_mgmt.js":        56,   # Inventory Management Viewer - JS
+    "viewer.js":          49,
+    "viewer.html":        50,
+    "inv_mgmt.js":        56,
+    "inv_mgmt_full.html": 52,
 }
 
-def upload_page(filename: str):
-    page_id = PAGE_IDS[filename]
-    path    = HERE / filename
-    content = path.read_text(encoding="utf-8")
 
-    # Inject build timestamp into viewer.js cache key so every deploy
-    # automatically busts the IndexedDB projection cache for all browsers.
-    if filename == "viewer.js" and "%%BUILD_TS%%" in content:
-        build_ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S")
-        content  = content.replace("%%BUILD_TS%%", build_ts)
-        print(f"  [cache-bust] PRJ_CACHE_BUILD = {build_ts}")
+class CORSHandler(http.server.SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Cache-Control", "no-cache")
+        super().end_headers()
 
-    FFFF  = "￿"
-    FFFD  = "�"
-    n_replaced = content.count(FFFF)
-    content_xml = content.replace(FFFF, FFFD)
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.end_headers()
 
-    def is_invalid(c):
-        n = ord(c)
-        if n in (0x9, 0xA, 0xD): return False
-        if 0x20 <= n <= 0xD7FF:  return False
-        if 0xE000 <= n <= 0xFFFD: return False
-        if 0x10000 <= n <= 0x10FFFF: return False
-        return True
-    still_bad = [c for c in content_xml if is_invalid(c)]
-    if still_bad:
-        print(f"  [WARN] {len(still_bad)} remaining invalid XML chars: "
-              f"{[hex(ord(c)) for c in set(still_bad)]}")
+    def log_message(self, fmt, *args):
+        print(f"  [CORS] {fmt % args}")
 
-    # QB requires <pagebody> with CDATA -- <pagetext> returns errcode=0 but writes blank content
-    body = (
-        f'<?xml version="1.0" encoding="UTF-8"?>'
-        f'<qdbapi>'
-        f'<usertoken>{TOKEN}</usertoken>'
-        f'<pageID>{page_id}</pageID>'
-        f'<pagetype>1</pagetype>'
-        f'<pagebody><![CDATA[{content_xml}]]></pagebody>'
-        f'</qdbapi>'
+
+def start_server():
+    os.chdir(HERE)
+    httpd = socketserver.TCPServer(("", PORT), CORSHandler)
+    t = threading.Thread(target=httpd.serve_forever, daemon=True)
+    t.start()
+    return httpd
+
+
+def js_snippet(filename):
+    return (
+        f"(async () => {{\n"
+        f"  const r = await fetch('http://localhost:{PORT}/{filename}');\n"
+        f"  if (!r.ok) return console.error('fetch failed:', r.status);\n"
+        f"  const content = await r.text();\n"
+        f"  ace.edit(document.querySelector('.ace_editor')).setValue(content);\n"
+        f"  document.getElementById('pagetext').value = content;\n"
+        f"  document.getElementById('btnSaveDone').click();\n"
+        f"  console.log('{filename} deployed, length=' + content.length);\n"
+        f"}})();"
     )
 
-    xml_bytes = body.encode("utf-8")
-    print(f"{filename} -> pageID={page_id}: {len(content):,} chars  ->  XML {len(xml_bytes):,}B  "
-          f"(U+FFFF->FFFD: {n_replaced})")
-
-    req = urllib.request.Request(
-        f"{URL}?a=API_AddReplaceDBPage",
-        data=xml_bytes,
-        headers={"Content-Type": "text/xml; charset=UTF-8", "QB-Realm-Hostname": REALM},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=120) as r:
-            resp = r.read().decode("utf-8")
-        errm = re.search(r"<errcode>(\d+)</errcode>", resp)
-        pid  = re.search(r"<pageID>(\d+)</pageID>", resp)
-        errt = re.search(r"<errtext>(.*?)</errtext>", resp)
-        code = errm.group(1) if errm else "?"
-        print(f"  -> errcode={code}  pageID={pid.group(1) if pid else '?'}"
-              f"  ({errt.group(1) if errt else ''})")
-        return code == "0"
-    except urllib.error.HTTPError as e:
-        print(f"  -> HTTP {e.code}: {e.read().decode('utf-8')[:300]}")
-        return False
 
 if __name__ == "__main__":
-    import sys
-    # Usage: python deploy_pages.py [forecast|invmgmt|all]
     target = sys.argv[1] if len(sys.argv) > 1 else "all"
 
-    results = []
-    if target in ("forecast", "all"):
-        print("--- Forecast Manager Viewer (pages 49/50) ---")
-        results.append(upload_page("viewer.js"))
-        results.append(upload_page("viewer.html"))
-    if target in ("invmgmt", "all"):
-        print("--- Inventory Management Viewer (pages 52/56) ---")
-        results.append(upload_page("inv_mgmt.js"))
-        results.append(upload_page("inv_mgmt_full.html"))
-
-    if all(results):
-        print("\n[OK] All pages deployed. Hard-refresh open tabs (Ctrl+Shift+R).")
+    if target == "forecast":
+        pages = [("viewer.js", 49), ("viewer.html", 50)]
+    elif target == "invmgmt":
+        pages = [("inv_mgmt.js", 56), ("inv_mgmt_full.html", 52)]
     else:
-        print("\n[WARN] One or more uploads failed.")
+        pages = [("viewer.js", 49), ("viewer.html", 50),
+                 ("inv_mgmt.js", 56), ("inv_mgmt_full.html", 52)]
+
+    print(f"\n=== QB Codepage Deployer ({target}) ===")
+    print(f"Serving {HERE} on http://localhost:{PORT}/\n")
+
+    httpd = start_server()
+    time.sleep(0.5)
+    print("Server started.\n")
+
+    for filename, page_id in pages:
+        path = HERE / filename
+        size = path.stat().st_size if path.exists() else 0
+        print(f"--- {filename} (page {page_id}, {size:,} bytes) ---")
+        print(f"Open: https://{REALM}/nav/app/{APP}/action/pageedit?pageID={page_id}")
+        print("Paste in DevTools console:")
+        print(js_snippet(filename))
+        print()
+
+    print("Waiting for deployments... Ctrl-C when done.")
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        httpd.shutdown()
+        print("\nServer stopped. Done.")
