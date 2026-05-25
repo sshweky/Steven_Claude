@@ -3896,12 +3896,33 @@ async function toggleDetail(key) {
     shpCells += `<td style="font-weight:700;color:#6a1b9a">${fmtN(Math.round(shpTot / 26))}</td>`;
     atsCells += `<td style="color:#bbb"> - </td>`;
     atsCells += `<td style="font-weight:700;color:#00695c">${fmtN(Math.round(atsTot / 26))}</td>`;
+    // DI Orders row — yellow highlight for Direct Import weeks (FID 1613)
+    const _diOrd = r.di_ord || [];
+    const _hasDi = _diOrd.some(v => v > 0);
+    let diCells = '';
+    let diTot = 0;
+    if (_hasDi) {
+      const _diTip = 'Direct Import order (Amazon DIRECT, acct 61865) — ships ex-factory from overseas. Included in AI forecast baseline.';
+      diCells = `<td class="row-label" style="color:#827717;font-weight:600;white-space:nowrap;background:#fffde7">DI Orders</td>`;
+      for (let i = 25; i >= 0; i--) {
+        const dv = _diOrd[i] || 0;
+        diTot += dv;
+        if (dv > 0) {
+          diCells += `<td style="background:#fffde7;color:#827717;font-weight:700;cursor:default" title="${_diTip}">${fmtN(dv)}</td>`;
+        } else {
+          diCells += `<td style="background:#fffde7;color:#ccc">-</td>`;
+        }
+      }
+      diCells += `<td style="background:#fffde7;font-weight:700;color:#827717">${fmtN(diTot)}</td>`;
+      diCells += `<td style="background:#fffde7;font-weight:700;color:#827717">${fmtN(Math.round(diTot / 26))}</td>`;
+    }
     histHtml = `
     <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:2px solid #ede7f6;">
       <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">L26W History${_ecHistNote ? ` <span style="font-weight:400;color:#1565c0;">(inherited from parent style ${_ecHistNote.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])})</span>` : ''}</div>
       <table class="dtbl">
         <tr>${histHdrCells}</tr>
         <tr>${ordCells}</tr>
+        ${_hasDi ? `<tr>${diCells}</tr>` : ''}
         <tr>${shpCells}</tr>
         <tr id="cxld-row-${safeIdForTotal}"></tr>
         <tr>${atsCells}</tr>
