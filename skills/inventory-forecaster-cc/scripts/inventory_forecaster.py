@@ -8075,6 +8075,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     else:
         # Dense buyer (≥ 50% non-zero): seasonal baseline + ordering pattern shape.
         _is_ecom_t4 = _is_ecom_cust(cust_name)
+        _pos_rate_dbg = 0.0  # temp diagnostic
+        if pos_data:
+            try:
+                _l4p = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
+                _l13p = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+                _pos_rate_dbg = _l4p if _l4p > 0 else _l13p
+            except Exception:
+                pass
+        if _f73_new_ramp and is_amazon:
+            print(f"  [DBG3] {key}: new_ramp={_f73_new_ramp} f34={_f34_is_new_launch} "
+                  f"is_amazon={is_amazon} pos_rate_approx={_pos_rate_dbg:.1f}", flush=True)
         fcst, cap, meta = seasonal_baseline(hist_for_model, mp, is_amazon=is_amazon,
                                             pos_data=pos_data, description=description,
                                             product_category=product_category,
