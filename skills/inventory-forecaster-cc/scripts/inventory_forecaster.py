@@ -15055,7 +15055,34 @@ def main():
         for rec in to_write:
             row = {merge_fid: rec["key"], ai_alert_fid: _sanitize_for_qb(rec.get("alert", ""))}
             if ai_analysis_fid:
-                row[ai_analysis_fid] = _sanitize_for_qb(rec.get("ai_analysis", ""))
+                _ai_html = rec.get("ai_analysis", "") or ""
+                # F37 v2 (2026-05-26): if this record had inventory-capped
+                # weeks, append a hidden marker the codepage viewer.js will
+                # parse to render red backgrounds on the affected AI cells.
+                # The data attribute is invisible to humans but lossless.
+                _f37_adj = rec.get("f37_adjustments") or []
+                if _f37_adj:
+                    _weeks_csv = ",".join(str(a["week"]) for a in _f37_adj
+                                          if a.get("adjusted", 0) < a.get("original", 0))
+                    if _weeks_csv:
+                        _detail = {str(a["week"]): {
+                                       "orig": int(a.get("original", 0)),
+                                       "adj":  int(a.get("adjusted", 0)),
+                                       "cap":  int(a.get("capacity", 0)),
+                                   }
+                                   for a in _f37_adj
+                                   if a.get("adjusted", 0) < a.get("original", 0)}
+                        # Embed as a single, attribute-safe hidden span. JSON
+                        # is double-quote, so we wrap the attribute in single
+                        # quotes and HTML-escape any stray '<' or '&'.
+                        _detail_json = (json.dumps(_detail, separators=(",", ":"))
+                                        .replace("&", "&amp;")
+                                        .replace("<", "&lt;"))
+                        _ai_html = _ai_html + (
+                            f'<span class="f37-capped" data-weeks="{_weeks_csv}" '
+                            f"data-detail='{_detail_json}' hidden></span>"
+                        )
+                row[ai_analysis_fid] = _sanitize_for_qb(_ai_html)
             if ai_confidence_fid and rec.get("confidence") is not None:
                 row[ai_confidence_fid] = int(rec["confidence"])
             # DI Ord History (FID 1613): 26 comma-separated weekly DI order quantities.
