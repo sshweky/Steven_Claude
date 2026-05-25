@@ -1,0 +1,9 @@
+{
+  "id": "32",
+  "subject": "FF15592 sanity dry-run after all 21 fixes",
+  "description": "Compare FF15592 family forecast vs the smoke test that ran earlier to confirm Finding #1's empirical cat-profile activation is well-behaved",
+  "activeForm": "FF15592 sanity check",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
