@@ -14571,6 +14571,10 @@ def main():
             _row["_ec_parent_mstyle"] = _pms2
             _row["_ec_parent_key"]    = _pk2
             _row["_ec_parent_l13"]    = _pl13_2
+            # Cascade DI weekly data so the codepage can highlight DI weeks on EC rows too
+            if _pr2.get("_di_ord_wkly"):
+                _row["_di_ord_wkly"] = _pr2["_di_ord_wkly"]
+                _row["_di_blend"]    = True
             _f69_f60_ct += 1
         if _f69_f60_ct:
             print(f"      [F69->F60] {_f69_f60_ct} EC variant(s) re-inherited "
