@@ -10,7 +10,7 @@ Runs `scripts/inventory_forecaster.py` to execute the full forecasting pipeline.
 **QB I/O split (as of 2026-05-25):**
 - **Phase 1 (projections pull)** -- QB direct REST API (`POST /v1/records/query` on `QB_PROJ_TABLE`). Server-side WHERE filtering: a 1-record dry-run fetches exactly 1 row.
 - **Phase 2 (master pack + Season from Styles)** -- QB direct REST API (`POST /v1/records/query` on `QB_STYLES_TABLE` = `bphzqfkev`). Batches WHERE-on-Mstyle in chunks of 400 (500 triggers HTTP 400 — QB WHERE clause length limit). FIDs: Mstyle=6, Master_Pack=110, Season=437.
-- **REST batch size limits:** reads (`POST /v1/records/query` with IN clause): max 400 per batch. Writes (`POST /v1/records` with `mergeFieldId`): 500 per batch.
+- **REST batch size limits:** reads (`POST /v1/records/query` with IN clause): max 400 per batch. Writes (`POST /v1/records` with `mergeFieldId`): 500–1,000 per batch (max 25,000 technically; stay ≤1,000 for timeout safety and partial-failure granularity).
 - **All other QB reads** (Amazon catalog, ATS history, AI Comments, retailer POS, etc.) -- CData MCP server (Basic auth: `steven@skaffles.com` / PAT).
 - **Write-back** (AI_PRJ_W1..W26, AI_ALERT, AI_ANALYSIS) -- CData MCP via UPDATE SQL. Validation push (`push_validation_qb.py`) -- QB REST API.
 
