@@ -10226,6 +10226,21 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #   LOW:   L13W_nz < 150     → standard (original) settings
     #
     # Placement: BEFORE F58 so explicit Tell-AI comment replays supersede.
+    # Safe defaults — assigned inside the is_amazon+non-Inactive block below;
+    # referenced post-de-indent by F59i/F59k/F59l/F59n guards that use exact
+    # model-string checks (not startswith), so initialize here to avoid
+    # UnboundLocalError for "Inactive (zero order history)" etc.
+    _f59_l4w_avg = 0.0
+    _f59_l8w_avg = 0.0
+    _f59_l13w_avg = 0.0
+    _f59_oos_days = 0.0
+    _f59_oos_active = False
+    _f59h_wos = 0.0
+    _f59h_soh = 0.0
+    _f59h_opo = 0.0
+    _f59a_floor = 0.0
+    _f59a_momentum = False
+    _f59_f18_capped = False
     if is_amazon and not model.startswith("Inactive") and not model.startswith("OTB"):
 
         # ── Velocity baselines with OOS-week exclusion (F59c) ────────────────
