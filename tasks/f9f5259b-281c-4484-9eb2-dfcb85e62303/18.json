@@ -1,0 +1,9 @@
+{
+  "id": "18",
+  "subject": "F5: Delete duplicate _cat_mults compute",
+  "description": "Lines 9233-9237 are identical to 8776-8780. Delete the second compute; keep the first.",
+  "activeForm": "Removing duplicate cat_mults",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

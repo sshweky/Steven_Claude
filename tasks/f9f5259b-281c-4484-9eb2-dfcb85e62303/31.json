@@ -1,0 +1,9 @@
+{
+  "id": "31",
+  "subject": "F21: Capture validation try/except errors",
+  "description": "Wide validate-after-forecast try/except swallows exceptions silently. Capture key + traceback to validation_errors.json.",
+  "activeForm": "Adding validation error capture",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

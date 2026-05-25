@@ -1,0 +1,9 @@
+{
+  "id": "26",
+  "subject": "F13: Move event calendar to config.py",
+  "description": "Hard-coded Prime Day month tuples in _get_event_boosts will break; move PRIME_DAY_BUMPS to config + add documentation",
+  "activeForm": "Externalizing event calendar",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

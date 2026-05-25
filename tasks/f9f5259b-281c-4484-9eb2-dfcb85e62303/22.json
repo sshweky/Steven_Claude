@@ -1,0 +1,9 @@
+{
+  "id": "22",
+  "subject": "F8: Remove legacy per-record CData UPDATE path",
+  "description": "write_one / cdata_update legacy path at lines 14498-14525 — gate behind explicit --allow-per-record-write flag",
+  "activeForm": "Gating legacy write path",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

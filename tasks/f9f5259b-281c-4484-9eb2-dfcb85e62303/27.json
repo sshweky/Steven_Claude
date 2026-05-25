@@ -1,0 +1,9 @@
+{
+  "id": "27",
+  "subject": "F14: Bundle MSTYLE_FAMILY_INDEX globals into Context",
+  "description": "Module-level globals invite empty-during-validation bug class. Wrap in dataclass passed explicitly.",
+  "activeForm": "Refactoring globals to Context",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

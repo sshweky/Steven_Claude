@@ -9458,14 +9458,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"W5-W26 unchanged (expect restoration within 4 weeks)"
                 )
 
-    # F37h-cat pre-compute (2026-05-25): resolve _cat_mults in forecast_record()
-    # scope so the F37 gate below can check it.  description/brand/etc. were
-    # extracted above at the F8 block (line ~7401); season comes from _sig.
-    _cat_mults = _category_week_multipliers(
-        description, product_category, product_subcategory, brand, brand_pt,
-        season=season,
-    ) if (description or product_category or product_subcategory
-          or brand or brand_pt or season) else None
+    # F37h-cat gate uses _cat_mults already computed above (~line 9007) for the
+    # F61 horizon-decay block.  Audit Finding #5 (2026-05-25): removed duplicate
+    # _cat_mults compute that was previously here -- the first compute is in
+    # scope for both F61 and F37, and the second was burning CPU re-walking the
+    # cat-profile dict on every record.
 
     # F37 — Forward inventory-shortfall adjustment (2026-05-05).
     # Reads anticipated on-hand for the next 26 weeks (Inv_Wk1..Inv_Wk26)

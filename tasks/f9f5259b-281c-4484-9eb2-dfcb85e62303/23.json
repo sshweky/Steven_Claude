@@ -1,0 +1,9 @@
+{
+  "id": "23",
+  "subject": "F9: Snapshot Phase 1 before sys.exit in main()",
+  "description": "Multiple sys.exit() calls destroy Phase 1 REST work. Cache raw_rows + reload on resumption.",
+  "activeForm": "Adding Phase 1 snapshot",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

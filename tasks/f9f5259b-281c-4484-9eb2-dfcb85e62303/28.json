@@ -1,0 +1,9 @@
+{
+  "id": "28",
+  "subject": "F15+16: REST retry consistency + skip final sleep",
+  "description": "Replace hard-coded attempt==3 with MAX_RETRIES across REST sites; skip sleep on final attempt before re-raise.",
+  "activeForm": "Unifying REST retry policy",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}
