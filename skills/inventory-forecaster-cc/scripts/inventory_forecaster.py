@@ -10900,12 +10900,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     and _f59m_pos_lw >= 100)
                 else max(_f59m_pos_l4, _f59m_pos_l13)
             )
-            if _dbg_ec24_key:
-                print(f"[DBG-F59m] INSIDE GATE: "
-                      f"pos_lw={_f59m_pos_lw:.0f} pos_l4={_f59m_pos_l4:.0f} "
-                      f"pos_l13={_f59m_pos_l13:.0f} genuine={_f59m_genuine} "
-                      f"steady={_f59m_steady:.0f} "
-                      f"aur={_f59m_aur:.2f} map={_f59m_map:.2f}")
             if (_f59m_steady >= 100
                     and _f59m_pos_l13 > 0
                     and _f59m_pos_l4 >= _f59m_pos_l13 * 0.40):
