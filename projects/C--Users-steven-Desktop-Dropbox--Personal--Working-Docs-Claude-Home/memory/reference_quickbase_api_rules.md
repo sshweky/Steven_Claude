@@ -190,26 +190,51 @@ If you know the app ID, hit it directly. The "discover everything" pattern (`/ap
 
 ```sql
 SELECT [col1],[col2] FROM Projections WHERE [Mstyle] = 'FF15592'
+SELECT [Mstyle],[Master_Pack] FROM Styles  WHERE [Mstyle] IN ('FF15592', ...)
 ```
 
-CData fetches **every row** from the Projections table (4,500+ rows x 250 columns) from QB server-side, then filters to the 1 matching row in the CData layer. From QB's perspective this looks identical to `SELECT * FROM Projections` -- full table scan every time, regardless of scope.
+CData fetches **every row** from the target table from QB server-side, then filters in the CData layer. From QB's perspective this looks identical to `SELECT * FROM <table>` -- full table scan every time, regardless of scope. **This is true for every CData read, not just the canonical example tables.**
 
 **Consequences:**
 - A single-record dry-run (`--acct 23011 --mstyle FF15592`) hits QB as hard as a full `--all` run
-- Under realm load (80 users sharing the realm), repeated large CData queries cause IncompleteRead(0 bytes) disconnects for everyone
-- The 250-column Projections query is especially heavy: QB must reconstruct every field on every row before returning
+- Under realm load (80 users sharing the realm), repeated large CData queries cause `IncompleteRead(0 bytes)` disconnects for everyone
+- Wide tables compound the problem: QB must reconstruct every field on every row before returning, even when CData asks for only 2-3 columns
+- A loop of N "narrow" CData queries against the same large table = N back-to-back full-table scans (the Phase 2 master-pack loop was 28 such scans before migration)
 
-**Rule:** Use the QB direct REST API (`POST /v1/records/query`) for any table with >500 rows where narrow scope filtering matters. The REST API pushes the WHERE clause to QB natively -- a 1-record query fetches exactly 1 row.
+### 5.2.1 Decision matrix -- CData vs QB REST API
 
-**CData is appropriate for:**
+| Table profile | Use CData | Use QB REST API |
+|---|---|---|
+| <100 rows, any width | ✓ | optional |
+| 100-500 rows, narrow (<20 cols) | ✓ | preferred |
+| 100-500 rows, wide (≥20 cols) | -- | ✓ |
+| >500 rows, any width | -- | ✓ |
+| >500 rows, narrow scope filter (<10% of rows match) | ❌ never | ✓ |
+| Any table queried in a retry/batch loop | ❌ never | ✓ |
+| Schema/metadata (`getInstructions`, `getTables`) | ✓ | -- |
+
+**Rule of thumb:** if a query's WHERE clause should return <10% of the source rows, or the source table has more than 500 rows, use the REST API. If the same query will run inside a loop (per-account, per-batch, per-mstyle), always use REST -- a CData loop is a guaranteed throttle event.
+
+### 5.2.2 Tables this has applied to (and the fix)
+
+| Table (dbid) | Width | Rows | Old CData path | New path |
+|---|---|---|---|---|
+| Projections (`bpd237tvm`) | ~250 cols | ~5,500 | Phase 1 single query | REST `POST /v1/records/query` (2026-05-25) |
+| Styles (`bphzqfkev`) | 423 cols | ~30K | Phase 2 loop of 28 batches | REST `POST /v1/records/query` batched by 500 mstyles (2026-05-25) |
+
+When a new heavy CData read is discovered, add a row to this table after migrating it.
+
+**CData is still appropriate for:**
 - Session prime (`getInstructions`) -- lightweight metadata call
-- Metadata queries on small tables (<100 rows)
-- Ad-hoc SQL exploration where table size is known to be small
+- Metadata queries (`getTables`, `getColumns`, `getProcedures`)
+- Reads on small tables (<100 rows) with no loop and no retry pressure
+- Ad-hoc SQL exploration where table size is known to be small and the query is one-shot
 
 **CData is NOT appropriate for:**
-- Projections table (4,500+ rows x 250 cols) -- use QB REST API
-- Any table where your scope filter would return <10% of the total rows
-- Any query you expect to run repeatedly in a retry loop
+- Any large table where your scope filter would return <10% of the total rows
+- Any query you expect to run repeatedly in a retry loop or batch loop
+- Wide tables (≥20 cols) regardless of row count, when better than 10 rows return
+- Production-path reads that block downstream work (the realm impact of a throttle is felt by all 80 users)
 
 ### 5.3 Field label normalization (CData SQL column names vs QB REST field labels)
 
@@ -290,8 +315,9 @@ QB exposes per-realm API usage metrics. Set a personal alert when your scripts h
 - ❌ Treat 0-byte timeouts as "no data" — they're throttle signals.
 - ❌ Share one QB user/token across multiple scripts (they fight for the same quota).
 - ❌ Skip the smoke test "because it worked yesterday."
-- ❌ **Use CData for large-table reads with narrow scope filters.** CData fetches the full table regardless of WHERE clause. For tables >500 rows with narrow scope, use QB REST API so filtering happens server-side. The Projections table (4,500 rows x 250 cols) is the canonical example -- a 1-record CData query hits QB just as hard as a full-table scan.
-- ❌ **Use CData for the Projections table Phase 1 fetch.** Use `POST /v1/records/query` with explicit FID list and server-side `where` filter instead.
+- ❌ **Use CData for any large-table read with narrow scope filters.** CData fetches the full table regardless of WHERE clause. For tables >500 rows with narrow scope, use QB REST API so filtering happens server-side. Projections (~5,500 rows × 250 cols) and Styles (~30K rows × 423 cols) are the canonical examples -- a 1-record CData query hits QB just as hard as a full-table scan.
+- ❌ **Use CData for the Projections Phase 1 fetch or the Styles Phase 2 fetch.** Both are migrated to `POST /v1/records/query` with explicit FID list and server-side `where`. Never revert.
+- ❌ **Loop a "narrow" CData read against the same large table.** A loop of N batches = N full-table scans of the underlying table. If your code does `for batch in batches: cdata_query(...)`, refactor to one REST call with WHERE before shipping.
 
 ---
 

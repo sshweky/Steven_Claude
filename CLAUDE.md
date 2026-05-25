@@ -106,15 +106,37 @@ for attempt in range(1, 4):
 Direct REST API (`api.quickbase.com/v1`) > CData > JSON-RPC
 
 - **Direct REST**: fastest, modern JSON, bulk endpoints, server-side WHERE filtering — default for all production code
-- **CData**: adds 100-500ms per call plus its own rate-limit layer. **CRITICAL: CData does NOT push WHERE clauses to QB -- it fetches the entire table and filters client-side.** A 1-record CData query on Projections (4,500 rows x 250 cols) hits QB identically to a full table scan. Use CData only for: session prime (`getInstructions`), metadata queries, and small tables (<100 rows). Never use CData for the Projections table or any large-table narrow-scope query.
+- **CData**: adds 100-500ms per call plus its own rate-limit layer. **CRITICAL: CData does NOT push WHERE clauses to QB -- it fetches the entire table and filters client-side, on every call.** This is true for every CData read, not just one or two canonical tables. A 1-record CData query on Projections (~5,500 rows × 250 cols) or Styles (~30K rows × 423 cols) hits QB identically to a full table scan. A loop of N "narrow" CData reads against the same table = N back-to-back full-table scans.
 - **JSON-RPC** (`pim.quickbase.com`): legacy, slow, per-record — only when REST doesn't support the operation
 
-**CData full-scan anti-pattern (never do this for large tables):**
+**Decision matrix — CData vs REST:**
+
+| Table profile | CData | REST |
+|---|---|---|
+| <100 rows, any width | ok | optional |
+| 100–500 rows, narrow (<20 cols) | ok | preferred |
+| 100–500 rows, wide (≥20 cols) | no | yes |
+| >500 rows, any width | no | yes |
+| >500 rows with narrow scope (<10% of rows match) | never | yes |
+| Any table inside a retry/batch loop | never | yes |
+| Schema/metadata (`getInstructions`, `getTables`) | yes | — |
+
+**CData full-scan anti-patterns (never do these):**
 ```sql
--- Looks like a narrow query -- actually fetches 4,500 rows x 250 cols from QB
+-- Looks narrow -- actually fetches ~5,500 rows x 250 cols
 SELECT [col1] FROM Projections WHERE [Mstyle] = 'FF15592'
+
+-- Looks narrow per batch -- actually fetches ~30K rows x 423 cols, 28 times in a row
+for batch in mstyle_batches:
+    SELECT [Mstyle],[Master_Pack] FROM Styles WHERE [Mstyle] IN ('FF...', ...)
 ```
-**Use QB REST API instead** (`POST /v1/records/query` with `where` and explicit `select` FIDs) -- QB filters server-side, returns exactly 1 row.
+**Use QB REST API instead** (`POST /v1/records/query` with `where` and explicit `select` FIDs). One batched REST query replaces the entire CData loop.
+
+**Tables already migrated to REST (never revert):**
+- Projections (`bpd237tvm`) — Phase 1 projections pull (2026-05-25)
+- Styles (`bphzqfkev`) — Phase 2 master-pack + Season pull (2026-05-25). FIDs: Mstyle=6, Master_Pack=110, Season=437
+
+When you add a new heavy CData read (or discover an existing one), migrate it to REST and add it to this list.
 
 **Field label normalization** -- CData converts QB labels to SQL column names by replacing all non-alphanumeric characters with a single underscore:
 ```python
