@@ -11975,19 +11975,19 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
         if len(full52) >= 40:
             l52_avg = sum(full52) / len(full52)
 
-    # Compact run-rate header: LW, Avg L4W, L13W, L26W, L52W
-    # (mirrors Amazon POS Sales format; shown for all non-Amazon records)
+    # Compact run-rate header — bolded labels with colons (2026-05-25 format).
+    # Format: "<cust> Order History: L4W: 5325/wk, L13W: 4566/wk, ..."
+    # Drops the legacy "LW {n}u" prefix (LW is reported elsewhere in narrative)
+    # and the "Avg" prefix on L4W.
     _hdr_parts = []
-    if lw > 0:
-        _hdr_parts.append(f"LW {int(lw):,}u")
     if l4_avg > 0:
-        _hdr_parts.append(f"Avg L4W {l4_avg:.0f}/wk")
+        _hdr_parts.append(f"<b>L4W:</b> {l4_avg:.0f}/wk")
     if l13_avg > 0:
-        _hdr_parts.append(f"L13W {l13_avg:.0f}/wk")
+        _hdr_parts.append(f"<b>L13W:</b> {l13_avg:.0f}/wk")
     if l26_avg > 0:
-        _hdr_parts.append(f"L26W {l26_avg:.0f}/wk")
+        _hdr_parts.append(f"<b>L26W:</b> {l26_avg:.0f}/wk")
     if l52_avg and l52_avg > 0:
-        _hdr_parts.append(f"L52W {l52_avg:.0f}/wk")
+        _hdr_parts.append(f"<b>L52W:</b> {l52_avg:.0f}/wk")
     if not _hdr_parts:
         return ""
     _cl = cust_label or "this account"
