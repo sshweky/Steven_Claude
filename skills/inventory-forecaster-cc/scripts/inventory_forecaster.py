@@ -11652,6 +11652,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         else:
             _rpl_demand      = max(_rpl_pos_l13, _rpl_ord_l13)
             _rpl_pos_primary = False
+        # [DBG-RPL]
+        if row.get("Acct_MStyle_Key_", "") == "1864-FF7120EC":
+            print(f"  [DBG-RPL] pos_primary={_rpl_pos_primary} item_accel={_rpl_item_accel} demand={_rpl_demand:.1f}")
 
         if _rpl_demand >= 50:
             # Step 1 -- build week-level rates: apply seasonal/event lifts on top
