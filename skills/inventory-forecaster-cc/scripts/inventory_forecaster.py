@@ -1296,7 +1296,7 @@ def _get_proj_field_map():
 
     url = f"https://api.quickbase.com/v1/fields?tableId={QB_PROJ_TABLE}"
     req = urllib.request.Request(url, headers=_QB_PROJ_HEADERS)
-    for attempt in range(1, 4):
+    for attempt in range(1, QB_REST_MAX_RETRIES + 1):
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 fields = json.loads(resp.read())
@@ -1476,7 +1476,7 @@ def _get_styles_field_map():
         return _QB_STYLES_FIELD_MAP_CACHE, _QB_STYLES_FID_TO_LABEL_CACHE
     url = f"https://api.quickbase.com/v1/fields?tableId={QB_STYLES_TABLE}"
     req = urllib.request.Request(url, headers=_QB_PROJ_HEADERS)
-    for attempt in range(1, 4):
+    for attempt in range(1, QB_REST_MAX_RETRIES + 1):
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 fields = json.loads(resp.read())
@@ -1658,7 +1658,7 @@ def _fetch_field_map_into(table_id, table_name, store_fn):
     """Shared helper: GET /v1/fields, normalize labels, cache + return."""
     url = f"https://api.quickbase.com/v1/fields?tableId={table_id}"
     req = urllib.request.Request(url, headers=_QB_PROJ_HEADERS)
-    for attempt in range(1, 4):
+    for attempt in range(1, QB_REST_MAX_RETRIES + 1):
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 fields = json.loads(resp.read())
