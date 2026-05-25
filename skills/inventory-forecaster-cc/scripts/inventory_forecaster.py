@@ -14291,59 +14291,57 @@ def main():
     # InventoryTrack Mstyle.
     amazon_catalog_us = {}
     if amazon_mstyles:
-        print(f"\n[2.6] Pulling Amazon Catalog US (F38 signals) for "
-              f"{len(amazon_mstyles)} mstyles ...", flush=True)
-        # 2026-05-25 (Audit Finding #2): migrated from CData full-table-scan
-        # loop to QB direct REST API.  Underlying table is ProductTrack app
-        # `bn458t5nz` -> Amazon Catalog US `bpfrw2epk` (580 fields, ~30K rows).
-        try:
-            amazon_catalog_us = fetch_amazon_catalog_us_qb_rest(amazon_mstyles)
-        except Exception as _p26_err:
-            print(f"      [WARN] Phase 2.6 QB REST fetch failed: {_p26_err}")
-            amazon_catalog_us = {}
-        print(f"      {len(amazon_catalog_us)} mstyles with Amazon Catalog US "
-              f"signals loaded (QB REST API)")
-
-    # ── Phase 2.6b: Amazon Inventory Health (SOH, OPO, WOS) ──────────
-    # Fetch Sellable On-Hand, Open PO Quantity, and Weeks-of-Supply from
-    # the Amazon_Invtry_Health table in ProductTrack and merge into
-    # amazon_catalog_us so forecast_record() and build_ai_analysis() can
-    # use them for balancing projections against Amazon's actual DC position.
-    # Join path: Amazon_Catalog_US.[ASIN] → Amazon_Invtry_Health.[ASIN]
-    if amazon_catalog_us:
-        _asin_to_ms = {}
-        for _ms, _rec in amazon_catalog_us.items():
-            _asin = (_rec.get("ASIN") or "").strip()
-            if _asin:
-                _asin_to_ms[_asin] = _ms
-        if _asin_to_ms:
-            print(f"\n[2.6b] Pulling Amazon Inventory Health for "
-                  f"{len(_asin_to_ms)} ASINs ...", flush=True)
-            # 2026-05-25 (Audit Finding #2): migrated from CData per-batch
-            # loop to QB direct REST API.  Table: ProductTrack.Amazon_Invtry_Health
-            # (`bp9akd3js`, 22 fields).  Returns ASIN -> {SOH, OPO, WOS}; we
-            # merge into amazon_catalog_us keyed by mstyle via _asin_to_ms.
-            _n_ih = 0
-            try:
-                _health_by_asin = fetch_amazon_invtry_health_qb_rest(
-                    list(_asin_to_ms.keys()))
-            except Exception as _p26b_err:
-                print(f"      [WARN] Phase 2.6b QB REST fetch failed: {_p26b_err}")
-                _health_by_asin = {}
-            for _a, _r in _health_by_asin.items():
-                _ms = _asin_to_ms.get(_a)
-                if _ms and _ms in amazon_catalog_us:
-                    amazon_catalog_us[_ms]["Inv_SOH"] = float(
-                        _r.get("Sellable_On_Hand_Units") or 0)
-                    amazon_catalog_us[_ms]["Inv_OPO"] = float(
-                        _r.get("Open_Purchase_Order_Quantity") or 0)
-                    amazon_catalog_us[_ms]["Inv_WOS"] = float(
-                        _r.get("WOS_OH") or 0)
-                    _n_ih += 1
-            print(f"      {_n_ih} mstyles enriched with DC inventory health data (QB REST API)")
+        _p26_cached, _p26_hit = _pull_cache_load("phase2_6", _use_pc)
+        if _p26_hit:
+            # Cache already has health data merged in (saved after Phase 2.6b)
+            amazon_catalog_us = _p26_cached
+            print(f"\n[2.6+2.6b] Amazon Catalog US + Health from pull cache "
+                  f"({len(amazon_catalog_us)} mstyles)", flush=True)
         else:
-            print(f"\n[2.6b] Amazon Inventory Health skipped "
-                  f"(no ASINs in Catalog US -- field may not exist in that table)")
+            print(f"\n[2.6] Pulling Amazon Catalog US (F38 signals) for "
+                  f"{len(amazon_mstyles)} mstyles ...", flush=True)
+            try:
+                amazon_catalog_us = fetch_amazon_catalog_us_qb_rest(amazon_mstyles)
+            except Exception as _p26_err:
+                print(f"      [WARN] Phase 2.6 QB REST fetch failed: {_p26_err}")
+                amazon_catalog_us = {}
+            print(f"      {len(amazon_catalog_us)} mstyles with Amazon Catalog US "
+                  f"signals loaded (QB REST API)")
+
+            # ── Phase 2.6b: Amazon Inventory Health (SOH, OPO, WOS) ──────────
+            if amazon_catalog_us:
+                _asin_to_ms = {}
+                for _ms, _rec in amazon_catalog_us.items():
+                    _asin = (_rec.get("ASIN") or "").strip()
+                    if _asin:
+                        _asin_to_ms[_asin] = _ms
+                if _asin_to_ms:
+                    print(f"\n[2.6b] Pulling Amazon Inventory Health for "
+                          f"{len(_asin_to_ms)} ASINs ...", flush=True)
+                    _n_ih = 0
+                    try:
+                        _health_by_asin = fetch_amazon_invtry_health_qb_rest(
+                            list(_asin_to_ms.keys()))
+                    except Exception as _p26b_err:
+                        print(f"      [WARN] Phase 2.6b QB REST fetch failed: {_p26b_err}")
+                        _health_by_asin = {}
+                    for _a, _r in _health_by_asin.items():
+                        _ms = _asin_to_ms.get(_a)
+                        if _ms and _ms in amazon_catalog_us:
+                            amazon_catalog_us[_ms]["Inv_SOH"] = float(
+                                _r.get("Sellable_On_Hand_Units") or 0)
+                            amazon_catalog_us[_ms]["Inv_OPO"] = float(
+                                _r.get("Open_Purchase_Order_Quantity") or 0)
+                            amazon_catalog_us[_ms]["Inv_WOS"] = float(
+                                _r.get("WOS_OH") or 0)
+                            _n_ih += 1
+                    print(f"      {_n_ih} mstyles enriched with DC inventory health data "
+                          f"(QB REST API)")
+                else:
+                    print(f"\n[2.6b] Amazon Inventory Health skipped "
+                          f"(no ASINs in Catalog US -- field may not exist in that table)")
+            # Save cache AFTER health merge so it's a single complete file
+            _pull_cache_save("phase2_6", amazon_catalog_us)
 
     # ── Phase 2.6c: Retailer POS + OH data (non-Amazon customers) ──────
     # Fetch consumer POS sell-through and retailer on-hand inventory from
