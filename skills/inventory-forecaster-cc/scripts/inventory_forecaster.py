@@ -12005,84 +12005,78 @@ def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
     cl = cust_label or "this account"
     expl = None
     # Priority-ordered discriminators — first match wins.
+    # Each explanation prefixed with "<b>Analysis:</b>", bolds key metric values,
+    # drops the sales-rep call-to-action (planners decide on action separately).
     # 1) Gap-week: LW=0 after a normal Prior-Wk order, otherwise stable.
     if (short_pct < 0 and lw == 0 and pw > 0 and per_l13 > 0 and
             pw <= per_l13 * 1.6 and medium_flat and len(l4_nz) >= 1):
-        expl = (f"LW=0 after a normal {pw:.0f}u Prior Wk order; L26W "
-                f"({l26_avg:.0f}/wk) still tracks L13W ({l13_avg:.0f}/wk) "
-                f"with {len(l13_nz)}/13W active. Single zero within an "
-                f"otherwise active cadence -- watch next 2-3 weeks; if no "
-                f"order lands, that is the real signal.")
+        expl = (f"<b>Analysis:</b> LW=0 after a normal <b>{pw:.0f}u</b> Prior Wk "
+                f"order; L26W ({l26_avg:.0f}/wk) still tracks L13W "
+                f"({l13_avg:.0f}/wk) with {len(l13_nz)}/13W active. Single zero "
+                f"within an otherwise active cadence.")
     # 2) Per-order qty shrinkage with stable cadence.
     elif (short_pct < 0 and per_l13 > 0 and per_l4 > 0 and
           per_l4 / per_l13 <= 0.80 and
           abs(freq_l4 - freq_l13) / max(freq_l13, 0.01) < 0.30):
-        expl = (f"Per-order qty dropped from ~{per_l13:.0f}u (L13W avg) to "
-                f"~{per_l4:.0f}u (L4W avg) while reorder cadence held steady "
-                f"({len(l4_nz)}/L4W vs {len(l13_nz)}/L13W). Smaller builds "
-                f"at same frequency -- confirm with sales rep what changed.")
+        expl = (f"<b>Analysis:</b> Per-order qty dropped from "
+                f"<b>~{per_l13:.0f}u</b> L13W to <b>~{per_l4:.0f}u</b> L4W avg, "
+                f"while reorder cadence held steady "
+                f"({len(l4_nz)}/L4W vs {len(l13_nz)}/L13W).")
     # 3) Cadence drop (qty stable, fewer orders).
     elif (short_pct < 0 and per_l13 > 0 and per_l4 > 0 and
           0.85 <= per_l4 / per_l13 <= 1.20 and
           freq_l4 < freq_l13 * 0.70):
-        expl = (f"L4W had {len(l4_nz)} order(s) at ~{per_l4:.0f}u vs the "
-                f"L13W pattern of {len(l13_nz)} orders at ~{per_l13:.0f}u -- "
-                f"fewer orders, same per-PO size. No POS data available to "
-                f"confirm retail velocity; verify with sales rep.")
+        expl = (f"<b>Analysis:</b> L4W had <b>{len(l4_nz)}</b> order(s) at "
+                f"<b>~{per_l4:.0f}u</b> vs the L13W pattern of "
+                f"<b>{len(l13_nz)}</b> orders at <b>~{per_l13:.0f}u</b> -- "
+                f"fewer orders, same per-PO size.")
     # 4) Multi-quarter softening (L26 below L52).
     elif (short_pct < 0 and l52_avg and l52_avg > 0 and
           l26_avg < l52_avg * 0.85):
         yoy_pct = (l26_avg / l52_avg - 1.0) * 100
-        expl = (f"L26W ({l26_avg:.0f}/wk) is {yoy_pct:+.0f}% vs L52W "
-                f"({l52_avg:.0f}/wk) -- below the same period last year and "
-                f"below the L26W window. Multi-quarter pattern at {cl}; "
-                f"investigate with the sales team.")
+        expl = (f"<b>Analysis:</b> L26W (<b>{l26_avg:.0f}/wk</b>) is "
+                f"<b>{yoy_pct:+.0f}%</b> vs L52W ({l52_avg:.0f}/wk) -- "
+                f"multi-quarter softening pattern at {cl}.")
     # 5) YoY momentum (up direction confirmed by L26 > L52).
     elif (short_pct > 0 and l52_avg and l52_avg > 0 and
           l26_avg > l52_avg * 1.10):
         yoy_pct = (l26_avg / l52_avg - 1.0) * 100
-        expl = (f"L26W ({l26_avg:.0f}/wk) is +{yoy_pct:.0f}% vs L52W "
-                f"({l52_avg:.0f}/wk) -- above the same period last year and "
-                f"sustained across the L26W window. Multi-quarter positive "
-                f"trend at {cl}.")
+        expl = (f"<b>Analysis:</b> L26W (<b>{l26_avg:.0f}/wk</b>) is "
+                f"<b>+{yoy_pct:.0f}%</b> vs L52W ({l52_avg:.0f}/wk) -- "
+                f"sustained multi-quarter positive trend at {cl}.")
     # 6) Per-order qty growth (cadence stable, qty up).
     elif (short_pct > 0 and per_l13 > 0 and per_l4 > 0 and
           per_l4 / per_l13 >= 1.20 and
           abs(freq_l4 - freq_l13) / max(freq_l13, 0.01) < 0.30):
-        expl = (f"Per-order qty grew from ~{per_l13:.0f}u (L13W avg) to "
-                f"~{per_l4:.0f}u (L4W avg) while reorder cadence held steady "
-                f"({len(l4_nz)}/L4W vs {len(l13_nz)}/L13W). Larger builds "
-                f"at same frequency -- confirm with sales rep whether "
-                f"distribution or store count changed.")
+        expl = (f"<b>Analysis:</b> Per-order qty grew from "
+                f"<b>~{per_l13:.0f}u</b> L13W to <b>~{per_l4:.0f}u</b> L4W avg, "
+                f"while reorder cadence held steady "
+                f"({len(l4_nz)}/L4W vs {len(l13_nz)}/L13W).")
     # 7) Burst rebound (LW > 0 after Prior Wk zero).
     elif short_pct > 0 and lw > 0 and pw == 0 and freq_l13 > 0:
-        expl = (f"LW {lw:.0f}u after a Prior Wk zero at {cl}. L13W cadence "
-                f"was {len(l13_nz)} orders/13W. Monitor next 2-3 weeks to "
-                f"confirm whether this is a sustained return to ordering.")
+        expl = (f"<b>Analysis:</b> LW <b>{lw:.0f}u</b> after a Prior Wk zero "
+                f"at {cl}. L13W cadence was <b>{len(l13_nz)}</b> orders/13W.")
     # 8) Sustained quiet (both recent weeks zero, declining).
     elif lw == 0 and pw == 0 and short_pct < 0:
-        expl = (f"Two consecutive zero weeks at {cl}. L13W cadence was "
-                f"{len(l13_nz)}/13W active -- two zeros in a row is below "
-                f"the established pattern. Verify order status before "
-                f"treating as a trend change.")
+        expl = (f"<b>Analysis:</b> Two consecutive zero weeks at {cl}. "
+                f"L13W cadence was <b>{len(l13_nz)}/13W</b> active -- below "
+                f"the established pattern.")
     # 9) Fallback — use medium-term context.
     else:
         if short_pct > 0:
-            expl = (f"L26W ({l26_avg:.0f}/wk) tracks L13W ({l13_avg:.0f}/wk) -- "
-                    f"the uptick is concentrated in L4W only ({l4_avg:.0f}/wk). "
-                    f"Monitor next 2-3 weeks for confirmation before treating "
-                    f"as a baseline shift.")
+            expl = (f"<b>Analysis:</b> L26W (<b>{l26_avg:.0f}/wk</b>) tracks "
+                    f"L13W ({l13_avg:.0f}/wk) -- the uptick is concentrated "
+                    f"in L4W only (<b>{l4_avg:.0f}/wk</b>).")
         else:
             if medium_flat:
-                expl = (f"L26W ({l26_avg:.0f}/wk) ≈ L13W ({l13_avg:.0f}/wk), "
-                        f"so {cl}'s medium-term run rate is flat and the "
-                        f"recent dip looks like normal cadence variance "
-                        f"over a short window. No action unless it persists.")
+                expl = (f"<b>Analysis:</b> L26W (<b>{l26_avg:.0f}/wk</b>) "
+                        f"~= L13W ({l13_avg:.0f}/wk), so {cl}'s medium-term "
+                        f"run rate is flat -- the recent dip looks like "
+                        f"normal short-window cadence variance.")
             else:
-                expl = (f"L26W ({l26_avg:.0f}/wk) and L13W ({l13_avg:.0f}/wk) "
-                        f"are both off baseline — this is a broader cooling "
-                        f"pattern at {cl}, not just last 4 weeks. Worth "
-                        f"checking POS or distribution for what changed.")
+                expl = (f"<b>Analysis:</b> L26W (<b>{l26_avg:.0f}/wk</b>) and "
+                        f"L13W (<b>{l13_avg:.0f}/wk</b>) are both off "
+                        f"baseline -- broader cooling pattern at {cl}.")
     return (f"{header} {arrow} {direction} {abs(short_pct):.0f}% (L4W vs L13W). {expl}"
             if expl else header)
 
