@@ -2845,6 +2845,24 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                 f"{_l13_nz_avg_f10:.0f}; forecast scaled up x{_f82_ratio:.2f}"
                 f"{_pos_tag}"
             )
+    elif (not is_amazon
+            and not _f10_applied
+            and not _f10b_applied
+            and not _f77_applied
+            and not _f77b_applied
+            and not is_new_launch
+            and _l13_nz_avg_f10 > 0
+            and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20
+            and not _f82r_l26_ok):
+        # F82r veto -- L4/L13 looks accelerating but L4 doesn't exceed
+        # L26 all-weeks avg by >= 1.15x.  Record the veto in narrative.
+        _f82_driver = (
+            f"F82r SKIPPED: L4 {_l4_avg_f10:.0f} = "
+            f"{(_l4_avg_f10/_l13_nz_avg_f10):.2f}x L13 nz {_l13_nz_avg_f10:.0f} "
+            f"BUT only {(_l4_avg_f10/max(_f82r_l26_avg,1)):.2f}x L26 all-wks "
+            f"{_f82r_l26_avg:.0f} (need >= 1.15x) -- L13 is in a trough vs L26, "
+            f"so L4/L13 acceleration is recovery, not growth"
+        )
 
     l26_avg = sum(float(v) for v in history[-26:]) / 26
     cap_base = baseline
