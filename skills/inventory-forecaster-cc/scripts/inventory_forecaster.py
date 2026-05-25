@@ -2806,6 +2806,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         "baseline_mode":  _baseline_mode,
         "seas_min":       round(min(S), 2),
         "seas_max":       round(max(S), 2),
+        # Audit fix #2/#3: surface upward-trend rule fires so downstream
+        # forecast_record() can avoid compounding lifts (F66 customer-bias,
+        # etc.) on top of an already-lifted forecast.
+        "f38b_applied":   bool(_f38b_applied),
+        "f79_applied":    bool(_f79_driver and "skipped" not in (_f79_driver or "")),
+        "f82_applied":    bool(_f82_applied),
     }
     # Surface the baseline-mode choice as a driver so planners can audit it
     # in the AI_ALERT narrative for every record (VP-Q1, 2026-04-28).
