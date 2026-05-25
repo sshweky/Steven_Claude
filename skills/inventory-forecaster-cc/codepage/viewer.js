@@ -1108,6 +1108,40 @@ async function _loadOneInvFlowRow(r) {
 
 // -- ATS (Available to Sell) L26W history from Inventory History - Weekly ----
 let _atsHistPromise = null;
+
+// On-demand fetch for a single mstyle (used when a detail panel opens before
+// the bulk batch finishes).  Returns the 26-element array (oldest -> newest)
+// or null when no row matches.  Caches the result onto r.ats_hist so re-opens
+// don't refetch.  Typical latency: 300-500 ms vs the 30-120 sec full batch.
+async function _fetchAtsForMstyle(r) {
+  if (!r || !r.mstyle || r.ats_hist) return r.ats_hist || null;
+  const FK   = CFG.ATS_HIST_FK_MSTYLE;
+  const FIDS = CFG.ATS_HIST_FIDS;
+  try {
+    const esc = String(r.mstyle).replace(/'/g, "''");
+    const resp = await qb('/records/query', {
+      from:    CFG.ATS_HIST_TID,
+      select:  [FK, ...FIDS],
+      where:   `{${FK}.EX.'${esc}'}`,
+      options: { top: 1, skip: 0 },
+    });
+    const row = (resp && resp.data && resp.data[0]) || null;
+    if (!row) return null;
+    const numCell = (rr, fid) => {
+      const c = rr[String(fid)];
+      if (!c || c.value == null || c.value === '') return 0;
+      const n = Number(c.value);
+      return Number.isFinite(n) ? n : 0;
+    };
+    const arr = FIDS.map(fid => numCell(row, fid));
+    r.ats_hist = arr;
+    return arr;
+  } catch (e) {
+    console.warn('[AtsHist] single-mstyle fetch failed:', e);
+    return null;
+  }
+}
+
 async function attachAtsHistory(records) {
   if (!records.length) return {};
   if (!_invFlowCacheBypassed()) {
