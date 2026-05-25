@@ -1,0 +1,9 @@
+{
+  "id": "16",
+  "subject": "Smoke test FF15592 dry-run after F1/F2/F3 fixes",
+  "description": "Exercise Phase 1 with new cat-profile fields, Phase 2.5/2.6/2.6b REST migrations, validator signal parity",
+  "activeForm": "Smoke-testing FF15592",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

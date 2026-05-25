@@ -3,7 +3,7 @@
   "subject": "F2: Migrate Phase 2.5/2.6/2.6b/F58 from CData to REST",
   "description": "Paused awaiting user direction. Phase 2.5 dbid known (bqp8vz625 InventoryTrack.Amazon_Catalog, FIDs verified). Phase 2.6/2.6b blocked on ProductTrack app ID — CData metadata confirms tables exist but doesn't expose QB dbid. F58 AI Comments stays on CData (within new policy threshold).",
   "activeForm": "Migrating Phase 2.x to REST",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }

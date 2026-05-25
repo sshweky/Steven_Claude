@@ -1611,9 +1611,11 @@ def fetch_master_pack_qb_rest(mstyles):
         master_pack[mstyle] = float master_pack value (default 1.0)
         season_map[mstyle]  = season string (only present if non-empty)
 
-    Replaces the legacy CData per-batch query against Styles which was a 28x
-    full-table scan against a 423-field table -- the root cause of Phase 2
-    realm throttling on --all runs.
+    Strategy: fetch the entire Styles table (3 fields, no WHERE) in paginated
+    10K-row pages and filter in Python.  This avoids QB's WHERE-clause length
+    limit (~2,000 chars) which broke OR-batching at >100 EX clauses.  With
+    only 3 fields selected (~30K rows), each page is small and fast.
+    (2026-05-25 -- migrated from OR-batch approach)
     """
     l2f, f2l = _get_styles_field_map()
 
@@ -1627,69 +1629,63 @@ def fetch_master_pack_qb_rest(mstyles):
     master_pack = {}
     season_map  = {}
 
-    # Batch the WHERE clause -- 200 mstyles per call.
-    # Each EX clause is ~20 chars; 200 batches = ~4 KB WHERE, well under QB's
-    # parser limit.  500-batch attempts returned HTTP 400 (WHERE too long).
-    # 200 = safe max confirmed.  (2026-05-25)
-    BATCH = 200
-    uniq  = sorted({m for m in mstyles if m})
-    for i in range(0, len(uniq), BATCH):
-        batch    = uniq[i:i + BATCH]
-        or_parts = " OR ".join(f"{{{mstyle_fid}.EX.'{m}'}}" for m in batch)
-        where    = f"({or_parts})"
-        skip     = 0
-        page_sz  = 1000
-        while True:
-            payload = json.dumps({
-                "from":    QB_STYLES_TABLE,
-                "select":  select_fids,
-                "where":   where,
-                "options": {"skip": skip, "top": page_sz},
-            }).encode("utf-8")
-            req = urllib.request.Request(url, data=payload,
-                                         headers=_QB_PROJ_HEADERS, method="POST")
-            resp_data = None
-            for attempt in range(1, 4):
-                try:
-                    with urllib.request.urlopen(req, timeout=90) as resp:
-                        resp_data = json.loads(resp.read())
-                    break
-                except urllib.error.HTTPError as e:
-                    body = e.read().decode("utf-8", errors="replace")[:300]
-                    print(f"  [Phase2-WARN] HTTP {e.code} attempt {attempt}: {body}", flush=True)
-                    if attempt == 3:
-                        raise RuntimeError(f"Phase 2 HTTP {e.code}: {body}")
-                    time.sleep(2 ** attempt)
-                except Exception as e:
-                    if attempt == 3:
-                        raise
-                    time.sleep(2 ** attempt)
+    # Build lookup set for fast filtering in Python
+    wanted = {m for m in mstyles if m}
 
-            records = resp_data.get("data", [])
-            for record in records:
-                ms = None
-                mp = None
-                sv = None
-                for fid_str, cell in record.items():
-                    fid = int(fid_str)
-                    val = cell.get("value") if isinstance(cell, dict) else cell
-                    if fid == mstyle_fid:
-                        ms = val
-                    elif fid == mp_fid:
-                        mp = val
-                    elif fid == season_fid:
-                        sv = val
-                if ms:
-                    try:
-                        master_pack[ms] = float(mp) if mp not in (None, "", 0) else 1.0
-                    except (TypeError, ValueError):
-                        master_pack[ms] = 1.0
-                    if isinstance(sv, str) and sv.strip():
-                        season_map[ms] = sv.strip()
-
-            if len(records) < page_sz:
+    skip    = 0
+    page_sz = 10000   # QB REST max page size
+    pages   = 0
+    while True:
+        payload = json.dumps({
+            "from":    QB_STYLES_TABLE,
+            "select":  select_fids,
+            "options": {"skip": skip, "top": page_sz},
+        }).encode("utf-8")
+        req = urllib.request.Request(url, data=payload,
+                                     headers=_QB_PROJ_HEADERS, method="POST")
+        resp_data = None
+        for attempt in range(1, 4):
+            try:
+                with urllib.request.urlopen(req, timeout=90) as resp:
+                    resp_data = json.loads(resp.read())
                 break
-            skip += page_sz
+            except urllib.error.HTTPError as e:
+                body = e.read().decode("utf-8", errors="replace")[:300]
+                print(f"  [Phase2-WARN] HTTP {e.code} attempt {attempt}: {body}", flush=True)
+                if attempt == 3:
+                    raise RuntimeError(f"Phase 2 HTTP {e.code}: {body}")
+                time.sleep(2 ** attempt)
+            except Exception as e:
+                if attempt == 3:
+                    raise
+                time.sleep(2 ** attempt)
+
+        records = resp_data.get("data", [])
+        pages  += 1
+        for record in records:
+            ms = None
+            mp = None
+            sv = None
+            for fid_str, cell in record.items():
+                fid = int(fid_str)
+                val = cell.get("value") if isinstance(cell, dict) else cell
+                if fid == mstyle_fid:
+                    ms = val
+                elif fid == mp_fid:
+                    mp = val
+                elif fid == season_fid:
+                    sv = val
+            if ms and ms in wanted:
+                try:
+                    master_pack[ms] = float(mp) if mp not in (None, "", 0) else 1.0
+                except (TypeError, ValueError):
+                    master_pack[ms] = 1.0
+                if isinstance(sv, str) and sv.strip():
+                    season_map[ms] = sv.strip()
+
+        if len(records) < page_sz:
+            break
+        skip += page_sz
 
     return master_pack, season_map
 
