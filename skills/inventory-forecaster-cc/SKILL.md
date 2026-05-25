@@ -738,25 +738,43 @@ The **effective week** is the boundary: orders before that week follow the prior
 ## Key Model Constants
 
 ```python
-# Prime Day (last Tuesday of June) — 3 ordering bumps at fixed calendar dates
-PRIME_DAY_BUMPS = [
-    (5, 1,  1.25),   # May 1    first pre-buy
-    (5, 15, 1.25),   # May 15   second pre-buy
-    (5, 29, 1.50),   # May 29   peak pre-buy
-]
-FALL_PRIME_DAY_LIFT = 1.30   # Tuesday after Labor Day (first Monday of September + 1 day)
-AMAZON_CUST_SUBSTR  = "AMAZON"
+# Calendar-anchored event dates -- update annually when Amazon announces
+# Confirm Prime Day ~2 weeks before event; Fall Deal ~2 weeks before event
+EVENT_DATES = {
+    2026: {
+        "prime_day": date(2026, 6, 22),   # CONFIRM ~2w before event
+        "fall_deal": date(2026, 10, 8),   # CONFIRM: usually Oct 5-15
+    },
+}
+
+# Prime Day lift schedule (offsets relative to anchor date, Amazon-only)
+PRIME_DAY_LIFT_SCHEDULE_OFFSETS = {-1: 1.10, 0: 1.25, 1: 1.25, 2: 1.20}
+
+# Fall Deal lift (offsets relative to anchor date, Amazon-only)
+FALL_DEAL_LIFT_OFFSETS = {-1: 1.12, 0: 1.12, 1: 1.12}
+FALL_DEAL_LIFT = 1.12
+
+# T5 / Thanksgiving 5 -- ALL accounts, pre-event build
+# Offsets relative to Thanksgiving (4th Thursday of November, auto-computed)
+T5_LIFT_SCHEDULE_OFFSETS = {-6: 1.20, -5: 1.15, -4: 1.15}
+
+AMAZON_CUST_SUBSTR = "AMAZON"
 ```
 
-Week-to-boost mappings are computed at runtime by `_get_event_boosts()` using `ORIG_PRJ_COLS[0]`
-as the W1 anchor date. This makes Prime Day and Fall Prime Day self-correcting as the projection
-window shifts each week.
+Event lift maps (`_AMAZON_EVENT_LIFTS`, `_ALL_EVENT_LIFTS`) are computed at startup
+by `build_event_lift_map(forecast_start_date)` from today's W1 Sunday.
+Maps are `{week_num: lift}` for W1-W26. T5 is derived from `_get_thanksgiving(year)`.
+
+**"Take the greater" rule (all events, all models):**
+- Event week: `effective = max(event_lift, item_seasonal_factor)`
+- Non-event week: `effective = item_seasonal_factor` (no event floor applied)
+- Never stack event lift on top of seasonal factor
 
 **seasonal_baseline() profile dampening:**
-- `DAMP = 0.3` (normal path) or `DAMP = 0.85` (F16-relief path for high-seasonality items)
+- `DAMP = 0.1` (production), +-20% from 1.0
 - Prevents position-based distortion (e.g. holiday pre-buys in Oct/Nov history
   landing in W1-W5 forecast slots and inflating front-weeks to 3-4x)
-- Explicit Prime Day and Fall Prime Day event lifts are applied on top of the dampened profile
+- Event lifts applied via "take the greater" -- not multiplicatively stacked
 
 **Baseline logic (seasonal_baseline):**
 - Order-history baseline = **L13W non-zero avg** (excludes post-event drawdown zeros
