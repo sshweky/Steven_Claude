@@ -779,6 +779,7 @@ async function _lazyLoadDetail(r) {
     ...LY_SHP_HIST_FIDS,
     CFG.FID.AI_ANALYSIS,
     CFG.FID.AI_ALERT,
+    CFG.FID.DI_ORD_HIST,
   ].filter(Boolean);
   const data = await qb('/records/query', {
     from:    CFG.PROJECTIONS_TID,
