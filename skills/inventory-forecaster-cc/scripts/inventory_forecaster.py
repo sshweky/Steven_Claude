@@ -10154,7 +10154,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             or _f59_l4w_avg >= _f59_l8w_avg * 0.85
         )
         _f59a_floor = _f59_l4w_avg * _f59a_mult
-        if _f59_l4w_avg > 0 and _f59a_momentum and _f59a_floor > 0 and not _f59_f18_capped:
+        # Skip L4W-history-based floor rules for new launches: L4W order history
+        # reflects initial DC build orders, not steady-state demand velocity.
+        # seasonal_baseline with F_NEW_AMZ_DAMP already anchors to POS (2026-05-25).
+        if _f59_l4w_avg > 0 and _f59a_momentum and _f59a_floor > 0 and not _f59_f18_capped and not _f73_new_ramp:
             _f59a_fired = 0
             for _i in range(len(fcst)):
                 if fcst[_i] > 0 and fcst[_i] < _f59a_floor:

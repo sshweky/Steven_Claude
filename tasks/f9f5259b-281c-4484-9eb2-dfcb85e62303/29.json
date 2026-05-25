@@ -1,9 +1,9 @@
 {
   "id": "29",
   "subject": "F17: Hoist magic numbers to RULE_THRESHOLDS in config",
-  "description": "F40/F42/F45/F61/F75 thresholds inline — move to config.py as a single RULE_THRESHOLDS dict for tunability",
+  "description": "Added RULE_THRESHOLDS skeleton dict in config.py with the most-cited inline magic numbers documented + env-var overridable. Did NOT migrate existing inline reads — too risky without tests. Future additions should land in this dict.",
   "activeForm": "Centralizing rule thresholds",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }

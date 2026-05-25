@@ -3,7 +3,7 @@
   "subject": "Full --all --dry-run sweep after audit fixes",
   "description": "Stress-test all 5,500 records on full dataset with Findings 1/2/3 applied, no write-back",
   "activeForm": "Running --all dry-run",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
