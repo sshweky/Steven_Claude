@@ -2749,6 +2749,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # (or dampen) so we don't multiply on top of an already-inflated L4
     # order signal.  POS-confirmed accelerations still get full F82 lift.
     _f82_driver = None
+    _f82_applied = False   # consumed by F66 customer-bias guard downstream
     if (not is_amazon
             and not _f10_applied
             and not _f10b_applied
