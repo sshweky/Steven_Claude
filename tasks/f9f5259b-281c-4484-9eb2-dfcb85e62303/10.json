@@ -1,9 +1,0 @@
-{
-  "id": "10",
-  "subject": "Run --all --validate + push validation to QB",
-  "description": "Held: forecast run paused while migrating Phase 2 Styles pull to QB REST API",
-  "activeForm": "Running full forecast + validate",
-  "status": "pending",
-  "blocks": [],
-  "blockedBy": []
-}

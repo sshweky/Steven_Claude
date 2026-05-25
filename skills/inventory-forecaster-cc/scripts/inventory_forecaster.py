@@ -1616,9 +1616,8 @@ def fetch_master_pack_qb_rest(mstyles):
     master_pack = {}
     season_map  = {}
 
-    # Batch the WHERE clause -- 100 mstyles per call.  500 caused HTTP 400
-    # because the OR-joined WHERE string exceeded QB REST's payload limit.
-    BATCH = 100
+    # Batch the WHERE clause -- 500 mstyles per call to keep payload sane.
+    BATCH = 500
     uniq  = sorted({m for m in mstyles if m})
     for i in range(0, len(uniq), BATCH):
         batch    = uniq[i:i + BATCH]
