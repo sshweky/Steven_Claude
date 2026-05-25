@@ -11697,14 +11697,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             # amounts as ratios relative to their mean (cap 2.5x, floor 0.5x) and
             # cycle that shape through steady-state weeks beyond the DC window.
             # Only activated for regular orderers (>= 8 of last 13 weeks non-zero).
-            # Fix B (2026-05-25): use raw pre-normalization order history for variability
-            # ratios. hist normalization (F60/F35/F43) can inject catch-up shipment values
-            # into weeks that had 0 orders, creating extreme ratios (e.g. 5184/mean=2.5)
-            # that cycle to W13 and W26 producing artificial spikes. Raw Ord_LW values
-            # from the row give clean 1.15-1.30x ratios. Note: _rpl_ord_l13 (demand
-            # baseline) continues to use hist[-13:] -- only the variability ratio source
-            # changes.
-            _rpl_l13w_raw  = [float(row.get(c) or 0) for c in ORD_COLS[-13:]]
+            #
+            # Fix B (2026-05-25): outlier suppression for one-off stock-up orders.
+            # A catch-up order after a stockout (e.g., 5x the typical on-week qty)
+            # generates a 2.5x-capped ratio that cycles to W13 and W26 via the 13-
+            # week pattern, creating artificial spikes in non-holiday weeks.
+            # Detection: any position with v > 1.5x the 2nd-highest non-zero value
+            # is a stock-up outlier.  Outlier positions use ratio=1.0 (flat demand)
+            # so the pattern projects a normal steady-state week there instead.
+            # Non-outlier on-weeks retain their natural variability ratios.
+            _rpl_l13w_raw  = [float(v) for v in hist[-13:]]
             _rpl_l13w_nz   = sum(1 for v in _rpl_l13w_raw if v > 0)
             _rpl_l13w_mean = sum(_rpl_l13w_raw) / 13   # all-weeks avg incl. zeros
             if _rpl_pos_primary:
@@ -11716,7 +11718,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 # tracks the POS rate without order-history amplification.
                 _rpl_var_ratios = None
             elif _rpl_l13w_mean >= 50 and _rpl_l13w_nz >= 8:
+                _rpl_nz_sorted = sorted(
+                    (v for v in _rpl_l13w_raw if v > 0), reverse=True
+                )
+                # Outlier threshold: 1.5x the 2nd-highest NZ value (needs >= 2 NZ weeks)
+                _rpl_outlier_thresh = (
+                    1.5 * _rpl_nz_sorted[1]
+                    if len(_rpl_nz_sorted) >= 2 else float('inf')
+                )
                 _rpl_var_ratios = [
+                    1.0 if v > _rpl_outlier_thresh else          # stock-up outlier: flat
                     min(2.5, max(0.5, v / _rpl_l13w_mean)) if v > 0 else 0.5
                     for v in _rpl_l13w_raw
                 ]
