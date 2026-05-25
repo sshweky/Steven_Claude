@@ -14871,6 +14871,13 @@ def main():
                 row[ai_analysis_fid] = _sanitize_for_qb(rec.get("ai_analysis", ""))
             if ai_confidence_fid and rec.get("confidence") is not None:
                 row[ai_confidence_fid] = int(rec["confidence"])
+            # DI Ord History (FID 1613): 26 comma-separated weekly DI order quantities.
+            # Populated by F69; empty string when no DI orders for this record.
+            _di_wkly = rec.get("_di_ord_wkly") or []
+            row[di_ord_hist_fid] = (
+                ",".join(str(int(round(v))) for v in _di_wkly[:26])
+                if _di_wkly and any(v > 0 for v in _di_wkly) else ""
+            )
             for i, fid in enumerate(wk_fids):
                 row[fid] = int(round(rec["forecast"][i])) if i < len(rec["forecast"]) else 0
             # Auto Project: copy AI forecast values into MAN PRJ columns for flagged records
