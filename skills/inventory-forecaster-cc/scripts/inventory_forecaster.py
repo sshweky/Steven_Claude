@@ -14386,7 +14386,7 @@ def main():
     # Query Order History for all candidate sibling keys in one batched pull
     _di_oh = {}
     try:
-        # `fetch_clean_demand` lifted to module-top import (Audit Finding #19).
+        from oos_history import fetch_clean_demand  # inline by design (see top of file)
         _di_oh = fetch_clean_demand(_di_candidate_keys, verbose=False)
     except Exception as _e:
         print(f"      [WARN] F69 DI fetch failed: {_e} — DI blending disabled",
