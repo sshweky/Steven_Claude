@@ -11447,7 +11447,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
                     low_mult=VALID_LOW_MULT, spike_mult=VALID_SPIKE_MULT,
                     oos_entry=None, open_po_wk=None, ats_hist=None,
-                    switchover_weeks=None):
+                    switchover_weeks=None, amazon_pos=None, season_map=None,
+                    amazon_catalog_us=None, retailer_pos=None):
     """
     Compare manual projections against historical order patterns.
     Flags weeks where the projection looks anomalous relative to what
@@ -11456,8 +11457,17 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
     # Shared prep with forecast_record() — see _prep_record_signals().
     # Includes F35 stockout-backlog normalization so validation flags are
     # computed against true demand intent, not pile-up artifacts.
+    # 2026-05-25 (Finding #3): pass POS/catalog/season/retailer signals so the
+    # validator's hist normalization (F43 spike attenuation, F41/F47 backfill,
+    # POS-aware logic) sees the SAME view the forecaster does.  Without these
+    # the validator over-attenuated spikes that POS confirmed, producing false
+    # CRITICAL/WARNING flags on items the forecaster correctly accelerated.
     _sig                = _prep_record_signals(row, master_pack, oos_entry=oos_entry,
-                                               ats_hist_l26=ats_hist)
+                                               amazon_pos=amazon_pos,
+                                               season_map=season_map,
+                                               amazon_catalog_us=amazon_catalog_us,
+                                               ats_hist_l26=ats_hist,
+                                               retailer_pos=retailer_pos)
     mp                  = _sig["mp"]
     hist                = _sig["hist"]
     is_amazon           = _sig["is_amazon"]

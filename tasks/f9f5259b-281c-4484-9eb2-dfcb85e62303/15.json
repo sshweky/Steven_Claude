@@ -1,0 +1,9 @@
+{
+  "id": "15",
+  "subject": "F2: Migrate Phase 2.5/2.6/2.6b/F58 from CData to REST",
+  "description": "Amazon_Catalog (POS), Amazon_Catalog_US (F38), Amazon_Invtry_Health, AI Comments — each currently a batched CData loop. Get dbids+FIDs, write fetch_X_qb_rest() helpers, replace CData call sites.",
+  "activeForm": "Migrating Phase 2.x to REST",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

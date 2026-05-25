@@ -1,0 +1,9 @@
+{
+  "id": "14",
+  "subject": "F1: Verify + add cat-profile fields to Phase 1 SELECT",
+  "description": "Check whether Product_Category/Product_Subcategory/Brand/Brand_PT_ live on Projections or Styles; add them to the appropriate fetch.",
+  "activeForm": "Adding cat-profile fields",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}
