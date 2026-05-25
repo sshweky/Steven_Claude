@@ -105,9 +105,22 @@ for attempt in range(1, 4):
 
 Direct REST API (`api.quickbase.com/v1`) > CData > JSON-RPC
 
-- **Direct REST**: fastest, modern JSON, bulk endpoints — default for all production code
-- **CData**: adds 100-500ms per call plus its own rate-limit layer — use for ad-hoc SQL exploration only
+- **Direct REST**: fastest, modern JSON, bulk endpoints, server-side WHERE filtering — default for all production code
+- **CData**: adds 100-500ms per call plus its own rate-limit layer. **CRITICAL: CData does NOT push WHERE clauses to QB -- it fetches the entire table and filters client-side.** A 1-record CData query on Projections (4,500 rows x 250 cols) hits QB identically to a full table scan. Use CData only for: session prime (`getInstructions`), metadata queries, and small tables (<100 rows). Never use CData for the Projections table or any large-table narrow-scope query.
 - **JSON-RPC** (`pim.quickbase.com`): legacy, slow, per-record — only when REST doesn't support the operation
+
+**CData full-scan anti-pattern (never do this for large tables):**
+```sql
+-- Looks like a narrow query -- actually fetches 4,500 rows x 250 cols from QB
+SELECT [col1] FROM Projections WHERE [Mstyle] = 'FF15592'
+```
+**Use QB REST API instead** (`POST /v1/records/query` with `where` and explicit `select` FIDs) -- QB filters server-side, returns exactly 1 row.
+
+**Field label normalization** -- CData converts QB labels to SQL column names by replacing all non-alphanumeric characters with a single underscore:
+```python
+cdata_name = re.sub(r'[^a-zA-Z0-9]+', '_', qb_label)
+# "Status @ Cust" -> "Status_Cust", "Ord/LW 51" -> "Ord_LW_51"
+```
 
 ---
 
