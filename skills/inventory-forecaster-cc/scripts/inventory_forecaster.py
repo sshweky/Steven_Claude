@@ -10703,12 +10703,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 )
 
     # ── F_RTL_WOS — Retailer OH inventory WOS adjustment ─────────────────────
-    # When a retailer's on-hand WOS deviates from the normal 8-week target,
+    # When a retailer's on-hand WOS deviates from RTL_WOS_TARGET (8 wks),
     # adjust the forecast proportionally.  Understocked retailers will reorder
     # more aggressively; overstocked retailers will slow replenishment until
     # inventory burns down.  Adjustment is gradual and capped:
     #   WOS < 8 : +4% per wk below target, max +20% (at WOS <= 3)
     #   WOS > 8 : -3.5% per wk above target, max -30% (at WOS >= 16.6)
+    # Target: config.RTL_WOS_TARGET = 8 wks (Store/DC standard buffer)
     # Applied as a uniform multiplier across all non-zero forecast weeks.
     if rtl_pos and not is_amazon and model not in ("Inactive", "OTB (zero)",
                                                     "Pre-launch NEW (manual passthrough)"):
