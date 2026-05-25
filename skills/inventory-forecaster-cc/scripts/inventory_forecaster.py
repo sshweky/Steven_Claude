@@ -13906,7 +13906,6 @@ def main():
     # ── Phase 2.7: VP-Q2 OOS-aware demand reconstruction ────────────
     oos_data = {}
     if getattr(args, "oos_smoothing", False):
-        from oos_history import fetch_clean_demand
         keys = [r.get("Acct_MStyle_Key_") for r in rows if r.get("Acct_MStyle_Key_")]
         print(f"\n[2.7] VP-Q2 OOS smoothing: reconstructing clean demand for {len(keys)} keys ...", flush=True)
         oos_data = fetch_clean_demand(keys)
