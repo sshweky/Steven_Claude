@@ -13970,8 +13970,8 @@ def main():
         # Check the bulk report cache: if it has rows, the pull itself succeeded.
         if len(open_pos_data) == 0:
             try:
-                from oos_history import _open_pos_cache_path as _po_cache_fn
-                _po_cache = _po_cache_fn()
+                # `_open_pos_cache_path` lifted to module-top import (Finding #19).
+                _po_cache = _open_pos_cache_path()
                 import json as _json2
                 _po_raw = _json2.load(open(_po_cache)) if _po_cache.exists() else []
                 _po_report_ok = len(_po_raw) > 0
