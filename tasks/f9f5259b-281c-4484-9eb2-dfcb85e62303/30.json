@@ -1,7 +1,7 @@
 {
   "id": "30",
   "subject": "F18+19+20: Named constants, module-top imports, central paths",
-  "description": "F18 (named retailer sleep constant) + F19 (lifted oos_history imports to module top) done. F20 (paths.py) skipped: only 1 hard-coded cache path site found, not worth a new module.",
+  "description": "F18 (named retailer sleep constant) done. F19 (lifted oos_history imports to module top) REVERTED — circular import discovered (oos_history imports from inventory_forecaster). Original inline imports restored. F20 (paths.py) skipped: only 1 hard-coded cache path site.",
   "activeForm": "Cleanup polish",
   "status": "completed",
   "blocks": [],

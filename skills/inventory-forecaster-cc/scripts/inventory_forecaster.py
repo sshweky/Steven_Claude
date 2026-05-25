@@ -13586,7 +13586,13 @@ def main():
                    help="Use direct QB REST /v1/records bulk upsert (~50× fewer "
                         "QB API hits). Default: ON for --all scope, OFF otherwise.")
     p.add_argument("--no-bulk-writeback", dest="bulk_writeback", action="store_false",
-                   help="Force per-record SQL UPDATE writeback (legacy path).")
+                   help="Force per-record SQL UPDATE writeback (legacy path; requires --allow-per-record-write).")
+    p.add_argument("--allow-per-record-write", action="store_true", default=False,
+                   help="(SAFETY GATE, 2026-05-25 Audit Finding #8) Explicit opt-in "
+                        "required to use the legacy per-record CData UPDATE writeback. "
+                        "This path issues N individual UPDATE statements (5,500 calls "
+                        "for --all), which is the #1 cause of QB realm throttle. "
+                        "Without this flag, --no-bulk-writeback exits with an error.")
     p.add_argument("--dry-run",       action="store_true", help="Forecast only, no write-back")
     p.add_argument("--pipeline",      action="store_true",
                    help="Route through the new explicit-phase pipeline (scripts/pipeline.py). "
