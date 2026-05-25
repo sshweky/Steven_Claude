@@ -1982,12 +1982,13 @@ def fetch_inv_flow_qb_rest(mstyles):
     def _fid(label):
         return l2f.get(label) or _INV_FLOW_FALLBACK_FIDS.get(label)
 
-    mstyle_fid = _fid("Mstyle")
-    wk1_fid    = _fid("Wk1")
-    rcv_fids   = [_fid(f"RcvWk{i}") for i in range(0, 27)]   # 0..26 = 27 fids
-    opn_fids   = [_fid(f"Opn_Wk{i}") for i in range(0, 27)]
+    mstyle_fid    = _fid("Mstyle")
+    wk1_fid       = _fid("Wk1")
+    lt_trans_fid  = _fid("LT_Trans_Days")   # FID 225; "LT+ Trans Days" normalized
+    rcv_fids      = [_fid(f"RcvWk{i}") for i in range(0, 27)]   # 0..26 = 27 fids
+    opn_fids      = [_fid(f"Opn_Wk{i}") for i in range(0, 27)]
 
-    select_fids = [mstyle_fid, wk1_fid] + rcv_fids + opn_fids
+    select_fids = [mstyle_fid, wk1_fid, lt_trans_fid] + rcv_fids + opn_fids
     select_fids = [f for f in select_fids if f is not None]
 
     rows = _qb_rest_query_batched_in(
@@ -2019,10 +2020,16 @@ def fetch_inv_flow_qb_rest(mstyles):
         for i in range(1, 27):
             opn.append(_to_float(r.get(f"Opn_Wk{i}")))
         opn[0] += _to_float(r.get("Opn_Wk0"))
+        lt_trans = _to_float(r.get("LT_Trans_Days"))
         # If duplicate mstyle row, prefer the row with non-zero beg_inv
         if ms in out and beg == 0 and out[ms]["beg_inv_w1"] != 0:
             continue
-        out[ms] = {"beg_inv_w1": beg, "rcv": rcv, "opn": opn}
+        out[ms] = {
+            "beg_inv_w1":   beg,
+            "rcv":          rcv,
+            "opn":          opn,
+            "lt_trans_days": lt_trans,   # 0.0 means missing -- F37 will use 150d default
+        }
     return out
 
 
