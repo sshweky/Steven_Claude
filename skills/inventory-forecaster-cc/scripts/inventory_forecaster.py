@@ -8785,14 +8785,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"rolled forward with 25%/wk decay until age 4 (fully lost)"
                 )
     elif _f37_skip and isinstance(meta, dict):
-        _f37_skip_reason = "Status_Cust=NEW" if _f37_status_new else "active-growth (L4>=0.8*L13)"
+        if bool(_cat_mults):
+            _f37_skip_reason = "curated-cat-profile (F37h-cat gate)"
+        elif _f37_status_new:
+            _f37_skip_reason = "Status_Cust=NEW"
+        else:
+            _f37_skip_reason = "active-growth (L4>=0.8*L13)"
         # NOTE: don't put "F37" at the front of the driver string -- the
         # rule_fires regex would match it as a fire event when it's actually
         # a skip. Use "[F37-skip]" with brackets to make the intent explicit
         # and avoid the regex.
         meta.setdefault("drivers", []).append(
             f"P6 OH-shortfall guard activated: {_f37_skip_reason} -- "
-            f"new-launch / growth items not subject to F37 W1-W2 zeroing"
+            f"cat-profile / new-launch / growth items bypass F37 inventory constraint"
         )
 
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
