@@ -1485,11 +1485,13 @@ def fetch_projections_qb_rest(prj_cols, args):
             where_parts.append(f"({or_p})")
 
     if getattr(args, 'mstyle', None):
+        # Use SW (starts-with) so that a base style code like "FF12302" matches
+        # variant records such as "FF12302/24EC" stored in QB.
         ms_list = [m.strip() for m in args.mstyle.split(',') if m.strip()]
         if len(ms_list) == 1:
-            where_parts.append(f"{{{mstyle_fid}.EX.'{ms_list[0]}'}}")
+            where_parts.append(f"{{{mstyle_fid}.SW.'{ms_list[0]}'}}")
         else:
-            or_p = "OR".join(f"{{{mstyle_fid}.EX.'{m}'}}" for m in ms_list)
+            or_p = "OR".join(f"{{{mstyle_fid}.SW.'{m}'}}" for m in ms_list)
             where_parts.append(f"({or_p})")
 
     if getattr(args, '_brand_mstyles', None):
