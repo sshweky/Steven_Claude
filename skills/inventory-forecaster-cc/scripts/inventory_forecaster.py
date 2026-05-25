@@ -2668,6 +2668,38 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             f"{min(S):.2f}-{max(S):.2f})"
         )
 
+    # F_NEW_AMZ_DAMP (2026-05-25) -- New-launch Amazon seasonal damping guard.
+    # For Amazon items still in launch/ramp phase (limited or noisy order
+    # history), the 52-week positional seasonal profile is unreliable: a few
+    # large LY orders at specific weekly positions dominate the profile and can
+    # push W1-W4 to 2-3x the baseline.  POS sell-through velocity (captured via
+    # F15 in the baseline) is the correct forward signal for these items, not
+    # the order-position shape.
+    # Fix: re-damp the already DAMP=0.30-compressed S array toward flat using
+    # DAMP=0.20, so the combined effective suppression is much stronger.  Total
+    # 26-week volume is largely preserved (the seasonal distribution flattens,
+    # not the sum); explicit event lifts (Prime Day, Fall Deal) still apply after.
+    # Gates:
+    #   - is_new_launch (F34 leading-zero pattern OR Status=NEW AND sparse L26W)
+    #   - is_amazon (DC replenishment; non-Amazon steady buyers use F_STEADY)
+    #   - not _f16_relief (genuine curated seasonal signal; don't suppress it)
+    #   - pos_rate > 0 (POS data confirms demand level; without it, fall back)
+    _f_new_amz_damp_applied = False
+    _f_new_amz_damp_driver  = None
+    if is_new_launch and is_amazon and not _f16_relief and pos_rate > 0:
+        DAMP_NEW_AMZ        = 0.20
+        _sna_min_raw        = min(S)
+        _sna_max_raw        = max(S)
+        S                   = [1.0 + DAMP_NEW_AMZ * (s - 1.0) for s in S]
+        _f_new_amz_damp_applied = True
+        _f_new_amz_damp_driver  = (
+            f"F_NEW_AMZ_DAMP new-launch Amazon: order-history seasonal profile "
+            f"unreliable (POS {pos_rate:.0f}/wk anchors baseline via F15); "
+            f"seasonal damped 80% toward flat "
+            f"(S range {_sna_min_raw:.2f}-{_sna_max_raw:.2f} -> "
+            f"{min(S):.2f}-{max(S):.2f})"
+        )
+
     # Raw forecast: damped profile + explicit event lifts
     raw = []
     _f85_floored = 0

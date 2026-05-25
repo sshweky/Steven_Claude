@@ -2,8 +2,8 @@
   "id": "35",
   "subject": "Run forecast --all --validate + push validation",
   "description": "Step 1: python run_forecast.py --all --validate (watchdog, ~15-20 min)\nStep 2: python push_validation_qb.py after completion",
-  "activeForm": "Running forecast --all --validate",
-  "status": "pending",
+  "activeForm": "Running full forecast + validate",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
