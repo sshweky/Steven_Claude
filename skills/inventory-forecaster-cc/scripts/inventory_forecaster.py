@@ -1694,6 +1694,247 @@ def fetch_master_pack_qb_rest(mstyles):
     return master_pack, season_map
 
 
+# ── QB REST API -- Phase 2.5 / 2.6 / 2.6b Amazon-data fetchers ────────────────
+# 2026-05-25 (Audit Finding #2): Phase 2.5 (Amazon_Catalog POS), 2.6
+# (Amazon_Catalog_US F38 signals), and 2.6b (Amazon_Invtry_Health DC inventory)
+# were CData per-batch loops against tables CData fetches in full on every
+# call -- same anti-pattern as Phases 1 and 2.  Migrated to QB REST below.
+#
+# Tables and FIDs (verified 2026-05-25 via GET /v1/fields):
+#   InventoryTrack.Amazon_Catalog (bqp8vz625): Mstyle=34, Ordered_Units_LW=154,
+#     Ordered_Units_Prior_Wk=180, Avg_L4w=193, L13w=194, L26w=195, L52w=196.
+#   ProductTrack.Amazon_Catalog_US (bpfrw2epk): Mstyle (model#)=21 [CData norm
+#     'Mstyle_model_'], ASIN=6, ASIN_Status=86, ASIN_Buyability_Flag=428,
+#     Amazon_Buybox=588, MAP_Price=463, AUR_L4w=948, AUR_L13w=949, AUR_L26w=951,
+#     AUR_L52w=950, Days_Amazon_OOS_L30d_=750, Sellable_On_Hand_Units=341.
+#   ProductTrack.Amazon_Invtry_Health (bp9akd3js): ASIN=6, Sellable=14,
+#     Open_PO_Qty=11, WOS_OH=50.
+
+_QB_AMZ_CATALOG_FMAP_CACHE      = None
+_QB_AMZ_CATALOG_F2L_CACHE       = {}
+_QB_AMZ_US_FMAP_CACHE           = None
+_QB_AMZ_US_F2L_CACHE            = {}
+_QB_AMZ_HEALTH_FMAP_CACHE       = None
+_QB_AMZ_HEALTH_F2L_CACHE        = {}
+
+
+def _get_amz_catalog_field_map():
+    """Fetch and cache the InventoryTrack.Amazon_Catalog field map."""
+    global _QB_AMZ_CATALOG_FMAP_CACHE, _QB_AMZ_CATALOG_F2L_CACHE
+    if _QB_AMZ_CATALOG_FMAP_CACHE is not None:
+        return _QB_AMZ_CATALOG_FMAP_CACHE, _QB_AMZ_CATALOG_F2L_CACHE
+    return _fetch_field_map_into(QB_AMZ_CATALOG_TABLE,
+                                 "Amazon_Catalog",
+                                 lambda l2f, f2l: _store_amz_catalog(l2f, f2l))
+
+
+def _store_amz_catalog(l2f, f2l):
+    global _QB_AMZ_CATALOG_FMAP_CACHE, _QB_AMZ_CATALOG_F2L_CACHE
+    _QB_AMZ_CATALOG_FMAP_CACHE = l2f
+    _QB_AMZ_CATALOG_F2L_CACHE  = f2l
+
+
+def _get_amz_us_field_map():
+    """Fetch and cache the ProductTrack.Amazon_Catalog_US field map."""
+    global _QB_AMZ_US_FMAP_CACHE, _QB_AMZ_US_F2L_CACHE
+    if _QB_AMZ_US_FMAP_CACHE is not None:
+        return _QB_AMZ_US_FMAP_CACHE, _QB_AMZ_US_F2L_CACHE
+    return _fetch_field_map_into(QB_AMZ_US_TABLE,
+                                 "Amazon_Catalog_US",
+                                 lambda l2f, f2l: _store_amz_us(l2f, f2l))
+
+
+def _store_amz_us(l2f, f2l):
+    global _QB_AMZ_US_FMAP_CACHE, _QB_AMZ_US_F2L_CACHE
+    _QB_AMZ_US_FMAP_CACHE = l2f
+    _QB_AMZ_US_F2L_CACHE  = f2l
+
+
+def _get_amz_health_field_map():
+    """Fetch and cache the ProductTrack.Amazon_Invtry_Health field map."""
+    global _QB_AMZ_HEALTH_FMAP_CACHE, _QB_AMZ_HEALTH_F2L_CACHE
+    if _QB_AMZ_HEALTH_FMAP_CACHE is not None:
+        return _QB_AMZ_HEALTH_FMAP_CACHE, _QB_AMZ_HEALTH_F2L_CACHE
+    return _fetch_field_map_into(QB_AMZ_HEALTH_TABLE,
+                                 "Amazon_Invtry_Health",
+                                 lambda l2f, f2l: _store_amz_health(l2f, f2l))
+
+
+def _store_amz_health(l2f, f2l):
+    global _QB_AMZ_HEALTH_FMAP_CACHE, _QB_AMZ_HEALTH_F2L_CACHE
+    _QB_AMZ_HEALTH_FMAP_CACHE = l2f
+    _QB_AMZ_HEALTH_F2L_CACHE  = f2l
+
+
+def _fetch_field_map_into(table_id, table_name, store_fn):
+    """Shared helper: GET /v1/fields, normalize labels, cache + return."""
+    url = f"https://api.quickbase.com/v1/fields?tableId={table_id}"
+    req = urllib.request.Request(url, headers=_QB_PROJ_HEADERS)
+    for attempt in range(1, 4):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                fields = json.loads(resp.read())
+            l2f, f2l = {}, {}
+            for f in fields:
+                label = f.get("label", "")
+                fid   = f.get("id")
+                norm  = re.sub(r'[^a-zA-Z0-9]+', '_', label)
+                l2f[norm] = fid
+                f2l[fid]  = norm
+            store_fn(l2f, f2l)
+            return l2f, f2l
+        except Exception as e:
+            if attempt == 3:
+                raise RuntimeError(f"[QB REST] Failed to fetch {table_name} field map: {e}")
+            time.sleep(2 ** attempt)
+
+
+def _qb_rest_query_batched_in(table_id, headers, fmap, fid_key,
+                              select_fids, fid_to_label, keys_list, batch_size=100,
+                              label="rest_batch"):
+    """Generic batched WHERE-IN over a REST query.
+
+    Used by all the Phase 2.x Amazon fetchers.  Each batch builds an OR-of-EX
+    formula (~25 chars per term, so BATCH=100 keeps the URL under ~3KB and
+    well below QB's WHERE clause length limit -- 500 triggers HTTP 400).
+    Returns a list of dicts keyed by CData-compatible normalized labels.
+    """
+    url      = "https://api.quickbase.com/v1/records/query"
+    out_rows = []
+    uniq     = sorted({k for k in keys_list if k})
+    for i in range(0, len(uniq), batch_size):
+        batch    = uniq[i:i + batch_size]
+        or_parts = "OR".join(f"{{{fid_key}.EX.'{k}'}}" for k in batch)
+        where    = f"({or_parts})"
+        skip     = 0
+        page_sz  = 1000
+        while True:
+            payload = json.dumps({
+                "from":    table_id,
+                "select":  select_fids,
+                "where":   where,
+                "options": {"skip": skip, "top": page_sz},
+            }).encode("utf-8")
+            req = urllib.request.Request(url, data=payload, headers=headers, method="POST")
+            resp_data = None
+            for attempt in range(1, 4):
+                try:
+                    with urllib.request.urlopen(req, timeout=90) as resp:
+                        resp_data = json.loads(resp.read())
+                    break
+                except Exception as e:
+                    if attempt == 3:
+                        raise RuntimeError(f"[QB REST {label}] batch {i // batch_size + 1} failed: {e}")
+                    time.sleep(2 ** attempt)
+            records = resp_data.get("data", [])
+            for record in records:
+                row = {}
+                for fid_str, cell in record.items():
+                    fid   = int(fid_str)
+                    label_norm = fid_to_label.get(fid, str(fid))
+                    val   = cell.get("value") if isinstance(cell, dict) else cell
+                    if isinstance(val, dict):
+                        val = val.get("name") or val.get("email") or ""
+                    row[label_norm] = val
+                out_rows.append(row)
+            if len(records) < page_sz:
+                break
+            skip += page_sz
+    return out_rows
+
+
+def fetch_amazon_pos_qb_rest(amazon_mstyles):
+    """Phase 2.5: pull Amazon Catalog POS data for given mstyles via REST.
+
+    Returns dict keyed by Mstyle -> {Ordered_Units_LW, Ordered_Units_Prior_Wk,
+    Avg_Units_Wk_L4w/L13w/L26w/L52w}.  Same shape the legacy CData query
+    produced, drop-in replacement for the Phase 2.5 loop.
+    """
+    l2f, f2l = _get_amz_catalog_field_map()
+    mstyle_fid = l2f.get("Mstyle")                  or 34
+    select_fids = [
+        mstyle_fid,
+        l2f.get("Ordered_Units_LW")       or 154,
+        l2f.get("Ordered_Units_Prior_Wk") or 180,
+        l2f.get("Avg_Units_Wk_L4w")       or 193,
+        l2f.get("Avg_Units_Wk_L13w")      or 194,
+        l2f.get("Avg_Units_Wk_L26w")      or 195,
+        l2f.get("Avg_Units_Wk_L52w")      or 196,
+    ]
+    rows = _qb_rest_query_batched_in(
+        QB_AMZ_CATALOG_TABLE, _QB_PROJ_HEADERS, l2f, mstyle_fid,
+        select_fids, f2l, amazon_mstyles,
+        batch_size=100, label="amazon_pos")
+    amazon_pos = {}
+    for r in rows:
+        ms = r.get("Mstyle")
+        if ms:
+            amazon_pos[ms] = r
+    return amazon_pos
+
+
+def fetch_amazon_catalog_us_qb_rest(amazon_mstyles):
+    """Phase 2.6: pull Amazon Catalog US (F38 signals) via REST.
+
+    Keyed by Mstyle_model_ -> {Amazon_Buybox, MAP_Price, AUR_L4w..L52w,
+    Days_Amazon_OOS_L30d_, Sellable_On_Hand_Units, ASIN_Buyability_Flag, ASIN,
+    ASIN_Status}.
+    """
+    l2f, f2l = _get_amz_us_field_map()
+    key_fid = l2f.get("Mstyle_model_") or 21
+    select_fids = [
+        key_fid,
+        l2f.get("Amazon_Buybox")            or 588,
+        l2f.get("MAP_Price")                or 463,
+        l2f.get("AUR_L4w")                  or 948,
+        l2f.get("AUR_L13w")                 or 949,
+        l2f.get("AUR_L26w")                 or 951,
+        l2f.get("AUR_L52w")                 or 950,
+        l2f.get("Days_Amazon_OOS_L30d_")    or 750,
+        l2f.get("Sellable_On_Hand_Units")   or 341,
+        l2f.get("ASIN_Buyability_Flag")     or 428,
+        l2f.get("ASIN")                     or 6,
+        l2f.get("ASIN_Status")              or 86,
+    ]
+    rows = _qb_rest_query_batched_in(
+        QB_AMZ_US_TABLE, _QB_PROJ_HEADERS, l2f, key_fid,
+        select_fids, f2l, amazon_mstyles,
+        batch_size=100, label="amazon_catalog_us")
+    out = {}
+    for r in rows:
+        k = r.get("Mstyle_model_")
+        if k:
+            out[k] = r
+    return out
+
+
+def fetch_amazon_invtry_health_qb_rest(asins):
+    """Phase 2.6b: pull Amazon DC inventory health (SOH/OPO/WOS) via REST.
+
+    Returns dict keyed by ASIN -> {Sellable_On_Hand_Units,
+    Open_Purchase_Order_Quantity, WOS_OH}.  Caller is responsible for joining
+    ASIN -> Mstyle via the Amazon_Catalog_US map.
+    """
+    l2f, f2l = _get_amz_health_field_map()
+    asin_fid = l2f.get("ASIN") or 6
+    select_fids = [
+        asin_fid,
+        l2f.get("Sellable_On_Hand_Units")        or 14,
+        l2f.get("Open_Purchase_Order_Quantity")  or 11,
+        l2f.get("WOS_OH")                        or 50,
+    ]
+    rows = _qb_rest_query_batched_in(
+        QB_AMZ_HEALTH_TABLE, _QB_PROJ_HEADERS, l2f, asin_fid,
+        select_fids, f2l, asins,
+        batch_size=100, label="amazon_invtry_health")
+    out = {}
+    for r in rows:
+        a = (r.get("ASIN") or "").strip()
+        if a:
+            out[a] = r
+    return out
+
+
 def build_scope_filter(args):
     clauses = []
     if args.acct:
