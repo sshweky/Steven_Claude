@@ -1536,7 +1536,7 @@ def fetch_master_pack_qb_rest(mstyles):
         req = urllib.request.Request(url, data=payload,
                                      headers=_QB_PROJ_HEADERS, method="POST")
         resp_data = None
-        for attempt in range(1, 4):
+        for attempt in range(1, QB_REST_MAX_RETRIES + 1):
             try:
                 with urllib.request.urlopen(req, timeout=90) as resp:
                     resp_data = json.loads(resp.read())
@@ -1544,11 +1544,11 @@ def fetch_master_pack_qb_rest(mstyles):
             except urllib.error.HTTPError as e:
                 body = e.read().decode("utf-8", errors="replace")[:300]
                 print(f"  [Phase2-WARN] HTTP {e.code} attempt {attempt}: {body}", flush=True)
-                if attempt == 3:
+                if attempt == QB_REST_MAX_RETRIES:
                     raise RuntimeError(f"Phase 2 HTTP {e.code}: {body}")
                 time.sleep(2 ** attempt)
             except Exception as e:
-                if attempt == 3:
+                if attempt == QB_REST_MAX_RETRIES:
                     raise
                 time.sleep(2 ** attempt)
 
