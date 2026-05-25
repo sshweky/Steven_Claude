@@ -14553,6 +14553,19 @@ def main():
     print(f"      {model_summary}  Bi-weekly enforced: {biweekly_ct}  "
           f"Alerts (>{ALERT_THRESHOLD*100:.4g}%): {alert_count}")
 
+    # Audit Finding #12 (2026-05-25): surface cat-profile SKU-gate rejections.
+    # If a planner added a derived profile that's been silently filtered out,
+    # this prints which categories + how many times.  Helps debug "I added a
+    # profile but I see no observable effect" reports.
+    if _CAT_PROFILE_REJECTIONS:
+        print(f"      [cat-profile gate] {len(_CAT_PROFILE_REJECTIONS)} "
+              f"profile(s) rejected by SKU gate (need >"
+              f"{SEASONAL_MIN_SKU_COUNT} consistent SKUs):")
+        for (_prio, _key), _info in sorted(_CAT_PROFILE_REJECTIONS.items(),
+                                            key=lambda kv: -kv[1]["count"])[:10]:
+            print(f"        {_prio} {_key!r:40} n_skus={_info['n_skus']} "
+                  f"(filtered {_info['count']} records)")
+
     # Save forecast JSON — wrapped with meta so viewer.py knows the prj_cols
     out_path = Path(args.out)
     output = {
