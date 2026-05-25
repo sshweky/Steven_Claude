@@ -10892,6 +10892,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # (observed: FF9298EC, FF9297/24, FF8649/24 in 2026-05-20 gap analysis).
     # Scale floor = 0.25 to avoid over-correction if POS data is stale.
     if (is_amazon                            # Amazon-only (defines _f59_l4w_avg etc.)
+            and not model.startswith("Inactive") and not model.startswith("OTB")
             and pos_data and isinstance(fcst, list) and len(fcst) >= 4
             and _f59_l4w_avg == 0           # no orders at all in L4W
             and _f59_oos_days < 14          # not a genuine OOS situation
