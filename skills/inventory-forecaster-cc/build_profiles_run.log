@@ -1,0 +1,64 @@
+[start] building category profiles from direct query on bpaxk2v8t (2024-2026)
+[cache] using cached query (737,973 rows, 6 cols)
+[resolve] qty   = Qty Shpd
+[resolve] mst   = Mstyle
+[resolve] cust  = Customer Name
+[resolve] cat   = Product Category
+[resolve] sub   = Product Subcategory
+[resolve] date  = Shpd Date
+[resolve] year  = None
+[resolve] month = None
+[consistency] 1,592/5,831 MStyles qualify (27.3%) — capturing 70,713,392/125,687,148 units (56.3%)
+[clean] demand cap pass complete:
+  OOS catch-up months capped : 1,097  (gap >= 2 mo, cap = 1.5x median)
+  ISO spike months capped    : 4,943  (cap = 2.5x median)
+  Total (mst,cust,ym) buckets scaled down: 6,040
+[aggregate] excluded 102,628 rows from inconsistent MStyles
+[aggregate] excluded 115,553 rows from OOS months [(2025, 5), (2025, 6), (2025, 7), (2025, 8), (2025, 9)]
+[aggregate] year weights: {2024: 2.0, 2025: 1.0, 2026: 1.0}
+[aggregate] skipped 31 bad rows, 0 out-of-window rows
+[aggregate] 41 categories, 156 subcategories
+
+[result] kept 31 categories, 84 subcategories
+[result] skipped 10 categories, 72 subcategories
+
+Top categories by volume (kept):
+  Grooming                                 43,155,298  peak=Jan (raw 1.45, clamped 1.35)  p/t=2.28
+  Disposable Tabletop                      12,946,609  peak=Mar (raw 1.73, clamped 1.57)  p/t=3.36
+  Waste Management                         12,131,600  peak=Mar (raw 1.42, clamped 1.32)  p/t=2.92
+  Litter Accessories                       12,128,275  peak=Mar (raw 2.17, clamped 1.96)  p/t=5.67
+  Air Care                                 10,934,413  peak=Mar (raw 2.37, clamped 2.13)  p/t=5.10
+  Dog Dental Care                          10,322,226  peak=Jan (raw 1.59, clamped 1.49)  p/t=2.51
+  Grooming Tools                            6,684,728  peak=Apr (raw 1.38, clamped 1.27)  p/t=2.03
+  Laundry                                   5,130,623  peak=Feb (raw 1.28, clamped 1.21)  p/t=1.70
+  Food Protection                           4,673,893  peak=Jan (raw 1.33, clamped 1.27)  p/t=2.21
+  Cat Grooming                              3,985,869  peak=Apr (raw 1.55, clamped 1.45)  p/t=2.63
+  Cleaning Tools                            3,816,358  peak=Mar (raw 1.37, clamped 1.25)  p/t=1.92
+  Treats & Chews                            3,130,065  peak=Apr (raw 1.52, clamped 1.40)  p/t=3.55
+  Cleaning                                  2,993,349  peak=Jan (raw 1.64, clamped 1.50)  p/t=2.90
+  Foils & Pans                              2,312,781  peak=Mar (raw 1.75, clamped 1.63)  p/t=4.40
+  Dog Toys                                  2,149,543  peak=Nov (raw 1.52, clamped 1.62)  p/t=3.48
+  Dental Toys                               1,951,506  peak=Nov (raw 1.78, clamped 1.89)  p/t=3.11
+  Pet Air Care                              1,813,640  peak=Feb (raw 1.51, clamped 1.43)  p/t=3.59
+  Grilling Tools                            1,522,119  peak=Apr (raw 2.17, clamped 1.89)  p/t=6.12
+  Dog Supplements                           1,373,954  peak=Jan (raw 1.72, clamped 1.53)  p/t=4.64
+  Cat Dental Care                           1,352,277  peak=Jan (raw 1.53, clamped 1.45)  p/t=3.19
+  Small Animal Care                           926,662  peak=Jan (raw 1.39, clamped 1.29)  p/t=2.37
+  Pro Hand Care                               873,891  peak=Mar (raw 2.03, clamped 1.84)  p/t=4.77
+  Cat Grooming Tools                          795,416  peak=Mar (raw 2.02, clamped 1.84)  p/t=4.38
+  Cat Stain & Odor                            690,281  peak=Jan (raw 1.31, clamped 1.23)  p/t=2.12
+  Dog Remedies                                588,765  peak=Mar (raw 1.37, clamped 1.35)  p/t=2.31
+
+Top skipped categories (by volume):
+  Cat Scratch Solutions                        78,714  (total 78,714 < 100,000)
+  Feeding & Food Storage                       71,746  (total 71,746 < 100,000)
+  Seasonal Toys                                54,096  (total 54,096 < 100,000)
+  Parchment Paper                              33,558  (total 33,558 < 100,000)
+  Cat Supplements                              18,312  (total 18,312 < 100,000)
+  Cat Toys                                     17,520  (total 17,520 < 100,000)
+  Costumes                                      5,903  (only 2 consistent SKU(s) < 3)
+  Other [Not Listed]                            2,725  (only 1 consistent SKU(s) < 3)
+  Beds                                          2,272  (only 1 consistent SKU(s) < 3)
+  Dispenser                                       645  (only 2 consistent SKU(s) < 3)
+
+[saved] scripts/derived_category_profiles.json  (31 cats + 84 subcats)

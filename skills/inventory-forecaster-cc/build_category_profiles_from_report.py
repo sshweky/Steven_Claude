@@ -111,23 +111,21 @@ HOLIDAY_LEAD_UPLIFT = {
 # ─── Demand-distortion cleaning ───────────────────────────────────────────────
 # Applied per (mstyle, customer) before rows flow into the category aggregate.
 #
-# 1. OOS catch-up spikes — when a (mstyle, customer) combo had a gap of
+# 1. ISO — Initial Stocking Orders.
+#    The very first order a retailer places for a new item fills all store shelves
+#    at once.  It is a one-time event unrelated to ongoing replenishment demand
+#    and can be 5-20× the steady-state weekly rate.  Including it inflates the
+#    seasonal index for whatever calendar month it happens to land in.
+#    Detection: first active month for each (mstyle, customer) combo → exclude
+#    entirely (scale = 0).  Subsequent months are normal replenishment.
+#
+# 2. OOS catch-up spikes — when a (mstyle, customer) combo had a gap of
 #    OOS_GAP_MONTHS or more consecutive zero-shipment months, the first month
 #    back contains pent-up make-up demand from multiple periods.  That catch-up
 #    is NOT genuine monthly demand for the purpose of the seasonal shape.
 #    Cap the bucket at OOS_CAP_MULT × that combo's median monthly qty.
-#
-# 2. ISO / isolated-spike orders — any (mstyle, customer, year_month) bucket
-#    where total shipped qty > ISO_CAP_MULT × median monthly qty for that combo.
-#    These are one-time bulk buys (annual pre-buys, display programs, promo
-#    fills) that would inflate one calendar month and falsely lift the index.
-#    Cap at ISO_CAP_MULT × median.
-#
-# Both caps share the same mechanism (scale_factor on the bucket); OOS catch-up
-# uses a tighter cap because the demand was already truly lost.
 OOS_GAP_MONTHS = 2          # gap >= this many calendar months → flag as OOS return
 OOS_CAP_MULT   = 1.5        # OOS catch-up month capped at 1.5× median (some catch-up is real)
-ISO_CAP_MULT   = 2.5        # ISO spike capped at 2.5× median monthly qty
 
 # Quality gates
 MIN_TOTAL_UNITS   = 100_000
