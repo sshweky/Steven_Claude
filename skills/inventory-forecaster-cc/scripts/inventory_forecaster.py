@@ -230,7 +230,15 @@ def _scan_rule_fires(meta=None, alert="", baseline_mode="", model="",
                      biweekly=False, is_amazon=False, is_international=False):
     """Derive rule_fires from existing driver/alert/mode/model signatures.
     Avoids per-branch _fire() instrumentation by scanning what the forecaster
-    already records about itself."""
+    already records about itself.
+
+    Audit Finding #11 (2026-05-25): kept this dual instrumentation (explicit
+    _fire() + regex scan) intentionally.  Fully migrating every site to
+    explicit _fire() would touch ~80 call sites with no test safety net and
+    would risk silently dropping rule counts in downstream analytics
+    (gap_analysis.py + analyze_manual_vs_ai.py).  The "[F37-skip]" workaround
+    pattern is the documented convention for new rules that need to record
+    themselves as a SKIP rather than a FIRE."""
     fires = set(_take_rule_fires())  # any explicit _fire() calls
     if isinstance(meta, dict):
         for d in meta.get("drivers", []) or []:

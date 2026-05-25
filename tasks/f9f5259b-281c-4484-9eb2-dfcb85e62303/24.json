@@ -3,7 +3,7 @@
   "subject": "F11: Standardize on _fire() instrumentation",
   "description": "Drop the regex-scan from driver strings. Add explicit _fire() calls at F40, F42, F75 and any sites currently relying on regex.",
   "activeForm": "Standardizing rule-fire tracking",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
