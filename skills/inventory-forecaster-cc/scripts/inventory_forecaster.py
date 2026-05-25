@@ -2639,6 +2639,27 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             f"forecast scaled up x{_f79_ratio:.2f}"
         )
 
+    # F80 (2026-05-24): Non-Amazon growth trend multiplier.
+    # Mirror of F79 for all non-Amazon accounts.  When L4W avg is >= 1.20x the
+    # L13W non-zero avg (and no decline correction fired), the static baseline
+    # under-projects a genuine step-change in demand.  Scale up by the L4W/L13W
+    # ratio, capped at 1.50x so a single atypical spike doesn't blow out the
+    # plan.  Not applied to new launches (ramp model handles them separately).
+    _f80_driver = None
+    if (not is_amazon
+            and not _f10_applied
+            and not _f77_applied
+            and not is_new_launch
+            and _l13_nz_avg_f10 > 0
+            and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20):
+        _f80_ratio  = min(_l4_avg_f10 / _l13_nz_avg_f10, 1.50)
+        forecast    = [snap(v * _f80_ratio, mp) if v > 0 else 0 for v in forecast]
+        _f80_driver = (
+            f"F80 non-Amazon growth: L4W avg {_l4_avg_f10:.0f} = "
+            f"{_f80_ratio:.2f}x L13W nz avg {_l13_nz_avg_f10:.0f}; "
+            f"forecast scaled up x{_f80_ratio:.2f}"
+        )
+
     l26_avg = sum(float(v) for v in history[-26:]) / 26
     cap_base = baseline
     meta = {
