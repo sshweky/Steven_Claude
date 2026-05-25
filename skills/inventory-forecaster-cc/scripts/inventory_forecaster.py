@@ -14204,56 +14204,101 @@ def main():
             if _ds_sfx and _ms[:-_ds_sfx] in _mss:
                 ec_parents.add(f"{_acct}-{_ms[:-_ds_sfx]}")
 
-    # F60 — EC-transition history inheritance (2026-05-15).
-    # When an EC variant ({mstyle}EC) exists for the same account as the
-    # original parent mstyle, the EC item is the same product prepped for
-    # ecommerce fulfillment — consumer demand is identical.  If the EC
-    # variant has sparse order history (<25% of parent L13W), it will
-    # misclassify as Inactive or New/Sparse and receive a near-zero forecast.
-    # Fix: copy the parent's order + shipment history columns directly into
-    # the EC row so the forecaster sees the real demand signal, then tag
-    # the row so the alert narrative explains why.
+    # F60 -- EC-transition history inheritance (2026-05-15, expanded 2026-05-25).
+    # EC variants ({mstyle}EC/COS/AMZ) are the same product prepped for
+    # ecommerce fulfillment -- consumer demand is identical to the base style.
+    # Always port the base style's full 52w order + ship history into the EC row.
     #
-    # Threshold: EC L13W total < 25% of parent L13W total (EC is new/sparse)
-    # AND parent L13W total > 0 (parent has meaningful history to inherit).
-    # Safe: row mutation is done before any parallel/thread work begins.
-    print(f"\n[2.9] F60 — EC transition history inheritance ...", flush=True)
-    row_by_key = {_r.get("Acct_MStyle_Key_", ""): _r for _r in rows}
-    _f60_count = 0
-    for _row in rows:
-        _k   = _row.get("Acct_MStyle_Key_", "")
-        _ms  = _row.get("Mstyle", "")
-        _f60_sfx = (2 if _ms.endswith("EC")
-                    else 3 if (_ms.endswith("COS") or _ms.endswith("AMZ"))
-                    else 0)
-        if not _f60_sfx or "-" not in _k:
-            continue
-        _parent_ms  = _ms[:-_f60_sfx]
-        _acct_pfx   = _k.split("-", 1)[0]
-        _parent_key = f"{_acct_pfx}-{_parent_ms}"
-        _parent_row = row_by_key.get(_parent_key)
-        if _parent_row is None:
-            continue
-        # Compare L13W totals to decide whether inheritance is warranted
-        _ec_l13     = sum(float(_row.get(c) or 0)      for c in ORD_COLS[-13:])
-        _par_l13    = sum(float(_parent_row.get(c) or 0) for c in ORD_COLS[-13:])
-        if _par_l13 <= 0 or _ec_l13 >= _par_l13 * 0.25:
-            # EC variant already has meaningful history — no inheritance needed
-            continue
-        # Copy full 52w order + shipment history from parent into EC row.
-        # This lets get_history() / get_ship_history() see the real demand
-        # signal without any changes to those functions.
+    # Two-pass approach (2026-05-25):
+    #   Pass 1 -- parents in active rows (row_by_key).
+    #   Pass 2 -- parents NOT in active rows (inactive/discontinued base style):
+    #             supplemental QB REST pull (no status filter) so discontinued
+    #             base styles can still donate their history.
+    # 25% L13W threshold REMOVED: always inherit if parent has history.
+    print(f"\n[2.9] F60 -- EC transition history inheritance ...", flush=True)
+    row_by_key   = {_r.get("Acct_MStyle_Key_", ""): _r for _r in rows}
+    _f60_count   = 0
+    _f60_missing = {}   # parent_key -> [ec_rows]
+
+    def _f60_apply(_ec_r, _pr, _pms, _pk):
+        nonlocal _f60_count
+        _pl13 = sum(float(_pr.get(c) or 0) for c in ORD_COLS[-13:])
+        if _pl13 <= 0:
+            return
+        _el13 = sum(float(_ec_r.get(c) or 0) for c in ORD_COLS[-13:])
         for _c in ORD_COLS:
-            _row[_c] = _parent_row.get(_c, 0)
+            _ec_r[_c] = _pr.get(_c, 0)
         for _c in SHP_COLS:
-            _row[_c] = _parent_row.get(_c, 0)
-        # Tag for alert/driver annotation in forecast_record()
-        _row["_ec_transition"]   = True
-        _row["_ec_parent_mstyle"] = _parent_ms
-        _row["_ec_parent_key"]    = _parent_key
-        _row["_ec_parent_l13"]    = _par_l13
-        _row["_ec_orig_l13"]      = _ec_l13
+            _ec_r[_c] = _pr.get(_c, 0)
+        _ec_r["_ec_transition"]    = True
+        _ec_r["_ec_parent_mstyle"] = _pms
+        _ec_r["_ec_parent_key"]    = _pk
+        _ec_r["_ec_parent_l13"]    = _pl13
+        _ec_r["_ec_orig_l13"]      = _el13
         _f60_count += 1
+
+    for _row in rows:
+        _k  = _row.get("Acct_MStyle_Key_", "")
+        _ms = _row.get("Mstyle", "")
+        _sfx = (2 if _ms.upper().endswith("EC")
+                else 3 if (_ms.upper().endswith("COS") or _ms.upper().endswith("AMZ"))
+                else 0)
+        if not _sfx or "-" not in _k:
+            continue
+        _pms = _ms[:-_sfx]
+        _pk  = f"{_k.split('-', 1)[0]}-{_pms}"
+        _pr  = row_by_key.get(_pk)
+        if _pr is not None:
+            _f60_apply(_row, _pr, _pms, _pk)
+        else:
+            _f60_missing.setdefault(_pk, []).append(_row)
+
+    # Pass 2: supplemental pull for inactive/discontinued base styles
+    if _f60_missing:
+        try:
+            _sl2f, _sf2l = _get_proj_field_map()
+            _skf   = _sl2f.get("Acct_MStyle_Key_") or 292
+            _ssel  = ([_skf]
+                      + [_sl2f[c] for c in ORD_COLS if c in _sl2f]
+                      + [_sl2f[c] for c in SHP_COLS if c in _sl2f])
+            _skeys = list(_f60_missing.keys())
+            _SB    = 50   # ~25 chars/clause x 50 = 1,250 chars -- safe
+            for _si in range(0, len(_skeys), _SB):
+                _sb   = _skeys[_si:_si + _SB]
+                _sor  = " OR ".join(f"{{{_skf}.EX.'{_pk}'}}" for _pk in _sb)
+                _spay = json.dumps({
+                    "from": QB_PROJ_TABLE, "select": _ssel,
+                    "where": f"({_sor})", "options": {"skip": 0, "top": 500},
+                }).encode("utf-8")
+                _sreq = urllib.request.Request(
+                    "https://api.quickbase.com/v1/records/query",
+                    data=_spay, headers=_QB_PROJ_HEADERS, method="POST")
+                _sd = {"data": []}
+                for _sa in range(1, 4):
+                    try:
+                        with urllib.request.urlopen(_sreq, timeout=60) as _sr:
+                            _sd = json.loads(_sr.read())
+                        break
+                    except Exception:
+                        if _sa == 3:
+                            break
+                        time.sleep(2 ** _sa)
+                for _srec in _sd.get("data", []):
+                    _srow = {}
+                    for _sf, _sc in _srec.items():
+                        _slbl = _sf2l.get(int(_sf), str(_sf))
+                        _sv   = _sc.get("value") if isinstance(_sc, dict) else _sc
+                        if isinstance(_sv, dict):
+                            _sv = _sv.get("name") or _sv.get("email") or ""
+                        _srow[_slbl] = _sv
+                    _spk = _srow.get("Acct_MStyle_Key_", "")
+                    if _spk in _f60_missing:
+                        _sms = _spk.split("-", 1)[-1] if "-" in _spk else _spk
+                        for _er in _f60_missing[_spk]:
+                            _f60_apply(_er, _srow, _sms, _spk)
+        except Exception as _fe:
+            print(f"  [F60-WARN] supplemental parent pull failed: {_fe}", flush=True)
+
     print(f"      {_f60_count} EC variants inherited parent history", flush=True)
 
     # F60-ATS (2026-05-24): propagate parent ATS + OOS data to EC variants.

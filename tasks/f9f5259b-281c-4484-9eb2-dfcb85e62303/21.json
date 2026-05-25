@@ -3,7 +3,7 @@
   "subject": "F6+7: qb_bulk_update empty-200 detection + per-record resumability",
   "description": "Treat empty 200 OK as failure. Track per-record success so resumability doesn't mark unwritten keys done.",
   "activeForm": "Fixing bulk update resilience",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
