@@ -11630,10 +11630,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Fix A (2026-05-24): use normalized hist (post F41/F35/F43) so phantom
         # stock-up orders removed by F41 are not counted in the demand baseline.
         _rpl_ord_l13 = sum(float(v) for v in hist[-13:]) / 13  # all-weeks avg (normalized)
-        # [DBG-RPL] temporary: trace F_AMZ_RPL internals for FF7120EC
-        if row.get("Acct_MStyle_Key_", "") == "1864-FF7120EC":
-            print(f"  [DBG-RPL] pos_l13={_rpl_pos_l13:.0f} pos_l4={_rpl_pos_l4:.0f} ord_l13={_rpl_ord_l13:.1f}")
-            print(f"  [DBG-RPL] hist[-13:]={[float(v) for v in hist[-13:]]}")
         # POS-primary demand (2026-05-24): when Amazon is ordering ABOVE consumer
         # POS AND POS is flat/decelerating, the excess reflects inventory build /
         # overfill against stable demand -- anchor to POS so we don't perpetuate
