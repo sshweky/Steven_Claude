@@ -702,7 +702,7 @@ Validation results (`Validation_*` fields) push via the separate
 | Master pack | `Master_Pack` on `Quickbase1.ProductTrack.Styles` |
 | Amazon Catalog | `Quickbase1.InventoryTrack.Amazon_Catalog` (join on `Mstyle`) |
 | POS fields | `Ordered_Units_LW`, `Avg_Units_Wk_L4w`, `Avg_Units_Wk_L13w`, `Avg_Units_Wk_L26w`, `Avg_Units_Wk_L52w` |
-| Event windows | Prime Day (calendar): May 1 x1.25, May 15 x1.25, May 29 x1.50 (Amazon-only) · Fall Prime Day: Tuesday after Labor Day x1.30 (Amazon-only) |
+| Event windows | **Prime Day** (Amazon-only): x1.10/x1.25/x1.25/x1.20 centered on anchor date (configure `EVENT_DATES[year]["prime_day"]`; ~June 22 for 2026) · **Fall Deal** (Amazon-only): x1.12 centered on anchor (configure `EVENT_DATES[year]["fall_deal"]`; ~Oct 8 for 2026) · **T5** (ALL accounts): x1.20/x1.15/x1.15 on weeks 6/5/4 before Thanksgiving (auto-computed). All events use "take the greater" rule: `effective = max(event_lift, seasonal_factor)` -- no stacking. |
 | Amazon gate | `AMAZON_CUST_SUBSTR = "AMAZON"` — all Prime Day lifts and POS pulls conditioned on this |
 | Alert threshold | >7.5% variance vs manual projections |
 
