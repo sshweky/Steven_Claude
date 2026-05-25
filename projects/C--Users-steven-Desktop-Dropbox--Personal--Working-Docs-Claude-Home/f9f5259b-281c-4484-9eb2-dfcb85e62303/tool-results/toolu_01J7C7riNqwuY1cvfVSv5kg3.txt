@@ -1,0 +1,145 @@
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:291:    # ── Outdoor cooking / grilling — RETAIL ORDERING lead-time adjusted ──────
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:920:    result_set = data.get("results", [data])[0]
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:921:    schema = result_set.get("schema", [])
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:923:    rows = result_set.get("rows", [])
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2690:    # orders off replenishment math (safety stock, lead-time buffer), not just POS
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2718:    # captures any lead-time / safety-stock premium embedded in the order pattern.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2770:                # reflects real safety-stock and lead-time premiums for B&M
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:2779:                # 30% lead-time / safety-stock premium.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5891:# holt_winters() removed 2026-05-21 -- audit confirmed the function was
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7553:    # Catches comments like "Transitioning to EC suffix starting W13 — reduce orders to zero"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7796:    # F60 — EC-transition flag (2026-05-15).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7800:    _f60_is_ec_transition = bool(row.get("_ec_transition"))
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:7801:    if _f60_is_ec_transition:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10219:    # F60: EC-transition narrative (history inherited in pre-pass above).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10647:        # F60 EC-transition override: when the EC item inherited parent
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10657:            _f60_is_ec_transition
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10673:            # (unresolvable) OR _f59i_ec_override (F60 EC-transition active
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10687:            # EC-transition override fired (WOS 1-5 with inherited parent
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10759:                        # EC-transition anchor: inherited parent history
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10801:                            f"EC-transition POS anchor "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10813:                            f"F60 EC-transition (WOS={_f59h_wos:.1f}wks)"
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:10837:    #      accounting for units already in transit (OPO).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11056:    # combination of on-hand + open POs (already in transit) does not cover
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11169:    # ── F60 — EC-transition narrative ────────────────────────────────────
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11172:    if _f60_is_ec_transition and isinstance(meta, dict):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11177:            f"F60 EC-transition: inherited 52w order+ship history from parent "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11319:                        f"{_f73_ship_wks_ago:.0f}wks ago (transit complete); "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11672:            # transit (not yet visible in DC open POs / SOH).  Add it back as
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11745:            # other months.  Guard: disable variability pattern for EC-transitioned
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:11748:            if _rpl_var_ratios and row.get("_ec_transition") and not any(ats_hist or []):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14562:    # F60 -- EC-transition history inheritance (2026-05-15, expanded 2026-05-25).
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14573:    print(f"\n[2.9] F60 -- EC transition history inheritance ...", flush=True)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14588:        _ec_r["_ec_transition"]    = True
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14684:        if not _row.get("_ec_transition"):
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14713:    # shipment (~10 weeks transit); P+P does not project for these.
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14762:    # 65-day lead time, so any PO placed up to ~9 weeks ago should already
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14851:            _row["_ec_transition"]    = True
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:15217:                    _default_pog_end = (date.fromisoformat(_pl) + timedelta(days=364)).isoformat()
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:15218:                    row[pog_end_fid] = _default_pog_end
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inspect_pog_invflow.py:34:               "iso", "lead time", "in store", "in-store")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inspect_pog_invflow.py:49:                   "min wos", "target wos", "safety stock", "lead time")
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:46:FAST_VESSEL_TRANSIT = 18      # days (used when recommending faster vessel)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:95:    in_transit_qty:    int           # I/T pcs (already shipped)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:103:        return self.in_transit_qty + self.in_work_qty
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:106:    def is_in_transit(self) -> bool:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:107:        return self.in_transit_qty > 0
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:113:    def transit_days(self) -> Optional[int]:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:119:        if self.is_in_transit:
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:120:            return "IN_TRANSIT"            # on the water, can't change ETD
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:147:    in_transit_qty:  int = 0           # current I/T on the affected PO
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:154:    gap_weeks_fixed: list[int] = field(default_factory=list)   # W#s this rec resolves
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:175:    lt_trans_days:    int
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:176:    transit_days:     int
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:183:    customer_demand:      list[dict] = field(default_factory=list)  # [{customer, weekly[26], total}] sorted desc by total
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:190:    it_iw_root:       int = 0           # root mstyle's in-transit + in-work pcs
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:208:    lt_wks:           float = 0.0
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:210:    lt_opt_weeks:     float = 0.0
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:254:    tot_shpd_ltd:          int = 0
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:295:    gap_weeks:            list[dict] = field(default_factory=list)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:297:    recommendations:      list[Recommendation] = field(default_factory=list)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:316:        I/T:\s*(?P<it>[\d,]+)\s*pcs                         # in-transit qty
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:360:            in_transit_qty=it,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:385:    "LT_Trans_Days", "Transit_Days", "LT_Wks_", "CNY_Weeks", "LT_Opt_Weeks",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:419:    "Tot_Shpd_LTD", "Last_Shp_Date_raw_",
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:597:            "lt_trans_days":_to_num(get("LT_Trans_Days")),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:598:            "transit_days": _to_num(get("Transit_Days")),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:599:            "lt_wks":       float(_to_num(get("LT_Wks_"))),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:601:            "lt_opt_weeks": float(_to_num(get("LT_Opt_Weeks"))),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:654:            "tot_shpd_ltd":    _to_num(get("Tot_Shpd_LTD")),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1032:            transit = po.transit_days() or rec.transit_days or 26
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1038:                # Faster vessel: keep ETD, swap to fast transit
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1039:                proposed_eta = po.etd + timedelta(days=FAST_VESSEL_TRANSIT)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1043:            new_etd = max(min_etd, target_eta - timedelta(days=transit))
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1072:        transit = po.transit_days() or rec.transit_days or 26
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1073:        new_eta = new_etd + timedelta(days=transit)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1081:                orig_eta=po.eta, proposed_eta=po.etd + timedelta(days=FAST_VESSEL_TRANSIT),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1085:                in_transit_qty=po.in_transit_qty, in_work_qty=po.in_work_qty,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1099:                in_transit_qty=po.in_transit_qty, in_work_qty=po.in_work_qty,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1135:                    in_transit_qty=furthest.in_transit_qty, in_work_qty=furthest.in_work_qty,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1145:                transit_days = furthest.transit_days() or rec.transit_days or 26
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1147:                new_eta = new_etd + timedelta(days=transit_days) if new_etd else None
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1158:                    in_transit_qty=furthest.in_transit_qty, in_work_qty=furthest.in_work_qty,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1164:                transit_days = furthest.transit_days() or rec.transit_days or 26
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1166:                new_eta = new_etd + timedelta(days=transit_days) if new_etd else None
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1177:                    in_transit_qty=furthest.in_transit_qty, in_work_qty=furthest.in_work_qty,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1224:            lt_trans_days=ivf["lt_trans_days"],
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1225:            transit_days=ivf["transit_days"],
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1250:            lt_wks=ivf.get("lt_wks", 0.0),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1252:            lt_opt_weeks=ivf.get("lt_opt_weeks", 0.0),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1291:            tot_shpd_ltd=ivf.get("tot_shpd_ltd", 0),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1377:        "lt_trans_days":      r.lt_trans_days,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1378:        "transit_days":       r.transit_days,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1383:                "in_transit_qty": p.in_transit_qty,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1388:                "transit_days":   p.transit_days(),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1423:                "in_transit_qty": rc.in_transit_qty,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1452:        "lt_wks":             r.lt_wks,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1454:        "lt_opt_weeks":       r.lt_opt_weeks,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1493:        "tot_shpd_ltd":       r.tot_shpd_ltd,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1544:    color:#fff; transition:opacity 0.4s ease;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1551:  #loadBar   { height:100%; background:#fff; width:0%; transition:width 0.6s ease; border-radius:3px; }
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1567:    transition: transform 0.1s, box-shadow 0.1s;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1714:const DEFAULT_SORT_CHAIN = ['inv_manager', 'brand', 'mstyle'];
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1905:  { id:'lt_wks',           label:'LT Wks',       align:'right', get: r => r.lt_wks, numeric:true,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:1906:    render: r => `<td class="right">${fmt(r.lt_wks)}</td>` },
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2065:    const chain = DEFAULT_SORT_CHAIN.map(id => COLS.find(c => c.id === id)).filter(Boolean);
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2251:      const it = p.in_transit_qty || 0, iw = p.in_work_qty || 0;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2254:      h += `Open (I/W): ${fmt(iw)}  ·  In Transit (I/T): ${fmt(it)}\n`;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2348:  let pos = '<table class="subtbl"><tr><th>PO #</th><th>Supplier</th><th class="right">I/T</th><th class="right">I/W</th><th>ETD</th><th>ETA</th><th class="right">Transit</th><th>Status</th></tr>';
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2350:    const sc = {LOCKED:'badge-gray', IN_TRANSIT:'badge-purple', MOVABLE:'badge-green', FASTER_VESSEL_WINDOW:'badge-amber', PULL_UP_NARROW:'badge-amber'}[p.status] || 'badge-gray';
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2352:      <td class="right">${fmt(p.in_transit_qty)}</td><td class="right">${fmt(p.in_work_qty)}</td>
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2354:      <td class="right">${p.transit_days || '—'}d</td>
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2388:          <span style="color:#888;">(I/T ${fmt(rc.in_transit_qty)}, I/W ${fmt(rc.in_work_qty)})</span></div>`;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2393:          body += `<div class="rec-row" style="color:#5e35b1;font-style:italic;font-size:11px;">Same ETD — request faster vessel only (transit ~18 days vs ~26)</div>`;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2399:          <span style="color:#888;">(I/T ${fmt(rc.in_transit_qty)}, I/W ${fmt(rc.in_work_qty)})</span></div>`;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2409:          <span style="color:#888;">(I/T ${fmt(rc.in_transit_qty)}, I/W ${fmt(rc.in_work_qty)})</span></div>`;
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2507:          <td>I/T (in transit)</td><td class="right">${fmt(r.it_qty)}</td>
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2529:          <td>LT (Wks) · CNY · LT+Opt</td><td class="right">${fmt(r.lt_wks)} · ${fmt(r.cny_weeks)} · ${fmt(r.lt_opt_weeks)}</td></tr>
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2553:          <td>Total Shpd LTD</td><td class="right">${fmt(r.tot_shpd_ltd)}</td>
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2590:      ${kpi('LT + CNY',        `${fmt(r.lt_wks)} + ${fmt(r.cny_weeks)}`, 'Lead time (weeks) + Chinese New Year shutdown weeks', '')}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2613:        ${kvRow('LT (Wks)',     fmt(r.lt_wks))}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inv_mgmt_viewer.py:2614:        ${kvRow('LT + Opt Wks', fmt(r.lt_opt_weeks))}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:60:    history: list[float] = field(default_factory=list)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:61:    history_for_model: list[float] = field(default_factory=list)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:62:    history_corrections: dict = field(default_factory=dict)   # {F35: [...], F39: [...]}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:66:    iso: dict = field(default_factory=dict)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:70:    fcst: list[float] = field(default_factory=list)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:75:    meta: dict = field(default_factory=lambda: {"drivers": [], "structured_drivers": []})
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:76:    rule_fires: set[str] = field(default_factory=set)
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:77:    locked_weeks: set[int] = field(default_factory=set)   # weeks that downstream may not touch
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\run_forecast.py:50:DEFAULT_MAX_OUTER_RETRIES = len(OUTER_RETRY_COOL_OFFS_MIN)   # = 10
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\run_forecast.py:172:    p.add_argument("--max-outer-retries", type=int, default=DEFAULT_MAX_OUTER_RETRIES,
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\run_forecast.py:174:                        f"(default: {DEFAULT_MAX_OUTER_RETRIES}). "
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\rule_aliases.py:60:    ("CLS-007", "F60",  "EC/COS/AMZ-transition history inheritance"),
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\tune_thresholds.py:49:DEFAULT_GRID = {
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\tune_thresholds.py:139:    grid = QUICK_GRID if args.quick else DEFAULT_GRID
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:83:            result_set = data.get("results", [data])[0]
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:84:            schema = result_set.get("schema", [])
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:86:            rows = result_set.get("rows", [])
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:1510:  .badge-critical {{ background:#c62828; color:#fff; cursor:pointer; transition:opacity .15s; }}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:1511:  .badge-warning  {{ background:#f9a825; color:#333; cursor:pointer; transition:opacity .15s; }}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:1512:  .badge-clean    {{ background:#2e7d32; color:#fff; cursor:pointer; transition:opacity .15s; }}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:1515:  .badge-pri-crit {{ border:2px solid #ef9a9a; color:#ef9a9a; background:transparent; cursor:pointer; transition:opacity .15s; }}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:1516:  .badge-pri-med  {{ border:2px solid #ffcc80; color:#ffcc80; background:transparent; cursor:pointer; transition:opacity .15s; }}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:1517:  .badge-pri-low  {{ border:2px solid #bdbdbd; color:#bdbdbd; background:transparent; cursor:pointer; transition:opacity .15s; }}
+C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\viewer.py:3182:          <b>Cancel→in-store lead time:</b> 2–4 wks (cancel ${{cancelWindow}}).

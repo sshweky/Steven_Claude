@@ -1946,6 +1946,7 @@ def _store_inv_flow(l2f, f2l):
 _INV_FLOW_FALLBACK_FIDS = {
     "Mstyle":  20,
     "Wk1":     134,        # Beg Inv W1 only (W2..W26 unused -- we cascade fresh)
+    "LT_Trans_Days": 225,  # "LT+ Trans Days" normalized; FID verified 2026-05-26
     # RcvWk0..RcvWk26
     "RcvWk0":  295, "RcvWk1":  28,  "RcvWk2":  35,  "RcvWk3":  36,  "RcvWk4":  50,
     "RcvWk5":  51,  "RcvWk6":  65,  "RcvWk7":  66,  "RcvWk8":  67,  "RcvWk9":  68,

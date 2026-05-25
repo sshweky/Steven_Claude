@@ -14,8 +14,6 @@
 
 [1/4] Pulling projections from Quickbase ...
       [QB REST] fetching field map ...
-  [watchdog] still running -- 54s since last output | last:       [QB REST] fetching field map ...
-  [watchdog] still running -- 115s since last output | last:       [QB REST] fetching field map ...
       5575 records retrieved (QB REST API)
 
 [2/4] Pulling master pack + Season from Styles ...
@@ -27,23 +25,22 @@
       viewer_pos_cache.json refreshed (1665 mstyles)
 
 [2.6] Pulling Amazon Catalog US (F38 signals) for 1904 mstyles ...
-  [watchdog] still running -- 15s since last output | last: [2.6] Pulling Amazon Catalog US (F38 signals) for 1904 mstyles ...
       1665 mstyles with Amazon Catalog US signals loaded (QB REST API)
 
 [2.6b] Pulling Amazon Inventory Health for 1665 ASINs ...
+  [watchdog] still running -- 4s since last output | last: [2.6b] Pulling Amazon Inventory Health for 1665 ASINs ...
       1537 mstyles enriched with DC inventory health data (QB REST API)
 
 [2.6c] Retailer POS + OH: fetching for 1099 non-Amazon mstyles ...
       595 acct-mstyle combos with retailer POS data
 
 [2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs) for 2288 mstyles ...
-  [watchdog] still running -- 18s since last output | last: [2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs) for 2288 mstyles ...
       2285 mstyles with Inv Flow data loaded (QB REST API)
       viewer_amz_cache.json refreshed (1665 mstyles)
 
 [2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 5575 keys (w1_date=2026-05-24) ...
       [vp-q4] BULK fetch: running QB report #27 on table bp8r4dejr (replaces per-account loop) ...
-      [vp-q4] 10,058 rows in 10.0s (1 API call vs ~137 per-account calls)
+      [vp-q4] 10,058 rows in 2.8s (1 API call vs ~137 per-account calls)
       [vp-q4] cached → open_pos_report.json (reused for 0h)
       [vp-q4] bucketed 7,159 in-scope rows across 1,699 keys (skipped: 2,490 out-of-scope · 0 zero-qty · 0 no-date · 409 outside-26w)
       1699 keys have confirmed forward POs (total open qty: 1,180,761 units)
@@ -95,6 +92,7 @@
       3200/5575 validated ...
       3300/5575 validated ...
       3400/5575 validated ...
+  [watchdog] still running -- 0s since last output | last:       3400/5575 validated ...
       3500/5575 validated ...
       3600/5575 validated ...
       3700/5575 validated ...
@@ -116,7 +114,7 @@
       5300/5575 validated ...
       5400/5575 validated ...
       5500/5575 validated ...
-      Validation complete in 10.0s
+      Validation complete in 11.6s
       Saved → validation_results.json
 
   ── Validation Summary ──
@@ -151,8 +149,7 @@
       42 DI sibling variant(s) blended into 42 base record(s)
       [F69->F60] 3 EC variant(s) re-inherited DI-enriched parent history
   [F58] Loaded 14 active AI adjustments (last 60 days)
-  [watchdog] still running -- 4s since last output | last:   [F58] Loaded 14 active AI adjustments (last 60 days)
-      5575 forecasts complete in 17.1s
+      5575 forecasts complete in 23.9s
       Croston's: 471  Heuristic: 224  Heuristic (F72 new-launch ramp): 6  Inactive: 1128  Inactive (F68): 1  Inactive (zero order history): 108  Inactive (zeroed by guards): 693  Inactive+Floor: 4  Inactive+S6 (off-price): 1  OTB (zero): 476  Pre-launch NEW (manual passthrough): 89  Reactivating: 29  Seasonal Baseline: 1058  Seasonal Baseline (burst): 168  Sparse Intermittent: 1119  Bi-weekly enforced: 279  Alerts (>7.5%): 3951
       [cat-profile gate] 42 profile(s) rejected by SKU gate (need >7 consistent SKUs):
         P2-subcategory 'Grooming||Balm'                         n_skus=6 (filtered 180 records)
@@ -173,12 +170,13 @@
       Auto Project: 11 records will have manual projections replaced with AI values
       W1 open POs: 1461 records -- AI PRJ W1 and MAN PRJ W1 zeroed (confirmed PO covers W1 demand)
       W2 open POs: 445 records have an open PO in W2 (MAN PRJ W2 left as-is -- planner controls via codepage Zero button)
-      Bulk upsert: 5,575 OK · 0 failed · 16.4s (340 rec/s)
+  [watchdog] still running -- 13s since last output | last:       W2 open POs: 445 records have an open PO in W2 (MAN PRJ W2 left as-is -- p
+      Bulk upsert: 5,575 OK · 0 failed · 13.8s (405 rec/s)
 
 ==================================================================
-  COMPLETE  |  5575 records  |  Total 26w demand: 15,881,980
+  COMPLETE  |  5575 records  |  Total 26w demand: 15,878,048
   Models -- Seasonal: 1058  Croston's: 471  Heuristic: 224  Inactive: 1128  Bi-weekly: 279
-  Write-back: 0.3 min  |  ok=0  fail=0
+  Write-back: 0.2 min  |  ok=0  fail=0
 
   ALERTS (3951 records — >7.5% variance or inactive):
   Key                                   Δ%  Model               AI 26w      Manual
@@ -209,7 +207,7 @@
   1864-FF8298                       +100.0%  Inactive (zero order history)                0       7,140
   1864-FF8423                        +10.2%  Seasonal Baseline           51,588      46,800
   1864-FF8424                        +20.8%  Heuristic                 4,212       5,315
-  1864-FF8654                        +30.2%  Seasonal Baseline           65,096      93,250
+  1864-FF8654                        +33.2%  Seasonal Baseline           62,292      93,250
   1864-FF8882                        +14.0%  Seasonal Baseline           49,644      57,744
   1864-FF8991                       +100.0%  Inactive                      0      21,325
   1864-FF9756                        +73.6%  Seasonal Baseline              600       2,275
@@ -585,7 +583,7 @@
   1864-BB15076                        +9.8%  Seasonal Baseline            3,012       3,340
   1864-FF5766AMZ2                   +100.0%  Inactive                      0       1,725
   1864-FF7266CP6                    +100.0%  Inactive (zeroed by guards)                0         200
-  1864-FF14364                       +50.7%  Croston's                 1,944       3,940
+  1864-FF14364                       +53.1%  Croston's                 1,848       3,940
   1864-FF14365                       +10.8%  Heuristic                 4,368       4,895
   4524-BB0217                        +24.7%  Sparse Intermittent            2,394       1,920
   20227-BB0332                       +44.0%  Seasonal Baseline (burst)              420         750
@@ -886,7 +884,7 @@
   1864-FF7221                         +9.7%  Seasonal Baseline           14,172      15,695
   23011-FF15592                      +14.9%  Seasonal Baseline           33,156      38,943
   1864-FF16705                       +20.3%  Heuristic                 7,464       9,365
-  1864-FF16704                       +26.5%  Seasonal Baseline           22,692      30,855
+  1864-FF16704                       +29.8%  Seasonal Baseline           21,660      30,855
   1864-BB18890                      +953.8%  Seasonal Baseline           20,550       1,950
   1864-BB15839                     +1357.9%  Croston's                33,824       2,320
   23011-FF15595                      +16.5%  Seasonal Baseline           25,308      30,313
@@ -4334,7 +4332,7 @@
   AI  1864-FF8652               216  144  144  144    0  144  144  144  144  144  144  144  144  144  144  192  144  144  144  162  162  162  162  162  168  162     148  +2.7% 
   Man 1864-FF8652                 0  165  150  150  150  150  175  175  175  175  155  155  155  155  155  150  150  150  150  160  160  160  160  160  160  160     152
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-FF8654               140  140  140  140 4208 4208 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806   2,504  +30.2% 
+  AI  1864-FF8654               140  140  140  140 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806 2806   2,396  +33.2% 
   Man 1864-FF8654                 0 2000 5000 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750 3750   3,587
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-FF8807                 0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
@@ -5915,7 +5913,7 @@
   AI  1864-BB15081               72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72   72      72  +0.0% 
   Man 1864-BB15081                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-FF14364                0    0    0    0  132  132   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84      75  +50.7% 
+  AI  1864-FF14364                0    0    0    0   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84   84      71  +53.1% 
   Man 1864-FF14364                0  195  265  265  265  120  120  120  120  120  185  185  185  185  185  120  120  120  120  135  135  135  135  135  135  135     152
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-FF14365              168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168  168     168  +10.8% 
@@ -7136,7 +7134,7 @@
   AI  1864-FF16705              384  276  276  276  276  276  276  276  276  276  276  276  276  276  276  360  276  276  276  300  300  300  300  276  276  276     287  +20.3% 
   Man 1864-FF16705                0  500  365  365  365  365  400  400  400  400  380  380  380  380  380  355  355  355  355  355  355  355  355  355  355  355     360
   -------------------------------------------------------------------------------------------------------------------------------------------------
-  AI  1864-FF16704               48   48   48   48   48 1536 1536 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020     873  +26.5% 
+  AI  1864-FF16704               48   48   48   48   48 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020 1020     833  +29.8% 
   Man 1864-FF16704             1500 1570 1100 1100 1100 1100 1210 1210 1210 1210 1175 1175 1175 1175 1175 1050 1050 1050 1050 1210 1210 1210 1210 1210 1210 1210   1,187
   -------------------------------------------------------------------------------------------------------------------------------------------------
   AI  1864-FF14303                0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0       0  +0.0% 
