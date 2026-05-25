@@ -1371,6 +1371,183 @@ def build_prj_q3(scope_filter=None):
     """).strip()
 
 
+# ── QB REST API -- Phase 1 projections fetch ──────────────────────────────────
+# Replaces the CData 250-col single-query with a direct QB REST API call.
+# Key advantages over CData:
+#   - Server-side filtering: QB only returns rows matching the scope filter.
+#     A 1-record dry-run fetches exactly 1 row, not a 4,500-row full scan.
+#   - No CData translation layer (no IncompleteRead throttle disconnects).
+#   - Reliable pagination: QB REST caps at 1000 rows/call with skip; clean loop.
+#   - Field map lookup is a lightweight one-time GET call at startup.
+
+_QB_PROJ_HEADERS = {
+    "QB-Realm-Hostname": QB_REALM,
+    "Authorization":     f"QB-USER-TOKEN {QB_USER_TOKEN}",
+    "Content-Type":      "application/json",
+}
+
+_QB_PROJ_FIELD_MAP_CACHE    = None   # label_normalized -> fid
+_QB_PROJ_FID_TO_LABEL_CACHE = {}     # fid (int) -> label_normalized
+
+
+def _get_proj_field_map():
+    """Fetch and cache the Projections table field map via QB REST API.
+
+    Returns (label_norm->fid dict, fid->label_norm dict).
+    label_norm = QB label with spaces replaced by underscores -- matches CData column names.
+    Cached for the entire session (one GET call per run).
+    """
+    global _QB_PROJ_FIELD_MAP_CACHE, _QB_PROJ_FID_TO_LABEL_CACHE
+    if _QB_PROJ_FIELD_MAP_CACHE is not None:
+        return _QB_PROJ_FIELD_MAP_CACHE, _QB_PROJ_FID_TO_LABEL_CACHE
+
+    url = f"https://api.quickbase.com/v1/fields?tableId={QB_PROJ_TABLE}"
+    req = urllib.request.Request(url, headers=_QB_PROJ_HEADERS)
+    for attempt in range(1, 4):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                fields = json.loads(resp.read())
+            l2f, f2l = {}, {}
+            for f in fields:
+                label = f.get("label", "")
+                fid   = f.get("id")
+                norm  = label.replace(" ", "_")
+                l2f[norm] = fid
+                f2l[fid]  = norm
+            _QB_PROJ_FIELD_MAP_CACHE    = l2f
+            _QB_PROJ_FID_TO_LABEL_CACHE = f2l
+            return l2f, f2l
+        except Exception as e:
+            if attempt == 3:
+                raise RuntimeError(f"[QB REST] Failed to fetch Projections field map: {e}")
+            time.sleep(2 ** attempt)
+
+
+def fetch_projections_qb_rest(prj_cols, args):
+    """Fetch Projections rows via QB direct REST API (replaces CData Phase 1 query).
+
+    Uses server-side WHERE filtering so QB returns only the rows matching the
+    scope (acct/mstyle/customer).  For a single-record dry-run this means 1 row
+    fetched, not a 4,500-row CData full-table scan.
+
+    Returns a list of dicts keyed by CData-compatible column names
+    (spaces->underscores), ready for use by the rest of the forecaster.
+    """
+    l2f, f2l = _get_proj_field_map()
+
+    # All column names we need (same set as the legacy build_prj_select)
+    all_col_names = (
+        ["Acct_MStyle_Key_", "Mstyle", "Customr_Name", "Description", "Status_Cust",
+         "PT_Item_Status", "Div", "Shpd_Wk_L13W_cust_", "Last_Ord_Date", "Last_Shp_Date",
+         "Inventory_Manager", "Flagged", "Auto_Project", "POG_Launch_Date", "POG_End_Date",
+         "Store_Count"]
+        + [f"AI_PRJ_W{w}" for w in range(1, 27)]
+        + list(prj_cols)    # MAN_PRJ date-stamped columns (rolling weekly)
+        + ORD_COLS
+        + SHP_COLS
+        + INV_OH_COLS
+        + OPN_COLS
+        + SUGG_COLS
+    )
+
+    select_fids = []
+    missing     = []
+    for col in all_col_names:
+        fid = l2f.get(col)
+        if fid is not None:
+            select_fids.append(fid)
+        else:
+            missing.append(col)
+    if missing:
+        print(f"      [WARN] {len(missing)} columns absent from QB field map "
+              f"(first 5: {missing[:5]}{'...' if len(missing)>5 else ''})")
+
+    # Known FID fallbacks (from analyze_manual_vs_ai.py + push_validation_qb.py)
+    status_fid = l2f.get("Status_Cust") or 10
+    key_fid    = l2f.get("Acct_MStyle_Key_") or 292
+    mstyle_fid = l2f.get("Mstyle")            or 196
+    cust_fid   = l2f.get("Customr_Name")      or 363
+
+    # Build QB WHERE clause (QB formula syntax: {fid.operator.'value'})
+    where_parts = [f"({{{status_fid}.SW.'A'}}OR{{{status_fid}.SW.'FD'}})"]
+
+    if getattr(args, 'acct', None):
+        acct_list = [a.strip() for a in args.acct.split(',') if a.strip()]
+        if len(acct_list) == 1:
+            where_parts.append(f"{{{key_fid}.SW.'{acct_list[0]}-'}}")
+        else:
+            or_p = "OR".join(f"{{{key_fid}.SW.'{a}-'}}" for a in acct_list)
+            where_parts.append(f"({or_p})")
+
+    if getattr(args, 'mstyle', None):
+        ms_list = [m.strip() for m in args.mstyle.split(',') if m.strip()]
+        if len(ms_list) == 1:
+            where_parts.append(f"{{{mstyle_fid}.EX.'{ms_list[0]}'}}")
+        else:
+            or_p = "OR".join(f"{{{mstyle_fid}.EX.'{m}'}}" for m in ms_list)
+            where_parts.append(f"({or_p})")
+
+    if getattr(args, '_brand_mstyles', None):
+        or_p = "OR".join(f"{{{mstyle_fid}.EX.'{m}'}}" for m in args._brand_mstyles)
+        where_parts.append(f"({or_p})")
+
+    if getattr(args, 'customer', None):
+        cv = args.customer.replace("'", "\\'")
+        where_parts.append(f"{{{cust_fid}.CT.'{cv}'}}")
+
+    if getattr(args, 'keys', None):
+        kl = [k.strip() for k in args.keys.split(',') if k.strip()]
+        or_p = "OR".join(f"{{{key_fid}.EX.'{k}'}}" for k in kl)
+        where_parts.append(f"({or_p})")
+
+    where = "AND".join(where_parts)
+
+    # Paginated fetch (QB REST max 1000 rows/call)
+    url      = "https://api.quickbase.com/v1/records/query"
+    all_rows = []
+    skip     = 0
+    page_sz  = 1000
+
+    while True:
+        payload = json.dumps({
+            "from":    QB_PROJ_TABLE,
+            "select":  select_fids,
+            "where":   where,
+            "options": {"skip": skip, "top": page_sz},
+        }).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers=_QB_PROJ_HEADERS, method="POST")
+
+        resp_data = None
+        for attempt in range(1, 4):
+            try:
+                with urllib.request.urlopen(req, timeout=90) as resp:
+                    resp_data = json.loads(resp.read())
+                break
+            except Exception as e:
+                if attempt == 3:
+                    raise
+                time.sleep(2 ** attempt)
+
+        records = resp_data.get("data", [])
+        for record in records:
+            row = {}
+            for fid_str, cell in record.items():
+                fid   = int(fid_str)
+                label = f2l.get(fid, str(fid))
+                val   = cell.get("value") if isinstance(cell, dict) else cell
+                # User fields come back as {"id":..,"name":..,"email":..}
+                if isinstance(val, dict):
+                    val = val.get("name") or val.get("email") or ""
+                row[label] = val
+            all_rows.append(row)
+
+        if len(records) < page_sz:
+            break
+        skip += page_sz
+
+    return all_rows
+
+
 def build_scope_filter(args):
     clauses = []
     if args.acct:
