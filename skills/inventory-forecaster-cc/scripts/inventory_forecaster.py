@@ -10696,13 +10696,14 @@ def _build_record_narrative(r):
 def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
                    oos_data=None, open_pos_data=None, amazon_catalog_us=None,
                    ats_data=None, switchover_weeks=None, acct_cadences=None,
-                   retailer_pos=None):
+                   retailer_pos=None, vacated_bases=None):
     """Run projection validation + AI forecast for each record."""
     high = getattr(args, "threshold", VALID_HIGH_MULT)
     oos_data        = oos_data        or {}
     open_pos_data   = open_pos_data   or {}
     ats_data        = ats_data        or {}
-    switchover_weeks = switchover_weeks or {}
+    switchover_weeks    = switchover_weeks or {}
+    vacated_base_index  = vacated_bases    or {}
 
     # S5 fix (2026-05-21) -- acct_cadences now pre-built once in main() and
     # passed in.  Fall back to local build if called standalone.
