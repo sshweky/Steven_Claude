@@ -14529,6 +14529,43 @@ def main():
     print(f"      {_f69_blend_count} DI sibling variant(s) blended into "
           f"{len(_f69_base_touched)} base record(s)", flush=True)
 
+    # F69->F60 re-apply: cascade DI-enriched base history into EC/COS/AMZ variants.
+    # F60 ran before F69, so any EC whose parent was just DI-blended missed the
+    # updated history.  Re-run F60 inheritance for those EC variants only.
+    if _f69_base_touched:
+        _f69_f60_ct = 0
+        for _row in rows:
+            _ms  = (_row.get("Mstyle") or "").strip()
+            _k   = _row.get("Acct_MStyle_Key_", "")
+            _sfx = (2 if _ms.upper().endswith("EC")
+                    else 3 if (_ms.upper().endswith("COS") or _ms.upper().endswith("AMZ"))
+                    else 0)
+            if not _sfx or "-" not in _k:
+                continue
+            _pms2 = _ms[:-_sfx]
+            _pk2  = f"{_k.split('-', 1)[0]}-{_pms2}"
+            if _pk2 not in _f69_base_touched:
+                continue   # parent not DI-enriched, skip
+            _pr2 = row_by_key.get(_pk2)
+            if _pr2 is None:
+                continue
+            _pl13_2 = sum(float(_pr2.get(c) or 0) for c in ORD_COLS[-13:])
+            if _pl13_2 <= 0:
+                continue
+            # Overwrite EC row's history with the now-DI-enriched parent history
+            for _c in ORD_COLS:
+                _row[_c] = _pr2.get(_c, 0)
+            for _c in SHP_COLS:
+                _row[_c] = _pr2.get(_c, 0)
+            _row["_ec_transition"]    = True
+            _row["_ec_parent_mstyle"] = _pms2
+            _row["_ec_parent_key"]    = _pk2
+            _row["_ec_parent_l13"]    = _pl13_2
+            _f69_f60_ct += 1
+        if _f69_f60_ct:
+            print(f"      [F69->F60] {_f69_f60_ct} EC variant(s) re-inherited "
+                  f"DI-enriched parent history", flush=True)
+
     # F58 — Pull active "AI Adjusted" comments once (lookback 60 days).
     # Bucketed by acct-mstyle key.  Most-recent comment per key wins.
     ai_comments = _f58_fetch_active_comments(lookback_days=60)
