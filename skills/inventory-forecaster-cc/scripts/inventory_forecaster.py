@@ -2782,6 +2782,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             f"→ final baseline capped at L13 all-avg × 1.5 "
             f"({_f22c_pre_baseline:.0f} → {baseline:.0f})"
         )
+    print(f"[BL_PRE_F_STEADY] baseline={baseline:.1f} ord_bl={ord_baseline:.1f} l13_avg={l13_avg:.1f}", flush=True)
     if _f24_applied:
         meta.setdefault("drivers", []).append(
             f"F24 L13-all ceiling: baseline capped at L13_avg × 2.0 "
@@ -10135,6 +10136,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         is_otb       = (model == "OTB (zero)"),
         season       = season,
     )
+
+    # DBG-FF12859 final trace (remove after diagnosis)
+    if (row.get("Mstyle", "") == "FF12859"
+            and "WAL MART" in (row.get("Customr_Name", "") or "").upper()):
+        import sys
+        print(f"  [DBG-FF12859-FINAL] model={model}  fcst[-3:]={fcst[-3:]}  "
+              f"sum={sum(fcst)}", file=sys.stderr)
+        if isinstance(meta, dict):
+            for _d in meta.get("drivers", []):
+                print(f"    driver: {_d}", file=sys.stderr)
 
     return {
         "key":         row["Acct_MStyle_Key_"],
