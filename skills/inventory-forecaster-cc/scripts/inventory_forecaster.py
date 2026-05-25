@@ -5122,100 +5122,11 @@ def _legacy_apply_oh_shortfall_adjustment_v1_REMOVED(row, fcst):
         "fetch_inv_flow_qb_rest().")
 
 
-# Removed F37 v1 body (lines 4910-5087 in pre-2026-05-26 file).
-# Replaced by the function above.  Original v1 read Inv_Wk1..Inv_Wk26 from
-# Projections (stale -- those columns were computed against the PREVIOUS run's
-# AI projection, leading to false shortfalls when current iteration changed
-# significantly).  See the F37h-cat bypass that was added 2026-05-25 to work
-# around this; that bypass is now removed since v2 cascades fresh.
-def _F37_V1_REMOVED_PLACEHOLDER():
-    pass
-
-    For weeks where we'd run short:
-      • Cap that week's AI projection at what we can actually ship
-      • Track the unmet demand as a backlog cohort that piles into future weeks
-      • Decay schedule (matches F34/F35): each cohort loses 25% of its
-        recoverable share per week of non-shipment
-            age 1: 75% recoverable
-            age 2: 50% recoverable
-            age 3: 25% recoverable
-            age 4+: 0% recoverable (drop the cohort — fully lost)
-      • A week's "real demand" = original AI forecast + Σ(recoverable backlog
-        from prior unmet cohorts).  We ship up to min(real demand, on-hand).
-      • OH carries forward correctly: if we shipped less in week N, that
-        savings boosts available OH in week N+1 and beyond.
-
-    Returns: (adjusted_fcst, list of {week, original, adjusted, oh_avail,
-    backlog_in, lost} dicts).  If Inv_Wk columns are missing or all zero,
-    returns the original forecast unchanged.
-
-    Tries multiple naming conventions for the QB column name.
-    """
-    # Pull Inv_Wk1..Inv_Wk26.  Try a few naming conventions so we work
-    # whether QB returns "Inv_Wk1", "Inv Wk1", or "InvWk1".
-    inv_oh = []
-    for i in range(1, 27):
-        v = (row.get(f"Inv_Wk{i}")
-             or row.get(f"Inv Wk{i}")
-             or row.get(f"InvWk{i}"))
-        if v is None or v == "":
-            return list(fcst), []
-        try:
-            inv_oh.append(float(v))
-        except (TypeError, ValueError):
-            return list(fcst), []
-
-    # Sanity: if every Inv value is 0 or positive AND no negatives at all,
-    # there's nothing to adjust — short-circuit.
-    if all(v >= 0 for v in inv_oh):
-        return list(fcst), []
-
-    adjusted = list(fcst)
-    cohorts = []   # list of [qty, age]
-    saved   = 0.0  # OH preserved by shipping less than fcst in prior weeks
-    adjustments = []
-
-    for w in range(min(26, len(fcst))):
-        # Available OH at start of week w (before shipping)
-        # = Inv_Wk[w] + AI_orig[w]   (undo this week's deduction in Inv)
-        # + saved                     (extra OH from prior under-shipments)
-        available = inv_oh[w] + float(fcst[w]) + saved
-
-        # Recoverable backlog from prior unmet cohorts
-        backlog = sum(q * max(0.0, 1.0 - 0.25 * a) for q, a in cohorts)
-
-        # This week's "real" demand intent = original forecast + recovered backlog
-        real_demand = float(fcst[w]) + backlog
-
-        if available >= real_demand:
-            ship = real_demand
-            cohorts = []        # fully fulfilled — clear all cohorts
-        else:
-            ship = max(0.0, available)
-            unmet = real_demand - ship
-            # Age existing cohorts by one week; drop those that hit age 4+
-            cohorts = [[q, a + 1] for q, a in cohorts if a + 1 < 4]
-            if unmet > 0:
-                cohorts.append([unmet, 1])
-
-        adjusted[w] = int(round(ship))
-        delta = float(fcst[w]) - adjusted[w]   # +ve = saved OH; -ve = spent extra
-        saved += delta
-
-        if adjusted[w] != fcst[w]:
-            adjustments.append({
-                "week":     w + 1,
-                "original": int(fcst[w]),
-                "adjusted": adjusted[w],
-                "oh_avail": int(available),
-                "backlog":  int(round(backlog)),
-            })
-
-    # Sum of demand permanently lost (cohorts that decayed past age 4 or
-    # were trimmed below recoverable share).  Approximation: original_total -
-    # adjusted_total - any cohort qty still rolling at the end (those still
-    # have a recoverable share that may carry beyond W26).
-    return adjusted, adjustments
+# F37 v1 body removed 2026-05-26 -- previously located at this line range,
+# replaced by the v2 fresh-cascade function above.  v1 used to read Inv_Wk1..
+# Inv_Wk26 from Projections (stale -- those columns are computed in QB against
+# the PREVIOUS run's AI projection).  The F37h-cat bypass added 2026-05-25 to
+# work around v1's staleness is also removed in this commit.
 
 
 def detect_iso(history):
