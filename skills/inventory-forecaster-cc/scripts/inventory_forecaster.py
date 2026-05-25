@@ -2490,6 +2490,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             _l13_cv = _stat_fs.stdev(l13) / l13_avg if len(l13) > 1 else 99.0
         except Exception:
             _l13_cv = 99.0
+        print(f"[FS_CV] cv={_l13_cv:.3f} fire={_l13_cv<=0.50}", flush=True)
         if _l13_cv <= 0.50:
             DAMP_STEADY   = 0.15
             _s_min_raw    = min(S)
@@ -10055,6 +10056,25 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"{_rpl_inv_note}.{_rpl_aur_note}{_rpl_t5_note}"
                     f"{_rpl_var_note} "
                     f"Supersedes prior model ({model})."
+                )
+
+    # ── F70c — Vacated base style ────────────────────────────────────────────────
+    # When a variant (EC/COS/AMZ/etc.) exists in scope AND the base manual is
+    # all-zeros, the planner has already signaled the switchover.  Zero all weeks
+    # so the model doesn't push demand the planner has explicitly zeroed.
+    # Runs AFTER F_AMZ_RPL so POS-driven values can't override planner intent.
+    # G2 below will demote the model to Inactive.
+    if (vacated_bases and not _f70_planner_protected
+            and row.get("Acct_MStyle_Key_", "") in vacated_bases):
+        _vb_variant = vacated_bases[row["Acct_MStyle_Key_"]]
+        if any(v != 0 for v in fcst):
+            fcst[:] = [0] * 26
+            _fire("F70c")
+            if isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    f"F70c Vacated base: variant {_vb_variant} exists in scope "
+                    f"and base manual is all-zeros -- planner has signaled "
+                    f"switchover; AI zeroed all weeks."
                 )
 
     prior = sum(manual_wks)
