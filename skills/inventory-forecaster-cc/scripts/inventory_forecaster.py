@@ -7202,26 +7202,34 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
         # F83 (2026-05-24): PDQ Croston's display-cap.
         # PDQ = Power Display Quantity (endcap/display placements at Walmart).
-        # These are NOT recurring orders -- they are one-off or limited-cycle
-        # display placements.  Croston's treats the cluster of 4-8 recent
-        # placements as ongoing intermittent demand and projects 26 weeks of
-        # that velocity (often 2x manual).  Cap total Croston's output for
-        # PDQ items at L26 all-weeks avg x 26 x 1.20 -- gives a 20% buffer
-        # above run-rate but disallows extrapolating launch-spike velocity.
+        # When the cluster of recent PDQ placements is FLAT or DECLINING (one
+        # initial burst that's settling), Croston's extrapolates the launch
+        # velocity for 26 weeks and over-projects 2x manual.
+        # Skip the cap when L4 >= L13_nz (recent placements show acceleration
+        # = the planner is actively reordering, not a one-time placement).
+        # Cap ceiling = L26 all-weeks avg x 26 x 1.50 (gives a buffer above
+        # observed run rate but disallows full launch-rate extrapolation).
         _f83_mstyle = (row.get("Mstyle") or "").upper()
         if "PDQ" in _f83_mstyle:
+            _f83_l4  = sum(hist_for_model[-4:])  / 4  if len(hist_for_model) >= 4  else 0
+            _f83_l13_nz = [v for v in hist_for_model[-13:] if v > 0]
+            _f83_l13_nz_avg = (sum(_f83_l13_nz) / len(_f83_l13_nz)) if _f83_l13_nz else 0
+            _f83_accelerating = (_f83_l4 > 0 and _f83_l13_nz_avg > 0
+                                 and _f83_l4 >= _f83_l13_nz_avg)
             _f83_l26_avg = sum(hist_for_model[-26:]) / 26 if len(hist_for_model) >= 26 else 0
-            if _f83_l26_avg > 0:
-                _f83_ceiling = _f83_l26_avg * 26 * 1.20
+            if _f83_l26_avg > 0 and not _f83_accelerating:
+                _f83_ceiling = _f83_l26_avg * 26 * 1.50
                 _f83_total   = sum(fcst)
                 if _f83_total > _f83_ceiling:
                     _f83_scale = _f83_ceiling / _f83_total
                     fcst       = [snap(v * _f83_scale, mp) if v > 0 else 0 for v in fcst]
                     meta.setdefault("drivers", []).append(
                         f"F83 PDQ Croston's cap: mstyle ends with PDQ "
-                        f"(display placements -- not recurring); L26 all-wks avg "
-                        f"{_f83_l26_avg:.0f} x 26 x 1.20 = {_f83_ceiling:.0f} ceiling; "
-                        f"total capped from {_f83_total:.0f} to {sum(fcst):.0f}"
+                        f"(display placements, L4 {_f83_l4:.0f} <= L13 nz "
+                        f"{_f83_l13_nz_avg:.0f} so not actively re-accelerating); "
+                        f"L26 all-wks avg {_f83_l26_avg:.0f} x 26 x 1.50 = "
+                        f"{_f83_ceiling:.0f} ceiling; total capped from "
+                        f"{_f83_total:.0f} to {sum(fcst):.0f}"
                     )
 
     else:
