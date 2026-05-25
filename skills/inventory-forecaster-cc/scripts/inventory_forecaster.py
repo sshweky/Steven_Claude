@@ -9677,8 +9677,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _inv_flow_rec = (inv_flow_data or {}).get(_ms_for_inv)
     _f37_skip = _f37_status_new or (not _inv_flow_rec)
     if model not in ("Inactive",) and not _f37_skip:
-        _adjusted_f37, _f37_adjustments = apply_oh_shortfall_adjustment(
+        _adjusted_f37, _f37_adjustments, _f37_lt_info = apply_oh_shortfall_adjustment(
             row, fcst, inv_flow=_inv_flow_rec)
+        if isinstance(meta, dict) and _f37_lt_info.get("used_default"):
+            # LT+Trans Days was missing or zero -- planner must verify.
+            # This is a data quality issue; use a prominent ALERT prefix so
+            # it surfaces in the AI_ANALYSIS narrative and in alert filtering.
+            _ms_lt = row.get("Mstyle") or row.get("Acct_MStyle_Key_") or "?"
+            meta.setdefault("drivers", []).append(
+                f"[ALERT] F37: LT+Trans Days missing for mstyle={_ms_lt!r} -- "
+                f"using conservative default of {_f37_lt_info['lt_trans_days']}d "
+                f"({_f37_lt_info['lt_trans_weeks']}wks). "
+                f"Planner must verify supplier lead time in Inventory Flow."
+            )
         if _f37_adjustments:
             # Snap to master pack to keep ship qty consistent with cadence
             fcst = [int(round(v / mp)) * int(mp) if v > 0 and mp > 0 else int(v)
@@ -9686,13 +9697,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             if isinstance(meta, dict):
                 meta["oh_shortfall_adjustments"] = _f37_adjustments
                 _changed_weeks = sorted({a["week"] for a in _f37_adjustments})
+                _lt_wks = _f37_lt_info["lt_trans_weeks"]
                 meta.setdefault("drivers", []).append(
                     f"F37 OH-shortfall adjustment (v2 fresh-cascade): "
                     f"{len(_f37_adjustments)} weeks capped at available inv "
                     f"(weeks {','.join(map(str, _changed_weeks[:8]))}"
-                    f"{'...' if len(_changed_weeks) > 8 else ''}); unmet demand "
-                    f"rolled forward with linear 25%/wk decay vs original cohort "
-                    f"qty, expiring at age 4."
+                    f"{'...' if len(_changed_weeks) > 8 else ''}); "
+                    f"constraint lifted from W{_lt_wks}+ (LT+Trans={_f37_lt_info['lt_trans_days']}d); "
+                    f"unmet demand rolled forward with linear 25%/wk decay vs "
+                    f"original cohort qty, expiring at age 4."
                 )
     elif _f37_skip and isinstance(meta, dict):
         if not _inv_flow_rec:
