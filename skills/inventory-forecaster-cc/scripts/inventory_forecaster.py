@@ -14496,6 +14496,10 @@ def main():
         # ORD_COLS[i] aligns with raw_ord[i]: index 0 = oldest, 51 = newest
         for _ci, _c in enumerate(ORD_COLS):
             _base_row[_c] = float(_base_row.get(_c) or 0) + _raw_ord[_ci]
+        # Track L26W DI weekly quantities separately (FID 1613 writeback for codepage yellow highlight)
+        _raw_l26 = _raw_ord[-26:]   # L26W slice, oldest→newest, aligned to ORD_HIST display
+        _prev_di_wkly = _base_row.get("_di_ord_wkly") or [0.0] * 26
+        _base_row["_di_ord_wkly"] = [_prev_di_wkly[_i] + _raw_l26[_i] for _i in range(26)]
         # Accumulate metadata for driver annotation
         _base_row["_di_blend"]    = True
         _base_row["_di_l13_add"]  = float(_base_row.get("_di_l13_add", 0)) + _sib_l13
