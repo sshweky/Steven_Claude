@@ -2633,6 +2633,37 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                 f"{_l13_nz_avg_f10:.0f}; blended 30/70 toward L4W"
             )
 
+    # F77b (2026-05-24): Moderate-decline soft brake.
+    # Deep-dive on 102 CRITICAL records showed 23 seasonal_baseline items
+    # over-projecting +49% on average where L4W was BELOW L13W nz avg but not
+    # severely enough for F77's 0.65 threshold.  F77b catches the "slowing"
+    # zone: L4W between 0.65 and 0.85 of L13W nz avg.  Lighter blend (0.15
+    # toward L4, 0.85 model) and W14+ x 0.95 -- just trims the over-projection,
+    # doesn't aggressively pull down.  Same seasonal-variance gate as F77.
+    _f77b_applied = False
+    _f77b_driver  = None
+    if (not _f10_applied and not _f77_applied and not is_new_launch
+            and _l13_nz_avg_f10 > 0
+            and _l4_avg_f10 < _l13_nz_avg_f10 * 0.85
+            and _l4_avg_f10 >= _l13_nz_avg_f10 * 0.65):
+        _f77b_S_min_nz = min((v for v in S if v > 0), default=1.0) if S else 1.0
+        _f77b_S_max    = max(S) if S else 1.0
+        _f77b_seasonal = _f77b_S_max > 0 and (_f77b_S_max / _f77b_S_min_nz) >= 2.5
+        if not _f77b_seasonal:
+            _new_f77b = []
+            for _w_f77b, _v_f77b in enumerate(forecast):
+                _blend = 0.15 * _l4_avg_f10 + 0.85 * _v_f77b
+                if _w_f77b >= 13:
+                    _blend *= 0.95
+                _new_f77b.append(snap(_blend, mp) if _blend > 0 else 0)
+            forecast = _new_f77b
+            _f77b_applied = True
+            _f77b_driver  = (
+                f"F77b moderate-decline brake: L4W avg {_l4_avg_f10:.0f} "
+                f"= {(_l4_avg_f10/_l13_nz_avg_f10)*100:.0f}% of L13W nz avg "
+                f"{_l13_nz_avg_f10:.0f}; blended 15/85 toward L4W"
+            )
+
     # F79 (2026-05-24): Amazon growth trend multiplier.
     # When Amazon is buying at an accelerating rate (L4W / L13W nz avg >= 1.20),
     # scale the forecast up by min(L4W / L13W_nz_avg, 1.50) to capture growth
