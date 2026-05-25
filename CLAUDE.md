@@ -52,8 +52,8 @@ WHERE [Status_Cust] LIKE 'A%' AND [Mstyle] LIKE 'FF%'
 
 ### Write patterns
 
-- **REST batch size limits:** reads (`POST /v1/records/query` with IN clause): max 400 per batch (500 triggers HTTP 400 — QB WHERE clause length limit). Writes (`POST /v1/records` with `mergeFieldId`): 500 per batch
-- **Bulk upsert via `POST /records` with `mergeFieldId`** — 500 records per batch
+- **REST batch size limits:** reads (`POST /v1/records/query` with IN clause): max 400 per batch (500 triggers HTTP 400 — QB WHERE clause length limit). Writes (`POST /v1/records` with `mergeFieldId`): 500–1,000 per batch (max 25,000 technically; stay ≤1,000 for timeout safety and partial-failure granularity)
+- **Bulk upsert via `POST /records` with `mergeFieldId`** — 500–1,000 records per batch
 - `fieldsToReturn: []` — skip echoing updated rows to save bandwidth
 - **Never `API_EditRecord` in a loop** — per-record calls are the #1 cause of throttling. 4,500 records = 9 bulk calls vs 4,500 per-record calls (500x difference)
 - **Sustained write rate <= 10 req/s** — default to 5 req/s if unsure. Burst <= 25 req/s
