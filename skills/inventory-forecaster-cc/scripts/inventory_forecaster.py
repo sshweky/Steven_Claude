@@ -2787,6 +2787,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             else:
                 _pos_tag = ""
             forecast    = [snap(v * _f82_ratio, mp) if v > 0 else 0 for v in forecast]
+            _f82_applied = (_f82_ratio > 1.0)
             _f82_driver = (
                 f"F82 non-Amazon growth: L4W avg {_l4_avg_f10:.0f} = "
                 f"{_l4_avg_f10 / _l13_nz_avg_f10:.2f}x L13W nz avg "
