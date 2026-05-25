@@ -29,6 +29,8 @@ projects/amazon-trend-analyzer/qb_chunks/
 skills/inventory-forecaster-cc/scripts/forecast_results*.json
 skills/inventory-forecaster-cc/scripts/validation_results*.json
 skills/inventory-forecaster-cc/scripts/critical_102_join.json
+# Pull cache (regenerated each live run, not source)
+skills/inventory-forecaster-cc/pull_cache/
 
 # --- Python ---
 __pycache__/
