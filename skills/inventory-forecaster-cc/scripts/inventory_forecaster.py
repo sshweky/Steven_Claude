@@ -11699,6 +11699,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 [_rpl_rates[0]] +
                 [0 if fcst[_wi] == 0 else _rpl_rates[_wi] for _wi in range(1, 26)]
             )
+            # [DBG-RPL]
+            if row.get("Acct_MStyle_Key_", "") == "1864-FF7120EC":
+                print(f"  [DBG-RPL] rates={_rpl_rates}")
+                print(f"  [DBG-RPL] rpl_new_before_varpattern={_rpl_new}")
+                print(f"  [DBG-RPL] var_ratios={_rpl_var_ratios}")
 
             # Fix 2 (2026-05-24): L13W ordering-variability setup.
             # Amazon's actual weekly order quantities fluctuate naturally -- a flat
