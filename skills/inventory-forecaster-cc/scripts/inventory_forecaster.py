@@ -1905,9 +1905,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # correctly captures gaps weeks where the account simply didn't order, unlike
     # non-zero L4W which over-weights whatever active orders happened to fall there.
     # Formula: 60% current ord_baseline + 40% all-weeks L4W avg.
-    # Effect: decelerating (L4W < L13W) -> baseline steps down toward recent pace;
-    #         accelerating (L4W > L13W) -> baseline steps up (capped by F27/T4 still
-    #         applying above it via their non-zero ratios if the ramp is large enough).
+    # Effect: decelerating (L4W < ord_baseline) -> baseline steps down toward recent pace.
+    # Directional gate (2026-05-25): ONLY apply when L4W all-weeks avg is BELOW
+    # the current baseline (decelerating / softer recent trend).  When L4W > baseline
+    # (acceleration or a spike order), skip the upward blend -- DC inventory-build
+    # orders inflate L4W and would incorrectly lift a baseline that should revert to
+    # the longer-term norm.  F27 / F62 handle genuine confirmed ramps separately.
     # Gates: not amazon, not ecom, >=4 active L13W weeks, no prior L4-ratio adjustment
     #        already fired (F6b/F26/F27), no T4 (T4 handles ecom).
     _f_ord_blend_applied = False
@@ -1917,7 +1920,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             and not _f6_applied      # F6b/F26/F27 didn't already adjust for L4
             and not _t4_applied):    # T4 already handled ecom L4/L13 blend
         _fob_l4_allw = sum(float(v) for v in history[-4:]) / 4.0
-        if _fob_l4_allw > 0:
+        if _fob_l4_allw > 0 and _fob_l4_allw < ord_baseline:  # deceleration only
             _fob_new    = ord_baseline * 0.60 + _fob_l4_allw * 0.40
             _fob_change = abs(_fob_new - ord_baseline) / ord_baseline
             if _fob_change >= 0.02:   # only apply when >=2% change (meaningful)
