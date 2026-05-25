@@ -201,19 +201,49 @@ CData fetches **every row** from the target table from QB server-side, then filt
 - Wide tables compound the problem: QB must reconstruct every field on every row before returning, even when CData asks for only 2-3 columns
 - A loop of N "narrow" CData queries against the same large table = N back-to-back full-table scans (the Phase 2 master-pack loop was 28 such scans before migration)
 
-### 5.2.1 Decision matrix -- CData vs QB REST API
+### 5.2.1 Unified CData-vs-REST policy (applies to ALL sources)
 
-| Table profile | Use CData | Use QB REST API |
-|---|---|---|
-| <100 rows, any width | ✓ | optional |
-| 100-500 rows, narrow (<20 cols) | ✓ | preferred |
-| 100-500 rows, wide (≥20 cols) | -- | ✓ |
-| >500 rows, any width | -- | ✓ |
-| >500 rows, narrow scope filter (<10% of rows match) | ❌ never | ✓ |
-| Any table queried in a retry/batch loop | ❌ never | ✓ |
-| Schema/metadata (`getInstructions`, `getTables`) | ✓ | -- |
+**This rule applies regardless of where the call originates:** production scripts, skill scripts, scheduled jobs, ad-hoc Claude chat, background subagents, planner-typed queries, browser-based exploration. The realm doesn't distinguish between sources -- a 30K-row full-scan from a chat session hits QB exactly as hard as one from a cron job.
 
-**Rule of thumb:** if a query's WHERE clause should return <10% of the source rows, or the source table has more than 500 rows, use the REST API. If the same query will run inside a loop (per-account, per-batch, per-mstyle), always use REST -- a CData loop is a guaranteed throttle event.
+**Important reframe:** the parameters that matter are **table characteristics**, not query characteristics. CData ignores your SELECT and WHERE, so the size of your query is irrelevant -- only the size of the underlying table determines realm impact. `SELECT [col1] FROM Styles WHERE [Mstyle]='FF15592'` looks tiny but hits the realm exactly as hard as `SELECT * FROM Styles`.
+
+**Use CData/MCP only when ALL of these hold:**
+
+| Parameter | Threshold |
+|---|---|
+| Target table row count | ≤ 100 rows AND not growing |
+| Target table column count | ≤ 30 columns |
+| Call pattern | Single one-shot (no loops, no batches, no retries by design) |
+| Frequency | Ad-hoc or rare; not on a polling/schedule loop |
+| Purpose | Either: (a) metadata (`getInstructions`, `getTables`, `getColumns`, `getProcedures`) -- always CData-OK regardless of size, or (b) genuine lookup against a stable small reference table |
+
+**Use REST API when ANY of these hold:**
+
+| Trigger | Why |
+|---|---|
+| Target table > 100 rows | Full-scan tax becomes real even for "1 row" queries |
+| Target table > 30 columns | Wide-row reconstruction tax on QB side |
+| Call inside a loop, batch, retry, or per-record pattern | One CData loop = N full-table scans |
+| Table is growing (transactions, logs, time-series, projections) | Today's small table is tomorrow's throttle |
+| Recurring/scheduled job | Recurring cost compounds |
+| Critical path of a long-running pipeline | A throttle here blocks the whole run |
+| You can't confidently answer "how many rows in this table?" | Default to REST when uncertain |
+
+**Worked examples (pim.quickbase.com realm):**
+
+| Table | dbid | Rows | Cols | Call type | Verdict |
+|---|---|---|---|---|---|
+| Divisions | `brjdizght` | 2 | few | one-shot lookup | CData OK |
+| Master Brands | `breus3wdk` | 148 | few | one-shot lookup | CData OK (borderline; watch growth) |
+| Amazon Bidding Profiles | `bp83954uq` | 25 | few | one-shot | CData OK |
+| Dates | `bqn6k7suj` | 2,192 | few | one-shot lookup | REST required (rows > 100) |
+| Projections | `bpd237tvm` | ~5,500 | 250 | any | REST required (already migrated) |
+| Styles | `bphzqfkev` | ~30K | 423 | any | REST required (already migrated) |
+| AI Comments | `bv2jirwts` | <100 | few | one-shot read | CData OK; watch growth |
+| AI Comments inside a 5,000-record loop | same | -- | -- | per-record | REST required (loop trigger) |
+| Any Amazon AdTrack perf table | many | millions | many | any | REST required, always |
+
+**Rule of thumb:** when uncertain about table size, default to REST. The cost of an unnecessary REST call is ~50ms. The cost of an unnecessary CData full-scan against a large table is a realm outage for 80 users.
 
 ### 5.2.2 Tables this has applied to (and the fix)
 
@@ -224,17 +254,10 @@ CData fetches **every row** from the target table from QB server-side, then filt
 
 When a new heavy CData read is discovered, add a row to this table after migrating it.
 
-**CData is still appropriate for:**
-- Session prime (`getInstructions`) -- lightweight metadata call
-- Metadata queries (`getTables`, `getColumns`, `getProcedures`)
-- Reads on small tables (<100 rows) with no loop and no retry pressure
-- Ad-hoc SQL exploration where table size is known to be small and the query is one-shot
-
-**CData is NOT appropriate for:**
-- Any large table where your scope filter would return <10% of the total rows
-- Any query you expect to run repeatedly in a retry loop or batch loop
-- Wide tables (≥20 cols) regardless of row count, when better than 10 rows return
-- Production-path reads that block downstream work (the realm impact of a throttle is felt by all 80 users)
+See §5.2.1 below for the unified threshold-based policy that supersedes prior guidance. Short version:
+- CData OK only when target table is ≤ 100 rows AND ≤ 30 cols AND the call is a single one-shot (no loop, no batch, no retry, no schedule).
+- Metadata calls (`getInstructions`, `getTables`, `getColumns`, `getProcedures`) are always CData-fine regardless of underlying table size.
+- All other reads go through QB REST API (`POST /v1/records/query`).
 
 ### 5.3 Field label normalization (CData SQL column names vs QB REST field labels)
 

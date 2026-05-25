@@ -109,17 +109,35 @@ Direct REST API (`api.quickbase.com/v1`) > CData > JSON-RPC
 - **CData**: adds 100-500ms per call plus its own rate-limit layer. **CRITICAL: CData does NOT push WHERE clauses to QB -- it fetches the entire table and filters client-side, on every call.** This is true for every CData read, not just one or two canonical tables. A 1-record CData query on Projections (~5,500 rows × 250 cols) or Styles (~30K rows × 423 cols) hits QB identically to a full table scan. A loop of N "narrow" CData reads against the same table = N back-to-back full-table scans.
 - **JSON-RPC** (`pim.quickbase.com`): legacy, slow, per-record — only when REST doesn't support the operation
 
-**Decision matrix — CData vs REST:**
+**Unified usage policy (applies to ALL sources — scripts, skills, ad-hoc chat, scheduled jobs, subagents):**
 
-| Table profile | CData | REST |
+The realm doesn't distinguish between sources. A chat query and a cron job hit QB the same way. CData ignores SELECT and WHERE, so query size is irrelevant — only TABLE size determines impact.
+
+**Use CData/MCP only when ALL of these hold:**
+- Target table ≤ 100 rows AND not growing
+- Target table ≤ 30 columns
+- Single one-shot call (no loop, no batch, no retry by design, no schedule)
+- Either (a) metadata call (`getInstructions`, `getTables`, `getColumns`, `getProcedures`) — always fine regardless of size, or (b) genuine lookup against a stable small reference table
+
+**Use REST when ANY of these hold:**
+- Target table > 100 rows
+- Target table > 30 columns
+- Inside a loop, batch, retry, or per-record pattern
+- Table is growing (transactions, logs, time-series, projections)
+- Recurring or scheduled job
+- Critical path of a long-running pipeline
+- Uncertain about table size — default to REST
+
+**Worked examples (this realm):**
+
+| Table | Rows | Verdict |
 |---|---|---|
-| <100 rows, any width | ok | optional |
-| 100–500 rows, narrow (<20 cols) | ok | preferred |
-| 100–500 rows, wide (≥20 cols) | no | yes |
-| >500 rows, any width | no | yes |
-| >500 rows with narrow scope (<10% of rows match) | never | yes |
-| Any table inside a retry/batch loop | never | yes |
-| Schema/metadata (`getInstructions`, `getTables`) | yes | — |
+| Divisions, Master Brands, Amazon Bidding Profiles | <200 | CData OK (one-shot) |
+| AI Comments (`bv2jirwts`) | <100 | CData OK (watch growth) |
+| Dates (`bqn6k7suj`) | 2,192 | REST required |
+| Projections (`bpd237tvm`) | ~5,500 × 250 cols | REST required (migrated) |
+| Styles (`bphzqfkev`) | ~30K × 423 cols | REST required (migrated) |
+| Any table inside a 5K-record loop | any | REST required |
 
 **CData full-scan anti-patterns (never do these):**
 ```sql
