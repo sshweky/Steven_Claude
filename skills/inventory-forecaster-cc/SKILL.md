@@ -9,9 +9,12 @@ Runs `scripts/inventory_forecaster.py` to execute the full forecasting pipeline.
 
 **QB I/O split (as of 2026-05-25):**
 - **Phase 1 (projections pull)** -- QB direct REST API (`POST /v1/records/query` on `QB_PROJ_TABLE`). Server-side WHERE filtering: a 1-record dry-run fetches exactly 1 row.
-- **Phase 2 (master pack + Season from Styles)** -- QB direct REST API (`POST /v1/records/query` on `QB_STYLES_TABLE` = `bphzqfkev`). Batches WHERE-on-Mstyle in chunks of 400 (500 triggers HTTP 400 — QB WHERE clause length limit). FIDs: Mstyle=6, Master_Pack=110, Season=437.
-- **REST batch size limits:** reads (`POST /v1/records/query` with IN clause): max 400 per batch. Writes (`POST /v1/records` with `mergeFieldId`): 500–1,000 per batch (max 25,000 technically; stay ≤1,000 for timeout safety and partial-failure granularity).
-- **All other QB reads** (Amazon catalog, ATS history, AI Comments, retailer POS, etc.) -- CData MCP server (Basic auth: `steven@skaffles.com` / PAT).
+- **Phase 2 (master pack + Season from Styles)** -- QB direct REST API (`POST /v1/records/query` on `QB_STYLES_TABLE` = `bphzqfkev`). Batches WHERE-on-Mstyle in chunks of 100 (500 triggers HTTP 400 — QB WHERE clause length limit). FIDs: Mstyle=6, Master_Pack=110, Season=437.
+- **Phase 2.5 (Amazon POS)** -- QB REST on `QB_AMZ_CATALOG_TABLE` = `bqp8vz625` (InventoryTrack.Amazon_Catalog). FIDs: Mstyle=34, Ordered_LW=154, Prior_Wk=180, L4w=193, L13w=194, L26w=195, L52w=196. `fetch_amazon_pos_qb_rest()`.
+- **Phase 2.6 (Amazon Catalog US / F38 signals)** -- QB REST on `QB_AMZ_US_TABLE` = `bpfrw2epk` (ProductTrack app `bn458t5nz`). FIDs: Mstyle_model_=21, ASIN=6, Amazon_Buybox=588, MAP_Price=463, AUR_L4w=948, AUR_L13w=949, AUR_L26w=951, AUR_L52w=950, Days_OOS_L30d=750, Sellable_SOH=341, ASIN_Buyability_Flag=428, ASIN_Status=86. `fetch_amazon_catalog_us_qb_rest()`.
+- **Phase 2.6b (Amazon Inventory Health)** -- QB REST on `QB_AMZ_HEALTH_TABLE` = `bp9akd3js` (ProductTrack.Amazon_Invtry_Health). FIDs: ASIN=6, Sellable_SOH=14, Open_PO_Qty=11, WOS_OH=50. `fetch_amazon_invtry_health_qb_rest()`.
+- **REST batch size limits:** reads (`POST /v1/records/query` with IN clause): conservative 100 per batch (well below 500 HTTP-400 threshold). Writes (`POST /v1/records` with `mergeFieldId`): 500–1,000 per batch.
+- **Remaining CData reads** (AI Comments, ATS history, retailer POS, Inventory Flow): F58 AI Comments is small + one-shot (within policy). ATS history and retailer POS still on CData per-batch loops — audit Finding #4 (retailer_pos error swallowing) and a future Phase 2.x migration item.
 - **Write-back** (AI_PRJ_W1..W26, AI_ALERT, AI_ANALYSIS) -- CData MCP via UPDATE SQL. Validation push (`push_validation_qb.py`) -- QB REST API.
 
 **Why Phases 1 & 2 use REST, not CData:** CData does NOT push WHERE clauses to QB -- it fetches the entire target table (Projections: 5,500 rows × 250 cols; Styles: 30K rows × 423 cols) regardless of scope filter, causing throttle disconnects under realm load. The REST API filters server-side.
