@@ -11691,27 +11691,21 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 [_rpl_rates[0]] +
                 [0 if fcst[_wi] == 0 else _rpl_rates[_wi] for _wi in range(1, 26)]
             )
-            # [DBG-RPL]
-            if row.get("Acct_MStyle_Key_", "") == "1864-FF7120EC":
-                print(f"  [DBG-RPL] rates={_rpl_rates}")
-                print(f"  [DBG-RPL] rpl_new_before_varpattern={_rpl_new}")
-                print(f"  [DBG-RPL] var_ratios={_rpl_var_ratios}")
-
             # Fix 2 (2026-05-24): L13W ordering-variability setup.
             # Amazon's actual weekly order quantities fluctuate naturally -- a flat
             # line misrepresents real ordering behavior.  Compute the L13W order
             # amounts as ratios relative to their mean (cap 2.5x, floor 0.5x) and
             # cycle that shape through steady-state weeks beyond the DC window.
             # Only activated for regular orderers (>= 8 of last 13 weeks non-zero).
-            # Fix A (2026-05-24): use normalized hist so phantom orders zeroed by
-            # F41 don't distort variability ratios (e.g., single stock-up at 2.5x cap).
-            _rpl_l13w_raw  = [float(v) for v in hist[-13:]]
+            # Fix B (2026-05-25): use raw pre-normalization order history for variability
+            # ratios. hist normalization (F60/F35/F43) can inject catch-up shipment values
+            # into weeks that had 0 orders, creating extreme ratios (e.g. 5184/mean=2.5)
+            # that cycle to W13 and W26 producing artificial spikes. Raw history gives
+            # clean 1.15-1.30x ratios. Note: _rpl_ord_l13 (demand baseline) continues
+            # to use hist[-13:] -- only the variability ratio source changes.
+            _rpl_l13w_raw  = [float(v) for v in history[-13:]]
             _rpl_l13w_nz   = sum(1 for v in _rpl_l13w_raw if v > 0)
             _rpl_l13w_mean = sum(_rpl_l13w_raw) / 13   # all-weeks avg incl. zeros
-            # [DBG-RPL]
-            if row.get("Acct_MStyle_Key_", "") == "1864-FF7120EC":
-                print(f"  [DBG-RPL] l13w_raw={_rpl_l13w_raw}")
-                print(f"  [DBG-RPL] l13w_mean={_rpl_l13w_mean:.1f} l13w_nz={_rpl_l13w_nz}")
             if _rpl_pos_primary:
                 # POS-primary: order-history variability reflects Amazon's
                 # inventory-management decisions (builds/drawdowns) rather than
