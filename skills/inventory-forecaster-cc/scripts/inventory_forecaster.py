@@ -1882,6 +1882,39 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if detect_biweekly(history) and ord_baseline > l13_avg * 1.05:
         ord_baseline = l13_avg
 
+    # F_ORD_BLEND (2026-05-25) -- All-weeks L4/L13W recency blend for non-Amazon
+    # brick-and-mortar accounts.  T4 handles e-commerce (non-zero L4W, accel bias).
+    # F6b/F26/F27 handle large deviations using non-zero L4/L13 ratios.
+    # This rule fills the gap: for B&M retailers, uses ALL-WEEKS L4W avg (including
+    # zero order-weeks) to blend recent demand into the baseline.  All-weeks L4W is
+    # what the planner sees as the last 4 weeks of actual ordering rate -- it
+    # correctly captures gaps weeks where the account simply didn't order, unlike
+    # non-zero L4W which over-weights whatever active orders happened to fall there.
+    # Formula: 60% current ord_baseline + 40% all-weeks L4W avg.
+    # Effect: decelerating (L4W < L13W) -> baseline steps down toward recent pace;
+    #         accelerating (L4W > L13W) -> baseline steps up (capped by F27/T4 still
+    #         applying above it via their non-zero ratios if the ramp is large enough).
+    # Gates: not amazon, not ecom, >=4 active L13W weeks, no prior L4-ratio adjustment
+    #        already fired (F6b/F26/F27), no T4 (T4 handles ecom).
+    _f_ord_blend_applied = False
+    _f_ord_blend_driver  = None
+    if (not is_amazon and not is_ecom
+            and len(l13_nz) >= 4
+            and not _f6_applied      # F6b/F26/F27 didn't already adjust for L4
+            and not _t4_applied):    # T4 already handled ecom L4/L13 blend
+        _fob_l4_allw = sum(float(v) for v in history[-4:]) / 4.0
+        if _fob_l4_allw > 0:
+            _fob_new    = ord_baseline * 0.60 + _fob_l4_allw * 0.40
+            _fob_change = abs(_fob_new - ord_baseline) / ord_baseline
+            if _fob_change >= 0.02:   # only apply when >=2% change (meaningful)
+                _fob_pct             = (_fob_new - ord_baseline) / ord_baseline * 100
+                ord_baseline         = _fob_new
+                _f_ord_blend_applied = True
+                _f_ord_blend_driver  = (
+                    f"F_ORD_BLEND: L4W all-weeks {_fob_l4_allw:.0f}/wk blended 40% "
+                    f"with L13W baseline -> {ord_baseline:.0f}/wk ({_fob_pct:+.1f}%)"
+                )
+
     # F22b superseded by F22c (see CHANGELOG.md).  F22c caps the FINAL
     # baseline after the POS/F13/F15 chain to avoid the F15 interaction.
     _l13_nz_count = len(l13_nz)
