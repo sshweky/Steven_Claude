@@ -11998,6 +11998,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "prior_total": int(prior),
         "pct_diff":    round(pct * 100, 1),
         "confidence":  _confidence,
+        # Normalized L13W avg (post-F35/F41/F43/F47/ATS normalization).
+        # This is the per-week order rate with duplicates, catch-up stock-up
+        # orders, and OOS distortion removed.  Stored so build_ai_analysis()
+        # can surface a "Normalized Ord/Wk L13w" bullet when it differs
+        # materially from the raw L13W order rate (2026-05-25).
+        "norm_l13w":   round(sum(float(v) for v in hist[-13:]) / 13, 1),
         # F56 — surface VP-Q4 PO-zeroed context so narrative can show
         # "Total forward demand = AI + confirmed POs" alongside visible AI.
         "po_zeroed_weeks":   (meta.get("po_zeroed_weeks", []) if isinstance(meta, dict) else []),
