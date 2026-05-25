@@ -68,6 +68,7 @@ QB_STYLES_TABLE       = os.environ.get("QB_STYLES_TABLE",       "bphzqfkev")  # 
 QB_AMZ_CATALOG_TABLE  = os.environ.get("QB_AMZ_CATALOG_TABLE",  "bqp8vz625")  # InventoryTrack.Amazon_Catalog (Phase 2.5 POS)
 QB_AMZ_US_TABLE       = os.environ.get("QB_AMZ_US_TABLE",       "bpfrw2epk")  # ProductTrack.Amazon_Catalog_US  (Phase 2.6)
 QB_AMZ_HEALTH_TABLE   = os.environ.get("QB_AMZ_HEALTH_TABLE",   "bp9akd3js")  # ProductTrack.Amazon_Invtry_Health (Phase 2.6b)
+QB_INV_FLOW_TABLE     = os.environ.get("QB_INV_FLOW_TABLE",     "bpsaju5pm")  # InventoryTrack.Inventory_Flow (Phase 2.7 F37 cascade)
 QB_BULK_BATCH         = int(os.environ.get("QB_BULK_BATCH", "500"))
 
 # QB report for VP-Q4 open-PO data -- bulk fetch in 1 API call.

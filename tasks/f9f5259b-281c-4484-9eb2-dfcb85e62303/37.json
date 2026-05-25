@@ -1,0 +1,9 @@
+{
+  "id": "37",
+  "subject": "F37 v2: fresh cascade + linear cohort decay",
+  "description": "Replace F37 to use fresh Inv Flow data cascade + linear 25%/week decay against original, 4-week expiry. Remove F37h-cat bypass.",
+  "activeForm": "Rewriting F37",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}
