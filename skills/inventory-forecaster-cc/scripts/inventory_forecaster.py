@@ -1672,7 +1672,7 @@ def _fetch_field_map_into(table_id, table_name, store_fn):
             store_fn(l2f, f2l)
             return l2f, f2l
         except Exception as e:
-            if attempt == 3:
+            if attempt == QB_REST_MAX_RETRIES:
                 raise RuntimeError(f"[QB REST] Failed to fetch {table_name} field map: {e}")
             time.sleep(2 ** attempt)
 
