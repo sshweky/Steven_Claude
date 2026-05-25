@@ -5034,6 +5034,103 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     `inv_flow=None` -> skip F37 entirely (backwards-compat for callers without
     Inv Flow data, e.g. unit tests).
 
+    Returns:
+        (adjusted_fcst, list of per-week adjustment dicts)
+    """
+    if not inv_flow:
+        return list(fcst), []
+
+    try:
+        beg_inv = float(inv_flow.get("beg_inv_w1", 0) or 0)
+    except (TypeError, ValueError):
+        beg_inv = 0.0
+    rcv = inv_flow.get("rcv") or [0.0] * 26
+    opn = inv_flow.get("opn") or [0.0] * 26
+    # Defensive: pad/truncate to exactly 26 entries
+    rcv = (list(rcv) + [0.0] * 26)[:26]
+    opn = (list(opn) + [0.0] * 26)[:26]
+
+    adjusted    = list(fcst)
+    cohorts     = []   # list of [original_qty, age]; new cohorts born at age 0
+    adjustments = []
+
+    for w in range(min(26, len(fcst))):
+        # Capacity = Beg Inv + this week's receipts - this week's open orders.
+        # Open Orders are committed customer POs that take priority over the
+        # forecast.  Floor at 0 -- if we're already oversold to open orders,
+        # the AI forecast simply can't ship anything this week.
+        capacity = beg_inv + rcv[w] - opn[w]
+        capacity = max(0.0, capacity)
+
+        # Recoverable backlog from prior unmet cohorts -- linear decay against
+        # ORIGINAL cohort qty.  Cohort at age 0 contributes 100% (it's already
+        # baked into own forecast for THIS week; cohorts born here are aged
+        # AFTER they're added so they don't double-count this same week).
+        backlog = sum(q * max(0.0, 1.0 - 0.25 * a) for q, a in cohorts)
+
+        # This week's real demand = own forecast + still-recoverable backlog
+        own = float(fcst[w])
+        real_demand = own + backlog
+
+        if capacity >= real_demand:
+            ship = real_demand
+            # Capacity fully satisfied demand -- age existing cohorts and prune
+            # any that hit age 4+ (fully decayed).  We DON'T clear all cohorts
+            # because partial-ship satisfaction doesn't extinguish a cohort
+            # under linear-against-original semantics -- the cohort just keeps
+            # decaying on schedule.
+            cohorts = [[q, a + 1] for q, a in cohorts if a + 1 < 4]
+        else:
+            ship  = capacity
+            unmet = real_demand - capacity
+            # Age existing cohorts first (drop age 4+)
+            cohorts = [[q, a + 1] for q, a in cohorts if a + 1 < 4]
+            # Create a new cohort for this week's unmet at age 0 (will contribute
+            # 100% if not satisfied this week -- but we already counted `own`
+            # and `backlog`, so this records the SURPLUS for future-week roll).
+            # We then immediately age it to 1 for next week's iteration.
+            if unmet > 0:
+                cohorts.append([unmet, 1])
+
+        adjusted[w] = int(round(ship))
+
+        # Update Beg Inv for next iteration: Beg + Recpts - shipped - OpenOrders
+        ending_inv = beg_inv + rcv[w] - ship - opn[w]
+        beg_inv = max(0.0, ending_inv)
+
+        if adjusted[w] != int(round(own)):
+            adjustments.append({
+                "week":     w + 1,
+                "original": int(round(own)),
+                "adjusted": adjusted[w],
+                "capacity": int(round(capacity)),
+                "backlog":  int(round(backlog)),
+            })
+
+    return adjusted, adjustments
+
+
+def _legacy_apply_oh_shortfall_adjustment_v1_REMOVED(row, fcst):
+    """REMOVED 2026-05-26 -- replaced by v2 above with fresh-cascade design.
+    Kept as a no-op stub so any stale callers fail loudly instead of silently
+    returning bad data.  Search the codebase for references and migrate to the
+    v2 signature (row, fcst, inv_flow=...).
+    """
+    raise NotImplementedError(
+        "F37 v1 was removed 2026-05-26.  Use apply_oh_shortfall_adjustment("
+        "row, fcst, inv_flow=...) and pass Inv Flow data from "
+        "fetch_inv_flow_qb_rest().")
+
+
+# Removed F37 v1 body (lines 4910-5087 in pre-2026-05-26 file).
+# Replaced by the function above.  Original v1 read Inv_Wk1..Inv_Wk26 from
+# Projections (stale -- those columns were computed against the PREVIOUS run's
+# AI projection, leading to false shortfalls when current iteration changed
+# significantly).  See the F37h-cat bypass that was added 2026-05-25 to work
+# around this; that bypass is now removed since v2 cascades fresh.
+def _F37_V1_REMOVED_PLACEHOLDER():
+    pass
+
     For weeks where we'd run short:
       • Cap that week's AI projection at what we can actually ship
       • Track the unmet demand as a backlog cohort that piles into future weeks
