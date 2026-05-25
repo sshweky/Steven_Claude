@@ -14304,7 +14304,12 @@ def main():
         if not getattr(args, "no_validation_flags", False):
             try:
                 _v = validate_record(row, master_pack, oos_entry=oos_ent,
-                                     open_po_wk=po_wk)
+                                     open_po_wk=po_wk, ats_hist=ats_hist,
+                                     switchover_weeks=switchover_index,
+                                     amazon_pos=amazon_pos,
+                                     season_map=season_map,
+                                     amazon_catalog_us=amazon_catalog_us,
+                                     retailer_pos=retailer_pos)
                 # On-Plan override: AI and Man are aligned -- nothing to review.
                 # Two cases: (1) both zero; (2) plan entered and gap <= 7.5%.
                 _man_tot = sum(float(row.get(c) or 0) for c in ORIG_PRJ_COLS)
