@@ -8083,7 +8083,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             except Exception:
                 pass
         if _f73_new_ramp and is_amazon:
-            print(f"  [DBG3] {key}: new_ramp={_f73_new_ramp} f34={_f34_is_new_launch} "
+            _dbg3_key = row.get("Acct_MStyle_Key_", "?")
+            print(f"  [DBG3] {_dbg3_key}: new_ramp={_f73_new_ramp} f34={_f34_is_new_launch} "
                   f"is_amazon={is_amazon} pos_rate_approx={_pos_rate_dbg:.1f}", flush=True)
         fcst, cap, meta = seasonal_baseline(hist_for_model, mp, is_amazon=is_amazon,
                                             pos_data=pos_data, description=description,
