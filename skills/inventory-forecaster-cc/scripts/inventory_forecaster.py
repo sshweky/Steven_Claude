@@ -3640,6 +3640,13 @@ def attenuate_recent_spikes(hist, pos_data=None):
     # this is a genuine demand step-change, not a one-off spike.  Using the
     # median (not mean) makes the test robust against a single week still at
     # the old run-rate while the others have stepped up.
+    #
+    # F49d (2026-05-24, callout from 16553-FF30784): POS-veto.
+    # When retailer POS data IS available (Petsmart, Target, Kroger, etc.)
+    # AND POS L4/L13 ratio is NOT confirming the acceleration (< 1.20), then
+    # the order spike is store-stocking / DC inventory build, NOT consumer
+    # sell-through.  Veto F49c's bypass so F43 can cap the order spike to
+    # a reasonable multiple of the historical baseline.
     if spike_count >= 2:
         _l4_nz_precap = sorted(
             float(out[i] or 0) for i in range(last4_start, n)
@@ -3648,11 +3655,37 @@ def attenuate_recent_spikes(hist, pos_data=None):
         if _l4_nz_precap:
             _l4_nz_median = _l4_nz_precap[len(_l4_nz_precap) // 2]
             if _l4_nz_median >= 2.0 * median_pre:
-                return out, [{"f49_skip": "order_history_sustained_acceleration",
-                              "spike_count": spike_count,
-                              "l4_nz_median": round(_l4_nz_median, 1),
-                              "median_pre":   round(median_pre, 1),
-                              "ratio":        round(_l4_nz_median / median_pre, 2)}]
+                # F49d POS-veto
+                _f49d_veto = False
+                _f49d_pos_l4_v  = 0.0
+                _f49d_pos_l13_v = 0.0
+                if pos_data:
+                    _f49d_pos_l4_v  = float(pos_data.get('l4w')
+                                             or pos_data.get('Avg_Units_Wk_L4w')  or 0)
+                    _f49d_pos_l13_v = float(pos_data.get('l13w')
+                                             or pos_data.get('Avg_Units_Wk_L13w') or 0)
+                    if (_f49d_pos_l4_v > 0 and _f49d_pos_l13_v > 0
+                            and (_f49d_pos_l4_v / _f49d_pos_l13_v) < 1.20):
+                        _f49d_veto = True
+                if not _f49d_veto:
+                    return out, [{"f49_skip": "order_history_sustained_acceleration",
+                                  "spike_count": spike_count,
+                                  "l4_nz_median": round(_l4_nz_median, 1),
+                                  "median_pre":   round(median_pre, 1),
+                                  "ratio":        round(_l4_nz_median / median_pre, 2)}]
+                # POS-veto path: fall through so F43 caps as normal, and
+                # tag a marker so forecast_record() can surface F49d.
+                # (Marker is consumed by the F49/F43 driver-narrative block.)
+                _f49d_marker = {
+                    "f49d_pos_veto":   True,
+                    "spike_count":     spike_count,
+                    "pos_l4":          round(_f49d_pos_l4_v, 1),
+                    "pos_l13":         round(_f49d_pos_l13_v, 1),
+                    "pos_ratio":       round(_f49d_pos_l4_v / _f49d_pos_l13_v, 2),
+                    "l4_nz_median":    round(_l4_nz_median, 1),
+                    "median_pre":      round(median_pre, 1),
+                    "order_ratio":     round(_l4_nz_median / median_pre, 2),
+                }
 
     corrections = []
     for i in range(last4_start, n):
