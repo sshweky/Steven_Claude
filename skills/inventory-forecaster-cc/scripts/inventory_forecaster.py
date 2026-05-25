@@ -1957,10 +1957,18 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # captures any lead-time / safety-stock premium embedded in the order pattern.
     #
     # Blend tiers (ord_baseline / pos_rate):
-    #   > 2.0  : 100% POS       -- extreme stockup; order history misleads
-    #   1.5-2.0: 70/30 POS/ord  -- elevated; POS leads, orders secondary
-    #   1.0-1.5: 65/35 POS/ord  -- normal above-POS; POS primary 26w anchor
-    #   < 1.0  : 65/35 POS/ord  -- depleting; POS anchors coming reorder
+    #
+    #   Amazon (DC replenishment converges to consumer velocity over 26w):
+    #     > 2.0  : 100% POS        -- extreme stockup; orders mislead
+    #     1.5-2.0: 70/30 POS/ord   -- elevated; POS primary
+    #     1.0-1.5: 65/35 POS/ord   -- normal; POS primary 26w anchor
+    #     < 1.0  : 65/35 POS/ord   -- depleting; POS anchors coming reorder
+    #
+    #   Non-Amazon B&M (orders reflect shelf-coverage + safety-stock premium):
+    #     > 2.0  : 70/30 POS/ord   -- extreme; still retain 30% order signal
+    #     1.5-2.0: 50/50 POS/ord   -- elevated; balanced (orders + POS equal)
+    #     1.0-1.5: 45/55 POS/ord   -- normal above-POS; orders primary
+    #     < 1.0  : 60/40 POS/ord   -- depleting; POS leads, orders secondary
     #
     # _f15_amazon_ord_primary flag suppresses F38b for Amazon items where
     # ord_baseline > pos_rate: amazon_pos_rate() already bakes L4/L13 trend
