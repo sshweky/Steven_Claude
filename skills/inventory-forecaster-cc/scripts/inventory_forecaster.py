@@ -3149,8 +3149,6 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             if _ev > 1.0:
                 if _f_new_amz_damp_applied:
                     _ev = 1.0 + DAMP_NEW_AMZ * (_ev - 1.0)
-                if _dbg_raw_loop and wnum <= 3:
-                    print(f"  [DBG2] W{wnum}: s={s:.3f} ev={_ev:.3f} raw={baseline*s*_ev:.1f}", flush=True)
                 s *= _ev
         raw.append(baseline * s)
 
