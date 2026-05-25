@@ -6,7 +6,13 @@ description: "End-to-end AI inventory demand forecaster and projection validator
 # Inventory Forecaster — Claude Code Skill
 
 Runs `scripts/inventory_forecaster.py` to execute the full forecasting pipeline.
-The script calls the CData MCP server directly (Basic auth) for all Quickbase I/O — no Anthropic SDK or API key required.
+
+**QB I/O split (as of 2026-05-25):**
+- **Phase 1 (projections pull)** -- QB direct REST API (`POST /v1/records/query`). Server-side WHERE filtering: a 1-record dry-run fetches exactly 1 row. No CData involved. Credentials from `config.py` (`QB_USER_TOKEN`, `QB_REALM`, `QB_PROJ_TABLE`).
+- **All other QB reads** (master pack, styles, ATS history, AI Comments, etc.) -- CData MCP server (Basic auth: `steven@skaffles.com` / PAT).
+- **Write-back** (AI_PRJ_W1..W26, AI_ALERT, AI_ANALYSIS) -- CData MCP via UPDATE SQL. Validation push (`push_validation_qb.py`) -- QB REST API.
+
+**Why Phase 1 uses REST, not CData:** CData does NOT push WHERE clauses to QB -- it fetches the entire Projections table (4,500+ rows x 250 cols) regardless of scope filter, causing throttle disconnects under realm load. The REST API filters server-side. Never revert Phase 1 to CData.
 
 ---
 

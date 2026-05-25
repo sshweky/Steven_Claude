@@ -178,11 +178,54 @@ If you know the app ID, hit it directly. The "discover everything" pattern (`/ap
 
 | Layer | Pros | Cons | Use when |
 |---|---|---|---|
-| **Direct REST API** (`api.quickbase.com/v1`) | Fastest. Modern. JSON. Bulk endpoints. | Need to handle auth + retries yourself. | **Default for all production code.** |
-| **CData JDBC/ODBC proxy** | SQL syntax. Federation across systems. | Adds 100-500ms per call. Adds another rate-limit layer. Has its own session/PAT to manage. | Ad-hoc SQL exploration. Joins across QB and other DBs. |
+| **Direct REST API** (`api.quickbase.com/v1`) | Fastest. Modern. JSON. Bulk endpoints. Server-side filtering. | Need to handle auth + retries yourself. | **Default for all production code.** |
+| **CData JDBC/ODBC proxy** | SQL syntax. Federation across systems. | Adds 100-500ms per call. Adds another rate-limit layer. **Does NOT push WHERE clauses to QB -- fetches all rows and filters client-side.** | Session prime (`getInstructions`). Ad-hoc SQL exploration on small tables only. |
 | **JSON-RPC API** (`pim.quickbase.com/db/<id>?a=...`) | Available for legacy operations not yet in REST. | Slow. XML responses on some endpoints. Per-record only. | Operations the v1 REST API doesn't support. |
 
 **Rule:** if the v1 REST API supports your operation, use it. CData and JSON-RPC are fallbacks.
+
+### 5.2 CData full-table-scan behavior (critical -- read before using CData for any large-table query)
+
+**CData does NOT push WHERE clauses to QuickBase.** When you run a CData SQL query like:
+
+```sql
+SELECT [col1],[col2] FROM Projections WHERE [Mstyle] = 'FF15592'
+```
+
+CData fetches **every row** from the Projections table (4,500+ rows x 250 columns) from QB server-side, then filters to the 1 matching row in the CData layer. From QB's perspective this looks identical to `SELECT * FROM Projections` -- full table scan every time, regardless of scope.
+
+**Consequences:**
+- A single-record dry-run (`--acct 23011 --mstyle FF15592`) hits QB as hard as a full `--all` run
+- Under realm load (80 users sharing the realm), repeated large CData queries cause IncompleteRead(0 bytes) disconnects for everyone
+- The 250-column Projections query is especially heavy: QB must reconstruct every field on every row before returning
+
+**Rule:** Use the QB direct REST API (`POST /v1/records/query`) for any table with >500 rows where narrow scope filtering matters. The REST API pushes the WHERE clause to QB natively -- a 1-record query fetches exactly 1 row.
+
+**CData is appropriate for:**
+- Session prime (`getInstructions`) -- lightweight metadata call
+- Metadata queries on small tables (<100 rows)
+- Ad-hoc SQL exploration where table size is known to be small
+
+**CData is NOT appropriate for:**
+- Projections table (4,500+ rows x 250 cols) -- use QB REST API
+- Any table where your scope filter would return <10% of the total rows
+- Any query you expect to run repeatedly in a retry loop
+
+### 5.3 Field label normalization (CData SQL column names vs QB REST field labels)
+
+CData normalizes QB field labels to SQL-safe column names by replacing any run of non-alphanumeric characters with a single underscore:
+
+```python
+import re
+cdata_col_name = re.sub(r'[^a-zA-Z0-9]+', '_', qb_field_label)
+# Examples:
+# "Status @ Cust"       -> "Status_Cust"
+# "Acct#-MStyle (Key)"  -> "Acct_MStyle_Key_"
+# "Ord/LW 51"           -> "Ord_LW_51"
+# "Shpd Wk L13W cust."  -> "Shpd_Wk_L13W_cust_"
+```
+
+Use this when building a label->FID map from `GET /v1/fields` to match against CData column names used elsewhere in your code.
 
 ### 5.1 Standard auth headers (REST)
 ```
@@ -247,6 +290,8 @@ QB exposes per-realm API usage metrics. Set a personal alert when your scripts h
 - ❌ Treat 0-byte timeouts as "no data" — they're throttle signals.
 - ❌ Share one QB user/token across multiple scripts (they fight for the same quota).
 - ❌ Skip the smoke test "because it worked yesterday."
+- ❌ **Use CData for large-table reads with narrow scope filters.** CData fetches the full table regardless of WHERE clause. For tables >500 rows with narrow scope, use QB REST API so filtering happens server-side. The Projections table (4,500 rows x 250 cols) is the canonical example -- a 1-record CData query hits QB just as hard as a full-table scan.
+- ❌ **Use CData for the Projections table Phase 1 fetch.** Use `POST /v1/records/query` with explicit FID list and server-side `where` filter instead.
 
 ---
 
@@ -279,43 +324,3 @@ Before writing a single API call, answer these:
 - [ ] Will this run during off-hours, or do I need to scale way back?
 
 If any answer is "no", reconsider before sending the first request.
-
----
-
-## 11. QB Codepage / View encoding rule (PERMANENT — never override)
-
-QB codepages (views, pages deployed via `API_AddReplaceDBPage`) are stored and served in **Latin-1 / Windows-1252**. Any multi-byte UTF-8 character (code point > U+00FF) will be mangled into a diamond question mark or corrupted silently.
-
-**Never use literal Unicode characters in QB views or codepages.** This includes:
-- Em dash `—` (U+2014) — use ` - ` instead
-- En dash `–` (U+2013) — use `-` instead
-- Checkmark `✓` (U+2713) — use HTML entity `&#x2713;` in HTML, or JS escape `✓` in `.textContent` assignments
-- Right arrow `->` symbols (U+2192) — use `->` instead
-- Any character > U+00FF
-
-**Safe alternatives:**
-- HTML entities like `&#x2713;` `&#x26A0;` are safe — they are ASCII bytes in the source file; the browser decodes them.
-- JavaScript Unicode escapes like `'￿'` or `'✓'` are safe — they are 6 ASCII characters in the source; the JS engine decodes them at runtime.
-- Stick to ASCII + HTML entities for all rendered strings.
-
-This rule was set by the user on 2026-05-16 after seeing diamond characters in a deployed FD-status panel. Apply it to every file that gets pasted or deployed to QB pages, including viewer.js, viewer.html, and any generated HTML stored in QB fields.
-
----
-
-## 11. QB Codepage / View encoding rule (PERMANENT — never override)
-
-QB codepages (views, pages deployed via `API_AddReplaceDBPage`) are stored and served in **Latin-1 / Windows-1252**. Any multi-byte UTF-8 character (code point > U+00FF) will be mangled into a diamond question mark or corrupted silently.
-
-**Never use literal Unicode characters in QB views or codepages.** This includes:
-- Em dash `—` (U+2014) — use ` - ` instead
-- En dash `–` (U+2013) — use `-` instead
-- Checkmark `✓` (U+2713) — use HTML entity `&#x2713;` in HTML, or JS escape `✓` in `.textContent` assignments
-- Right arrow `->` symbols (U+2192) — use `->` instead
-- Any character > U+00FF
-
-**Safe alternatives:**
-- HTML entities like `&#x2713;` `&#x26A0;` are safe — they are ASCII bytes in the source file; the browser decodes them.
-- JavaScript Unicode escapes like `'￿'` or `'✓'` are safe — they are 6 ASCII characters in the source; the JS engine decodes them at runtime.
-- Stick to ASCII + HTML entities for all rendered strings.
-
-This rule was set by the user on 2026-05-16 after seeing diamond characters in a deployed FD-status panel. Apply it to every file that gets pasted or deployed to QB pages, including viewer.js, viewer.html, and any generated HTML stored in QB fields.
