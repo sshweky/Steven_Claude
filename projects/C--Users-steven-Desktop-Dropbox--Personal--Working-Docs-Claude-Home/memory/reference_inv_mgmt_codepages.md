@@ -28,18 +28,18 @@ OOS gap analysis, PO recommendations, inventory flow.
 
 ## Deploy Method (updated 2026-05-25)
 
-**The legacy `API_AddReplaceDBPage` XML API is BROKEN** -- returns errcode=0 but saves nothing. QB REST API has no /v1/pages endpoint. Never use `deploy_pages.py` with the old API approach.
+**The legacy `API_AddReplaceDBPage` XML API is BROKEN** -- returns errcode=0 but saves nothing. QB REST API has no /v1/pages endpoint. `deploy_pages.py` now uses the CORS server approach instead.
 
 ### Working deploy procedure:
-1. Run `python codepage/deploy_pages.py` from the repo root -- starts a local CORS server on localhost:8743
-2. For each page (viewer.js p49, viewer.html p50):
-   a. Navigate to the QB page editor: `https://pim.quickbase.com/nav/app/bpd24h9wy/action/pageedit?pageID=49` (or 50)
+1. Run `python codepage/deploy_pages.py [forecast|invmgmt|all]` from the skill root (`C:\Users\steven\.claude\skills\inventory-forecaster-cc\`) -- starts a local CORS server on localhost:8743
+2. For each page listed:
+   a. Navigate to the QB page editor URL printed by the script
    b. Open DevTools console (F12)
-   c. Paste and run the JS snippet printed by the script
+   c. Paste and run the JS snippet printed for that page
    d. "Page saved" toast confirms success
 3. Ctrl-C the script when done
 
-**Alternative (Claude-automated):** Use the Chrome MCP to navigate to each editor, inject content via `fetch('http://localhost:8743/viewer.js')`, set Ace editor value, click Save.
+**Alternative (Claude-automated):** Use the Chrome MCP to navigate to each editor, inject content via `fetch('http://localhost:8743/<filename>')`, set Ace editor value, click Save.
 
 **Verify**: `fetch('https://pim.quickbase.com/db/bpd24h9wy?a=dbpage&pageID=49', {credentials:'include'})` from a QB tab -- check `.length > 0`.
 
