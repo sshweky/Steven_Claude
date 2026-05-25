@@ -3133,10 +3133,17 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             s = 1.0
             _f85_floored += 1
         # F11 — Prime Day / Fall Prime Day ordering lift (Amazon-only, calendar-based).
+        # F_NEW_AMZ_DAMP guard: for new-launch Amazon items the order-history
+        # seasonal profile is unreliable, so the profile was already re-damped
+        # by DAMP_NEW_AMZ above.  Apply the same damping to the event boost so
+        # that a calendar-triggered 1.50x doesn't undo the profile dampening.
+        # (e.g. 1.50x -> 1.0 + 0.20*(0.50) = 1.10x for new launches)
         if is_amazon:
             _pb, _fb = _get_event_boosts()
             _ev = max(_pb.get(wnum, 1.0), _fb.get(wnum, 1.0))
             if _ev > 1.0:
+                if _f_new_amz_damp_applied:
+                    _ev = 1.0 + DAMP_NEW_AMZ * (_ev - 1.0)
                 s *= _ev
         raw.append(baseline * s)
 
