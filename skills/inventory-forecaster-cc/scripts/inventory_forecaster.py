@@ -2047,6 +2047,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # applied later in forecast_record() since it overrides the forecast array,
     # not the baseline scalar.
     _f38_driver = None
+    _f38b_applied = False   # F38b/F38e positive-trend lift; consumed by F79 guard
     if is_amazon and amz_catalog and pos_data and baseline > 0:
         # F15 ord-primary: skip F38b entirely.  The L13W order rate used as
         # baseline already captures recent POS acceleration -- the rolling
