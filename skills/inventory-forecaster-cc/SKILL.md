@@ -631,14 +631,18 @@ Phase 3 — Forecast (pure Python, no API calls)
   │   [Fix 1] Category seasonality blend (after DAMP, before event lifts):
   │     S = 0.30xhistorical_S + 0.70xcategory_profile (re-normalized)
   │     Applied in seasonal_baseline(), crostens(), and heuristic()
-  │   Explicit event lifts (Amazon-only, calendar-date-based):
-  │     Prime Day (last Tue of June): ordering bumps May 1 x1.25, May 15 x1.25, May 29 x1.50
-  │     Fall Prime Day (first Tue of Oct): ordering bump Tuesday after Labor Day x1.30
+  │   Explicit event lifts (calendar-date-anchored, "take the greater" rule):
+  │     All events: effective_lift = max(event_lift, item_seasonal_factor) for that week
+  │     (floors at event level; does NOT stack with seasonal -- prevents double-lift on peak weeks)
+  │     Prime Day (Amazon-only): tapered x1.10/x1.25/x1.25/x1.20 over 4-week window centered on anchor
+  │     Fall Deal (Amazon-only): flat x1.12 over 3-week window centered on anchor
+  │     T5/Thanksgiving (ALL accounts): x1.20/x1.15/x1.15 pre-event build, weeks 6/5/4 before Thanksgiving
+  │       Thanksgiving = 4th Thursday of November (auto-computed annually)
   │
-  ├── Croston's: α=0.3 over 78-obs weighted series
+  ├── Croston's: alpha=0.3 over 78-obs weighted series
   │   z and p refined 70% L13W / 30% smoothed model output
   │   Quantities scaled by L52W seasonal profile + category blend
-  │   Event calendar: calendar-based insertions (Prime Day May 1/15/29, Fall Prime Day Tue after Labor Day)
+  │   Event calendar: calendar-based insertions using same anchor dates + "take the greater" rule
   │   [Fix 5] Rescaling cap: if AI 26w avg > L13W all-weeks avg × 1.10
   │     → scale down (floor 0.5×) to prevent over-projection vs true weekly rate
   │
