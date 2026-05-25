@@ -1616,9 +1616,10 @@ def fetch_master_pack_qb_rest(mstyles):
     master_pack = {}
     season_map  = {}
 
-    # Batch the WHERE clause -- 100 mstyles per call.  500-item OR chains
-    # return HTTP 400 from QB REST (payload too large / query too complex).
-    # SKILL.md says 500 but 100 is the confirmed working limit. (2026-05-25)
+    # Batch the WHERE clause -- 100 mstyles per call (conservative).
+    # QB REST upper bound is ~400; 500 triggers HTTP 400 (WHERE clause length
+    # limit, each EX OR adds ~25 chars).  100 leaves headroom for longer
+    # mstyle names and concurrent pressure on the realm. (2026-05-25)
     BATCH = 100
     uniq  = sorted({m for m in mstyles if m})
     for i in range(0, len(uniq), BATCH):
