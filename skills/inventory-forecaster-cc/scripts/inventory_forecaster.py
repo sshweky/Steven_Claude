@@ -10607,745 +10607,745 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"POS_L4W={_rtl_l4w:,.0f}/wk"
                     )
 
-        # ── F59i — POS anchor for Amazon items with healthy DC WOS ───────────
-        # EC = "Ecomm Ready" -- standard Amazon DC items in poly-bag packaging.
-        # They have their own ASINs, own order history, own DC inventory.
-        # Treat EC items identically to non-EC items -- the only gates are
-        # WOS (DC coverage) and the AI-vs-POS ratio.
-        #
-        # When the near-term forecast (W1-W4 non-zero avg) runs >15% above POS
-        # L4W and the DC has adequate coverage (WOS >= 6), the order-history
-        # baseline is likely inflated by inventory build rather than genuine
-        # demand growth.  Blend toward POS L13W.
-        #
-        # Gates: is_amazon, POS data present, not DI-blended, WOS >= 6 or unknown.
-        _f59i_ms = (row.get("Mstyle") or row.get("mstyle") or "").upper()
-        if (is_amazon
-                and model not in ("Inactive", "OTB (zero)",
-                                  "Pre-launch NEW (manual passthrough)")
-                and not row.get("_di_blend")
-                and isinstance(fcst, list) and len(fcst) >= 26
-                and pos_data):
-            _f59i_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
-            _f59i_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-            _f59i_pos_l52 = float(pos_data.get("Avg_Units_Wk_L52w") or 0)
-            _f59i_wos     = _f59h_wos   # reuse WOS computed in F59h block above
+    # ── F59i — POS anchor for Amazon items with healthy DC WOS ───────────
+    # EC = "Ecomm Ready" -- standard Amazon DC items in poly-bag packaging.
+    # They have their own ASINs, own order history, own DC inventory.
+    # Treat EC items identically to non-EC items -- the only gates are
+    # WOS (DC coverage) and the AI-vs-POS ratio.
+    #
+    # When the near-term forecast (W1-W4 non-zero avg) runs >15% above POS
+    # L4W and the DC has adequate coverage (WOS >= 6), the order-history
+    # baseline is likely inflated by inventory build rather than genuine
+    # demand growth.  Blend toward POS L13W.
+    #
+    # Gates: is_amazon, POS data present, not DI-blended, WOS >= 6 or unknown.
+    _f59i_ms = (row.get("Mstyle") or row.get("mstyle") or "").upper()
+    if (is_amazon
+            and model not in ("Inactive", "OTB (zero)",
+                              "Pre-launch NEW (manual passthrough)")
+            and not row.get("_di_blend")
+            and isinstance(fcst, list) and len(fcst) >= 26
+            and pos_data):
+        _f59i_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+        _f59i_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _f59i_pos_l52 = float(pos_data.get("Avg_Units_Wk_L52w") or 0)
+        _f59i_wos     = _f59h_wos   # reuse WOS computed in F59h block above
 
-            # F60 EC-transition override: when the EC item inherited parent
-            # order history (F60 fired), the parent's historical order rate is
-            # NOT a reliable forward signal for the EC item.  The parent may
-            # have been ordered at higher rates for the parent ASIN, but the EC
-            # ASIN starts fresh -- POS is the correct demand anchor.
-            # Allow F59i to fire regardless of WOS when F60 is active and the
-            # ratio is above the moderate threshold.  Use moderate blend only
-            # (never severe anchor) for WOS 1-5 so we don't over-correct when
-            # Amazon is also in a brief restock phase for the new EC variant.
-            _f59i_ec_override = (
-                _f60_is_ec_transition
-                and _f59h_wos > 0    # known WOS (not 0 = unknown)
-                and _f59h_wos < 6    # would normally be gated
-            )
-            if (_f59i_pos_l4 >= 100 and _f59i_pos_l13 > 0
-                    and amz_catalog
-                    and (_f59h_wos >= 6 or _f59h_wos == 0
-                         or _f59i_ec_override)):
-                # ── F59i: all Amazon models — tiered POS correction ───────────
-                # Amazon orders include DC inventory management (restock, safety-
-                # stock builds, catch-up after short-ship) on top of consumer
-                # demand.  When DC WOS is healthy (>= 6) and the forecast
-                # materially exceeds POS L4W, the excess is almost certainly
-                # inventory management noise, not real demand growth.
+        # F60 EC-transition override: when the EC item inherited parent
+        # order history (F60 fired), the parent's historical order rate is
+        # NOT a reliable forward signal for the EC item.  The parent may
+        # have been ordered at higher rates for the parent ASIN, but the EC
+        # ASIN starts fresh -- POS is the correct demand anchor.
+        # Allow F59i to fire regardless of WOS when F60 is active and the
+        # ratio is above the moderate threshold.  Use moderate blend only
+        # (never severe anchor) for WOS 1-5 so we don't over-correct when
+        # Amazon is also in a brief restock phase for the new EC variant.
+        _f59i_ec_override = (
+            _f60_is_ec_transition
+            and _f59h_wos > 0    # known WOS (not 0 = unknown)
+            and _f59h_wos < 6    # would normally be gated
+        )
+        if (_f59i_pos_l4 >= 100 and _f59i_pos_l13 > 0
+                and amz_catalog
+                and (_f59h_wos >= 6 or _f59h_wos == 0
+                     or _f59i_ec_override)):
+            # ── F59i: all Amazon models — tiered POS correction ───────────
+            # Amazon orders include DC inventory management (restock, safety-
+            # stock builds, catch-up after short-ship) on top of consumer
+            # demand.  When DC WOS is healthy (>= 6) and the forecast
+            # materially exceeds POS L4W, the excess is almost certainly
+            # inventory management noise, not real demand growth.
+            #
+            # WOS gate: fires when WOS >= 6 (healthy DC) OR WOS == 0
+            # (unresolvable) OR _f59i_ec_override (F60 EC-transition active
+            # and WOS is explicitly low 1-5 -- inherited parent history
+            # over-represents EC forward demand; POS is the correct anchor).
+            # WOS == 0 means "unknown", not "zero inventory"; we still apply
+            # a correction but cap it at moderate blend (never severe anchor)
+            # because we cannot confirm the DC is actually well-stocked.
+            # WOS 1-5 (explicitly low) is skipped: Amazon is actively
+            # restocking and the elevated orders are real fill-in demand.
+            #
+            # Applies to ALL non-EC models (Seasonal Baseline, Heuristic,
+            # Croston's, etc.) -- a flat Heuristic forecast at 1.7x POS
+            # with a healthy DC is just as wrong as an inflated Seasonal one.
+            #
+            # _f59i_wos_capped: True when WOS is unknown (0) OR when the
+            # EC-transition override fired (WOS 1-5 with inherited parent
+            # history) -- in either case, restrict >1.40x cases to moderate
+            # blend instead of severe anchor, since DC may be in a mild
+            # restock phase for the new variant.
+            _f59i_wos_capped = (_f59h_wos == 0 or _f59i_ec_override)
+            #
+            # Two-tier correction by severity:
+            #   Moderate (1.15x-1.40x): 50/50 blend toward POS L13W
+            #     -- gentle pull-back, preserves some model signal
+            #   Severe (> 1.40x): direct POS L4W anchor (floor 0.60)
+            #     -- at 40%+ above consumer demand with a healthy DC the
+            #        excess is overwhelmingly inventory noise, not growth
+            _f59i_w1_4_nz  = [v for v in fcst[:4] if v > 0]
+            _f59i_w1_4_avg = sum(_f59i_w1_4_nz) / max(len(_f59i_w1_4_nz), 1)
+            _f59i_ratio    = (_f59i_w1_4_avg / _f59i_pos_l4
+                              if _f59i_pos_l4 > 0 else 0)
+            if _f59i_ratio > 1.15:
+                # ── Price-recovery bypass (2026-05-20) ───────────────────
+                # When AUR was recently corrected and POS is rapidly
+                # accelerating back toward the pre-problem run rate,
+                # anchoring to the depressed L4W POS would suppress the
+                # forecast to the mid-recovery level and under-project
+                # true forward demand.
                 #
-                # WOS gate: fires when WOS >= 6 (healthy DC) OR WOS == 0
-                # (unresolvable) OR _f59i_ec_override (F60 EC-transition active
-                # and WOS is explicitly low 1-5 -- inherited parent history
-                # over-represents EC forward demand; POS is the correct anchor).
-                # WOS == 0 means "unknown", not "zero inventory"; we still apply
-                # a correction but cap it at moderate blend (never severe anchor)
-                # because we cannot confirm the DC is actually well-stocked.
-                # WOS 1-5 (explicitly low) is skipped: Amazon is actively
-                # restocking and the elevated orders are real fill-in demand.
+                # Pattern: AUR too low -> Amazon stops ordering (L13W/L26W
+                # goes dark). AUR corrected -> orders resume and POS
+                # snaps back.  L4W POS reflects partial recovery only;
+                # L52W POS is the pre-problem baseline.
                 #
-                # Applies to ALL non-EC models (Seasonal Baseline, Heuristic,
-                # Croston's, etc.) -- a flat Heuristic forecast at 1.7x POS
-                # with a healthy DC is just as wrong as an inflated Seasonal one.
+                # Detection (all must hold):
+                #   L4W POS > L13W POS * 2.0 -- rapid recent acceleration
+                #   L52W POS > L13W POS * 3.0 -- L13W was anomalously
+                #                                 depressed (dark period)
+                #   AUR >= MAP * 0.75          -- retail largely corrected
+                #                                 (or no MAP data available)
+                #                                 75% threshold: price was
+                #                                 corrected but may still be
+                #                                 slightly below MAP during
+                #                                 the recovery ramp
                 #
-                # _f59i_wos_capped: True when WOS is unknown (0) OR when the
-                # EC-transition override fired (WOS 1-5 with inherited parent
-                # history) -- in either case, restrict >1.40x cases to moderate
-                # blend instead of severe anchor, since DC may be in a mild
-                # restock phase for the new variant.
-                _f59i_wos_capped = (_f59h_wos == 0 or _f59i_ec_override)
-                #
-                # Two-tier correction by severity:
-                #   Moderate (1.15x-1.40x): 50/50 blend toward POS L13W
-                #     -- gentle pull-back, preserves some model signal
-                #   Severe (> 1.40x): direct POS L4W anchor (floor 0.60)
-                #     -- at 40%+ above consumer demand with a healthy DC the
-                #        excess is overwhelmingly inventory noise, not growth
-                _f59i_w1_4_nz  = [v for v in fcst[:4] if v > 0]
-                _f59i_w1_4_avg = sum(_f59i_w1_4_nz) / max(len(_f59i_w1_4_nz), 1)
-                _f59i_ratio    = (_f59i_w1_4_avg / _f59i_pos_l4
-                                  if _f59i_pos_l4 > 0 else 0)
-                if _f59i_ratio > 1.15:
-                    # ── Price-recovery bypass (2026-05-20) ───────────────────
-                    # When AUR was recently corrected and POS is rapidly
-                    # accelerating back toward the pre-problem run rate,
-                    # anchoring to the depressed L4W POS would suppress the
-                    # forecast to the mid-recovery level and under-project
-                    # true forward demand.
-                    #
-                    # Pattern: AUR too low -> Amazon stops ordering (L13W/L26W
-                    # goes dark). AUR corrected -> orders resume and POS
-                    # snaps back.  L4W POS reflects partial recovery only;
-                    # L52W POS is the pre-problem baseline.
-                    #
-                    # Detection (all must hold):
-                    #   L4W POS > L13W POS * 2.0 -- rapid recent acceleration
-                    #   L52W POS > L13W POS * 3.0 -- L13W was anomalously
-                    #                                 depressed (dark period)
-                    #   AUR >= MAP * 0.75          -- retail largely corrected
-                    #                                 (or no MAP data available)
-                    #                                 75% threshold: price was
-                    #                                 corrected but may still be
-                    #                                 slightly below MAP during
-                    #                                 the recovery ramp
-                    #
-                    # Action: skip F59i suppression entirely.  The order-history
-                    # baseline reflects genuine reactivation demand, not
-                    # inventory management noise.
-                    _f59i_aur = float((amz_catalog or {}).get("AUR_L4w")  or 0)
-                    _f59i_map = float((amz_catalog or {}).get("MAP_Price") or 0)
-                    _f59i_price_recovery = (
-                        _f59i_pos_l13 > 0
-                        and _f59i_pos_l4  > _f59i_pos_l13 * 2.0
-                        and _f59i_pos_l52 > _f59i_pos_l13 * 3.0
-                        and (_f59i_map == 0 or _f59i_aur >= _f59i_map * 0.75)
-                    )
-                    if _f59i_price_recovery:
-                        if isinstance(meta, dict):
-                            _f59i_aur_note = (
-                                f"AUR {_f59i_aur:.2f} >= MAP {_f59i_map:.2f} * 75%"
-                                f" -- retail largely corrected. "
-                                if _f59i_map > 0 else ""
-                            )
-                            meta.setdefault("drivers", []).append(
-                                f"F59i price-recovery bypass: POS L4W "
-                                f"{_f59i_pos_l4:.0f}/wk is "
-                                f"{_f59i_pos_l4/max(_f59i_pos_l13,1):.1f}x L13W "
-                                f"{_f59i_pos_l13:.0f}/wk (rapid acceleration). "
-                                f"L52W {_f59i_pos_l52:.0f}/wk shows healthy "
-                                f"pre-problem run rate vs depressed L13W dark "
-                                f"period. {_f59i_aur_note}"
-                                f"Skipping POS suppression -- order-history "
-                                f"baseline reflects reactivation demand, not "
-                                f"inventory noise. Model: {model}."
-                            )
+                # Action: skip F59i suppression entirely.  The order-history
+                # baseline reflects genuine reactivation demand, not
+                # inventory management noise.
+                _f59i_aur = float((amz_catalog or {}).get("AUR_L4w")  or 0)
+                _f59i_map = float((amz_catalog or {}).get("MAP_Price") or 0)
+                _f59i_price_recovery = (
+                    _f59i_pos_l13 > 0
+                    and _f59i_pos_l4  > _f59i_pos_l13 * 2.0
+                    and _f59i_pos_l52 > _f59i_pos_l13 * 3.0
+                    and (_f59i_map == 0 or _f59i_aur >= _f59i_map * 0.75)
+                )
+                if _f59i_price_recovery:
+                    if isinstance(meta, dict):
+                        _f59i_aur_note = (
+                            f"AUR {_f59i_aur:.2f} >= MAP {_f59i_map:.2f} * 75%"
+                            f" -- retail largely corrected. "
+                            if _f59i_map > 0 else ""
+                        )
+                        meta.setdefault("drivers", []).append(
+                            f"F59i price-recovery bypass: POS L4W "
+                            f"{_f59i_pos_l4:.0f}/wk is "
+                            f"{_f59i_pos_l4/max(_f59i_pos_l13,1):.1f}x L13W "
+                            f"{_f59i_pos_l13:.0f}/wk (rapid acceleration). "
+                            f"L52W {_f59i_pos_l52:.0f}/wk shows healthy "
+                            f"pre-problem run rate vs depressed L13W dark "
+                            f"period. {_f59i_aur_note}"
+                            f"Skipping POS suppression -- order-history "
+                            f"baseline reflects reactivation demand, not "
+                            f"inventory noise. Model: {model}."
+                        )
+                else:
+                    if _f59i_ratio > 1.40 and _f59i_ec_override:
+                        # EC-transition anchor: inherited parent history
+                        # over-represents forward demand for the new EC ASIN.
+                        # Use max(POS_LW, POS_L4W) as the direct anchor --
+                        # no 0.60 floor, because we have a confirmed genuine
+                        # demand signal (AUR >= MAP checked in override gate).
+                        # F59m will add gap-fill uplift on top.
+                        _f59i_pos_lw_ec = float(
+                            (pos_data or {}).get("Ordered_Units_LW") or 0)
+                        _f59i_anchor = (
+                            max(_f59i_pos_lw_ec, _f59i_pos_l4)
+                            / max(_f59i_w1_4_avg, 1)
+                        )
+                        _f59i_mode   = "EC-anchor"
+                    elif _f59i_ratio > 1.40 and not _f59i_wos_capped:
+                        # Severe: anchor to POS L4W (floor 0.60 guards against
+                        # temporarily-depressed POS reading).
+                        # Only fires when WOS is confirmed >= 6 (known healthy).
+                        # When WOS is unknown (capped), fall through to moderate
+                        # blend -- we cannot confirm DC is well-stocked.
+                        _f59i_anchor = max(0.60, _f59i_pos_l4 / _f59i_w1_4_avg)
+                        _f59i_mode   = "strong"
                     else:
-                        if _f59i_ratio > 1.40 and _f59i_ec_override:
-                            # EC-transition anchor: inherited parent history
-                            # over-represents forward demand for the new EC ASIN.
-                            # Use max(POS_LW, POS_L4W) as the direct anchor --
-                            # no 0.60 floor, because we have a confirmed genuine
-                            # demand signal (AUR >= MAP checked in override gate).
-                            # F59m will add gap-fill uplift on top.
-                            _f59i_pos_lw_ec = float(
-                                (pos_data or {}).get("Ordered_Units_LW") or 0)
-                            _f59i_anchor = (
-                                max(_f59i_pos_lw_ec, _f59i_pos_l4)
-                                / max(_f59i_w1_4_avg, 1)
-                            )
-                            _f59i_mode   = "EC-anchor"
-                        elif _f59i_ratio > 1.40 and not _f59i_wos_capped:
-                            # Severe: anchor to POS L4W (floor 0.60 guards against
-                            # temporarily-depressed POS reading).
-                            # Only fires when WOS is confirmed >= 6 (known healthy).
-                            # When WOS is unknown (capped), fall through to moderate
-                            # blend -- we cannot confirm DC is well-stocked.
-                            _f59i_anchor = max(0.60, _f59i_pos_l4 / _f59i_w1_4_avg)
-                            _f59i_mode   = "strong"
-                        else:
-                            # Moderate: soft blend toward POS L13W.
-                            # Used for 1.15x-1.40x ratio, OR when ratio > 1.40
-                            # but WOS is unknown (capped) -- conservative action
-                            # on uncertain DC-stock data.
-                            _f59i_anchor = (
-                                (_f59i_pos_l13 * 0.50 + _f59i_w1_4_avg * 0.50)
-                                / _f59i_w1_4_avg
-                            )
-                            _f59i_mode   = (
-                                "blend (WOS unknown)" if _f59i_wos_capped
-                                else "blend"
-                            )
-                        _f59i_anchor = min(_f59i_anchor, 1.0)  # never inflate
-                        for _wi in range(len(fcst)):
-                            fcst[_wi] = snap(fcst[_wi] * _f59i_anchor, mp)
-                        _fire("F59i")
-                        if isinstance(meta, dict):
-                            _f59i_pos_lw_disp = float(
-                                (pos_data or {}).get("Ordered_Units_LW") or 0)
-                            _f59i_desc = (
-                                f"EC-transition POS anchor "
-                                f"(max(POS_LW {_f59i_pos_lw_disp:.0f}, "
-                                f"L4W {_f59i_pos_l4:.0f})/wk; "
-                                f"parent history discarded as EC demand signal)"
-                                if _f59i_mode == "EC-anchor"
-                                else (
-                                    f"direct POS L4W anchor (floor 60%)"
-                                    if _f59i_mode == "strong"
-                                    else f"50% blend toward POS L13W {_f59i_pos_l13:.0f}/wk"
-                                )
-                            )
-                            _f59i_wos_label = (
-                                f"F60 EC-transition (WOS={_f59h_wos:.1f}wks)"
-                                if _f59i_ec_override
-                                else (
-                                    "DC WOS unknown"
-                                    if _f59i_wos_capped
-                                    else f"DC WOS {_f59h_wos:.1f}wks (healthy)"
-                                )
-                            )
-                            meta.setdefault("drivers", []).append(
-                                f"F59i POS anchor ({_f59i_mode}): AI W1-W4 avg "
-                                f"{_f59i_w1_4_avg:.0f}/wk is "
-                                f"{(_f59i_ratio - 1) * 100:.0f}% above consumer "
-                                f"POS L4W {_f59i_pos_l4:.0f}/wk with {_f59i_wos_label} -- "
-                                f"order history inflated by DC inventory management, "
-                                f"not demand growth. Rescaled x{_f59i_anchor:.3f} via "
-                                f"{_f59i_desc}. Model: {model}."
-                            )
-
-        # ── F59j — Amazon DC understock: POS floor + early-week restock lift ──
-        # When Amazon DC WOS < 8 (below target range of 8-12 wks), Amazon will
-        # order ABOVE consumer POS rate to rebuild DC inventory.  The AI should:
-        #   1. Floor every non-zero week at POS L4W (never project below
-        #      consumer demand -- that is always the minimum ordering rate)
-        #   2. Add a restock lift to W1-W3 to bring DC back to 8 WOS target,
-        #      accounting for units already in transit (OPO).
-        #
-        # Restock deficit = max(0, 8 * demand_rate - (SOH + OPO))
-        # where demand_rate = SOH / WOS (Amazon's internal sell-through rate).
-        # Spread deficit evenly over 3 weeks.
-        #
-        # This is directionally opposite to what F59i does: F59i reduces when
-        # DC is healthy (WOS >= 6) and AI > POS; F59j lifts when DC is low.
-        # They are mutually exclusive by WOS gate (F59i needs WOS >= 6).
-        if (is_amazon
-                and pos_data
-                and model not in ("Inactive", "OTB (zero)",
-                                  "Pre-launch NEW (manual passthrough)")
-                and isinstance(fcst, list) and len(fcst) >= 26
-                and 0 < _f59h_wos < 8):
-            _f59j_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
-            if _f59j_pos_l4 >= 50:
-                # Amazon's internal demand rate (implied by their own WOS calc)
-                _f59j_demand_rate = _f59h_soh / _f59h_wos if _f59h_wos > 0 else _f59j_pos_l4
-                # How many units does Amazon need to reach 8 WOS?
-                _f59j_target_inv  = 8.0 * _f59j_demand_rate
-                _f59j_pipeline    = _f59h_soh + _f59h_opo   # OH + already-ordered OPO
-                _f59j_deficit     = max(0.0, _f59j_target_inv - _f59j_pipeline)
-                # Spread restock over W1-W3
-                _f59j_restock_wks = 3
-                _f59j_lift        = snap(_f59j_deficit / _f59j_restock_wks, mp) \
-                                    if _f59j_deficit > 0 else 0
-                _f59j_floor       = snap(_f59j_pos_l4, mp)
-                _f59j_changed     = False
-                for _wi in range(len(fcst)):
-                    _orig = fcst[_wi]
-                    if _wi < _f59j_restock_wks and _f59j_lift > 0:
-                        # Restock weeks: base = max(model, POS floor) + lift
-                        fcst[_wi] = snap(max(fcst[_wi], _f59j_floor) + _f59j_lift, mp)
-                    elif fcst[_wi] > 0 and fcst[_wi] < _f59j_floor:
-                        # Sustaining weeks: floor at POS L4W
-                        fcst[_wi] = _f59j_floor
-                    if fcst[_wi] != _orig:
-                        _f59j_changed = True
-                if _f59j_changed:
-                    _fire("F59j")
+                        # Moderate: soft blend toward POS L13W.
+                        # Used for 1.15x-1.40x ratio, OR when ratio > 1.40
+                        # but WOS is unknown (capped) -- conservative action
+                        # on uncertain DC-stock data.
+                        _f59i_anchor = (
+                            (_f59i_pos_l13 * 0.50 + _f59i_w1_4_avg * 0.50)
+                            / _f59i_w1_4_avg
+                        )
+                        _f59i_mode   = (
+                            "blend (WOS unknown)" if _f59i_wos_capped
+                            else "blend"
+                        )
+                    _f59i_anchor = min(_f59i_anchor, 1.0)  # never inflate
+                    for _wi in range(len(fcst)):
+                        fcst[_wi] = snap(fcst[_wi] * _f59i_anchor, mp)
+                    _fire("F59i")
                     if isinstance(meta, dict):
+                        _f59i_pos_lw_disp = float(
+                            (pos_data or {}).get("Ordered_Units_LW") or 0)
+                        _f59i_desc = (
+                            f"EC-transition POS anchor "
+                            f"(max(POS_LW {_f59i_pos_lw_disp:.0f}, "
+                            f"L4W {_f59i_pos_l4:.0f})/wk; "
+                            f"parent history discarded as EC demand signal)"
+                            if _f59i_mode == "EC-anchor"
+                            else (
+                                f"direct POS L4W anchor (floor 60%)"
+                                if _f59i_mode == "strong"
+                                else f"50% blend toward POS L13W {_f59i_pos_l13:.0f}/wk"
+                            )
+                        )
+                        _f59i_wos_label = (
+                            f"F60 EC-transition (WOS={_f59h_wos:.1f}wks)"
+                            if _f59i_ec_override
+                            else (
+                                "DC WOS unknown"
+                                if _f59i_wos_capped
+                                else f"DC WOS {_f59h_wos:.1f}wks (healthy)"
+                            )
+                        )
                         meta.setdefault("drivers", []).append(
-                            f"F59j DC restock: WOS={_f59h_wos:.1f}wks below 8wk "
-                            f"target. SOH={_f59h_soh:,.0f}u + OPO={_f59h_opo:,.0f}u "
-                            f"pipeline vs target {_f59j_target_inv:,.0f}u "
-                            f"(8wks x {_f59j_demand_rate:,.0f}/wk demand rate). "
-                            + (f"Restock deficit {_f59j_deficit:,.0f}u spread over "
-                               f"W1-W{_f59j_restock_wks} (+{_f59j_lift:,.0f}u/wk lift). "
-                               if _f59j_deficit > 0 else "OPO already covers 8 WOS target. ") +
-                            f"All weeks floored at POS L4W {_f59j_pos_l4:,.0f}/wk."
+                            f"F59i POS anchor ({_f59i_mode}): AI W1-W4 avg "
+                            f"{_f59i_w1_4_avg:.0f}/wk is "
+                            f"{(_f59i_ratio - 1) * 100:.0f}% above consumer "
+                            f"POS L4W {_f59i_pos_l4:.0f}/wk with {_f59i_wos_label} -- "
+                            f"order history inflated by DC inventory management, "
+                            f"not demand growth. Rescaled x{_f59i_anchor:.3f} via "
+                            f"{_f59i_desc}. Model: {model}."
                         )
 
-        # ── F59k — Amazon L4W=0 + POS also declining: EOL wind-down correction ──
-        # When Amazon L4W orders have gone completely to zero AND consumer POS
-        # also shows material decline (L4W POS < 40% of L13W POS), this is a
-        # genuine EOL or channel wind-down scenario -- NOT a stockout recovery.
-        # The F50 stockout guard (at the baseline level) may have preserved the
-        # full L13W order baseline; this rule corrects the forward forecast here.
-        #
-        # Key discriminators vs stockout (F50):
-        #   - Genuine OOS: L4W orders=0 because DC ran out; POS may also be 0
-        #     but oos_days >= 14 signals the inventory gap.  F59k skips.
-        #   - EOL/wind-down: L4W orders=0 AND consumer POS L4W < 40% of L13W POS.
-        #     Both the DC and end consumer have stopped/slowed.  F59k fires.
-        #
-        # Anchor: MAX(pos_l4w, pos_l13w * 0.50) as target weekly rate.
-        # Planners historically project 40-55% of L13W when facing this pattern
-        # (observed: FF9298EC, FF9297/24, FF8649/24 in 2026-05-20 gap analysis).
-        # Scale floor = 0.25 to avoid over-correction if POS data is stale.
-        if (is_amazon                            # Amazon-only (defines _f59_l4w_avg etc.)
-                and pos_data and isinstance(fcst, list) and len(fcst) >= 4
-                and _f59_l4w_avg == 0           # no orders at all in L4W
-                and _f59_oos_days < 14          # not a genuine OOS situation
-                and _f59_l13w_avg >= 200):      # item had real order history
-            _f59k_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
-            _f59k_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-            if (_f59k_pos_l13 >= 100                         # credible POS signal
-                    and _f59k_pos_l4 < _f59k_pos_l13 * 0.40):  # consumer also declining
-                _f59k_target  = max(_f59k_pos_l4, _f59k_pos_l13 * 0.50)
-                _f59k_nz      = [v for v in fcst if v > 0]
-                _f59k_avg     = sum(_f59k_nz) / max(len(_f59k_nz), 1)
-                if _f59k_avg > _f59k_target * 1.10:  # only correct if AI materially above target
-                    _f59k_scale = max(0.25, _f59k_target / max(_f59k_avg, 1))
-                    for _wi in range(len(fcst)):
-                        fcst[_wi] = snap(fcst[_wi] * _f59k_scale, mp)
-                    _fire("F59k")
-                    if isinstance(meta, dict):
-                        meta.setdefault("drivers", []).append(
-                            f"F59k EOL/wind-down: L4W orders=0 (OOS days="
-                            f"{_f59_oos_days:.0f}), POS L4W={_f59k_pos_l4:.0f}/wk "
-                            f"({_f59k_pos_l4/max(_f59k_pos_l13,1)*100:.0f}% of "
-                            f"POS L13W={_f59k_pos_l13:.0f}/wk) -- consumer demand "
-                            f"declining, not stockout. Anchored to "
-                            f"MAX(POS_L4W, POS_L13W*0.50)={_f59k_target:.0f}/wk; "
-                            f"scaled x{_f59k_scale:.2f} (L13W orders were "
-                            f"{_f59_l13w_avg:.0f}/wk)."
-                        )
-
-        # ── F59l — Sparse/intermittent Amazon: POS floor when DC is healthy ──
-        # When Croston's or Heuristic projects less than 70% of consumer POS
-        # L13W rate AND the Amazon DC is in the healthy steady-state range
-        # (8-20 WOS), the shortfall is caused by lumpy order history
-        # understating true consumer demand -- NOT by soft demand.
-        #
-        # Root cause: Amazon orders in large periodic batches (once every 4-5
-        # weeks for intermittent items).  Croston's inter-order interval math
-        # divides the per-order qty by the interval, yielding a low projected
-        # weekly rate even when consumers are buying ~1,000/wk at retail.
-        # Heuristic items have the same problem: sparse order history produces
-        # a conservative baseline that misses the steady consumer pull.
-        #
-        # When DC WOS is at Amazon's 8-12wk steady-state target, orders will
-        # continue matching consumer sell-through.  POS L13W is the correct
-        # forward demand signal -- not the sparse order history average.
-        #
-        # Correction: scale the full 26-week forecast so the average weekly
-        # rate equals POS L13W.  Preserves the lumpy shape (big/quiet weeks)
-        # while anchoring total demand to consumer velocity.
-        #
-        # Guards:
-        #   POS L13W >= 200:  credible consumer signal (not noise)
-        #   POS L4W >= POS L13W * 0.40:  POS not in sharp recent decline
-        #   DC WOS 8-20:  healthy steady-state (F59h handles extreme cases)
-        #   AI avg < POS L13W * 0.70:  meaningful gap (30%+ below consumer)
-        #   Scale cap 5.0:  guard against runaway uplift on very sparse history
-        #   EC items treated identically to non-EC (both are standard DC replenishment)
-        if (is_amazon and pos_data and amz_catalog
-                and model in ("Croston's", "Heuristic")
-                and isinstance(fcst, list) and sum(fcst) > 0):
-            _f59l_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-            _f59l_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
-            _f59l_wos     = _f59h_wos
-            _f59l_ai_avg  = sum(fcst) / 26.0
-            if (_f59l_pos_l13 >= 200
-                    and _f59l_pos_l4 >= _f59l_pos_l13 * 0.40
-                    and 8.0 <= _f59l_wos <= 20.0
-                    and _f59l_ai_avg < _f59l_pos_l13 * 0.70):
-                _f59l_target_total = _f59l_pos_l13 * 26.0
-                _f59l_scale = min(5.0, _f59l_target_total / max(sum(fcst), 1))
-                if _f59l_scale > 1.01:
-                    fcst = [snap(v * _f59l_scale, mp) for v in fcst]
-                    _fire("F59l")
-                    if isinstance(meta, dict):
-                        meta.setdefault("drivers", []).append(
-                            f"F59l sparse POS anchor: {model} avg {_f59l_ai_avg:.0f}/wk "
-                            f"< POS L13W {_f59l_pos_l13:.0f}/wk (70% floor) with "
-                            f"DC WOS {_f59l_wos:.1f}wks (healthy 8-20wk range) -- "
-                            f"lumpy order history understates consumer demand. "
-                            f"Scaled x{_f59l_scale:.2f} to POS L13W rate "
-                            f"(POS L4W={_f59l_pos_l4:.0f}/wk). Model: {model}."
-                        )
-
-        # ── F59n — Post-DC-restock spike normalization (2026-05-21) ────────
-        # When Amazon placed a large DC restock order last week (LW order >>
-        # L13W avg) AND the DC was running low (WOS < 8), the order-history
-        # baseline is inflated by the catch-up buy.  But that restock already
-        # happened -- going forward, orders should revert to consumer POS
-        # velocity, not continue at the one-time restock rate.
-        #
-        # This rule normalizes the forward forecast back to the POS-based
-        # demand rate BEFORE F59m adds the gap-fill uplift.  F59m then
-        # correctly places the remaining gap above the POS floor.
-        #
-        # Gates:
-        #   0 < WOS < 8          -- low DC confirms restock context
-        #   LW order >= 5x L13W  -- spike magnitude (catch-up buy)
-        #   AUR >= MAP * 0.90    -- genuine demand (not below-MAP deal)
-        #   POS_LW >= 100/wk     -- credible consumer signal
-        #   AI avg > POS_LW * 1.30 -- model is meaningfully too high
-        if (is_amazon and amz_catalog and pos_data
-                and isinstance(fcst, list) and len(fcst) >= 26
-                and model not in ("Inactive", "OTB (zero)",
-                                  "Pre-launch NEW (manual passthrough)")
-                and 0 < _f59h_wos < 8):
-            _f59n_lw_ord  = float(hist[-1]) if hist else 0
-            _f59n_l13_ord = sum(hist[-13:]) / 13.0 if len(hist) >= 13 else 0
-            _f59n_pos_lw  = float(pos_data.get("Ordered_Units_LW")  or 0)
-            _f59n_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
-            _f59n_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-            _f59n_aur     = float(amz_catalog.get("AUR_L4w")   or 0)
-            _f59n_map     = float(amz_catalog.get("MAP_Price")  or 0)
-            _f59n_spike   = _f59n_l13_ord > 0 and _f59n_lw_ord >= _f59n_l13_ord * 5
-            _f59n_genuine = (_f59n_aur > 0 and _f59n_map > 0
-                             and _f59n_aur >= _f59n_map * 0.90)
-            _f59n_credible = _f59n_pos_lw >= 100
-            _f59n_ai_avg  = sum(fcst) / max(len(fcst), 1)
-            _f59n_ai_high = _f59n_ai_avg > _f59n_pos_lw * 1.30
-            if _f59n_spike and _f59n_genuine and _f59n_credible and _f59n_ai_high:
-                # Clamp all weeks to max(POS_LW, L4W, L13W) -- use the highest
-                # available consumer rate so we don't anchor to a reading that
-                # may still be ramping.  Only reduce -- never inflate.
-                _f59n_target = max(_f59n_pos_lw, _f59n_pos_l4, _f59n_pos_l13)
-                _f59n_snapped = snap(_f59n_target, mp)
-                _f59n_changed = False
-                for _wi in range(len(fcst)):
-                    if _wi in _vp_q4_zeroed_idx:
-                        continue
-                    if fcst[_wi] > _f59n_snapped * 1.10:
-                        fcst[_wi] = _f59n_snapped
-                        _f59n_changed = True
-                if _f59n_changed:
-                    _fire("F59n")
-                    if isinstance(meta, dict):
-                        meta.setdefault("drivers", []).append(
-                            f"F59n post-restock normalization: LW order "
-                            f"{_f59n_lw_ord:,.0f}u = "
-                            f"{_f59n_lw_ord / max(_f59n_l13_ord, 1):.1f}x "
-                            f"L13W avg {_f59n_l13_ord:,.0f}u -- DC restock spike "
-                            f"(WOS={_f59h_wos:.1f}wks). AUR {_f59n_aur:.2f} >= "
-                            f"MAP {_f59n_map:.2f} (genuine demand). "
-                            f"Anchored forecast from {_f59n_ai_avg:,.0f}/wk to "
-                            f"POS {_f59n_target:,.0f}/wk. "
-                            f"F59m will add gap-fill uplift. Model: {model}."
-                        )
-
-        # ── F59m — Amazon low-DC restock demand uplift ──────────────────────
-        # When Amazon's DC is explicitly undersupplied (DC WOS < 8) and the
-        # combination of on-hand + open POs (already in transit) does not cover
-        # the standard 10-week target, Amazon will place orders ABOVE consumer
-        # POS velocity to rebuild inventory.  These extra restock orders are real
-        # forward demand that the model must project.
-        #
-        # Logic:
-        #   steady_rate   = max(POS_LW, POS_L4W, POS_L13W) when AUR>=MAP*0.90
-        #                   and POS_LW > POS_L4W * 1.5 (demand accelerating);
-        #                   otherwise max(POS_L4W, POS_L13W).
-        #                   Using POS_LW as the demand rate captures a genuine
-        #                   step-change in consumer velocity that has not yet
-        #                   worked its way into the 4- and 13-week averages.
-        #   total_supply  = (SOH + OPO) / steady_rate -- if SOH known from catalog;
-        #                   else WOS + OPO/steady       -- WOS as SOH proxy
-        #   net_gap_wks   = max(0, 10 - total_supply)  -- weeks still short
-        #   gap_units     = net_gap_wks * steady_rate
-        #   ramp_weeks    = 3 when gap > 4wks (large gap: spread over 3 weeks);
-        #                   2 otherwise (standard)
-        #   W1-W(ramp)    = min(steady * 2.5, steady + gap/ramp_weeks)
-        #   W(ramp+1)-W26 = max(current_forecast, steady) at least consumer velocity
-        #   VP-Q4-zeroed weeks are left unchanged (those POs already placed).
-        #
-        # Gates:
-        #   0 < DC_WOS < 8  -- explicitly low (WOS=0 = unknown, skip)
-        #   steady_rate >= 100/wk  -- credible consumer signal
-        #   POS_L4W >= POS_L13W * 0.40  -- not in EOL decline (F59k handles that)
-        #   net_gap_wks > 0.5  -- meaningful remaining gap
-        #   Not DI-blended (F69-wos handles that path)
-        #   Not Inactive / OTB
-        if (is_amazon and pos_data
-                and isinstance(fcst, list) and len(fcst) >= 26
-                and model not in ("Inactive", "OTB (zero)",
-                                  "Pre-launch NEW (manual passthrough)")
-                and not row.get("_di_blend")
-                and 0 < _f59h_wos < 8):
-            _f59m_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
-            _f59m_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-            _f59m_pos_lw  = float(pos_data.get("Ordered_Units_LW")  or 0)
-            # Use POS_LW as the demand rate when AUR >= MAP (genuine signal) and
-            # LW is meaningfully above L4W (demand step-change just occurred).
-            # This prevents the pipeline from appearing healthy using a stale
-            # average that doesn't yet reflect the new consumer velocity.
-            _f59m_aur     = float((amz_catalog or {}).get("AUR_L4w")  or 0)
-            _f59m_map     = float((amz_catalog or {}).get("MAP_Price") or 0)
-            _f59m_genuine = (_f59m_aur > 0 and _f59m_map > 0
-                             and _f59m_aur >= _f59m_map * 0.90)
-            _f59m_steady  = (
-                max(_f59m_pos_lw, _f59m_pos_l4, _f59m_pos_l13)
-                if (_f59m_genuine
-                    and _f59m_pos_lw > _f59m_pos_l4 * 1.5
-                    and _f59m_pos_lw >= 100)
-                else max(_f59m_pos_l4, _f59m_pos_l13)
-            )
-            if (_f59m_steady >= 100
-                    and _f59m_pos_l13 > 0
-                    and _f59m_pos_l4 >= _f59m_pos_l13 * 0.40):
-                # Compute total supply in weeks.  Use raw SOH when available
-                # (most accurate); fall back to WOS figure as SOH proxy.
-                if _f59h_soh > 0:
-                    _f59m_total_wks = (_f59h_soh + _f59h_opo) / max(_f59m_steady, 1)
-                else:
-                    # WOS from Amazon may already include OPO; add OPO separately
-                    # only when SOH data is absent and WOS looks SOH-only.
-                    _f59m_opo_wks   = _f59h_opo / max(_f59m_steady, 1)
-                    _f59m_total_wks = _f59h_wos + _f59m_opo_wks
-                _f59m_gap_wks = max(0.0, 10.0 - _f59m_total_wks)
-                if _f59m_gap_wks > 0.5:
-                    # For a large gap (> 4 weeks) spread restock over 3 weeks
-                    # instead of 2 -- this is also more robust when W1 may get
-                    # zeroed by F_PO_CUTOFF (gap-fill then lands in W2+W3).
-                    _f59m_ramp_wks = 3 if _f59m_gap_wks > 4.0 else 2
-                    _f59m_gap_units = _f59m_gap_wks * _f59m_steady
-                    _f59m_wk_uplift = _f59m_gap_units / _f59m_ramp_wks
-                    _f59m_w_ramp    = min(_f59m_steady * 2.5,
-                                          _f59m_steady + _f59m_wk_uplift)
-                    _f59m_changed = False
-                    for _wi in range(len(fcst)):
-                        if _wi in _vp_q4_zeroed_idx:
-                            continue   # VP-Q4 already handled this week via open PO
-                        if _wi < _f59m_ramp_wks:
-                            _f59m_val = snap(_f59m_w_ramp, mp)
-                            if _f59m_val > fcst[_wi]:
-                                fcst[_wi] = _f59m_val
-                                _f59m_changed = True
-                        else:
-                            _f59m_floor = snap(_f59m_steady, mp)
-                            if _f59m_floor > fcst[_wi]:
-                                fcst[_wi] = _f59m_floor
-                                _f59m_changed = True
-                    if _f59m_changed:
-                        _fire("F59m")
-                        if isinstance(meta, dict):
-                            _f59m_soh_note = (
-                                f"SOH={_f59h_soh:,.0f}u, OPO={_f59h_opo:,.0f}u"
-                                if _f59h_soh > 0
-                                else f"DC WOS={_f59h_wos:.1f}wks, OPO={_f59h_opo:,.0f}u"
-                            )
-                            _f59m_ramp_note = (
-                                f"W1-W{_f59m_ramp_wks}"
-                                if _f59m_ramp_wks == 2 else
-                                f"W1-W{_f59m_ramp_wks} (extended: gap>4wks)"
-                            )
-                            meta.setdefault("drivers", []).append(
-                                f"F59m low-DC restock: {_f59m_soh_note} -- "
-                                f"total supply {_f59m_total_wks:.1f}wks vs 10wk target; "
-                                f"net gap {_f59m_gap_wks:.1f}wks = {_f59m_gap_units:,.0f}u "
-                                f"spread over {_f59m_ramp_note} ({_f59m_w_ramp:.0f}/wk each); "
-                                f"W{_f59m_ramp_wks+1}-W26 floored at steady rate {_f59m_steady:.0f}/wk "
-                                f"(POS LW={_f59m_pos_lw:.0f}/wk, "
-                                f"L4W={_f59m_pos_l4:.0f}/wk, "
-                                f"L13W={_f59m_pos_l13:.0f}/wk)."
-                            )
-
-        # ── F60 — EC-transition narrative ────────────────────────────────────
-        # History was inherited from parent mstyle in the pre-pass.  Log the
-        # driver text now that `meta` is available.
-        if _f60_is_ec_transition and isinstance(meta, dict):
-            _f60_parent   = row.get("_ec_parent_mstyle", "?")
-            _f60_par_l13  = row.get("_ec_parent_l13",   0)
-            _f60_orig_l13 = row.get("_ec_orig_l13",     0)
-            meta.setdefault("drivers", []).append(
-                f"F60 EC-transition: inherited 52w order+ship history from parent "
-                f"{_f60_parent} (parent L13W={_f60_par_l13:.0f}, "
-                f"EC own L13W={_f60_orig_l13:.0f} — "
-                f"{_f60_orig_l13 / max(_f60_par_l13, 1) * 100:.0f}% of parent); "
-                f"forecast reflects parent demand signal"
-            )
-
-        # ── F69 — DI direct-import blend narrative ───────────────────────────
-        # Sibling (MPP/ADF) order history was added to this base record's
-        # ORD_COLS in the pre-pass.  Log the additive contribution.
-        _dbg_key = row.get("Acct_MStyle_Key_", "")
-        if _dbg_key == "1864-FF8654":
-            print(f"[DBG F69-REACH] key={_dbg_key!r} _di_blend={row.get('_di_blend')!r} _di_ord_wkly={bool(row.get('_di_ord_wkly'))} meta_is_dict={isinstance(meta,dict)} model={model!r}", flush=True)
-        if row.get("_di_blend") and isinstance(meta, dict):
-            _fire("F69")
-            meta.setdefault("drivers", []).append(
-                f"F69 DI blend: {row.get('_di_label','?')} direct-import history "
-                f"added to base demand signal (+{row.get('_di_l13_add', 0):.0f} units L13W); "
-                f"forecast reflects total product demand (warehouse + factory-direct)"
-            )
-
-        # ── F69 DI WOS-excess correction ─────────────────────────────────────
-        # For DI-blended Amazon records the combined warehouse + factory-direct
-        # order history reflects total replenishment demand, which tracks the
-        # underlying consumer POS rate.  The model's order-history baseline can
-        # understate demand when DI orders are large and infrequent (lumpy
-        # cadence), so we anchor the full 26-week forecast to POS L13W and apply
-        # a WOS-excess reduction for any inventory Amazon holds above its ~12wk
-        # target ceiling.
-        #
-        # Adjustment:
-        #   excess_wos = max(0, current_wos − 12)   [12wk = Amazon's target max]
-        #   wos_scale  = max(0.70, 1 − excess_wos/26)
-        #   target/wk  = pos_l13w × wos_scale
-        #
-        # The model's seasonal shape is preserved by proportional rescaling;
-        # this correction covers the full 26-week horizon (superseding F59h's
-        # 8-week soft taper for DI-blended records where POS is the cleaner
-        # demand signal).
-        if (row.get("_di_blend") and is_amazon
-                and isinstance(fcst, list) and len(fcst) >= 26
-                and model not in ("Inactive",)):
-            _f69w_pos_l13 = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
-            if _f69w_pos_l13 > 0:
-                _fire("F69-wos")
-                _f69w_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
-                if _f69w_wos <= 0:
-                    _f69w_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
-                    _f69w_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
-                    _f69w_wos = (_f69w_soh + _f69w_opo) / _f69w_pos_l13
-                _f69w_excess = max(0.0, _f69w_wos - 12.0)
-                _f69w_scale  = max(0.70, 1.0 - _f69w_excess / 26.0)
-                _f69w_target = _f69w_pos_l13 * _f69w_scale
-                # Proportional rescale — preserve the model's seasonal shape
-                _f69w_cur_avg = sum(fcst) / max(len(fcst), 1)
-                if _f69w_cur_avg > 0:
-                    _f69w_anchor = _f69w_target / _f69w_cur_avg
-                    for _wi in range(len(fcst)):
-                        fcst[_wi] = snap(fcst[_wi] * _f69w_anchor, mp)
-                else:
-                    for _wi in range(len(fcst)):
-                        fcst[_wi] = snap(_f69w_target, mp)
+    # ── F59j — Amazon DC understock: POS floor + early-week restock lift ──
+    # When Amazon DC WOS < 8 (below target range of 8-12 wks), Amazon will
+    # order ABOVE consumer POS rate to rebuild DC inventory.  The AI should:
+    #   1. Floor every non-zero week at POS L4W (never project below
+    #      consumer demand -- that is always the minimum ordering rate)
+    #   2. Add a restock lift to W1-W3 to bring DC back to 8 WOS target,
+    #      accounting for units already in transit (OPO).
+    #
+    # Restock deficit = max(0, 8 * demand_rate - (SOH + OPO))
+    # where demand_rate = SOH / WOS (Amazon's internal sell-through rate).
+    # Spread deficit evenly over 3 weeks.
+    #
+    # This is directionally opposite to what F59i does: F59i reduces when
+    # DC is healthy (WOS >= 6) and AI > POS; F59j lifts when DC is low.
+    # They are mutually exclusive by WOS gate (F59i needs WOS >= 6).
+    if (is_amazon
+            and pos_data
+            and model not in ("Inactive", "OTB (zero)",
+                              "Pre-launch NEW (manual passthrough)")
+            and isinstance(fcst, list) and len(fcst) >= 26
+            and 0 < _f59h_wos < 8):
+        _f59j_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+        if _f59j_pos_l4 >= 50:
+            # Amazon's internal demand rate (implied by their own WOS calc)
+            _f59j_demand_rate = _f59h_soh / _f59h_wos if _f59h_wos > 0 else _f59j_pos_l4
+            # How many units does Amazon need to reach 8 WOS?
+            _f59j_target_inv  = 8.0 * _f59j_demand_rate
+            _f59j_pipeline    = _f59h_soh + _f59h_opo   # OH + already-ordered OPO
+            _f59j_deficit     = max(0.0, _f59j_target_inv - _f59j_pipeline)
+            # Spread restock over W1-W3
+            _f59j_restock_wks = 3
+            _f59j_lift        = snap(_f59j_deficit / _f59j_restock_wks, mp) \
+                                if _f59j_deficit > 0 else 0
+            _f59j_floor       = snap(_f59j_pos_l4, mp)
+            _f59j_changed     = False
+            for _wi in range(len(fcst)):
+                _orig = fcst[_wi]
+                if _wi < _f59j_restock_wks and _f59j_lift > 0:
+                    # Restock weeks: base = max(model, POS floor) + lift
+                    fcst[_wi] = snap(max(fcst[_wi], _f59j_floor) + _f59j_lift, mp)
+                elif fcst[_wi] > 0 and fcst[_wi] < _f59j_floor:
+                    # Sustaining weeks: floor at POS L4W
+                    fcst[_wi] = _f59j_floor
+                if fcst[_wi] != _orig:
+                    _f59j_changed = True
+            if _f59j_changed:
+                _fire("F59j")
                 if isinstance(meta, dict):
                     meta.setdefault("drivers", []).append(
-                        f"F69-WOS: DI-blended forecast anchored to consumer POS "
-                        f"({_f69w_pos_l13:,.0f}/wk L13W); DC WOS={_f69w_wos:.1f}wks "
-                        f"(excess {_f69w_excess:.1f}wks → ×{_f69w_scale:.2f}) → "
-                        f"target {_f69w_target:,.0f}/wk (warehouse + DI combined demand)"
+                        f"F59j DC restock: WOS={_f59h_wos:.1f}wks below 8wk "
+                        f"target. SOH={_f59h_soh:,.0f}u + OPO={_f59h_opo:,.0f}u "
+                        f"pipeline vs target {_f59j_target_inv:,.0f}u "
+                        f"(8wks x {_f59j_demand_rate:,.0f}/wk demand rate). "
+                        + (f"Restock deficit {_f59j_deficit:,.0f}u spread over "
+                           f"W1-W{_f59j_restock_wks} (+{_f59j_lift:,.0f}u/wk lift). "
+                           if _f59j_deficit > 0 else "OPO already covers 8 WOS target. ") +
+                        f"All weeks floored at POS L4W {_f59j_pos_l4:,.0f}/wk."
                     )
 
-        # ── F73 — DI post-receipt suppression + demand ramp ──────────────────
-        # When a DI (factory-direct) sibling order shipped 11+ weeks ago it is
-        # very likely received at Amazon DC.  During drawdown Amazon orders
-        # little-to-no domestic replenishment; once DI inventory depletes to
-        # the 8-week safety target, full domestic ordering resumes.
-        # Prime Day (late June) accelerates depletion 2 weeks early.
-        #
-        # Shape (supersedes F69-WOS output when DI is confirmed received):
-        #   W1 → suppress_int      : floor orders (5% of POS; DI in drawdown)
-        #   post-suppress, if Prime Day build: x1.5 ramp for 2 weeks
-        #   post-suppress → W26    : POS L13W rate (no DI restock ~6 months)
-        #
-        # Fires only when: DI received (ship >= 11wks ago) AND WOS > 9 AND
-        # POS L13W > 0 (need demand signal).  Requires _di_ord_wkly on row.
-        _f73_di_wkly = row.get("_di_ord_wkly") or []
-        if (row.get("_di_blend") and is_amazon
-                and isinstance(fcst, list) and len(fcst) >= 26
-                and model not in ("Inactive",)
-                and _f73_di_wkly and any(v > 0 for v in _f73_di_wkly)):
-            # Find last non-zero DI order week in L26W (oldest=idx0, newest=idx25)
-            _f73_last_nz = -1
-            for _fi in range(25, -1, -1):
-                if _fi < len(_f73_di_wkly) and _f73_di_wkly[_fi] > 0:
-                    _f73_last_nz = _fi
-                    break
-            if _f73_last_nz >= 0:
-                # index 0 = 26 weeks ago, index 25 = 1 week ago
-                _f73_ship_wks_ago = 26 - _f73_last_nz
-                _f73_received     = (_f73_ship_wks_ago >= 11)
-                _f73_pos_l13      = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
-                _f73_inv_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
-                if _f73_inv_wos <= 0 and _f73_pos_l13 > 0:
-                    _f73_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
-                    _f73_opo      = float((amz_catalog or {}).get("Inv_OPO") or 0)
-                    _f73_inv_wos  = (_f73_soh + _f73_opo) / _f73_pos_l13
-                if _f73_received and _f73_pos_l13 > 0 and _f73_inv_wos > 9.0:
-                    _fire("F73")
-                    _f73_suppress_raw = max(0.0, _f73_inv_wos - 8.0)
-                    # Prime Day pull-forward (~July 13; Amazon builds 2wks ahead)
-                    _f73_today        = date.today()
-                    _f73_prime_dt     = date(_f73_today.year, 7, 13)
-                    if _f73_prime_dt < _f73_today:      # already past this year
-                        _f73_prime_dt = date(_f73_today.year + 1, 7, 13)
-                    _f73_prime_wks    = max(0, (_f73_prime_dt - _f73_today).days // 7)
-                    # Prime Day acceleration: if suppress window extends into the
-                    # Prime Day build period (prime_wks - 2), demand depletes DI
-                    # stock 2 weeks faster than steady-state rate implies.
-                    _f73_accel = 0.0
-                    if (_f73_prime_wks >= 3
-                            and _f73_suppress_raw >= (_f73_prime_wks - 2)):
-                        _f73_accel = 2.0
-                    _f73_suppress_adj = max(0.0, _f73_suppress_raw - _f73_accel)
-                    _f73_suppress_int = min(int(round(_f73_suppress_adj)), 24)
-                    # Floor during drawdown: minimal domestic top-off (5% of POS)
-                    _f73_floor        = snap(_f73_pos_l13 * 0.05, mp)
-                    # Post-suppress: full POS rate (domestic covers all demand;
-                    # no DI restock expected for ~6 months since nothing on order)
-                    _f73_post_rate    = _f73_pos_l13
-                    for _wi in range(26):
-                        if _wi < _f73_suppress_int:
-                            _f73_v = _f73_floor
-                        elif (_f73_accel > 0
-                              and _wi < _f73_suppress_int + 2
-                              and _f73_suppress_int + 2 <= _f73_prime_wks):
-                            # 2-week Prime Day pre-build immediately after suppression
-                            _f73_v = _f73_post_rate * 1.5
-                        else:
-                            _f73_v = _f73_post_rate
-                        fcst[_wi] = snap(_f73_v, mp)
+    # ── F59k — Amazon L4W=0 + POS also declining: EOL wind-down correction ──
+    # When Amazon L4W orders have gone completely to zero AND consumer POS
+    # also shows material decline (L4W POS < 40% of L13W POS), this is a
+    # genuine EOL or channel wind-down scenario -- NOT a stockout recovery.
+    # The F50 stockout guard (at the baseline level) may have preserved the
+    # full L13W order baseline; this rule corrects the forward forecast here.
+    #
+    # Key discriminators vs stockout (F50):
+    #   - Genuine OOS: L4W orders=0 because DC ran out; POS may also be 0
+    #     but oos_days >= 14 signals the inventory gap.  F59k skips.
+    #   - EOL/wind-down: L4W orders=0 AND consumer POS L4W < 40% of L13W POS.
+    #     Both the DC and end consumer have stopped/slowed.  F59k fires.
+    #
+    # Anchor: MAX(pos_l4w, pos_l13w * 0.50) as target weekly rate.
+    # Planners historically project 40-55% of L13W when facing this pattern
+    # (observed: FF9298EC, FF9297/24, FF8649/24 in 2026-05-20 gap analysis).
+    # Scale floor = 0.25 to avoid over-correction if POS data is stale.
+    if (is_amazon                            # Amazon-only (defines _f59_l4w_avg etc.)
+            and pos_data and isinstance(fcst, list) and len(fcst) >= 4
+            and _f59_l4w_avg == 0           # no orders at all in L4W
+            and _f59_oos_days < 14          # not a genuine OOS situation
+            and _f59_l13w_avg >= 200):      # item had real order history
+        _f59k_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+        _f59k_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        if (_f59k_pos_l13 >= 100                         # credible POS signal
+                and _f59k_pos_l4 < _f59k_pos_l13 * 0.40):  # consumer also declining
+            _f59k_target  = max(_f59k_pos_l4, _f59k_pos_l13 * 0.50)
+            _f59k_nz      = [v for v in fcst if v > 0]
+            _f59k_avg     = sum(_f59k_nz) / max(len(_f59k_nz), 1)
+            if _f59k_avg > _f59k_target * 1.10:  # only correct if AI materially above target
+                _f59k_scale = max(0.25, _f59k_target / max(_f59k_avg, 1))
+                for _wi in range(len(fcst)):
+                    fcst[_wi] = snap(fcst[_wi] * _f59k_scale, mp)
+                _fire("F59k")
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F59k EOL/wind-down: L4W orders=0 (OOS days="
+                        f"{_f59_oos_days:.0f}), POS L4W={_f59k_pos_l4:.0f}/wk "
+                        f"({_f59k_pos_l4/max(_f59k_pos_l13,1)*100:.0f}% of "
+                        f"POS L13W={_f59k_pos_l13:.0f}/wk) -- consumer demand "
+                        f"declining, not stockout. Anchored to "
+                        f"MAX(POS_L4W, POS_L13W*0.50)={_f59k_target:.0f}/wk; "
+                        f"scaled x{_f59k_scale:.2f} (L13W orders were "
+                        f"{_f59_l13w_avg:.0f}/wk)."
+                    )
+
+    # ── F59l — Sparse/intermittent Amazon: POS floor when DC is healthy ──
+    # When Croston's or Heuristic projects less than 70% of consumer POS
+    # L13W rate AND the Amazon DC is in the healthy steady-state range
+    # (8-20 WOS), the shortfall is caused by lumpy order history
+    # understating true consumer demand -- NOT by soft demand.
+    #
+    # Root cause: Amazon orders in large periodic batches (once every 4-5
+    # weeks for intermittent items).  Croston's inter-order interval math
+    # divides the per-order qty by the interval, yielding a low projected
+    # weekly rate even when consumers are buying ~1,000/wk at retail.
+    # Heuristic items have the same problem: sparse order history produces
+    # a conservative baseline that misses the steady consumer pull.
+    #
+    # When DC WOS is at Amazon's 8-12wk steady-state target, orders will
+    # continue matching consumer sell-through.  POS L13W is the correct
+    # forward demand signal -- not the sparse order history average.
+    #
+    # Correction: scale the full 26-week forecast so the average weekly
+    # rate equals POS L13W.  Preserves the lumpy shape (big/quiet weeks)
+    # while anchoring total demand to consumer velocity.
+    #
+    # Guards:
+    #   POS L13W >= 200:  credible consumer signal (not noise)
+    #   POS L4W >= POS L13W * 0.40:  POS not in sharp recent decline
+    #   DC WOS 8-20:  healthy steady-state (F59h handles extreme cases)
+    #   AI avg < POS L13W * 0.70:  meaningful gap (30%+ below consumer)
+    #   Scale cap 5.0:  guard against runaway uplift on very sparse history
+    #   EC items treated identically to non-EC (both are standard DC replenishment)
+    if (is_amazon and pos_data and amz_catalog
+            and model in ("Croston's", "Heuristic")
+            and isinstance(fcst, list) and sum(fcst) > 0):
+        _f59l_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _f59l_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+        _f59l_wos     = _f59h_wos
+        _f59l_ai_avg  = sum(fcst) / 26.0
+        if (_f59l_pos_l13 >= 200
+                and _f59l_pos_l4 >= _f59l_pos_l13 * 0.40
+                and 8.0 <= _f59l_wos <= 20.0
+                and _f59l_ai_avg < _f59l_pos_l13 * 0.70):
+            _f59l_target_total = _f59l_pos_l13 * 26.0
+            _f59l_scale = min(5.0, _f59l_target_total / max(sum(fcst), 1))
+            if _f59l_scale > 1.01:
+                fcst = [snap(v * _f59l_scale, mp) for v in fcst]
+                _fire("F59l")
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F59l sparse POS anchor: {model} avg {_f59l_ai_avg:.0f}/wk "
+                        f"< POS L13W {_f59l_pos_l13:.0f}/wk (70% floor) with "
+                        f"DC WOS {_f59l_wos:.1f}wks (healthy 8-20wk range) -- "
+                        f"lumpy order history understates consumer demand. "
+                        f"Scaled x{_f59l_scale:.2f} to POS L13W rate "
+                        f"(POS L4W={_f59l_pos_l4:.0f}/wk). Model: {model}."
+                    )
+
+    # ── F59n — Post-DC-restock spike normalization (2026-05-21) ────────
+    # When Amazon placed a large DC restock order last week (LW order >>
+    # L13W avg) AND the DC was running low (WOS < 8), the order-history
+    # baseline is inflated by the catch-up buy.  But that restock already
+    # happened -- going forward, orders should revert to consumer POS
+    # velocity, not continue at the one-time restock rate.
+    #
+    # This rule normalizes the forward forecast back to the POS-based
+    # demand rate BEFORE F59m adds the gap-fill uplift.  F59m then
+    # correctly places the remaining gap above the POS floor.
+    #
+    # Gates:
+    #   0 < WOS < 8          -- low DC confirms restock context
+    #   LW order >= 5x L13W  -- spike magnitude (catch-up buy)
+    #   AUR >= MAP * 0.90    -- genuine demand (not below-MAP deal)
+    #   POS_LW >= 100/wk     -- credible consumer signal
+    #   AI avg > POS_LW * 1.30 -- model is meaningfully too high
+    if (is_amazon and amz_catalog and pos_data
+            and isinstance(fcst, list) and len(fcst) >= 26
+            and model not in ("Inactive", "OTB (zero)",
+                              "Pre-launch NEW (manual passthrough)")
+            and 0 < _f59h_wos < 8):
+        _f59n_lw_ord  = float(hist[-1]) if hist else 0
+        _f59n_l13_ord = sum(hist[-13:]) / 13.0 if len(hist) >= 13 else 0
+        _f59n_pos_lw  = float(pos_data.get("Ordered_Units_LW")  or 0)
+        _f59n_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+        _f59n_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _f59n_aur     = float(amz_catalog.get("AUR_L4w")   or 0)
+        _f59n_map     = float(amz_catalog.get("MAP_Price")  or 0)
+        _f59n_spike   = _f59n_l13_ord > 0 and _f59n_lw_ord >= _f59n_l13_ord * 5
+        _f59n_genuine = (_f59n_aur > 0 and _f59n_map > 0
+                         and _f59n_aur >= _f59n_map * 0.90)
+        _f59n_credible = _f59n_pos_lw >= 100
+        _f59n_ai_avg  = sum(fcst) / max(len(fcst), 1)
+        _f59n_ai_high = _f59n_ai_avg > _f59n_pos_lw * 1.30
+        if _f59n_spike and _f59n_genuine and _f59n_credible and _f59n_ai_high:
+            # Clamp all weeks to max(POS_LW, L4W, L13W) -- use the highest
+            # available consumer rate so we don't anchor to a reading that
+            # may still be ramping.  Only reduce -- never inflate.
+            _f59n_target = max(_f59n_pos_lw, _f59n_pos_l4, _f59n_pos_l13)
+            _f59n_snapped = snap(_f59n_target, mp)
+            _f59n_changed = False
+            for _wi in range(len(fcst)):
+                if _wi in _vp_q4_zeroed_idx:
+                    continue
+                if fcst[_wi] > _f59n_snapped * 1.10:
+                    fcst[_wi] = _f59n_snapped
+                    _f59n_changed = True
+            if _f59n_changed:
+                _fire("F59n")
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F59n post-restock normalization: LW order "
+                        f"{_f59n_lw_ord:,.0f}u = "
+                        f"{_f59n_lw_ord / max(_f59n_l13_ord, 1):.1f}x "
+                        f"L13W avg {_f59n_l13_ord:,.0f}u -- DC restock spike "
+                        f"(WOS={_f59h_wos:.1f}wks). AUR {_f59n_aur:.2f} >= "
+                        f"MAP {_f59n_map:.2f} (genuine demand). "
+                        f"Anchored forecast from {_f59n_ai_avg:,.0f}/wk to "
+                        f"POS {_f59n_target:,.0f}/wk. "
+                        f"F59m will add gap-fill uplift. Model: {model}."
+                    )
+
+    # ── F59m — Amazon low-DC restock demand uplift ──────────────────────
+    # When Amazon's DC is explicitly undersupplied (DC WOS < 8) and the
+    # combination of on-hand + open POs (already in transit) does not cover
+    # the standard 10-week target, Amazon will place orders ABOVE consumer
+    # POS velocity to rebuild inventory.  These extra restock orders are real
+    # forward demand that the model must project.
+    #
+    # Logic:
+    #   steady_rate   = max(POS_LW, POS_L4W, POS_L13W) when AUR>=MAP*0.90
+    #                   and POS_LW > POS_L4W * 1.5 (demand accelerating);
+    #                   otherwise max(POS_L4W, POS_L13W).
+    #                   Using POS_LW as the demand rate captures a genuine
+    #                   step-change in consumer velocity that has not yet
+    #                   worked its way into the 4- and 13-week averages.
+    #   total_supply  = (SOH + OPO) / steady_rate -- if SOH known from catalog;
+    #                   else WOS + OPO/steady       -- WOS as SOH proxy
+    #   net_gap_wks   = max(0, 10 - total_supply)  -- weeks still short
+    #   gap_units     = net_gap_wks * steady_rate
+    #   ramp_weeks    = 3 when gap > 4wks (large gap: spread over 3 weeks);
+    #                   2 otherwise (standard)
+    #   W1-W(ramp)    = min(steady * 2.5, steady + gap/ramp_weeks)
+    #   W(ramp+1)-W26 = max(current_forecast, steady) at least consumer velocity
+    #   VP-Q4-zeroed weeks are left unchanged (those POs already placed).
+    #
+    # Gates:
+    #   0 < DC_WOS < 8  -- explicitly low (WOS=0 = unknown, skip)
+    #   steady_rate >= 100/wk  -- credible consumer signal
+    #   POS_L4W >= POS_L13W * 0.40  -- not in EOL decline (F59k handles that)
+    #   net_gap_wks > 0.5  -- meaningful remaining gap
+    #   Not DI-blended (F69-wos handles that path)
+    #   Not Inactive / OTB
+    if (is_amazon and pos_data
+            and isinstance(fcst, list) and len(fcst) >= 26
+            and model not in ("Inactive", "OTB (zero)",
+                              "Pre-launch NEW (manual passthrough)")
+            and not row.get("_di_blend")
+            and 0 < _f59h_wos < 8):
+        _f59m_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+        _f59m_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _f59m_pos_lw  = float(pos_data.get("Ordered_Units_LW")  or 0)
+        # Use POS_LW as the demand rate when AUR >= MAP (genuine signal) and
+        # LW is meaningfully above L4W (demand step-change just occurred).
+        # This prevents the pipeline from appearing healthy using a stale
+        # average that doesn't yet reflect the new consumer velocity.
+        _f59m_aur     = float((amz_catalog or {}).get("AUR_L4w")  or 0)
+        _f59m_map     = float((amz_catalog or {}).get("MAP_Price") or 0)
+        _f59m_genuine = (_f59m_aur > 0 and _f59m_map > 0
+                         and _f59m_aur >= _f59m_map * 0.90)
+        _f59m_steady  = (
+            max(_f59m_pos_lw, _f59m_pos_l4, _f59m_pos_l13)
+            if (_f59m_genuine
+                and _f59m_pos_lw > _f59m_pos_l4 * 1.5
+                and _f59m_pos_lw >= 100)
+            else max(_f59m_pos_l4, _f59m_pos_l13)
+        )
+        if (_f59m_steady >= 100
+                and _f59m_pos_l13 > 0
+                and _f59m_pos_l4 >= _f59m_pos_l13 * 0.40):
+            # Compute total supply in weeks.  Use raw SOH when available
+            # (most accurate); fall back to WOS figure as SOH proxy.
+            if _f59h_soh > 0:
+                _f59m_total_wks = (_f59h_soh + _f59h_opo) / max(_f59m_steady, 1)
+            else:
+                # WOS from Amazon may already include OPO; add OPO separately
+                # only when SOH data is absent and WOS looks SOH-only.
+                _f59m_opo_wks   = _f59h_opo / max(_f59m_steady, 1)
+                _f59m_total_wks = _f59h_wos + _f59m_opo_wks
+            _f59m_gap_wks = max(0.0, 10.0 - _f59m_total_wks)
+            if _f59m_gap_wks > 0.5:
+                # For a large gap (> 4 weeks) spread restock over 3 weeks
+                # instead of 2 -- this is also more robust when W1 may get
+                # zeroed by F_PO_CUTOFF (gap-fill then lands in W2+W3).
+                _f59m_ramp_wks = 3 if _f59m_gap_wks > 4.0 else 2
+                _f59m_gap_units = _f59m_gap_wks * _f59m_steady
+                _f59m_wk_uplift = _f59m_gap_units / _f59m_ramp_wks
+                _f59m_w_ramp    = min(_f59m_steady * 2.5,
+                                      _f59m_steady + _f59m_wk_uplift)
+                _f59m_changed = False
+                for _wi in range(len(fcst)):
+                    if _wi in _vp_q4_zeroed_idx:
+                        continue   # VP-Q4 already handled this week via open PO
+                    if _wi < _f59m_ramp_wks:
+                        _f59m_val = snap(_f59m_w_ramp, mp)
+                        if _f59m_val > fcst[_wi]:
+                            fcst[_wi] = _f59m_val
+                            _f59m_changed = True
+                    else:
+                        _f59m_floor = snap(_f59m_steady, mp)
+                        if _f59m_floor > fcst[_wi]:
+                            fcst[_wi] = _f59m_floor
+                            _f59m_changed = True
+                if _f59m_changed:
+                    _fire("F59m")
                     if isinstance(meta, dict):
-                        _f73_pd_note = (
-                            f"; Prime Day pull-fwd: -2wk suppress, "
-                            f"W{_f73_suppress_int + 1}-W{_f73_suppress_int + 2} x1.5 ramp"
-                            if _f73_accel > 0 else ""
+                        _f59m_soh_note = (
+                            f"SOH={_f59h_soh:,.0f}u, OPO={_f59h_opo:,.0f}u"
+                            if _f59h_soh > 0
+                            else f"DC WOS={_f59h_wos:.1f}wks, OPO={_f59h_opo:,.0f}u"
+                        )
+                        _f59m_ramp_note = (
+                            f"W1-W{_f59m_ramp_wks}"
+                            if _f59m_ramp_wks == 2 else
+                            f"W1-W{_f59m_ramp_wks} (extended: gap>4wks)"
                         )
                         meta.setdefault("drivers", []).append(
-                            f"F73 DI post-receipt: last DI ship "
-                            f"{_f73_ship_wks_ago:.0f}wks ago (transit complete); "
-                            f"Amazon WOS={_f73_inv_wos:.1f}wks, target=8wks -> "
-                            f"{_f73_suppress_int}wk drawdown suppress "
-                            f"(floor {_f73_floor:.0f}/wk); "
-                            f"post-suppress {_f73_post_rate:.0f}/wk POS rate "
-                            f"(no DI restock ~6mo)"
-                            + _f73_pd_note
+                            f"F59m low-DC restock: {_f59m_soh_note} -- "
+                            f"total supply {_f59m_total_wks:.1f}wks vs 10wk target; "
+                            f"net gap {_f59m_gap_wks:.1f}wks = {_f59m_gap_units:,.0f}u "
+                            f"spread over {_f59m_ramp_note} ({_f59m_w_ramp:.0f}/wk each); "
+                            f"W{_f59m_ramp_wks+1}-W26 floored at steady rate {_f59m_steady:.0f}/wk "
+                            f"(POS LW={_f59m_pos_lw:.0f}/wk, "
+                            f"L4W={_f59m_pos_l4:.0f}/wk, "
+                            f"L13W={_f59m_pos_l13:.0f}/wk)."
                         )
 
-        # ── F69-shift — DI channel declining → boost domestic projection ──────
-        # When DI (MPP/ADF sibling) orders are meaningfully lower in L4W vs L13W
-        # (< 70% of historical avg), Amazon is likely shifting volume back to
-        # domestic warehouse sourcing.  The blended order history already captures
-        # total combined demand, so the model will naturally project the decline
-        # forward — but domestic orders may not yet show the compensating uptick.
-        # Correct by adding the per-week shortfall to all 26 forecast weeks.
-        # Only fires when F69-WOS POS anchor did NOT run (no POS L13 data) —
-        # if POS data is available, consumer demand governs and the channel-shift
-        # correction is redundant (2026-05-20).
-        _f69s_pos_l13 = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
-        _f69s_l13_wk  = row.get("_di_l13_add", 0) / 13.0
-        _f69s_l4_wk   = row.get("_di_l4_add",  0) / 4.0
-        if (not (_f69s_pos_l13 > 0)
-                and _f69s_l13_wk > 0
-                and _f69s_l4_wk < _f69s_l13_wk * 0.70
-                and isinstance(fcst, list) and len(fcst) >= 26
-                and model not in ("Inactive",)):
-            _f69s_delta = _f69s_l13_wk - _f69s_l4_wk
-            for _wi in range(len(fcst)):
-                fcst[_wi] = snap(max(0, fcst[_wi] + _f69s_delta), mp)
-            _fire("F69-shift")
+    # ── F60 — EC-transition narrative ────────────────────────────────────
+    # History was inherited from parent mstyle in the pre-pass.  Log the
+    # driver text now that `meta` is available.
+    if _f60_is_ec_transition and isinstance(meta, dict):
+        _f60_parent   = row.get("_ec_parent_mstyle", "?")
+        _f60_par_l13  = row.get("_ec_parent_l13",   0)
+        _f60_orig_l13 = row.get("_ec_orig_l13",     0)
+        meta.setdefault("drivers", []).append(
+            f"F60 EC-transition: inherited 52w order+ship history from parent "
+            f"{_f60_parent} (parent L13W={_f60_par_l13:.0f}, "
+            f"EC own L13W={_f60_orig_l13:.0f} — "
+            f"{_f60_orig_l13 / max(_f60_par_l13, 1) * 100:.0f}% of parent); "
+            f"forecast reflects parent demand signal"
+        )
+
+    # ── F69 — DI direct-import blend narrative ───────────────────────────
+    # Sibling (MPP/ADF) order history was added to this base record's
+    # ORD_COLS in the pre-pass.  Log the additive contribution.
+    _dbg_key = row.get("Acct_MStyle_Key_", "")
+    if _dbg_key == "1864-FF8654":
+        print(f"[DBG F69-REACH] key={_dbg_key!r} _di_blend={row.get('_di_blend')!r} _di_ord_wkly={bool(row.get('_di_ord_wkly'))} meta_is_dict={isinstance(meta,dict)} model={model!r}", flush=True)
+    if row.get("_di_blend") and isinstance(meta, dict):
+        _fire("F69")
+        meta.setdefault("drivers", []).append(
+            f"F69 DI blend: {row.get('_di_label','?')} direct-import history "
+            f"added to base demand signal (+{row.get('_di_l13_add', 0):.0f} units L13W); "
+            f"forecast reflects total product demand (warehouse + factory-direct)"
+        )
+
+    # ── F69 DI WOS-excess correction ─────────────────────────────────────
+    # For DI-blended Amazon records the combined warehouse + factory-direct
+    # order history reflects total replenishment demand, which tracks the
+    # underlying consumer POS rate.  The model's order-history baseline can
+    # understate demand when DI orders are large and infrequent (lumpy
+    # cadence), so we anchor the full 26-week forecast to POS L13W and apply
+    # a WOS-excess reduction for any inventory Amazon holds above its ~12wk
+    # target ceiling.
+    #
+    # Adjustment:
+    #   excess_wos = max(0, current_wos − 12)   [12wk = Amazon's target max]
+    #   wos_scale  = max(0.70, 1 − excess_wos/26)
+    #   target/wk  = pos_l13w × wos_scale
+    #
+    # The model's seasonal shape is preserved by proportional rescaling;
+    # this correction covers the full 26-week horizon (superseding F59h's
+    # 8-week soft taper for DI-blended records where POS is the cleaner
+    # demand signal).
+    if (row.get("_di_blend") and is_amazon
+            and isinstance(fcst, list) and len(fcst) >= 26
+            and model not in ("Inactive",)):
+        _f69w_pos_l13 = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+        if _f69w_pos_l13 > 0:
+            _fire("F69-wos")
+            _f69w_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
+            if _f69w_wos <= 0:
+                _f69w_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
+                _f69w_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
+                _f69w_wos = (_f69w_soh + _f69w_opo) / _f69w_pos_l13
+            _f69w_excess = max(0.0, _f69w_wos - 12.0)
+            _f69w_scale  = max(0.70, 1.0 - _f69w_excess / 26.0)
+            _f69w_target = _f69w_pos_l13 * _f69w_scale
+            # Proportional rescale — preserve the model's seasonal shape
+            _f69w_cur_avg = sum(fcst) / max(len(fcst), 1)
+            if _f69w_cur_avg > 0:
+                _f69w_anchor = _f69w_target / _f69w_cur_avg
+                for _wi in range(len(fcst)):
+                    fcst[_wi] = snap(fcst[_wi] * _f69w_anchor, mp)
+            else:
+                for _wi in range(len(fcst)):
+                    fcst[_wi] = snap(_f69w_target, mp)
             if isinstance(meta, dict):
                 meta.setdefault("drivers", []).append(
-                    f"F69-shift: DI channel ({row.get('_di_label','?')}) orders "
-                    f"declining — L4W avg {_f69s_l4_wk:.0f}/wk vs L13W avg "
-                    f"{_f69s_l13_wk:.0f}/wk. Domestic forecast increased "
-                    f"+{_f69s_delta:.0f}/wk across W1-W26 to compensate for "
-                    f"expected DI-to-domestic channel shift."
+                    f"F69-WOS: DI-blended forecast anchored to consumer POS "
+                    f"({_f69w_pos_l13:,.0f}/wk L13W); DC WOS={_f69w_wos:.1f}wks "
+                    f"(excess {_f69w_excess:.1f}wks → ×{_f69w_scale:.2f}) → "
+                    f"target {_f69w_target:,.0f}/wk (warehouse + DI combined demand)"
                 )
+
+    # ── F73 — DI post-receipt suppression + demand ramp ──────────────────
+    # When a DI (factory-direct) sibling order shipped 11+ weeks ago it is
+    # very likely received at Amazon DC.  During drawdown Amazon orders
+    # little-to-no domestic replenishment; once DI inventory depletes to
+    # the 8-week safety target, full domestic ordering resumes.
+    # Prime Day (late June) accelerates depletion 2 weeks early.
+    #
+    # Shape (supersedes F69-WOS output when DI is confirmed received):
+    #   W1 → suppress_int      : floor orders (5% of POS; DI in drawdown)
+    #   post-suppress, if Prime Day build: x1.5 ramp for 2 weeks
+    #   post-suppress → W26    : POS L13W rate (no DI restock ~6 months)
+    #
+    # Fires only when: DI received (ship >= 11wks ago) AND WOS > 9 AND
+    # POS L13W > 0 (need demand signal).  Requires _di_ord_wkly on row.
+    _f73_di_wkly = row.get("_di_ord_wkly") or []
+    if (row.get("_di_blend") and is_amazon
+            and isinstance(fcst, list) and len(fcst) >= 26
+            and model not in ("Inactive",)
+            and _f73_di_wkly and any(v > 0 for v in _f73_di_wkly)):
+        # Find last non-zero DI order week in L26W (oldest=idx0, newest=idx25)
+        _f73_last_nz = -1
+        for _fi in range(25, -1, -1):
+            if _fi < len(_f73_di_wkly) and _f73_di_wkly[_fi] > 0:
+                _f73_last_nz = _fi
+                break
+        if _f73_last_nz >= 0:
+            # index 0 = 26 weeks ago, index 25 = 1 week ago
+            _f73_ship_wks_ago = 26 - _f73_last_nz
+            _f73_received     = (_f73_ship_wks_ago >= 11)
+            _f73_pos_l13      = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+            _f73_inv_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
+            if _f73_inv_wos <= 0 and _f73_pos_l13 > 0:
+                _f73_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
+                _f73_opo      = float((amz_catalog or {}).get("Inv_OPO") or 0)
+                _f73_inv_wos  = (_f73_soh + _f73_opo) / _f73_pos_l13
+            if _f73_received and _f73_pos_l13 > 0 and _f73_inv_wos > 9.0:
+                _fire("F73")
+                _f73_suppress_raw = max(0.0, _f73_inv_wos - 8.0)
+                # Prime Day pull-forward (~July 13; Amazon builds 2wks ahead)
+                _f73_today        = date.today()
+                _f73_prime_dt     = date(_f73_today.year, 7, 13)
+                if _f73_prime_dt < _f73_today:      # already past this year
+                    _f73_prime_dt = date(_f73_today.year + 1, 7, 13)
+                _f73_prime_wks    = max(0, (_f73_prime_dt - _f73_today).days // 7)
+                # Prime Day acceleration: if suppress window extends into the
+                # Prime Day build period (prime_wks - 2), demand depletes DI
+                # stock 2 weeks faster than steady-state rate implies.
+                _f73_accel = 0.0
+                if (_f73_prime_wks >= 3
+                        and _f73_suppress_raw >= (_f73_prime_wks - 2)):
+                    _f73_accel = 2.0
+                _f73_suppress_adj = max(0.0, _f73_suppress_raw - _f73_accel)
+                _f73_suppress_int = min(int(round(_f73_suppress_adj)), 24)
+                # Floor during drawdown: minimal domestic top-off (5% of POS)
+                _f73_floor        = snap(_f73_pos_l13 * 0.05, mp)
+                # Post-suppress: full POS rate (domestic covers all demand;
+                # no DI restock expected for ~6 months since nothing on order)
+                _f73_post_rate    = _f73_pos_l13
+                for _wi in range(26):
+                    if _wi < _f73_suppress_int:
+                        _f73_v = _f73_floor
+                    elif (_f73_accel > 0
+                          and _wi < _f73_suppress_int + 2
+                          and _f73_suppress_int + 2 <= _f73_prime_wks):
+                        # 2-week Prime Day pre-build immediately after suppression
+                        _f73_v = _f73_post_rate * 1.5
+                    else:
+                        _f73_v = _f73_post_rate
+                    fcst[_wi] = snap(_f73_v, mp)
+                if isinstance(meta, dict):
+                    _f73_pd_note = (
+                        f"; Prime Day pull-fwd: -2wk suppress, "
+                        f"W{_f73_suppress_int + 1}-W{_f73_suppress_int + 2} x1.5 ramp"
+                        if _f73_accel > 0 else ""
+                    )
+                    meta.setdefault("drivers", []).append(
+                        f"F73 DI post-receipt: last DI ship "
+                        f"{_f73_ship_wks_ago:.0f}wks ago (transit complete); "
+                        f"Amazon WOS={_f73_inv_wos:.1f}wks, target=8wks -> "
+                        f"{_f73_suppress_int}wk drawdown suppress "
+                        f"(floor {_f73_floor:.0f}/wk); "
+                        f"post-suppress {_f73_post_rate:.0f}/wk POS rate "
+                        f"(no DI restock ~6mo)"
+                        + _f73_pd_note
+                    )
+
+    # ── F69-shift — DI channel declining → boost domestic projection ──────
+    # When DI (MPP/ADF sibling) orders are meaningfully lower in L4W vs L13W
+    # (< 70% of historical avg), Amazon is likely shifting volume back to
+    # domestic warehouse sourcing.  The blended order history already captures
+    # total combined demand, so the model will naturally project the decline
+    # forward — but domestic orders may not yet show the compensating uptick.
+    # Correct by adding the per-week shortfall to all 26 forecast weeks.
+    # Only fires when F69-WOS POS anchor did NOT run (no POS L13 data) —
+    # if POS data is available, consumer demand governs and the channel-shift
+    # correction is redundant (2026-05-20).
+    _f69s_pos_l13 = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+    _f69s_l13_wk  = row.get("_di_l13_add", 0) / 13.0
+    _f69s_l4_wk   = row.get("_di_l4_add",  0) / 4.0
+    if (not (_f69s_pos_l13 > 0)
+            and _f69s_l13_wk > 0
+            and _f69s_l4_wk < _f69s_l13_wk * 0.70
+            and isinstance(fcst, list) and len(fcst) >= 26
+            and model not in ("Inactive",)):
+        _f69s_delta = _f69s_l13_wk - _f69s_l4_wk
+        for _wi in range(len(fcst)):
+            fcst[_wi] = snap(max(0, fcst[_wi] + _f69s_delta), mp)
+        _fire("F69-shift")
+        if isinstance(meta, dict):
+            meta.setdefault("drivers", []).append(
+                f"F69-shift: DI channel ({row.get('_di_label','?')}) orders "
+                f"declining — L4W avg {_f69s_l4_wk:.0f}/wk vs L13W avg "
+                f"{_f69s_l13_wk:.0f}/wk. Domestic forecast increased "
+                f"+{_f69s_delta:.0f}/wk across W1-W26 to compensate for "
+                f"expected DI-to-domestic channel shift."
+            )
 
     # F58 — Tell-AI comment replay (2026-05-08 → option B).
     # Apply the planner's most-recent "AI Adjusted" comment from QB Projection

@@ -637,8 +637,10 @@ Phase 3 — Forecast (pure Python, no API calls)
   │     (floors at event level; does NOT stack with seasonal -- prevents double-lift on peak weeks)
   │     Prime Day (Amazon-only): tapered x1.10/x1.25/x1.25/x1.20 over 4-week window centered on anchor
   │     Fall Deal (Amazon-only): flat x1.12 over 3-week window centered on anchor
-  │     T5/Thanksgiving (ALL accounts): x1.20/x1.15/x1.15 pre-event build, weeks 6/5/4 before Thanksgiving
+  │     T5/Thanksgiving (ALL accounts): x1.20/x1.15/x1.15 pre-event build (weeks 6/5/4 before Thanksgiving)
+  │       + x1.15 post-event bump 1 week after Thanksgiving (Cyber Monday / Christmas list week)
   │       Thanksgiving = 4th Thursday of November (auto-computed annually)
+  │       NOTE: the +1w post-event bump only falls in W1-W26 for runs on June 11 or later
   │
   ├── Croston's: alpha=0.3 over 78-obs weighted series
   │   z and p refined 70% L13W / 30% smoothed model output
