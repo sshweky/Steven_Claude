@@ -11184,9 +11184,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # ── F69 — DI direct-import blend narrative ───────────────────────────
     # Sibling (MPP/ADF) order history was added to this base record's
     # ORD_COLS in the pre-pass.  Log the additive contribution.
-    _dbg_key = row.get("Acct_MStyle_Key_", "")
-    if _dbg_key == "1864-FF8654":
-        print(f"[DBG F69-REACH] key={_dbg_key!r} _di_blend={row.get('_di_blend')!r} _di_ord_wkly={bool(row.get('_di_ord_wkly'))} meta_is_dict={isinstance(meta,dict)} model={model!r}", flush=True)
     if row.get("_di_blend") and isinstance(meta, dict):
         _fire("F69")
         meta.setdefault("drivers", []).append(
