@@ -1616,15 +1616,15 @@ def fetch_master_pack_qb_rest(mstyles):
     master_pack = {}
     season_map  = {}
 
-    # Batch the WHERE clause -- 100 mstyles per call (conservative).
-    # QB REST upper bound is ~400; 500 triggers HTTP 400 (WHERE clause length
-    # limit, each EX OR adds ~25 chars).  100 leaves headroom for longer
-    # mstyle names and concurrent pressure on the realm. (2026-05-25)
-    BATCH = 100
+    # Batch the WHERE clause -- 500 mstyles per call.
+    # QB REST requires spaces around OR in the WHERE string; without them the
+    # parser returns HTTP 400 on batches larger than ~50 clauses.
+    # Fix 2026-05-25: "OR".join -> " OR ".join (spaces required by QB parser).
+    BATCH = 500
     uniq  = sorted({m for m in mstyles if m})
     for i in range(0, len(uniq), BATCH):
         batch    = uniq[i:i + BATCH]
-        or_parts = "OR".join(f"{{{mstyle_fid}.EX.'{m}'}}" for m in batch)
+        or_parts = " OR ".join(f"{{{mstyle_fid}.EX.'{m}'}}" for m in batch)
         where    = f"({or_parts})"
         skip     = 0
         page_sz  = 1000
