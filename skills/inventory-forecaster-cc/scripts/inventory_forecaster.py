@@ -2742,6 +2742,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         )
     if _f77_applied and _f77_driver:
         meta.setdefault("drivers", []).append(_f77_driver)
+    if _f77b_applied and _f77b_driver:
+        meta.setdefault("drivers", []).append(_f77b_driver)
     if _f79_driver:
         meta.setdefault("drivers", []).append(_f79_driver)
     if _f82_driver:
