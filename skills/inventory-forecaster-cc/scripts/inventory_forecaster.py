@@ -3092,9 +3092,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     #   - pos_rate > 0 (POS data confirms demand level; without it, fall back)
     _f_new_amz_damp_applied = False
     _f_new_amz_damp_driver  = None
-    print(f"  [DBG-DAMP] is_new_launch={is_new_launch} is_amazon={is_amazon} pos_rate={pos_rate:.1f}", flush=True)
+    DAMP_NEW_AMZ            = 0.20   # defined here so the raw[] loop can reference it
     if is_new_launch and is_amazon and pos_rate > 0:
-        DAMP_NEW_AMZ        = 0.20
         _sna_min_raw        = min(S)
         _sna_max_raw        = max(S)
         S                   = [1.0 + DAMP_NEW_AMZ * (s - 1.0) for s in S]
