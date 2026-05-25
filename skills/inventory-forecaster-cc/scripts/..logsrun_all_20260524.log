@@ -1,0 +1,27 @@
+
+============================================================
+  [watchdog] Starting forecaster (inner attempt 1/3)
+============================================================
+  [auto-throttle] --all detected → workers=2, rate_limit_ms=150, bulk_writeback=on
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_17_W1 -> 11_08_W26
+
+[1/4] Pulling projections from Quickbase ...
+      5575 records retrieved
+
+[2/4] Pulling master pack + Season from Styles ...
+  [watchdog] still running -- 19s since last output | last: [2/4] Pulling master pack + Season from Styles ...
+      2284 master pack records loaded (168 with Season tag)
+
+[2.5] Pulling Amazon catalog POS for 1904 mstyles ...
+      1665 mstyles with POS data loaded
+      viewer_pos_cache.json refreshed (1665 mstyles)
+
+[2.6] Pulling Amazon Catalog US (F38 signals) for 1904 mstyles ...
+  [watchdog] still running -- 5s since last output | last: [2.6] Pulling Amazon Catalog US (F38 signals) for 1904 mstyles ...

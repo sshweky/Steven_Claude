@@ -1973,21 +1973,39 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         _pos_healthy_f15 = _pos_l13_f15 > 0 and _pos_l4_f15 >= _pos_l13_f15 * 0.5
         if pos_rate > 0 and _pos_healthy_f15:
             _ord_cov_ratio = ord_baseline / pos_rate
-            if _ord_cov_ratio > 2.0:
-                # Extreme stockup: recent orders are inventory build, not demand.
-                # 100% POS as the rate anchor.
+            if _ord_cov_ratio > 2.0 and is_amazon:
+                # Amazon extreme stockup: recent orders are inventory build,
+                # not demand.  100% POS as the rate anchor.
                 baseline = pos_rate
                 _f15_driver = (f"F15 stocked-up {_ord_cov_ratio:.1f}x > 2.0 "
                                f"-> 100% POS ({pos_rate:.0f}/wk; "
                                f"ord {ord_baseline:.0f})")
-            elif _ord_cov_ratio > 1.5:
-                # Elevated ordering (1.5-2.0x POS): Amazon is ordering above
-                # consumer velocity.  POS is the 26w demand anchor (70%);
-                # order history contributes 30% to preserve any lead-time
-                # or safety-stock premium.
+            elif _ord_cov_ratio > 2.0:
+                # Non-Amazon extreme stockup: even extreme over-ordering
+                # reflects real safety-stock and lead-time premiums for B&M
+                # retailers.  Retain 30% order signal; 70% POS anchor.
+                baseline = pos_rate * 0.70 + ord_baseline * 0.30
+                _f15_driver = (f"F15 stocked-up (non-Amazon) {_ord_cov_ratio:.1f}x "
+                               f"> 2.0 -> 70/30 POS/ord "
+                               f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f}")
+            elif _ord_cov_ratio > 1.5 and is_amazon:
+                # Amazon elevated (1.5-2.0x POS): Amazon orders converge to
+                # consumer velocity over 26w.  POS leads (70%); orders give
+                # 30% lead-time / safety-stock premium.
                 baseline = pos_rate * 0.70 + ord_baseline * 0.30
                 _f15_driver = (f"F15 elevated {_ord_cov_ratio:.2f}x "
                                f"-> 70/30 POS/ord "
+                               f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f}")
+            elif _ord_cov_ratio > 1.5:
+                # Non-Amazon elevated (1.5-2.0x POS): B&M retailers routinely
+                # order above their POS rate to maintain shelf coverage and
+                # safety stock -- this is by design, not excess inventory.
+                # Balanced 50/50 blend honours both demand signals equally.
+                # ord_baseline here is the F_ORD_BLEND result, already
+                # incorporating L4W recency (60% L13W + 40% L4W orders).
+                baseline = pos_rate * 0.50 + ord_baseline * 0.50
+                _f15_driver = (f"F15 elevated (non-Amazon) {_ord_cov_ratio:.2f}x "
+                               f"-> 50/50 POS/ord "
                                f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f}")
             elif _ord_cov_ratio > 1.0 and is_amazon:
                 # Normal Amazon ordering (1.0-1.5x POS): over 26 weeks Amazon
@@ -2002,18 +2020,26 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                                f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f} "
                                f"(POS primary 26w anchor; F38b suppressed)")
             elif _ord_cov_ratio > 1.0:
-                # Non-Amazon above-POS: keep original 75/25 POS/ord blend.
-                baseline = pos_rate * 0.75 + ord_baseline * 0.25
-                _f15_driver = (f"F15 above-POS {_ord_cov_ratio:.2f}x "
-                               f"-> 75/25 POS/ord "
-                               f"({pos_rate:.0f}/{ord_baseline:.0f})")
+                # Non-Amazon slightly above POS (1.0-1.5x): orders are the
+                # primary demand signal -- 45% POS / 55% orders.  The POS
+                # component acts as a sanity-check floor, not the anchor.
+                baseline = pos_rate * 0.45 + ord_baseline * 0.55
+                _f15_driver = (f"F15 above-POS (non-Amazon) {_ord_cov_ratio:.2f}x "
+                               f"-> 45/55 POS/ord "
+                               f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f}")
             else:
                 # Orders at or below POS -- customer may be depleting stock.
-                # POS still anchors the baseline; 65/35 POS/ord blend.
-                baseline = pos_rate * 0.65 + ord_baseline * 0.35
-                _f15_driver = (f"F15 depleting {_ord_cov_ratio:.2f}x "
-                               f"-> 65/35 POS/ord "
-                               f"({pos_rate:.0f}/{ord_baseline:.0f})")
+                # POS anchors the baseline; blend differs slightly by channel.
+                if is_amazon:
+                    baseline = pos_rate * 0.65 + ord_baseline * 0.35
+                    _f15_driver = (f"F15 depleting {_ord_cov_ratio:.2f}x "
+                                   f"-> 65/35 POS/ord "
+                                   f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f}")
+                else:
+                    baseline = pos_rate * 0.60 + ord_baseline * 0.40
+                    _f15_driver = (f"F15 depleting (non-Amazon) {_ord_cov_ratio:.2f}x "
+                                   f"-> 60/40 POS/ord "
+                                   f"({pos_rate:.0f}/{ord_baseline:.0f}) = {baseline:.0f}")
         else:
             # POS present but collapsing (L4 < 50% of L13) or zero -- fall back
             # to order-history baseline (dying item, not a stocking-up scenario).
