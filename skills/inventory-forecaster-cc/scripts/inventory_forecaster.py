@@ -1411,7 +1411,12 @@ def _get_proj_field_map():
             for f in fields:
                 label = f.get("label", "")
                 fid   = f.get("id")
-                norm  = label.replace(" ", "_")
+                # CData normalizes QB labels to SQL column names by replacing
+                # any run of non-alphanumeric characters with a single underscore.
+                # e.g. "Status @ Cust" -> "Status_Cust"
+                #      "Acct#-MStyle (Key)" -> "Acct_MStyle_Key_"
+                #      "Ord/LW 51" -> "Ord_LW_51"
+                norm  = re.sub(r'[^a-zA-Z0-9]+', '_', label)
                 l2f[norm] = fid
                 f2l[fid]  = norm
             _QB_PROJ_FIELD_MAP_CACHE    = l2f
