@@ -9120,6 +9120,23 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         if _f66g_in_decline and _f66_mult > 1.10:
             _f66_mult     = 1.10
             _f66g_clamped = True
+        # F66i — WOS-at-target gate (2026-05-25).
+        # F66 upward corrections (>1.0) were calibrated on historical records that
+        # include inventory-build periods when the retailer was ordering ABOVE their
+        # POS rate to rebuild DC stock.  When DC WOS is within [target-2, target+4]
+        # (6-12 wks for RTL_WOS_TARGET=8), the retailer is in equilibrium -- their
+        # order rate already equals their POS rate.  Applying an upward bias on top
+        # of a baseline that IS the POS rate would double-count the premium and
+        # over-project by the full correction factor.  Only valid when the retailer
+        # is genuinely understocked (WOS < target - 2) and about to accelerate orders.
+        _f66i_clamped = False
+        if _f66_mult > 1.0 and not is_amazon:
+            _f66i_wos = float(rtl_pos.get("OH_WOS") or 0) if rtl_pos else 0.0
+            if (_f66i_wos > 0
+                    and _f66i_wos >= (RTL_WOS_TARGET - 2.0)
+                    and _f66i_wos <= (RTL_WOS_TARGET + 4.0)):
+                _f66_mult     = 1.0
+                _f66i_clamped = True
         # F66h acceleration interlock -- read flags stashed by seasonal_baseline()
         _f66h_already_lifted = False
         _f66h_clamped        = False
