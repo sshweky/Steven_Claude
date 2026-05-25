@@ -14328,7 +14328,8 @@ def main():
                                      switchover_weeks=switchover_index,
                                      acct_cadences=acct_cadences,
                                      retailer_pos=retailer_pos,
-                                     vacated_bases=vacated_base_index)
+                                     vacated_bases=vacated_base_index,
+                                     inv_flow_data=inv_flow_data)
         elapsed_val = time.time() - t_val
         print(f"      Validation complete in {elapsed_val:.1f}s")
 
