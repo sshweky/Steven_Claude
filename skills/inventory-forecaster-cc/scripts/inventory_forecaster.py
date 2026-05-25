@@ -11225,6 +11225,92 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"target {_f69w_target:,.0f}/wk (warehouse + DI combined demand)"
                     )
 
+        # ── F73 — DI post-receipt suppression + demand ramp ──────────────────
+        # When a DI (factory-direct) sibling order shipped 11+ weeks ago it is
+        # very likely received at Amazon DC.  During drawdown Amazon orders
+        # little-to-no domestic replenishment; once DI inventory depletes to
+        # the 8-week safety target, full domestic ordering resumes.
+        # Prime Day (late June) accelerates depletion 2 weeks early.
+        #
+        # Shape (supersedes F69-WOS output when DI is confirmed received):
+        #   W1 → suppress_int      : floor orders (5% of POS; DI in drawdown)
+        #   post-suppress, if Prime Day build: x1.5 ramp for 2 weeks
+        #   post-suppress → W26    : POS L13W rate (no DI restock ~6 months)
+        #
+        # Fires only when: DI received (ship >= 11wks ago) AND WOS > 9 AND
+        # POS L13W > 0 (need demand signal).  Requires _di_ord_wkly on row.
+        _f73_di_wkly = row.get("_di_ord_wkly") or []
+        if (row.get("_di_blend") and is_amazon
+                and isinstance(fcst, list) and len(fcst) >= 26
+                and model not in ("Inactive",)
+                and _f73_di_wkly and any(v > 0 for v in _f73_di_wkly)):
+            # Find last non-zero DI order week in L26W (oldest=idx0, newest=idx25)
+            _f73_last_nz = -1
+            for _fi in range(25, -1, -1):
+                if _fi < len(_f73_di_wkly) and _f73_di_wkly[_fi] > 0:
+                    _f73_last_nz = _fi
+                    break
+            if _f73_last_nz >= 0:
+                # index 0 = 26 weeks ago, index 25 = 1 week ago
+                _f73_ship_wks_ago = 26 - _f73_last_nz
+                _f73_received     = (_f73_ship_wks_ago >= 11)
+                _f73_pos_l13      = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+                _f73_inv_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
+                if _f73_inv_wos <= 0 and _f73_pos_l13 > 0:
+                    _f73_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
+                    _f73_opo      = float((amz_catalog or {}).get("Inv_OPO") or 0)
+                    _f73_inv_wos  = (_f73_soh + _f73_opo) / _f73_pos_l13
+                if _f73_received and _f73_pos_l13 > 0 and _f73_inv_wos > 9.0:
+                    _fire("F73")
+                    _f73_suppress_raw = max(0.0, _f73_inv_wos - 8.0)
+                    # Prime Day pull-forward (~July 13; Amazon builds 2wks ahead)
+                    _f73_today        = date.today()
+                    _f73_prime_dt     = date(_f73_today.year, 7, 13)
+                    if _f73_prime_dt < _f73_today:      # already past this year
+                        _f73_prime_dt = date(_f73_today.year + 1, 7, 13)
+                    _f73_prime_wks    = max(0, (_f73_prime_dt - _f73_today).days // 7)
+                    # Prime Day acceleration: if suppress window extends into the
+                    # Prime Day build period (prime_wks - 2), demand depletes DI
+                    # stock 2 weeks faster than steady-state rate implies.
+                    _f73_accel = 0.0
+                    if (_f73_prime_wks >= 3
+                            and _f73_suppress_raw >= (_f73_prime_wks - 2)):
+                        _f73_accel = 2.0
+                    _f73_suppress_adj = max(0.0, _f73_suppress_raw - _f73_accel)
+                    _f73_suppress_int = min(int(round(_f73_suppress_adj)), 24)
+                    # Floor during drawdown: minimal domestic top-off (5% of POS)
+                    _f73_floor        = snap(_f73_pos_l13 * 0.05, mp)
+                    # Post-suppress: full POS rate (domestic covers all demand;
+                    # no DI restock expected for ~6 months since nothing on order)
+                    _f73_post_rate    = _f73_pos_l13
+                    for _wi in range(26):
+                        if _wi < _f73_suppress_int:
+                            _f73_v = _f73_floor
+                        elif (_f73_accel > 0
+                              and _wi < _f73_suppress_int + 2
+                              and _f73_suppress_int + 2 <= _f73_prime_wks):
+                            # 2-week Prime Day pre-build immediately after suppression
+                            _f73_v = _f73_post_rate * 1.5
+                        else:
+                            _f73_v = _f73_post_rate
+                        fcst[_wi] = snap(_f73_v, mp)
+                    if isinstance(meta, dict):
+                        _f73_pd_note = (
+                            f"; Prime Day pull-fwd: -2wk suppress, "
+                            f"W{_f73_suppress_int + 1}-W{_f73_suppress_int + 2} x1.5 ramp"
+                            if _f73_accel > 0 else ""
+                        )
+                        meta.setdefault("drivers", []).append(
+                            f"F73 DI post-receipt: last DI ship "
+                            f"{_f73_ship_wks_ago:.0f}wks ago (transit complete); "
+                            f"Amazon WOS={_f73_inv_wos:.1f}wks, target=8wks -> "
+                            f"{_f73_suppress_int}wk drawdown suppress "
+                            f"(floor {_f73_floor:.0f}/wk); "
+                            f"post-suppress {_f73_post_rate:.0f}/wk POS rate "
+                            f"(no DI restock ~6mo)"
+                            + _f73_pd_note
+                        )
+
         # ── F69-shift — DI channel declining → boost domestic projection ──────
         # When DI (MPP/ADF sibling) orders are meaningfully lower in L4W vs L13W
         # (< 70% of historical avg), Amazon is likely shifting volume back to
