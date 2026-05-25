@@ -31,9 +31,12 @@ MAX_RETRIES     = int(os.environ.get("MAX_RETRIES", "5"))
 # Direct Quickbase REST API -- bypasses CData for bulk write-back.
 QB_REALM        = os.environ.get("QB_REALM",      "pim.quickbase.com")
 QB_USER_TOKEN   = os.environ.get("QB_USER_TOKEN", "b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s")
-QB_PROJ_TABLE   = os.environ.get("QB_PROJ_TABLE", "bpd237tvm")
-QB_STYLES_TABLE = os.environ.get("QB_STYLES_TABLE", "bphzqfkev")  # InventoryTrack.Styles
-QB_BULK_BATCH   = int(os.environ.get("QB_BULK_BATCH", "500"))
+QB_PROJ_TABLE         = os.environ.get("QB_PROJ_TABLE",         "bpd237tvm")
+QB_STYLES_TABLE       = os.environ.get("QB_STYLES_TABLE",       "bphzqfkev")  # InventoryTrack.Styles
+QB_AMZ_CATALOG_TABLE  = os.environ.get("QB_AMZ_CATALOG_TABLE",  "bqp8vz625")  # InventoryTrack.Amazon_Catalog (Phase 2.5 POS)
+QB_AMZ_US_TABLE       = os.environ.get("QB_AMZ_US_TABLE",       "bpfrw2epk")  # ProductTrack.Amazon_Catalog_US  (Phase 2.6)
+QB_AMZ_HEALTH_TABLE   = os.environ.get("QB_AMZ_HEALTH_TABLE",   "bp9akd3js")  # ProductTrack.Amazon_Invtry_Health (Phase 2.6b)
+QB_BULK_BATCH         = int(os.environ.get("QB_BULK_BATCH", "500"))
 
 # QB report for VP-Q4 open-PO data -- bulk fetch in 1 API call.
 QB_OPEN_POS_TABLE       = os.environ.get("QB_OPEN_POS_TABLE",  "bp8r4dejr")
