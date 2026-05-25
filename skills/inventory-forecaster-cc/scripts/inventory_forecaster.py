@@ -2543,6 +2543,17 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # Snap to master pack
     forecast = [snap(v, mp) for v in raw]
 
+    # DBG-FF12859 temporary trace (remove after diagnosis)
+    if description and "grooming glove" in (description or "").lower():
+        import sys
+        _last4h = list(history[-4:])
+        _last3h = list(history[-3:])
+        print(f"  [DBG-FF12859] desc={description[:40]!r} mp={mp}", file=sys.stderr)
+        print(f"  [DBG-FF12859] hist[-4:]={_last4h}  hist[-3:]={_last3h}", file=sys.stderr)
+        print(f"  [DBG-FF12859] baseline={baseline:.1f}  cat_mults={'yes' if _cat_mults else 'no'}  S[-3:]={S[-3:]}", file=sys.stderr)
+        print(f"  [DBG-FF12859] raw[-3:]={raw[-3:]}  fcst[-3:]={forecast[-3:]}", file=sys.stderr)
+        print(f"  [DBG-FF12859] _fa_applied={_fa_applied}  l13_zero_count={l13_zero_count}  trailing_zeros={_trailing_zeros}", file=sys.stderr)
+
     # F10 — Declining-item end-of-life detection (YoY-gated, 2026-04-21).
     # Two tests must both pass before we scale down:
     #   1) L4W avg < 70% of L13W non-zero avg (current drop)
