@@ -4435,6 +4435,95 @@ def _is_launching(row):
     return any(t in it for t in _LAUNCHING_TOKENS)
 
 
+def new_launch_signals(row, history):
+    """
+    Centralized new-launch detector (audit item #4, 2026-05-24).
+
+    Audit found at least 7 different new-launch flags spread across the
+    forecaster body (_f34_is_new_launch, _f73_sc_new, _f73_new_ramp,
+    _f72_is_new_launch_ramp, _f72b_full_velocity, _is_launching(row),
+    plus per-rule _f37_status_new / _f61_status_new etc.).  They don't
+    always agree and were a known source of "why didn't F10 fire here?"
+    bugs.
+
+    This helper computes ONE structured snapshot of all the signals so
+    a caller can pick exactly which test it needs without reinventing
+    the boundary cases.
+
+    Returns a dict with the following fields:
+      f34_ramp        - bool, True if L52[27:51] sum < 1% of L26 sum
+                        (history-only "started in the last 6 months" test)
+      sc_new          - bool, "NEW" appears in Status_Cust
+      l26_nz_count    - int, weeks with >0 orders in L26
+      l52_nz_count    - int, weeks with >0 orders in L52
+      launching_token - bool, _is_launching(row) (PT_Item_Status token match)
+      sparse_history  - bool, l26_nz_count <= 13 (half of L26 empty)
+      recent_burst    - bool, last 6 wks have >=4 non-zero AND
+                        prior 6 (weeks -12..-7) have >=5 zeros
+                        (mirrors F72 detection)
+      full_velocity   - bool, L4 avg >= 1000 AND L13 nz avg >= 1000
+                        AND L4 >= 0.85 * L13_nz_avg
+                        (mirrors F72b override -- "launched but already
+                        at steady state, don't ramp")
+      new_launch      - bool, the canonical "treat as a new launch"
+                        decision: f34_ramp OR (sc_new AND sparse_history)
+                        OR launching_token.  Subject to full_velocity
+                        override (when True, new_launch becomes False).
+
+    Callers should prefer this helper over inventing their own test.
+    Existing rules will be migrated incrementally; until then, check
+    each rule's expected semantics carefully before swapping.
+    """
+    h = list(history or [])
+    n = len(h)
+
+    # L52 history split
+    if n >= 52:
+        _l52_early = h[-52:-26]
+        _l26_sum   = sum(h[-26:])
+        _early_sum = sum(_l52_early)
+        f34_ramp = (_l26_sum > 0 and _early_sum < _l26_sum * 0.01)
+    else:
+        f34_ramp = False
+
+    sc_new = "NEW" in (row.get("Status_Cust") or "").upper()
+    launching_token = _is_launching(row)
+
+    l26_nz_count = sum(1 for v in h[-26:] if float(v or 0) > 0)
+    l52_nz_count = sum(1 for v in h[-52:] if float(v or 0) > 0) if n >= 52 else l26_nz_count
+    sparse_history = (l26_nz_count <= 13)
+
+    # F72 recent-burst pattern
+    recent6_nz   = sum(1 for v in h[-6:]    if float(v or 0) > 0)
+    prior6_zero  = sum(1 for v in h[-12:-6] if float(v or 0) == 0) if n >= 12 else 0
+    recent_burst = (recent6_nz >= 4 and prior6_zero >= 5)
+
+    # F72b full-velocity override
+    _l4_avg     = (sum(h[-4:])  / 4)  if n >= 4  else 0.0
+    _l13_nz     = [v for v in h[-13:] if float(v or 0) > 0]
+    _l13_nz_avg = (sum(_l13_nz) / len(_l13_nz)) if _l13_nz else 0.0
+    full_velocity = (
+        _l4_avg >= 1000 and _l13_nz_avg >= 1000
+        and _l4_avg >= _l13_nz_avg * 0.85
+    )
+
+    # Canonical decision
+    new_launch_raw = f34_ramp or (sc_new and sparse_history) or launching_token
+    new_launch = new_launch_raw and not full_velocity
+
+    return {
+        "f34_ramp":        f34_ramp,
+        "sc_new":          sc_new,
+        "l26_nz_count":    l26_nz_count,
+        "l52_nz_count":    l52_nz_count,
+        "launching_token": launching_token,
+        "sparse_history":  sparse_history,
+        "recent_burst":    recent_burst,
+        "full_velocity":   full_velocity,
+        "new_launch":      new_launch,
+    }
+
+
 def _get_shp_history(row):
     """52-week shipment history (oldest→newest) used by F8 corroboration."""
     return [float(row.get(c) or 0) for c in SHP_COLS]
