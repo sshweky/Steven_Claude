@@ -8291,7 +8291,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _f61_active_growth = (_f61_l13_avg > 0 and _f61_l4_avg >= _f61_l13_avg * 0.80)
     if (not is_amazon and not _f34_is_new_launch and not _f61_is_seasonal
             and not _f61_has_cat_prof and not _f61_status_new
-            and not _f61_active_growth
+            and not _f61_active_growth and not bool(_cat_mults)
             and model != "Inactive" and sum(fcst) > 0):
         _f61_fired = 0
         for _wi in range(8, 26):       # W9-W26 (0-indexed: 8-25)
