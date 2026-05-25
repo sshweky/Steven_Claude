@@ -2788,6 +2788,16 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # DC stock-build, not consumer demand growth.  Skip F82 in that case
     # (or dampen) so we don't multiply on top of an already-inflated L4
     # order signal.  POS-confirmed accelerations still get full F82 lift.
+    # F82r (2026-05-25, 20595-FF7266 callout): L26-confirmation gate.
+    # F82 originally fired when L4 >= L13_nz * 1.20.  Problem: when L13 sits
+    # in a recent TROUGH below L26 (older history was higher), an L4 that
+    # merely recovers toward L26 trips the L4/L13 ratio.  L4 isn't really
+    # growing - it's just normalising back to baseline.  Require L4 to also
+    # exceed L26 all-weeks avg by >= 1.15x so the multiplier only fires
+    # when L4 is genuinely above a longer-term reference.
+    _f82r_l26_avg = sum(history[-26:]) / 26 if len(history) >= 26 else 0
+    _f82r_l26_ok  = (_f82r_l26_avg > 0
+                     and _l4_avg_f10 >= _f82r_l26_avg * 1.15)
     _f82_driver = None
     _f82_applied = False   # consumed by F66 customer-bias guard downstream
     if (not is_amazon
@@ -2797,7 +2807,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             and not _f77b_applied
             and not is_new_launch
             and _l13_nz_avg_f10 > 0
-            and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20):
+            and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20
+            and _f82r_l26_ok):
         # F82g POS-confirmation check
         _f82g_pos_l4  = float(pos_data.get('l4w')
                               or pos_data.get('Avg_Units_Wk_L4w')  or 0) if pos_data else 0.0
