@@ -804,6 +804,12 @@ async function _lazyLoadDetail(r) {
   r.hist_shp  = SHP_HIST_FIDS.map(fid => num(row, fid));
   r.ly_ord    = LY_ORD_HIST_FIDS.map(fid => num(row, fid));
   r.ly_shp    = LY_SHP_HIST_FIDS.map(fid => num(row, fid));
+  // DI Ord History (FID 1613): comma-separated L26W DI weekly order quantities.
+  // Empty string when no DI orders; parse into a 26-element numeric array.
+  const _diRaw = str(row, CFG.FID.DI_ORD_HIST) || '';
+  r.di_ord = _diRaw
+    ? _diRaw.split(',').map(v => parseInt(v, 10) || 0)
+    : [];
   r.narrative = str(row, CFG.FID.AI_ANALYSIS) || str(row, CFG.FID.AI_ALERT);
   // Re-compute weeks_slim (per-week AI vs manual severity).
   // Seasonal customers: 0-weeks between orders are normal — suppress those alerts.
