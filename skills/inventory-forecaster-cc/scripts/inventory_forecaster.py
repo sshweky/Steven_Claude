@@ -3031,6 +3031,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             f"R8 burst-median ceiling: top2 >= 70% of L13 nz total "
             f"-> ord_baseline capped at median x 1.5 = {ord_baseline:.0f}"
         )
+    if _f_ord_blend_applied and _f_ord_blend_driver:
+        meta.setdefault("drivers", []).append(_f_ord_blend_driver)
     if _f_steady_applied and _f_steady_driver:
         meta["steady_buyer"] = True
         meta.setdefault("drivers", []).append(_f_steady_driver)
