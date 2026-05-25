@@ -13997,7 +13997,7 @@ def main():
     print(f"\n[2.9] VP-ATS: fetching ATS L26W history for "
           f"{len(_ats_mstyles)} mstyles ...", flush=True)
     try:
-        from oos_history import fetch_ats_history
+        # `fetch_ats_history` lifted to module-top import (Audit Finding #19).
         ats_data = fetch_ats_history(mstyle_set=_ats_mstyles)
         _n_ats_nz = sum(1 for v in ats_data.values() if any(x > 0 for x in v))
         print(f"      {len(ats_data)} mstyles loaded, "
