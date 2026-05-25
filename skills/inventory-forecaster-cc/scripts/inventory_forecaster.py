@@ -3566,6 +3566,27 @@ def attenuate_recent_spikes(hist, pos_data=None):
                           "l4_pos": round(l4_pos, 1), "l13_pos": round(l13_pos, 1),
                           "ratio": round(l4_pos / l13_pos, 2)}]
 
+    # F49c (2026-05-24): Non-Amazon order-history sustained-acceleration guard.
+    # Mirrors F49's POS check for accounts that have no POS data (e.g. Walmart
+    # wholesale).  When 2+ of the last 4 weeks are above cap_threshold AND the
+    # median of those L4W non-zero values is >= 2.0x the prior baseline median,
+    # this is a genuine demand step-change, not a one-off spike.  Using the
+    # median (not mean) makes the test robust against a single week still at
+    # the old run-rate while the others have stepped up.
+    if spike_count >= 2:
+        _l4_nz_precap = sorted(
+            float(out[i] or 0) for i in range(last4_start, n)
+            if float(out[i] or 0) > 0
+        )
+        if _l4_nz_precap:
+            _l4_nz_median = _l4_nz_precap[len(_l4_nz_precap) // 2]
+            if _l4_nz_median >= 2.0 * median_pre:
+                return out, [{"f49_skip": "order_history_sustained_acceleration",
+                              "spike_count": spike_count,
+                              "l4_nz_median": round(_l4_nz_median, 1),
+                              "median_pre":   round(median_pre, 1),
+                              "ratio":        round(_l4_nz_median / median_pre, 2)}]
+
     corrections = []
     for i in range(last4_start, n):
         v = float(out[i] or 0)
