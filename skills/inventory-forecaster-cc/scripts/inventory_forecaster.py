@@ -2505,6 +2505,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             )
 
     # Raw forecast: damped profile + explicit event lifts
+    print(f"[FS_S] S_max={max(S):.3f} S_min={min(S):.3f} baseline={baseline:.1f} f_steady={_f_steady_applied}", flush=True)
     raw = []
     _f66_floored = 0
     # F66 (2026-05-21) — Seasonal floor: the seasonal profile can only
@@ -12633,7 +12634,8 @@ def main():
                                      ats_data=ats_data,
                                      switchover_weeks=switchover_index,
                                      acct_cadences=acct_cadences,
-                                     retailer_pos=retailer_pos)
+                                     retailer_pos=retailer_pos,
+                                     vacated_bases=vacated_base_index)
         elapsed_val = time.time() - t_val
         print(f"      Validation complete in {elapsed_val:.1f}s")
 
