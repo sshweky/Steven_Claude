@@ -2328,12 +2328,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         (bool(_seasonal_cat) or (_raw_peak_trough >= 1.8 and not _is_steady_buyer))
         and _f16_vol_ok
     )
-    # F16 Amazon POS-stability gate (2026-05-24).
+    # F16 POS-stability gate (2026-05-24 Amazon, 2026-05-25 extended to non-Amazon).
     # F16 relief fires when order history shows a 1.8x+ peak/trough ratio.  For
-    # Amazon items this often reflects ORDERING CADENCE (bulk buys every 4-8 wks)
-    # rather than true consumer demand seasonality.  When:
+    # all accounts this often reflects ORDERING CADENCE (bulk buys / lumpy B&M
+    # batch orders) rather than true consumer demand seasonality.  When:
     #   (a) the relief would fire from order history alone (no category profile), AND
-    #   (b) the item is Amazon with healthy POS data, AND
+    #   (b) POS data is available (Amazon pos_data OR retailer rtl_pos), AND
     #   (c) POS L4W / L13W ratio is within 0.75-1.35 (consumer demand is stable)
     # ... override back to DAMP_NORMAL.  Category-tagged items are always allowed
     # full relief since the tag confirms genuine seasonality.
@@ -2354,6 +2354,19 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             if _pos_stable_f16:  # POS stable -- order lumps are cadence noise, not seasonality
                 _f16_relief = False
                 _f16_amz_pos_gate_fired = True
+    # Non-Amazon extension (2026-05-25): same logic for B&M retailer POS data.
+    # Lumpy batch ordering (every 3-4 weeks) creates high raw peak/trough from
+    # ORDER CADENCE, not real seasonality.  When retailer POS is stable, suppress.
+    _f16_rtl_pos_gate_fired = False
+    if _f16_relief and not bool(_seasonal_cat) and not is_amazon and rtl_pos:
+        _rtl_pos_l4_f16  = float(rtl_pos.get("Avg_Units_Wk_L4w")  or 0)
+        _rtl_pos_l13_f16 = float(rtl_pos.get("Avg_Units_Wk_L13w") or 0)
+        if _rtl_pos_l13_f16 > 0 and _rtl_pos_l4_f16 > 0:
+            _rtl_l4_l13_f16 = _rtl_pos_l4_f16 / _rtl_pos_l13_f16
+            _rtl_pos_stable = 0.75 <= _rtl_l4_l13_f16 <= 1.35
+            if _rtl_pos_stable:
+                _f16_relief = False
+                _f16_rtl_pos_gate_fired = True
     # Eased 2026-05-06: 0.4 → 0.85 (relief), 0.1 → 0.3 (base).  Allows post-cap
     # peak up to 2.5× so sharp Q3/Q4 seasonals (Halloween, Holiday) come
     # through at full strength.
