@@ -445,43 +445,39 @@ def compute_demand_caps(rows, fields):
             continue
 
         oos_cap = OOS_CAP_MULT * median_qty
-        iso_cap = ISO_CAP_MULT * median_qty
 
         for i, ym in enumerate(all_months):
             qty = month_qtys[ym]
 
-            # Detect OOS gap: how many calendar months since the previous shipment?
-            # Count only real months (subtract known OOS_DROP_MONTHS from the gap).
+            # ── ISO: first active month = Initial Stocking Order ──────────────
+            # The very first shipment to a retailer fills all store shelves and
+            # is completely unrepresentative of ongoing weekly demand.  Exclude.
             if i == 0:
-                gap_real = 0  # no prior history — not a catch-up
-            else:
-                prev_ym   = all_months[i - 1]
-                prev_idx  = prev_ym[0] * 12 + prev_ym[1]
-                curr_idx  = ym[0]     * 12 + ym[1]
-                gap_total = curr_idx - prev_idx - 1  # calendar months in between
-                # Subtract OOS_DROP_MONTHS that fall inside the gap (not a real silent period)
-                oos_in_gap = 0
-                for (dy, dm) in OOS_DROP_MONTHS:
-                    di = dy * 12 + dm
-                    if prev_idx < di < curr_idx:
-                        oos_in_gap += 1
-                gap_real = max(0, gap_total - oos_in_gap)
+                scale_factors[(mst, cust, ym[0], ym[1])] = 0.0
+                n_iso += 1
+                continue
 
-            is_oos_catchup = (gap_real >= OOS_GAP_MONTHS)
-            cap            = oos_cap if is_oos_catchup else iso_cap
+            # ── OOS catch-up: gap >= OOS_GAP_MONTHS real calendar months ─────
+            prev_ym  = all_months[i - 1]
+            prev_idx = prev_ym[0] * 12 + prev_ym[1]
+            curr_idx = ym[0]      * 12 + ym[1]
+            gap_total = curr_idx - prev_idx - 1   # calendar months between
+            # Don't count known tariff-OOS months as a real gap
+            oos_in_gap = sum(
+                1 for (dy, dm) in OOS_DROP_MONTHS
+                if prev_idx < dy * 12 + dm < curr_idx
+            )
+            gap_real = max(0, gap_total - oos_in_gap)
 
-            if qty > cap:
-                scale_factors[(mst, cust, ym[0], ym[1])] = cap / qty
-                if is_oos_catchup:
-                    n_oos += 1
-                else:
-                    n_iso += 1
+            if gap_real >= OOS_GAP_MONTHS and qty > oos_cap:
+                scale_factors[(mst, cust, ym[0], ym[1])] = oos_cap / qty
+                n_oos += 1
 
-    total_capped = len(scale_factors)
+    total_scaled = len(scale_factors)
     print(f"[clean] demand cap pass complete:", flush=True)
-    print(f"  OOS catch-up months capped : {n_oos:,}  (gap >= {OOS_GAP_MONTHS} mo, cap = {OOS_CAP_MULT}x median)", flush=True)
-    print(f"  ISO spike months capped    : {n_iso:,}  (cap = {ISO_CAP_MULT}x median)", flush=True)
-    print(f"  Total (mst,cust,ym) buckets scaled down: {total_capped:,}", flush=True)
+    print(f"  ISO (initial stocking) months excluded : {n_iso:,}  (first month per mstyle+customer = 0)", flush=True)
+    print(f"  OOS catch-up months capped             : {n_oos:,}  (gap >= {OOS_GAP_MONTHS} mo, cap = {OOS_CAP_MULT}x median)", flush=True)
+    print(f"  Total (mst,cust,ym) buckets with scale : {total_scaled:,}", flush=True)
     return scale_factors
 
 
@@ -689,9 +685,9 @@ def main():
         "planner_overrides":           sorted(PLANNER_OVERRIDES.keys()),
         "holiday_lead_uplift":         {str(k): v for k, v in HOLIDAY_LEAD_UPLIFT.items()},
         "demand_cleaning": {
+            "iso":             "first month per (mstyle, customer) excluded (scale=0)",
             "oos_gap_months":  OOS_GAP_MONTHS,
             "oos_cap_mult":    OOS_CAP_MULT,
-            "iso_cap_mult":    ISO_CAP_MULT,
         },
         "gates": {
             "min_total_units":           MIN_TOTAL_UNITS,
