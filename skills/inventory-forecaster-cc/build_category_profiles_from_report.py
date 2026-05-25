@@ -531,10 +531,15 @@ def build_profiles(rows, fields):
             excluded_oos += 1
             continue
 
+        # Apply demand-distortion cap (OOS catch-up / ISO spike scaling).
+        # scale_factors key is (mst, cust, y, m); absent = no cap (scale=1.0).
+        cust_name = (r.get(fields["cust"]) or "").strip() if fields.get("cust") else ""
+        sf_key = (mst, cust_name, y, m)
+        demand_scale = scale_factors.get(sf_key, 1.0)
+
         # Apply year weight (2024 clean baseline) and customer weight (Amazon /
         # Walmart / Petsmart get 2× pull on the seasonal shape).
-        cust_name = (r.get(fields["cust"]) or "").strip() if fields.get("cust") else ""
-        wqty = qty * YEAR_WEIGHTS.get(y, 1.0) * _customer_weight(cust_name)
+        wqty = qty * demand_scale * YEAR_WEIGHTS.get(y, 1.0) * _customer_weight(cust_name)
 
         cat_month[cat][m-1] += wqty
         cat_total[cat]      += wqty
