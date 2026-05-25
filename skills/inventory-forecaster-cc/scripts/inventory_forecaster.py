@@ -400,6 +400,20 @@ CATEGORY_PROFILES = {
     "paw balm":          [0.80, 1.10, 1.40, 1.50, 1.50, 1.40, 1.25, 1.05, 0.85, 0.70, 0.65, 0.65],
     "biosilk":           [0.65, 1.30, 1.65, 1.75, 1.65, 1.50, 1.30, 1.05, 0.75, 0.55, 0.45, 0.40],
     "chi pet":           [0.65, 1.30, 1.65, 1.75, 1.65, 1.50, 1.30, 1.05, 0.75, 0.55, 0.45, 0.40],
+
+    # -- Pet calming / anxiety supplements -- holiday-build retail ordering ----
+    # Consumer demand peaks Halloween (Oct 31), Thanksgiving, Christmas, NYE.
+    # Retailers place orders mid-Oct through Nov to stock shelves for Nov-Dec.
+    # Sep has NO special lift -- ordering ramp begins ~Oct 15 per planner input.
+    # Jan slightly elevated (post-holiday / NYE calming demand still trickling).
+    # F85 floors Jan-Sep to 1.0x in the forecast window so the profile only
+    # lifts Oct-Nov; it never suppresses demand below baseline in off-season.
+    # Added 2026-05-25.
+    "calming chew":      [0.80, 0.75, 0.80, 0.75, 0.70, 0.65, 0.75, 0.80, 0.85, 1.55, 1.95, 1.40],
+    "calming treat":     [0.80, 0.75, 0.80, 0.75, 0.70, 0.65, 0.75, 0.80, 0.85, 1.55, 1.95, 1.40],
+    "anxiety relief":    [0.80, 0.75, 0.80, 0.75, 0.70, 0.65, 0.75, 0.80, 0.85, 1.55, 1.95, 1.40],
+    "calming":           [0.80, 0.75, 0.80, 0.75, 0.70, 0.65, 0.75, 0.80, 0.85, 1.55, 1.95, 1.40],
+    "anxiety chew":      [0.80, 0.75, 0.80, 0.75, 0.70, 0.65, 0.75, 0.80, 0.85, 1.55, 1.95, 1.40],
 }
 
 # M2 fix (2026-05-21) -- Pre-sorted iteration order for _get_category_profile().
