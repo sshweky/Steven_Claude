@@ -3141,6 +3141,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if _f_steady_applied and _f_steady_driver:
         meta["steady_buyer"] = True
         meta.setdefault("drivers", []).append(_f_steady_driver)
+    if _f_new_amz_damp_applied and _f_new_amz_damp_driver:
+        meta.setdefault("drivers", []).append(_f_new_amz_damp_driver)
 
     # F_BURST (2026-05-24) — Burst post-processor for pulsed ordering patterns.
     # Fires when: pulsed pattern already detected (_fa_applied, >=4 L13W zero
