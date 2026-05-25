@@ -12594,14 +12594,19 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             if _smart:
                 specific.append(_smart)
 
-        # Order Trends bullet: B2B order history run-rate (all records with pos data).
+        # Order Trends bullet: B2B order history run-rate.
+        # Amazon: pinned alongside POS Sales/DC Inv/AUR so it always renders.
+        # Non-Amazon: goes to specific (subject to MAX_BULLETS cap).
         if len(hist) >= 4:
             _ly_hist_pos = rec.get("history_ly_ord") or []
             _smart_ord = _smart_order_trend(hist,
                                             ly_hist_26=_ly_hist_pos if _ly_hist_pos else None,
                                             cust_label=_cust_label)
             if _smart_ord:
-                specific.append(_smart_ord)
+                if is_amazon:
+                    pinned_last.insert(0, _smart_ord)   # Order History first, then POS/DC/AUR
+                else:
+                    specific.append(_smart_ord)
     else:
         # No POS data at all.
         if is_amazon:
@@ -12611,6 +12616,15 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                 "Forecast uses order history only -- "
                 "verify item is set up in the Amazon Catalog table in QB."
             )
+            # Still show order history even when POS is missing
+            if len(hist) >= 4:
+                _ly_hist_npos = rec.get("history_ly_ord") or []
+                _smart_ord_npos = _smart_order_trend(
+                    hist,
+                    ly_hist_26=_ly_hist_npos if _ly_hist_npos else None,
+                    cust_label=_cust_label)
+                if _smart_ord_npos:
+                    pinned_last.insert(0, _smart_ord_npos)
         if not is_amazon and len(hist) >= 4:
             _ly_hist = rec.get("history_ly_ord") or []
             _smart_ord = _smart_order_trend(hist,
