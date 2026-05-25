@@ -5528,7 +5528,50 @@ def heuristic(history, mp, l13w, is_amazon=False, description=None,
         forecast = _new_fh
         _f10_applied_h = True
 
+    # F77h (2026-05-24): Post-launch / recent-slowdown brake for Heuristic.
+    # Deep-dive on 102 CRITICAL records caught 9 Target launch items where the
+    # heuristic baseline averaged the LAUNCH spike weeks (18k initial PO + 7k
+    # / 5k recovery weeks) into the forward rate, but L4W has SETTLED to
+    # ~1500/wk.  F10 skips these because is_new_launch=True.  F77h fires when:
+    #   - L4W < L13W nz avg * 0.65   (severe blend, 0.30/0.70 toward L4)
+    #   - or L4W < L13W nz avg * 0.85 (moderate blend, 0.15/0.85 toward L4)
+    # Independent of F10 (which is YoY-gated and new-launch-blocked).
+    _f77h_applied = False
+    _f77h_driver  = None
+    if not _f10_applied_h and _l13_nz_avg_f10h > 0 and _l4_avg_f10h > 0:
+        _ratio_h = _l4_avg_f10h / _l13_nz_avg_f10h
+        if _ratio_h < 0.65:
+            _blend_h = []
+            for _wi, _vi in enumerate(forecast):
+                _b = 0.30 * _l4_avg_f10h + 0.70 * _vi
+                if _wi >= 13:
+                    _b *= 0.90
+                _blend_h.append(snap(_b, mp) if _b > 0 else 0)
+            forecast = _blend_h
+            _f77h_applied = True
+            _f77h_driver  = (
+                f"F77h post-launch slowdown (severe): L4W avg {_l4_avg_f10h:.0f} "
+                f"= {_ratio_h*100:.0f}% of L13W nz avg {_l13_nz_avg_f10h:.0f}; "
+                f"blended 30/70 toward L4W"
+            )
+        elif _ratio_h < 0.85:
+            _blend_h = []
+            for _wi, _vi in enumerate(forecast):
+                _b = 0.15 * _l4_avg_f10h + 0.85 * _vi
+                if _wi >= 13:
+                    _b *= 0.95
+                _blend_h.append(snap(_b, mp) if _b > 0 else 0)
+            forecast = _blend_h
+            _f77h_applied = True
+            _f77h_driver  = (
+                f"F77h post-launch slowdown (moderate): L4W avg {_l4_avg_f10h:.0f} "
+                f"= {_ratio_h*100:.0f}% of L13W nz avg {_l13_nz_avg_f10h:.0f}; "
+                f"blended 15/85 toward L4W"
+            )
+
     meta = {"baseline": round(baseline, 1), "n_active": n_active, "src": src}
+    if _f77h_applied and _f77h_driver:
+        meta.setdefault("drivers", []).append(_f77h_driver)
     if _f23b_applied:
         meta["trailing_zeros"] = _trailing_zeros_h
         meta.setdefault("drivers", []).append(
