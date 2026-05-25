@@ -14386,16 +14386,23 @@ def main():
     inv_flow_data = {}
     _inv_flow_mstyles = sorted({r["Mstyle"] for r in rows if r.get("Mstyle")})
     if _inv_flow_mstyles:
-        print(f"\n[2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs) for "
+        print(f"\n[2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for "
               f"{len(_inv_flow_mstyles)} mstyles ...", flush=True)
-        try:
-            inv_flow_data = fetch_inv_flow_qb_rest(_inv_flow_mstyles)
-            print(f"      {len(inv_flow_data)} mstyles with Inv Flow data loaded "
-                  f"(QB REST API)", flush=True)
-        except Exception as _ifperr:
-            print(f"      [WARN] Inv Flow fetch failed: {_ifperr} -- "
-                  f"F37 will skip inventory-shortfall capping this run", flush=True)
-            inv_flow_data = {}
+        _p26d_cached, _p26d_hit = _pull_cache_load("phase2_6d", _use_pc)
+        if _p26d_hit:
+            inv_flow_data = _p26d_cached
+            print(f"      {len(inv_flow_data)} mstyles with Inv Flow data from pull cache",
+                  flush=True)
+        else:
+            try:
+                inv_flow_data = fetch_inv_flow_qb_rest(_inv_flow_mstyles)
+                print(f"      {len(inv_flow_data)} mstyles with Inv Flow data loaded "
+                      f"(QB REST API)", flush=True)
+            except Exception as _ifperr:
+                print(f"      [WARN] Inv Flow fetch failed: {_ifperr} -- "
+                      f"F37 will skip inventory-shortfall capping this run", flush=True)
+                inv_flow_data = {}
+            _pull_cache_save("phase2_6d", inv_flow_data)
 
     # ── Save Amazon catalog viewer cache (AUR + DC inv for viewer.py) ──────────
     # Written after Phase 2.6b so Inv_SOH/OPO/WOS are already merged in.
