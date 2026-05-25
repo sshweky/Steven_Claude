@@ -6905,6 +6905,36 @@ function _syncFlaggedOnlyButton() {
   }
 }
 
+// Sticky toggle for the "Show Snoozed Only" toolbar button.  When true,
+// applyFilters() only retains records with r._snoozed === true.  Persists in
+// sessionStorage so the toggle survives page reloads.
+let SNOOZED_ONLY = (function () {
+  try { return sessionStorage.getItem('snoozedOnly') === '1'; }
+  catch (e) { return false; }
+})();
+
+function toggleSnoozedOnly() {
+  SNOOZED_ONLY = !SNOOZED_ONLY;
+  try { sessionStorage.setItem('snoozedOnly', SNOOZED_ONLY ? '1' : '0'); }
+  catch (e) { /* ignore */ }
+  _syncSnoozedOnlyButton();
+  applyFilters();
+}
+
+function _syncSnoozedOnlyButton() {
+  const btn = document.getElementById('snoozedOnlyBtn');
+  if (!btn) return;
+  if (SNOOZED_ONLY) {
+    btn.style.background = '#757575';
+    btn.style.color = '#fff';
+    btn.title = 'Currently showing snoozed records only  -  click to show all';
+  } else {
+    btn.style.background = '#fff';
+    btn.style.color = '#757575';
+    btn.title = 'Show only snoozed records (toggle)';
+  }
+}
+
 function applyFilters() {
   const search    = document.getElementById('search').value.toLowerCase();
   const volSet        = _msSel('volFilter');
