@@ -2479,6 +2479,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     #   - skip if fewer than 13 L13W observations (thin history)
     _f_steady_applied = False
     _f_steady_driver  = None
+    print(f"[FS_DBG] amz={is_amazon} fa={_fa_applied} z={l13_zero_count} avg={l13_avg:.1f} nL13={len(l13)} hist_L13={history[-13:]}", flush=True)
     if (not is_amazon
             and not _fa_applied
             and l13_zero_count <= 1
@@ -4112,6 +4113,7 @@ def _build_switchover_index(rows):
     # Step 2 -- for each variant row, find its base key and record active weeks
     result         = {}   # base_key   -> {week_idx: [variant_mstyles]}
     variant_result = {}   # variant_key -> {week_idx: [base_mstyle]}
+    vacated_bases  = {}   # base_key   -> variant_mstyle  (F70c: base man=all-0, variant in scope)
 
     for vrow in rows:
         vkey = vrow.get("Acct_MStyle_Key_", "")
@@ -4144,6 +4146,16 @@ def _build_switchover_index(rows):
             if man_prj[wi] > 0 or opn_w[wi] > 0:
                 result.setdefault(base_key, {}).setdefault(wi, []).append(vms)
 
+        # F70c -- Vacated base detection.
+        # The variant exists in scope.  If the base's manual is all-zeros,
+        # the planner has already signaled the switchover -- zero the base AI
+        # forecast entirely (F70 would not fire because the variant may also
+        # have all-zero manual, giving it nothing to trigger on).
+        base_row = row_by_key[base_key]
+        base_man = [float(base_row.get(c) or 0) for c in ORIG_PRJ_COLS]
+        if not any(v > 0 for v in base_man):
+            vacated_bases[base_key] = vms
+
     # Step 3 -- build reverse map: variant should be zeroed for weeks BEFORE
     # the switchover (i.e. weeks where the base style is still active).
     for base_key, week_map in result.items():
@@ -4161,7 +4173,13 @@ def _build_switchover_index(rows):
                 for wi in range(first_sw_week):
                     variant_result.setdefault(variant_key, {}).setdefault(wi, []).append(base_ms_b)
 
-    return result, variant_result
+    # Step 4 -- F70c: remove vacated_bases entries that are already fully covered
+    # by regular F70 (all 26 weeks zeroed) -- no need for F70c in that case.
+    for bk in list(vacated_bases.keys()):
+        if bk in result and len(result[bk]) >= 26:
+            del vacated_bases[bk]
+
+    return result, variant_result, vacated_bases
 
 
 def _build_cust_baseline_index(rows):
