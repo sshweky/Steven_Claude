@@ -1910,6 +1910,121 @@ def fetch_amazon_invtry_health_qb_rest(asins):
     return out
 
 
+# ── QB REST API -- Phase 2.7 Inventory Flow fetch (F37 v2 cascade input) ──────
+# Pulls per-mstyle Beg Inv (Wk1 only), Receipts (RcvWk0..RcvWk26), and Open
+# Customer Orders (Opn Wk0..Opn Wk26) from InventoryTrack.Inventory_Flow.
+# Used by the rewritten F37 (2026-05-26) which does a FRESH cascade based on
+# this run's AI projection -- replaces the previous F37 which read stale
+# Projections.Inv_Wk* fields derived from the PRIOR run's AI projection.
+#
+# RcvWk0 and OpnWk0 represent "current week prior to W1" -- per planner
+# convention they roll into W1 (we sum 0+1 into the W1 slot).
+#
+# Table: InventoryTrack.Inventory_Flow (bpsaju5pm).  FIDs verified 2026-05-26.
+
+_QB_INV_FLOW_FMAP_CACHE = None
+_QB_INV_FLOW_F2L_CACHE  = {}
+
+
+def _get_inv_flow_field_map():
+    """Fetch and cache the Inventory_Flow field map via QB REST."""
+    global _QB_INV_FLOW_FMAP_CACHE, _QB_INV_FLOW_F2L_CACHE
+    if _QB_INV_FLOW_FMAP_CACHE is not None:
+        return _QB_INV_FLOW_FMAP_CACHE, _QB_INV_FLOW_F2L_CACHE
+    return _fetch_field_map_into(QB_INV_FLOW_TABLE, "Inventory_Flow",
+                                 lambda l2f, f2l: _store_inv_flow(l2f, f2l))
+
+
+def _store_inv_flow(l2f, f2l):
+    global _QB_INV_FLOW_FMAP_CACHE, _QB_INV_FLOW_F2L_CACHE
+    _QB_INV_FLOW_FMAP_CACHE = l2f
+    _QB_INV_FLOW_F2L_CACHE  = f2l
+
+
+# Hardcoded FID fallbacks (verified via GET /v1/fields 2026-05-26).  CData label
+# normalization: "Opn Wk0" -> "Opn_Wk0", "RcvWk0" -> "RcvWk0", "Wk1" -> "Wk1".
+_INV_FLOW_FALLBACK_FIDS = {
+    "Mstyle":  20,
+    "Wk1":     134,        # Beg Inv W1 only (W2..W26 unused -- we cascade fresh)
+    # RcvWk0..RcvWk26
+    "RcvWk0":  295, "RcvWk1":  28,  "RcvWk2":  35,  "RcvWk3":  36,  "RcvWk4":  50,
+    "RcvWk5":  51,  "RcvWk6":  65,  "RcvWk7":  66,  "RcvWk8":  67,  "RcvWk9":  68,
+    "RcvWk10": 69,  "RcvWk11": 70,  "RcvWk12": 71,  "RcvWk13": 72,  "RcvWk14": 73,
+    "RcvWk15": 74,  "RcvWk16": 75,  "RcvWk17": 76,  "RcvWk18": 77,  "RcvWk19": 78,
+    "RcvWk20": 79,  "RcvWk21": 80,  "RcvWk22": 81,  "RcvWk23": 82,  "RcvWk24": 83,
+    "RcvWk25": 84,  "RcvWk26": 85,
+    # Opn Wk0..Opn Wk26 (CData-normalized labels)
+    "Opn_Wk0": 296, "Opn_Wk1": 30,  "Opn_Wk2": 37,  "Opn_Wk3": 39,  "Opn_Wk4": 38,
+    "Opn_Wk5": 87,  "Opn_Wk6": 89,  "Opn_Wk7": 90,  "Opn_Wk8": 91,  "Opn_Wk9": 92,
+    "Opn_Wk10": 93, "Opn_Wk11": 94, "Opn_Wk12": 95, "Opn_Wk13": 96, "Opn_Wk14": 97,
+    "Opn_Wk15": 98, "Opn_Wk16": 99, "Opn_Wk17": 100, "Opn_Wk18": 101,"Opn_Wk19": 143,
+    "Opn_Wk20": 103,"Opn_Wk21": 104,"Opn_Wk22": 105,"Opn_Wk23": 106,"Opn_Wk24": 107,
+    "Opn_Wk25": 108,"Opn_Wk26": 109,
+}
+
+
+def fetch_inv_flow_qb_rest(mstyles):
+    """Phase 2.7: pull Inventory_Flow per-mstyle for F37 v2 cascade.
+
+    Returns dict keyed by Mstyle:
+        {
+          "beg_inv_w1": float,        # actual current on-hand
+          "rcv":  [r1, r2, ..., r26], # week-indexed (W1 = RcvWk0 + RcvWk1)
+          "opn":  [o1, o2, ..., o26], # week-indexed (W1 = OpnWk0 + OpnWk1)
+        }
+
+    RcvWk0 and OpnWk0 represent prior-week residual that planners convention-
+    ally roll into Wk1 -- we sum them at the W1 index per planner direction.
+    """
+    l2f, f2l = _get_inv_flow_field_map()
+
+    def _fid(label):
+        return l2f.get(label) or _INV_FLOW_FALLBACK_FIDS.get(label)
+
+    mstyle_fid = _fid("Mstyle")
+    wk1_fid    = _fid("Wk1")
+    rcv_fids   = [_fid(f"RcvWk{i}") for i in range(0, 27)]   # 0..26 = 27 fids
+    opn_fids   = [_fid(f"Opn_Wk{i}") for i in range(0, 27)]
+
+    select_fids = [mstyle_fid, wk1_fid] + rcv_fids + opn_fids
+    select_fids = [f for f in select_fids if f is not None]
+
+    rows = _qb_rest_query_batched_in(
+        QB_INV_FLOW_TABLE, _QB_PROJ_HEADERS, l2f, mstyle_fid,
+        select_fids, f2l, mstyles,
+        batch_size=100, label="inv_flow")
+
+    def _to_float(v):
+        if v is None or v == "":
+            return 0.0
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return 0.0
+
+    out = {}
+    for r in rows:
+        ms = r.get("Mstyle")
+        if not ms:
+            continue
+        beg = _to_float(r.get("Wk1"))
+        # Build per-week receipts (index 0 = W1; RcvWk0 rolls into W1)
+        rcv = []
+        for i in range(1, 27):
+            rcv.append(_to_float(r.get(f"RcvWk{i}")))
+        rcv[0] += _to_float(r.get("RcvWk0"))
+        # Build per-week open orders (index 0 = W1; OpnWk0 rolls into W1)
+        opn = []
+        for i in range(1, 27):
+            opn.append(_to_float(r.get(f"Opn_Wk{i}")))
+        opn[0] += _to_float(r.get("Opn_Wk0"))
+        # If duplicate mstyle row, prefer the row with non-zero beg_inv
+        if ms in out and beg == 0 and out[ms]["beg_inv_w1"] != 0:
+            continue
+        out[ms] = {"beg_inv_w1": beg, "rcv": rcv, "opn": opn}
+    return out
+
+
 def build_scope_filter(args):
     clauses = []
     if args.acct:
