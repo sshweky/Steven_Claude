@@ -11302,18 +11302,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 for _wi in range(26):
                     if _wi < _f73_suppress_int:
                         _f73_v = _f73_floor
-                    elif (_f73_accel > 0
-                          and _wi < _f73_suppress_int + 2
-                          and _f73_suppress_int + 2 <= _f73_prime_wks):
-                        # 2-week Prime Day pre-build immediately after suppression
-                        _f73_v = _f73_post_rate * 1.5
                     else:
                         _f73_v = _f73_post_rate
                     fcst[_wi] = snap(_f73_v, mp)
                 if isinstance(meta, dict):
+                    # Prime Day: the DI shipment IS the Prime Day build --
+                    # Amazon already has the stock. No P+P pre-build needed.
+                    # Accel only shortens suppress window (faster DI depletion).
                     _f73_pd_note = (
-                        f"; Prime Day pull-fwd: -2wk suppress, "
-                        f"W{_f73_suppress_int + 1}-W{_f73_suppress_int + 2} x1.5 ramp"
+                        f"; Prime Day accel: -2wk suppress "
+                        f"(Prime Day depletes DI stock faster)"
                         if _f73_accel > 0 else ""
                     )
                     meta.setdefault("drivers", []).append(
