@@ -822,7 +822,10 @@ async function _lazyLoadDetail(r) {
   r.f37_capped_weeks  = new Set();
   r.f37_capped_detail = {};
   if (r.narrative) {
-    const _capMatch = r.narrative.match(/class=["']f37-capped["'][^>]*data-weeks=["']([0-9,]+)["'][^>]*data-detail=['"]([^'"]+)['"]/);
+    // Match the hidden span.  data-detail is wrapped in single-quotes so its
+    // JSON payload (which uses double-quotes) doesn't escape.  Use a
+    // backreference so the regex doesn't trip on the inner double-quotes.
+    const _capMatch = r.narrative.match(/class=["']f37-capped["'][^>]*data-weeks=["']([0-9,]+)["'][^>]*data-detail=(['"])([\s\S]*?)\2/);
     if (_capMatch) {
       try {
         _capMatch[1].split(',').forEach(w => {
@@ -830,7 +833,7 @@ async function _lazyLoadDetail(r) {
           if (n >= 1 && n <= 26) r.f37_capped_weeks.add(n);
         });
         // data-detail uses &lt; / &amp; HTML-escapes; unescape before JSON.parse
-        const _detailRaw = _capMatch[2]
+        const _detailRaw = _capMatch[3]
           .replace(/&lt;/g, '<')
           .replace(/&amp;/g, '&');
         r.f37_capped_detail = JSON.parse(_detailRaw) || {};
