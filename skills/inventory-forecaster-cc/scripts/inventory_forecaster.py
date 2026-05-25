@@ -1428,13 +1428,13 @@ def fetch_projections_qb_rest(prj_cols, args):
         req = urllib.request.Request(url, data=payload, headers=_QB_PROJ_HEADERS, method="POST")
 
         resp_data = None
-        for attempt in range(1, 4):
+        for attempt in range(1, QB_REST_MAX_RETRIES + 1):
             try:
                 with urllib.request.urlopen(req, timeout=90) as resp:
                     resp_data = json.loads(resp.read())
                 break
             except Exception as e:
-                if attempt == 3:
+                if attempt == QB_REST_MAX_RETRIES:
                     raise
                 time.sleep(2 ** attempt)
 
