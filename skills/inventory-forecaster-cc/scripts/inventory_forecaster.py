@@ -10988,6 +10988,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     _f59m_opo_wks   = _f59h_opo / max(_f59m_steady, 1)
                     _f59m_total_wks = _f59h_wos + _f59m_opo_wks
                 _f59m_gap_wks = max(0.0, 10.0 - _f59m_total_wks)
+                if _dbg_ec24_key:
+                    print(f"[DBG-F59m] GAP: total_wks={_f59m_total_wks:.2f} "
+                          f"gap_wks={_f59m_gap_wks:.2f} "
+                          f"gap>0.5={_f59m_gap_wks > 0.5}")
                 if _f59m_gap_wks > 0.5:
                     # For a large gap (> 4 weeks) spread restock over 3 weeks
                     # instead of 2 -- this is also more robust when W1 may get
@@ -10997,6 +11001,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     _f59m_wk_uplift = _f59m_gap_units / _f59m_ramp_wks
                     _f59m_w_ramp    = min(_f59m_steady * 2.5,
                                           _f59m_steady + _f59m_wk_uplift)
+                    if _dbg_ec24_key:
+                        print(f"[DBG-F59m] RAMP: ramp_wks={_f59m_ramp_wks} "
+                              f"gap_units={_f59m_gap_units:.0f} "
+                              f"w_ramp={_f59m_w_ramp:.1f} "
+                              f"snap_ramp={snap(_f59m_w_ramp, mp)} "
+                              f"floor={snap(_f59m_steady, mp)}")
                     _f59m_changed = False
                     for _wi in range(len(fcst)):
                         if _wi in _vp_q4_zeroed_idx:
