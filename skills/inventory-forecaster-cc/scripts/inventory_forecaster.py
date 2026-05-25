@@ -8758,7 +8758,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _f37_l4_avg     = sum(float(v or 0) for v in hist[-4:])  / 4  if len(hist) >= 4  else 0
     _f37_l13_avg    = sum(float(v or 0) for v in hist[-13:]) / 13 if len(hist) >= 13 else 0
     _f37_active_growth = (_f37_l13_avg > 0 and _f37_l4_avg >= _f37_l13_avg * 0.80)
-    _f37_skip       = _f37_status_new or _f37_active_growth
+    # F37h-cat gate (2026-05-25): skip F37 inventory-shortfall constraint when a
+    # curated category profile is driving the seasonal shape.  The Inv_Wk fields
+    # in QB are derived from the PREVIOUS run's AI projections; when the previous
+    # run used a wrong/stale seasonal shape (e.g. inflated Sep from position-based
+    # seasonal_profile), the inventory model shows a false shortfall in peak months.
+    # The cat profile (e.g. calming supplements) intentionally builds Oct-Nov demand;
+    # the inventory team will plan receipts accordingly once the correct signal is
+    # written to QB.  On the next run after write-back the Inv_Wk fields will reflect
+    # the corrected demand and F37 can resume normal operation.
+    _f37_skip       = _f37_status_new or _f37_active_growth or bool(_cat_mults)
     if model not in ("Inactive",) and not _f37_skip:
         _adjusted_f37, _f37_adjustments = apply_oh_shortfall_adjustment(row, fcst)
         if _f37_adjustments:
