@@ -7102,6 +7102,22 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 and _f72_prior6_zero >= 5
             )
             if _f72_is_new_launch_ramp:
+                # F72b (2026-05-24): F72 full-velocity early-exit.
+                # When the new launch is already running at >= 1,000/wk with
+                # L4 ~ L13 (no ramp curve in recent weeks), the item has hit
+                # steady-state.  Passing is_new_launch=True caused F10 / F77
+                # / F77h to skip and the ramp curve to under-project for
+                # 26 weeks.  When recent rate is healthy and stable, treat as
+                # post-launch steady -- skip the ramp gate.
+                _f72b_l4  = sum(hist_for_model[-4:])  / 4  if len(hist_for_model) >= 4  else 0
+                _f72b_l13 = sum(hist_for_model[-13:]) / 13 if len(hist_for_model) >= 13 else 0
+                _f72b_l13_nz = [v for v in hist_for_model[-13:] if v > 0]
+                _f72b_l13_nz_avg = (sum(_f72b_l13_nz) / len(_f72b_l13_nz)) if _f72b_l13_nz else 0
+                _f72b_full_velocity = (
+                    _f72b_l4 >= 1000 and _f72b_l13_nz_avg >= 1000
+                    and _f72b_l4 >= _f72b_l13_nz_avg * 0.85
+                )
+                _f72_is_new = not _f72b_full_velocity
                 # Route to Heuristic with the recent dense data as the signal
                 fcst, cap, meta = heuristic(hist_for_model, mp, l13w, is_amazon=is_amazon,
                                             description=description,
@@ -7109,14 +7125,22 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                             product_subcategory=product_subcategory,
                                             brand=brand, brand_pt=brand_pt,
                                             pos_data=pos_data, season=season,
-                                            is_new_launch=True)
-                model    = "Heuristic (F72 new-launch ramp)"
+                                            is_new_launch=_f72_is_new)
+                model    = "Heuristic (F72 new-launch ramp)" if _f72_is_new else "Heuristic (F72b post-launch steady)"
                 biweekly = False
-                meta.setdefault("drivers", []).append(
-                    f"F72 New-launch ramp detected: L26[-6:] has {_f72_recent6_nz} "
-                    f"non-zero (recent), L26[-12:-6] has {_f72_prior6_zero} zeros "
-                    f"(pre-launch); rerouted from Sparse Intermittent to Heuristic"
-                )
+                if _f72_is_new:
+                    meta.setdefault("drivers", []).append(
+                        f"F72 New-launch ramp detected: L26[-6:] has {_f72_recent6_nz} "
+                        f"non-zero (recent), L26[-12:-6] has {_f72_prior6_zero} zeros "
+                        f"(pre-launch); rerouted from Sparse Intermittent to Heuristic"
+                    )
+                else:
+                    meta.setdefault("drivers", []).append(
+                        f"F72b post-launch steady override: launch detected but L4 "
+                        f"{_f72b_l4:.0f}/wk and L13 nz {_f72b_l13_nz_avg:.0f}/wk both "
+                        f">= 1,000/wk with L4 >= 85% of L13 nz -- item is at "
+                        f"steady-state, skip is_new_launch gate so F10/F77h can fire"
+                    )
             else:
                 # Truly sparse buyer (< 25% non-zero = typically every 6–12 weeks).
                 # Mimic the historical batch cadence, anchored to account-level cadence.
