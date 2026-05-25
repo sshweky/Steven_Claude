@@ -8099,6 +8099,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                             is_new_launch=_f73_new_ramp,
                                             amz_catalog=amz_catalog,
                                             rtl_pos=rtl_pos)
+        if _f73_new_ramp and is_amazon:
+            _dbg3_key = row.get("Acct_MStyle_Key_", "?")
+            print(f"  [DBG4] {_dbg3_key}: sbaseline fcst[:4]={fcst[:4]} avg={sum(fcst)/26:.0f}", flush=True)
         model    = ("Seasonal Baseline (burst)"
                     if meta.get("model") == "seasonal_baseline_burst"
                     else "Seasonal Baseline")
@@ -8107,6 +8110,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _cadence_gap = detect_biweekly(hist_for_model)
         biweekly = bool(_cadence_gap)
         fcst     = apply_ordering_pattern(fcst, hist_for_model, mp)
+        if _f73_new_ramp and is_amazon:
+            print(f"  [DBG4] {_dbg3_key}: after aop gap={_cadence_gap} fcst[:4]={fcst[:4]}", flush=True)
 
         # F76 -- Seasonal Baseline thin-history ceiling guard (2026-05-24).
         #

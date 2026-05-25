@@ -1,0 +1,9 @@
+{
+  "id": "36",
+  "subject": "Run forecast --all --validate + push validation (fresh)",
+  "description": "Fresh full run after OR-space bug fix. BATCH=500 now works. Steps: 1) run_forecast.py --all --validate, 2) push_validation_qb.py",
+  "activeForm": "Running full forecast",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}
