@@ -3,7 +3,7 @@
   "subject": "Diagnose FF12302/24EC baseline (DBG3 fix + re-run)",
   "description": "Run run_forecast.py --mstyle FF12302 --acct 1864 --dry-run from scripts/ directory to verify F_NEW_AMZ_DAMP + event boost dampening fix",
   "activeForm": "Running DBG3 diagnostic for FF12302/24EC",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }

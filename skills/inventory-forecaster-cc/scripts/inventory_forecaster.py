@@ -11700,10 +11700,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             # Fix B (2026-05-25): use raw pre-normalization order history for variability
             # ratios. hist normalization (F60/F35/F43) can inject catch-up shipment values
             # into weeks that had 0 orders, creating extreme ratios (e.g. 5184/mean=2.5)
-            # that cycle to W13 and W26 producing artificial spikes. Raw history gives
-            # clean 1.15-1.30x ratios. Note: _rpl_ord_l13 (demand baseline) continues
-            # to use hist[-13:] -- only the variability ratio source changes.
-            _rpl_l13w_raw  = [float(v) for v in history[-13:]]
+            # that cycle to W13 and W26 producing artificial spikes. Raw Ord_LW values
+            # from the row give clean 1.15-1.30x ratios. Note: _rpl_ord_l13 (demand
+            # baseline) continues to use hist[-13:] -- only the variability ratio source
+            # changes.
+            _rpl_l13w_raw  = [float(row.get(c) or 0) for c in ORD_COLS[-13:]]
             _rpl_l13w_nz   = sum(1 for v in _rpl_l13w_raw if v > 0)
             _rpl_l13w_mean = sum(_rpl_l13w_raw) / 13   # all-weeks avg incl. zeros
             if _rpl_pos_primary:
