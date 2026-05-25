@@ -14251,15 +14251,18 @@ def main():
     amazon_mstyles = list(_amz_raw | {_ec_parent_for_query(m) for m in _amz_raw})
     if amazon_mstyles:
         print(f"\n[2.5] Pulling Amazon catalog POS for {len(amazon_mstyles)} mstyles ...", flush=True)
-        # 2026-05-25 (Audit Finding #2): migrated from CData full-table-scan
-        # loop to QB direct REST API.  See fetch_amazon_pos_qb_rest() at the
-        # top of this file.  Same per-Mstyle keying, drop-in replacement.
-        try:
-            amazon_pos = fetch_amazon_pos_qb_rest(amazon_mstyles)
-        except Exception as _p25_err:
-            print(f"      [WARN] Phase 2.5 QB REST fetch failed: {_p25_err}")
-            amazon_pos = {}
-        print(f"      {len(amazon_pos)} mstyles with POS data loaded (QB REST API)")
+        _p25_cached, _p25_hit = _pull_cache_load("phase2_5", _use_pc)
+        if _p25_hit:
+            amazon_pos = _p25_cached
+            print(f"      {len(amazon_pos)} mstyles with POS data from pull cache", flush=True)
+        else:
+            try:
+                amazon_pos = fetch_amazon_pos_qb_rest(amazon_mstyles)
+            except Exception as _p25_err:
+                print(f"      [WARN] Phase 2.5 QB REST fetch failed: {_p25_err}")
+                amazon_pos = {}
+            _pull_cache_save("phase2_5", amazon_pos)
+            print(f"      {len(amazon_pos)} mstyles with POS data loaded (QB REST API)")
         # Write a viewer-friendly POS cache (lowercase short keys) so the
         # viewer always sees fresh POS data on next launch.  Includes
         # ordered_lw, ordered_prior_wk, l4w, l13w, l26w, l52w (added
