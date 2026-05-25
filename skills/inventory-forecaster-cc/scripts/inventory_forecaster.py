@@ -515,15 +515,20 @@ def _load_derived_profiles():
 #   2. Apply seasonal indexes only as upward demand multipliers — floor every
 #      month value at 1.0 so the index never DECREASES forecast demand.
 #   3. Values <= 0.80 are noise — clamp to 1.0 (== rule #2 effectively).
-SEASONAL_MIN_SKU_COUNT = int(os.environ.get("SEASONAL_MIN_SKU_COUNT", "7"))
-"""2026-05-25: lowered from 10 to 7 (rejection rule `n_skus <= 7`, so any
-category with >=8 consistent SKUs now passes).  Surfaced by Finding #12's
-end-of-run rejection log: several at-boundary categories (Dog Supplements/
-Soft Chew, Dental Spray, Glass Care, Oven & Grill Care -- all 10 SKUs;
-plus Eye Care, Waste Bags, Water Additive, Pet Air Care -- 8 SKUs) were
-being filtered out at the `>10` boundary even though they have planner-
-trusted data behind them.  Categories with <8 SKUs (Balm-6, Sponge-7,
-Plastic-PP-6) still fall through to the keyword-fallback profile."""
+SEASONAL_MIN_SKU_COUNT = int(os.environ.get("SEASONAL_MIN_SKU_COUNT", "6"))
+"""2026-05-25: lowered from 10 to 6 (rejection rule `n_skus <= 6`, so any
+category with >=7 consistent SKUs now passes).  Surfaced by Finding #12's
+end-of-run rejection log:
+  - `>10` boundary filtered Dog Supplements/Soft Chew, Dental Spray, Glass
+    Care, Oven & Grill Care (10 SKUs each) plus Eye Care, Waste Bags, Water
+    Additive, Pet Air Care (8 SKUs each) -- planner-trusted categories
+    being rejected on noise.
+  - `>=7` additionally lets Cleaning Tools/Sponge (7), Air Care/Aerosol (7),
+    Hand Care/Hand Soap (7) and similar borderline categories through.
+Categories with <7 SKUs (Balm-6, Plastic-PP-6, Rolled Foil-6, Laundry-6,
+Microfiber-5, Furniture-4, Mints-3) still fall through to keyword-fallback
+or per-record forecasting -- below 7 SKUs the empirical aggregate becomes
+too noisy to trust (outlier SKUs / promo events dominate at small n)."""
 SEASONAL_FLOOR         = 1.00      # never multiply demand below 1.0× baseline
 SEASONAL_NOISE_GATE    = 0.80      # values <= 0.80 ignored (floored at 1.0)
 
