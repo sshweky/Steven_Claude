@@ -3375,6 +3375,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # Pure order-history signal; no manual reference.
     if l13_avg > 0:
         _f24_ceiling = l13_avg * 2.0
+        # F24_RTL_LIFT: when F15_RTL is active, the order-history ceiling
+        # l13_avg*2.0 can suppress a POS-anchored baseline built on depressed
+        # order weeks.  Raise the ceiling to the L4W POS rate so the retailer's
+        # current consumer sell-through rate is not artificially capped.
+        if _f15_rtl_active and _pos_l4_f15 > _f24_ceiling:
+            _f24_ceiling = _pos_l4_f15
         if baseline > _f24_ceiling:
             _f24_pre_baseline = baseline
             baseline = _f24_ceiling
