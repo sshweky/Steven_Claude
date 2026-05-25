@@ -2101,6 +2101,7 @@ function adaptRow(row) {
     hist_ord:          histOrd,
     ly_ord:            lyOrd,
     ly_shp:            lyShp,
+    di_ord:            diOrd,
     last_comment:          str(row, F.LAST_COMMENT),
     last_comment_date:     str(row, F.LAST_COMMENT_DATE),
     flagged:               bool(row, F.FLAGGED),
