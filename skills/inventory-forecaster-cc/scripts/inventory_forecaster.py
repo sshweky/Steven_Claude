@@ -13960,6 +13960,11 @@ def main():
                         "forecast run also computes validation flags on the manual "
                         "projection and merges them into forecast_results.json under "
                         "each record's 'validation' field.")
+    p.add_argument("--use-pull-cache",  action="store_true", dest="use_pull_cache",
+                       help="Skip all QB pulls and load from pull_cache/ on disk. "
+                            "Useful for debugging algorithm changes without re-hitting QB. "
+                            "Cache is always refreshed after a live pull so next debug "
+                            "run can use it immediately.")
     p.add_argument("--allow-stale-cache", action="store_true",
                    help="Allow the 24-hour open-PO disk cache to be reused on this "
                         "run.  By default (2026-05-06), forecast runs ignore the cache "
