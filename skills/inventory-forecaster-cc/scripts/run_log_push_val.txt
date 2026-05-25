@@ -1,0 +1,20 @@
+
+Loading C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\validation_results.json ...
+  5575 records  |  12 batches of 500  |  LIVE
+
+Pushing to QB table bpd237tvm (mergeFieldId=292) ...
+    500/5575  (9%)  batch ok=500 fail=0
+   1000/5575  (18%)  batch ok=500 fail=0
+   1500/5575  (27%)  batch ok=500 fail=0
+   2000/5575  (36%)  batch ok=500 fail=0
+   2500/5575  (45%)  batch ok=500 fail=0
+   3000/5575  (54%)  batch ok=500 fail=0
+   3500/5575  (63%)  batch ok=500 fail=0
+   4000/5575  (72%)  batch ok=500 fail=0
+   4500/5575  (81%)  batch ok=500 fail=0
+   5000/5575  (90%)  batch ok=500 fail=0
+   5500/5575  (99%)  batch ok=500 fail=0
+   5575/5575  (100%)  batch ok=75 fail=0
+
+==================================================
+  Done in 13.1s  —  5575 pushed  /  0 failed

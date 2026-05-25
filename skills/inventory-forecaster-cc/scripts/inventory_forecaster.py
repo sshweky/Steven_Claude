@@ -5014,12 +5014,25 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
 
     `inv_flow` dict (passed by caller from `fetch_inv_flow_qb_rest()` output):
         {
-          "beg_inv_w1": float,    # actual on-hand at start of W1
-          "rcv":        [r1..r26],# per-week receipts; r1 includes RcvWk0 rollover
-          "opn":        [o1..o26],# per-week confirmed open customer POs; o1 includes OpnWk0 rollover
+          "beg_inv_w1":   float,    # actual on-hand at start of W1
+          "rcv":          [r1..r26],# per-week receipts; r1 includes RcvWk0 rollover
+          "opn":          [o1..o26],# per-week confirmed open customer POs; o1 includes OpnWk0 rollover
+          "lt_trans_days": float,   # LT+ Trans Days (FID 225); 0 means missing
         }
 
-    Per-week math:
+    LT+Trans horizon gate (2026-05-26):
+        For any forecast week W that falls on or AFTER the LT+Trans Days
+        horizon (converted to weeks by ceiling division), the inventory cap is
+        NOT applied.  The reasoning: if W >= ceil(lt_trans_days / 7), we can
+        still place a purchase order today and receive the goods by that week,
+        so the current inventory position is irrelevant.  The cap only
+        constrains the "no-order window" -- weeks so near-term that any new
+        PO would arrive too late to help.
+
+        If lt_trans_days is 0 or missing, a conservative DEFAULT of 150 days
+        (~22 weeks) is used and a flag is set so the planner can be alerted.
+
+    Per-week math (within the no-order window):
         capacity_w = max(0, beg_inv_w + rcv[w] - opn[w])
         backlog_w  = SUM over live cohorts of (orig * max(0, 1 - 0.25*age))
         demand_w   = own_forecast[w] + backlog_w
@@ -5043,10 +5056,19 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     Inv Flow data, e.g. unit tests).
 
     Returns:
-        (adjusted_fcst, list of per-week adjustment dicts)
+        (adjusted_fcst, list of per-week adjustment dicts, lt_info dict)
+        lt_info = {
+            "lt_trans_days":  int,   # effective value used (after default applied)
+            "lt_trans_weeks": int,   # horizon week (F37 inactive at or beyond this)
+            "used_default":   bool,  # True if the 150d fallback was applied
+        }
     """
+    _LT_TRANS_DEFAULT_DAYS = 150   # ~22 weeks; conservative fallback
+
     if not inv_flow:
-        return list(fcst), []
+        return list(fcst), [], {"lt_trans_days": _LT_TRANS_DEFAULT_DAYS,
+                                "lt_trans_weeks": (_LT_TRANS_DEFAULT_DAYS + 6) // 7,
+                                "used_default": False}
 
     try:
         beg_inv = float(inv_flow.get("beg_inv_w1", 0) or 0)
@@ -5058,11 +5080,39 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     rcv = (list(rcv) + [0.0] * 26)[:26]
     opn = (list(opn) + [0.0] * 26)[:26]
 
+    # LT+Trans horizon: weeks at or beyond this index are unconstrained.
+    _raw_lt = inv_flow.get("lt_trans_days") or 0
+    try:
+        _raw_lt = float(_raw_lt)
+    except (TypeError, ValueError):
+        _raw_lt = 0.0
+    _used_lt_default = (_raw_lt <= 0)
+    _effective_lt    = _LT_TRANS_DEFAULT_DAYS if _used_lt_default else _raw_lt
+    # Ceiling division: week N is unconstrained when N >= lt_trans_weeks
+    _lt_trans_weeks  = int((_effective_lt + 6) // 7)
+
+    lt_info = {
+        "lt_trans_days":  int(_effective_lt),
+        "lt_trans_weeks": _lt_trans_weeks,
+        "used_default":   _used_lt_default,
+    }
+
     adjusted    = list(fcst)
     cohorts     = []   # list of [original_qty, age]; new cohorts born at age 0
     adjustments = []
 
     for w in range(min(26, len(fcst))):
+        own = float(fcst[w])
+
+        # Horizon gate: if this week is at or beyond LT+Trans Days, we can
+        # still order from the supplier -- inventory position is irrelevant.
+        # Leave the AI forecast untouched, let any pending cohort backlog
+        # continue aging, but do NOT cap or record an adjustment.
+        if (w + 1) >= _lt_trans_weeks:
+            # Age and prune cohorts so backlog doesn't pile up past the horizon
+            cohorts = [[q, a + 1] for q, a in cohorts if a + 1 < 4]
+            continue
+
         # Capacity = Beg Inv + this week's receipts - this week's open orders.
         # Open Orders are committed customer POs that take priority over the
         # forecast.  Floor at 0 -- if we're already oversold to open orders,
@@ -5077,7 +5127,6 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
         backlog = sum(q * max(0.0, 1.0 - 0.25 * a) for q, a in cohorts)
 
         # This week's real demand = own forecast + still-recoverable backlog
-        own = float(fcst[w])
         real_demand = own + backlog
 
         if capacity >= real_demand:
@@ -5094,9 +5143,8 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
             # Age existing cohorts first (drop age 4+)
             cohorts = [[q, a + 1] for q, a in cohorts if a + 1 < 4]
             # Create a new cohort for this week's unmet at age 0 (will contribute
-            # 100% if not satisfied this week -- but we already counted `own`
-            # and `backlog`, so this records the SURPLUS for future-week roll).
-            # We then immediately age it to 1 for next week's iteration.
+            # 100% if not satisfied next week -- we then immediately age it to 1
+            # for the next iteration).
             if unmet > 0:
                 cohorts.append([unmet, 1])
 
@@ -5115,7 +5163,7 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
                 "backlog":  int(round(backlog)),
             })
 
-    return adjusted, adjustments
+    return adjusted, adjustments, lt_info
 
 
 # F37 v1 body removed 2026-05-26 -- previously located at this line range,
