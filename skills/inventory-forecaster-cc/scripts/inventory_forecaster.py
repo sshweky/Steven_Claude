@@ -14771,6 +14771,7 @@ def main():
                             amazon_catalog_us=amazon_catalog_us,
                             ai_comments=ai_comments, ats_hist=ats_hist,
                             switchover_weeks=switchover_index,
+                            inv_flow_data=inv_flow_data,
                             variant_zero_weeks=variant_zero_index,
                             retailer_pos=retailer_pos,
                             vacated_bases=vacated_base_index)
