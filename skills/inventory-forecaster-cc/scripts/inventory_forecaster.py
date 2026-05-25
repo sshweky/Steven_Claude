@@ -7859,12 +7859,20 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # forecast double-corrects in the wrong direction.  When the item is in
     # decline (L4W <= L13W nz avg) clamp the lift multiplier to <= 1.10 so
     # the bias-up doesn't undo the brake.
+    #
+    # F66h (2026-05-24, audit item #2): Acceleration interlock.  When F82 (or
+    # F79 / F38b) already lifted the forecast for an accelerating record, F66's
+    # upward customer-bias would double-lift on top -- direct cause of the Target
+    # +120% over-projection in the 102 CRITICAL deep-dive.  When any upward
+    # rule fired AND F66 would also lift (>1.0), clamp F66 to max(1.05, 1.0).
     if model != "Inactive" and sum(fcst) > 0:
         _f66_mult = 1.0
+        _bias_cust = None
         _cu_upper = cust_name.upper()
-        for _bias_cust, _bias_mult in CUSTOMER_BIAS_CORRECTIONS.items():
-            if _bias_cust in _cu_upper:
-                _f66_mult = _bias_mult
+        for _b_cust, _b_mult in CUSTOMER_BIAS_CORRECTIONS.items():
+            if _b_cust in _cu_upper:
+                _bias_cust = _b_cust
+                _f66_mult  = _b_mult
                 break
         _f66g_l4  = sum(hist[-4:])  / 4  if len(hist) >= 4  else 0
         _f66g_l13_nz = [v for v in hist[-13:] if v > 0]
@@ -7877,12 +7885,28 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         if _f66g_in_decline and _f66_mult > 1.10:
             _f66_mult     = 1.10
             _f66g_clamped = True
+        # F66h acceleration interlock -- read flags stashed by seasonal_baseline()
+        _f66h_already_lifted = False
+        _f66h_clamped        = False
+        if isinstance(meta, dict):
+            _f66h_already_lifted = bool(
+                meta.get("f82_applied") or meta.get("f79_applied")
+                or meta.get("f38b_applied")
+            )
+        if _f66h_already_lifted and _f66_mult > 1.05:
+            _f66_mult     = 1.05
+            _f66h_clamped = True
         if _f66_mult != 1.0:
             fcst = [snap(v * _f66_mult, mp) if v > 0 else 0 for v in fcst]
+            _f66_clamp_tag = ""
+            if _f66g_clamped:
+                _f66_clamp_tag = " (F66g clamped to 1.10 -- item in decline)"
+            elif _f66h_clamped:
+                _f66_clamp_tag = (" (F66h clamped to 1.05 -- F38b/F79/F82 already "
+                                  "lifted, prevent double-up)")
             meta.setdefault("drivers", []).append(
-                f"F66 Customer bias correction ({_bias_cust}): x{_f66_mult:.2f} "
-                f"{'(F66g clamped to 1.10 -- item in decline, original bias not applied) '
-                  if _f66g_clamped else ''}"
+                f"F66 Customer bias correction ({_bias_cust}): x{_f66_mult:.2f}"
+                f"{_f66_clamp_tag} "
                 f"(AI systematically {'under' if _f66_mult > 1 else 'over'}-projects "
                 f"this account based on planner override history)"
             )
