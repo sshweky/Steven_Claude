@@ -13964,7 +13964,7 @@ def main():
     # ── Phase 2.8: VP-Q4 forward-window confirmed-PO pull ───────────
     open_pos_data = {}
     if not getattr(args, "no_po_zero", False):
-        # `fetch_open_pos_forward` lifted to module-top import (Audit Finding #19).
+        from oos_history import fetch_open_pos_forward  # inline by design (see top of file)
         keys = [r.get("Acct_MStyle_Key_") for r in rows if r.get("Acct_MStyle_Key_")]
         # Decode W1_DATE from ORIG_PRJ_COLS[0] (e.g. "05_10_W1" -> 2026-05-10).
         # Passing this to fetch_open_pos_forward fixes VP-Q4's bucketing alignment:
