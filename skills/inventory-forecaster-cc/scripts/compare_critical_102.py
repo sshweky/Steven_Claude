@@ -88,7 +88,7 @@ print()
 # Top improvers
 per_key.sort(key=lambda r: -r['improvement'])
 print("Top 15 improved records (|gap| reduction):")
-print(f"  {'Key':22s} {'Bucket':36s} {'Old AI':>9s} {'New AI':>9s} {'Manual':>9s} {'old%':>8s} {'Δ new%':>8s} {'Saved':>9s}")
+print(f"  {'Key':22s} {'Bucket':36s} {'Old AI':>9s} {'New AI':>9s} {'Manual':>9s} {'old%':>8s} {'new%':>8s} {'Saved':>9s}")
 for r in per_key[:15]:
     print(f"  {r['key']:22s} {(r['bucket'] or '')[:36]:36s} {r['old_ai']:>9,} {r['new_ai']:>9,} {r['manual']:>9,} {r['old_pct']:>+7.1f}% {r['new_pct']:>+7.1f}% {r['improvement']:>+9,}")
 print()
@@ -96,7 +96,7 @@ print()
 # Top WORSE records
 per_key.sort(key=lambda r: r['improvement'])
 print("Top 10 records that got WORSE (|gap| increased):")
-print(f"  {'Key':22s} {'Bucket':36s} {'Old AI':>9s} {'New AI':>9s} {'Manual':>9s} {'old%':>8s} {'Δ new%':>8s} {'Cost':>9s}")
+print(f"  {'Key':22s} {'Bucket':36s} {'Old AI':>9s} {'New AI':>9s} {'Manual':>9s} {'old%':>8s} {'new%':>8s} {'Cost':>9s}")
 for r in per_key[:10]:
     if r['improvement'] >= 0: break
     print(f"  {r['key']:22s} {(r['bucket'] or '')[:36]:36s} {r['old_ai']:>9,} {r['new_ai']:>9,} {r['manual']:>9,} {r['old_pct']:>+7.1f}% {r['new_pct']:>+7.1f}% {r['improvement']:>+9,}")
