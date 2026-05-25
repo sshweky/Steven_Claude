@@ -3,7 +3,7 @@
   "subject": "F12: Log cat-profile SKU gate rejections",
   "description": "_apply_forecasting_rules returns None silently when n_skus too low — add visible driver string when rejected",
   "activeForm": "Adding cat-profile gate logging",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }

@@ -517,16 +517,32 @@ SEASONAL_FLOOR         = 1.00      # never multiply demand below 1.0× baseline
 SEASONAL_NOISE_GATE    = 0.80      # values <= 0.80 ignored (floored at 1.0)
 
 
-def _apply_forecasting_rules(profile_values, n_skus):
+# Audit Finding #12 (2026-05-25): track cat-profile rejections so planners can
+# see WHICH curated categories are getting filtered by the SKU gate.  Without
+# this, a planner who adds a new category in derived_profiles.json gets no
+# visibility into why their work has no observable effect.  Printed once
+# per-category at end of run (see _print_cat_profile_rejections in main()).
+_CAT_PROFILE_REJECTIONS = {}     # (priority, key) -> {"n_skus": int, "count": int}
+
+
+def _apply_forecasting_rules(profile_values, n_skus, *, priority="?", key="?"):
     """Apply the planner-directive forecasting rules to a 12-element profile.
 
     Returns the rule-adjusted profile, or None if the SKU gate is not met
     (signaling the caller to fall through to next-priority match).
+
+    `priority` and `key` are diagnostic-only -- recorded in
+    _CAT_PROFILE_REJECTIONS for end-of-run summary so planners can see which
+    cat profiles were silently filtered by the SKU gate.
     """
     if profile_values is None:
         return None
     if n_skus is not None and n_skus <= SEASONAL_MIN_SKU_COUNT:
-        return None  # SKU gate failed — let caller try next priority
+        # SKU gate failed -- let caller try next priority.
+        _rec = _CAT_PROFILE_REJECTIONS.setdefault(
+            (priority, key), {"n_skus": n_skus, "count": 0})
+        _rec["count"] += 1
+        return None
     # Floor at 1.0 — only allow seasonality to INCREASE demand
     return [max(v, SEASONAL_FLOOR) for v in profile_values]
 
