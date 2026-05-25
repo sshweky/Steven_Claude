@@ -2696,6 +2696,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if (not is_amazon
             and not _f10_applied
             and not _f77_applied
+            and not _f77b_applied
             and not is_new_launch
             and _l13_nz_avg_f10 > 0
             and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20):
