@@ -14451,6 +14451,11 @@ def main():
             continue
         if AMAZON_CUST_SUBSTR not in _cust:
             continue   # DI only applies to Amazon
+        # Skip EC/COS/AMZ variants here -- their base style is already in the
+        # loop and handles the DI lookup.  After blending, the F69->F60 re-apply
+        # block (below) cascades the DI-enriched base history into EC variants.
+        if any(_ms.upper().endswith(_es) for _es in ("EC", "COS", "AMZ")):
+            continue
         for _sfx in _DI_SUFFIXES:
             _sib_key = f"{_DI_IMPORT_ACCT}-{_ms}{_sfx}"
             _di_candidate_keys.append(_sib_key)

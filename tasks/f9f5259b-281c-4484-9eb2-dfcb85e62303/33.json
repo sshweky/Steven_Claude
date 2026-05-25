@@ -1,0 +1,9 @@
+{
+  "id": "33",
+  "subject": "--all --dry-run after threshold=7 change",
+  "description": "Verify global impact of SEASONAL_MIN_SKU_COUNT lowering (10→7), surface which previously-rejected categories now pass",
+  "activeForm": "Running full dry-run with new threshold",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
