@@ -1925,7 +1925,8 @@ def _burst_postprocess(forecast, history, mp, l13_zero_count):
 def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=None,
                       product_category=None, product_subcategory=None,
                       brand=None, brand_pt=None, shpd_l13=0.0, season=None,
-                      is_ecom=False, is_new_launch=False, amz_catalog=None):
+                      is_ecom=False, is_new_launch=False, amz_catalog=None,
+                      rtl_pos=None):
     """
     Forecasting model for dense CPG replenishment (orders most weeks):
 
