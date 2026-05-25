@@ -1646,6 +1646,24 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     _fa_applied    = False
     _baseline_mode = ""
 
+    # F_STEADY (2026-05-24): pre-compute steady-buyer flag so F7/F78/F_STEADY
+    # can all share the same detection.  Steady buyers (CV<=0.50, 0-1 zero weeks)
+    # have LY batch orders that do NOT predict forward demand -- any peak-anchor
+    # or seasonal distortion from LY must be suppressed for these records.
+    try:
+        import statistics as _stat_sb
+        _l13_cv = _stat_sb.stdev(l13) / l13_avg if l13_avg > 0 and len(l13) > 1 else 99.0
+    except Exception:
+        _l13_cv = 99.0
+    _is_steady_buyer = (
+        not is_amazon
+        and not _fa_applied
+        and l13_zero_count <= 1
+        and l13_avg > 0
+        and len(l13) >= 13
+        and _l13_cv <= 0.50
+    )
+
     # Signal A — fulfillment gap (OOS proxy).
     #
     # BUG-FIX (2026-05-07): `shpd_l13` from `Shpd_Wk_L13W_cust_` is a PER-WEEK
@@ -2267,7 +2285,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # instead of the current trough. This lets items heading INTO peak season
     # forecast at their true seasonal peak rather than at current quiet levels.
     _peak_anchor_driver = None
-    if _cat_mults:
+    if _cat_mults and not _is_steady_buyer:
         _cat_profile_pa = _get_category_profile(description, product_category,
                                                 product_subcategory, brand, brand_pt,
                                                 season=season)
@@ -2304,7 +2322,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # avg is 3x+ the L13W nz avg, re-anchor the baseline to the historical peak.
     # Catches seasonal items like fire starters, dental kits, air fresheners,
     # Fraganzia deodorizers that lack a CATEGORY_PROFILES entry.
-    if not _peak_anchor_driver and not _cat_mults and len(history) >= 26:
+    if not _peak_anchor_driver and not _cat_mults and not _is_steady_buyer and len(history) >= 26:
         from datetime import date as _dt_f78, timedelta as _td_f78
         _today_f78 = _dt_f78.today()
         _f78_month_vals = {}
@@ -2479,33 +2497,21 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     #   - skip if fewer than 13 L13W observations (thin history)
     _f_steady_applied = False
     _f_steady_driver  = None
-    print(f"[FS_DBG] amz={is_amazon} fa={_fa_applied} z={l13_zero_count} avg={l13_avg:.1f} nL13={len(l13)} hist_L13={history[-13:]}", flush=True)
-    if (not is_amazon
-            and not _fa_applied
-            and l13_zero_count <= 1
-            and l13_avg > 0
-            and len(l13) >= 13):
-        try:
-            import statistics as _stat_fs
-            _l13_cv = _stat_fs.stdev(l13) / l13_avg if len(l13) > 1 else 99.0
-        except Exception:
-            _l13_cv = 99.0
-        print(f"[FS_CV] cv={_l13_cv:.3f} fire={_l13_cv<=0.50}", flush=True)
-        if _l13_cv <= 0.50:
-            DAMP_STEADY   = 0.15
-            _s_min_raw    = min(S)
-            _s_max_raw    = max(S)
-            S             = [1.0 + DAMP_STEADY * (s - 1.0) for s in S]
-            _f_steady_applied = True
-            _f_steady_driver  = (
-                f"F_STEADY steady buyer: L13 zero-weeks={l13_zero_count}/13, "
-                f"CV={_l13_cv:.2f} (<=0.50); seasonal damped 85% toward flat "
-                f"(S range {_s_min_raw:.2f}-{_s_max_raw:.2f} -> "
-                f"{min(S):.2f}-{max(S):.2f})"
-            )
+    if _is_steady_buyer:
+        DAMP_STEADY   = 0.15
+        _s_min_raw    = min(S)
+        _s_max_raw    = max(S)
+        S             = [1.0 + DAMP_STEADY * (s - 1.0) for s in S]
+        _f_steady_applied = True
+        _f_steady_driver  = (
+            f"F_STEADY steady buyer: L13 zero-weeks={l13_zero_count}/13, "
+            f"CV={_l13_cv:.2f} (<=0.50); peak-anchor (profile+fallback) suppressed; "
+            f"seasonal damped 85% toward flat "
+            f"(S range {_s_min_raw:.2f}-{_s_max_raw:.2f} -> "
+            f"{min(S):.2f}-{max(S):.2f})"
+        )
 
     # Raw forecast: damped profile + explicit event lifts
-    print(f"[FS_S] S_max={max(S):.3f} S_min={min(S):.3f} baseline={baseline:.1f} f_steady={_f_steady_applied}", flush=True)
     raw = []
     _f66_floored = 0
     # F66 (2026-05-21) — Seasonal floor: the seasonal profile can only
@@ -2543,17 +2549,6 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
 
     # Snap to master pack
     forecast = [snap(v, mp) for v in raw]
-
-    # DBG-FF12859 temporary trace (remove after diagnosis)
-    if description and "grooming glove" in (description or "").lower():
-        import sys
-        _last4h = list(history[-4:])
-        _last3h = list(history[-3:])
-        print(f"  [DBG-FF12859] desc={description[:40]!r} mp={mp}", file=sys.stderr)
-        print(f"  [DBG-FF12859] hist[-4:]={_last4h}  hist[-3:]={_last3h}", file=sys.stderr)
-        print(f"  [DBG-FF12859] baseline={baseline:.1f}  cat_mults={'yes' if _cat_mults else 'no'}  S[-3:]={S[-3:]}", file=sys.stderr)
-        print(f"  [DBG-FF12859] raw[-3:]={raw[-3:]}  fcst[-3:]={forecast[-3:]}", file=sys.stderr)
-        print(f"  [DBG-FF12859] _fa_applied={_fa_applied}  l13_zero_count={l13_zero_count}  trailing_zeros={_trailing_zeros}", file=sys.stderr)
 
     # F10 — Declining-item end-of-life detection (YoY-gated, 2026-04-21).
     # Two tests must both pass before we scale down:
@@ -2782,7 +2777,6 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             f"→ final baseline capped at L13 all-avg × 1.5 "
             f"({_f22c_pre_baseline:.0f} → {baseline:.0f})"
         )
-    print(f"[BL_PRE_F_STEADY] baseline={baseline:.1f} ord_bl={ord_baseline:.1f} l13_avg={l13_avg:.1f}", flush=True)
     if _f24_applied:
         meta.setdefault("drivers", []).append(
             f"F24 L13-all ceiling: baseline capped at L13_avg × 2.0 "
