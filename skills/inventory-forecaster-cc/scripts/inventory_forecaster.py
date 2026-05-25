@@ -10876,16 +10876,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #   net_gap_wks > 0.5  -- meaningful remaining gap
         #   Not DI-blended (F69-wos handles that path)
         #   Not Inactive / OTB
-        _dbg_ec24_key = (row.get("Acct_MStyle_Key_") or "") == "1864-FF12302/24EC"
-        if _dbg_ec24_key:
-            print(f"[DBG-F59m] PRE-GATE: key=1864-FF12302/24EC "
-                  f"is_amazon={is_amazon} pos_data={bool(pos_data)} "
-                  f"model={model!r} di_blend={row.get('_di_blend')} "
-                  f"_f59h_wos={_f59h_wos:.2f} _f59h_soh={_f59h_soh:.0f} "
-                  f"_f59h_opo={_f59h_opo:.0f} "
-                  f"_f73_new_ramp={_f73_new_ramp} "
-                  f"fcst_pre_f59m_avg={sum(fcst)/len(fcst):.1f} "
-                  f"fcst_pre[:4]={fcst[:4]}")
         if (is_amazon and pos_data
                 and isinstance(fcst, list) and len(fcst) >= 26
                 and model not in ("Inactive", "OTB (zero)",
