@@ -2519,9 +2519,10 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
 
     # Raw forecast: damped profile + explicit event lifts
     raw = []
-    _f66_floored = 0
-    # F66 (2026-05-21) — Seasonal floor: the seasonal profile can only
-    # INCREASE demand, never reduce it.  Any week where the multiplier
+    _f85_floored = 0
+    # F85 (renamed from F66 on 2026-05-24 to break collision with F66 customer-
+    # bias correction in forecast_record).  Seasonal floor: the seasonal profile
+    # can only INCREASE demand, never reduce it.  Any week where the multiplier
     # would fall below 1.0 is held at 1.0 (flat baseline).
     #
     # GATE: only applies when a category profile was blended in (_cat_mults
@@ -2535,13 +2536,13 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # order weeks, low in gap weeks).  Raising gap weeks to 1.0 there creates
     # phantom demand in weeks the customer won't order, producing an
     # artificially flat and elevated forecast.
-    _f66_eligible = bool(_cat_mults)
+    _f85_eligible = bool(_cat_mults)
     for i in range(26):
         wnum = i + 1
         s = S[i]
-        if _f66_eligible and s < 1.0:
+        if _f85_eligible and s < 1.0:
             s = 1.0
-            _f66_floored += 1
+            _f85_floored += 1
         # F11 — Prime Day / Fall Prime Day ordering lift (Amazon-only, calendar-based).
         if is_amazon:
             _pb, _fb = _get_event_boosts()
