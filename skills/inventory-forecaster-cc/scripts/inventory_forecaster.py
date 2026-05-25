@@ -5119,10 +5119,19 @@ def crostens(history, mp, is_amazon=False, description=None,
     #            stock burns through → cap z toward POS L13W rate.
     #   Moderate above-POS (POS × 1.0–2.0): blend 75% POS / 25% Croston's.
     # Volume-gated (POS L13 ≥ 50/wk) to avoid tail-item noise.
+    #
+    # F18g (2026-05-25): Amazon-only gate.  Until 2026-05-24, retailer POS keys
+    # silently failed to match because of a "16553.0-FF30784" vs "16553-FF30784"
+    # type-mismatch bug, so F18 was effectively Amazon-only.  When the key bug
+    # was fixed, F18 started firing on non-Amazon records and collapsed PDQ
+    # display-placement items where order >> POS is structural (display orders
+    # don't translate to consumer sell-through 1:1).  Restored Amazon-only for
+    # F18 itself; non-Amazon POS guardrails now run via F49d (spike-cap veto)
+    # and F82g (growth multiplier veto).
     _f18_applied     = False
     _f18_driver      = None
     _f18_capped_down = False   # True when F18 intentionally caps z DOWN (R6 must not re-lift)
-    if pos_data:
+    if pos_data and is_amazon:
         _pos_l4_f18  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
         _pos_l13_f18 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
         _pos_l26_f18 = float(pos_data.get("Avg_Units_Wk_L26w") or 0)
