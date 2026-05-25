@@ -1300,6 +1300,14 @@ def qb_bulk_update(table_id, records, merge_field_id, batch_size=None):
                        + len(meta.get("updatedRecordIds", []))
                        + len(meta.get("unchangedRecordIds", [])))
                 _processed = meta.get("totalNumberOfRecordsProcessed", _ok)
+                # Audit Finding #6 (2026-05-25): treat empty 200 OK as a
+                # throttle signal -- if we sent N rows and QB processed zero,
+                # that's a silent throttle (or a body-format issue), NOT
+                # success.  Re-raise to trigger retry.
+                if _processed == 0 and len(chunk) > 0:
+                    raise RuntimeError(
+                        f"empty 200 OK: 0 of {len(chunk)} rows processed "
+                        f"(likely silent throttle)")
                 _failed_meta = max(0, _processed - _ok)
                 n_ok   += _ok
                 n_fail += _failed_meta + max(0, len(chunk) - _processed)
