@@ -11967,7 +11967,10 @@ def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
         r = validate_record(row, master_pack, high_mult=high,
                             oos_entry=oos_ent, open_po_wk=po_wk,
                             ats_hist=ats_hist,
-                            switchover_weeks=switchover_weeks)
+                            switchover_weeks=switchover_weeks,
+                            amazon_pos=amazon_pos, season_map=season_map,
+                            amazon_catalog_us=amazon_catalog_us,
+                            retailer_pos=retailer_pos)
         # Also run the AI forecast so we can show it in the viewer
         prefix = key.split("-")[0] if "-" in key else key
         acct_iv = acct_cadences.get(prefix)
