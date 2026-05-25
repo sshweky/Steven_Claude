@@ -9000,10 +9000,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"(fall replenishment W17-18 +10%, holiday pre-order W21-22 +8%)"
             )
 
-    # _cat_mults pre-compute for F61 + F37 gates (fix 2026-05-25).
-    # F37h-cat added an assignment at line ~9215 which made _cat_mults local
-    # to forecast_record(); accessing it here (before that assignment) raised
-    # UnboundLocalError.  Compute once now; line 9215 overwrites identically.
+    # _cat_mults pre-compute for F61 + F37h-cat gates.
+    # Single source of truth: both downstream gates read this same value.
+    # Removing this compute will break both F61 horizon decay and the F37
+    # inventory-shortfall bypass for curated-cat-profile items.
     _cat_mults = _category_week_multipliers(
         description, product_category, product_subcategory, brand, brand_pt,
         season=season,
