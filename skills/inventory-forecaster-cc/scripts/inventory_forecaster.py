@@ -1075,7 +1075,7 @@ def _fetch_retailer_pos(rows):
             if len(batch_data) < 1000 or (total > 0 and len(raw_rows) >= total):
                 break
             skip += 1000
-            time.sleep(0.15)
+            time.sleep(RETAILER_POS_PAGE_DELAY_S)
 
     if not raw_rows:
         return {}
