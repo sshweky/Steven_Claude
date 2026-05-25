@@ -2707,12 +2707,17 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # the static baseline misses.  Only fires on Seasonal Baseline (this function),
     # not Croston's/Heuristic (they have their own trend handling).
     # Guard: skip if F10 or F77 already applied a decline correction.
+    # F79g (2026-05-24, audit item #3): F38b interlock.  F38b already
+    # multiplied `baseline` by (1 + L4/L13 trend).  Applying F79 on top would
+    # double-count the same Amazon-POS acceleration signal (~1.20 × 1.20 =
+    # 1.44 compounding on a +20% trend item).  When F38b fired, skip F79.
     _f79_driver = None
     if (is_amazon
             and not _f10_applied
             and not _f10b_applied
             and not _f77_applied
             and not _f77b_applied
+            and not _f38b_applied
             and not is_new_launch
             and _l13_nz_avg_f10 > 0
             and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20):
@@ -2722,6 +2727,12 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             f"F79 Amazon growth: L4W avg {_l4_avg_f10:.0f} = "
             f"{_f79_ratio:.2f}x L13W nz avg {_l13_nz_avg_f10:.0f}; "
             f"forecast scaled up x{_f79_ratio:.2f}"
+        )
+    elif _f38b_applied and is_amazon and _l13_nz_avg_f10 > 0 \
+            and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20:
+        _f79_driver = (
+            f"F79 skipped (F79g interlock): F38b already lifted baseline by "
+            f"L4/L13 trend; applying F79 on top would double-count."
         )
 
     # F82 (2026-05-24): Non-Amazon growth trend multiplier.
