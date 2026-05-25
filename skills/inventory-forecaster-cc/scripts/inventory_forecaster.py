@@ -14211,14 +14211,22 @@ def main():
     # throttled the realm.  REST sends the WHERE server-side so QB returns only
     # the matching ~5,500 rows × 3 fields total.
     print(f"\n[2/4] Pulling master pack + Season from Styles ...", flush=True)
-    print(f"      [QB REST] fetching Styles field map ...", flush=True)
     mstyles_needed = sorted({r["Mstyle"] for r in rows if r.get("Mstyle")})
-    try:
-        master_pack, season_map = fetch_master_pack_qb_rest(mstyles_needed)
-    except Exception as _p2_err:
-        sys.exit(f"ERROR: Phase 2 QB REST fetch failed: {_p2_err}")
-    print(f"      {len(master_pack)} master pack records loaded "
-          f"({len(season_map)} with Season tag) (QB REST API)")
+    _p2_cached, _p2_hit = _pull_cache_load("phase2", _use_pc)
+    if _p2_hit:
+        master_pack = _p2_cached.get("master_pack", {})
+        season_map  = _p2_cached.get("season_map", {})
+        print(f"      {len(master_pack)} master pack + {len(season_map)} season records "
+              f"from pull cache", flush=True)
+    else:
+        print(f"      [QB REST] fetching Styles field map ...", flush=True)
+        try:
+            master_pack, season_map = fetch_master_pack_qb_rest(mstyles_needed)
+        except Exception as _p2_err:
+            sys.exit(f"ERROR: Phase 2 QB REST fetch failed: {_p2_err}")
+        _pull_cache_save("phase2", {"master_pack": master_pack, "season_map": season_map})
+        print(f"      {len(master_pack)} master pack records loaded "
+              f"({len(season_map)} with Season tag) (QB REST API)")
 
     # ── Phase 2.5: Pull Amazon Catalog POS data (Amazon items only) ──
     amazon_pos = {}
