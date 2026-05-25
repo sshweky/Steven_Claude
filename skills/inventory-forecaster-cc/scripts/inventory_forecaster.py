@@ -9596,26 +9596,30 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # week of non-shipment (matches F34/F35 schedule; fully lost at age 4+).
     # apply_oh_shortfall_adjustment returns int-rounded values; we snap to
     # MP here in the orchestrator (single snap pass).
-    # P6 (2026-05-24): Skip F37 OH-shortfall capping on NEW-launch items and
-    # items in active growth.  Variance deep-dive showed F37 zeroing W1-W2 on
-    # Walmart "A: NEW" Croston's records (#4, 5, 9, 10) when planner has
-    # 7,000-10,000 in those weeks.  Warehouse SOH being high doesn't mean
-    # demand is satisfied -- new-launch ordering happens concurrently.
-    _f37_status_new = "NEW" in (row.get("Status_Cust") or "").upper()
-    _f37_l4_avg     = sum(float(v or 0) for v in hist[-4:])  / 4  if len(hist) >= 4  else 0
-    _f37_l13_avg    = sum(float(v or 0) for v in hist[-13:]) / 13 if len(hist) >= 13 else 0
-    _f37_active_growth = (_f37_l13_avg > 0 and _f37_l4_avg >= _f37_l13_avg * 0.80)
-    # F37h-cat bypass REMOVED 2026-05-26: previously skipped F37 for curated
-    # cat-profile items because stale Inv_Wk* fields gave a wrong inventory
-    # picture.  F37 v2 cascades inventory FRESH from raw Inv Flow components
-    # using THIS run's AI projection, so the bypass is no longer needed --
-    # cat-profile items now go through F37 normally.
+    # F37 skip logic (2026-05-26 -- v2 update):
+    #   - Status_Cust=NEW: keep skip.  New-launch ordering is concurrent with
+    #     warehouse-restocking; capping on current SOH zeros W1-W2 incorrectly.
+    #   - active-growth bypass REMOVED.  The 2026-05-24 active-growth gate
+    #     (L4_avg >= 0.8 * L13_avg) was a workaround for F37 v1's staleness
+    #     bug -- v1 read Inv_Wk* fields cascaded against the PREVIOUS run's
+    #     AI projection, so on actively-ordering items the stale Inv_Wk*
+    #     incorrectly showed depleted inventory and F37 over-capped W1-W2.
+    #     F37 v2 cascades fresh, so this workaround is no longer needed.
+    #     Critically, removing it ALSO unblocks F37 for the high-volume
+    #     actively-ordering records where inventory pressure matters most
+    #     (FF8651/8 type: 286K capacity vs 295K demand -- F37 v1 + bypass
+    #     never trimmed; v2 + no-bypass correctly trims ~7K).
+    #   - F37h-cat bypass REMOVED 2026-05-26: previously skipped F37 for
+    #     curated cat-profile items because stale Inv_Wk* gave wrong inventory.
+    #     v2 fresh cascade eliminates that bug; cat-profile items now go
+    #     through F37 normally.
     # Look up this record's Inv Flow data (mstyle-keyed; each acct-mstyle
     # assumes the full mstyle inventory is available -- planner allocates
     # across customers at gametime).
+    _f37_status_new = "NEW" in (row.get("Status_Cust") or "").upper()
     _ms_for_inv = (row.get("Mstyle") or "").strip()
     _inv_flow_rec = (inv_flow_data or {}).get(_ms_for_inv)
-    _f37_skip = _f37_status_new or _f37_active_growth or (not _inv_flow_rec)
+    _f37_skip = _f37_status_new or (not _inv_flow_rec)
     if model not in ("Inactive",) and not _f37_skip:
         _adjusted_f37, _f37_adjustments = apply_oh_shortfall_adjustment(
             row, fcst, inv_flow=_inv_flow_rec)

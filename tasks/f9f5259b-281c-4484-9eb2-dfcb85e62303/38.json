@@ -1,0 +1,9 @@
+{
+  "id": "38",
+  "subject": "--all --dry-run after F37 v2 rewrite",
+  "description": "Verify global impact of fresh-cascade F37 + Inv Flow REST pull; compare cohort triggers, total demand, alert count vs baseline (16,447,414 with stale F37 + F37h-cat bypass)",
+  "activeForm": "Running --all --dry-run for F37 v2 validation",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
