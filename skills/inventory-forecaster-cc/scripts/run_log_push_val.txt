@@ -17,4 +17,4 @@ Pushing to QB table bpd237tvm (mergeFieldId=292) ...
    5575/5575  (100%)  batch ok=75 fail=0
 
 ==================================================
-  Done in 13.1s  —  5575 pushed  /  0 failed
+  Done in 37.1s  —  5575 pushed  /  0 failed

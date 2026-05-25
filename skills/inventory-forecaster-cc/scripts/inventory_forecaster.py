@@ -7352,6 +7352,16 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
         _rtl_key = row.get("Acct_MStyle_Key_", "")
         if _rtl_key:
             _rtl_entry = retailer_pos.get(_rtl_key)
+            # Retailer-suffix fallback: some retailers append a 2-3 letter
+            # code to the mstyle in Projections (e.g. "FF11926KL" for Kohls,
+            # "FF20301PS" for Petsmart) but the Retailer Sales POS table stores
+            # the data under the base mstyle ("FF11926", "FF20301").
+            # If the exact key missed, strip the trailing alpha suffix and retry.
+            if not _rtl_entry and '-' in _rtl_key:
+                _acct_part, _ms_part = _rtl_key.split('-', 1)
+                _ms_base = re.sub(r'[A-Z]{2,3}$', '', _ms_part)
+                if _ms_base and _ms_base != _ms_part:
+                    _rtl_entry = retailer_pos.get(f"{_acct_part}-{_ms_base}")
             if _rtl_entry and float(_rtl_entry.get("Avg_Units_Wk_L13w") or 0) > 0:
                 rtl_pos  = _rtl_entry
                 pos_data = _rtl_entry  # same field names as Amazon POS
