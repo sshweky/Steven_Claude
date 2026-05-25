@@ -2796,9 +2796,9 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # in the AI_ALERT narrative for every record (VP-Q1, 2026-04-28).
     if _baseline_mode:
         meta.setdefault("drivers", []).append(f"VP-Q1 baseline: {_baseline_mode}")
-    if _f66_floored:
+    if _f85_floored:
         meta.setdefault("drivers", []).append(
-            f"F66 seasonal floor: {_f66_floored} week(s) where raw profile < 1.0 "
+            f"F85 seasonal floor: {_f85_floored} week(s) where raw profile < 1.0 "
             f"raised to 1.0 (profile can only increase demand, raw min was "
             f"{round(min(S), 2)})"
         )
