@@ -13175,19 +13175,47 @@ def main():
     if args.all:      scope_parts.append("all active")
     scope_desc = " | ".join(scope_parts) if scope_parts else "all active"
 
-    # ── Phase 1: Pull projection records ──────────────────────────
+    # ── Phase 1: Pull projection records (3 split queries) ────────
+    # Splitting the original 250-col query into three ~80-col queries
+    # avoids CData/QB throttle disconnects under realm load.
+    # Q1 is required; Q2/Q3 are merged in by key (graceful zero-fill on failure).
     scope_filter = build_scope_filter(args)
-    sql = build_prj_select(ORIG_PRJ_COLS)
-    if scope_filter:
-        sql += f"\nAND {scope_filter}"
 
     print(f"\n[1/4] Pulling projections from Quickbase ...", flush=True)
-    raw_rows = cdata_query(sql, "projections")
+
+    # Q1: metadata + MAN_PRJ + ORD_COLS (~94 cols) -- required
+    sql_q1 = build_prj_q1(ORIG_PRJ_COLS, scope_filter)
+    raw_rows = cdata_query(sql_q1, "projections")
     if not raw_rows:
         sys.exit("ERROR: No records returned. Check scope filters and CData connection.")
-
     rows = [{k: clean_html(v) for k, v in r.items()} for r in raw_rows]
-    print(f"      {len(rows)} records retrieved", flush=True)
+    print(f"      Q1: {len(rows)} records (metadata + projections + orders)", flush=True)
+
+    # Q2: SHP_COLS + INV_OH_COLS (~79 cols) -- merge by key
+    sql_q2 = build_prj_q2(scope_filter)
+    raw_q2 = cdata_query(sql_q2, "projections_q2") or []
+    if raw_q2:
+        q2_map = {r["Acct_MStyle_Key_"]: r for r in raw_q2 if r.get("Acct_MStyle_Key_")}
+        for row in rows:
+            extra = q2_map.get(row.get("Acct_MStyle_Key_"), {})
+            row.update({k: clean_html(v) for k, v in extra.items() if k != "Acct_MStyle_Key_"})
+        print(f"      Q2: {len(raw_q2)} records merged (shipment history + inv OH)", flush=True)
+    else:
+        print(f"      Q2: WARN -- shipment/inv OH fetch failed; SHP/INV fields will be zero", flush=True)
+
+    # Q3: AI_PRJ + OPN_COLS + SUGG_COLS (~79 cols) -- merge by key
+    sql_q3 = build_prj_q3(scope_filter)
+    raw_q3 = cdata_query(sql_q3, "projections_q3") or []
+    if raw_q3:
+        q3_map = {r["Acct_MStyle_Key_"]: r for r in raw_q3 if r.get("Acct_MStyle_Key_")}
+        for row in rows:
+            extra = q3_map.get(row.get("Acct_MStyle_Key_"), {})
+            row.update({k: clean_html(v) for k, v in extra.items() if k != "Acct_MStyle_Key_"})
+        print(f"      Q3: {len(raw_q3)} records merged (AI projections + open POs + suggested)", flush=True)
+    else:
+        print(f"      Q3: WARN -- AI_PRJ/OPN/SUGG fetch failed; those fields will be zero", flush=True)
+
+    print(f"      {len(rows)} total records ready", flush=True)
 
     # ── Phase 2: Pull master pack + Season ─────────────────────────
     print(f"\n[2/4] Pulling master pack + Season from Styles ...", flush=True)
