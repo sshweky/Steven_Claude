@@ -2330,6 +2330,16 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # avg is 3x+ the L13W nz avg, re-anchor the baseline to the historical peak.
     # Catches seasonal items like fire starters, dental kits, air fresheners,
     # Fraganzia deodorizers that lack a CATEGORY_PROFILES entry.
+    #
+    # F78g (2026-05-25, callout 20595-FF7258/FF7266 Tractor Supply): recency guard.
+    # When L13 is 35% of historical peak AND L4 is only mildly above L13
+    # (e.g. L4/L13 < 1.50), the item has DECLINED from the peak and is in a
+    # steady-trough state -- it is NOT heading back to peak.  Anchoring the
+    # baseline to the historical peak in that state produces a 2x forecast
+    # over recent run rate.  Require EITHER:
+    #   (a) L4 >= peak * 0.50  (within striking distance of peak, recovering)
+    #   (b) L4 >= L13_nz * 1.50  (strong recent acceleration -- rebound under way)
+    # before allowing the F78 re-anchor.
     if not _peak_anchor_driver and not _cat_mults and not _is_steady_buyer and len(history) >= 26:
         from datetime import date as _dt_f78, timedelta as _td_f78
         _today_f78 = _dt_f78.today()
@@ -2346,17 +2356,47 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             _f78_peak_avg = _f78_month_avgs[_f78_peak_m]
             _f78_l13_nz  = [v for v in history[-13:] if v > 0]
             _f78_l13_avg = sum(_f78_l13_nz) / len(_f78_l13_nz) if _f78_l13_nz else 0
+            _f78_l4_avg  = sum(history[-4:]) / 4 if len(history) >= 4 else 0
+            # F78g recency-confirmation gate
+            _f78g_recovering = (
+                _f78_peak_avg > 0
+                and _f78_l4_avg > 0
+                and _f78_l13_avg > 0
+                and (
+                    _f78_l4_avg >= _f78_peak_avg * 0.50
+                    or _f78_l4_avg >= _f78_l13_avg * 1.50
+                )
+            )
             if (_f78_l13_avg > 0
                     and _f78_peak_avg > _f78_l13_avg * 3.0
-                    and _f78_peak_avg > baseline * 1.3):
+                    and _f78_peak_avg > baseline * 1.3
+                    and _f78g_recovering):
                 _f78_max_S = max(S) if S else 1.0
                 if _f78_max_S > 0:
                     baseline = _f78_peak_avg / _f78_max_S
                     _peak_anchor_driver = (
                         f"F78 peak-anchor (no profile): L52 peak-month avg "
                         f"{_f78_peak_avg:.0f} = {_f78_peak_avg/_f78_l13_avg:.1f}x "
-                        f"L13 trough {_f78_l13_avg:.0f}"
+                        f"L13 trough {_f78_l13_avg:.0f} (F78g recovery confirmed: "
+                        f"L4 {_f78_l4_avg:.0f} >= "
+                        f"{(_f78_l4_avg/_f78_peak_avg)*100:.0f}% of peak OR "
+                        f"{_f78_l4_avg/max(_f78_l13_avg,1):.2f}x L13)"
                     )
+            elif (_f78_l13_avg > 0
+                    and _f78_peak_avg > _f78_l13_avg * 3.0
+                    and _f78_peak_avg > baseline * 1.3
+                    and not _f78g_recovering):
+                # F78g veto -- record the skip in narrative so the planner sees
+                # why the peak wasn't used.  Don't change baseline.
+                _peak_anchor_driver = (
+                    f"F78g peak-anchor SKIPPED: L52 peak {_f78_peak_avg:.0f} is "
+                    f"{_f78_peak_avg/_f78_l13_avg:.1f}x L13 trough "
+                    f"{_f78_l13_avg:.0f}, but L4 {_f78_l4_avg:.0f} is only "
+                    f"{(_f78_l4_avg/_f78_peak_avg)*100:.0f}% of peak and "
+                    f"{_f78_l4_avg/max(_f78_l13_avg,1):.2f}x L13 (need >=50% "
+                    f"of peak OR >=1.50x L13 to confirm rebound) -- anchoring "
+                    f"to recent run rate {baseline:.0f}, not historical peak"
+                )
 
     # F24 — Final-baseline L13-all-weeks ceiling (placed AFTER F7 peak-anchor
     # so F7's baseline reassignment is also capped).  Observed pattern in

@@ -6761,6 +6761,9 @@ function resetAllFilters() {
   FLAGGED_ONLY = false;
   try { sessionStorage.setItem('flaggedOnly', '0'); } catch (e) { /* ignore */ }
   _syncFlaggedOnlyButton();
+  SNOOZED_ONLY = false;
+  try { sessionStorage.setItem('snoozedOnly', '0'); } catch (e) { /* ignore */ }
+  _syncSnoozedOnlyButton();
   SHOW_FOR_ME_ONLY = false;
   _syncForMeButton();
   applyFilters();
@@ -6964,7 +6967,7 @@ function applyFilters() {
       if (!txt.includes(search)) return false;
     }
     if (volSet.size        && !volSet.has(r.vol_tier))                  return false;
-    if (priSet.size        && (r._snoozed || !priSet.has(r.priority))) return false;
+    if (priSet.size && !SNOOZED_ONLY && (r._snoozed || !priSet.has(r.priority))) return false;
     if (patSet.size        && !patSet.has(r.pattern))                  return false;
     if (brandSet.size      && !brandSet.has(r.brand))                  return false;
     if (mgrSet.size        && !mgrSet.has(r.inv_manager))              return false;
