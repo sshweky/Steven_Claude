@@ -12969,7 +12969,8 @@ def main():
                             ai_comments=ai_comments, ats_hist=ats_hist,
                             switchover_weeks=switchover_index,
                             variant_zero_weeks=variant_zero_index,
-                            retailer_pos=retailer_pos)
+                            retailer_pos=retailer_pos,
+                            vacated_bases=vacated_base_index)
         # Build AI Analysis narrative — stored as a rich-text HTML string so
         # the QB codepage viewer can display it without re-deriving on the
         # client.  Mirrors the same logic the local viewer's
