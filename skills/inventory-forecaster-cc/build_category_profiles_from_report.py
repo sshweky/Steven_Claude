@@ -683,7 +683,7 @@ def main():
         "source":       f"direct /v1/records/query on table {TABLE_ID}",
         "window":       {"start_year": START_YEAR, "end_year": END_YEAR},
         "method":       "monthly Qty_Shpd index, mean=1.0, weighted+OOS-adjusted, "
-                        "consistent-MStyle filter (no promo blasts)",
+                        "consistent-MStyle filter, OOS-catchup+ISO-spike demand caps",
         "year_weights":            YEAR_WEIGHTS,
         "oos_dropped":             sorted(OOS_DROP_MONTHS),
         "strategic_customer_keywords": STRATEGIC_CUSTOMER_KEYWORDS,
