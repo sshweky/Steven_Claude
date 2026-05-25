@@ -7756,6 +7756,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # in the same direction, apply a calibration multiplier derived from the
     # trailing planner-vs-AI bias analysis.  Multiplier > 1.0 = AI under-projects.
     # Only applies to non-zero, non-Inactive forecasts.
+    #
+    # F66g (2026-05-24): Decline-aware gate.  The bias multipliers were
+    # calibrated against a forecaster that didn't have the F77h / F77b / F10b
+    # decline brakes -- so a >1.0 lift applied ON TOP of an already-reduced
+    # forecast double-corrects in the wrong direction.  When the item is in
+    # decline (L4W <= L13W nz avg) clamp the lift multiplier to <= 1.10 so
+    # the bias-up doesn't undo the brake.
     if model != "Inactive" and sum(fcst) > 0:
         _f66_mult = 1.0
         _cu_upper = cust_name.upper()
@@ -7763,10 +7770,23 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             if _bias_cust in _cu_upper:
                 _f66_mult = _bias_mult
                 break
+        _f66g_l4  = sum(hist[-4:])  / 4  if len(hist) >= 4  else 0
+        _f66g_l13_nz = [v for v in hist[-13:] if v > 0]
+        _f66g_l13_nz_avg = (sum(_f66g_l13_nz) / len(_f66g_l13_nz)) if _f66g_l13_nz else 0
+        _f66g_in_decline = (
+            _f66g_l4 > 0 and _f66g_l13_nz_avg > 0
+            and _f66g_l4 < _f66g_l13_nz_avg * 0.85
+        )
+        _f66g_clamped = False
+        if _f66g_in_decline and _f66_mult > 1.10:
+            _f66_mult     = 1.10
+            _f66g_clamped = True
         if _f66_mult != 1.0:
             fcst = [snap(v * _f66_mult, mp) if v > 0 else 0 for v in fcst]
             meta.setdefault("drivers", []).append(
-                f"F66 Customer bias correction ({_bias_cust}): ×{_f66_mult:.2f} "
+                f"F66 Customer bias correction ({_bias_cust}): x{_f66_mult:.2f} "
+                f"{'(F66g clamped to 1.10 -- item in decline, original bias not applied) '
+                  if _f66g_clamped else ''}"
                 f"(AI systematically {'under' if _f66_mult > 1 else 'over'}-projects "
                 f"this account based on planner override history)"
             )
