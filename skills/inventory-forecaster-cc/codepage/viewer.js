@@ -1935,6 +1935,12 @@ function adaptRow(row) {
   // LY actuals  -  26 elements W1..W26, aligned to forecast weeks (52 wk shift).
   const lyOrd    = LY_ORD_HIST_FIDS.map(fid => num(row, fid));
   const lyShp    = LY_SHP_HIST_FIDS.map(fid => num(row, fid));
+  // DI Ord History (FID 1613): comma-separated L26W DI weekly order quantities.
+  // Written by F69 in the forecaster; empty string when no DI orders exist.
+  const _diRawAdapt = str(row, CFG.FID.DI_ORD_HIST) || '';
+  const diOrd = _diRawAdapt
+    ? _diRawAdapt.split(',').map(v => parseInt(v, 10) || 0)
+    : [];
 
   // L4W per-week order rate from the most recent 4 weeks of histOrd
   // (histOrd is oldest>newest, so .slice(-4) is Ord LW-3..Ord LW).
