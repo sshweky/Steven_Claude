@@ -14356,12 +14356,18 @@ def main():
         print(f"\n[2.6c] Retailer POS + OH: fetching for "
               f"{len({r.get('Mstyle') for r in _rtl_rows})} non-Amazon mstyles ...",
               flush=True)
-        try:
-            retailer_pos = _fetch_retailer_pos(_rtl_rows)
-            print(f"      {len(retailer_pos)} acct-mstyle combos with retailer POS data")
-        except Exception as _e:
-            print(f"      [WARN] retailer_pos fetch failed: {_e} -- "
-                  f"F15 POS blend and F_RTL_WOS disabled this run", flush=True)
+        _p26c_cached, _p26c_hit = _pull_cache_load("phase2_6c", _use_pc)
+        if _p26c_hit:
+            retailer_pos = _p26c_cached
+            print(f"      {len(retailer_pos)} acct-mstyle combos from pull cache", flush=True)
+        else:
+            try:
+                retailer_pos = _fetch_retailer_pos(_rtl_rows)
+                print(f"      {len(retailer_pos)} acct-mstyle combos with retailer POS data")
+            except Exception as _e:
+                print(f"      [WARN] retailer_pos fetch failed: {_e} -- "
+                      f"F15 POS blend and F_RTL_WOS disabled this run", flush=True)
+            _pull_cache_save("phase2_6c", retailer_pos)
     else:
         print(f"\n[2.6c] Retailer POS skipped (no non-Amazon records in scope)",
               flush=True)
