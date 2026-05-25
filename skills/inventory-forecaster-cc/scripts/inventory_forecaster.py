@@ -2788,6 +2788,24 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # ord_baseline > pos_rate: amazon_pos_rate() already bakes L4/L13 trend
     # weighting into pos_rate so applying F38b on top would double-count growth.
     _f15_amazon_ord_primary = False
+    # F15_RTL: For non-Amazon records with retailer POS data (Walmart, Petsmart,
+    # Petco, etc.), use the retailer's consumer POS rate as the F15 demand anchor.
+    # Field names are identical to Amazon POS (Avg_Units_Wk_L4w/L13w/L26w/L52w)
+    # so amazon_pos_rate() and the existing F15 non-Amazon blend tiers apply directly.
+    #
+    # Why: during inventory drawdown periods (retailer is overstocked and ordering
+    # light) the order-history baseline understates true steady-state demand.
+    # Consumer POS reflects what the retailer is actually selling through -- once
+    # their WOS normalizes, they will reorder at the POS rate.  Using POS as the
+    # anchor gives the correct forward demand signal.
+    #
+    # Gate: POS must be healthy (L4W >= 50% of L13W) to avoid inflating dying items.
+    # Only activates when no Amazon POS is already supplied (pos_data is None).
+    if not pos_data and rtl_pos and not is_amazon:
+        _f15_rtl_l4  = float(rtl_pos.get("Avg_Units_Wk_L4w")  or 0)
+        _f15_rtl_l13 = float(rtl_pos.get("Avg_Units_Wk_L13w") or 0)
+        if _f15_rtl_l13 > 0 and _f15_rtl_l4 >= _f15_rtl_l13 * 0.50:
+            pos_data = rtl_pos   # shadow parameter for F15 block below
     if pos_data:
         pos_rate, pos_trend, pos_trend_ratio = amazon_pos_rate(pos_data)
         # F15_RTL_ESC -- Non-Amazon POS escalation forward-lean (2026-05-25).
