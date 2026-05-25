@@ -7927,6 +7927,102 @@ def _f58_fetch_active_comments(lookback_days=60):
     return by_key
 
 
+def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
+                           description, product_category, product_subcategory,
+                           brand, brand_pt, season):
+    """
+    Retailer WOS (POS) primary forecasting model.
+
+    Uses consumer sell-through (POS) as the demand signal rather than
+    ship / order history.  Algorithm:
+
+    1. Baseline = L13W POS.  If L4W > L13W * 1.15 AND the L4W window
+       does not overlap promo / event months {Jan, Jul, Nov, Dec},
+       blend: 0.60 * L4W + 0.40 * L13W.
+    2. WOS fill: compute units needed to bring DC to RTL_WOS_TARGET weeks.
+       -- If Opn_W1 == 0 (no confirmed POs yet): fill W1-W2.
+       -- If Opn_W1 >  0 (W1 already has a PO):  fill W2-W3.
+       Fill split evenly across the two weeks, snapped to MP.
+    3. Non-fill weeks: baseline_pps * category_seasonal_mult, snapped to MP.
+
+    Returns a result dict on success, or None if L13W == 0 (no POS baseline).
+    """
+    l4w    = float(rtl_pos.get("Avg_Units_Wk_L4w")  or 0)
+    l13w   = float(rtl_pos.get("Avg_Units_Wk_L13w") or 0)
+    oh_lw  = float(rtl_pos.get("OH_Units_LW")        or 0)
+    oh_wos = float(rtl_pos.get("OH_WOS")              or 0)
+
+    if l13w <= 0:
+        return None   # no POS baseline -- fall through to classification routing
+
+    # -- Step 1: POS baseline ------------------------------------------------
+    # Event-overlap check: does the L4W window (last ~28 days) touch any of
+    # the promo / holiday months where acceleration may be artificially elevated?
+    _today = date.today()
+    _event_months = {1, 7, 11, 12}   # Jan, Jul, Nov, Dec
+    _l4w_months = {(_today - timedelta(days=d)).month for d in range(28)}
+    _event_overlap = bool(_l4w_months & _event_months)
+
+    if l4w > l13w * 1.15 and not _event_overlap:
+        baseline_pps = 0.60 * l4w + 0.40 * l13w
+        _baseline_src = (
+            f"L4W blend (L4W {l4w:.0f} > L13W {l13w:.0f} x 1.15, "
+            f"no event overlap)"
+        )
+    else:
+        baseline_pps = l13w
+        if _event_overlap:
+            _ev_hit = sorted(_l4w_months & _event_months)
+            _baseline_src = (
+                f"L13W anchor (event overlap in L4W window: months {_ev_hit})"
+            )
+        else:
+            _baseline_src = (
+                f"L13W anchor (L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.15)"
+            )
+
+    # -- Step 2: WOS fill ----------------------------------------------------
+    fill_units  = max(0.0, RTL_WOS_TARGET * baseline_pps - oh_lw)
+    _has_opn_w1 = float(opn_w1 or 0) > 0
+    if _has_opn_w1:
+        fill_start, fill_end = 1, 3   # 0-indexed: W2-W3
+    else:
+        fill_start, fill_end = 0, 2   # 0-indexed: W1-W2
+    fill_per_wk = snap(fill_units / 2.0, mp) if fill_units > 0 else 0
+
+    # -- Step 3: build 26-week forecast --------------------------------------
+    _cat_mults_rtl = _category_week_multipliers(
+        description, product_category, product_subcategory, brand, brand_pt,
+        season=season,
+    ) if (description or product_category or product_subcategory
+          or brand or brand_pt or season) else None
+
+    fcst = []
+    for w in range(26):
+        if fill_per_wk > 0 and fill_start <= w < fill_end:
+            fcst.append(fill_per_wk)
+        else:
+            mult = _cat_mults_rtl[w] if _cat_mults_rtl else 1.0
+            fcst.append(snap(baseline_pps * mult, mp))
+
+    return {
+        "fcst":          fcst,
+        "cap":           round(baseline_pps, 1),
+        "fill_units":    fill_units,
+        "fill_per_wk":   fill_per_wk,
+        "fill_start_wk": fill_start + 1,   # 1-based for display
+        "fill_end_wk":   fill_end,          # 1-based inclusive
+        "has_opn_w1":    _has_opn_w1,
+        "baseline_pps":  round(baseline_pps, 1),
+        "baseline_src":  _baseline_src,
+        "oh_lw":         oh_lw,
+        "oh_wos":        oh_wos,
+        "l4w":           l4w,
+        "l13w":          l13w,
+        "has_cat_mults": bool(_cat_mults_rtl),
+    }
+
+
 def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     season_map=None, oos_entry=None, open_po_wk=None,
                     amazon_catalog_us=None, ai_comments=None, ats_hist=None,
