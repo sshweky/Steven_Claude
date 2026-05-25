@@ -4991,14 +4991,48 @@ def nz_rate(history, window=26):
     return sum(1 for v in h if v > 0) / len(h)
 
 
-def apply_oh_shortfall_adjustment(row, fcst):
+def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     """
-    F37 — Forward inventory-shortfall adjustment (2026-05-05).
+    F37 v2 — Forward inventory-shortfall adjustment (2026-05-26 rewrite).
 
-    Reads anticipated on-hand for the next 26 weeks from QB columns
-    Inv_Wk1..Inv_Wk26 (Projections table).  These values have the current
-    AI projection ALREADY DEDUCTED, so Inv_WkN < 0 means we'd run out
-    that week if we tried to ship the planned forecast.
+    NEW DESIGN (replaces 2026-05-05 version):
+      - Reads RAW components from Inventory_Flow table (Beg_Inv_Wk1,
+        RcvWk0..RcvWk26, OpnWk0..OpnWk26) via `inv_flow` dict passed in.
+      - Computes the 26-week cascade FRESH in Python using THIS run's AI
+        forecast, instead of reading stale Inv_Wk* fields on Projections
+        that were derived from the PREVIOUS run's AI projection.
+      - Removes the F37h-cat bypass entirely -- cat-profile items no longer
+        need to skip F37 since the cascade is no longer stale.
+
+    `inv_flow` dict (passed by caller from `fetch_inv_flow_qb_rest()` output):
+        {
+          "beg_inv_w1": float,    # actual on-hand at start of W1
+          "rcv":        [r1..r26],# per-week receipts; r1 includes RcvWk0 rollover
+          "opn":        [o1..o26],# per-week confirmed open customer POs; o1 includes OpnWk0 rollover
+        }
+
+    Per-week math:
+        capacity_w = max(0, beg_inv_w + rcv[w] - opn[w])
+        backlog_w  = SUM over live cohorts of (orig * max(0, 1 - 0.25*age))
+        demand_w   = own_forecast[w] + backlog_w
+        ship_w     = min(demand_w, capacity_w)
+        if demand_w > capacity_w:
+            new_cohort = (orig=demand_w - capacity_w, age starts at 0)
+        ending_inv_w = beg_inv_w + rcv[w] - ship_w - opn[w]
+        beg_inv_{w+1} = max(0, ending_inv_w)
+
+    Decay: LINEAR 25%/week against the cohort's ORIGINAL qty.
+        age 0 (born this week): 100% of original counted in same-week demand
+        age 1: 75%
+        age 2: 50%
+        age 3: 25%
+        age 4+: 0% (cohort expired -- customers gave up)
+
+    Open Orders take priority over forecast demand (Open Orders are confirmed
+    customer POs that MUST ship; they're deducted from capacity).
+
+    `inv_flow=None` -> skip F37 entirely (backwards-compat for callers without
+    Inv Flow data, e.g. unit tests).
 
     For weeks where we'd run short:
       • Cap that week's AI projection at what we can actually ship
