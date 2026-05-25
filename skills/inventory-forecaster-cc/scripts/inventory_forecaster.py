@@ -8845,7 +8845,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _op_interval = int(round(sum(_op_gaps) / len(_op_gaps))) if _op_gaps else 4
             else:
                 _op_interval = 4
-            _op_interval = max(3, min(6, _op_interval))   # clamp 3-6 weeks
+            _op_interval = max(4, min(6, _op_interval))   # clamp 4-6 weeks (off-price orders monthly minimum)
 
             # Place order slots starting at first available week, spaced by interval
             _op_avail_set = set(_bulk_avail)
