@@ -154,6 +154,9 @@ for batch in mstyle_batches:
 **Tables already migrated to REST (never revert):**
 - Projections (`bpd237tvm`) — Phase 1 projections pull (2026-05-25)
 - Styles (`bphzqfkev`) — Phase 2 master-pack + Season pull (2026-05-25). FIDs: Mstyle=6, Master_Pack=110, Season=437
+- Amazon Catalog (`bqp8vz625`, InventoryTrack) — Phase 2.5 POS pull (2026-05-25). FIDs: Mstyle=34, Ordered_LW=154, Prior_Wk=180, L4w=193, L13w=194, L26w=195, L52w=196
+- Amazon Catalog US (`bpfrw2epk`, ProductTrack app `bn458t5nz`) — Phase 2.6 F38 signals (2026-05-25). FIDs: Mstyle_model_=21, ASIN=6, Amazon_Buybox=588, MAP_Price=463, AUR_L4w=948, AUR_L13w=949, AUR_L26w=951, AUR_L52w=950, Days_OOS_L30d=750, Sellable_SOH=341, ASIN_Buyability_Flag=428, ASIN_Status=86
+- Amazon Invtry Health (`bp9akd3js`, ProductTrack) — Phase 2.6b DC inventory (2026-05-25). FIDs: ASIN=6, Sellable_SOH=14, Open_PO_Qty=11, WOS_OH=50
 
 When you add a new heavy CData read (or discover an existing one), migrate it to REST and add it to this list.
 
