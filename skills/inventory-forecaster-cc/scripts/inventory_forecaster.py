@@ -13879,25 +13879,16 @@ def main():
     if amazon_mstyles:
         print(f"\n[2.6] Pulling Amazon Catalog US (F38 signals) for "
               f"{len(amazon_mstyles)} mstyles ...", flush=True)
-        AMZUS_COLS = ["Mstyle_model_", "Amazon_Buybox", "MAP_Price",
-                      "AUR_L4w", "AUR_L13w", "AUR_L26w", "AUR_L52w",
-                      "Days_Amazon_OOS_L30d_", "Sellable_On_Hand_Units",
-                      "ASIN_Buyability_Flag", "ASIN", "ASIN_Status"]
-        amzus_sel = ", ".join(f"[{c}]" for c in AMZUS_COLS)
-        BATCH_AMZUS = 200
-        for i in range(0, len(amazon_mstyles), BATCH_AMZUS):
-            batch     = amazon_mstyles[i:i + BATCH_AMZUS]
-            in_clause = ", ".join(f"'{m}'" for m in batch)
-            amzus_rows = cdata_query(
-                f"SELECT {amzus_sel} FROM [Quickbase1].[ProductTrack].[Amazon_Catalog_US]"
-                f" WHERE [Mstyle_model_] IN ({in_clause})",
-                f"amazon_catalog_us batch {i // BATCH_AMZUS + 1}")
-            for r in amzus_rows:
-                _key = r.get("Mstyle_model_")
-                if _key:
-                    amazon_catalog_us[_key] = r
+        # 2026-05-25 (Audit Finding #2): migrated from CData full-table-scan
+        # loop to QB direct REST API.  Underlying table is ProductTrack app
+        # `bn458t5nz` -> Amazon Catalog US `bpfrw2epk` (580 fields, ~30K rows).
+        try:
+            amazon_catalog_us = fetch_amazon_catalog_us_qb_rest(amazon_mstyles)
+        except Exception as _p26_err:
+            print(f"      [WARN] Phase 2.6 QB REST fetch failed: {_p26_err}")
+            amazon_catalog_us = {}
         print(f"      {len(amazon_catalog_us)} mstyles with Amazon Catalog US "
-              f"signals loaded")
+              f"signals loaded (QB REST API)")
 
     # ── Phase 2.6b: Amazon Inventory Health (SOH, OPO, WOS) ──────────
     # Fetch Sellable On-Hand, Open PO Quantity, and Weeks-of-Supply from
