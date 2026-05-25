@@ -3,7 +3,7 @@
   "subject": "Migrate Phase 2 Styles master-pack pull from CData to QB REST API",
   "description": "Same pattern as Phase 1 projections migration: replace per-batch CData IN-clause query against Styles (full-table scan) with a single QB REST POST /v1/records/query call. Need Styles dbid, FIDs for Mstyle / Master_Pack / Season, paginate at 1000.",
   "activeForm": "Migrating Phase 2 to QB REST",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
