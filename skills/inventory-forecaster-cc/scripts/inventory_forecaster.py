@@ -5184,6 +5184,7 @@ def crostens(history, mp, is_amazon=False, description=None,
                 _f18_capped_down = True   # R6 must not re-lift
 
     # P2 / F18b (2026-05-24): Burst carve-out for Amazon Croston's.
+    # F18bg (2026-05-25): same Amazon-only gate as F18 (see F18g rationale).
     # Variance deep-dive: items where the LAST 4 weeks of L13 dominate (e.g.
     # Prime Day pre-buy burst at the end of L13) but F18 didn't fire because
     # the lumpy earlier weeks in L13 muddled the implied rate. The burst
