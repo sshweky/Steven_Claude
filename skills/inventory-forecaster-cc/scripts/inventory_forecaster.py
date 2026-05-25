@@ -2777,7 +2777,13 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     #     (protects genuinely high-seasonality items from getting blended down)
     #   - Not a new launch
     # Blend is lighter than F10: 0.30 × L4W + 0.70 × model; W14+ × 0.90.
-    if (not _f10_applied and not is_new_launch
+    # F77h-cat gate (2026-05-25): skip F77 when a curated category profile was
+    # applied (_cat_mults set).  The profile already encodes the correct seasonal
+    # shape; blending toward L4W would corrupt the holiday/seasonal build.  The
+    # old variance gate (>= 2.5x) was accidentally doing this job before (the
+    # raw order-history spike from a pre-buy inflated S variance > 2.5x), but
+    # that was fragile.  Explicit cat-profile gate is the right fix.
+    if (not _f10_applied and not is_new_launch and not bool(_cat_mults)
             and _l13_nz_avg_f10 > 0
             and _l4_avg_f10 < _l13_nz_avg_f10 * 0.65):
         # Gate on seasonal profile variance
