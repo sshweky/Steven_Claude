@@ -3851,9 +3851,13 @@ async function toggleDetail(key) {
   }
 
   const atsHist = r.ats_hist || [];
-  // If ATS is still loading and detail is open, re-render once it resolves
-  if (!r.ats_hist && _atsHistPromise) {
-    _atsHistPromise.finally(() => {
+  // Fast path: if ATS isn't attached yet, kick off a single-mstyle fetch in
+  // parallel and re-render this panel when it lands.  Typical latency ~300 ms
+  // vs the 30-120 sec bulk attach.  The bulk attach still runs in the
+  // background so other rows fill in passively.
+  if (!r.ats_hist) {
+    _fetchAtsForMstyle(r).then(arr => {
+      if (!arr) return;
       if (_openDetailKey !== key) return;
       el.dataset.loaded = '';
       el.style.display = 'none';
