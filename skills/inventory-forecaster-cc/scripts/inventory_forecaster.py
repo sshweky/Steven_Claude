@@ -3162,13 +3162,16 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # ordering average -- F30's l13_avg*1.05 ceiling would suppress the
     # POS-anchored baseline far below the retailer's actual reorder rate.
     # Bypass F30 for overstocked RTL items; the consumer POS signal is trusted.
+    _f30_rtl_skip = False   # separate flag from Amazon F51 to avoid log collision
     if (not _f51_skip and not _f15_rtl_overstocked and baseline >= 1000.0 and l13_avg > 0
             and baseline > l13_avg * 1.05):
         baseline = l13_avg * 1.05
         _f30_applied = True
-    elif ((_f51_skip or _f15_rtl_overstocked)
+    elif _f51_skip and baseline >= 1000.0 and l13_avg > 0 and baseline > l13_avg * 1.05:
+        _f51_applied = True  # Amazon POS-accel bypass; surface in meta later
+    elif (_f15_rtl_overstocked
             and baseline >= 1000.0 and l13_avg > 0 and baseline > l13_avg * 1.05):
-        _f51_applied = True  # actually prevented a cap; surface in meta later
+        _f30_rtl_skip = True  # RTL overstocked bypass; logged below
 
     # F24 moved below — must run AFTER F7 peak-anchored baseline, which
     # re-assigns `baseline = _peak_baseline / _max_S` and would undo F24.
