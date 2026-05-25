@@ -7755,7 +7755,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     season_map=None, oos_entry=None, open_po_wk=None,
                     amazon_catalog_us=None, ai_comments=None, ats_hist=None,
                     switchover_weeks=None, variant_zero_weeks=None,
-                    retailer_pos=None, vacated_bases=None):
+                    retailer_pos=None, vacated_bases=None, inv_flow_data=None):
     # Reset rule-fire tracker for this record (used by deck-harvest tooling).
     _start_rule_fires()
     # Shared prep (mp, hist + F35 stockout normalization, customer flags,
