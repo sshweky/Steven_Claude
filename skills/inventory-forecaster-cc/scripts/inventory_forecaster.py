@@ -7758,6 +7758,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     retailer_pos=None, vacated_bases=None, inv_flow_data=None):
     # Reset rule-fire tracker for this record (used by deck-harvest tooling).
     _start_rule_fires()
+    if row.get("Acct_MStyle_Key_") == "1864-FF8654":
+        print(f"[DBG ENTRY] forecast_record called for 1864-FF8654, _di_blend={row.get('_di_blend')!r}", flush=True)
     # Shared prep (mp, hist + F35 stockout normalization, customer flags,
     # POS lookup, season tag) — kept identical across forecast and validate
     # via _prep_record_signals().
