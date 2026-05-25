@@ -14826,6 +14826,7 @@ def main():
         ai_alert_fid      = fmap.get("AI ALERT") or fmap.get("AI_ALERT")
         ai_analysis_fid   = fmap.get("AI Analysis")  # fid 1590 — rich-text narrative
         ai_confidence_fid = fmap.get("AI_Confidence") or fmap.get("AI Confidence") or 1612
+        di_ord_hist_fid   = fmap.get("DI Ord History") or 1613  # L26W DI weekly qtys for codepage highlight
         wk_fids           = [fmap.get(f"AI PRJ W{i}") or fmap.get(f"AI_PRJ_W{i}")
                            for i in range(1, 27)]
         if not all(wk_fids) or not ai_alert_fid:
