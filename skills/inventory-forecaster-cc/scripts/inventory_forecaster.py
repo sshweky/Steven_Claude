@@ -110,13 +110,12 @@ SWITCHOVER_SUFFIXES = ("EC", "COS", "AMZ", "DS", "DTC")
 # International accounts (Mexico) handled separately by is_international flag.
 CUSTOMER_BIAS_CORRECTIONS = {
     "TARGET CTRL INV PRCSNG":    1.40,  # P9 (2026-05-24): manual UP-bias on 13/15 records, $103K gap
-    # ── Downward corrections — pending planner review ──────────────────────
-    # Auto-derived from analyze_manual_vs_ai.py; planners consistently set
-    # manual projections BELOW AI for these accounts.  Needs vetting before
-    # treating as permanent calibration.  See explanation in SKILL.md.
-    "PET PHARM":                 0.55,
-    "H G BUYING":                0.45,
-    "PETCO MEXICO":              0.45,
+    # ── Downward corrections — commented out pending planner review ────────
+    # Auto-derived from analyze_manual_vs_ai.py.  Re-enable after confirming
+    # whether planner's lower numbers or AI projections are more accurate.
+    # "PET PHARM":               0.55,
+    # "H G BUYING":              0.45,
+    # "PETCO MEXICO":            0.45,
 }
 
 # F19 — Conservative inactive floor (on-by-default 2026-05-06).  Items
