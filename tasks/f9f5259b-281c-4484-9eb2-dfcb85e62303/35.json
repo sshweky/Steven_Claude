@@ -1,0 +1,9 @@
+{
+  "id": "35",
+  "subject": "Production --all --validate run with write-back",
+  "description": "Full --all --validate including QB write-back of AI_PRJ_W1..W26, AI_ALERT, AI_ANALYSIS",
+  "activeForm": "Running --all --validate",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,9 @@
+{
+  "id": "36",
+  "subject": "Push validation results to QB",
+  "description": "push_validation_qb.py - send Priority/Pattern/Narrative validation fields to QB",
+  "activeForm": "Pushing validation to QB",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

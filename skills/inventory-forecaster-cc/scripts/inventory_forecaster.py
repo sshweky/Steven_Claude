@@ -14720,6 +14720,11 @@ def main():
                     json.dump(_verr_log, open(_verr_path, "w"), indent=2)
                 except Exception:
                     pass    # never let the error-capture itself crash the run
+        # Carry _di_ord_wkly from the source row into the result dict so the
+        # writeback section (which reads from results/to_write) can populate
+        # FID 1613 "DI Ord History" in QB.
+        if row.get("_di_ord_wkly"):
+            r["_di_ord_wkly"] = row["_di_ord_wkly"]
         results.append(r)
 
     pat_counts  = {}
