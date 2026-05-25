@@ -390,8 +390,106 @@ def build_consistent_mstyle_set(rows, fields):
     return consistent
 
 
+def compute_demand_caps(rows, fields):
+    """Pre-pass: build per-(mstyle, customer) monthly totals, detect OOS catch-up
+    spikes and ISO outlier orders, and return a scale_factors dict.
+
+    scale_factors[(mst, cust, y, m)] = float in (0, 1]
+    Any bucket absent from the dict has scale = 1.0 (no cap needed).
+    """
+    if not fields.get("mst") or not fields.get("cust"):
+        print("[clean] WARNING: mst or cust field missing — skipping demand cap pass", flush=True)
+        return {}
+
+    # Step 1 — aggregate monthly totals per (mst, cust, y, m)
+    buckets = defaultdict(float)
+    bucket_meta = {}   # (mst, cust, y, m) -> (cat, sub) for logging
+    for r in rows:
+        try:
+            qty = float(r.get(fields["qty"]) or 0)
+        except (TypeError, ValueError):
+            continue
+        if qty <= 0:
+            continue
+        mst  = (r.get(fields["mst"])  or "").strip()
+        cust = (r.get(fields["cust"]) or "").strip()
+        y, m = _parse_year_month(r, fields)
+        if not y or not m or y < START_YEAR or y > END_YEAR:
+            continue
+        if (y, m) in OOS_DROP_MONTHS:
+            continue
+        key = (mst, cust, y, m)
+        buckets[key] += qty
+        if key not in bucket_meta:
+            cat = (r.get(fields["cat"]) or "").strip()
+            sub = (r.get(fields["sub"]) or "").strip() if fields["sub"] else ""
+            bucket_meta[key] = (cat, sub)
+
+    # Step 2 — group by (mst, cust), compute median, detect gaps
+    combo_months = defaultdict(dict)  # (mst, cust) -> {(y, m): qty}
+    for (mst, cust, y, m), qty in buckets.items():
+        combo_months[(mst, cust)][(y, m)] = qty
+
+    scale_factors = {}
+    n_oos = 0
+    n_iso = 0
+
+    for (mst, cust), month_qtys in combo_months.items():
+        if not month_qtys:
+            continue
+        all_months = sorted(month_qtys.keys())
+        qtys_sorted = sorted(month_qtys[ym] for ym in all_months)
+        if not qtys_sorted:
+            continue
+        # Median of all non-zero monthly shipment quantities for this combo
+        median_qty = qtys_sorted[len(qtys_sorted) // 2]
+        if median_qty <= 0:
+            continue
+
+        oos_cap = OOS_CAP_MULT * median_qty
+        iso_cap = ISO_CAP_MULT * median_qty
+
+        for i, ym in enumerate(all_months):
+            qty = month_qtys[ym]
+
+            # Detect OOS gap: how many calendar months since the previous shipment?
+            # Count only real months (subtract known OOS_DROP_MONTHS from the gap).
+            if i == 0:
+                gap_real = 0  # no prior history — not a catch-up
+            else:
+                prev_ym   = all_months[i - 1]
+                prev_idx  = prev_ym[0] * 12 + prev_ym[1]
+                curr_idx  = ym[0]     * 12 + ym[1]
+                gap_total = curr_idx - prev_idx - 1  # calendar months in between
+                # Subtract OOS_DROP_MONTHS that fall inside the gap (not a real silent period)
+                oos_in_gap = 0
+                for (dy, dm) in OOS_DROP_MONTHS:
+                    di = dy * 12 + dm
+                    if prev_idx < di < curr_idx:
+                        oos_in_gap += 1
+                gap_real = max(0, gap_total - oos_in_gap)
+
+            is_oos_catchup = (gap_real >= OOS_GAP_MONTHS)
+            cap            = oos_cap if is_oos_catchup else iso_cap
+
+            if qty > cap:
+                scale_factors[(mst, cust, ym[0], ym[1])] = cap / qty
+                if is_oos_catchup:
+                    n_oos += 1
+                else:
+                    n_iso += 1
+
+    total_capped = len(scale_factors)
+    print(f"[clean] demand cap pass complete:", flush=True)
+    print(f"  OOS catch-up months capped : {n_oos:,}  (gap >= {OOS_GAP_MONTHS} mo, cap = {OOS_CAP_MULT}x median)", flush=True)
+    print(f"  ISO spike months capped    : {n_iso:,}  (cap = {ISO_CAP_MULT}x median)", flush=True)
+    print(f"  Total (mst,cust,ym) buckets scaled down: {total_capped:,}", flush=True)
+    return scale_factors
+
+
 def build_profiles(rows, fields):
     consistent_mstyles = build_consistent_mstyle_set(rows, fields)
+    scale_factors      = compute_demand_caps(rows, fields)
 
     cat_month  = defaultdict(lambda: [0.0] * 12)
     sub_month  = defaultdict(lambda: [0.0] * 12)
