@@ -1,0 +1,9 @@
+{
+  "id": "9",
+  "subject": "Dry-run FF15592 to verify F37 cat-profile gate fix",
+  "description": "Run --acct 23011 --mstyle FF15592 --dry-run to confirm F37 not in rule_fires and W25/W26 show proper Nov holiday values (~2300+)",
+  "activeForm": "Running dry-run for FF15592",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

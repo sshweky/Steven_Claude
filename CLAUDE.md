@@ -175,3 +175,9 @@ Direct REST API (`api.quickbase.com/v1`) > CData > JSON-RPC
 - [ ] Concurrency capped (<=2 wide, <=6 narrow)?
 - [ ] Write rate <= 10 req/s?
 - [ ] Running off-hours, or scaled way back for business hours?
+
+---
+
+## Owned Brands
+
+Never recommend SKU reduction, distribution cuts, or rationalization for A&H, Burt's Bees, BioSilk, CHI, Vibrant Life, Glad for Pets, Kingsford, GladWare. Applies to our own brands only — competitors are fair game.
