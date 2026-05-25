@@ -26,7 +26,10 @@ import os
 CDATA_MCP_URL   = "https://mcp.cloud.cdata.com/mcp"
 CDATA_EMAIL     = os.environ.get("CDATA_EMAIL", "steven@skaffles.com")
 CDATA_PAT       = os.environ.get("CDATA_PAT",   "VaTIPqklo14D1yMkfqKRi1punowIvp/6XEHtBSgybad2Jbyl")
-MAX_RETRIES     = int(os.environ.get("MAX_RETRIES", "5"))
+MAX_RETRIES         = int(os.environ.get("MAX_RETRIES", "5"))         # CData retries
+QB_REST_MAX_RETRIES = int(os.environ.get("QB_REST_MAX_RETRIES", "3"))  # QB REST (faster, more reliable)
+# Audit Finding #15+16 (2026-05-25): REST sites previously used hard-coded 3;
+# centralised here.  Total backoff budget per CLAUDE.md = 2+4+8 = 14s.
 
 # Direct Quickbase REST API -- bypasses CData for bulk write-back.
 QB_REALM        = os.environ.get("QB_REALM",      "pim.quickbase.com")
