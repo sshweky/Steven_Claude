@@ -1079,6 +1079,11 @@ def _fetch_retailer_pos(rows):
     ms_list = sorted(non_amz_mstyles)
     raw_rows = []
 
+    # Audit Finding #4 (2026-05-25): track which mstyles a batch was supposed
+    # to cover so we can report partial-failure counts to the caller and apply
+    # exponential backoff retries instead of silently dropping a whole batch.
+    failed_mstyles = set()    # mstyles whose batches couldn't be loaded
+
     for i in range(0, len(ms_list), BATCH):
         batch = ms_list[i : i + BATCH]
         # Build OR'd mstyle filter
@@ -1091,17 +1096,30 @@ def _fetch_retailer_pos(rows):
                  f"AND{{{F_DATE}.AF.'{cutoff}'}}")
         skip = 0
         while True:
-            try:
-                resp = _qb_request("POST", "/records/query", {
-                    "from":    RTL_TID,
-                    "select":  [F_DATE, F_MSTYLE, F_POS_U, F_OH_U, F_INSTOCK, F_ACCT],
-                    "where":   where,
-                    "sortBy":  [{"fieldId": F_DATE, "order": "DESC"}],
-                    "options": {"top": 1000, "skip": skip},
-                }, timeout=90)
-            except Exception as _e:
+            # 3-retry exponential backoff to recover from transient throttle,
+            # then surface failure to the caller via failed_mstyles.
+            resp = None
+            _last_err = None
+            for _attempt in range(1, QB_REST_MAX_RETRIES + 1):
+                try:
+                    resp = _qb_request("POST", "/records/query", {
+                        "from":    RTL_TID,
+                        "select":  [F_DATE, F_MSTYLE, F_POS_U, F_OH_U, F_INSTOCK, F_ACCT],
+                        "where":   where,
+                        "sortBy":  [{"fieldId": F_DATE, "order": "DESC"}],
+                        "options": {"top": 1000, "skip": skip},
+                    }, timeout=90)
+                    break
+                except Exception as _e:
+                    _last_err = _e
+                    if _attempt == QB_REST_MAX_RETRIES:
+                        break
+                    time.sleep(2 ** _attempt)
+            if resp is None:
                 print(f"      [WARN] retailer_pos batch {i // BATCH + 1} "
-                      f"skip={skip} failed: {_e}", flush=True)
+                      f"skip={skip} failed after {QB_REST_MAX_RETRIES} retries: "
+                      f"{_last_err}", flush=True)
+                failed_mstyles.update(batch)
                 break
             batch_data = resp.get("data", [])
             raw_rows.extend(batch_data)

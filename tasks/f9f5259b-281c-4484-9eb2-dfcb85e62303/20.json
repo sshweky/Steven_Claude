@@ -3,7 +3,7 @@
   "subject": "F4: Add retry+raise to _fetch_retailer_pos",
   "description": "Silently swallows partial batch failures; add 3-retry exponential backoff and surface n_missing to caller",
   "activeForm": "Hardening retailer POS fetch",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }
