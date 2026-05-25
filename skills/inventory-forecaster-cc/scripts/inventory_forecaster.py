@@ -8286,7 +8286,54 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # record the signal for alerting and don't early-return.
         pass
 
-    if pattern == "inactive":
+    # -- F_RTL_POS_WOS -- Retailer WOS (POS) primary model ------------------
+    # Short-circuits classification-based routing (inactive / sparse / croston /
+    # dense) when the account has valid POS + OH data and is not a new-launch
+    # ramp.  Uses consumer sell-through as the demand signal, fills to
+    # RTL_WOS_TARGET WOS in the near-term, then applies category seasonal lifts.
+    # Gate: rtl_pos is only populated for non-Amazon, non-international accounts
+    # (see _prep_record_signals) so those conditions are already implied here.
+    _opn_w1 = float(row.get("Opn_W1") or 0)
+    _rtl_wos_r = None
+    if (rtl_pos is not None
+            and float(rtl_pos.get("OH_WOS") or 0) > 0
+            and not _f73_new_ramp):
+        _rtl_wos_r = _retailer_wos_forecast(
+            rtl_pos, mp, _opn_w1,
+            description, product_category, product_subcategory,
+            brand, brand_pt, season)
+
+    if _rtl_wos_r is not None:
+        _fire("F_RTL_POS_WOS")
+        fcst     = _rtl_wos_r["fcst"]
+        cap      = _rtl_wos_r["cap"]
+        model    = "Retailer WOS (POS)"
+        biweekly = False
+        meta     = {
+            "model":         "Retailer WOS (POS)",
+            "baseline_pps":  _rtl_wos_r["baseline_pps"],
+            "baseline_src":  _rtl_wos_r["baseline_src"],
+            "oh_wos":        round(_rtl_wos_r["oh_wos"], 2),
+            "oh_lw":         round(_rtl_wos_r["oh_lw"], 0),
+            "fill_units":    round(_rtl_wos_r["fill_units"], 0),
+            "fill_per_wk":   _rtl_wos_r["fill_per_wk"],
+            "fill_start_wk": _rtl_wos_r["fill_start_wk"],
+            "fill_end_wk":   _rtl_wos_r["fill_end_wk"],
+            "has_opn_w1":    _rtl_wos_r["has_opn_w1"],
+            "has_cat_mults": _rtl_wos_r["has_cat_mults"],
+            "drivers": [
+                f"F_RTL_POS_WOS: POS baseline {_rtl_wos_r['baseline_pps']:,.0f}/wk "
+                f"({_rtl_wos_r['baseline_src']}); "
+                f"DC OH {_rtl_wos_r['oh_wos']:.1f}wks ({_rtl_wos_r['oh_lw']:,.0f}u); "
+                f"fill {_rtl_wos_r['fill_units']:,.0f}u in "
+                f"W{_rtl_wos_r['fill_start_wk']}-W{_rtl_wos_r['fill_end_wk']} "
+                f"({_rtl_wos_r['fill_per_wk']:,.0f}u/wk each); "
+                + ("with" if _rtl_wos_r["has_cat_mults"] else "no")
+                + " category seasonal lifts"
+            ],
+        }
+
+    elif pattern == "inactive":
         fcst, cap, meta, model = [0] * 26, 0, {}, "Inactive"
         biweekly = False
 
