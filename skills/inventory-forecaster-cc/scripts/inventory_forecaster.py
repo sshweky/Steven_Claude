@@ -2669,7 +2669,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # doesn't aggressively pull down.  Same seasonal-variance gate as F77.
     _f77b_applied = False
     _f77b_driver  = None
-    if (not _f10_applied and not _f77_applied and not is_new_launch
+    if (not _f10_applied and not _f10b_applied and not _f77_applied
+            and not is_new_launch
             and _l13_nz_avg_f10 > 0
             and _l4_avg_f10 < _l13_nz_avg_f10 * 0.85
             and _l4_avg_f10 >= _l13_nz_avg_f10 * 0.65):
