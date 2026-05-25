@@ -9605,18 +9605,20 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _f37_l4_avg     = sum(float(v or 0) for v in hist[-4:])  / 4  if len(hist) >= 4  else 0
     _f37_l13_avg    = sum(float(v or 0) for v in hist[-13:]) / 13 if len(hist) >= 13 else 0
     _f37_active_growth = (_f37_l13_avg > 0 and _f37_l4_avg >= _f37_l13_avg * 0.80)
-    # F37h-cat gate (2026-05-25): skip F37 inventory-shortfall constraint when a
-    # curated category profile is driving the seasonal shape.  The Inv_Wk fields
-    # in QB are derived from the PREVIOUS run's AI projections; when the previous
-    # run used a wrong/stale seasonal shape (e.g. inflated Sep from position-based
-    # seasonal_profile), the inventory model shows a false shortfall in peak months.
-    # The cat profile (e.g. calming supplements) intentionally builds Oct-Nov demand;
-    # the inventory team will plan receipts accordingly once the correct signal is
-    # written to QB.  On the next run after write-back the Inv_Wk fields will reflect
-    # the corrected demand and F37 can resume normal operation.
-    _f37_skip       = _f37_status_new or _f37_active_growth or bool(_cat_mults)
+    # F37h-cat bypass REMOVED 2026-05-26: previously skipped F37 for curated
+    # cat-profile items because stale Inv_Wk* fields gave a wrong inventory
+    # picture.  F37 v2 cascades inventory FRESH from raw Inv Flow components
+    # using THIS run's AI projection, so the bypass is no longer needed --
+    # cat-profile items now go through F37 normally.
+    # Look up this record's Inv Flow data (mstyle-keyed; each acct-mstyle
+    # assumes the full mstyle inventory is available -- planner allocates
+    # across customers at gametime).
+    _ms_for_inv = (row.get("Mstyle") or "").strip()
+    _inv_flow_rec = (inv_flow_data or {}).get(_ms_for_inv)
+    _f37_skip = _f37_status_new or _f37_active_growth or (not _inv_flow_rec)
     if model not in ("Inactive",) and not _f37_skip:
-        _adjusted_f37, _f37_adjustments = apply_oh_shortfall_adjustment(row, fcst)
+        _adjusted_f37, _f37_adjustments = apply_oh_shortfall_adjustment(
+            row, fcst, inv_flow=_inv_flow_rec)
         if _f37_adjustments:
             # Snap to master pack to keep ship qty consistent with cadence
             fcst = [int(round(v / mp)) * int(mp) if v > 0 and mp > 0 else int(v)
@@ -9625,15 +9627,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 meta["oh_shortfall_adjustments"] = _f37_adjustments
                 _changed_weeks = sorted({a["week"] for a in _f37_adjustments})
                 meta.setdefault("drivers", []).append(
-                    f"F37 OH-shortfall adjustment: {len(_f37_adjustments)} weeks "
-                    f"capped/lifted by anticipated on-hand "
+                    f"F37 OH-shortfall adjustment (v2 fresh-cascade): "
+                    f"{len(_f37_adjustments)} weeks capped at available inv "
                     f"(weeks {','.join(map(str, _changed_weeks[:8]))}"
-                    f"{'…' if len(_changed_weeks) > 8 else ''}); unmet demand "
-                    f"rolled forward with 25%/wk decay until age 4 (fully lost)"
+                    f"{'...' if len(_changed_weeks) > 8 else ''}); unmet demand "
+                    f"rolled forward with linear 25%/wk decay vs original cohort "
+                    f"qty, expiring at age 4."
                 )
     elif _f37_skip and isinstance(meta, dict):
-        if bool(_cat_mults):
-            _f37_skip_reason = "curated-cat-profile (F37h-cat gate)"
+        if not _inv_flow_rec:
+            _f37_skip_reason = f"no Inv Flow data for mstyle={_ms_for_inv!r}"
         elif _f37_status_new:
             _f37_skip_reason = "Status_Cust=NEW"
         else:
@@ -9644,7 +9647,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # and avoid the regex.
         meta.setdefault("drivers", []).append(
             f"P6 OH-shortfall guard activated: {_f37_skip_reason} -- "
-            f"cat-profile / new-launch / growth items bypass F37 inventory constraint"
+            f"new-launch / growth items bypass F37 inventory constraint"
         )
 
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
