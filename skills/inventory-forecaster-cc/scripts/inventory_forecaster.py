@@ -2721,6 +2721,13 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # under-projects a genuine step-change in demand.  Scale up by the L4W/L13W
     # ratio, capped at 1.50x so a single atypical spike doesn't blow out the
     # plan.  Not applied to new launches (ramp model handles them separately).
+    # F82 (2026-05-24): Non-Amazon growth trend multiplier.
+    # F82g (2026-05-24, 16553-FF30784 callout): retailer-POS gate.
+    # When retailer POS data is available and POS L4/L13 ratio is NOT
+    # confirming the order acceleration (< 1.10), the order spike reflects
+    # DC stock-build, not consumer demand growth.  Skip F82 in that case
+    # (or dampen) so we don't multiply on top of an already-inflated L4
+    # order signal.  POS-confirmed accelerations still get full F82 lift.
     _f82_driver = None
     if (not is_amazon
             and not _f10_applied
@@ -2730,13 +2737,41 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             and not is_new_launch
             and _l13_nz_avg_f10 > 0
             and _l4_avg_f10 >= _l13_nz_avg_f10 * 1.20):
-        _f82_ratio  = min(_l4_avg_f10 / _l13_nz_avg_f10, 1.50)
-        forecast    = [snap(v * _f82_ratio, mp) if v > 0 else 0 for v in forecast]
-        _f82_driver = (
-            f"F82 non-Amazon growth: L4W avg {_l4_avg_f10:.0f} = "
-            f"{_f82_ratio:.2f}x L13W nz avg {_l13_nz_avg_f10:.0f}; "
-            f"forecast scaled up x{_f82_ratio:.2f}"
-        )
+        # F82g POS-confirmation check
+        _f82g_pos_l4  = float(pos_data.get('l4w')
+                              or pos_data.get('Avg_Units_Wk_L4w')  or 0) if pos_data else 0.0
+        _f82g_pos_l13 = float(pos_data.get('l13w')
+                              or pos_data.get('Avg_Units_Wk_L13w') or 0) if pos_data else 0.0
+        _f82g_has_pos = (_f82g_pos_l4 > 0 and _f82g_pos_l13 > 0)
+        _f82g_pos_ratio = (_f82g_pos_l4 / _f82g_pos_l13) if _f82g_has_pos else 0
+        if _f82g_has_pos and _f82g_pos_ratio < 1.10:
+            # POS does NOT confirm acceleration -- store-stocking only.
+            # Skip F82 entirely.  Record the veto for the narrative.
+            _f82_driver = (
+                f"F82g POS-veto: order L4 {_l4_avg_f10:.0f} = "
+                f"{(_l4_avg_f10/_l13_nz_avg_f10):.2f}x L13 nz {_l13_nz_avg_f10:.0f} "
+                f"BUT POS L4 {_f82g_pos_l4:.0f} = {_f82g_pos_ratio:.2f}x POS L13 "
+                f"{_f82g_pos_l13:.0f} (< 1.10) -- consumer demand NOT "
+                f"accelerating; order surge is DC stock-build, F82 multiplier "
+                f"skipped"
+            )
+        else:
+            _f82_ratio  = min(_l4_avg_f10 / _l13_nz_avg_f10, 1.50)
+            # If POS confirms but more weakly than orders, dampen by the POS
+            # ratio so we lift in proportion to consumer signal.
+            if _f82g_has_pos and _f82g_pos_ratio < (_l4_avg_f10 / _l13_nz_avg_f10):
+                _f82_ratio = min(_f82_ratio, max(1.0, _f82g_pos_ratio))
+                _pos_tag = (f" (dampened by POS ratio {_f82g_pos_ratio:.2f} "
+                            f"-- order accel outpacing POS)")
+            else:
+                _pos_tag = ""
+            forecast    = [snap(v * _f82_ratio, mp) if v > 0 else 0 for v in forecast]
+            _f82_driver = (
+                f"F82 non-Amazon growth: L4W avg {_l4_avg_f10:.0f} = "
+                f"{_l4_avg_f10 / _l13_nz_avg_f10:.2f}x L13W nz avg "
+                f"{_l13_nz_avg_f10:.0f}; forecast scaled up x{_f82_ratio:.2f}"
+                f"{_pos_tag}"
+            )
 
     l26_avg = sum(float(v) for v in history[-26:]) / 26
     cap_base = baseline
