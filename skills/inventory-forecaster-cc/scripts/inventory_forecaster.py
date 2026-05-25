@@ -11210,6 +11210,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #   - F58 Tell-AI explicit planner comment (planner intent always wins)
     #   - F69 DI-blended records (handled by F69-WOS separately)
     #   - Inactive / OTB / Pre-launch models (no forward demand to anchor)
+    #   - New launches (_f73_new_ramp): low DC WOS is expected during initial
+    #     stocking and does not signal a replen gap; seasonal_baseline with
+    #     F_NEW_AMZ_DAMP already anchors the forecast to POS velocity (2026-05-25)
     _f_amz_rpl_f58 = (
         is_amazon
         and any(
@@ -11224,6 +11227,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             and amz_catalog
             and not row.get("_di_blend")
             and not _f_amz_rpl_f58
+            and not _f73_new_ramp
             and not model.startswith("Inactive")
             and not model.startswith("OTB")
             and not model.startswith("Pre-launch")
