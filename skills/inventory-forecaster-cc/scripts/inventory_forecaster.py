@@ -41,19 +41,14 @@ try:
 except ImportError:
     sys.exit("ERROR: pip install numpy")
 
-# ─── Module-top imports (Audit Finding #19, 2026-05-25) ───────────────────────
-# These were previously imported deep inside main() in 5+ places.  Lifting to
-# module top means import failures surface at startup instead of mid-run.
-try:
-    from oos_history import (
-        neutralize_compounding,
-        fetch_clean_demand,
-        fetch_open_pos_forward,
-        fetch_ats_history,
-        _open_pos_cache_path,
-    )
-except ImportError as _oos_imp_err:
-    sys.exit(f"ERROR: oos_history.py import failed: {_oos_imp_err}")
+# Audit Finding #19 (reverted 2026-05-25): tried to lift oos_history imports
+# to module top here, but `oos_history.py` line 29 itself imports FROM
+# `inventory_forecaster` (cdata_query, ORD_COLS, etc.), creating a circular
+# import that fails because cdata_query is defined ~line 905 of THIS file --
+# below where the back-edge would resolve.  The deep-inside-function imports
+# in oos_history call sites are load-bearing.  DO NOT move them to module
+# top without first refactoring oos_history to break the circular dependency
+# (e.g. move shared symbols into a `_cdata_shared.py` that both can import).
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 # All constants imported from scripts/config.py.  That module is the single
