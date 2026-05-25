@@ -8129,7 +8129,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # blend that smoothly damps the forecast toward recent trend.
     # For mild acceleration (ratio 1.10–1.28), apply a proportional lift.
     # Skip for Amazon (has its own POS blend), new launches, and Inactive.
-    if model != "Inactive" and sum(fcst) > 0 and not is_amazon and not _f34_is_new_launch:
+    # F62 steady-buyer gate (2026-05-25): steady buyers (CV<=0.50, 0-1 zero L13W)
+    # have L4W non-zero avg that is unreliable for trend detection -- a single
+    # spike order in the last 4 weeks inflates the non-zero avg and makes the
+    # item look like it's accelerating when it's actually stable.  Skip F62 for
+    # these accounts; the L4/L13 trend was already incorporated via F_ORD_BLEND
+    # in seasonal_baseline() using all-weeks L4W which is more reliable.
+    if (model != "Inactive" and sum(fcst) > 0 and not is_amazon
+            and not _f34_is_new_launch
+            and not (isinstance(meta, dict) and meta.get("steady_buyer"))):
         _f62_l4_nz  = [float(v) for v in hist[-4:]  if float(v or 0) > 0]
         _f62_l13_nz = [float(v) for v in hist[-13:] if float(v or 0) > 0]
         if len(_f62_l4_nz) >= 2 and len(_f62_l13_nz) >= 3:
