@@ -12309,7 +12309,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
          'AUR_L4w', 'AUR_L13w', 'AUR_L26w', 'AUR_L52w'.
     """
     from html import escape as _e
-    MAX_BULLETS = 5  # POS + DC inv + AUR are 3 pinned; keep 2 slots for specific/critical
+    MAX_BULLETS = 6  # Order History + POS + DC inv + AUR are 4 pinned; keep 2 slots for specific/critical
     _cust_label = _friendly_cust_name(rec.get("cust") or "")
     is_apl      = APL_CUST_SUBSTR in (rec.get("cust") or "").upper()
     is_amazon   = (AMAZON_CUST_SUBSTR in (rec.get("cust") or "").upper()) and not is_apl
