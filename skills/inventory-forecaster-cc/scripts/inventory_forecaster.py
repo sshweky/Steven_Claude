@@ -1705,13 +1705,13 @@ def _qb_rest_query_batched_in(table_id, headers, fmap, fid_key,
             }).encode("utf-8")
             req = urllib.request.Request(url, data=payload, headers=headers, method="POST")
             resp_data = None
-            for attempt in range(1, 4):
+            for attempt in range(1, QB_REST_MAX_RETRIES + 1):
                 try:
                     with urllib.request.urlopen(req, timeout=90) as resp:
                         resp_data = json.loads(resp.read())
                     break
                 except Exception as e:
-                    if attempt == 3:
+                    if attempt == QB_REST_MAX_RETRIES:
                         raise RuntimeError(f"[QB REST {label}] batch {i // batch_size + 1} failed: {e}")
                     time.sleep(2 ** attempt)
             records = resp_data.get("data", [])
