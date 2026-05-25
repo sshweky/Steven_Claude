@@ -13908,6 +13908,21 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             f'AI Confidence: {_conf_val}/100 ({_conf_label})</span>'
         )
         parts.append(_conf_badge)
+    # Normalized Ord/Wk L13w bullet (2026-05-25).
+    # Show when normalization (F35/F41/F43/F47/ATS) removed meaningful demand
+    # from the raw L13W order rate -- e.g. phantom duplicates, catch-up stock-up
+    # orders after a stockout, or OOS ramp distortion.  Threshold: differs by
+    # > 5% of raw L13W OR > 50 units/wk (whichever is larger).
+    _raw_l13w_val  = sum(hist[-13:]) / 13   # raw from ORD_L26_COLS (last 13 weeks)
+    _norm_l13w_val = rec.get("norm_l13w")
+    if (_norm_l13w_val is not None
+            and _raw_l13w_val > 0
+            and abs(_raw_l13w_val - _norm_l13w_val) > max(50.0, 0.05 * _raw_l13w_val)):
+        parts.append(
+            f'<b>Normalized Ord/Wk L13w:</b> {int(round(_norm_l13w_val)):,}/wk '
+            f'(raw L13W: {int(round(_raw_l13w_val)):,}/wk -- '
+            f'duplicates and spikes removed)'
+        )
     parts.extend(critical)                              # always shown, no cap
     _pinned_count = len(pinned_last)
     remaining = MAX_BULLETS - len(parts) - _pinned_count
