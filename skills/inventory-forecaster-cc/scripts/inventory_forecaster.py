@@ -14167,40 +14167,38 @@ def main():
     scope_filter = build_scope_filter(args)   # still used by Phase 2+ CData calls
 
     print(f"\n[1/4] Pulling projections from Quickbase ...", flush=True)
-    print(f"      [QB REST] fetching field map ...", flush=True)
-    # Audit Finding #9 (2026-05-25): snapshot Phase 1 results to a disk cache
-    # before any sys.exit() in subsequent phases.  Phase 1 is the most
-    # expensive single fetch (~5,500 rows × ~250 cols via REST = ~30s); a
-    # transient Phase 2 failure shouldn't force re-fetching it.  On next run,
-    # if --allow-stale-cache or the cache is fresh (<1h), Phase 1 is skipped
-    # and the cached snapshot is reloaded.
-    _p1_cache_path = Path(__file__).parent.parent / "phase1_projections_cache.json"
-    _p1_cache_max_age_s = 3600       # 1 hour
-    raw_rows = None
-    if (getattr(args, "allow_stale_cache", False) or
-            getattr(args, "resume", None)):
-        try:
-            if _p1_cache_path.exists():
-                _age = time.time() - _p1_cache_path.stat().st_mtime
-                if _age < _p1_cache_max_age_s or getattr(args, "allow_stale_cache", False):
-                    raw_rows = json.load(open(_p1_cache_path))
-                    print(f"      [Phase 1 cache] reusing {_p1_cache_path.name} "
-                          f"(age {_age/60:.1f}m, {len(raw_rows)} rows)", flush=True)
-        except Exception as _ce:
-            print(f"      [WARN] Phase 1 cache read failed: {_ce} -- re-fetching", flush=True)
-            raw_rows = None
-    if raw_rows is None:
-        try:
-            raw_rows = fetch_projections_qb_rest(ORIG_PRJ_COLS, args)
-        except Exception as _p1_err:
-            sys.exit(f"ERROR: Phase 1 QB REST fetch failed: {_p1_err}")
-        if not raw_rows:
-            sys.exit("ERROR: No records returned. Check scope filters and QB connection.")
-        # Persist for resumability before any downstream sys.exit can lose it.
-        try:
-            json.dump(raw_rows, open(_p1_cache_path, "w"))
-        except Exception as _ce:
-            print(f"      [WARN] Phase 1 cache write failed: {_ce}", flush=True)
+    _use_pc = getattr(args, "use_pull_cache", False)
+    raw_rows, _p1_hit = _pull_cache_load("phase1", _use_pc)
+    if not _p1_hit:
+        # Legacy stale-cache path (--allow-stale-cache / --resume): still supported
+        # for backward compat but superseded by --use-pull-cache.
+        _p1_cache_path = Path(__file__).parent.parent / "phase1_projections_cache.json"
+        _p1_cache_max_age_s = 3600
+        if (getattr(args, "allow_stale_cache", False) or getattr(args, "resume", None)):
+            try:
+                if _p1_cache_path.exists():
+                    _age = time.time() - _p1_cache_path.stat().st_mtime
+                    if _age < _p1_cache_max_age_s or getattr(args, "allow_stale_cache", False):
+                        raw_rows = json.load(open(_p1_cache_path))
+                        print(f"      [Phase 1 cache] reusing {_p1_cache_path.name} "
+                              f"(age {_age/60:.1f}m, {len(raw_rows)} rows)", flush=True)
+            except Exception as _ce:
+                print(f"      [WARN] Phase 1 cache read failed: {_ce} -- re-fetching", flush=True)
+                raw_rows = None
+        if raw_rows is None:
+            print(f"      [QB REST] fetching field map ...", flush=True)
+            try:
+                raw_rows = fetch_projections_qb_rest(ORIG_PRJ_COLS, args)
+            except Exception as _p1_err:
+                sys.exit(f"ERROR: Phase 1 QB REST fetch failed: {_p1_err}")
+            if not raw_rows:
+                sys.exit("ERROR: No records returned. Check scope filters and QB connection.")
+            # Persist to both legacy path and unified pull_cache/
+            try:
+                json.dump(raw_rows, open(_p1_cache_path, "w"))
+            except Exception as _ce:
+                print(f"      [WARN] Phase 1 legacy cache write failed: {_ce}", flush=True)
+            _pull_cache_save("phase1", raw_rows)
 
     rows = [{k: clean_html(v) for k, v in r.items()} for r in raw_rows]
     print(f"      {len(rows)} records retrieved (QB REST API)", flush=True)
