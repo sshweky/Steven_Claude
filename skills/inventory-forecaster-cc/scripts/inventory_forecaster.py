@@ -9805,7 +9805,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Planners historically project 40-55% of L13W when facing this pattern
         # (observed: FF9298EC, FF9297/24, FF8649/24 in 2026-05-20 gap analysis).
         # Scale floor = 0.25 to avoid over-correction if POS data is stale.
-        if (pos_data and isinstance(fcst, list) and len(fcst) >= 4
+        if (is_amazon                            # Amazon-only (defines _f59_l4w_avg etc.)
+                and pos_data and isinstance(fcst, list) and len(fcst) >= 4
                 and _f59_l4w_avg == 0           # no orders at all in L4W
                 and _f59_oos_days < 14          # not a genuine OOS situation
                 and _f59_l13w_avg >= 200):      # item had real order history
