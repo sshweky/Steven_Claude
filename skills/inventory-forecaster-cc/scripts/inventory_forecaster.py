@@ -1583,6 +1583,49 @@ def _get_styles_field_map():
             time.sleep(2 ** attempt)
 
 
+# ── Pull-cache helpers ─────────────────────────────────────────────────────────
+# Used by --use-pull-cache to load/save each data-pull phase to/from disk.
+# This lets debug re-runs skip all QB fetches and run the algorithm against
+# previously-pulled data without touching the shared realm.
+#
+# Cache lives at: <skill_root>/pull_cache/<phase_name>.json
+# It is ALWAYS written after a live fetch (so the next debug run can use it
+# immediately).  --use-pull-cache bypasses the live fetch and loads from disk.
+
+_PULL_CACHE_ROOT = Path(__file__).parent.parent / "pull_cache"
+
+
+def _pull_cache_load(name, use_cache):
+    """Try to load <name>.json from pull_cache/. Returns (data, hit) tuple.
+
+    `hit` is True when data came from cache; False means caller must fetch live.
+    """
+    if not use_cache:
+        return None, False
+    p = _PULL_CACHE_ROOT / f"{name}.json"
+    if not p.exists():
+        print(f"      [PULL CACHE] {name}.json not found -- fetching live", flush=True)
+        return None, False
+    try:
+        data = json.load(open(p, encoding="utf-8"))
+        size_kb = p.stat().st_size // 1024
+        print(f"      [PULL CACHE] loaded {name}.json ({size_kb:,}KB)", flush=True)
+        return data, True
+    except Exception as e:
+        print(f"      [WARN] pull cache read failed for {name}: {e} -- fetching live",
+              flush=True)
+        return None, False
+
+
+def _pull_cache_save(name, data):
+    """Write data to pull_cache/<name>.json. Silently skips on error."""
+    try:
+        _PULL_CACHE_ROOT.mkdir(parents=True, exist_ok=True)
+        json.dump(data, open(_PULL_CACHE_ROOT / f"{name}.json", "w", encoding="utf-8"))
+    except Exception as e:
+        print(f"      [WARN] pull cache write failed for {name}: {e}", flush=True)
+
+
 def fetch_master_pack_qb_rest(mstyles):
     """Pull Master_Pack + Season for the given mstyles via QB direct REST API.
 
