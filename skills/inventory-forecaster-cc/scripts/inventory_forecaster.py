@@ -10720,38 +10720,77 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"forward supply — near-term gap pre-covered"
                 )
 
-    # ── F_RTL_WOS — Retailer OH inventory WOS adjustment ─────────────────────
-    # When a retailer's on-hand WOS deviates from RTL_WOS_TARGET (8 wks),
-    # adjust the forecast proportionally.  Understocked retailers will reorder
-    # more aggressively; overstocked retailers will slow replenishment until
-    # inventory burns down.  Adjustment is gradual and capped:
-    #   WOS < 8 : +4% per wk below target, max +20% (at WOS <= 3)
-    #   WOS > 8 : -3.5% per wk above target, max -30% (at WOS >= 16.6)
-    # Target: config.RTL_WOS_TARGET = 8 wks (Store/DC standard buffer)
-    # Applied as a uniform multiplier across all non-zero forecast weeks.
+    # ── F_RTL_WOS — Retailer OH inventory WOS correction (revised 2026-05-25) ──
+    # Phase-aware WOS adjustment for brick-and-mortar retailers with POS + OH data.
+    # Replaces the original uniform multiplier with a two-phase model that matches
+    # the actual retailer replenishment cycle:
+    #
+    #   OVERSTOCKED (WOS > 10.5):
+    #     Retailer is drawing down excess inventory -- orders stay light until WOS
+    #     reaches target range.  Correction window:
+    #       excess_wos  = current_wos - 10.0 (target high)
+    #       fill_ratio  = recent L4W order rate / POS L4W
+    #         < 0.70 = correction already running -> corr_mult = 0.60
+    #         >= 0.70 = not yet started             -> corr_mult = 1.00
+    #       correction_weeks = max(0, min(4, round(excess_wos x corr_mult)))
+    #     Near-term correction weeks are zeroed.  Post-correction, the POS-
+    #     anchored baseline (from F15_RTL) drives steady-state demand.
+    #
+    #   UNDERSTOCKED (WOS < RTL_WOS_TARGET - 0.5):
+    #     Retailer will accelerate reorders.  Uniform boost:
+    #     +4% per wk below RTL_WOS_TARGET, capped at +20%.
+    #
+    #   NEAR-TARGET (7.5-10.5 WOS): no adjustment.
+    _RTL_WOS_TARGET_HIGH = 10.0
     if rtl_pos and not is_amazon and model not in ("Inactive", "OTB (zero)",
                                                     "Pre-launch NEW (manual passthrough)"):
-        _rtl_oh_wos = float(rtl_pos.get("OH_WOS") or 0)
-        _rtl_oh_lw  = float(rtl_pos.get("OH_Units_LW") or 0)
-        _rtl_l4w    = float(rtl_pos.get("Avg_Units_Wk_L4w") or 0)
-        if _rtl_oh_wos > 0:
-            if _rtl_oh_wos < RTL_WOS_TARGET:
+        _rtl_oh_wos  = float(rtl_pos.get("OH_WOS")           or 0)
+        _rtl_oh_lw   = float(rtl_pos.get("OH_Units_LW")       or 0)
+        _rtl_pos_l4w = float(rtl_pos.get("Avg_Units_Wk_L4w") or 0)
+        if _rtl_oh_wos > 0 and _rtl_pos_l4w > 0:
+            if _rtl_oh_wos > _RTL_WOS_TARGET_HIGH + 0.5:
+                # Overstocked: compute correction window.
+                # If the retailer is already ordering lightly (fill_ratio < 70%),
+                # the drawdown is in progress and fewer additional weeks are needed.
+                _rtl_excess_wos  = _rtl_oh_wos - _RTL_WOS_TARGET_HIGH
+                _rtl_ord_l4w     = sum(float(v) for v in hist[-4:]) / 4.0
+                _rtl_fill_ratio  = (_rtl_ord_l4w / _rtl_pos_l4w
+                                    if _rtl_pos_l4w > 0 else 1.0)
+                _rtl_corr_mult   = 0.60 if _rtl_fill_ratio < 0.70 else 1.00
+                _rtl_correction_wks = max(0, min(4,
+                                                 round(_rtl_excess_wos * _rtl_corr_mult)))
+                if _rtl_correction_wks > 0:
+                    for _wi in range(_rtl_correction_wks):
+                        fcst[_wi] = 0
+                    _fire("F_RTL_WOS")
+                    if isinstance(meta, dict):
+                        _corr_note = ("in progress"
+                                      if _rtl_corr_mult < 1.0 else "not yet started")
+                        meta.setdefault("drivers", []).append(
+                            f"F_RTL_WOS: WOS {_rtl_oh_wos:.1f}wks "
+                            f"(target {_RTL_WOS_TARGET_HIGH:.0f}wks) -> "
+                            f"{_rtl_correction_wks}w drawdown correction "
+                            f"(W1-W{_rtl_correction_wks} zeroed); "
+                            f"fill_ratio={_rtl_fill_ratio:.0%} ({_corr_note}); "
+                            f"post-correction at POS ~{_rtl_pos_l4w:,.0f}/wk; "
+                            f"OH={_rtl_oh_lw:,.0f}u"
+                        )
+            elif _rtl_oh_wos < RTL_WOS_TARGET - 0.5:
                 # Understocked: retailer will accelerate reorders
                 _rtl_wos_mult = min(1.20, 1.0 + 0.04 * (RTL_WOS_TARGET - _rtl_oh_wos))
-            else:
-                # Overstocked: retailer will slow replenishment
-                _rtl_wos_mult = max(0.70, 1.0 - 0.035 * (_rtl_oh_wos - RTL_WOS_TARGET))
-            if abs(_rtl_wos_mult - 1.0) >= 0.02:   # only fire if >= 2% adjustment
-                fcst = [snap(max(0, v * _rtl_wos_mult), mp) if v > 0 else 0
-                        for v in fcst]
-                _fire("F_RTL_WOS")
-                if isinstance(meta, dict):
-                    meta.setdefault("drivers", []).append(
-                        f"F_RTL_WOS retailer OH WOS: {_rtl_oh_wos:.1f}wks "
-                        f"(target {RTL_WOS_TARGET:.0f}wks) -> {_rtl_wos_mult:.0%} uniform adjust; "
-                        f"OH={_rtl_oh_lw:,.0f}u "
-                        f"POS_L4W={_rtl_l4w:,.0f}/wk"
-                    )
+                if abs(_rtl_wos_mult - 1.0) >= 0.02:
+                    fcst = [snap(max(0, v * _rtl_wos_mult), mp) if v > 0 else 0
+                            for v in fcst]
+                    _fire("F_RTL_WOS")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F_RTL_WOS: understocked {_rtl_oh_wos:.1f}wks "
+                            f"(target {RTL_WOS_TARGET:.0f}wks) -> "
+                            f"{_rtl_wos_mult:.0%} boost; "
+                            f"OH={_rtl_oh_lw:,.0f}u "
+                            f"POS_L4W={_rtl_pos_l4w:,.0f}/wk"
+                        )
+            # Near-target (7.5-10.5 WOS): no adjustment needed.
 
     # ── F59i — POS anchor for Amazon items with healthy DC WOS ───────────
     # EC = "Ecomm Ready" -- standard Amazon DC items in poly-bag packaging.
