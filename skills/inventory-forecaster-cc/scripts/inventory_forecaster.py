@@ -4559,6 +4559,12 @@ def sparse_intermittent_forecast(history, mp, account_interval=None, is_offprice
             f"R2 Sparse L26 ceiling: L26_avg {_l26_avg_r2:.0f}/wk × 26 × 1.5 "
             f"→ total capped"
         )
+    if _f84_applied:
+        meta.setdefault("drivers", []).append(
+            f"F84 Sparse low-nz density cap: L26 has only {_f84_l26_nz_count} "
+            f"non-zero week(s); capped forecast to {_f84_l26_nz_count} "
+            f"placement(s) (don't extrapolate cadence beyond observed history)"
+        )
     return forecast, round(avg_qty, 1), meta
 
 
