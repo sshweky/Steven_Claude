@@ -14132,6 +14132,30 @@ def main():
               flush=True)
         retailer_pos = {}
 
+    # ── Phase 2.6d: Inventory Flow per-mstyle (F37 v2 cascade input) ──────────
+    # 2026-05-26: pulls Beg Inv (Wk1), per-week Receipts (RcvWk0..Wk26), and
+    # per-week Open Customer Orders (Opn Wk0..Wk26) from Inventory_Flow.  Used
+    # by the rewritten F37 in forecast_record() which now cascades inventory
+    # forward FRESH against this run's AI projection -- replaces the previous
+    # F37 which read stale Projections.Inv_Wk* fields derived from the prior
+    # run's projection.  RcvWk0/OpnWk0 roll into the W1 slot per planner
+    # convention.  Inventory is treated per-mstyle (game-time planner decision
+    # on cross-acct allocation -- each acct-mstyle assumes the full mstyle
+    # inventory is available to it; see SKILL.md F37 v2 notes).
+    inv_flow_data = {}
+    _inv_flow_mstyles = sorted({r["Mstyle"] for r in rows if r.get("Mstyle")})
+    if _inv_flow_mstyles:
+        print(f"\n[2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs) for "
+              f"{len(_inv_flow_mstyles)} mstyles ...", flush=True)
+        try:
+            inv_flow_data = fetch_inv_flow_qb_rest(_inv_flow_mstyles)
+            print(f"      {len(inv_flow_data)} mstyles with Inv Flow data loaded "
+                  f"(QB REST API)", flush=True)
+        except Exception as _ifperr:
+            print(f"      [WARN] Inv Flow fetch failed: {_ifperr} -- "
+                  f"F37 will skip inventory-shortfall capping this run", flush=True)
+            inv_flow_data = {}
+
     # ── Save Amazon catalog viewer cache (AUR + DC inv for viewer.py) ──────────
     # Written after Phase 2.6b so Inv_SOH/OPO/WOS are already merged in.
     # viewer.py reads this at launch to add DC inv + AUR bullets to the narrative.
