@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Run dry-run forecast for 1864-FF12302/24EC",
+  "description": "Run run_forecast.py --mstyle FF12302 --acct 1864 --dry-run from scripts/ directory to verify F_NEW_AMZ_DAMP + event boost dampening fix",
+  "activeForm": "Running forecast dry-run",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}
