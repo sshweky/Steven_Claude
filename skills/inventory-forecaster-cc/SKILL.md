@@ -792,6 +792,7 @@ for context only. For current behavior and fire location, always check RULES.md.
 
 | Date | Rules added | Theme |
 |---|---|---|
+| 2026-05-25 | F37h-cat, F77/F77b/F61 cat-profile gates, Calming profile, QB REST Phase 2 | Curated cat-profile bypass of seasonal-decay / inventory-shortfall rules (F77/F77b/F61/F37) so calming supplements and similar items keep their planner-intended holiday shape; calming profile added to `CATEGORY_PROFILES`; `_cat_mults` pre-computed in `forecast_record()` so the F37 gate can reference it. Phase 2 (Styles master pack + Season) migrated from CData full-table-scan loop to QB REST API (`POST /v1/records/query` on `bphzqfkev`, FIDs Mstyle=6/Master_Pack=110/Season=437) -- eliminates the 28-batch full-scan throttle event that took out Phase 2 of `--all` runs. |
 | 2026-05-23 | (audit Phase 1) | Deleted stale METHODOLOGY.md; centralized constants in `scripts/config.py`; added `audit_rules.py` + `rule_dependency_graph.py`; promoted retry policy into `run_forecast.py`; schema-versioned output JSONs. |
 | 2026-05-21 | F59o, F59i EC-override, F59m, F59n, F60, VP-Q4 false-abort fix | Seasonal overlay for Heuristic/Croston's; EC parent POS lookup; open-PO guard. |
 | 2026-05-21 | (cleanup) | Removed `holt_winters()` function; renamed F31->F71, F6->F6a/b/c. |
