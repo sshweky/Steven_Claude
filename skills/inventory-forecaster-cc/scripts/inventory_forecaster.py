@@ -8068,7 +8068,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                             shpd_l13=l13w, season=season,
                                             is_ecom=_is_ecom_t4,
                                             is_new_launch=_f73_new_ramp,
-                                            amz_catalog=amz_catalog)
+                                            amz_catalog=amz_catalog,
+                                            rtl_pos=rtl_pos)
         model    = ("Seasonal Baseline (burst)"
                     if meta.get("model") == "seasonal_baseline_burst"
                     else "Seasonal Baseline")
