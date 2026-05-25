@@ -300,6 +300,11 @@ F59K_POS_CREDIBILITY    = float(os.environ.get("F59K_POS_CREDIBILITY",    "100")
 F59J_POS_FLOOR          = float(os.environ.get("F59J_POS_FLOOR",          "50"))
 """F59j requires POS L13W >= this for the restock lift to fire."""
 
+RTL_WOS_TARGET          = float(os.environ.get("RTL_WOS_TARGET",           "8.0"))
+"""Store/DC on-hand WOS target for all non-Amazon customers.
+F_RTL_WOS adjusts the forecast up when OH_WOS < target and down when > target.
+8 weeks = standard retailer replenishment buffer (covers ~2 ordering cycles)."""
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # WRITEBACK
