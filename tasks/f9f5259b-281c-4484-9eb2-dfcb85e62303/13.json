@@ -3,7 +3,7 @@
   "subject": "F3: Wire signals into validate_record _prep call",
   "description": "Pass amazon_pos, amazon_catalog_us, season_map, retailer_pos from run_validation through validate_record into _prep_record_signals at line 11453",
   "activeForm": "Wiring validator signals",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }

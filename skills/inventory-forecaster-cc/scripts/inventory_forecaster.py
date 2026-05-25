@@ -1441,11 +1441,21 @@ def fetch_projections_qb_rest(prj_cols, args):
     l2f, f2l = _get_proj_field_map()
 
     # All column names we need (same set as the legacy build_prj_select)
+    # 2026-05-25 (Finding #1): added Product_Category / Product_Subcategory / Brand
+    # so the derived category-profile system (Priority 2 + 3 in
+    # _get_category_profile) actually gets non-empty inputs.  Previously these
+    # were never SELECTed -- row.get() returned None -> "" -- so empirical
+    # category profiles silently never matched and only the Description-keyword
+    # fallback (Priority 4) ever fired.  Brand_PT_ does not exist on the
+    # Projections table (verified via GET /v1/fields 2026-05-25); the
+    # row.get("Brand_PT_") read in forecast_record() returns "" and that's the
+    # intended safe fallback -- the cat-profile matcher treats it as absent.
     all_col_names = (
         ["Acct_MStyle_Key_", "Mstyle", "Customr_Name", "Description", "Status_Cust",
          "PT_Item_Status", "Div", "Shpd_Wk_L13W_cust_", "Last_Ord_Date", "Last_Shp_Date",
          "Inventory_Manager", "Flagged", "Auto_Project", "POG_Launch_Date", "POG_End_Date",
-         "Store_Count"]
+         "Store_Count",
+         "Product_Category", "Product_Subcategory", "Brand"]
         + [f"AI_PRJ_W{w}" for w in range(1, 27)]
         + list(prj_cols)    # MAN_PRJ date-stamped columns (rolling weekly)
         + ORD_COLS
