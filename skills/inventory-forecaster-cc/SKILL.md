@@ -13,7 +13,15 @@ Runs `scripts/inventory_forecaster.py` to execute the full forecasting pipeline.
 - **All other QB reads** (Amazon catalog, ATS history, AI Comments, retailer POS, etc.) -- CData MCP server (Basic auth: `steven@skaffles.com` / PAT).
 - **Write-back** (AI_PRJ_W1..W26, AI_ALERT, AI_ANALYSIS) -- CData MCP via UPDATE SQL. Validation push (`push_validation_qb.py`) -- QB REST API.
 
-**Why Phases 1 & 2 use REST, not CData:** CData does NOT push WHERE clauses to QB -- it fetches the entire target table (Projections: 4,500 rows × 250 cols; Styles: 30K rows × 423 cols) regardless of scope filter, causing throttle disconnects under realm load. The REST API filters server-side. Never revert Phases 1 or 2 to CData. If a future read against a large table (>100 rows or >50 cols) is added, build it on QB REST API, not CData.
+**Why Phases 1 & 2 use REST, not CData:** CData does NOT push WHERE clauses to QB -- it fetches the entire target table (Projections: 5,500 rows × 250 cols; Styles: 30K rows × 423 cols) regardless of scope filter, causing throttle disconnects under realm load. The REST API filters server-side.
+
+**Unified CData-vs-REST policy (applies to ALL sources — scripts, skills, ad-hoc chat, scheduled jobs, subagents):**
+- **CData OK only when ALL hold:** target table ≤100 rows AND not growing, ≤30 columns, single one-shot call (no loop/batch/retry/schedule). Metadata calls (`getInstructions`, `getTables`, `getColumns`, `getProcedures`) always CData-OK regardless of size.
+- **REST required when ANY hold:** table >100 rows OR >30 cols, inside a loop/batch/retry/per-record pattern, growing table (transactions, projections, logs), recurring/scheduled job, critical path. Uncertain about size → default to REST.
+- **Never revert** Phase 1 (Projections, `bpd237tvm`) or Phase 2 (Styles, `bphzqfkev` — FIDs Mstyle=6, Master_Pack=110, Season=437) to CData. When a new heavy CData read is added or discovered, migrate it to REST using the `fetch_projections_qb_rest()` / `fetch_master_pack_qb_rest()` pattern (cached field map + paginated POST `/v1/records/query`) and add it to this list.
+- CData remains the right tool for: master pack lookups against small reference tables, ad-hoc one-shot exploration, and write-back UPDATE SQL (Phase 4 write-back is still on CData pending a future migration to REST `POST /records` with `mergeFieldId`).
+
+**F37 cat-profile gate (2026-05-25):** In `forecast_record()` (line ~9060), `_cat_mults` is pre-computed from `description`/`product_category`/`product_subcategory`/`brand`/`brand_pt`/`season` before the F37 inventory-shortfall section so the F37h-cat gate (`_f37_skip = ... or bool(_cat_mults)`) can read it. The gate prevents F37 from zeroing peak-season weeks on curated-cat-profile items (e.g. calming supplements) when QB's Inv_Wk fields reflect a previous run's wrong seasonal shape. Do NOT remove the pre-compute -- the gate references `_cat_mults` but the variable is otherwise only defined inside `seasonal_baseline()` scope.
 
 ---
 
