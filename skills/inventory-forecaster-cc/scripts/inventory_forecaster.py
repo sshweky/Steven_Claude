@@ -8761,6 +8761,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"(fall replenishment W17-18 +10%, holiday pre-order W21-22 +8%)"
             )
 
+    # _cat_mults pre-compute for F61 + F37 gates (fix 2026-05-25).
+    # F37h-cat added an assignment at line ~9215 which made _cat_mults local
+    # to forecast_record(); accessing it here (before that assignment) raised
+    # UnboundLocalError.  Compute once now; line 9215 overwrites identically.
+    _cat_mults = _category_week_multipliers(
+        description, product_category, product_subcategory, brand, brand_pt,
+        season=season,
+    ) if (description or product_category or product_subcategory
+          or brand or brand_pt or season) else None
+
     # F61 — Horizon confidence decay (2026-05-17).
     # Planners systematically cut the AI back-half forecast (W9-W26) more
     # aggressively than the near-term.  For items without strong seasonal
