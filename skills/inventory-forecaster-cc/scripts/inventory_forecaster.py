@@ -7141,6 +7141,14 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"{_first['l13_pos']:.0f}/wk = {_first['ratio']:.2f}x "
                     f"(>=1.20) -> preserved signal"
                 )
+            elif _reason == "order_history_sustained_acceleration":
+                meta.setdefault("drivers", []).append(
+                    f"F49c F43-skip order-history sustained acceleration: "
+                    f"{_first['spike_count']}/4 recent weeks > 2.5x prior median; "
+                    f"L4W nz median {_first['l4_nz_median']:.0f}/wk = "
+                    f"{_first['ratio']:.2f}x prior median {_first['median_pre']:.0f}/wk "
+                    f"(>=2.0x) -> genuine run-rate step-change, preserved signal"
+                )
         elif _first.get("f49b_internal"):
             # F49b (2026-05-21): internal spike within F49 sustained-acceleration
             # window — cap just the outlier, leave the acceleration signal intact.
