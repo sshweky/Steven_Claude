@@ -1616,11 +1616,11 @@ def fetch_master_pack_qb_rest(mstyles):
     master_pack = {}
     season_map  = {}
 
-    # Batch the WHERE clause -- 500 mstyles per call.
-    # QB REST requires spaces around OR in the WHERE string; without them the
-    # parser returns HTTP 400 on batches larger than ~50 clauses.
-    # Fix 2026-05-25: "OR".join -> " OR ".join (spaces required by QB parser).
-    BATCH = 500
+    # Batch the WHERE clause -- 200 mstyles per call.
+    # Each EX clause is ~20 chars; 200 batches = ~4 KB WHERE, well under QB's
+    # parser limit.  500-batch attempts returned HTTP 400 (WHERE too long).
+    # 200 = safe max confirmed.  (2026-05-25)
+    BATCH = 200
     uniq  = sorted({m for m in mstyles if m})
     for i in range(0, len(uniq), BATCH):
         batch    = uniq[i:i + BATCH]
