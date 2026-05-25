@@ -9121,20 +9121,37 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f66_mult     = 1.10
             _f66g_clamped = True
         # F66i — WOS-at-target gate (2026-05-25).
-        # F66 upward corrections (>1.0) were calibrated on historical records that
-        # include inventory-build periods when the retailer was ordering ABOVE their
-        # POS rate to rebuild DC stock.  When DC WOS is within [target-2, target+4]
-        # (6-12 wks for RTL_WOS_TARGET=8), the retailer is in equilibrium -- their
-        # order rate already equals their POS rate.  Applying an upward bias on top
-        # of a baseline that IS the POS rate would double-count the premium and
-        # over-project by the full correction factor.  Only valid when the retailer
-        # is genuinely understocked (WOS < target - 2) and about to accelerate orders.
+        # F66 upward corrections were calibrated on historical data that includes
+        # inventory-BUILD periods when customers ordered ABOVE POS rate to rebuild
+        # DC stock.  When the DC is at or above target WOS, ordering has already
+        # converged to the consumer POS rate -- applying an upward bias on top of
+        # a POS-anchored baseline double-counts the build premium.
+        #
+        # Suppress upward F66 when WOS >= (target_floor - 2):
+        #   Amazon:      target = 10-12wks  →  gate fires when WOS >= 8
+        #   Non-Amazon:  target = 8wks      →  gate fires when WOS >= 6
+        # Only valid below this threshold (genuinely understocked, about to
+        # accelerate orders above POS).
         _f66i_clamped = False
-        if _f66_mult > 1.0 and not is_amazon:
-            _f66i_wos = float(rtl_pos.get("OH_WOS") or 0) if rtl_pos else 0.0
-            if (_f66i_wos > 0
-                    and _f66i_wos >= (RTL_WOS_TARGET - 2.0)
-                    and _f66i_wos <= (RTL_WOS_TARGET + 4.0)):
+        _f66i_wos     = 0.0
+        _f66i_target  = ""
+        if _f66_mult > 1.0:
+            if is_amazon:
+                # Source Amazon WOS inline (F59h hasn't run yet at this point)
+                _f66i_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
+                if _f66i_wos <= 0:
+                    _f66i_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
+                    _f66i_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
+                    _f66i_pl  = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+                    if _f66i_pl > 0:
+                        _f66i_wos = (_f66i_soh + _f66i_opo) / _f66i_pl
+                _f66i_threshold = AMZ_WOS_TARGET_MIN - 2.0   # 8.0
+                _f66i_target    = f"{AMZ_WOS_TARGET_MIN:.0f}-{AMZ_WOS_TARGET_MAX:.0f}wks"
+            else:
+                _f66i_wos       = float(rtl_pos.get("OH_WOS") or 0) if rtl_pos else 0.0
+                _f66i_threshold = RTL_WOS_TARGET - 2.0        # 6.0
+                _f66i_target    = f"{RTL_WOS_TARGET:.0f}wks"
+            if _f66i_wos > 0 and _f66i_wos >= _f66i_threshold:
                 _f66_mult     = 1.0
                 _f66i_clamped = True
         # F66h acceleration interlock -- read flags stashed by seasonal_baseline()
