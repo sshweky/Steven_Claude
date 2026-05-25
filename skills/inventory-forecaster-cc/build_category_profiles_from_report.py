@@ -690,6 +690,11 @@ def main():
         "strategic_customer_weight":   STRATEGIC_CUSTOMER_WEIGHT,
         "planner_overrides":           sorted(PLANNER_OVERRIDES.keys()),
         "holiday_lead_uplift":         {str(k): v for k, v in HOLIDAY_LEAD_UPLIFT.items()},
+        "demand_cleaning": {
+            "oos_gap_months":  OOS_GAP_MONTHS,
+            "oos_cap_mult":    OOS_CAP_MULT,
+            "iso_cap_mult":    ISO_CAP_MULT,
+        },
         "gates": {
             "min_total_units":           MIN_TOTAL_UNITS,
             "min_active_months":         MIN_ACTIVE_MONTHS,
