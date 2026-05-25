@@ -12362,7 +12362,8 @@ def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
                              ats_hist=ats_hist,
                              switchover_weeks=switchover_weeks,
                              retailer_pos=retailer_pos,
-                             vacated_bases=vacated_base_index)
+                             vacated_bases=vacated_base_index,
+                             inv_flow_data=inv_flow_data)
         r["ai_forecast"] = fr["forecast"]
         r["ai_model"]    = fr["model"]
         r["ai_total"]    = fr["new_total"]
