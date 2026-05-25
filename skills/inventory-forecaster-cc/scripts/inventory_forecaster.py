@@ -10160,16 +10160,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         season       = season,
     )
 
-    # DBG-FF12859 final trace (remove after diagnosis)
-    if (row.get("Mstyle", "") == "FF12859"
-            and "WAL MART" in (row.get("Customr_Name", "") or "").upper()):
-        import sys
-        print(f"  [DBG-FF12859-FINAL] model={model}  fcst[-3:]={fcst[-3:]}  "
-              f"sum={sum(fcst)}", file=sys.stderr)
-        if isinstance(meta, dict):
-            for _d in meta.get("drivers", []):
-                print(f"    driver: {_d}", file=sys.stderr)
-
     return {
         "key":         row["Acct_MStyle_Key_"],
         "mstyle":      row.get("Mstyle", ""),
