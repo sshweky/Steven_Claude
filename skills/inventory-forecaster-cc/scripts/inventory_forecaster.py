@@ -14729,14 +14729,38 @@ def main():
                     pass  # malformed date — skip silently
             payload.append(row)
         n_ok, n_fail, errors = qb_bulk_update(QB_PROJ_TABLE, payload, merge_fid)
-        # Track completed keys: assume in-order success for the batches that returned OK.
-        # qb_bulk_update returns aggregate counts, not per-record IDs; we mark all keys
-        # in successful batches as done. (errors[] flags the partial batches.)
-        bad_batches = {e["batch_start"] for e in errors if "error" in e}
+        # Audit Finding #7 (2026-05-25): tighten the resumability rule -- a key
+        # is only "done" if its batch had no exception AND no lineErrors AND no
+        # within-batch partial-fail count.  Previously a batch with within-batch
+        # lineErrors (some rows OK, some failed) marked all rows done because
+        # the batch as a whole "returned"; that meant --resume skipped rows
+        # that QB had actually rejected.  Empty-200 throttles (Finding #6) now
+        # raise to retry, so those don't reach this marking path.
+        bad_batch_starts = set()
+        for e in errors:
+            bad_batch_starts.add(e["batch_start"])     # any error of any shape
+        # Build per-row failure index from lineErrors so we can mark only the
+        # specific failing rows as not-done within a partially-failed batch.
+        line_err_rows = set()
+        for e in errors:
+            le = e.get("lineErrors") or {}
+            for row_idx in le.keys():
+                try:
+                    line_err_rows.add(e["batch_start"] + int(row_idx))
+                except (TypeError, ValueError):
+                    pass
         for i, rec in enumerate(to_write):
             batch_start = (i // QB_BULK_BATCH) * QB_BULK_BATCH
-            if batch_start not in bad_batches:
-                done_keys.append(rec["key"])
+            # Skip if (a) whole batch raised, OR (b) this specific row hit a
+            # lineError, OR (c) the batch reported partial-fail count (rare,
+            # only when n_processed != len(batch) and no lineErrors detail).
+            if batch_start in bad_batch_starts:
+                # Don't mark anything in a fully-failed batch as done.  The
+                # whole batch will be retried on --resume.
+                continue
+            if i in line_err_rows:
+                continue
+            done_keys.append(rec["key"])
         with open(completed_path, "w") as f:
             json.dump(done_keys, f)
         elapsed_wb = time.time() - t_wb
