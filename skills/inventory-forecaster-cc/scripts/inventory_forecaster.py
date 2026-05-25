@@ -2701,6 +2701,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     _f79_driver = None
     if (is_amazon
             and not _f10_applied
+            and not _f10b_applied
             and not _f77_applied
             and not _f77b_applied
             and not is_new_launch
@@ -2723,6 +2724,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     _f82_driver = None
     if (not is_amazon
             and not _f10_applied
+            and not _f10b_applied
             and not _f77_applied
             and not _f77b_applied
             and not is_new_launch
