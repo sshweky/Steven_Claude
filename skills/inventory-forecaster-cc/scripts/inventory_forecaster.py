@@ -13905,32 +13905,28 @@ def main():
         if _asin_to_ms:
             print(f"\n[2.6b] Pulling Amazon Inventory Health for "
                   f"{len(_asin_to_ms)} ASINs ...", flush=True)
-            IH_COLS = ["ASIN", "Sellable_On_Hand_Units",
-                       "Open_Purchase_Order_Quantity", "WOS_OH"]
-            ih_sel    = ", ".join(f"[{c}]" for c in IH_COLS)
-            IH_BATCH  = 200
-            _n_ih     = 0
-            _asins    = list(_asin_to_ms.keys())
-            for i in range(0, len(_asins), IH_BATCH):
-                _batch     = _asins[i:i + IH_BATCH]
-                _in_clause = ", ".join(f"'{a}'" for a in _batch)
-                ih_rows    = cdata_query(
-                    f"SELECT {ih_sel} "
-                    f"FROM [Quickbase1].[ProductTrack].[Amazon_Invtry_Health] "
-                    f"WHERE [ASIN] IN ({_in_clause})",
-                    f"inv_health batch {i // IH_BATCH + 1}")
-                for _r in ih_rows:
-                    _a  = (_r.get("ASIN") or "").strip()
-                    _ms = _asin_to_ms.get(_a)
-                    if _ms and _ms in amazon_catalog_us:
-                        amazon_catalog_us[_ms]["Inv_SOH"] = float(
-                            _r.get("Sellable_On_Hand_Units") or 0)
-                        amazon_catalog_us[_ms]["Inv_OPO"] = float(
-                            _r.get("Open_Purchase_Order_Quantity") or 0)
-                        amazon_catalog_us[_ms]["Inv_WOS"] = float(
-                            _r.get("WOS_OH") or 0)
-                        _n_ih += 1
-            print(f"      {_n_ih} mstyles enriched with DC inventory health data")
+            # 2026-05-25 (Audit Finding #2): migrated from CData per-batch
+            # loop to QB direct REST API.  Table: ProductTrack.Amazon_Invtry_Health
+            # (`bp9akd3js`, 22 fields).  Returns ASIN -> {SOH, OPO, WOS}; we
+            # merge into amazon_catalog_us keyed by mstyle via _asin_to_ms.
+            _n_ih = 0
+            try:
+                _health_by_asin = fetch_amazon_invtry_health_qb_rest(
+                    list(_asin_to_ms.keys()))
+            except Exception as _p26b_err:
+                print(f"      [WARN] Phase 2.6b QB REST fetch failed: {_p26b_err}")
+                _health_by_asin = {}
+            for _a, _r in _health_by_asin.items():
+                _ms = _asin_to_ms.get(_a)
+                if _ms and _ms in amazon_catalog_us:
+                    amazon_catalog_us[_ms]["Inv_SOH"] = float(
+                        _r.get("Sellable_On_Hand_Units") or 0)
+                    amazon_catalog_us[_ms]["Inv_OPO"] = float(
+                        _r.get("Open_Purchase_Order_Quantity") or 0)
+                    amazon_catalog_us[_ms]["Inv_WOS"] = float(
+                        _r.get("WOS_OH") or 0)
+                    _n_ih += 1
+            print(f"      {_n_ih} mstyles enriched with DC inventory health data (QB REST API)")
         else:
             print(f"\n[2.6b] Amazon Inventory Health skipped "
                   f"(no ASINs in Catalog US -- field may not exist in that table)")
