@@ -305,6 +305,14 @@ RTL_WOS_TARGET          = float(os.environ.get("RTL_WOS_TARGET",           "8.0"
 F_RTL_WOS adjusts the forecast up when OH_WOS < target and down when > target.
 8 weeks = standard retailer replenishment buffer (covers ~2 ordering cycles)."""
 
+AMZ_WOS_TARGET_MIN      = float(os.environ.get("AMZ_WOS_TARGET_MIN",       "10.0"))
+"""Amazon DC WOS lower bound of healthy target range (10-12 wks).
+When Amazon DC WOS >= AMZ_WOS_TARGET_MIN - 2 (i.e. >= 8), the DC is at or
+above equilibrium and ordering converges to the consumer POS rate."""
+
+AMZ_WOS_TARGET_MAX      = float(os.environ.get("AMZ_WOS_TARGET_MAX",       "12.0"))
+"""Amazon DC WOS upper bound of healthy target range (10-12 wks)."""
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # WRITEBACK
