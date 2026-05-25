@@ -11876,9 +11876,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 _rpl_rates[_wi] * _rpl_var_ratios[_pat_i], mp
                             )
 
-            # [DBG-RPL]
-            if row.get("Acct_MStyle_Key_", "") == "1864-FF7120EC":
-                print(f"  [DBG-RPL] final_rpl_new={_rpl_new}")
             fcst[:] = _rpl_new
             _fire("F_AMZ_RPL")
             _rpl_t5_note = (
