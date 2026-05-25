@@ -32,6 +32,7 @@ MAX_RETRIES     = int(os.environ.get("MAX_RETRIES", "5"))
 QB_REALM        = os.environ.get("QB_REALM",      "pim.quickbase.com")
 QB_USER_TOKEN   = os.environ.get("QB_USER_TOKEN", "b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s")
 QB_PROJ_TABLE   = os.environ.get("QB_PROJ_TABLE", "bpd237tvm")
+QB_STYLES_TABLE = os.environ.get("QB_STYLES_TABLE", "bphzqfkev")  # InventoryTrack.Styles
 QB_BULK_BATCH   = int(os.environ.get("QB_BULK_BATCH", "500"))
 
 # QB report for VP-Q4 open-PO data -- bulk fetch in 1 API call.
