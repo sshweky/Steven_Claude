@@ -8639,23 +8639,38 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             meta["po_total_qty"]      = _po_total_qty
             meta["po_total_removed"]  = _po_total_removed
 
-    # VP-OP (2026-05-20) — Off-price PO buffer zone.
-    # Off-price accounts buy in large, infrequent batches — once a PO is confirmed
-    # they will not reorder within 4 weeks on either side of it.  Zero out AI
-    # forecast in that ±4-week window unless a separate PO already exists in the
-    # specific week (those are already handled by VP-Q4 above and represent a
-    # distinct, independent order event).
+    # VP-OP (revised 2026-05-24) — Off-price PO buffer zone.
+    # Off-price accounts buy in large, infrequent batches.  Two constraints:
+    #   BACKWARD (-4 wks before each PO): customer won't place another order
+    #     just before their next committed PO -- apply around every PO.
+    #   FORWARD  (+2 wks from LAST PO only): brief quiet period after the cluster
+    #     clears; customer resumes buying on their normal cadence shortly after.
+    #
+    # The original ±4-around-each-PO approach compounded when POs were clustered
+    # (e.g., W2-W13), causing the forward buffers to chain and wipe out W1-W17.
+    # That pushed all remaining AI demand into W18-W26 -- back-loading that
+    # doesn't reflect the customer's actual monthly ordering cadence.
+    _op_po_weeks = set()
     if _effective_po_wk and _is_offprice_cust(cust_name):
         _op_po_weeks = {i for i, qty in enumerate(_effective_po_wk[:26]) if qty > 0}
+        _last_po_idx = max(_op_po_weeks) if _op_po_weeks else -1
         _op_buf_zeroed = []
+
+        # Backward buffer: 4 weeks before EACH confirmed PO
         for _po_idx in sorted(_op_po_weeks):
-            for _offset in range(-4, 5):
-                if _offset == 0:
-                    continue  # PO week itself already handled by VP-Q4
+            for _offset in range(-4, 0):
                 _tgt = _po_idx + _offset
                 if 0 <= _tgt < 26 and _tgt not in _op_po_weeks and fcst[_tgt] > 0:
                     _op_buf_zeroed.append((_tgt + 1, fcst[_tgt]))
                     fcst[_tgt] = 0
+
+        # Forward buffer: 2 weeks from the LAST PO only (not compounded per-PO)
+        for _offset in range(1, 3):
+            _tgt = _last_po_idx + _offset
+            if 0 <= _tgt < 26 and _tgt not in _op_po_weeks and fcst[_tgt] > 0:
+                _op_buf_zeroed.append((_tgt + 1, fcst[_tgt]))
+                fcst[_tgt] = 0
+
         if _op_buf_zeroed and isinstance(meta, dict):
             _op_removed = sum(z[1] for z in _op_buf_zeroed)
             _op_wks_str = ",".join(f"W{z[0]}" for z in sorted(_op_buf_zeroed, key=lambda x: x[0])[:6])
@@ -8666,6 +8681,74 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"({_op_wks_str}; removed {_op_removed:,.0f} units)"
             )
             _fire("VP-OP")
+
+    # F_OP_BULK (2026-05-24) — Off-price discrete bulk-order reshaper.
+    # After VP-Q4 + VP-OP determine the available forecast weeks, the seasonal
+    # baseline produces smooth weekly values (e.g., ~3,900/wk for 11 weeks).
+    # Off-price customers don't order every week -- they buy in large batches
+    # on a roughly monthly cadence (1-2x/month).  Reshape the available demand
+    # into discrete bulk order events placed at the customer's historical
+    # inter-order interval, zeroing weeks between order slots.
+    #
+    # Only fires when VP-OP was active (confirmed POs exist) -- without confirmed
+    # POs the standard model already handles off-price adequately.
+    if _op_po_weeks and _is_offprice_cust(cust_name):
+        _bulk_avail  = [i for i in range(26) if fcst[i] > 0]
+        _bulk_total  = sum(fcst[i] for i in _bulk_avail)
+
+        if len(_bulk_avail) >= 2 and _bulk_total >= mp:
+            # Compute inter-order interval from L26W non-zero weeks (newest=index 0)
+            _op_hist_nz_idx = [i for i, v in enumerate(hist[-26:]) if v > 0]
+            if len(_op_hist_nz_idx) >= 2:
+                # Gaps between consecutive non-zero weeks; filter out 1-week adjacencies
+                # (split shipments) to get true ordering events
+                _op_gaps = [
+                    _op_hist_nz_idx[j + 1] - _op_hist_nz_idx[j]
+                    for j in range(len(_op_hist_nz_idx) - 1)
+                    if _op_hist_nz_idx[j + 1] - _op_hist_nz_idx[j] >= 2
+                ]
+                _op_interval = int(round(sum(_op_gaps) / len(_op_gaps))) if _op_gaps else 4
+            else:
+                _op_interval = 4
+            _op_interval = max(3, min(6, _op_interval))   # clamp 3-6 weeks
+
+            # Place order slots starting at first available week, spaced by interval
+            _op_avail_set = set(_bulk_avail)
+            _op_slots     = []
+            _op_cursor    = _bulk_avail[0]
+            while _op_cursor <= 25:
+                # Use this week if available; otherwise slide to next available
+                _op_slot = next(
+                    (w for w in _bulk_avail if w >= _op_cursor), None
+                )
+                if _op_slot is None:
+                    break
+                _op_slots.append(_op_slot)
+                _op_cursor = _op_slot + _op_interval
+
+            if _op_slots:
+                # Distribute demand evenly; last slot absorbs rounding remainder
+                _op_each = snap(_bulk_total / len(_op_slots), mp)
+                _op_each = max(_op_each, mp)   # at least one master pack
+                for i in _bulk_avail:
+                    fcst[i] = 0
+                for _si, _sl in enumerate(_op_slots):
+                    if _sl < 26:
+                        if _si == len(_op_slots) - 1:
+                            # Last slot: give it remaining demand (avoid rounding loss)
+                            _placed = sum(fcst)
+                            _remainder = snap(_bulk_total - _placed, mp)
+                            fcst[_sl] = max(_remainder, mp)
+                        else:
+                            fcst[_sl] = _op_each
+                _fire("F_OP_BULK")
+                if isinstance(meta, dict):
+                    _slots_str = ", ".join(f"W{s+1}" for s in _op_slots)
+                    meta.setdefault("drivers", []).append(
+                        f"F_OP_BULK: reshaped {_bulk_total:,.0f}u into "
+                        f"{len(_op_slots)} bulk orders ({_op_each:,.0f}u each) "
+                        f"at {_op_interval}-wk interval: {_slots_str}"
+                    )
 
     # VP-FL (2026-05-17) — Frontload dampening.
     # When a customer places a significantly above-normal order (W1 open PO or
