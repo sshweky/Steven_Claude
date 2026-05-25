@@ -3974,8 +3974,16 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         meta.setdefault("drivers", []).append(
             f"F51 F30-skip POS-confirmed acceleration: Amazon POS L4 "
             f"{_f51_l4_pos:.0f}/wk vs L13 {_f51_l13_pos:.0f}/wk = "
-            f"{_f51_l4_pos/_f51_l13_pos:.2f}× (≥1.10) → preserved F38b lift "
+            f"{_f51_l4_pos/_f51_l13_pos:.2f}x (>=1.10) -> preserved F38b lift "
             f"(baseline {_f51_pre_baseline:.0f}/wk, would have capped to "
+            f"{l13_avg*1.05:.0f}/wk)"
+        )
+    if _f30_rtl_skip:
+        _rtl_wos_log = float(rtl_pos.get("OH_WOS") or 0) if rtl_pos else 0
+        meta.setdefault("drivers", []).append(
+            f"F30_RTL_SKIP: retailer overstocked (WOS={_rtl_wos_log:.1f}wks > 10.5) "
+            f"-> F30 l13_avg*1.05 cap bypassed; POS-anchored baseline trusted "
+            f"(baseline {_f30_pre_baseline:.0f}/wk, F30 would have capped to "
             f"{l13_avg*1.05:.0f}/wk)"
         )
     if _f6_applied and _f6_applied != "F50_stockout_skip":
