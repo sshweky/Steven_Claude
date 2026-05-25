@@ -7150,6 +7150,30 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         biweekly = bool(_cadence_gap_c)
         fcst = apply_ordering_pattern(fcst, hist_for_model, mp)
 
+        # F83 (2026-05-24): PDQ Croston's display-cap.
+        # PDQ = Power Display Quantity (endcap/display placements at Walmart).
+        # These are NOT recurring orders -- they are one-off or limited-cycle
+        # display placements.  Croston's treats the cluster of 4-8 recent
+        # placements as ongoing intermittent demand and projects 26 weeks of
+        # that velocity (often 2x manual).  Cap total Croston's output for
+        # PDQ items at L26 all-weeks avg x 26 x 1.20 -- gives a 20% buffer
+        # above run-rate but disallows extrapolating launch-spike velocity.
+        _f83_mstyle = (row.get("Mstyle") or "").upper()
+        if "PDQ" in _f83_mstyle:
+            _f83_l26_avg = sum(hist_for_model[-26:]) / 26 if len(hist_for_model) >= 26 else 0
+            if _f83_l26_avg > 0:
+                _f83_ceiling = _f83_l26_avg * 26 * 1.20
+                _f83_total   = sum(fcst)
+                if _f83_total > _f83_ceiling:
+                    _f83_scale = _f83_ceiling / _f83_total
+                    fcst       = [snap(v * _f83_scale, mp) if v > 0 else 0 for v in fcst]
+                    meta.setdefault("drivers", []).append(
+                        f"F83 PDQ Croston's cap: mstyle ends with PDQ "
+                        f"(display placements -- not recurring); L26 all-wks avg "
+                        f"{_f83_l26_avg:.0f} x 26 x 1.20 = {_f83_ceiling:.0f} ceiling; "
+                        f"total capped from {_f83_total:.0f} to {sum(fcst):.0f}"
+                    )
+
     else:
         # Dense buyer (≥ 50% non-zero): seasonal baseline + ordering pattern shape.
         _is_ecom_t4 = _is_ecom_cust(cust_name)
