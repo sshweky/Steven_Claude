@@ -5193,7 +5193,7 @@ def crostens(history, mp, is_amazon=False, description=None,
     #   L4W_avg > L13W_avg * 1.8  (recent burst >> baseline)
     #   AND POS_L13W > 0  AND  L4W_avg > POS_L13W * 1.5  (burst not driven by POS)
     # Action: cap z to L13W average EXCLUDING the L4W burst weeks * 1.2
-    if pos_data and not _f18_applied:
+    if pos_data and is_amazon and not _f18_applied:
         _f18b_l4 = [float(v or 0) for v in history[-4:]]
         _f18b_l13 = [float(v or 0) for v in history[-13:]]
         _f18b_l4_avg  = sum(_f18b_l4)  / max(len(_f18b_l4),  1) if _f18b_l4  else 0
