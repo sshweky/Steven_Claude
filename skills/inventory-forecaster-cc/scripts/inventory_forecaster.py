@@ -3116,6 +3116,16 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
             baseline = _f22c_ceiling
             _f22c_applied = True
 
+    # F15_RTL_OVERSTOCKED helper flag: True when this is a non-Amazon retailer
+    # record with POS data AND the retailer is currently overstocked (WOS > 10.5).
+    # Used to bypass F30 and F24 caps -- both are anchored on the suppressed
+    # order-history average, which understates demand during intentional drawdown.
+    _f15_rtl_overstocked = (
+        _f15_rtl_active
+        and rtl_pos is not None
+        and float(rtl_pos.get("OH_WOS") or 0) > 10.5
+    )
+
     # F30 (2026-04-26) — HIGH-vol Seasonal Baseline cap.  Deep-deviation
     # analysis (n=42 HIGH-vol records) showed median bias of +13% vs L13W
     # with 57% running >+10% hot.  HIGH-volume items have buyer plans that
