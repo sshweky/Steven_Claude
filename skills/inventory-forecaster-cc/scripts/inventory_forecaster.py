@@ -5110,18 +5110,6 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     return adjusted, adjustments
 
 
-def _legacy_apply_oh_shortfall_adjustment_v1_REMOVED(row, fcst):
-    """REMOVED 2026-05-26 -- replaced by v2 above with fresh-cascade design.
-    Kept as a no-op stub so any stale callers fail loudly instead of silently
-    returning bad data.  Search the codebase for references and migrate to the
-    v2 signature (row, fcst, inv_flow=...).
-    """
-    raise NotImplementedError(
-        "F37 v1 was removed 2026-05-26.  Use apply_oh_shortfall_adjustment("
-        "row, fcst, inv_flow=...) and pass Inv Flow data from "
-        "fetch_inv_flow_qb_rest().")
-
-
 # F37 v1 body removed 2026-05-26 -- previously located at this line range,
 # replaced by the v2 fresh-cascade function above.  v1 used to read Inv_Wk1..
 # Inv_Wk26 from Projections (stale -- those columns are computed in QB against
