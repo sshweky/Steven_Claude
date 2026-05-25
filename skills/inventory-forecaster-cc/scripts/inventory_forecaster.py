@@ -14488,7 +14488,35 @@ def main():
                 }
             except Exception as _e:
                 # Validation failure shouldn't block the forecast write-back.
+                # Audit Finding #21 (2026-05-25): previously the exception was
+                # silently truncated to 200 chars on the record itself with no
+                # paper trail.  Now also append key + full traceback to a
+                # dedicated validation_errors.json so the planner / debugger
+                # can see WHICH records' validation crashed and WHY.
                 r["validation"] = {"error": str(_e)[:200]}
+                try:
+                    import traceback as _tb
+                    _verr_entry = {
+                        "key":       key,
+                        "mstyle":    row.get("Mstyle", ""),
+                        "customer":  row.get("Customr_Name", ""),
+                        "error":     str(_e),
+                        "traceback": _tb.format_exc(),
+                    }
+                    _verr_path = Path(__file__).parent.parent / "validation_errors.json"
+                    if _verr_path.exists():
+                        try:
+                            _verr_log = json.load(open(_verr_path))
+                            if not isinstance(_verr_log, list):
+                                _verr_log = []
+                        except Exception:
+                            _verr_log = []
+                    else:
+                        _verr_log = []
+                    _verr_log.append(_verr_entry)
+                    json.dump(_verr_log, open(_verr_path, "w"), indent=2)
+                except Exception:
+                    pass    # never let the error-capture itself crash the run
         results.append(r)
 
     pat_counts  = {}

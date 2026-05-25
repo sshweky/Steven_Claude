@@ -1,9 +1,9 @@
 {
   "id": "30",
   "subject": "F18+19+20: Named constants, module-top imports, central paths",
-  "description": "Name the 0.15s retailer POS sleep; lift `from oos_history import` to top; centralize cache paths in paths.py",
+  "description": "F18 (named retailer sleep constant) + F19 (lifted oos_history imports to module top) done. F20 (paths.py) skipped: only 1 hard-coded cache path site found, not worth a new module.",
   "activeForm": "Cleanup polish",
-  "status": "in_progress",
+  "status": "completed",
   "blocks": [],
   "blockedBy": []
 }
