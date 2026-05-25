@@ -13352,47 +13352,23 @@ def main():
     if args.all:      scope_parts.append("all active")
     scope_desc = " | ".join(scope_parts) if scope_parts else "all active"
 
-    # ── Phase 1: Pull projection records (3 split queries) ────────
-    # Splitting the original 250-col query into three ~80-col queries
-    # avoids CData/QB throttle disconnects under realm load.
-    # Q1 is required; Q2/Q3 are merged in by key (graceful zero-fill on failure).
-    scope_filter = build_scope_filter(args)
+    # ── Phase 1: Pull projection records (QB REST API) ────────────
+    # Uses direct QB REST API with server-side filtering -- not CData.
+    # A single-record dry-run fetches exactly 1 row; --all fetches ~4,500
+    # in paginated 1,000-row pages.  No CData full-table-scan throttle issues.
+    scope_filter = build_scope_filter(args)   # still used by Phase 2+ CData calls
 
     print(f"\n[1/4] Pulling projections from Quickbase ...", flush=True)
-
-    # Q1: metadata + MAN_PRJ + ORD_COLS (~94 cols) -- required
-    sql_q1 = build_prj_q1(ORIG_PRJ_COLS, scope_filter)
-    raw_rows = cdata_query(sql_q1, "projections")
+    print(f"      [QB REST] fetching field map ...", flush=True)
+    try:
+        raw_rows = fetch_projections_qb_rest(ORIG_PRJ_COLS, args)
+    except Exception as _p1_err:
+        sys.exit(f"ERROR: Phase 1 QB REST fetch failed: {_p1_err}")
     if not raw_rows:
-        sys.exit("ERROR: No records returned. Check scope filters and CData connection.")
+        sys.exit("ERROR: No records returned. Check scope filters and QB connection.")
+
     rows = [{k: clean_html(v) for k, v in r.items()} for r in raw_rows]
-    print(f"      Q1: {len(rows)} records (metadata + projections + orders)", flush=True)
-
-    # Q2: SHP_COLS + INV_OH_COLS (~79 cols) -- merge by key
-    sql_q2 = build_prj_q2(scope_filter)
-    raw_q2 = cdata_query(sql_q2, "projections_q2") or []
-    if raw_q2:
-        q2_map = {r["Acct_MStyle_Key_"]: r for r in raw_q2 if r.get("Acct_MStyle_Key_")}
-        for row in rows:
-            extra = q2_map.get(row.get("Acct_MStyle_Key_"), {})
-            row.update({k: clean_html(v) for k, v in extra.items() if k != "Acct_MStyle_Key_"})
-        print(f"      Q2: {len(raw_q2)} records merged (shipment history + inv OH)", flush=True)
-    else:
-        print(f"      Q2: WARN -- shipment/inv OH fetch failed; SHP/INV fields will be zero", flush=True)
-
-    # Q3: AI_PRJ + OPN_COLS + SUGG_COLS (~79 cols) -- merge by key
-    sql_q3 = build_prj_q3(scope_filter)
-    raw_q3 = cdata_query(sql_q3, "projections_q3") or []
-    if raw_q3:
-        q3_map = {r["Acct_MStyle_Key_"]: r for r in raw_q3 if r.get("Acct_MStyle_Key_")}
-        for row in rows:
-            extra = q3_map.get(row.get("Acct_MStyle_Key_"), {})
-            row.update({k: clean_html(v) for k, v in extra.items() if k != "Acct_MStyle_Key_"})
-        print(f"      Q3: {len(raw_q3)} records merged (AI projections + open POs + suggested)", flush=True)
-    else:
-        print(f"      Q3: WARN -- AI_PRJ/OPN/SUGG fetch failed; those fields will be zero", flush=True)
-
-    print(f"      {len(rows)} total records ready", flush=True)
+    print(f"      {len(rows)} records retrieved (QB REST API)", flush=True)
 
     # ── Phase 2: Pull master pack + Season ─────────────────────────
     print(f"\n[2/4] Pulling master pack + Season from Styles ...", flush=True)
