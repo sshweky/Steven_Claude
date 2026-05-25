@@ -9148,6 +9148,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         if _f66h_already_lifted and _f66_mult > 1.05:
             _f66_mult     = 1.05
             _f66h_clamped = True
+        if _f66i_clamped:
+            meta.setdefault("drivers", []).append(
+                f"F66i WOS-at-target gate: {_bias_cust} bias x{_b_mult:.2f} suppressed "
+                f"(DC WOS={_f66i_wos:.1f}wks in equilibrium range "
+                f"[{RTL_WOS_TARGET - 2:.0f}-{RTL_WOS_TARGET + 4:.0f}wks]; "
+                f"order rate already equals POS rate -- no build premium needed)"
+            )
         if _f66_mult != 1.0:
             fcst = [snap(v * _f66_mult, mp) if v > 0 else 0 for v in fcst]
             _f66_clamp_tag = ""
