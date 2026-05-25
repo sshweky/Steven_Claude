@@ -581,14 +581,18 @@ def _get_category_profile(description, product_category=None, product_subcategor
         sub_payload = derived["by_subcategory"].get(sub_key)
         if sub_payload and sub_payload.get("profile"):
             n_skus = (sub_payload.get("stats") or {}).get("consistent_skus")
-            adjusted = _apply_forecasting_rules(sub_payload["profile"], n_skus)
+            adjusted = _apply_forecasting_rules(
+                sub_payload["profile"], n_skus,
+                priority="P2-subcategory", key=sub_key)
             if adjusted is not None:
                 return adjusted
     if cat:
         cat_payload = derived["by_category"].get(cat)
         if cat_payload and cat_payload.get("profile"):
             n_skus = (cat_payload.get("stats") or {}).get("consistent_skus")
-            adjusted = _apply_forecasting_rules(cat_payload["profile"], n_skus)
+            adjusted = _apply_forecasting_rules(
+                cat_payload["profile"], n_skus,
+                priority="P3-category", key=cat)
             if adjusted is not None:
                 return adjusted
 
