@@ -10176,7 +10176,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Model is discounting this as noise; re-blend non-zero weeks toward
         # a 60% L4W / 40% L13W target to preserve the recent signal.
         # Skip when F18 POS-anchored cap fired (same reason as F59a above).
+        # Skip for new launches: L4W reflects initial DC build, not acceleration.
         if (not _f59_f18_capped
+                and not _f73_new_ramp
                 and _f59_l4w_avg > 0 and _f59_l13w_avg > 0
                 and _f59_l4w_avg >= _f59_l13w_avg * 1.40):
             _f59b_target = _f59_l4w_avg * 0.60 + _f59_l13w_avg * 0.40
