@@ -10217,7 +10217,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         if _rpl_demand >= 50:
             # Step 1 -- build week-level rates: apply seasonal/event lifts on top
             # of the demand baseline.  Three lift layers (applied in order):
-            #   (a) Category profile (empirical monthly index, F66-style floor 1.0).
+            #   (a) Category profile (empirical monthly index, F85-style floor 1.0).
             #   (b) Prime Day / Fall Prime Day calendar boosts (discrete events).
             #   (c) T5/Holiday + Season-specific ramp (AMZ_T5_HOLIDAY_BOOSTS).
             # Layers (a) and (c) use MAX to avoid double-counting when the empirical
