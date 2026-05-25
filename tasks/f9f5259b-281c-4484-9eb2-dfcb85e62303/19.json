@@ -3,7 +3,7 @@
   "subject": "F10: Delete dead legacy CData SQL builders",
   "description": "build_prj_select, build_prj_q1/q2/q3 at lines 1258-1371 are unreferenced + contain CData SQL that violates new policy.",
   "activeForm": "Deleting legacy SQL builders",
-  "status": "pending",
+  "status": "in_progress",
   "blocks": [],
   "blockedBy": []
 }

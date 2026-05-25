@@ -1255,121 +1255,12 @@ def qb_bulk_update(table_id, records, merge_field_id, batch_size=None):
 
 
 # ─── SQL builders ─────────────────────────────────────────────────────────────
-
-def build_prj_select(prj_cols):
-    """Build the projection SELECT using dynamically computed weekly column names.
-
-    LEGACY single-query version (250 cols) kept for reference.
-    Production code uses build_prj_q1/q2/q3 to split into three ~80-col queries
-    that are far less likely to trigger CData/QB throttle disconnects.
-    """
-    prj_col_sql  = ",".join(f"[{c}]" for c in prj_cols)
-    shp_col_sql  = ",".join(f"[{c}]" for c in SHP_COLS)
-    ord_col_sql  = ",".join(f"[{c}]" for c in ORD_COLS)
-    sugg_col_sql = ",".join(f"[{c}]" for c in SUGG_COLS)
-    inv_col_sql  = ",".join(f"[{c}]" for c in INV_OH_COLS)
-    opn_col_sql  = ",".join(f"[{c}]" for c in OPN_COLS)
-    return textwrap.dedent(f"""
-        SELECT
-          [Acct_MStyle_Key_], [Mstyle], [Customr_Name], [Description], [Status_Cust],
-          [PT_Item_Status], [Div],
-          [Shpd_Wk_L13W_cust_], [Last_Ord_Date], [Last_Shp_Date], [Inventory_Manager],
-          [Flagged], [Auto_Project], [POG_Launch_Date], [POG_End_Date], [Store_Count],
-          [AI_PRJ_W1],[AI_PRJ_W2],[AI_PRJ_W3],[AI_PRJ_W4],[AI_PRJ_W5],
-          [AI_PRJ_W6],[AI_PRJ_W7],[AI_PRJ_W8],[AI_PRJ_W9],[AI_PRJ_W10],
-          [AI_PRJ_W11],[AI_PRJ_W12],[AI_PRJ_W13],[AI_PRJ_W14],[AI_PRJ_W15],
-          [AI_PRJ_W16],[AI_PRJ_W17],[AI_PRJ_W18],[AI_PRJ_W19],[AI_PRJ_W20],
-          [AI_PRJ_W21],[AI_PRJ_W22],[AI_PRJ_W23],[AI_PRJ_W24],[AI_PRJ_W25],[AI_PRJ_W26],
-          {prj_col_sql},
-          {shp_col_sql},
-          {ord_col_sql},
-          {sugg_col_sql},
-          {inv_col_sql},
-          {opn_col_sql}
-        FROM [Quickbase1].[InventoryTrack].[Projections]
-        WHERE ([Status_Cust] LIKE 'A%' OR [Status_Cust] LIKE 'FD%')
-    """).strip()
-
-
-# ── Split projection queries (Phase 1 multi-fetch) ────────────────────────────
-# The single 250-col query above triggers CData/QB throttle disconnects under
-# realm load.  Splitting into three ~80-col queries dramatically reduces the
-# per-query cost.  Q1 is required; Q2/Q3 are merged in by key after the fact.
-
-PRJ_BASE_FILTER = "([Status_Cust] LIKE 'A%' OR [Status_Cust] LIKE 'FD%')"
-PRJ_TABLE       = "[Quickbase1].[InventoryTrack].[Projections]"
-
-
-def build_prj_q1(prj_cols, scope_filter=None):
-    """Q1 -- Core forecast data (~94 cols): metadata + MAN_PRJ + ORD_COLS.
-
-    This is the required query; the run aborts if it fails.
-    """
-    prj_col_sql = ",".join(f"[{c}]" for c in prj_cols)
-    ord_col_sql = ",".join(f"[{c}]" for c in ORD_COLS)
-    where = PRJ_BASE_FILTER
-    if scope_filter:
-        where += f" AND {scope_filter}"
-    return textwrap.dedent(f"""
-        SELECT
-          [Acct_MStyle_Key_], [Mstyle], [Customr_Name], [Description], [Status_Cust],
-          [PT_Item_Status], [Div],
-          [Shpd_Wk_L13W_cust_], [Last_Ord_Date], [Last_Shp_Date], [Inventory_Manager],
-          [Flagged], [Auto_Project], [POG_Launch_Date], [POG_End_Date], [Store_Count],
-          {prj_col_sql},
-          {ord_col_sql}
-        FROM {PRJ_TABLE}
-        WHERE {where}
-    """).strip()
-
-
-def build_prj_q2(scope_filter=None):
-    """Q2 -- Shipment history + inventory OH (~79 cols): key + SHP_COLS + INV_OH_COLS.
-
-    Used by F41 (phantom-order dedupe), F8 (corroboration), F37 (OH shortfall).
-    Merged into rows by Acct_MStyle_Key_ after Q1 succeeds.
-    """
-    shp_col_sql = ",".join(f"[{c}]" for c in SHP_COLS)
-    inv_col_sql = ",".join(f"[{c}]" for c in INV_OH_COLS)
-    where = PRJ_BASE_FILTER
-    if scope_filter:
-        where += f" AND {scope_filter}"
-    return textwrap.dedent(f"""
-        SELECT
-          [Acct_MStyle_Key_],
-          {shp_col_sql},
-          {inv_col_sql}
-        FROM {PRJ_TABLE}
-        WHERE {where}
-    """).strip()
-
-
-def build_prj_q3(scope_filter=None):
-    """Q3 -- AI projections + open POs + suggested (~79 cols): key + AI_PRJ + OPN + SUGG.
-
-    AI_PRJ: previous run's projections (used by F58 AI Comments adjustment).
-    OPN: open customer PO qtys per week (used by VP-Q4 zero logic).
-    SUGG: viewer display only.
-    Merged into rows by Acct_MStyle_Key_ after Q1 succeeds.
-    """
-    sugg_col_sql = ",".join(f"[{c}]" for c in SUGG_COLS)
-    opn_col_sql  = ",".join(f"[{c}]" for c in OPN_COLS)
-    where = PRJ_BASE_FILTER
-    if scope_filter:
-        where += f" AND {scope_filter}"
-    return textwrap.dedent(f"""
-        SELECT
-          [Acct_MStyle_Key_],
-          [AI_PRJ_W1],[AI_PRJ_W2],[AI_PRJ_W3],[AI_PRJ_W4],[AI_PRJ_W5],
-          [AI_PRJ_W6],[AI_PRJ_W7],[AI_PRJ_W8],[AI_PRJ_W9],[AI_PRJ_W10],
-          [AI_PRJ_W11],[AI_PRJ_W12],[AI_PRJ_W13],[AI_PRJ_W14],[AI_PRJ_W15],
-          [AI_PRJ_W16],[AI_PRJ_W17],[AI_PRJ_W18],[AI_PRJ_W19],[AI_PRJ_W20],
-          [AI_PRJ_W21],[AI_PRJ_W22],[AI_PRJ_W23],[AI_PRJ_W24],[AI_PRJ_W25],[AI_PRJ_W26],
-          {sugg_col_sql},
-          {opn_col_sql}
-        FROM {PRJ_TABLE}
-        WHERE {where}
-    """).strip()
+# 2026-05-25 (Audit Finding #10): the legacy CData SQL builders
+# build_prj_select(), build_prj_q1(), build_prj_q2(), build_prj_q3() were
+# removed.  They were unreferenced as of the Phase 1 REST migration and their
+# CData SQL would violate the current "no CData on tables > 100 rows" policy
+# if anyone were tempted to revive them.  Phase 1 now lives entirely in
+# fetch_projections_qb_rest() below.
 
 
 # ── QB REST API -- Phase 1 projections fetch ──────────────────────────────────
