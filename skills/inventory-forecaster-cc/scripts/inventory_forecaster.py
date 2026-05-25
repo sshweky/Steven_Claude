@@ -41,6 +41,20 @@ try:
 except ImportError:
     sys.exit("ERROR: pip install numpy")
 
+# ─── Module-top imports (Audit Finding #19, 2026-05-25) ───────────────────────
+# These were previously imported deep inside main() in 5+ places.  Lifting to
+# module top means import failures surface at startup instead of mid-run.
+try:
+    from oos_history import (
+        neutralize_compounding,
+        fetch_clean_demand,
+        fetch_open_pos_forward,
+        fetch_ats_history,
+        _open_pos_cache_path,
+    )
+except ImportError as _oos_imp_err:
+    sys.exit(f"ERROR: oos_history.py import failed: {_oos_imp_err}")
+
 # ─── Config ───────────────────────────────────────────────────────────────────
 # All constants imported from scripts/config.py.  That module is the single
 # source of truth for thresholds and supports env-var override for A/B testing
