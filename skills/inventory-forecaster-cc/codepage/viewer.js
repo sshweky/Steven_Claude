@@ -7097,11 +7097,10 @@ function applyFilters() {
       return dir * sa.localeCompare(sb);
     });
   } else {
-    // Default sort: Inv Mgr > Brand > Customer > Mstyle.
+    // Default sort: Customer > Brand > Mstyle.
     FILTERED_RECORDS.sort((a, b) =>
-         _sortKey(a.inv_manager).localeCompare(_sortKey(b.inv_manager))
+         _sortKey(a.cust       ).localeCompare(_sortKey(b.cust       ))
       || _sortKey(a.brand      ).localeCompare(_sortKey(b.brand      ))
-      || _sortKey(a.cust       ).localeCompare(_sortKey(b.cust       ))
       || _sortKey(a.mstyle     ).localeCompare(_sortKey(b.mstyle     ))
     );
   }
@@ -7379,12 +7378,11 @@ async function bootstrap() {
     });
 
     _setBoot('Sorting projections...');
-    _setDetail(`Ordering ${ALL_RECORDS.length.toLocaleString()} records by Inv Mgr > Brand > Customer > Mstyle`);
+    _setDetail(`Ordering ${ALL_RECORDS.length.toLocaleString()} records by Customer > Brand > Mstyle`);
     await new Promise(r => setTimeout(r, 16));
     ALL_RECORDS.sort((a, b) =>
-        _sortKey(a.inv_manager).localeCompare(_sortKey(b.inv_manager))
+        _sortKey(a.cust       ).localeCompare(_sortKey(b.cust       ))
      || _sortKey(a.brand      ).localeCompare(_sortKey(b.brand      ))
-     || _sortKey(a.cust       ).localeCompare(_sortKey(b.cust       ))
      || _sortKey(a.mstyle     ).localeCompare(_sortKey(b.mstyle     ))
     );
 
