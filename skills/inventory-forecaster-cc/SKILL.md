@@ -762,6 +762,15 @@ FALL_DEAL_LIFT = 1.12
 T5_LIFT_SCHEDULE_OFFSETS = {-6: 1.20, -5: 1.15, -4: 1.15}
 
 AMAZON_CUST_SUBSTR = "AMAZON"
+
+# DC inventory lag correction targets (F_DC_LAG, 2026-05-26)
+AMZ_WOS_TARGET_MIN = 10.0   # Amazon target WOS for adj_DC_OH correction
+AMZ_WOS_TARGET_MAX = 12.0
+RTL_WOS_TARGET     = 8.0    # Retailer target WOS for adj_DC_OH correction
+
+# Retailer trade calendar event windows (F_YOY_CADENCE + F64, fixed week numbers)
+TRADE_FALL_REPLEN_WEEKS  = {17, 18}   # Fall replenishment ordering window
+TRADE_FALL_SEASON2_WEEKS = {21, 22}   # Holiday pre-order window
 ```
 
 Event lift maps (`_AMAZON_EVENT_LIFTS`, `_ALL_EVENT_LIFTS`) are computed at startup
