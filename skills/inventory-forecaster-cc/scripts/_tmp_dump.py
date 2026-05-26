@@ -1,15 +1,20 @@
-import json
-with open(r'C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\forecast_results.json') as f:
+import json, re
+with open(r'C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\forecast_FF12508.json') as f:
     d = json.load(f)
-print('Top type:', type(d).__name__)
-if isinstance(d, dict):
-    print('Top keys:', list(d.keys()))
-    recs = d.get('records', d.get('results', []))
-else:
-    recs = d
-print('Record count:', len(recs))
-if recs:
-    print('First record keys:', list(recs[0].keys())[:8] if isinstance(recs[0], dict) else type(recs[0]).__name__)
-    print('First key:', recs[0].get('key') if isinstance(recs[0], dict) else recs[0])
-matched = [r for r in recs if isinstance(r, dict) and r.get('key') == '1864-FF12508']
-print('FF12508 matches:', len(matched))
+recs = d.get('records', d) if isinstance(d, dict) else d
+for r in recs:
+    if isinstance(r, dict) and r.get('key') == '1864-FF12508':
+        print('Model:', r.get('model'))
+        print('Cap_base:', r.get('cap_base'))
+        print('MP:', r.get('mp'))
+        print('Rule_fires:', r.get('rule_fires'))
+        print('Forecast:', r.get('forecast'))
+        print('F37 adjustments:')
+        for a in r.get('f37_adjustments') or []:
+            print(' ', a)
+        meta = r.get('meta', {})
+        print('Meta keys:', list(meta.keys()))
+        for drv in meta.get('drivers', []):
+            s = re.sub(r'<[^>]+>', ' ', drv) if isinstance(drv, str) else str(drv)
+            print(' D:', s[:300])
+        break
