@@ -3021,6 +3021,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # not the baseline scalar.
     _f38_driver = None
     _f38b_applied = False   # F38b/F38e positive-trend lift; consumed by F79 guard
+    _f38p_applied = False
+    _f38p_driver = None
     if is_amazon and amz_catalog and pos_data and baseline > 0:
         # F15 ord-primary: skip F38b entirely.  The L13W order rate used as
         # baseline already captures recent POS acceleration -- the rolling
@@ -3095,6 +3097,39 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                             f"vs L13w {_f38_l13:.0f}/wk); WOS {_wos:.1f}, no OOS -- "
                             f"baseline cut {_pre_f38:.0f} -> {baseline:.0f}"
                         )
+            # F38p -- AUR-confirmed price-change LW baseline reset (2026-05-26).
+            # Fires when LW POS deviates >=5% from L4W avg AND AUR shifted >=5%
+            # in the matching direction (price up -> demand down, or vice versa).
+            # Uses LW (not L4W) as the new baseline because a confirmed price change
+            # is a structural demand break -- averaging pre-change weeks into L4W
+            # masks the true new run rate.  F38 uses L4W-vs-L13W; F38p uses
+            # LW-vs-L4W to catch sharper, more recent breaks.  Runs independently
+            # of whether F38a-e fired.  Alerts the planner via the driver string.
+            _f38p_pos_lw    = float(pos_data.get("Ordered_Units_LW") or 0)
+            _f38p_aur_l13   = float(amz_catalog.get("AUR_L13w") or 0)
+            if _f38_l4 > 0 and _f38p_pos_lw > 0 and _f38_aur > 0 and _f38p_aur_l13 > 0:
+                _f38p_lw_chg  = (_f38p_pos_lw / _f38_l4) - 1.0
+                _f38p_aur_chg = (_f38_aur / _f38p_aur_l13) - 1.0
+                _f38p_price_drove = (
+                    abs(_f38p_lw_chg)  >= 0.05
+                    and abs(_f38p_aur_chg) >= 0.05
+                    and ((_f38p_aur_chg > 0 and _f38p_lw_chg < 0)
+                         or (_f38p_aur_chg < 0 and _f38p_lw_chg > 0))
+                )
+                if _f38p_price_drove:
+                    _pre_f38p = baseline
+                    baseline = _f38p_pos_lw
+                    _f38p_applied = True
+                    _f38p_dir = "increase" if _f38p_aur_chg > 0 else "decrease"
+                    _f38p_driver = (
+                        f"F38p PRICE CHANGE ALERT: AUR {_f38p_dir} "
+                        f"${_f38p_aur_l13:.2f} (L13W) -> ${_f38_aur:.2f} (L4W) "
+                        f"({_f38p_aur_chg*100:+.0f}%); POS shifted "
+                        f"{_f38_l4:.0f}/wk (L4W) -> {_f38p_pos_lw:.0f}/wk (LW) "
+                        f"({_f38p_lw_chg*100:+.0f}%); "
+                        f"baseline reset to LW rate {_f38p_pos_lw:.0f} "
+                        f"(was {_pre_f38p:.0f})"
+                    )
 
     # 26-week seasonal shape with eased dampening (2026-05-06).  Updated to
     # let strong seasonals (Halloween, Holiday, July 4th, Easter) come through
@@ -3993,6 +4028,8 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         meta.setdefault("drivers", []).append(_f15_driver)
     if _f38_driver:
         meta.setdefault("drivers", []).append(_f38_driver)
+    if _f38p_driver:
+        meta.setdefault("drivers", []).append(_f38p_driver)
     if _f4_applied:
         meta.setdefault("drivers", []).append(
             f"F4 thin-history window widened: L13_nz={len(l13_nz)} ≤ 4 AND "
