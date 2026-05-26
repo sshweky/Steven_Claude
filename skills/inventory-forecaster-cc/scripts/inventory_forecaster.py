@@ -8114,6 +8114,7 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
         "l4w":           l4w,
         "l13w":          l13w,
         "has_cat_mults": bool(_cat_mults_rtl),
+        "wos_target":    wos_target,
     }
 
 
