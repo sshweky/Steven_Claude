@@ -13102,25 +13102,31 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"hasn't transmitted yet, not that Amazon won't order this week."
                 )
 
-    # F_W1_PO_ZERO — Final guard: when a confirmed open PO covers W1, the AI
-    # W1 forecast MUST be zero (the PO IS the W1 demand; any AI projection
-    # on top double-counts).  Some upstream rules (F69-WOS rescale, F37, etc.)
-    # may have left a non-zero residual after VP-Q4's initial zeroing -- this
-    # is the unconditional safety net that runs last.
-    # Runs for all customers, not just Amazon.
-    if (_opn_w1 > 0
-            and isinstance(fcst, list) and len(fcst) >= 1
-            and fcst[0] > 0):
-        _w1_was = fcst[0]
-        fcst[0] = 0
-        _fire("F_W1_PO_ZERO")
-        if isinstance(meta, dict):
-            meta.setdefault("drivers", []).append(
-                f"F_W1_PO_ZERO: AI W1 forced to 0 ({_w1_was:,}u removed) -- "
-                f"confirmed Open PO of {_opn_w1:,.0f}u already covers W1. "
-                f"Showing any AI projection on top of the PO would double-count "
-                f"forward demand."
-            )
+    # F_PO_ZERO_ALL — Final safety net: ANY week with a confirmed open PO must
+    # have AI forecast = 0.  The PO IS the demand for that week; any AI on top
+    # double-counts.  VP-Q4 does an earlier zeroing pass, but downstream rules
+    # (F69-WOS rescale, F37, etc.) can re-inflate weeks -- this unconditional
+    # loop runs last and catches all W1-W26.
+    # Runs for all customers (replaces the former W1-only F_W1_PO_ZERO guard).
+    if isinstance(fcst, list) and isinstance(_opn_row_wk, list):
+        _po_zero_removed = {}
+        for _wi in range(min(26, len(fcst))):
+            _po_qty_wi = _opn_row_wk[_wi] if _wi < len(_opn_row_wk) else 0.0
+            if _po_qty_wi > 0 and fcst[_wi] > 0:
+                _po_zero_removed[_wi + 1] = (int(round(fcst[_wi])), int(round(_po_qty_wi)))
+                fcst[_wi] = 0
+        if _po_zero_removed:
+            _fire("F_PO_ZERO_ALL")
+            if isinstance(meta, dict):
+                _detail_str = ", ".join(
+                    f"W{w}: AI {ai:,}u removed (PO={po:,}u)"
+                    for w, (ai, po) in sorted(_po_zero_removed.items())
+                )
+                meta.setdefault("drivers", []).append(
+                    f"F_PO_ZERO_ALL: AI zeroed for {len(_po_zero_removed)} week(s) "
+                    f"with confirmed Open POs -- {_detail_str}. "
+                    f"PO is the demand; AI on top would double-count."
+                )
 
     alert = ""
     if model == "Inactive" and prior > 0:
