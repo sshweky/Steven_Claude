@@ -2879,9 +2879,6 @@ function toggleDetail(key) {{
     const aiDiff = aiVal - w.projection;
     const aiCls  = aiDiff > 0 ? 'color:#2e7d32' : aiDiff < 0 ? 'color:#c62828' : 'color:#888';
     aiCells   += `<td style="${{aiCls}};font-weight:600">${{fmtN(aiVal)}}</td>`;
-    const sugVal = sug[i] || 0;
-    sugTot    += sugVal;
-    sugCells  += `<td style="color:#555;font-size:10px">${{fmtN(sugVal)}}</td>`;
     const opnVal = (r.opn_w || [])[i] || 0;
     opnTot    += opnVal;
     opnCells  += `<td style="${{opnVal === 0 ? 'color:#bbb' : 'color:#6d4c00;font-weight:600'}};font-size:10px">${{fmtN(opnVal)}}</td>`;
@@ -2896,7 +2893,6 @@ function toggleDetail(key) {{
   hdrCells  += '<th>Total</th>';
   projCells += `<td style="font-weight:700">${{fmtN(r.proj_total)}}</td>`;
   aiCells   += `<td style="font-weight:700;color:#1565c0">${{fmtN(r.ai_total)}}</td>`;
-  sugCells  += `<td style="font-weight:700;color:#555">${{fmtN(sugTot)}}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${{fmtN(opnTot)}}</td>`;
   lyOrdCells += `<td style="font-weight:700;color:#2e7d32">${{fmtN(lyOrdTot)}}</td>`;
   lyShpCells += `<td style="font-weight:700;color:#1565c0">${{fmtN(lyShpTot)}}</td>`;
