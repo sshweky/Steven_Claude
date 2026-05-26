@@ -8096,6 +8096,8 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
 
     # -- Step 1: POS baseline ------------------------------------------------
     baseline_pps, _baseline_src = _compute_pos_baseline(l4w, l13w, amz_aur_data=amz_aur_data)
+    # [DBG F87] temporary
+    print(f"  [DBG WOS] baseline_pps={baseline_pps:.0f} src='{_baseline_src[:50]}' mp={mp} snap={snap(baseline_pps,mp)}")
 
     # -- Step 2: WOS fill ----------------------------------------------------
     # F86 (2026-05-25) OH data guard: if oh_lw == 0 AND oh_wos == 0, the
