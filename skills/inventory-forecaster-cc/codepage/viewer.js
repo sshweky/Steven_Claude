@@ -4488,6 +4488,7 @@ async function toggleDetail(key) {
       </table>
     </div>
     ${histHtml}
+    ${posHistHtml}
     ${invFlowSectionHtml}
     ${switchoverHtml}
     ${tellAiBlock}
