@@ -1436,7 +1436,12 @@ def fetch_projections_qb_rest(prj_cols, args):
          "Store_Count", "Estimated_ISO", "UPSPW",
          "Product_Category", "Product_Subcategory", "Brand",
          "Baseline_Override",           # FID 1614 — planner-set manual baseline (units/wk)
-         "Baseline_Override_Date"]      # FID 1615 — date the override was set; auto-expires after 30 days
+         "Baseline_Override_Date",      # FID 1615 — date the override was set; auto-expires after 30 days
+         "Master_Pack",                 # FID 1178 — for variant-record-creation defaults
+         "Acct_",                       # FID 11   — numeric account # (needed when creating variant records)
+         "Switchover_Active",           # FID 1602 — checkbox: base style is being switched over
+         "Switchover_To_MStyle",        # FID 1603 — target variant mstyle (planner-set OR PCS-PX auto-link)
+         "Switchover_Date"]             # FID 1604 — date planning shifts to variant (auto-computed)
         + [f"AI_PRJ_W{w}" for w in range(1, 27)]
         + list(prj_cols)    # MAN_PRJ date-stamped columns (rolling weekly)
         + ORD_COLS
