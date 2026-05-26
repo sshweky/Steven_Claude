@@ -8689,6 +8689,14 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 + "; "
                 + ("with" if _rtl_wos_r["has_cat_mults"] else "no")
                 + " category seasonal lifts"
+                + (
+                    f"; Prime Day/Fall PD calendar applied"
+                    if _rtl_wos_r.get("has_events") else ""
+                )
+                + (
+                    f"; T5/Holiday ramp lifted W{','.join(str(w) for w in _rtl_wos_r['t5_weeks'])}"
+                    if _rtl_wos_r.get("t5_weeks") else ""
+                )
             ],
         }
 
