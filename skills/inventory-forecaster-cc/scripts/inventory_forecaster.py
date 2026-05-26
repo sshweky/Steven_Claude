@@ -8048,7 +8048,16 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
         return l13w, (
             f"L13W anchor (event overlap in L4W window: months {_ev_hit})"
         )
-    return l13w, f"L13W anchor (no spike: L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.075)"
+    # F87 (2026-05-26) — deceleration guard (retailer path).
+    # When L4W has dropped >20% below L13W (and L4W window isn't in an event
+    # month where seasonal dip is expected), use L4W as the baseline anchor.
+    if l4w > 0 and l4w < l13w * 0.80:
+        _decline_pct = (1 - l4w / l13w) * 100
+        return l4w, (
+            f"L4W anchor (F87 declining: L4W {l4w:.0f} is {_decline_pct:.1f}% "
+            f"below L13W {l13w:.0f} -- current sell-through is the demand signal)"
+        )
+    return l13w, f"L13W anchor (stable: L4W {l4w:.0f} within 20% of L13W {l13w:.0f})"
 
 
 def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
