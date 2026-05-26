@@ -10413,6 +10413,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             f"NEW-launch / missing-data items bypass F37 inventory constraint"
         )
 
+    # [DBG F87] temporary
+    if "FF12689" in (row.get("Acct_MStyle_Key_","") or ""):
+        print(f"  [DBG post-F37] fcst_w14={fcst[13] if len(fcst)>13 else '?'}")
+
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
     #
     # No single forecast week may exceed 2.0× the L26 non-zero mean, regardless
