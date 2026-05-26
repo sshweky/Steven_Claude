@@ -8411,6 +8411,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _ovr_suppressed_by_ramp = (_baseline_override > 0 and _f73_new_ramp)
 
     _rtl_wos_r = None
+    # DEBUG (temp) — log rtl_pos state for diagnosis
+    _dbg_key = row.get("Acct_MStyle_Key_", "")
+    if _dbg_key in ("23011-FF38640",):
+        print(f"  [DBG F86] {_dbg_key}: rtl_pos={rtl_pos is not None}, "
+              f"L13W={float((rtl_pos or {}).get('Avg_Units_Wk_L13w') or 0):.0f}, "
+              f"L4W={float((rtl_pos or {}).get('Avg_Units_Wk_L4w') or 0):.0f}, "
+              f"OH_WOS={float((rtl_pos or {}).get('OH_WOS') or 0):.2f}, "
+              f"OH_LW={float((rtl_pos or {}).get('OH_Units_LW') or 0):.0f}, "
+              f"f73_ramp={_f73_new_ramp}, baseline_ovr={_baseline_override}", flush=True)
     # F86 (2026-05-25) — gate changed from OH_WOS > 0 to L13W > 0.
     # Original gate required retailer OH data to be present before routing to
     # _retailer_wos_forecast().  Retailers that don't report DC OH weekly (e.g.
