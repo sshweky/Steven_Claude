@@ -2005,9 +2005,17 @@ def _store_inv_flow(l2f, f2l):
 
 # Hardcoded FID fallbacks (verified via GET /v1/fields 2026-05-26).  CData label
 # normalization: "Opn Wk0" -> "Opn_Wk0", "RcvWk0" -> "RcvWk0", "Wk1" -> "Wk1".
+# BEG FIDs Wk2..Wk26 added 2026-05-26: use QB-formula per-week Beg Inv directly
+# instead of cascading from Wk1 (viewer.html INV_FLOW_BEG_FIDS order confirmed).
 _INV_FLOW_FALLBACK_FIDS = {
     "Mstyle":  20,
-    "Wk1":     134,        # Beg Inv W1 only (W2..W26 unused -- we cascade fresh)
+    # Beg Inv Wk1..Wk26 (QB-formula fields -- use directly, no cascade)
+    "Wk1":  134, "Wk2":   8, "Wk3":   9, "Wk4":  10, "Wk5": 110,
+    "Wk6":  111, "Wk7":  112, "Wk8": 113, "Wk9": 114, "Wk10": 115,
+    "Wk11": 116, "Wk12": 117, "Wk13": 118, "Wk14": 128, "Wk15": 129,
+    "Wk16": 130, "Wk17": 131, "Wk18": 120, "Wk19": 121, "Wk20": 122,
+    "Wk21": 123, "Wk22": 124, "Wk23": 125, "Wk24": 126, "Wk25": 127,
+    "Wk26": 119,
     "LT_Trans_Days": 225,  # "LT+ Trans Days" normalized; FID verified 2026-05-26
     # RcvWk0..RcvWk26
     "RcvWk0":  295, "RcvWk1":  28,  "RcvWk2":  35,  "RcvWk3":  36,  "RcvWk4":  50,
@@ -2027,14 +2035,19 @@ _INV_FLOW_FALLBACK_FIDS = {
 
 
 def fetch_inv_flow_qb_rest(mstyles):
-    """Phase 2.7: pull Inventory_Flow per-mstyle for F37 v2 cascade.
+    """Phase 2.7: pull Inventory_Flow per-mstyle for F37 v2 direct-BegInv.
 
     Returns dict keyed by Mstyle:
         {
-          "beg_inv_w1": float,        # actual current on-hand
-          "rcv":  [r1, r2, ..., r26], # week-indexed (W1 = RcvWk0 + RcvWk1)
-          "opn":  [o1, o2, ..., o26], # week-indexed (W1 = OpnWk0 + OpnWk1)
+          "beg_inv_w1":  float,         # actual current on-hand (Wk1, FID 134)
+          "beg_inv_wks": [b1..b26],     # QB-formula Beg Inv for each week (use directly)
+          "rcv":         [r1..r26],     # per-week receipts (W1 = RcvWk0 + RcvWk1)
+          "opn":         [o1..o26],     # per-week open orders (W1 = OpnWk0 + OpnWk1)
+          "lt_trans_days": float,
         }
+
+    beg_inv_wks[w] is the QB-formula Beg Inv for forecast week w+1.  F37 uses
+    these directly per week -- no cascade simulation.
 
     RcvWk0 and OpnWk0 represent prior-week residual that planners convention-
     ally roll into Wk1 -- we sum them at the W1 index per planner direction.
@@ -2045,12 +2058,13 @@ def fetch_inv_flow_qb_rest(mstyles):
         return l2f.get(label) or _INV_FLOW_FALLBACK_FIDS.get(label)
 
     mstyle_fid    = _fid("Mstyle")
-    wk1_fid       = _fid("Wk1")
     lt_trans_fid  = _fid("LT_Trans_Days")   # FID 225; "LT+ Trans Days" normalized
-    rcv_fids      = [_fid(f"RcvWk{i}") for i in range(0, 27)]   # 0..26 = 27 fids
+    # Beg Inv FIDs for Wk1..Wk26 (QB formula fields; order matters -- w+1 = week number)
+    beg_fids      = [_fid(f"Wk{i}") for i in range(1, 27)]     # 26 fids
+    rcv_fids      = [_fid(f"RcvWk{i}") for i in range(0, 27)]  # 0..26 = 27 fids
     opn_fids      = [_fid(f"Opn_Wk{i}") for i in range(0, 27)]
 
-    select_fids = [mstyle_fid, wk1_fid, lt_trans_fid] + rcv_fids + opn_fids
+    select_fids = [mstyle_fid, lt_trans_fid] + beg_fids + rcv_fids + opn_fids
     select_fids = [f for f in select_fids if f is not None]
 
     rows = _qb_rest_query_batched_in(
@@ -2071,7 +2085,9 @@ def fetch_inv_flow_qb_rest(mstyles):
         ms = r.get("Mstyle")
         if not ms:
             continue
-        beg = _to_float(r.get("Wk1"))
+        # QB-formula Beg Inv for each week -- read directly, no cascade
+        beg_inv_wks = [_to_float(r.get(f"Wk{i}")) for i in range(1, 27)]
+        beg = beg_inv_wks[0]  # Wk1 = beg_inv_w1 (kept for backwards compat)
         # Build per-week receipts (index 0 = W1; RcvWk0 rolls into W1)
         rcv = []
         for i in range(1, 27):
@@ -2088,9 +2104,10 @@ def fetch_inv_flow_qb_rest(mstyles):
             continue
         out[ms] = {
             "beg_inv_w1":   beg,
+            "beg_inv_wks":  beg_inv_wks,  # 26-element list, index 0 = W1
             "rcv":          rcv,
             "opn":          opn,
-            "lt_trans_days": lt_trans,   # 0.0 means missing -- F37 will use 150d default
+            "lt_trans_days": lt_trans,    # 0.0 means missing -- F37 will use 150d default
         }
     return out
 
@@ -5163,11 +5180,23 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
 
     `inv_flow` dict (passed by caller from `fetch_inv_flow_qb_rest()` output):
         {
-          "beg_inv_w1":   float,    # actual on-hand at start of W1
-          "rcv":          [r1..r26],# per-week receipts; r1 includes RcvWk0 rollover
-          "opn":          [o1..o26],# per-week confirmed open customer POs; o1 includes OpnWk0 rollover
-          "lt_trans_days": float,   # LT+ Trans Days (FID 225); 0 means missing
+          "beg_inv_w1":   float,        # actual on-hand at start of W1 (backwards compat)
+          "beg_inv_wks":  [b1..b26],    # QB-formula Beg Inv per week (use directly)
+          "rcv":          [r1..r26],    # per-week receipts; r1 includes RcvWk0 rollover
+          "opn":          [o1..o26],    # per-week confirmed open customer POs
+          "lt_trans_days": float,       # LT+ Trans Days (FID 225); 0 means missing
         }
+
+    KEY METHODOLOGY (2026-05-26 correction):
+        Beg Inv for each week comes directly from the QB-formula fields in the
+        Inventory Flow table (INV_FLOW_BEG_FIDS in viewer.html).  These fields
+        are computed by QB against actual planner-managed inventory data.  Do
+        NOT simulate/cascade from Wk1 -- that approach compounded errors week
+        over week because it used AI demand as surrogate ship qty.
+
+        capacity_w = max(0, BegInv_W[w] + rcv[w] - opn[w])
+
+        where BegInv_W[w] = beg_inv_wks[w] (directly from QB).
 
     LT+Trans horizon gate (2026-05-26):
         For any forecast week W that falls on or AFTER the LT+Trans Days
@@ -5182,21 +5211,8 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
         (~22 weeks) is used and a flag is set so the planner can be alerted.
 
     Per-week math (within the no-order window):
-        capacity_w = max(0, beg_inv_w + rcv[w] - opn[w])
-        backlog_w  = SUM over live cohorts of (orig * max(0, 1 - 0.25*age))
-        demand_w   = own_forecast[w] + backlog_w
+        capacity_w = max(0, BegInv_W[w] + rcv[w] - opn[w])
         ship_w     = min(demand_w, capacity_w)
-        if demand_w > capacity_w:
-            new_cohort = (orig=demand_w - capacity_w, age starts at 0)
-        ending_inv_w = beg_inv_w + rcv[w] - ship_w - opn[w]
-        beg_inv_{w+1} = max(0, ending_inv_w)
-
-    Decay: LINEAR 25%/week against the cohort's ORIGINAL qty.
-        age 0 (born this week): 100% of original counted in same-week demand
-        age 1: 75%
-        age 2: 50%
-        age 3: 25%
-        age 4+: 0% (cohort expired -- customers gave up)
 
     Open Orders take priority over forecast demand (Open Orders are confirmed
     customer POs that MUST ship; they're deducted from capacity).
@@ -5219,10 +5235,23 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
                                 "lt_trans_weeks": (_LT_TRANS_DEFAULT_DAYS + 6) // 7,
                                 "used_default": False}
 
-    try:
-        beg_inv = float(inv_flow.get("beg_inv_w1", 0) or 0)
-    except (TypeError, ValueError):
-        beg_inv = 0.0
+    # QB-formula per-week Beg Inv -- read directly from Inventory Flow table.
+    # Fall back to beg_inv_w1 for all weeks if beg_inv_wks is missing
+    # (old inv_flow dict from callers that haven't been updated yet).
+    _raw_beg_wks = inv_flow.get("beg_inv_wks")
+    if _raw_beg_wks and len(_raw_beg_wks) >= 26:
+        beg_inv_wks = [float(v or 0) for v in _raw_beg_wks[:26]]
+    else:
+        # Fallback: use beg_inv_w1 for all weeks (old behaviour -- triggers warning)
+        _fallback_beg = float(inv_flow.get("beg_inv_w1", 0) or 0)
+        beg_inv_wks = [_fallback_beg] * 26
+        import warnings
+        warnings.warn(
+            "F37: beg_inv_wks missing from inv_flow -- falling back to beg_inv_w1 "
+            "for all weeks.  Upgrade fetch_inv_flow_qb_rest() caller.",
+            stacklevel=3,
+        )
+
     rcv = inv_flow.get("rcv") or [0.0] * 26
     opn = inv_flow.get("opn") or [0.0] * 26
     # Defensive: pad/truncate to exactly 26 entries
@@ -5258,27 +5287,20 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
         if (w + 1) >= _lt_trans_weeks:
             continue
 
-        # Capacity = Beg Inv + this week's receipts - this week's open orders.
-        # Open Orders are committed customer POs that take priority over the
-        # forecast.  Floor at 0 -- if we're already oversold to open orders,
-        # the AI forecast simply can't ship anything this week.
-        capacity = max(0.0, beg_inv + rcv[w] - opn[w])
+        # Capacity = QB-formula Beg Inv for this week + receipts - open orders.
+        # BegInv_W[w] comes directly from the Inventory Flow table (QB formula
+        # field) -- NOT simulated/cascaded from the prior week.
+        # Open Orders are committed customer POs that take priority.
+        # Floor at 0: if already oversold to open orders, AI forecast ships 0.
+        beg_inv_w = beg_inv_wks[w]
+        capacity = max(0.0, beg_inv_w + rcv[w] - opn[w])
 
         # Cap-only model (no rollforward): we ship min(demand, capacity).
-        # Unmet demand in this week is NOT rolled into future weeks -- Amazon
-        # will simply order less in W and re-order at its normal cadence
-        # later.  Event-driven lifts (T5 / Prime Day / etc.) still land in
-        # their scheduled weeks because we don't manufacture phantom catch-up.
-        if capacity >= demand:
-            ship = demand
-        else:
-            ship = capacity
+        # Unmet demand is NOT rolled into future weeks -- Amazon will order
+        # less in W and re-order at its normal cadence later.
+        ship = min(demand, capacity)
 
         adjusted[w] = int(round(ship))
-
-        # Update Beg Inv for next iteration: Beg + Recpts - shipped - OpenOrders
-        ending_inv = beg_inv + rcv[w] - ship - opn[w]
-        beg_inv = max(0.0, ending_inv)
 
         if adjusted[w] != int(round(demand)):
             adjustments.append({
@@ -5286,6 +5308,7 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
                 "original": int(round(demand)),
                 "adjusted": adjusted[w],
                 "capacity": int(round(capacity)),
+                "beg_inv":  int(round(beg_inv_w)),  # QB Beg Inv used for this week
                 "backlog":  0,   # legacy field, always 0 -- no rollforward
             })
 
@@ -5293,10 +5316,12 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
 
 
 # F37 v1 body removed 2026-05-26 -- previously located at this line range,
-# replaced by the v2 fresh-cascade function above.  v1 used to read Inv_Wk1..
+# replaced by the v2 direct-BegInv function above.  v1 used to read Inv_Wk1..
 # Inv_Wk26 from Projections (stale -- those columns are computed in QB against
-# the PREVIOUS run's AI projection).  The F37h-cat bypass added 2026-05-25 to
-# work around v1's staleness is also removed in this commit.
+# the PREVIOUS run's AI projection).  v2a (2026-05-26 initial) replaced that
+# with a cascade simulation from Wk1 using AI demand as surrogate -- also wrong
+# because it compounded week-over-week errors.  v2b (2026-05-26 correction)
+# reads QB-formula Beg Inv directly per week from Inventory Flow table.
 
 
 def detect_iso(history):
@@ -16358,9 +16383,10 @@ def main():
                                           if a.get("adjusted", 0) < a.get("original", 0))
                     if _weeks_csv:
                         _detail = {str(a["week"]): {
-                                       "orig": int(a.get("original", 0)),
-                                       "adj":  int(a.get("adjusted", 0)),
-                                       "cap":  int(a.get("capacity", 0)),
+                                       "orig":    int(a.get("original", 0)),
+                                       "adj":     int(a.get("adjusted", 0)),
+                                       "cap":     int(a.get("capacity", 0)),
+                                       "beg_inv": int(a.get("beg_inv", 0)),
                                    }
                                    for a in _f37_adj
                                    if a.get("adjusted", 0) < a.get("original", 0)}

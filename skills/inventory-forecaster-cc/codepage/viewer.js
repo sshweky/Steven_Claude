@@ -819,7 +819,8 @@ async function _lazyLoadDetail(r) {
   // F37 v2 capped-weeks (2026-05-26): parse the hidden span injected by the
   // forecaster writeback step.  Format:
   //   <span class="f37-capped" data-weeks="22,25,26"
-  //         data-detail='{"22":{"orig":15104,"adj":5269,"cap":5269},...}' hidden></span>
+  //         data-detail='{"22":{"orig":15104,"adj":5269,"cap":5269,"beg_inv":5269},...}' hidden></span>
+  // beg_inv = QB-formula Beg Inv for that week (direct from Inv Flow table, no cascade)
   // Used by the detail-pane renderer to paint AI Forecast cells with a red
   // background when the AI ask exceeded available inventory that week.
   r.f37_capped_weeks  = new Set();
@@ -3413,7 +3414,9 @@ async function toggleDetail(key) {
       _aiBg = 'background:#ffebee;';   // light red tint
       const _det = r.f37_capped_detail && r.f37_capped_detail[String(_wk1Idx)];
       if (_det) {
-        _aiTitle = ` title="Inventory short: AI wanted ${fmtN(_det.orig)}, can ship ${fmtN(_det.adj)} (capacity ${fmtN(_det.cap)} this week). Unmet demand rolls forward, decaying 25%/week vs original; expires at age 4."`;
+        const _begInvStr = _det.beg_inv != null ? ` | Beg Inv: ${fmtN(_det.beg_inv)}` : '';
+        _aiTitle = ` title="Inventory short: AI wanted ${fmtN(_det.orig)}, can ship ${fmtN(_det.adj)} | Capacity: ${fmtN(_det.cap)}${_begInvStr} (QB Inv Flow, direct)"`;
+
       } else {
         _aiTitle = ' title="F37 inventory-shortfall cap: AI demand exceeded available inventory this week."';
       }
