@@ -7,7 +7,7 @@
 //
 // Functional parity with the local Python viewer (scripts/viewer.py):
 // same filters, same table columns, same expand-row detail panel, same
-// Use AI / Use Sugg / Flag / Comment buttons.  No deviations from layout.
+// Use AI / Flag / Comment buttons.  No deviations from layout.
 //
 // Filter dropdowns (severity / volume / priority / pattern / brand / inv mgr /
 // customer) all auto-populate from actual values in the QB record set  - 
@@ -2208,9 +2208,6 @@ function adaptRow(row) {
     ai_vs_l13:         Math.round(ai_vs_l13  * 10) / 10,
     man_vs_l13:        Math.round(man_vs_l13 * 10) / 10,
     weeks_slim:        weeks_slim,
-    suggested:         sug,
-    sugg_total:        sug.reduce((a,b) => a + b, 0),
-    sugg_wk:           Math.round((sug.reduce((a,b) => a + b, 0) / 26) * 10) / 10,
     hist_shp:          histShp,
     hist_ord:          histOrd,
     ly_ord:            lyOrd,
@@ -3328,7 +3325,6 @@ function renderPage(page) {
       <td>${fmtN(Math.round(r.shp_wk))}</td>
       <td id="metric-projwk-${_safeId2}">${fmtN(Math.round(r.proj_wk))}</td>
       <td id="metric-aiwk-${_safeId2}" style="color:#1565c0;font-weight:600">${fmtN(Math.round(r.ai_wk))}</td>
-      <td style="color:#555" title="Average of Suggested W1..W26">${fmtN(Math.round(r.sugg_wk))}</td>
       <td id="metric-aiproj-${_safeId2}" style="font-size:14px;font-weight:800;color:${aiVsProj === null ? '#888' : aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888'}">${aiVsProj === null ? '-' : (aiVsProj >= 0 ? '+' : '') + aiVsProj.toFixed(1) + '%'}</td>
       <td id="metric-fcst-${_safeId2}" style="text-align:center">${_fcstStatusBadge(r.fcst_status)}</td>
       <td id="metric-ail13-${_safeId2}" style="font-size:13px;font-weight:700;color:${!l13Avail ? '#888' : (aiVsL13 > 0 ? '#2e7d32' : aiVsL13 < 0 ? '#c62828' : '#888')}">${l13Avail ? (aiVsL13 >= 0 ? '+' : '') + aiVsL13.toFixed(1) + '%' : ' - '}</td>
@@ -3400,7 +3396,6 @@ async function toggleDetail(key) {
   const wks    = r.weeks_slim || [];
   const aiFcst = r.ai_fcst    || [];
   const aiMdl  = r.ai_model   || '';
-  const sug    = r.suggested  || [];
 
   // Safety valve: if the record wasn't found in ALL_RECORDS (e.g. key mismatch
   // between the onclick and the cached records), show a diagnostic card instead
@@ -3422,9 +3417,8 @@ async function toggleDetail(key) {
   let hdrCells  = '<th class="row-label"></th>';
   let projCells = '<td class="row-label">Projection</td>';
   let aiCells   = `<td class="row-label" style="color:#1565c0;font-weight:600">AI Forecast<br><span style="font-weight:normal;font-size:10px">${aiMdl}</span></td>`;
-  let sugCells  = '<td class="row-label" style="color:#555">Suggested</td>';
   let opnCells  = '<td class="row-label" style="color:#6d4c00;font-weight:600">Open POs</td>';
-  let sugTot = 0, opnTot = 0;
+  let opnTot = 0;
 
   // Pre-compute the safe-id we use for both the Total cell and the input
   // dataset attributes (key may contain hyphens that are fine in attrs but
@@ -3505,9 +3499,6 @@ async function toggleDetail(key) {
       }
     }
     aiCells   += `<td style="${_aiBg}${aiCls};font-weight:600"${_aiTitle}>${fmtN(aiVal)}</td>`;
-    const sugVal = sug[i] || 0;
-    sugTot    += sugVal;
-    sugCells  += `<td style="color:#555;font-size:10px">${fmtN(sugVal)}</td>`;
     const opnVal = (r.opn_w || [])[i] || 0;
     opnTot    += opnVal;
     opnCells  += `<td style="${opnVal === 0 ? 'color:#bbb' : 'color:#6d4c00;font-weight:600'};font-size:10px">${fmtN(opnVal)}</td>`;
@@ -3515,7 +3506,6 @@ async function toggleDetail(key) {
   hdrCells  += '<th>Total</th>';
   projCells += `<td id="man-total-${safeIdForTotal}" style="font-weight:700">${fmtN(liveProjTotal)}</td>`;
   aiCells   += `<td style="font-weight:700;color:#1565c0">${fmtN(r.ai_total)}</td>`;
-  sugCells  += `<td style="font-weight:700;color:#555">${fmtN(sugTot)}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(opnTot)}</td>`;
 
   // Avg/Wk column  -  separate header so the invFlow table (which also reuses
@@ -3525,7 +3515,6 @@ async function toggleDetail(key) {
   const projHdrCells = hdrCells + '<th style="color:#888;font-weight:600">Avg/Wk</th>';
   projCells += `<td id="man-avgwk-${safeIdForTotal}" style="font-weight:700;color:#555">${fmtN(Math.round(liveProjTotal / _wkCount))}</td>`;
   aiCells   += `<td style="font-weight:700;color:#1565c0">${fmtN(Math.round(r.ai_total / _wkCount))}</td>`;
-  sugCells  += `<td style="font-weight:700;color:#555">${fmtN(Math.round(sugTot / _wkCount))}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(Math.round(opnTot / _wkCount))}</td>`;
 
   // LY actuals  -  Ordered LY (green) + Shipped LY (blue), W1..W26 alignment.
@@ -4295,8 +4284,6 @@ async function toggleDetail(key) {
       <span style="font-weight:600;color:#333;">Edit MAN:</span>
       <button class="et-btn stage-ai"  onclick="stageFromSource('${safeKey}','ai')"
               title="Copy 26 weeks of AI Forecast into the editable cells as unsaved edits (yellow). Tweak as needed, then click Save All to write to Quickbase.">Use AI</button>
-      <button class="et-btn stage-sug" onclick="stageFromSource('${safeKey}','suggested')"
-              title="Copy 26 weeks of Suggested values into the editable cells as unsaved edits (yellow). Tweak as needed, then click Save All to write to Quickbase.">Use Sugg</button>
       <button class="et-btn fill-all"  onclick="fillRowFromFocused('${safeKey}','all')"
               title="Set every week (W1-W26) to the value of the cell you most recently clicked.">Fill All ></button>
       <button class="et-btn fill-all"  onclick="fillRowFromFocused('${safeKey}','right')"
@@ -4523,7 +4510,6 @@ async function toggleDetail(key) {
         <tr>${projHdrCells}</tr>
         <tr>${projCells}</tr>
         <tr>${aiCells}</tr>
-        <tr>${sugCells}</tr>
         <tr><td colspan="29" style="padding:0;height:6px;background:transparent;border:none"></td></tr>
         <tr>${opnCells}</tr>
         <tr>${lyOrdCells}</tr>
@@ -5673,9 +5659,9 @@ async function markMgrResponseRead(key, commentRid, btnEl) {
   }
 }
 
-// -- Use AI / Use Suggested > upsert manual prj cols ------------------------
+// -- Use AI > upsert manual prj cols -----------------------------------------
 async function copyToMan(key, source, btn) {
-  const label = source === 'ai' ? 'AI PRJ' : 'Suggested';
+  const label = 'AI PRJ';
   if (!confirm(`Overwrite 26 weeks of MAN projections with ${label} for ${key}?\n\nThis writes to Quickbase immediately.`)) return;
   const orig = btn.textContent;
   btn.disabled = true; btn.textContent = '...';
@@ -5683,7 +5669,7 @@ async function copyToMan(key, source, btn) {
   try {
     const rec = ALL_RECORDS.find(x => x.key === key);
     if (!rec) throw new Error('record not found');
-    const sourceVals = source === 'ai' ? rec.ai_fcst : rec.suggested;
+    const sourceVals = rec.ai_fcst;
     if (!sourceVals || sourceVals.length !== 26) throw new Error(`expected 26 ${label} values, got ${(sourceVals||[]).length}`);
 
     const fields = {};
@@ -6019,7 +6005,7 @@ function zeroDuplicateManPrj(key, safeKey) {
   }
 }
 
-// Stage AI / Suggested: copy 26 source values into the editable inputs as
+// Stage AI: copy 26 source values into the editable inputs as
 // unsaved edits. Cells whose new value matches the QB-loaded original stay
 // un-dirty (onManEdit handles that automatically).
 // -- Tell-AI: planner explains logic, AI proposes a 26-week diff --------------
@@ -6908,9 +6894,9 @@ async function saveAiCommentOnly(key) {
 function stageFromSource(key, source) {
   const rec = ALL_RECORDS.find(x => x.key === key);
   if (!rec) { alert('Record not found.'); return; }
-  const vals = source === 'ai' ? rec.ai_fcst : rec.suggested;
+  const vals = rec.ai_fcst;
   if (!vals || vals.length !== 26) {
-    alert(`No ${source === 'ai' ? 'AI Forecast' : 'Suggested'} values available for this record.`);
+    alert('No AI Forecast values available for this record.');
     return;
   }
   document.querySelectorAll(`.man-edit[data-key="${key.replace(/"/g,'\\"')}"]`).forEach(el => {

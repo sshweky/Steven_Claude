@@ -1376,7 +1376,7 @@ def build_validation_page_html():
 
     # Build per-record JSON for the JS layer.
     # weeks (slim — week/projection/severity only, no per-week reason strings),
-    # history_l26_shp, history_l26_ord, and suggested are now included inline so
+    # history_l26_shp, history_l26_ord are now included inline so
     # toggleDetail needs zero network round-trips. Total page size ~5-8 MB.
     records_js = []
     for r in recs:
@@ -2621,12 +2621,11 @@ function exportAllInView() {{
   const wkLabels = (prefix) => Array.from({{length:26}}, (_, i) => `${{prefix}} W${{i+1}}`);
   const header = [
     'Key','Inv Manager','Brand','Customer','Mstyle','Description','Priority',
-    'Ord/Wk L4W','Ord/Wk L13W','Shpd/Wk L13W','Proj/Wk','AI Fcst/Wk','Sugg /Wk','AI vs Proj %','AI vs L13 %','Man vs L13 %',
-    'Flags','Max Sev','Proj 26w','AI 26w','Sugg 26w','Model','Pattern','Biweekly',
+    'Ord/Wk L4W','Ord/Wk L13W','Shpd/Wk L13W','Proj/Wk','AI Fcst/Wk','AI vs Proj %','AI vs L13 %','Man vs L13 %',
+    'Flags','Max Sev','Proj 26w','AI 26w','Model','Pattern','Biweekly',
     'Last Comment','Last Comment Date','Narrative',
     ...wkLabels('AI'),
     ...wkLabels('Man'),
-    ...wkLabels('Sugg'),
     ...wkLabels('Hist Ord'),
     ...wkLabels('Hist Shp'),
     'Comment','Flagged'
@@ -4192,15 +4191,6 @@ class Handler(BaseHTTPRequestHandler):
             sql = build_copy_to_manual_sql(key, ai_cols)
             ok  = cdata_update(sql, key)
             self._json({"ok": ok, "key": key, "source": "ai"})
-        elif self.path == "/api/use-suggested":
-            # Copy Suggested Projection values → MAN (date-stamped) columns
-            key = payload.get("key", "")
-            if not key:
-                self._json({"error": "missing key"}, 400); return
-            sug_cols = [f"Suggested_Projection_Wk{w}" for w in range(1, 27)]
-            sql = build_copy_to_manual_sql(key, sug_cols)
-            ok  = cdata_update(sql, key)
-            self._json({"ok": ok, "key": key, "source": "suggested"})
         elif self.path == "/api/toggle-flag":
             # Write the boolean Flagged field (fid 1592) on Projections.
             # Replaces the localStorage-only flag — now shared across users.
