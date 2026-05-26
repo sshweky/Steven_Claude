@@ -1598,10 +1598,17 @@ def _get_styles_field_map():
 _PULL_CACHE_ROOT = Path(__file__).parent.parent / "pull_cache"
 
 
+_PULL_CACHE_MAX_AGE_S = 4 * 3600   # 4-hour hard expiry — refuse stale cache silently
+
+
 def _pull_cache_load(name, use_cache):
     """Try to load <name>.json from pull_cache/. Returns (data, hit) tuple.
 
     `hit` is True when data came from cache; False means caller must fetch live.
+
+    Hard expiry: files older than _PULL_CACHE_MAX_AGE_S are treated as missing.
+    This prevents accidentally loading multi-day-old data when --use-pull-cache
+    is passed without realising the cache is stale.
     """
     if not use_cache:
         return None, False
@@ -1609,10 +1616,17 @@ def _pull_cache_load(name, use_cache):
     if not p.exists():
         print(f"      [PULL CACHE] {name}.json not found -- fetching live", flush=True)
         return None, False
+    age_s = time.time() - p.stat().st_mtime
+    if age_s > _PULL_CACHE_MAX_AGE_S:
+        age_h = age_s / 3600
+        print(f"      [PULL CACHE] {name}.json is {age_h:.1f}h old (max {_PULL_CACHE_MAX_AGE_S//3600}h) "
+              f"-- too stale, fetching live", flush=True)
+        return None, False
     try:
         data = json.load(open(p, encoding="utf-8"))
         size_kb = p.stat().st_size // 1024
-        print(f"      [PULL CACHE] loaded {name}.json ({size_kb:,}KB)", flush=True)
+        age_min = age_s / 60
+        print(f"      [PULL CACHE] loaded {name}.json ({size_kb:,}KB, {age_min:.0f}min old)", flush=True)
         return data, True
     except Exception as e:
         print(f"      [WARN] pull cache read failed for {name}: {e} -- fetching live",
