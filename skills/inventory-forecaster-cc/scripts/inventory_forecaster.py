@@ -8523,10 +8523,20 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 "OH_Units_LW":       _f85_soh,
                 "OH_WOS":            _f85_wos,
             }
+            # Amazon-only: pass AUR + MAP so the baseline rule applies the
+            # spike-vs-promo check (see _compute_pos_baseline).  WOS target
+            # set to AMZ_WOS_TARGET_MIN (10wks) -- non-Amazon retailers
+            # default to RTL_WOS_TARGET (8wks).
+            _f85_aur = {
+                "aur_l4w":   float((amz_catalog or {}).get("AUR_L4w")   or 0),
+                "map_price": float((amz_catalog or {}).get("MAP_Price") or 0),
+            }
             _rtl_wos_r = _retailer_wos_forecast(
                 _f85_synth, mp, _opn_w1,
                 description, product_category, product_subcategory,
-                brand, brand_pt, season)
+                brand, brand_pt, season,
+                wos_target=AMZ_WOS_TARGET_MIN,
+                amz_aur_data=_f85_aur)
 
     if _baseline_override > 0 and not _f73_new_ramp:
         _fire("F_BASELINE_OVR")
