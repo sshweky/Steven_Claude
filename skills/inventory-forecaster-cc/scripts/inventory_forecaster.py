@@ -7962,25 +7962,97 @@ def _f58_fetch_active_comments(lookback_days=60):
     return by_key
 
 
+def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
+    """
+    Compute the POS-anchored demand baseline.
+
+    Two paths depending on whether AUR (Average Unit Retail) data is provided:
+
+    Amazon path (amz_aur_data dict supplied):
+      Spike detection: L4W >= L13W * 1.075 (>= 7.5% above L13W)
+      If spike, check AUR_L4W vs MAP_Price:
+        - AUR < MAP  → promotional pricing was active.  The spike is promo-
+          driven and won't persist at full price.  Use L13W as baseline.
+        - AUR >= MAP → no promo, real demand growth.  Use a 50/50 blend of
+          L4W and L13W (lean recent but anchor to longer history).
+      No spike → L13W.
+
+    Retailer path (amz_aur_data is None):
+      Simple acceleration rule (existing F85 logic):
+        - L4W > L13W * 1.15 AND L4W window doesn't overlap event months
+          (Jan/Jul/Nov/Dec):  baseline = 0.60 * L4W + 0.40 * L13W
+        - Else:  baseline = L13W
+
+    Returns: (baseline_pps, baseline_src_text)
+    """
+    if amz_aur_data is not None:
+        # ── Amazon AUR-aware spike logic ────────────────────────────────
+        spike = l4w >= l13w * 1.075
+        if not spike:
+            return l13w, (
+                f"L13W anchor (no spike: L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.075)"
+            )
+        aur_l4w   = float(amz_aur_data.get("aur_l4w")   or 0)
+        map_price = float(amz_aur_data.get("map_price") or 0)
+        promo_active = (map_price > 0 and aur_l4w > 0 and aur_l4w < map_price)
+        spike_pct = (l4w / l13w - 1) * 100 if l13w > 0 else 0
+        if promo_active:
+            return l13w, (
+                f"L13W anchor (spike +{spike_pct:.1f}% L4W vs L13W, but "
+                f"AUR_L4W ${aur_l4w:.2f} < MAP ${map_price:.2f} -- "
+                f"promo-driven, won't persist at full price)"
+            )
+        _aur_note = (
+            f"AUR_L4W ${aur_l4w:.2f} >= MAP ${map_price:.2f}"
+            if (map_price > 0 and aur_l4w > 0) else
+            "no AUR data -- treated as no-promo"
+        )
+        return 0.50 * l4w + 0.50 * l13w, (
+            f"L4W/L13W 50/50 blend (spike +{spike_pct:.1f}% L4W vs L13W, "
+            f"{_aur_note} -- real demand growth)"
+        )
+
+    # ── Retailer (non-Amazon) path ──────────────────────────────────────
+    _today = date.today()
+    _event_months = {1, 7, 11, 12}
+    _l4w_months = {(_today - timedelta(days=d)).month for d in range(28)}
+    _event_overlap = bool(_l4w_months & _event_months)
+
+    if l4w > l13w * 1.15 and not _event_overlap:
+        return 0.60 * l4w + 0.40 * l13w, (
+            f"L4W blend (L4W {l4w:.0f} > L13W {l13w:.0f} x 1.15, "
+            f"no event overlap)"
+        )
+    if _event_overlap:
+        _ev_hit = sorted(_l4w_months & _event_months)
+        return l13w, (
+            f"L13W anchor (event overlap in L4W window: months {_ev_hit})"
+        )
+    return l13w, f"L13W anchor (L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.15)"
+
+
 def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
                            description, product_category, product_subcategory,
-                           brand, brand_pt, season):
+                           brand, brand_pt, season,
+                           wos_target=None, amz_aur_data=None):
     """
-    Retailer WOS (POS) primary forecasting model.
+    Unified POS + DC-inventory WOS forecast.
 
-    Uses consumer sell-through (POS) as the demand signal rather than
-    ship / order history.  Algorithm:
+    Originally the non-Amazon retailer model; now also used for Amazon F85
+    via the wos_target + amz_aur_data parameters.  The two paths share
+    everything except:
+      - WOS fill target: Amazon = AMZ_WOS_TARGET_MIN (10wks),
+                          retailers = RTL_WOS_TARGET (8wks).
+      - Baseline rule: Amazon uses AUR-aware spike detection;
+                       retailers use the simple L4W blend.
 
-    1. Baseline = L13W POS.  If L4W > L13W * 1.15 AND the L4W window
-       does not overlap promo / event months {Jan, Jul, Nov, Dec},
-       blend: 0.60 * L4W + 0.40 * L13W.
-    2. WOS fill: compute units needed to bring DC to RTL_WOS_TARGET weeks.
-       -- If Opn_W1 == 0 (no confirmed POs yet): fill W1-W2.
-       -- If Opn_W1 >  0 (W1 already has a PO):  fill W2-W3.
-       Fill split evenly across the two weeks, snapped to MP.
-    3. Non-fill weeks: baseline_pps * category_seasonal_mult, snapped to MP.
+    Algorithm:
+      1. Baseline from _compute_pos_baseline() -- branches on amz_aur_data.
+      2. WOS fill: bring DC up to wos_target weeks (split W1-W2,
+         or W2-W3 if Opn_W1 already has a PO).
+      3. Non-fill weeks: baseline * category seasonal mult, snapped to MP.
 
-    Returns a result dict on success, or None if L13W == 0 (no POS baseline).
+    Returns a result dict on success, or None if L13W == 0.
     """
     l4w    = float(rtl_pos.get("Avg_Units_Wk_L4w")  or 0)
     l13w   = float(rtl_pos.get("Avg_Units_Wk_L13w") or 0)
@@ -7990,31 +8062,11 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     if l13w <= 0:
         return None   # no POS baseline -- fall through to classification routing
 
-    # -- Step 1: POS baseline ------------------------------------------------
-    # Event-overlap check: does the L4W window (last ~28 days) touch any of
-    # the promo / holiday months where acceleration may be artificially elevated?
-    _today = date.today()
-    _event_months = {1, 7, 11, 12}   # Jan, Jul, Nov, Dec
-    _l4w_months = {(_today - timedelta(days=d)).month for d in range(28)}
-    _event_overlap = bool(_l4w_months & _event_months)
+    if wos_target is None:
+        wos_target = AMZ_WOS_TARGET_MIN if amz_aur_data is not None else RTL_WOS_TARGET
 
-    if l4w > l13w * 1.15 and not _event_overlap:
-        baseline_pps = 0.60 * l4w + 0.40 * l13w
-        _baseline_src = (
-            f"L4W blend (L4W {l4w:.0f} > L13W {l13w:.0f} x 1.15, "
-            f"no event overlap)"
-        )
-    else:
-        baseline_pps = l13w
-        if _event_overlap:
-            _ev_hit = sorted(_l4w_months & _event_months)
-            _baseline_src = (
-                f"L13W anchor (event overlap in L4W window: months {_ev_hit})"
-            )
-        else:
-            _baseline_src = (
-                f"L13W anchor (L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.15)"
-            )
+    # -- Step 1: POS baseline ------------------------------------------------
+    baseline_pps, _baseline_src = _compute_pos_baseline(l4w, l13w, amz_aur_data=amz_aur_data)
 
     # -- Step 2: WOS fill ----------------------------------------------------
     # F86 (2026-05-25) OH data guard: if oh_lw == 0 AND oh_wos == 0, the
@@ -8024,7 +8076,7 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     # seasonal mults for all 26 weeks.  When OH IS reported (oh_lw > 0 or
     # oh_wos > 0), compute the normal deficit fill.
     _oh_data_available = (oh_lw > 0 or oh_wos > 0)
-    fill_units  = max(0.0, RTL_WOS_TARGET * baseline_pps - oh_lw) if _oh_data_available else 0.0
+    fill_units  = max(0.0, wos_target * baseline_pps - oh_lw) if _oh_data_available else 0.0
     _has_opn_w1 = float(opn_w1 or 0) > 0
     if _has_opn_w1:
         fill_start, fill_end = 1, 3   # 0-indexed: W2-W3
