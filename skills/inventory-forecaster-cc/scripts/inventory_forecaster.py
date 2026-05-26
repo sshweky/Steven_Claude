@@ -8015,7 +8015,14 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
             )
 
     # -- Step 2: WOS fill ----------------------------------------------------
-    fill_units  = max(0.0, RTL_WOS_TARGET * baseline_pps - oh_lw)
+    # F86 (2026-05-25) OH data guard: if oh_lw == 0 AND oh_wos == 0, the
+    # retailer did not report DC inventory for this item this week.  Don't
+    # assume the DC is empty (which would generate an 8-WOS fill of ~64K
+    # units in W1-W2).  Instead, skip the fill and use POS baseline with
+    # seasonal mults for all 26 weeks.  When OH IS reported (oh_lw > 0 or
+    # oh_wos > 0), compute the normal deficit fill.
+    _oh_data_available = (oh_lw > 0 or oh_wos > 0)
+    fill_units  = max(0.0, RTL_WOS_TARGET * baseline_pps - oh_lw) if _oh_data_available else 0.0
     _has_opn_w1 = float(opn_w1 or 0) > 0
     if _has_opn_w1:
         fill_start, fill_end = 1, 3   # 0-indexed: W2-W3
