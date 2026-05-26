@@ -8296,24 +8296,84 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # record the signal for alerting and don't early-return.
         pass
 
-    # -- F_RTL_POS_WOS -- Retailer WOS (POS) primary model ------------------
-    # Short-circuits classification-based routing (inactive / sparse / croston /
-    # dense) when the account has valid POS + OH data and is not a new-launch
-    # ramp.  Uses consumer sell-through as the demand signal, fills to
-    # RTL_WOS_TARGET WOS in the near-term, then applies category seasonal lifts.
-    # Gate: rtl_pos is only populated for non-Amazon, non-international accounts
-    # (see _prep_record_signals) so those conditions are already implied here.
-    _opn_w1 = float(row.get("Opn_W1") or 0)
+    # -- F_BASELINE_OVR / F_RTL_POS_WOS -- Primary model selection ----------
+    # F_BASELINE_OVR fires first when a planner has manually set a baseline
+    # (units/wk) in the viewer.  The override rate is treated as the computed
+    # baseline; all downstream shaping still applies: category seasonal
+    # multipliers, snap to master pack, and (for retailer accounts with OH)
+    # WOS fill logic.  Skips the POS-WOS compute entirely when active.
+    # F_RTL_POS_WOS fires next when POS + OH data are available (no override).
+    _opn_w1            = float(row.get("Opn_W1")           or 0)
+    _baseline_override = float(row.get("Baseline_Override") or 0)
+
     _rtl_wos_r = None
     if (rtl_pos is not None
             and float(rtl_pos.get("OH_WOS") or 0) > 0
-            and not _f73_new_ramp):
+            and not _f73_new_ramp
+            and not _baseline_override):   # skip POS compute when override active
         _rtl_wos_r = _retailer_wos_forecast(
             rtl_pos, mp, _opn_w1,
             description, product_category, product_subcategory,
             brand, brand_pt, season)
 
-    if _rtl_wos_r is not None:
+    if _baseline_override > 0 and not _f73_new_ramp:
+        _fire("F_BASELINE_OVR")
+        _ovr_mults = _category_week_multipliers(
+            description, product_category, product_subcategory, brand, brand_pt,
+            season=season,
+        ) if (description or product_category or product_subcategory
+              or brand or brand_pt or season) else None
+        if rtl_pos is not None and float(rtl_pos.get("OH_WOS") or 0) > 0:
+            # Retailer path: apply WOS fill on top of the override baseline
+            _oh_lw_o  = float(rtl_pos.get("OH_Units_LW") or 0)
+            _oh_wos_o = float(rtl_pos.get("OH_WOS")      or 0)
+            _fill_u   = max(0.0, RTL_WOS_TARGET * _baseline_override - _oh_lw_o)
+            _has_ow1  = _opn_w1 > 0
+            _fs, _fe  = (1, 3) if _has_ow1 else (0, 2)  # 0-indexed fill window
+            _fpw      = snap(_fill_u / 2.0, mp) if _fill_u > 0 else 0
+            fcst = []
+            for _w in range(26):
+                if _fpw > 0 and _fs <= _w < _fe:
+                    fcst.append(_fpw)
+                else:
+                    _m = _ovr_mults[_w] if _ovr_mults else 1.0
+                    fcst.append(snap(_baseline_override * _m, mp))
+            cap  = round(_baseline_override, 1)
+            meta = {
+                "model":             "Manual Baseline (override)",
+                "baseline_override": _baseline_override,
+                "has_cat_mults":     bool(_ovr_mults),
+                "oh_wos":            round(_oh_wos_o, 2),
+                "oh_lw":             round(_oh_lw_o, 0),
+                "fill_units":        round(_fill_u, 0),
+                "fill_per_wk":       _fpw,
+                "fill_start_wk":     _fs + 1,
+                "fill_end_wk":       _fe,
+                "drivers": [
+                    f"F_BASELINE_OVR: manual {_baseline_override:,.0f}/wk; "
+                    f"DC OH {_oh_wos_o:.1f}wks ({_oh_lw_o:,.0f}u); "
+                    f"fill {_fill_u:,.0f}u in W{_fs+1}-W{_fe} ({_fpw:,.0f}u/wk each); "
+                    + ("category seasonal lifts applied" if _ovr_mults else "no cat mults")
+                ],
+            }
+        else:
+            # Non-retailer (or no OH data): baseline * seasonal mults, snapped
+            fcst = [snap(_baseline_override * (_ovr_mults[_w] if _ovr_mults else 1.0), mp)
+                    for _w in range(26)]
+            cap  = round(_baseline_override, 1)
+            meta = {
+                "model":             "Manual Baseline (override)",
+                "baseline_override": _baseline_override,
+                "has_cat_mults":     bool(_ovr_mults),
+                "drivers": [
+                    f"F_BASELINE_OVR: manual {_baseline_override:,.0f}/wk; "
+                    + ("category seasonal lifts applied" if _ovr_mults else "no cat mults")
+                ],
+            }
+        model    = "Manual Baseline (override)"
+        biweekly = False
+
+    elif _rtl_wos_r is not None:
         _fire("F_RTL_POS_WOS")
         fcst     = _rtl_wos_r["fcst"]
         cap      = _rtl_wos_r["cap"]
