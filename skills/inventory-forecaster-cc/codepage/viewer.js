@@ -4064,6 +4064,53 @@ async function toggleDetail(key) {
     </div>`;
   }
 
+  // -- POS History table (Retailer Sales, bv2izcn5b) -------------------------
+  // Shown only when r.pos_hist has data; aligned to same date columns as L26W.
+  let posHistHtml = '';
+  const _ph = r.pos_hist;
+  if (_ph && typeof _ph === 'object') {
+    const _phCustLabel = _friendlyCustName(r.cust);
+    const _hasOh      = _ph.oh.some(v => v !== null);
+    const _hasInstock = _ph.instock.some(v => v !== null);
+    let _phHdr   = '<th class="row-label" style="width:1%;white-space:nowrap"></th>';
+    let _phUnits = `<td class="row-label" style="color:#1565c0;font-weight:600;white-space:nowrap">POS Units</td>`;
+    let _phOh    = `<td class="row-label" style="color:#555;font-weight:600;white-space:nowrap">OH Units</td>`;
+    let _phInst  = `<td class="row-label" style="color:#2e7d32;font-weight:600;white-space:nowrap">Instock %</td>`;
+    let _phUTot  = 0;
+    for (let i = 25; i >= 0; i--) {
+      const label = _fmtHistDate(26 - i);
+      _phHdr += `<th style="font-size:10px;font-weight:normal;white-space:normal;min-width:0;padding:2px 3px;width:1%">${label}</th>`;
+      const uv = _ph.units[i];
+      const ov = _ph.oh[i];
+      const iv = _ph.instock[i];
+      _phUTot  += (uv !== null ? uv : 0);
+      _phUnits += uv === null
+        ? `<td style="color:#bbb">-</td>`
+        : `<td style="${uv === 0 ? 'color:#bbb' : 'color:#1565c0;font-weight:600'}">${fmtN(uv)}</td>`;
+      _phOh    += ov === null
+        ? `<td style="color:#bbb">-</td>`
+        : `<td style="${ov === 0 ? 'color:#bbb' : 'color:#555'}">${fmtN(Math.round(ov))}</td>`;
+      const instPct = iv !== null ? Math.round(iv * 100) : null;
+      _phInst  += instPct === null
+        ? `<td style="color:#bbb">-</td>`
+        : `<td style="${instPct >= 90 ? 'color:#2e7d32;font-weight:600' : instPct >= 70 ? 'color:#f57f17' : 'color:#c62828;font-weight:600'}">${instPct}%</td>`;
+    }
+    _phHdr   += `<th style="min-width:0;padding:2px 3px;width:1%">Total</th><th style="color:#888;font-weight:600;min-width:0;padding:2px 3px;width:1%">Avg/Wk</th>`;
+    _phUnits += `<td style="font-weight:700;color:#1565c0">${fmtN(_phUTot)}</td><td style="font-weight:700;color:#1565c0">${fmtN(Math.round(_phUTot / 26))}</td>`;
+    _phOh    += `<td style="color:#bbb"> - </td><td style="color:#bbb"> - </td>`;
+    _phInst  += `<td style="color:#bbb"> - </td><td style="color:#bbb"> - </td>`;
+    posHistHtml = `
+    <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e8f5e9;">
+      <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">${_phCustLabel} POS History</div>
+      <table class="dtbl">
+        <tr>${_phHdr}</tr>
+        <tr>${_phUnits}</tr>
+        ${_hasOh      ? `<tr>${_phOh}</tr>`   : ''}
+        ${_hasInstock ? `<tr>${_phInst}</tr>` : ''}
+      </table>
+    </div>`;
+  }
+
   // narrative may be \n-joined (viewer.py local) or <br>/<br><br>-joined (QB ai_analysis field).
   // First collapse double-<br> to a single \n, then convert any remaining single <br> to \n
   // so every bullet point becomes its own list item regardless of how QB serialised the text.
