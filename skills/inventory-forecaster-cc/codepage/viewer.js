@@ -7532,4 +7532,33 @@ window.addEventListener('beforeunload', function(e) {
   }
 });
 
+// -- Sticky-header height tracker -------------------------------------------
+// The .topbar and .toolbar are position:sticky at the top so they stay visible
+// during table scroll.  Their heights vary (e.g. badges wrap on narrow screens),
+// so we measure dynamically and publish CSS custom properties that the table
+// <thead> uses to position its own sticky rows BELOW the frozen header.
+function _updateStickyHeights() {
+  const topbar  = document.querySelector('.topbar');
+  const toolbar = document.querySelector('.toolbar');
+  if (!topbar || !toolbar) return;
+  const th  = topbar.offsetHeight;
+  const tbh = toolbar.offsetHeight;
+  const root = document.documentElement.style;
+  root.setProperty('--topbar-h', th + 'px');
+  root.setProperty('--frozen-h', (th + tbh) + 'px');
+}
+window.addEventListener('load',   _updateStickyHeights);
+window.addEventListener('resize', _updateStickyHeights);
+// ResizeObserver catches dynamic reflow (badges populating, save bar showing
+// counts, "X records shown" stat line widening) without needing a manual call.
+if (typeof ResizeObserver !== 'undefined') {
+  const _stickyRO = new ResizeObserver(_updateStickyHeights);
+  setTimeout(() => {
+    const tb  = document.querySelector('.topbar');
+    const tlb = document.querySelector('.toolbar');
+    if (tb)  _stickyRO.observe(tb);
+    if (tlb) _stickyRO.observe(tlb);
+  }, 100);
+}
+
 bootstrap();
