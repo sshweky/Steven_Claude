@@ -4217,14 +4217,14 @@ async function toggleDetail(key) {
                </label>`
             : `<label style="font-size:11px;color:#555;">Type:
                  <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
+                   <option value="AI training"      style="color:#6a1b9a;">AI training</option>
+                   <option value="FYI"              style="color:#616161;">FYI</option>
+                   <option value="Manager Response" ${r.planner_reply_pending  ? 'selected' : ''} style="color:#e65100;font-weight:600;">Manager Response</option>
                    <option value="Needs Action"     ${!r.manager_reply_pending && !r.planner_reply_pending ? 'selected' : ''} style="color:#1565c0;font-weight:600;">Needs Action</option>
                    <option value="Planner Response" ${r.manager_reply_pending  ? 'selected' : ''} style="color:#00695c;font-weight:600;">Planner Response</option>
-                   <option value="Manager Response" ${r.planner_reply_pending  ? 'selected' : ''} style="color:#e65100;font-weight:600;">Manager Response</option>
-                   <option value="FYI"              style="color:#616161;">FYI</option>
-                   <option value="Reviewed"         style="color:#5c6bc0;">Reviewed</option>
                    <option value="Resolved">Resolved</option>
+                   <option value="Reviewed"         style="color:#5c6bc0;">Reviewed</option>
                    <option value="Snoozed"          style="color:#888;">Snoozed</option>
-                   <option value="AI training"      style="color:#6a1b9a;">AI training</option>
                  </select>
                </label>`
           }
