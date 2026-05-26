@@ -6541,6 +6541,40 @@ function cancelAiAdjustment(key) {
   }
 }
 
+// -- Baseline Override save --------------------------------------------------
+// Writes FID 1614 (Baseline Override) to the Projections record.
+// value=0 or empty clears the override (AI reverts to its computed baseline).
+// The change takes effect on the NEXT forecaster run -- the AI applies
+// seasonality multipliers, snap-to-master-pack, and (for retailer accounts)
+// WOS fill on top of the override rate.
+async function saveBaselineOverride(key, value) {
+  if (!CFG.FID.BASELINE_OVERRIDE) return;
+  const v   = parseFloat(value) || 0;
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (!rec) return;
+  const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+  const inp    = document.getElementById('baseline-ovr-' + safeId);
+  if (inp) inp.disabled = true;
+  try {
+    const fields = {};
+    fields[CFG.FID.KEY]               = { value: key };
+    fields[CFG.FID.BASELINE_OVERRIDE] = { value: v > 0 ? v : null };
+    await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
+    rec.baseline_override = v;
+    if (inp) {
+      inp.value = v > 0 ? v : '';
+      inp.style.background = '#e8f5e9';
+      setTimeout(() => { inp.style.background = ''; }, 1500);
+    }
+  } catch (e) {
+    if (inp) inp.style.background = '#ffebee';
+    console.error('[BaselineOverride] save failed:', e);
+    alert('Failed to save baseline override: ' + (e.message || e));
+  } finally {
+    if (inp) inp.disabled = false;
+  }
+}
+
 // Mark an AI Adjustment History entry as inactive  -  flips [Ignored]=true
 // on the AI Comments record so F58 stops re-applying it on future
 // forecaster runs.  Audit trail is preserved (the comment row stays);
