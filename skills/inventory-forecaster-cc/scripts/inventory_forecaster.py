@@ -11641,6 +11641,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"inventory noise. Model: {model}."
                         )
                 else:
+                    # [DBG F87]
+                    if "FF12689" in (row.get("Acct_MStyle_Key_","") or ""):
+                        _dbg_fcst14 = fcst[13] if len(fcst)>13 else "?"
+                        print(f"  [DBG mid-11643] fcst_w14={_dbg_fcst14}")
                     if _f59i_ratio > 1.40 and _f59i_ec_override:
                         # EC-transition anchor: inherited parent history
                         # over-represents forward demand for the new EC ASIN.
