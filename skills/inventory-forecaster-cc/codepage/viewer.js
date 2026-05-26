@@ -5471,7 +5471,38 @@ async function addComment(key) {
     rec.last_comment_date = new Date().toISOString();
   }
   btn.textContent = 'Save'; btn.disabled = false;
-  if (typeof loadCommentHistory === 'function') loadCommentHistory(key, true);
+  // Optimistic UI: inject new comment bubble immediately so it appears before
+  // QB read-after-write propagates (QB can lag 200-500ms before a fresh query
+  // sees a just-inserted record; without this the panel flashes "No comments").
+  {
+    const _optCont = document.getElementById('cmt-hist-' + key);
+    if (_optCont) {
+      const _optTs   = new Date().toISOString();
+      const _fmtTs_  = ts => { try { return new Date(ts).toLocaleString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); } catch(e){ return ts||''; } };
+      const _auth_   = CURRENT_USER.name || '';
+      const _isFyi_  = flag === 'FYI';
+      const _isAiTr_ = flag === 'AI training';
+      const _bc_     = _isFyi_ ? '#9e9e9e' : _isAiTr_ ? '#6a1b9a'
+                     : flag === 'Planner Response' ? '#00695c'
+                     : flag === 'Needs Action'     ? '#1565c0'
+                     : flag === 'Manager Response' ? '#e65100' : '#8b2252';
+      const _bg_     = _isFyi_ ? '#fafafa'  : _isAiTr_ ? '#f9f4ff'
+                     : flag === 'Planner Response' ? '#f1faf9'
+                     : flag === 'Needs Action'     ? '#e8f0fe'
+                     : flag === 'Manager Response' ? '#fff8f0' : '#fdf7fa';
+      const _al_     = _auth_ ? `<b style="color:${_bc_}">${escHtml(_auth_)}</b> &middot; ` : '';
+      const _fb_     = flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:${_bg_};color:${_bc_};margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '';
+      const _bub_    = `<div style="padding:6px 6px 6px 10px;margin-bottom:4px;border-left:3px solid ${_bc_};background:${_bg_};border-radius:0 4px 4px 0;"><div style="font-size:10px;color:#888;font-weight:600;display:flex;align-items:center;flex-wrap:wrap;gap:4px;"><span>${_al_}${escHtml(_fmtTs_(_optTs))}</span>${_fb_}</div><div style="font-size:11px;color:#333;white-space:pre-wrap;line-height:1.35;margin-top:3px;">${escHtml(txt)}</div></div>`;
+      if (/No mgr\/flag|Loading/.test(_optCont.innerHTML)) {
+        _optCont.innerHTML = _bub_;
+      } else {
+        _optCont.insertAdjacentHTML('beforeend', _bub_);
+      }
+      _optCont.scrollTop = _optCont.scrollHeight;
+    }
+  }
+  // Background QB refresh — replaces optimistic bubble once propagation catches up
+  if (typeof loadCommentHistory === 'function') setTimeout(() => loadCommentHistory(key, true), 800);
 
   // --- Step 3: Routing — update Projections pending-flags (best-effort) ----
   // FYI comments are informational — no routing, no pending flags.
