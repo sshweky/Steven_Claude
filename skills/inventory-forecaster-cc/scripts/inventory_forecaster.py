@@ -12325,43 +12325,23 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # NO LONGER drives the baseline (see POS-only rule below).
         _rpl_ord_l13 = sum(float(v) for v in hist[-13:]) / 13  # all-weeks avg (normalized)
 
-        # POS-only baseline rule (per planner directive, 2026-05-26):
-        # For ANY Amazon Active Replen item with consumer POS data, the demand
-        # baseline IS the POS rate -- not max(POS, Ord), not a blend with Ord.
-        # Order history (especially lumpy DI buys) often inflates above true
-        # consumer demand and must not drive the baseline.
-        #
-        # Mirror of F85 / _retailer_wos_forecast() baseline logic:
-        #   - If POS L4W > POS L13W x 1.15 AND L4W window doesn't overlap an
-        #     event month (Jan / Jul / Nov / Dec — Prime / Holiday lifts that
-        #     don't persist), blend: 0.60 x L4W + 0.40 x L13W.
-        #   - Otherwise anchor to POS L13W.
-        # Order history is recorded in the driver narrative for transparency
-        # but never enters _rpl_demand.
-        _rpl_pos_accel = (_rpl_pos_l4 / _rpl_pos_l13) if _rpl_pos_l13 > 0 else 1.0
-        _rpl_event_months = {1, 7, 11, 12}
-        _rpl_l4_months    = {(date.today() - timedelta(days=_d)).month for _d in range(28)}
-        _rpl_event_overlap = bool(_rpl_l4_months & _rpl_event_months)
+        # POS-only baseline (per planner directive, 2026-05-26).
+        # Uses the centralized AUR-aware helper so F_AMZ_RPL and F85 always
+        # agree on baseline -- the only difference is F_AMZ_RPL's later
+        # WOS-correction and L13W variability layering on top.
+        # Order L13W is captured for driver narrative only -- it never enters
+        # the baseline.  Rationale: lumpy DI buys inflate Order L13W above
+        # true consumer demand.
+        _rpl_aur_data = {
+            "aur_l4w":   float((amz_catalog or {}).get("AUR_L4w")   or 0),
+            "map_price": float((amz_catalog or {}).get("MAP_Price") or 0),
+        }
+        _rpl_demand, _rpl_baseline_src = _compute_pos_baseline(
+            _rpl_pos_l4, _rpl_pos_l13, amz_aur_data=_rpl_aur_data
+        )
 
-        if _rpl_pos_accel >= 1.15 and _rpl_pos_l4 >= 50 and not _rpl_event_overlap:
-            _rpl_demand       = 0.60 * _rpl_pos_l4 + 0.40 * _rpl_pos_l13
-            _rpl_baseline_src = (
-                f"POS L4W blend (L4W {_rpl_pos_l4:.0f} > L13W {_rpl_pos_l13:.0f} x 1.15, "
-                f"no event overlap)"
-            )
-        else:
-            _rpl_demand       = _rpl_pos_l13
-            if _rpl_event_overlap:
-                _rpl_baseline_src = (
-                    f"POS L13W anchor (event overlap in L4W window: "
-                    f"months {sorted(_rpl_l4_months & _rpl_event_months)})"
-                )
-            else:
-                _rpl_baseline_src = (
-                    f"POS L13W anchor (L4W {_rpl_pos_l4:.0f} <= L13W {_rpl_pos_l13:.0f} x 1.15)"
-                )
-
-        _rpl_pos_primary = True   # always POS-primary now -- no Order-history fallback
+        _rpl_pos_primary = True   # always POS-primary now
+        _rpl_pos_accel   = (_rpl_pos_l4 / _rpl_pos_l13) if _rpl_pos_l13 > 0 else 1.0
         _rpl_item_accel  = (_rpl_pos_accel >= 1.15 and _rpl_pos_l4 >= 50)  # kept for downstream rule checks
         if _rpl_demand >= 50:
             # Step 1 -- build week-level rates: apply seasonal/event lifts on top
