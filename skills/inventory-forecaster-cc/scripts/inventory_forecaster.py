@@ -8900,6 +8900,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         biweekly = bool(_cadence_gap)
         fcst     = apply_ordering_pattern(fcst, hist_for_model, mp)
 
+        # F84 annotation: record why Seasonal Baseline was forced for acct 1864.
+        if _f84_1864_pos_primary and isinstance(meta, dict):
+            _fire("F84")
+            meta.setdefault("drivers", []).append(
+                f"F84 Acct-1864 POS-primary: DI order history is lumpy -- "
+                f"POS L13W {_f84_pos_l13:.0f}/wk is the true demand signal; "
+                f"routed to Seasonal Baseline (bypassed Croston's / Sparse Intermittent)"
+            )
+
         # F76 -- Seasonal Baseline thin-history ceiling guard (2026-05-24).
         #
         # EC items that inherit order history via F60 (or items reclassified
