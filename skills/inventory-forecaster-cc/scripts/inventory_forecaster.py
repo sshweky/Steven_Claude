@@ -8014,8 +8014,8 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
             if (map_price > 0 and aur_l4w > 0) else
             "no AUR data -- treated as no-promo"
         )
-        return 0.50 * l4w + 0.50 * l13w, (
-            f"L4W/L13W 50/50 blend (spike +{spike_pct:.1f}% L4W vs L13W, "
+        return 0.70 * l4w + 0.30 * l13w, (
+            f"L4W/L13W 70/30 blend (spike +{spike_pct:.1f}% L4W vs L13W, "
             f"{_aur_note} -- real demand growth)"
         )
 
