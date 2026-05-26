@@ -9958,6 +9958,153 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     ) if (description or product_category or product_subcategory
           or brand or brand_pt or season) else None
 
+    # F_POG_FUTURE — Future POG order schedule (2026-05-26)
+    # When POG_Launch_Date is in the future, override the model forecast with
+    # an event-driven schedule:
+    #   Phase 1 — ISO fill order ~4 weeks before POG start.
+    #             Qty = Estimated_ISO if set, else Store_Count × master_pack.
+    #             Skipped if ISO was already placed (large order in L8W history
+    #             or open PO near the ship window).
+    #   Phase 2 — Dead zone: 3 weeks after ISO ships (customer absorbing fill).
+    #   Phase 3 — Ramp: Store_Count × UPSPW × 75%, snapped to mp, with seasonal
+    #             category profile and T5/event lifts layered on top.
+    #   POS adj  — Once POS_Units_LW data arrives:
+    #             if POS > ramp_base: adjust up immediately.
+    #             if POS < ramp_base: hold for 4 weeks from ISO ship date, then
+    #             adjust down to POS rate.
+    # Only fires for non-Amazon, non-Inactive, non-OTB retailers with a future
+    # POG date within the 26-week horizon.
+    _pog_launch_str_f = (str(row.get("POG_Launch_Date") or "")).strip()[:10]
+    if (
+        _pog_launch_str_f
+        and not is_amazon
+        and model not in ("Inactive", "OTB (zero)", "Pre-launch NEW")
+    ):
+        try:
+            _pog_date_f  = date.fromisoformat(_pog_launch_str_f)
+            _pcol0       = ORIG_PRJ_COLS[0]   # e.g. "05_26_W1"
+            _pw1_m, _pw1_d = int(_pcol0[0:2]), int(_pcol0[3:5])
+            _pw1_today   = date.today()
+            _pog_w1_f    = date(_pw1_today.year, _pw1_m, _pw1_d)
+            if (_pog_w1_f - _pw1_today).days < -180:
+                _pog_w1_f = date(_pw1_today.year + 1, _pw1_m, _pw1_d)
+            _pog_delta   = (_pog_date_f - _pog_w1_f).days
+            _pog_w_idx_f = _pog_delta // 7   # 0-based; W1=0, W2=1, ...
+
+            if 1 <= _pog_w_idx_f <= 25:
+                # --- field reads ---
+                _pog_stores  = int(float(row.get("Store_Count")   or 0))
+                _pog_upspw   = float(row.get("UPSPW")              or 0)
+                _pog_est_iso = int(float(row.get("Estimated_ISO")  or 0))
+
+                # ISO qty: planner estimate first, then store count × mp
+                _pog_iso_qty = _pog_est_iso if _pog_est_iso > 0 else (_pog_stores * mp)
+                _pog_iso_qty = snap(_pog_iso_qty, mp) if _pog_iso_qty >= mp else 0
+
+                # ISO ship week = 4 weeks before POG start; min 0 (W1)
+                _pog_iso_idx = max(0, _pog_w_idx_f - 4)
+                # Ramp always starts at POG start week (iso_ship + 4 = pog_week)
+                _pog_ramp_idx = _pog_w_idx_f
+
+                # --- ISO already placed? ---
+                # Backward: large order (>= 50% of ISO qty) in last 8 weeks of history
+                _pog_hist_l8  = [float(v or 0) for v in hist[-8:]]
+                _pog_iso_hist = (
+                    _pog_iso_qty > 0
+                    and max(_pog_hist_l8, default=0) >= _pog_iso_qty * 0.5
+                )
+                # Forward: open PO within ±1 week of expected ship date
+                _pog_opn_wk = [float(row.get(c) or 0) for c in OPN_COLS]
+                _pog_ship_window = range(
+                    max(0, _pog_iso_idx - 1),
+                    min(26, _pog_iso_idx + 2)
+                )
+                _pog_iso_open_po = any(
+                    _pog_opn_wk[i] > 0 for i in _pog_ship_window
+                )
+                _pog_iso_placed = _pog_iso_hist or _pog_iso_open_po
+
+                # --- ramp base ---
+                if _pog_stores > 0 and _pog_upspw > 0:
+                    _pog_ramp_base = float(snap(_pog_stores * _pog_upspw * 0.75, mp))
+                else:
+                    # fallback: L13W shipment avg
+                    _pog_l13_vals  = [float(v or 0) for v in hist[-13:]]
+                    _pog_l13_avg   = sum(_pog_l13_vals) / 13 if _pog_l13_vals else 0
+                    _pog_ramp_base = float(snap(_pog_l13_avg, mp)) if _pog_l13_avg >= mp else 0.0
+
+                # --- POS adjustment ---
+                _pog_pos_lw = float((rtl_pos or {}).get("POS_Units_LW") or 0)
+                # wks_since_ship is negative if ISO hasn't shipped yet (future)
+                _pog_wks_since_ship = 0 - _pog_iso_idx
+                if _pog_pos_lw > 0 and _pog_ramp_base > 0:
+                    if _pog_pos_lw > _pog_ramp_base:
+                        _pog_ramp_base = float(snap(_pog_pos_lw, mp))
+                        _pog_pos_adj   = "up"
+                    elif _pog_wks_since_ship >= 4:
+                        _pog_ramp_base = float(snap(_pog_pos_lw, mp))
+                        _pog_pos_adj   = "down"
+                    else:
+                        _pog_pos_adj   = f"hold ({max(0, 4 - _pog_wks_since_ship)}w left)"
+                else:
+                    _pog_pos_adj = None
+
+                # --- event / seasonal boosts ---
+                _pog_pb, _pog_fb = _get_event_boosts()
+                _pog_t5          = _get_t5_seasonal_boosts(season)
+
+                # --- build forecast ---
+                _pog_new_fcst = [0] * 26
+                for _wi in range(26):
+                    if _wi == _pog_iso_idx and not _pog_iso_placed and _pog_iso_qty > 0:
+                        _pog_new_fcst[_wi] = _pog_iso_qty         # ISO fill
+                    elif _pog_iso_idx < _wi < _pog_ramp_idx:
+                        _pog_new_fcst[_wi] = 0                     # dead zone
+                    elif _wi >= _pog_ramp_idx and _pog_ramp_base > 0:
+                        wnum     = _wi + 1
+                        _pm      = 1.0
+                        if _cat_mults:
+                            _pm = max(1.0, _cat_mults[_wi])
+                        _pev = max(_pog_pb.get(wnum, 1.0), _pog_fb.get(wnum, 1.0))
+                        if _pev > 1.0:
+                            _pm *= _pev
+                        _pt5 = _pog_t5.get(wnum, 1.0)
+                        if _pt5 > _pm:
+                            _pm = _pt5
+                        _pog_new_fcst[_wi] = snap(_pog_ramp_base * _pm, mp)
+
+                fcst  = _pog_new_fcst
+                model = "F_POG_FUTURE"
+                _fire("F_POG_FUTURE")
+                if isinstance(meta, dict):
+                    _piso_src = (
+                        f"Est. ISO {_pog_iso_qty:,}u" if _pog_est_iso > 0
+                        else f"Stores({_pog_stores}) x MP({mp}) = {_pog_iso_qty:,}u"
+                    )
+                    _pramp_src = (
+                        f"Stores({_pog_stores}) x UPSPW({_pog_upspw:.1f}) x 75% = {int(_pog_ramp_base):,}u/wk"
+                        if _pog_stores > 0 and _pog_upspw > 0
+                        else f"L13W fallback = {int(_pog_ramp_base):,}u/wk"
+                    )
+                    _piso_note = (
+                        "ISO already placed (skipped)"
+                        if _pog_iso_placed
+                        else f"ISO W{_pog_iso_idx + 1} ({_piso_src})"
+                    )
+                    _ppos_note = (
+                        f"; POS_LW={int(_pog_pos_lw):,}u -> adjusted {_pog_pos_adj}"
+                        if _pog_pos_adj else ""
+                    )
+                    meta.setdefault("drivers", []).append(
+                        f"F_POG_FUTURE: POG starts W{_pog_w_idx_f + 1} "
+                        f"({_pog_launch_str_f}). {_piso_note}. "
+                        f"Dead zone W{_pog_iso_idx + 2}-W{_pog_ramp_idx} "
+                        f"(3 wks). Ramp W{_pog_ramp_idx + 1}+: {_pramp_src}"
+                        f"{_ppos_note}."
+                    )
+        except (ValueError, AttributeError, TypeError):
+            pass   # malformed POG date or missing fields — fall through to normal model
+
     # F61 — Horizon confidence decay (2026-05-17).
     # Planners systematically cut the AI back-half forecast (W9-W26) more
     # aggressively than the near-term.  For items without strong seasonal
@@ -13225,6 +13372,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "pog_launch":    (str(row.get("POG_Launch_Date") or ""))[:10],
         "pog_end":       (str(row.get("POG_End_Date") or ""))[:10],
         "store_count":   int(float(row.get("Store_Count") or 0)),
+        "estimated_iso": int(float(row.get("Estimated_ISO") or 0)),
+        "upspw":         float(row.get("UPSPW") or 0),
         "opn_w":         [int(float(row.get(c) or 0)) for c in OPN_COLS],
         "status_cust":   (str(row.get("Status_Cust") or "")).strip(),
         "item_status":   (str(row.get("PT_Item_Status") or "")).strip(),
@@ -13546,6 +13695,8 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         "pog_launch":    (str(row.get("POG_Launch_Date") or ""))[:10],
         "pog_end":       (str(row.get("POG_End_Date") or ""))[:10],
         "store_count":   int(float(row.get("Store_Count") or 0)),
+        "estimated_iso": int(float(row.get("Estimated_ISO") or 0)),
+        "upspw":         float(row.get("UPSPW") or 0),
         "opn_w":         [int(float(row.get(c) or 0)) for c in OPN_COLS],
         # Status fields — needed by narrative to detect unexplained planner truncations
         "status_cust":   (str(row.get("Status_Cust") or "")).strip(),
