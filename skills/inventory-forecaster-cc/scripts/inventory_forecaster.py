@@ -8412,6 +8412,48 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             description, product_category, product_subcategory,
             brand, brand_pt, season)
 
+    elif (is_amazon
+          and pos_data is not None
+          and float(pos_data.get("Avg_Units_Wk_L13w") or 0) > 0
+          and not _f73_new_ramp
+          and not _baseline_override):
+        # F85 (2026-05-25) — Amazon POS-WOS primary model.
+        #
+        # Rule (user-defined): for ANY Amazon account with consumer POS data
+        # AND DC inventory data, apply the same logic as the non-Amazon retailer
+        # WOS model:
+        #   1. Baseline = POS L4W rate (or L13W if L4W <= L13W x 1.15).
+        #   2. Fill W1-W2 if DC WOS < RTL_WOS_TARGET (8 wks) to bring it back up.
+        #   3. Remaining weeks = baseline x category seasonal / holiday multipliers.
+        #
+        # DC inventory sources (in order of preference):
+        #   Inv_WOS  — direct WOS field in Amazon Catalog (most authoritative)
+        #   Inv_SOH  — sellable SOH; compute WOS = (SOH + OPO) / POS_L13W
+        #   Inv_OPO  — open PO qty already inbound (included in WOS calc)
+        #
+        # Guard: only engage when at least one DC signal is present.  If all
+        # three are zero / missing, we can't tell "DC is empty" from "no data"
+        # and should not trigger an erroneous 8-WOS fill-up; fall through to
+        # F84 (Seasonal Baseline + F15 POS anchor) instead.
+        _f85_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _f85_soh     = float((amz_catalog or {}).get("Inv_SOH") or 0)
+        _f85_opo     = float((amz_catalog or {}).get("Inv_OPO") or 0)
+        _f85_wos     = float((amz_catalog or {}).get("Inv_WOS") or 0)
+        if _f85_wos <= 0 and _f85_pos_l13 > 0:
+            _f85_wos = (_f85_soh + _f85_opo) / _f85_pos_l13
+        _f85_has_dc = _f85_wos > 0 or _f85_soh > 0 or _f85_opo > 0
+        if _f85_has_dc:
+            _f85_synth = {
+                "Avg_Units_Wk_L4w":  pos_data.get("Avg_Units_Wk_L4w")  or 0,
+                "Avg_Units_Wk_L13w": _f85_pos_l13,
+                "OH_Units_LW":       _f85_soh,
+                "OH_WOS":            _f85_wos,
+            }
+            _rtl_wos_r = _retailer_wos_forecast(
+                _f85_synth, mp, _opn_w1,
+                description, product_category, product_subcategory,
+                brand, brand_pt, season)
+
     if _baseline_override > 0 and not _f73_new_ramp:
         _fire("F_BASELINE_OVR")
         _ovr_mults = _category_week_multipliers(
