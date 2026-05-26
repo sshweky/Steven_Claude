@@ -4991,8 +4991,19 @@ async function loadCommentHistory(key, force) {
           const isToPlanner = flag === 'Needs Action';
           const isMgrResp   = flag === 'Manager Response';
           const isFyi       = flag === 'FYI';
-          const borderColor = isFyi ? '#9e9e9e' : (isReply ? '#00695c' : (isToPlanner ? '#1565c0' : (isMgrResp ? '#e65100' : '#8b2252')));
-          const bgColor     = isFyi ? '#fafafa'  : (isReply ? '#f1faf9'  : (isToPlanner ? '#e8f0fe' : (isMgrResp ? '#fff8f0' : '#fdf7fa')));
+          const isClosed    = flag === 'Resolved' || flag === 'Reviewed' || flag === 'Snoozed';
+          const borderColor = isFyi     ? '#9e9e9e'
+                            : isReply   ? '#00695c'
+                            : isToPlanner ? '#1565c0'
+                            : isMgrResp ? '#e65100'
+                            : isClosed  ? '#388e3c'
+                            : '#8b2252';
+          const bgColor     = isFyi     ? '#fafafa'
+                            : isReply   ? '#f1faf9'
+                            : isToPlanner ? '#e8f0fe'
+                            : isMgrResp ? '#fff8f0'
+                            : isClosed  ? '#f1f8e9'
+                            : '#fdf7fa';
           // "From: Author -> To: Recipient" header line -- omitted for FYI (no directed recipient)
           const fromPart   = (!isFyi && author) ? `<b style="color:${borderColor}">${escHtml(author)}</b>` : (isFyi && author ? `<span style="color:#757575">${escHtml(author)}</span>` : '');
           const toPart     = (!isFyi && sendTo) ? ` <span style="color:#888">-&gt;</span> <b style="color:${borderColor}">${escHtml(sendTo)}</b>` : '';
@@ -5005,7 +5016,9 @@ async function loadCommentHistory(key, force) {
                 ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e3f0ff;color:#1565c0;margin-left:6px;vertical-align:middle;">Needs Action</span>`
                 : isMgrResp
                   ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#e65100;margin-left:6px;vertical-align:middle;">Manager Response</span>`
-                  : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
+                  : isClosed
+                    ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#e8f5e9;color:#2e7d32;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>`
+                    : (flag ? `<span style="display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fff3e0;color:#8b2252;margin-left:6px;vertical-align:middle;">${escHtml(flag)}</span>` : '');
           // "Mark Reviewed" only appears on Planner Response bubbles (director action)
           // "Mark Read" appears on Manager Response bubbles (planner acknowledges)
           const reviewBtn = isReply
