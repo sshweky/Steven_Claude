@@ -7978,9 +7978,13 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
       No spike → L13W.
 
     Retailer path (amz_aur_data is None):
-      Simple acceleration rule (existing F85 logic):
-        - L4W > L13W * 1.15 AND L4W window doesn't overlap event months
-          (Jan/Jul/Nov/Dec):  baseline = 0.60 * L4W + 0.40 * L13W
+      Spike rule (aligned with Amazon threshold 2026-05-26):
+        - L4W >= L13W * 1.075 (>= 7.5% spike) AND L4W window doesn't
+          overlap event months (Jan/Jul/Nov/Dec):
+              baseline = 0.60 * L4W + 0.40 * L13W
+          (Retailers lack AUR/MAP data so the event-month skip is the only
+          guardrail against false-positive acceleration during predictable
+          promo cycles -- it stays in place.)
         - Else:  baseline = L13W
 
     Returns: (baseline_pps, baseline_src_text)
