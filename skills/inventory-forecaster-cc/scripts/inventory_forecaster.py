@@ -15980,7 +15980,7 @@ def main():
     # date are metadata fixes, not forecast values.
     print(f"\n[1.5] Amazon switchover auto-link + Switchover_Date backfill ...",
           flush=True)
-    _sw_backfill = _switchover_backfill(rows, list(prj_cols))
+    _sw_backfill = _switchover_backfill(rows, list(ORIG_PRJ_COLS))
     _apply_switchover_backfill(_sw_backfill, dry_run=bool(getattr(args, "dry_run", False)))
 
     # ── Phase 2: Pull master pack + Season ─────────────────────────
