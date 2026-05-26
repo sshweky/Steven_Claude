@@ -12214,11 +12214,22 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     _f73_accel = 2.0
                 _f73_suppress_adj = max(0.0, _f73_suppress_raw - _f73_accel)
                 _f73_suppress_int = min(int(round(_f73_suppress_adj)), 24)
+                # F88: respect F87 deceleration on velocity anchor.
+                # If L4W POS is >20% below L13W POS (structural decline), use
+                # L4W rather than L13W so the post-suppress projection does not
+                # resume at an inflated historical rate on a falling item.
+                _f73_pos_l4  = float((pos_data or {}).get("Avg_Units_Wk_L4w") or 0)
+                _f73_f88     = (
+                    _f73_pos_l4 > 0
+                    and _f73_pos_l13 > 0
+                    and _f73_pos_l4 < _f73_pos_l13 * 0.80
+                )
+                _f73_vel      = _f73_pos_l4 if _f73_f88 else _f73_pos_l13
                 # Floor during drawdown: minimal domestic top-off (5% of POS)
-                _f73_floor        = snap(_f73_pos_l13 * 0.05, mp)
+                _f73_floor        = snap(_f73_vel * 0.05, mp)
                 # Post-suppress: full POS rate (domestic covers all demand;
                 # no DI restock expected for ~6 months since nothing on order)
-                _f73_post_rate    = _f73_pos_l13
+                _f73_post_rate    = _f73_vel
                 for _wi in range(26):
                     if _wi < _f73_suppress_int:
                         _f73_v = _f73_floor
