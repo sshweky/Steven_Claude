@@ -8551,10 +8551,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             "drivers": [
                 f"{_f85_flag_str}: POS baseline {_rtl_wos_r['baseline_pps']:,.0f}/wk "
                 f"({_rtl_wos_r['baseline_src']}); "
-                f"DC OH {_rtl_wos_r['oh_wos']:.1f}wks ({_rtl_wos_r['oh_lw']:,.0f}u); "
-                f"fill {_rtl_wos_r['fill_units']:,.0f}u in "
-                f"W{_rtl_wos_r['fill_start_wk']}-W{_rtl_wos_r['fill_end_wk']} "
-                f"({_rtl_wos_r['fill_per_wk']:,.0f}u/wk each); "
+                + (
+                    f"DC OH {_rtl_wos_r['oh_wos']:.1f}wks ({_rtl_wos_r['oh_lw']:,.0f}u); "
+                    f"fill {_rtl_wos_r['fill_units']:,.0f}u in "
+                    f"W{_rtl_wos_r['fill_start_wk']}-W{_rtl_wos_r['fill_end_wk']} "
+                    f"({_rtl_wos_r['fill_per_wk']:,.0f}u/wk each)"
+                    if _rtl_wos_r["fill_units"] > 0
+                    else "no DC OH data -- fill skipped; baseline-only"
+                )
+                + "; "
                 + ("with" if _rtl_wos_r["has_cat_mults"] else "no")
                 + " category seasonal lifts"
             ],
