@@ -103,18 +103,10 @@ window.QB_CONFIG = {
     BASELINE_OVERRIDE_DATE: 1615, // date     -  when the override was set; auto-expires after 30 days
     // AI PRJ W1..W26 are consecutive: 1511..1536
     AI_PRJ_W1:    1511,
-    // Suggested Projection Wk1..Wk26 (NON-consecutive  -  see arrays below)
   },
 
   // AI PRJ W1..W26 fids (consecutive 1511..1536)
   AI_PRJ_FIDS: Array.from({length: 26}, (_, i) => 1511 + i),
-
-  // Suggested Projection Wk1..Wk26 fids  -  order matters, manual mapping
-  SUG_FIDS: [
-    905, 906, 907, 908, 909, 910, 911, 912, 913, 914,
-    915, 916, 917, 918, 919, 920, 921, 922, 923, 924,
-    925, 926, 927, 928, 929, 930,
-  ],
 
   // Open Customer PO Wk1..Wk26 fids (consecutive 223..248)
   OPN_FIDS: Array.from({length: 26}, (_, i) => 223 + i),
@@ -645,7 +637,6 @@ window.QB_CONFIG = {
     <th class="sortable" data-sort-key="shp_wk"       data-col-type="number"  onclick="cycleSort('shp_wk')" title="Average ordered units per week over the last 13 weeks">Ord L13 <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="proj_wk"      data-col-type="number"  onclick="cycleSort('proj_wk')"   title="Average projected orders per week (26-wk), including open POs in zeroed-out weeks">Proj/Wk<br><span style="font-size:9px;font-weight:400;color:#aaa">(+Open POs)</span> <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="ai_wk"        data-col-type="number"  onclick="cycleSort('ai_wk')"     title="Average AI forecast per week (26-wk), including open POs in zeroed-out weeks">AI Fcst/Wk<br><span style="font-size:9px;font-weight:400;color:#aaa">(+Open POs)</span> <span class="sort-ind"></span></th>
-    <th class="sortable" data-sort-key="sugg_wk"      data-col-type="number"  onclick="cycleSort('sugg_wk')" title="Average of Suggested W1..W26">Sugg /Wk <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="ai_vs_proj"   data-col-type="number"  onclick="cycleSort('ai_vs_proj')">AI vs Proj <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="fcst_status"  data-col-type="string"  onclick="cycleSort('fcst_status')" title="Forecast status vs manual projection (±10% threshold, min 1,000u volume / 500u gap)">Fcst Status <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="ai_vs_l13"    data-col-type="number"  onclick="cycleSort('ai_vs_l13')">AI vs L13 <span class="sort-ind"></span></th>
@@ -672,7 +663,6 @@ window.QB_CONFIG = {
     <th><input class="col-filter" data-field="shp_wk"       data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
     <th><input class="col-filter" data-field="proj_wk"      data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
     <th><input class="col-filter" data-field="ai_wk"        data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
-    <th><input class="col-filter" data-field="sugg_wk"      data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
     <th><input class="col-filter" data-field="ai_vs_proj"   data-col-type="number"  oninput="applyFilters()" placeholder=">10, <-5..."></th>
     <th><input class="col-filter" data-field="fcst_status"  data-col-type="string"  oninput="applyFilters()" placeholder="Over/Under..."></th>
     <th><input class="col-filter" data-field="ai_vs_l13"    data-col-type="number"  oninput="applyFilters()" placeholder=">10, <-5..."></th>

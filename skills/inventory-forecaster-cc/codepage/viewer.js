@@ -449,7 +449,6 @@ function buildSelectFids() {
     ...(F.SWITCHOVER_DATE        ? [F.SWITCHOVER_DATE]        : []),
   ];
   CFG.AI_PRJ_FIDS.forEach(fid => sel.push(fid));
-  CFG.SUG_FIDS.forEach(fid => sel.push(fid));
   CFG.OPN_FIDS.forEach(fid => sel.push(fid));
   MAN_PRJ_FIDS.forEach(fid => sel.push(fid));
   ORD_HIST_FIDS.forEach(fid => sel.push(fid));
@@ -743,7 +742,7 @@ async function _loadPrjCache() {
 // apps on pim.quickbase.com).  They are lazy-fetched from QB the first time
 // a planner expands a row (_lazyLoadDetail).
 const _PRJ_CACHE_STRIP = new Set([
-  'ai_fcst', 'weeks_slim', 'suggested', 'opn_w',
+  'ai_fcst', 'weeks_slim', 'opn_w',
   'hist_ord', 'hist_shp', 'ly_ord', 'ly_shp', 'narrative',
 ]);
 
@@ -775,7 +774,6 @@ async function _savePrjCache(records) {
 async function _lazyLoadDetail(r) {
   const selectFids = [
     ...CFG.AI_PRJ_FIDS,
-    ...CFG.SUG_FIDS,
     ...CFG.OPN_FIDS,
     ...MAN_PRJ_FIDS,
     ...ORD_HIST_FIDS,
@@ -798,7 +796,6 @@ async function _lazyLoadDetail(r) {
   const forecast = CFG.AI_PRJ_FIDS.map(fid => num(row, fid));
   const manual   = MAN_PRJ_FIDS  .map(fid => num(row, fid));
   r.ai_fcst   = forecast;
-  r.suggested = CFG.SUG_FIDS.map(fid => num(row, fid));
   r.opn_w     = CFG.OPN_FIDS.map(fid => num(row, fid));
   // Recompute conflict with fresh PO + manual data (r.is_offprice preserved from adaptRow)
   const { conflicts: _lazyCfls, hasConflict: _lazyCfl } =
@@ -2046,7 +2043,6 @@ function adaptRow(row) {
   const F = CFG.FID;
   const forecast = CFG.AI_PRJ_FIDS.map(fid => num(row, fid));
   const manual   = MAN_PRJ_FIDS  .map(fid => num(row, fid));
-  const sug      = CFG.SUG_FIDS  .map(fid => num(row, fid));
   const opn      = CFG.OPN_FIDS  .map(fid => num(row, fid));
   const histOrd  = ORD_HIST_FIDS .map(fid => num(row, fid));
   const histShp  = SHP_HIST_FIDS .map(fid => num(row, fid));

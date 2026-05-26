@@ -258,15 +258,15 @@ INTERNATIONAL_CUST_SUBSTRS = [
 
 OFFPRICE_CUST_SUBSTRS = [
     "BURLINGTON", "ROSS STORES", "TJ MAXX", "T J MAXX", "MARSHALLS",
-    "SAM'S CLUB", "VARIETY WHOLESALERS", "OLLIE", "BIG LOTS",
-    "FIVE BELOW", "FRAGRANCENET", "DD'S DISCOUNTS", "DD'S DISCOUNT",
+    "VARIETY WHOLESALERS", "OLLIE", "BIG LOTS",
+    "FRAGRANCENET", "DD'S DISCOUNTS", "DD'S DISCOUNT",
     "GABRIEL BROTHERS",
 ]
 """R1: off-price / one-time-buy retailers. Route through OTB detection.
-NOTE: KOHL removed 2026-05-26 -- Kohl's is a weekly-replenishment dept store,
-not a closeout channel. OFFPRICE_CUST_SUBSTRS is for true liquidation channels
-(Burlington/Ross/TJX/etc.) that buy in bulk with long gaps between POs.
-Kohl's OTB items are caught by _detect_otb() PATH A/B from history."""
+Removed 2026-05-26:
+  KOHL      -- weekly-replenishment dept store, not closeout
+  SAM'S CLUB -- club/warehouse channel, regular replenishment
+  FIVE BELOW -- value retailer with regular weekly ordering"""
 
 
 # ─────────────────────────────────────────────────────────────────────────────

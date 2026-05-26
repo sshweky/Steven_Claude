@@ -3288,7 +3288,6 @@ function toggleDetail(key) {{
         <tr>${{hdrCells}}</tr>
         <tr>${{projCells}}</tr>
         <tr>${{aiCells}}</tr>
-        <tr>${{sugCells}}</tr>
         <tr><td colspan="28" style="padding:0;height:6px;background:transparent;border:none"></td></tr>
         <tr>${{opnCells}}</tr>
         <tr>${{lyOrdCells}}</tr>
@@ -4061,22 +4060,11 @@ class Handler(BaseHTTPRequestHandler):
             if rec is None:
                 self._json({"error": "not found"}, 404)
             else:
-                # suggested is now stored in validation_results.json — no CData call needed
-                sug = rec.get("suggested")
-                if sug is None:
-                    sug = fetch_suggested_weeks(key)
-                    rec["suggested"] = sug   # cache for session
                 self._json({
                     "weeks":           rec.get("weeks", []),
-                    "suggested":       sug,
                     "history_l26_shp": rec.get("history_l26_shp", rec.get("history_l26", [])),
                     "history_l26_ord": rec.get("history_l26_ord", []),
                 })
-        elif self.path.startswith("/api/suggested"):
-            from urllib.parse import urlparse, parse_qs
-            qs = parse_qs(urlparse(self.path).query)
-            key = qs.get("key", [""])[0]
-            self._json({"suggested": fetch_suggested_weeks(key)})
         elif self.path.startswith("/api/explain"):
             # D5: Anomaly explain endpoint -- returns the full rule firing trace
             # for one record so a planner can self-serve "why is W7 = 2,760?"
