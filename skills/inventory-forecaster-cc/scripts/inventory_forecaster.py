@@ -12666,6 +12666,99 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"switchover; AI zeroed all weeks."
                 )
 
+    # ── F_YOY_CADENCE — LY promo/holiday window timing replication (2026-05-26) ──
+    # On items with a full year of order history, replace the within-window
+    # week-to-week distribution for promotional and holiday lift periods with last
+    # year's actual order cadence.  This preserves the forecast TOTAL for each
+    # window -- only the timing and variability within the window changes.
+    #
+    # Windows:
+    #   Prime Day  : W7-W9   (Amazon only -- mid-May pre-order, ~6-8 wks before July event)
+    #   Fall Deal  : W23-W25 (all channels -- back-to-school / fall promo pre-order)
+    #
+    # LY mapping: ORD_COLS is ordered oldest->newest, so hist[0]=Ord_LW_51=52 wks
+    # ago = LY-W1, hist[1]=LY-W2, ..., hist[n-1]=LY-Wn.
+    # Forecast week W_n -> hist[n-1].
+    #
+    # Full-YoY gate: at least 3 non-zero order weeks in hist[:26] (LY-W1..W26)
+    # confirms the item was actively ordering one full year ago.  The specific LY
+    # window must also have a positive total (LY event was active for this item).
+    #
+    # Exclusions:
+    #   - Inactive / OTB (zero) / Pre-launch families -- no active forecast
+    #   - F58 Tell-AI explicit planner overrides -- planner intent wins
+    #   - Windows where the current total == 0 after all prior rules -- nothing to redistribute
+    _F_YOY_SKIP_MODELS = {
+        "Inactive", "OTB (zero)",
+        "Pre-launch NEW (manual passthrough)",
+        "Inactive (zeroed by guards)",
+        "Inactive (zero order history)",
+    }
+    _fyoy_f58_fired = any(
+        "F58 Tell-AI replay" in str(d) and "not auto-applied" not in str(d)
+        for d in ((meta or {}).get("drivers") or [])
+    )
+    if (model not in _F_YOY_SKIP_MODELS
+            and not _fyoy_f58_fired
+            and isinstance(hist_for_model, list) and len(hist_for_model) >= 26
+            and isinstance(fcst, list) and len(fcst) >= 26
+            and sum(fcst) > 0):
+        # Full-YoY gate: meaningful order activity in the LY window (hist[:26])
+        _fyoy_ly_active = sum(1 for v in hist_for_model[:26] if float(v) > 0) >= 3
+        if _fyoy_ly_active:
+            # Event windows: (sorted week numbers 1-indexed, amazon_only flag)
+            _fyoy_windows = [
+                (sorted(PRIME_DAY_WEEKS),  True),   # W7, W8, W9 -- Amazon only
+                (sorted(FALL_DEAL_WEEKS),  False),  # W23, W24, W25 -- all channels
+            ]
+            for _fyoy_wks, _fyoy_amz_only in _fyoy_windows:
+                if _fyoy_amz_only and not is_amazon:
+                    continue
+                # 0-indexed positions into fcst and hist
+                _fyoy_fc_idx  = [w - 1 for w in _fyoy_wks]   # same offsets for hist
+                # LY order values for this event window (hist[w-1] = LY week w)
+                _fyoy_ly_vals = [float(hist_for_model[i]) for i in _fyoy_fc_idx]
+                _fyoy_ly_tot  = sum(_fyoy_ly_vals)
+                if _fyoy_ly_tot <= 0:
+                    continue   # no LY event activity for this window -- skip
+                # Current forecast total for the window (after all prior rules)
+                _fyoy_fc_tot  = sum(fcst[i] for i in _fyoy_fc_idx)
+                if _fyoy_fc_tot <= 0:
+                    continue   # window zeroed by prior rules (VP-Q4, F70, etc.) -- skip
+                # LY normalized shape: proportion each week held of the window total
+                _fyoy_shape   = [v / _fyoy_ly_tot for v in _fyoy_ly_vals]
+                # Capture original forecast values before we modify them (for driver log)
+                _fyoy_orig    = [fcst[i] for i in _fyoy_fc_idx]
+                # Apply LY shape to this year's window total
+                _fyoy_new_raw = [_fyoy_shape[j] * _fyoy_fc_tot for j in range(len(_fyoy_wks))]
+                _fyoy_snapped = [snap(max(0.0, v), mp) for v in _fyoy_new_raw]
+                # Preserve window total exactly: absorb any pack-rounding residual
+                # into the largest (most absorptive) week
+                _fyoy_resid = int(_fyoy_fc_tot) - sum(_fyoy_snapped)
+                if _fyoy_resid != 0 and _fyoy_snapped:
+                    _fyoy_big = max(range(len(_fyoy_wks)), key=lambda j: _fyoy_snapped[j])
+                    _fyoy_snapped[_fyoy_big] = snap(
+                        max(0.0, _fyoy_snapped[_fyoy_big] + _fyoy_resid), mp
+                    )
+                # Only write back if the distribution actually changed
+                if any(_fyoy_snapped[j] != _fyoy_orig[j] for j in range(len(_fyoy_wks))):
+                    for j, fc_i in enumerate(_fyoy_fc_idx):
+                        fcst[fc_i] = _fyoy_snapped[j]
+                    _fire("F_YOY_CADENCE")
+                    if isinstance(meta, dict):
+                        _fyoy_ch    = "Amazon" if is_amazon else "Retailer"
+                        _fyoy_wname = "Prime Day" if 7 in set(_fyoy_wks) else "Fall Deal"
+                        meta.setdefault("drivers", []).append(
+                            f"F_YOY_CADENCE {_fyoy_wname} ({_fyoy_ch}): "
+                            f"LY W{_fyoy_wks[0]}-W{_fyoy_wks[-1]} "
+                            f"= {' / '.join(f'{v:.0f}' for v in _fyoy_ly_vals)} "
+                            f"(LY total {_fyoy_ly_tot:.0f}u, shape "
+                            f"{' / '.join(f'{s:.1%}' for s in _fyoy_shape)}) "
+                            f"applied to {_fyoy_fc_tot:.0f}u window total "
+                            f"-> {' / '.join(f'{v:.0f}' for v in _fyoy_snapped)} "
+                            f"(was {' / '.join(f'{v:.0f}' for v in _fyoy_orig)})"
+                        )
+
     prior = sum(manual_wks)
     new   = sum(fcst)
     pct   = abs(new - prior) / prior if prior > 0 else 0
