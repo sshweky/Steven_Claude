@@ -48,16 +48,35 @@ PAGE_IDS = {
 }
 
 
-class CORSHandler(http.server.SimpleHTTPRequestHandler):
-    def end_headers(self):
+class CORSHandler(http.server.BaseHTTPRequestHandler):
+    """Minimal raw handler -- avoids Python 3.13+ SimpleHTTPRequestHandler CORS
+    validation that hangs cross-origin GET requests (regression vs 3.12)."""
+
+    def _send_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
         self.send_header("Cache-Control", "no-cache")
-        super().end_headers()
 
     def do_OPTIONS(self):
         self.send_response(200)
+        self._send_cors_headers()
         self.end_headers()
+
+    def do_GET(self):
+        path = self.path.lstrip("/") or "index.html"
+        filepath = HERE / path
+        if not filepath.exists():
+            self.send_response(404)
+            self.end_headers()
+            return
+        data = filepath.read_bytes()
+        ctype = "application/javascript" if path.endswith(".js") else "text/html; charset=utf-8"
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(data)))
+        self._send_cors_headers()
+        self.end_headers()
+        self.wfile.write(data)
 
     def log_message(self, fmt, *args):
         print(f"  [CORS] {fmt % args}")
