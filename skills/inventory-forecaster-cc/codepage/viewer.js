@@ -1182,6 +1182,29 @@ async function _fetchAtsForMstyle(r) {
   }
 }
 
+// -- F35 normalization note --------------------------------------------------
+// Parses F35 stockout correction entries from the AI narrative text.
+// The forecaster writes one line per correction window in the format:
+//   "F35 Stockout backlog removed: Nw gap at hist[X], baseline=Y/wk; stripped Z units..."
+// Returns array of { length, start, baseline, removed }, newest-first.
+function _parseF35Corrections(narrative) {
+  const out = [];
+  if (!narrative) return out;
+  const re = /F35 Stockout backlog removed: (\d+)w gap at hist\[(\d+)\], baseline=([\d.]+)\/wk; stripped ([\d.]+) units/g;
+  let m;
+  while ((m = re.exec(narrative)) !== null) {
+    out.push({
+      length:   parseInt(m[1],  10),
+      start:    parseInt(m[2],  10),
+      baseline: parseFloat(m[3]),
+      removed:  parseFloat(m[4]),
+    });
+  }
+  // Sort newest (highest start index) first so the primary baseline is most recent
+  out.sort((a, b) => b.start - a.start);
+  return out;
+}
+
 // -- POS History from Retailer Sales (bv2izcn5b) ----------------------------
 // On-demand fetch for a single customer+mstyle.  Returns
 //   { units:[26], oh:[26], instock:[26] }  oldest->newest (slot 0 = 26w ago,
@@ -4050,9 +4073,33 @@ async function toggleDetail(key) {
       diCells += `<td style="background:#fffde7;font-weight:700;color:#827717">${fmtN(diTot)}</td>`;
       diCells += `<td style="background:#fffde7;font-weight:700;color:#827717">${fmtN(Math.round(diTot / 26))}</td>`;
     }
+    // F35 normalization callout -- shown when OOS backlog was stripped and
+    // the resulting normalized demand differs from the raw L13 avg.
+    const _f35Corrs = _parseF35Corrections(r.narrative || '');
+    let _f35NoteHtml = '';
+    if (_f35Corrs.length) {
+      const _rawL13 = histOrd.length >= 13
+        ? histOrd.slice(-13).reduce((a,b)=>a+b,0) / 13
+        : (histOrd.length ? histOrd.reduce((a,b)=>a+b,0) / histOrd.length : 0);
+      const _normBase = _f35Corrs[0].baseline; // most-recent OOS window baseline
+      if (Math.abs(_rawL13 - _normBase) >= 1) {
+        const _parts = _f35Corrs.map(c =>
+          `${fmtN(Math.round(c.removed))}u stripped from ${c.length}-wk catch-up (hist[${c.start}])`
+        );
+        _f35NoteHtml =
+          `<div style="font-size:11px;background:#fff3e0;border-left:3px solid #ef6c00;` +
+          `border-radius:2px;padding:3px 8px;margin:2px 0 4px 0;color:#bf360c;">` +
+          `<b>F35 OOS normalization:</b> raw L13 <b>${_rawL13.toFixed(0)}/wk</b> ` +
+          `<span style="color:#888"> -> </span>` +
+          ` normalized <b>${_normBase.toFixed(0)}/wk</b>` +
+          ` <span style="color:#888;font-weight:normal">(${_parts.join('; ')})</span>` +
+          `</div>`;
+      }
+    }
     histHtml = `
     <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:2px solid #ede7f6;">
       <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">L26W History${_ecHistNote ? ` <span style="font-weight:400;color:#1565c0;">(inherited from parent style ${_ecHistNote.replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c])})</span>` : ''}</div>
+      ${_f35NoteHtml}
       <table class="dtbl">
         <tr>${histHdrCells}</tr>
         <tr>${ordCells}</tr>
