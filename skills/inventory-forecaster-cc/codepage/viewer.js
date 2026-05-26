@@ -4160,6 +4160,23 @@ async function toggleDetail(key) {
           <button onclick="previewAiAdjustment('${safeKey}')" style="font-size:11px;padding:5px 14px;background:#1565c0;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;">Preview Adjustments</button>
         </div>
         <div id="ai-adj-preview-${safeId}"></div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid #c5d9f0;">
+          <div style="font-size:11px;color:#444;margin-bottom:4px;font-weight:600;">
+            Baseline Override (units/wk)
+            <span style="font-weight:400;color:#888;font-size:10px;"> - AI applies seasonality + snap on next run</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="number" id="baseline-ovr-${safeId}" min="0" step="1"
+                   value="${r.baseline_override > 0 ? r.baseline_override : ''}"
+                   placeholder="e.g. 240"
+                   style="width:90px;padding:4px 6px;border:1px solid #1565c0;border-radius:4px;font-size:12px;"
+                   onblur="saveBaselineOverride('${safeKey}', this.value)"
+                   onkeydown="if(event.key==='Enter'){this.blur();}"/>
+            <button onclick="saveBaselineOverride('${safeKey}', 0)"
+                    style="font-size:11px;padding:4px 10px;background:#fff;color:#888;border:1px solid #ccc;border-radius:4px;cursor:pointer;"
+                    title="Clear override - AI will compute its own baseline on the next run">Clear</button>
+          </div>
+        </div>
       </div>
       ${CFG.AI_COMMENTS_TID ? `
         <!-- RIGHT: AI Adjustment History - only rendered when table is configured -->
