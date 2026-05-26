@@ -93,19 +93,6 @@ def cdata_query(sql, description="query"):
     return []
 
 
-def fetch_suggested_weeks(key):
-    """Pull the 26 Suggested_Projection_Wk* values for a given record key."""
-    k = key.replace("'", "''")
-    cols = ",".join(f"[Suggested_Projection_Wk{w}]" for w in range(1, 27))
-    sql = (f"SELECT {cols} FROM [Quickbase1].[InventoryTrack].[Projections] "
-           f"WHERE [Acct_MStyle_Key_] = '{k}'")
-    rows = cdata_query(sql, f"suggested for {key}")
-    if not rows:
-        return [0] * 26
-    r = rows[0]
-    return [int(r.get(f"Suggested_Projection_Wk{w}") or 0) for w in range(1, 27)]
-
-
 def build_copy_to_manual_sql(key, source_cols):
     """Build an UPDATE that copies source_cols (list of 26 QB column names)
     into the 26 date-stamped manual projection columns (prj_cols)."""
@@ -939,7 +926,6 @@ def _adapt_forecast_to_validation(rec):
     rec.setdefault("shpd_per_wk_l13", 0)
     rec.setdefault("history_l26_shp", [])
     rec.setdefault("history_l26_ord", [])
-    rec.setdefault("suggested",       [])
     return rec
 
 
@@ -1428,11 +1414,6 @@ def build_validation_page_html():
             "man_vs_l13":       r.get("man_vs_l13_pct", 0),
             # Detail data — preloaded for instant expand, no CData fetch needed
             "weeks_slim":       weeks_slim,
-            "suggested":        r.get("suggested", []),
-            # Avg-per-week of the 26 Suggested values, surfaced as a header
-            # column so planners can compare AI Fcst/Wk vs Suggested /Wk at a glance.
-            "sugg_total":       sum(r.get("suggested", [])) if r.get("suggested") else 0,
-            "sugg_wk":          (sum(r.get("suggested", [])) / 26.0) if r.get("suggested") else 0,
             "hist_shp":         r.get("history_l26_shp", r.get("history_l26", [])),
             "hist_ord":         r.get("history_l26_ord", []),
             # LY actuals (weeks 27-52 ago, aligned to W1..W26 of the forecast).
@@ -1651,13 +1632,11 @@ def build_validation_page_html():
   .comment-input {{ font-size:11px; width:160px; padding:2px 5px; border:1px solid #ddd;
                     border-radius:3px; resize:vertical; min-height:24px; }}
   .comment-input:focus {{ border-color:#1565c0; outline:none; }}
-  /* Use AI / Use Suggested buttons */
+  /* Use AI button */
   .use-btn {{ font-size:10px; padding:3px 6px; border:1px solid #ccc; border-radius:3px;
               background:#fff; cursor:pointer; font-weight:600; white-space:nowrap; }}
   .use-btn.use-ai  {{ color:#1565c0; border-color:#90caf9; }}
   .use-btn.use-ai:hover  {{ background:#e3f2fd; }}
-  .use-btn.use-sug {{ color:#555;    border-color:#ccc; }}
-  .use-btn.use-sug:hover {{ background:#eeeeee; }}
   .use-btn:disabled {{ opacity:0.6; cursor:wait; }}
   .use-btn.done {{ background:#c8e6c9; color:#1b5e20; border-color:#81c784; }}
   .use-btn.failed {{ background:#ffcdd2; color:#b71c1c; border-color:#ef9a9a; }}
@@ -1750,12 +1729,10 @@ def build_validation_page_html():
     <th class="sortable" data-sort-key="shp_wk"       data-col-type="number"  onclick="cycleSort('shp_wk')">Ord/Wk L13W <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="proj_wk"      data-col-type="number"  onclick="cycleSort('proj_wk')">Proj/Wk <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="ai_wk"        data-col-type="number"  onclick="cycleSort('ai_wk')">AI Fcst/Wk <span class="sort-ind"></span></th>
-    <th class="sortable" data-sort-key="sugg_wk"      data-col-type="number"  onclick="cycleSort('sugg_wk')" title="Average of Suggested W1..W26">Sugg /Wk <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="ai_vs_proj"   data-col-type="number"  onclick="cycleSort('ai_vs_proj')">AI vs Proj <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="ai_vs_l13"    data-col-type="number"  onclick="cycleSort('ai_vs_l13')">AI vs L13 <span class="sort-ind"></span></th>
     <th class="sortable" data-sort-key="man_vs_l13"   data-col-type="number"  onclick="cycleSort('man_vs_l13')">Man vs L13 <span class="sort-ind"></span></th>
     <th style="width:70px;">Use AI</th>
-    <th style="width:90px;">Use Sugg</th>
   </tr>
   <!-- Per-column quick-filter row.  Numeric columns understand operators. -->
   <tr class="col-filter-row">
@@ -1773,7 +1750,6 @@ def build_validation_page_html():
     <th><input class="col-filter" data-field="shp_wk"       data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
     <th><input class="col-filter" data-field="proj_wk"      data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
     <th><input class="col-filter" data-field="ai_wk"        data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
-    <th><input class="col-filter" data-field="sugg_wk"      data-col-type="number"  oninput="applyFilters()" placeholder=">100, <50..."></th>
     <th><input class="col-filter" data-field="ai_vs_proj"   data-col-type="number"  oninput="applyFilters()" placeholder=">10, <-5..."></th>
     <th><input class="col-filter" data-field="ai_vs_l13"    data-col-type="number"  oninput="applyFilters()" placeholder=">10, <-5..."></th>
     <th><input class="col-filter" data-field="man_vs_l13"   data-col-type="number"  oninput="applyFilters()" placeholder=">10, <-5..."></th>
@@ -2561,12 +2537,11 @@ function exportFlagged() {{
   }};
   const header = [
     'Key','Inv Manager','Brand','Customer','Mstyle','Description','Priority',
-    'Ord/Wk L4W','Ord/Wk L13W','Shpd/Wk L13W','Proj/Wk','AI Fcst/Wk','Sugg /Wk','AI vs Proj %','AI vs L13 %','Man vs L13 %',
-    'Flags','Max Sev','Proj 26w','AI 26w','Sugg 26w','Model','Pattern','Biweekly',
+    'Ord/Wk L4W','Ord/Wk L13W','Shpd/Wk L13W','Proj/Wk','AI Fcst/Wk','AI vs Proj %','AI vs L13 %','Man vs L13 %',
+    'Flags','Max Sev','Proj 26w','AI 26w','Model','Pattern','Biweekly',
     'Last Comment','Last Comment Date','Narrative',
     ...wkLabels('AI'),
     ...wkLabels('Man'),
-    ...wkLabels('Sugg'),
     ...wkLabels('Hist Ord'),
     ...wkLabels('Hist Shp'),
     'Comment','Flagged'
@@ -2580,7 +2555,6 @@ function exportFlagged() {{
                  : '0%';
     const ai   = pad26(r.ai_fcst);
     const man  = manFromWeeks(r.weeks_slim);
-    const sugg = pad26(r.suggested);
     const hOrd = pad26(r.hist_ord);
     const hShp = pad26(r.hist_shp);
     const aiVsL13Str  = (r.ai_vs_l13  != null) ? Number(r.ai_vs_l13).toFixed(1) + '%'  : '';
@@ -2598,7 +2572,6 @@ function exportFlagged() {{
       Math.round(r.shpd_wk || 0),
       Math.round(r.proj_wk || 0),
       Math.round(r.ai_wk   || 0),
-      Math.round(r.sugg_wk || 0),
       pct,
       aiVsL13Str,
       manVsL13Str,
@@ -2606,7 +2579,6 @@ function exportFlagged() {{
       r.max_sev  || '',
       Math.round(r.proj_total || 0),
       Math.round(r.ai_total   || 0),
-      Math.round(r.sugg_total || 0),
       r.ai_model || '',
       r.pattern  || '',
       r.biweekly ? 'Y' : '',
@@ -2615,7 +2587,6 @@ function exportFlagged() {{
       (r.narrative || '').replace(/[\\r\\n]+/g,' '),
       ...ai,
       ...man,
-      ...sugg,
       ...hOrd,
       ...hShp,
       (ud.comment || '').replace(/[\\r\\n]+/g,' '),
@@ -2686,7 +2657,6 @@ function exportAllInView() {{
                  : '0%';
     const ai   = pad26(r.ai_fcst);
     const man  = manFromWeeks(r.weeks_slim);
-    const sugg = pad26(r.suggested);
     const hOrd = pad26(r.hist_ord);
     const hShp = pad26(r.hist_shp);
     const aiVsL13Str  = (r.ai_vs_l13  != null) ? Number(r.ai_vs_l13).toFixed(1) + '%'  : '';
@@ -2704,7 +2674,6 @@ function exportAllInView() {{
       Math.round(r.shpd_wk || 0),
       Math.round(r.proj_wk || 0),
       Math.round(r.ai_wk   || 0),
-      Math.round(r.sugg_wk || 0),
       pct,
       aiVsL13Str,
       manVsL13Str,
@@ -2712,7 +2681,6 @@ function exportAllInView() {{
       r.max_sev  || '',
       Math.round(r.proj_total || 0),
       Math.round(r.ai_total   || 0),
-      Math.round(r.sugg_total || 0),
       r.ai_model || '',
       r.pattern  || '',
       r.biweekly ? 'Y' : '',
@@ -2721,7 +2689,6 @@ function exportAllInView() {{
       (r.narrative || '').replace(/[\\r\\n]+/g,' '),
       ...ai,
       ...man,
-      ...sugg,
       ...hOrd,
       ...hShp,
       (ud.comment || '').replace(/[\\r\\n]+/g,' '),
@@ -2750,14 +2717,14 @@ function priLabel(p) {{
 }}
 
 async function copyToMan(key, source, btn) {{
-  const label = source === 'ai' ? 'AI PRJ' : 'Suggested';
+  const label = 'AI PRJ';
   if (!confirm(`Overwrite 26 weeks of MAN projections with ${{label}} for ${{key}}?\\n\\nThis writes to Quickbase immediately.`)) return;
   const orig = btn.textContent;
   btn.disabled = true;
   btn.textContent = '…';
   btn.classList.remove('done', 'failed');
   try {{
-    const endpoint = source === 'ai' ? '/api/use-ai' : '/api/use-suggested';
+    const endpoint = '/api/use-ai';
     const res = await fetch(endpoint, {{
       method: 'POST',
       headers: {{'Content-Type':'application/json'}},
@@ -2830,12 +2797,10 @@ function renderPage(page) {{
       <td>${{fmtN(Math.round(r.shp_wk))}}</td>
       <td>${{fmtN(Math.round(r.proj_wk))}}</td>
       <td style="color:#1565c0;font-weight:600">${{fmtN(Math.round(r.ai_wk))}}</td>
-      <td style="color:#555" title="Average of Suggested W1..W26">${{fmtN(Math.round(r.sugg_wk || 0))}}</td>
       <td style="font-size:14px;font-weight:800;color:${{aiVsProj > 0 ? '#2e7d32' : aiVsProj < 0 ? '#c62828' : '#888'}}">${{aiVsProj >= 0 ? '+' : ''}}${{aiVsProj.toFixed(1)}}%</td>
       <td style="font-size:13px;font-weight:700;color:${{!l13Avail ? '#888' : (aiVsL13 > 0 ? '#2e7d32' : aiVsL13 < 0 ? '#c62828' : '#888')}}">${{l13Avail ? (aiVsL13 >= 0 ? '+' : '') + aiVsL13.toFixed(1) + '%' : '—'}}</td>
       <td style="font-size:13px;font-weight:700;color:${{!l13Avail ? '#888' : (manVsL13 > 0 ? '#2e7d32' : manVsL13 < 0 ? '#c62828' : '#888')}}">${{l13Avail ? (manVsL13 >= 0 ? '+' : '') + manVsL13.toFixed(1) + '%' : '—'}}</td>
       <td style="text-align:center"><button class="use-btn use-ai" onclick="event.stopPropagation();copyToMan('${{r.key}}','ai',this)" title="Overwrite MAN weeks with AI PRJ">Use AI</button></td>
-      <td style="text-align:center"><button class="use-btn use-sug" onclick="event.stopPropagation();copyToMan('${{r.key}}','suggested',this)" title="Overwrite MAN weeks with Suggested PRJ">Use Sugg</button></td>
     `;
     tb.appendChild(tr);
 
@@ -2888,10 +2853,9 @@ function toggleDetail(key) {{
   const wks    = r.weeks_slim || [];   // {{week, projection, severity}}
   const aiFcst = r.ai_fcst   || [];
   const aiMdl  = r.ai_model  || '';
-  const sug    = r.suggested  || [];
 
   // LY actuals — weeks 27-52 ago, aligned to W1..W26.  Rendered as two
-  // additional rows under "Suggested": Ordered LY (green) and Shipped LY
+  // additional rows below the AI row: Ordered LY (green) and Shipped LY
   // (blue).  Empty arrays render zeros gracefully when forecast_results.json
   // predates this field (re-run forecast to populate).
   const lyOrd = r.ly_ord || [];
@@ -2900,11 +2864,10 @@ function toggleDetail(key) {{
   let hdrCells  = '<th class="row-label"></th>';
   let projCells = '<td class="row-label">Projection</td>';
   let aiCells   = `<td class="row-label" style="color:#1565c0;font-weight:600">AI Forecast<br><span style="font-weight:normal;font-size:10px">${{aiMdl}}</span></td>`;
-  let sugCells  = '<td class="row-label" style="color:#555">Suggested</td>';
   let opnCells  = '<td class="row-label" style="color:#6d4c00;font-weight:600">Open Customer POs</td>';
   let lyOrdCells = '<td class="row-label" style="color:#2e7d32;font-weight:600">Ordered LY</td>';
   let lyShpCells = '<td class="row-label" style="color:#1565c0;font-weight:600">Shipped LY</td>';
-  let sugTot = 0, opnTot = 0, lyOrdTot = 0, lyShpTot = 0;
+  let opnTot = 0, lyOrdTot = 0, lyShpTot = 0;
 
   for (let i = 0; i < wks.length; i++) {{
     const w   = wks[i];

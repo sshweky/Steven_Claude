@@ -695,10 +695,6 @@ SHP_COLS = [f"Shp_LW_{i}" for i in range(51, 0, -1)] + ["Shp_LW"]
 # Last 26 weeks of orders for the viewer display row (subset of ORD_COLS).
 ORD_L26_COLS = [f"Ord_LW_{i}" for i in range(25, 0, -1)] + ["Ord_LW"]
 
-# Suggested_Projection_Wk columns (written by the AI forecast run).
-# Pulled at validation time and stored in validation_results.json so the viewer
-# can display them instantly — no second CData round-trip needed per row click.
-SUGG_COLS = [f"Suggested_Projection_Wk{w}" for w in range(1, 27)]
 OPN_COLS  = [f"Opn_W{w}" for w in range(1, 27)]
 
 # Anticipated on-hand by week (Projections table).  Inv_WkN = OH at end of
@@ -1447,7 +1443,6 @@ def fetch_projections_qb_rest(prj_cols, args):
         + SHP_COLS
         + INV_OH_COLS
         + OPN_COLS
-        + SUGG_COLS
     )
 
     select_fids = []
@@ -13530,8 +13525,6 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         # in the viewer detail pane below the Suggested row.
         "history_ly_shp":   [int(float(row.get(c) or 0)) for c in SHP_COLS[:26]],
         "history_ly_ord":   [int(float(row.get(c) or 0)) for c in ORD_COLS[:26]],
-        # AI-suggested (Suggested_Projection_Wk* columns) — preloaded so viewer needs no CData call
-        "suggested":        [int(float(row.get(c) or 0)) for c in SUGG_COLS],
         # F35 audit trail — list of stockout corrections applied to history
         # before validation flags were computed.  Each entry records the
         # zero-run start index, length, pre-gap baseline, and units stripped.
