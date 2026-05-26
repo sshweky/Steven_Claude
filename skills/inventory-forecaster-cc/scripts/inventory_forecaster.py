@@ -12957,6 +12957,26 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"hasn't transmitted yet, not that Amazon won't order this week."
                 )
 
+    # F_W1_PO_ZERO — Final guard: when a confirmed open PO covers W1, the AI
+    # W1 forecast MUST be zero (the PO IS the W1 demand; any AI projection
+    # on top double-counts).  Some upstream rules (F69-WOS rescale, F37, etc.)
+    # may have left a non-zero residual after VP-Q4's initial zeroing -- this
+    # is the unconditional safety net that runs last.
+    # Runs for all customers, not just Amazon.
+    if (_opn_w1 > 0
+            and isinstance(fcst, list) and len(fcst) >= 1
+            and fcst[0] > 0):
+        _w1_was = fcst[0]
+        fcst[0] = 0
+        _fire("F_W1_PO_ZERO")
+        if isinstance(meta, dict):
+            meta.setdefault("drivers", []).append(
+                f"F_W1_PO_ZERO: AI W1 forced to 0 ({_w1_was:,}u removed) -- "
+                f"confirmed Open PO of {_opn_w1:,.0f}u already covers W1. "
+                f"Showing any AI projection on top of the PO would double-count "
+                f"forward demand."
+            )
+
     alert = ""
     if model == "Inactive" and prior > 0:
         alert = _build_alert(model, new, prior, pct, cap, mp, meta,
