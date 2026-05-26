@@ -15823,6 +15823,39 @@ def main():
             with open(err_path, "w") as f:
                 json.dump(errors, f, indent=2)
             print(f"      Errors saved → {err_path}")
+
+        # Auto-clear Baseline Overrides that have exceeded their 30-day TTL.
+        # Collected in _EXPIRED_OVERRIDES during Phase 3; written back as a
+        # single bulk null-write so they don't accumulate silently.
+        if _EXPIRED_OVERRIDES and not getattr(args, "dry_run", False):
+            _ovr_fid  = fmap.get("Baseline Override") or 1614
+            _ovrd_fid = fmap.get("Baseline Override Date") or 1615
+            _exp_data = []
+            for _ekey in set(k for k in _EXPIRED_OVERRIDES if k):
+                _ed = {}
+                _ed[merge_fid]  = {"value": _ekey}
+                _ed[_ovr_fid]   = {"value": None}
+                _ed[_ovrd_fid]  = {"value": None}
+                _exp_data.append(_ed)
+            if _exp_data:
+                try:
+                    for _i in range(0, len(_exp_data), 500):
+                        _ep = json.dumps({
+                            "to": QB_PROJ_TABLE,
+                            "data": _exp_data[_i:_i + 500],
+                            "mergeFieldId": merge_fid,
+                            "fieldsToReturn": [],
+                        }).encode("utf-8")
+                        _er = urllib.request.Request(
+                            "https://api.quickbase.com/v1/records",
+                            data=_ep, headers=_QB_PROJ_HEADERS, method="POST"
+                        )
+                        with urllib.request.urlopen(_er, timeout=30):
+                            pass
+                    print(f"      [BaselineOverride] auto-cleared {len(_exp_data)} expired override(s) (>30 days old)")
+                except Exception as _ee:
+                    print(f"      [WARN] Failed to clear expired overrides: {_ee}")
+
         _print_summary(results, elapsed_wb, n_fail)
         return
 
