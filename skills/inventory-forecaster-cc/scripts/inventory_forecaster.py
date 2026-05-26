@@ -12143,7 +12143,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _f69w_wos = (_f69w_soh + _f69w_opo) / _f69w_pos_l13
             _f69w_excess = max(0.0, _f69w_wos - 12.0)
             _f69w_scale  = max(0.70, 1.0 - _f69w_excess / 26.0)
-            _f69w_target = _f69w_pos_l13 * _f69w_scale
+            # Anchor to the spike+AUR-aware baseline (cap) when F85 set one --
+            # otherwise the LW/L4W blend the planner directed would be silently
+            # dragged back down to plain POS L13W on every DI-blended record.
+            # Falls back to POS L13W when no F85 cap exists (e.g. non-POS-WOS
+            # model path).
+            _f69w_baseline = cap if (cap or 0) > _f69w_pos_l13 else _f69w_pos_l13
+            _f69w_target = _f69w_baseline * _f69w_scale
             # Proportional rescale — preserve the model's seasonal shape
             _f69w_cur_avg = sum(fcst) / max(len(fcst), 1)
             if _f69w_cur_avg > 0:
@@ -12154,9 +12160,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 for _wi in range(len(fcst)):
                     fcst[_wi] = snap(_f69w_target, mp)
             if isinstance(meta, dict):
+                _f69w_anchor_src = ("F85 spike+AUR baseline" if _f69w_baseline != _f69w_pos_l13
+                                    else "POS L13W")
                 meta.setdefault("drivers", []).append(
-                    f"F69-WOS: DI-blended forecast anchored to consumer POS "
-                    f"({_f69w_pos_l13:,.0f}/wk L13W); DC WOS={_f69w_wos:.1f}wks "
+                    f"F69-WOS: DI-blended forecast anchored to {_f69w_anchor_src} "
+                    f"({_f69w_baseline:,.0f}/wk); DC WOS={_f69w_wos:.1f}wks "
                     f"(excess {_f69w_excess:.1f}wks → ×{_f69w_scale:.2f}) → "
                     f"target {_f69w_target:,.0f}/wk (warehouse + DI combined demand)"
                 )
