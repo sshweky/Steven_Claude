@@ -8122,13 +8122,39 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     ) if (description or product_category or product_subcategory
           or brand or brand_pt or season) else None
 
+    # Amazon-only event-boost layers (2026-05-26): when amz_aur_data is supplied
+    # (Amazon path), layer Prime Day / Fall Prime Day calendar bumps and the
+    # T5/Holiday seasonal ramp on top of the category profile so F85 records
+    # get the same Q4 lift schedule F_AMZ_RPL applies for Active Replen items.
+    # Non-Amazon retailers (amz_aur_data is None) get empty dicts and the
+    # layers naturally skip -- their event/holiday cadence is captured in the
+    # category profile already.
+    _pb_boosts, _fb_boosts, _t5_boosts = ({}, {}, {})
+    _t5_applied_weeks = []
+    if amz_aur_data is not None:
+        _pb_boosts, _fb_boosts = _get_event_boosts()
+        _t5_boosts = _get_t5_seasonal_boosts(season)
+
     fcst = []
     for w in range(26):
         if fill_per_wk > 0 and fill_start <= w < fill_end:
             fcst.append(fill_per_wk)
-        else:
-            mult = _cat_mults_rtl[w] if _cat_mults_rtl else 1.0
-            fcst.append(snap(baseline_pps * mult, mp))
+            continue
+        # (a) Category profile -- lifts only (floor at 1.0)
+        mult = 1.0
+        if _cat_mults_rtl:
+            mult = max(1.0, _cat_mults_rtl[w])
+        wnum = w + 1
+        # (b) Prime Day / Fall Prime Day -- multiplicative discrete event
+        _ev = max(_pb_boosts.get(wnum, 1.0), _fb_boosts.get(wnum, 1.0))
+        if _ev > 1.0:
+            mult *= _ev
+        # (c) T5/Holiday seasonal ramp -- MAX with existing mult (no stack)
+        _t5 = _t5_boosts.get(wnum, 1.0)
+        if _t5 > mult:
+            mult = _t5
+            _t5_applied_weeks.append(wnum)
+        fcst.append(snap(baseline_pps * mult, mp))
 
     return {
         "fcst":          fcst,
@@ -8146,6 +8172,8 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
         "l13w":          l13w,
         "has_cat_mults": bool(_cat_mults_rtl),
         "wos_target":    wos_target,
+        "t5_weeks":      _t5_applied_weeks,   # 1-indexed weeks where T5 lifted the rate
+        "has_events":    bool(_pb_boosts or _fb_boosts),  # Prime Day calendar wired
     }
 
 
