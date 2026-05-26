@@ -13610,6 +13610,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             "preserved). Clear the override or wait until the item exits ramp."
         )
 
+    # Surface any Phase-1.5 switchover backfill alerts (missing variant
+    # projections, newly-created variant record, etc.) so the planner sees
+    # them in the codepage narrative.
+    _sw_alert = row.get("_switchover_alert")
+    if _sw_alert and isinstance(meta, dict):
+        meta.setdefault("drivers", []).append(_sw_alert)
+
     # F_AMZ_W1_CADENCE — Amazon Tue/Wed pre-10am order-cadence guard.
     # Amazon's regular weekly PO transmission lands around 10am on Tue or Wed.
     # When the forecaster runs before that cutoff, Opn_W1 = 0 for an Amazon
