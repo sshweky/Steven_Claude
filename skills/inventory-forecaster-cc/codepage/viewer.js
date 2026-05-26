@@ -6567,22 +6567,38 @@ function cancelAiAdjustment(key) {
 // WOS fill on top of the override rate.
 async function saveBaselineOverride(key, value) {
   if (!CFG.FID.BASELINE_OVERRIDE) return;
-  const v   = parseFloat(value) || 0;
-  const rec = ALL_RECORDS.find(x => x.key === key);
+  const v      = parseFloat(value) || 0;
+  const rec    = ALL_RECORDS.find(x => x.key === key);
   if (!rec) return;
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   const inp    = document.getElementById('baseline-ovr-' + safeId);
+  const status = document.getElementById('baseline-ovr-status-' + safeId);
   if (inp) inp.disabled = true;
+  const todayIso = new Date().toISOString().slice(0, 10);  // YYYY-MM-DD
   try {
     const fields = {};
     fields[CFG.FID.KEY]               = { value: key };
     fields[CFG.FID.BASELINE_OVERRIDE] = { value: v > 0 ? v : null };
+    if (CFG.FID.BASELINE_OVERRIDE_DATE)
+      fields[CFG.FID.BASELINE_OVERRIDE_DATE] = { value: v > 0 ? todayIso : null };
     await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
-    rec.baseline_override = v;
+    rec.baseline_override      = v;
+    rec.baseline_override_date = v > 0 ? todayIso : '';
     if (inp) {
       inp.value = v > 0 ? v : '';
       inp.style.background = '#e8f5e9';
       setTimeout(() => { inp.style.background = ''; }, 1500);
+    }
+    // Refresh the status line to show new expiry or cleared state
+    if (status) {
+      if (v > 0) {
+        const expDate  = new Date(Date.now() + 30 * 86400 * 1000);
+        const expStr   = (expDate.getMonth()+1) + '/' + expDate.getDate() + '/' + String(expDate.getFullYear()).slice(2);
+        status.innerHTML = '<span style="color:#555;">Expires ' + expStr + ' (30 days remaining). </span>'
+                         + '<span style="color:#1565c0;">Takes effect on next forecast run.</span>';
+      } else {
+        status.innerHTML = '<span style="color:#888;">Takes effect on next forecast run. Auto-clears after 30 days.</span>';
+      }
     }
   } catch (e) {
     if (inp) inp.style.background = '#ffebee';
