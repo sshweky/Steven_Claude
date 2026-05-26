@@ -10364,6 +10364,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _ms_for_inv = (row.get("Mstyle") or "").strip()
     _inv_flow_rec = (inv_flow_data or {}).get(_ms_for_inv)
     _f37_skip = _f37_status_new or (not _inv_flow_rec)
+    # [DBG F87] temporary
+    _dbg_key = row.get("Acct_MStyle_Key_","")
+    if "FF12689" in _dbg_key:
+        print(f"  [DBG F37-pre] key={_dbg_key} model={model} fcst_w14={fcst[13] if len(fcst)>13 else '?'} skip={_f37_skip}")
     if model not in ("Inactive",) and not _f37_skip:
         _adjusted_f37, _f37_adjustments, _f37_lt_info = apply_oh_shortfall_adjustment(
             row, fcst, inv_flow=_inv_flow_rec)
