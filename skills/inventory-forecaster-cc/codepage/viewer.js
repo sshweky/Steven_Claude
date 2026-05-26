@@ -1684,10 +1684,31 @@ function _buildPogBlockHtml(r) {
       </div>` : ''}
       ${pogLaunch ? `
       <div style="margin-top:4px;">
-        <b>Likely order window:</b> ${orderWindow} <span style="color:#888;">(4-6 wks before POG launch)</span>  | 
+        <b>Likely order window:</b> ${orderWindow} <span style="color:#888;">(4-6 wks before POG launch)</span>  |
         <b>Cancel->in-store lead time:</b> 2-4 wks (cancel ${cancelWindow}).
         After ISO, expect a ~4-wk pause before replenishment orders begin.
       </div>` : ''}
+      ${(() => {
+        const _warn  = r.pog_end_warn    || false;
+        const _zeroWk = Number(r.pog_end_zero_wk  || 0);
+        const _exp   = Number(r.pog_end_exposure || 0);
+        if (!_zeroWk) return '';
+        if (_warn) {
+          // F_POG_END_WARN: Status is Active, AI PRJ extends past cutoff
+          return `<div style="margin-top:8px;padding:10px 12px;background:#b71c1c;border:2px solid #7f0000;border-radius:6px;font-size:11px;color:#fff;">
+            <div style="font-weight:700;font-size:12px;margin-bottom:5px;">&#x26A0; OVERSTOCK ALERT: Approaching POG End Date</div>
+            <div>POG End: <b>${fmtDate(pogEnd)}</b> &nbsp;|&nbsp; Zero-out target: <b>W${_zeroWk}</b> (6 weeks before POG End).</div>
+            ${_exp > 0 ? `<div style="margin-top:4px;">AI forecast has <b>${_exp.toLocaleString()} units</b> projected from W${_zeroWk} onward -- overstock risk if POG ends as planned.</div>` : ''}
+            <div style="margin-top:6px;font-weight:600;">Status @ Cust is still Active. Change it to FD (Future Delete) and the AI will zero the forecast automatically from W${_zeroWk}.</div>
+          </div>`;
+        } else {
+          // F_POG_END_ZERO applied: FD status, forecast already zeroed
+          return `<div style="margin-top:8px;padding:8px 12px;background:#4a148c;border:1px solid #6a1b9a;border-radius:6px;font-size:11px;color:#fff;">
+            <div style="font-weight:700;margin-bottom:3px;">&#x2713; F_POG_END_ZERO Applied -- Status is FD (Future Delete)</div>
+            <div>AI forecast zeroed from <b>W${_zeroWk}</b> onward (6 weeks before POG End Date <b>${fmtDate(pogEnd)}</b>).${_exp > 0 ? ' ' + _exp.toLocaleString() + ' units of demand removed to prevent overstock.' : ''}</div>
+          </div>`;
+        }
+      })()}
     </div>`;
 }
 

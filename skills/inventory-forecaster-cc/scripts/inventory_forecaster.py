@@ -10123,6 +10123,67 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         except (ValueError, AttributeError, TypeError):
             pass   # malformed POG date or missing fields — fall through to normal model
 
+    # F_POG_END_ZERO / F_POG_END_WARN — POG End Date behavior (2026-05-26)
+    # F_POG_END_ZERO: Status starts with "FD" (Future Delete) + POG End Date set
+    #   -> Hard-zero AI PRJ from 6 weeks before POG End Date through W26.
+    # F_POG_END_WARN: Status starts with "A" (Active) + POG End Date within horizon
+    #   -> No forecast change; fire a giant driver warning about overstock exposure.
+    _pog_end_warn     = False  # surfaced in result dict for viewer banner
+    _pog_end_zero_wk  = 0     # 1-based week number of cutoff (0 = not applicable)
+    _pog_end_exposure = 0     # AI PRJ units at/past cutoff (before zeroing for FD)
+    _pog_end_str_e    = (str(row.get("POG_End_Date") or "")).strip()[:10]
+    if _pog_end_str_e:
+        try:
+            _pog_end_date_e    = date.fromisoformat(_pog_end_str_e)
+            _pog_cutoff_date_e = _pog_end_date_e - timedelta(weeks=6)
+            # W1 date derivation — identical to F_POG_FUTURE
+            _pe_col0     = ORIG_PRJ_COLS[0]
+            _pe_m, _pe_d = int(_pe_col0[0:2]), int(_pe_col0[3:5])
+            _pe_today    = date.today()
+            _pe_w1       = date(_pe_today.year, _pe_m, _pe_d)
+            if (_pe_w1 - _pe_today).days < -180:
+                _pe_w1 = date(_pe_today.year + 1, _pe_m, _pe_d)
+            _pe_cutoff_idx = (_pog_cutoff_date_e - _pe_w1).days // 7  # 0-based
+            _pe_status     = (str(row.get("Status_Cust") or "")).strip().upper()
+            _pe_is_fd      = _pe_status.startswith("FD")
+            _pe_is_active  = _pe_status.startswith("A") and not _pe_is_fd
+            if _pe_cutoff_idx < 26:  # cutoff falls within our 26-week horizon
+                _pe_start         = max(0, _pe_cutoff_idx)
+                _pog_end_exposure = int(sum(fcst[_pe_start:26]))
+                _pog_end_zero_wk  = max(1, _pe_cutoff_idx + 1)  # 1-based, clamp to W1
+                if _pe_is_fd:
+                    # F_POG_END_ZERO: hard zero from cutoff week onward
+                    for _wi in range(_pe_start, 26):
+                        fcst[_wi] = 0
+                    _fire("F_POG_END_ZERO")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F_POG_END_ZERO: Status is FD (Future Delete). "
+                            f"POG End Date {_pog_end_str_e}. "
+                            f"AI forecast zeroed W{_pog_end_zero_wk}-W26 "
+                            f"(cutoff = {_pog_cutoff_date_e.isoformat()}, "
+                            f"6 weeks before POG End). "
+                            f"{_pog_end_exposure:,} units of demand removed "
+                            f"to prevent overstock."
+                        )
+                elif _pe_is_active and _pog_end_exposure > 0:
+                    # F_POG_END_WARN: no forecast change, fire giant warning
+                    _pog_end_warn = True
+                    _fire("F_POG_END_WARN")
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F_POG_END_WARN WARNING: POG End Date is "
+                            f"{_pog_end_str_e}. Zero-out target is W{_pog_end_zero_wk} "
+                            f"({_pog_cutoff_date_e.isoformat()}, 6 weeks before POG End). "
+                            f"AI forecast has {_pog_end_exposure:,} units projected at/past "
+                            f"W{_pog_end_zero_wk} -- these represent overstock risk if the "
+                            f"POG ends as planned. Status @ Cust is still Active. "
+                            f"Change Status @ Cust to FD (Future Delete) and the AI will "
+                            f"zero the forecast automatically."
+                        )
+        except (ValueError, AttributeError, TypeError):
+            pass   # malformed POG end date — skip silently
+
     # F61 — Horizon confidence decay (2026-05-17).
     # Planners systematically cut the AI back-half forecast (W9-W26) more
     # aggressively than the near-term.  For items without strong seasonal
@@ -13408,6 +13469,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "f70_switchover":        dict(_f70_sw_entry),
         "f70_zeroed_weeks":      dict(_f70_week_map),
         "f70_planner_protected": _f70_planner_protected,
+        # F_POG_END_ZERO / F_POG_END_WARN — POG end date flags (2026-05-26)
+        # pog_end_warn: True when status is Active and AI PRJ extends past cutoff
+        # pog_end_zero_wk: 1-based week of cutoff (0 = not applicable)
+        # pog_end_exposure: AI PRJ units at/past cutoff before any zeroing
+        "pog_end_warn":     _pog_end_warn,
+        "pog_end_zero_wk":  _pog_end_zero_wk,
+        "pog_end_exposure": _pog_end_exposure,
     }
 
 
@@ -13719,6 +13787,10 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         # Status fields — needed by narrative to detect unexplained planner truncations
         "status_cust":   (str(row.get("Status_Cust") or "")).strip(),
         "item_status":   (str(row.get("PT_Item_Status") or "")).strip(),
+        # POG end flags (always false for validation records — forecaster sets these)
+        "pog_end_warn":     False,
+        "pog_end_zero_wk":  0,
+        "pog_end_exposure": 0,
     }
 
 

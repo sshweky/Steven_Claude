@@ -146,7 +146,7 @@ var IF_RCV = [28,35,36,50,51,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,
 var IF_PRJ = [146,147,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173];
 var IF_ATS = [716,717,718,719,720,715,722,723,724,725,726,727,728,729,730,731,902,903,904,905,906,907,908,909,910,911];
 
-var PRJ_F = { Mstyle:196, CustName:376, StatusCust:10, PTItemStatus:374, Brand:398, Description:399, AcctMStyleKey:292 };
+var PRJ_F = { Mstyle:196, CustName:376, StatusCust:10, PTItemStatus:374, Brand:398, Description:399, AcctMStyleKey:292, POGEndDate:1595 };
 var PRJ_MANUAL = [22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97];
 
 // -- QB API --------------------------------------------------------------------
@@ -437,9 +437,33 @@ async function loadData() {
     if (!ms) continue;
     var weekly = PRJ_MANUAL.map(function(fid){return toNum((row[fid]||{}).value);});
     var total  = weekly.reduce(function(a,b){return a+b;},0);
-    if (!prjByMs[ms]) prjByMs[ms] = { custs:[], desc:desc, brand:brand };
+    if (!prjByMs[ms]) prjByMs[ms] = { custs:[], desc:desc, brand:brand, pog_end_warns:[] };
     else { if(desc && !prjByMs[ms].desc) prjByMs[ms].desc=desc; if(brand && !prjByMs[ms].brand) prjByMs[ms].brand=brand; }
     prjByMs[ms].custs.push({ customer:cust, weekly:weekly, total:total });
+    // F_POG_END_WARN: detect active customers approaching POG End Date cutoff (6 wks before)
+    var _peStr = (String((row[PRJ_F.POGEndDate]||{}).value||'')).trim().slice(0,10);
+    var _peSC  = (String((row[PRJ_F.StatusCust]||{}).value||'')).trim().toUpperCase();
+    if (_peStr && _peSC.startsWith('A')) {
+      var _peDate = new Date(_peStr);
+      if (!isNaN(_peDate.getTime())) {
+        var _peCutoff = new Date(_peDate.getTime() - 6 * 7 * 86400000);
+        var _peToday  = new Date(); _peToday.setHours(0,0,0,0);
+        var _peW1Sun  = new Date(_peToday); _peW1Sun.setDate(_peToday.getDate() - _peToday.getDay());
+        var _peCutIdx = Math.floor((_peCutoff - _peW1Sun) / (7 * 86400000));
+        if (_peCutIdx < 26) {
+          var _peStart   = Math.max(0, _peCutIdx);
+          var _peExp     = weekly.slice(_peStart).reduce(function(a,b){return a+b;}, 0);
+          if (_peExp > 0) {
+            prjByMs[ms].pog_end_warns.push({
+              customer: cust,
+              pog_end:  _peStr,
+              cutoff_wk: Math.max(1, _peCutIdx + 1),
+              exposure:  _peExp
+            });
+          }
+        }
+      }
+    }
   }
 
   // Build records from Inventory Flow
@@ -564,6 +588,7 @@ async function loadData() {
       qty_oh_root:0, it_iw_root:0, ats_oh_oo_root:0, assembleable_kits:0,
       open_pos:openPos,
       manual_demand_26w:manDem26w, customer_demand:custDemand, demand_26w:0,
+      pog_end_warns: pi.pog_end_warns || [],
       pipeline_total:0, oh_excess:0, pipeline_excess:0, pipeline_wos:0,
       gap_weeks:[], overstocked:false, stock_status:'', recommendations:[], priority:'LOW', flag:'',
       purchase_rec:0, purchase_rec_etd:null, purchase_rec_push_supplier:false,
@@ -1746,7 +1771,25 @@ function renderDetail(r) {
       +'</div>';
   }
 
-  return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+stockStatusBox+'</div></div><div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">- hover Expected Receipts cells for PO detail / hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+invGapBanner+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div><div class="section"><h3>&#127919; Recommended Actions</h3><div class="recs-wrap">'+recs+'</div></div>'+purRecSection+'</div>';
+  // POG End Date overstock warning — fires when any customer is Active + within 6 wks of POG End
+  var pogEndWarnHtml = '';
+  if (r.pog_end_warns && r.pog_end_warns.length > 0) {
+    var _pwItems = r.pog_end_warns.map(function(w) {
+      return '<li><b>' + esc(w.customer) + '</b>: POG End ' + fmtDate(w.pog_end)
+        + ', zero-out target W' + w.cutoff_wk
+        + (w.exposure > 0 ? ' -- ' + fmt(w.exposure) + ' units at overstock risk' : '')
+        + '</li>';
+    }).join('');
+    pogEndWarnHtml = '<div class="section">'
+      + '<h3 style="color:#b71c1c;">&#x26A0; POG End Date -- Overstock Alert</h3>'
+      + '<div style="padding:10px 12px;background:#ffebee;border:2px solid #ef9a9a;border-radius:4px;font-size:11px;color:#b71c1c;">'
+      + '<div style="font-weight:700;font-size:12px;margin-bottom:6px;">One or more customers are within 6 weeks of their POG End Date. AI forecast extends past the zero-out cutoff, creating overstock risk.</div>'
+      + '<ul style="margin:4px 0;padding-left:18px;">' + _pwItems + '</ul>'
+      + '<div style="margin-top:8px;font-style:italic;color:#880000;">Status @ Cust is Active for all items above. If the buyer has confirmed the POG is ending, change Status @ Cust to FD (Future Delete) in the Forecast Manager -- the AI will zero the forecast automatically from the cutoff week.</div>'
+      + '</div></div>';
+  }
+
+  return '<div class="dwrap"><div class="section" style="padding:10px 14px;"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">'+identityBox+itemDataBox+stockStatusBox+'</div></div>'+pogEndWarnHtml+'<div class="section"><h3>&#128230; Inventory Flow <span style="font-size:10px;font-weight:400;color:#888;">- hover Expected Receipts cells for PO detail / hover Prj Demand cells for customer breakdown</span></h3><div style="overflow-x:auto">'+invFlow+'</div>'+invGapBanner+kpiStrip+'</div><div class="section"><h3>&#128197; Aged Inventory</h3>'+agedInvHtml+'</div><div class="section"><h3>&#127919; Recommended Actions</h3><div class="recs-wrap">'+recs+'</div></div>'+purRecSection+'</div>';
 }
 
 // -- Reco spreadsheet ----------------------------------------------------------
