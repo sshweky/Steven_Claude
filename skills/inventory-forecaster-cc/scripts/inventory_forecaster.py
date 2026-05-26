@@ -8022,9 +8022,10 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
     _l4w_months = {(_today - timedelta(days=d)).month for d in range(28)}
     _event_overlap = bool(_l4w_months & _event_months)
 
-    if l4w > l13w * 1.15 and not _event_overlap:
+    if l4w >= l13w * 1.075 and not _event_overlap:
+        spike_pct = (l4w / l13w - 1) * 100 if l13w > 0 else 0
         return 0.60 * l4w + 0.40 * l13w, (
-            f"L4W blend (L4W {l4w:.0f} > L13W {l13w:.0f} x 1.15, "
+            f"L4W blend (spike +{spike_pct:.1f}% L4W vs L13W, threshold 7.5%, "
             f"no event overlap)"
         )
     if _event_overlap:
@@ -8032,7 +8033,7 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
         return l13w, (
             f"L13W anchor (event overlap in L4W window: months {_ev_hit})"
         )
-    return l13w, f"L13W anchor (L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.15)"
+    return l13w, f"L13W anchor (no spike: L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.075)"
 
 
 def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
