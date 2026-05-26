@@ -15983,6 +15983,15 @@ def main():
     _sw_backfill = _switchover_backfill(rows, list(ORIG_PRJ_COLS))
     _apply_switchover_backfill(_sw_backfill, dry_run=bool(getattr(args, "dry_run", False)))
 
+    # Stash switchover alerts on the originating rows so forecast_record()
+    # can surface them in the AI_ANALYSIS narrative for planner visibility.
+    if _sw_backfill["alerts"]:
+        _sw_alert_by_key = {a["key"]: a["msg"] for a in _sw_backfill["alerts"]}
+        for _r in rows:
+            _k = _r.get("Acct_MStyle_Key_", "")
+            if _k in _sw_alert_by_key:
+                _r["_switchover_alert"] = _sw_alert_by_key[_k]
+
     # ── Phase 2: Pull master pack + Season ─────────────────────────
     # 2026-05-25: migrated from CData to QB direct REST API.  The legacy CData
     # query "SELECT ... FROM Styles WHERE Mstyle IN (...)" looked narrow but
