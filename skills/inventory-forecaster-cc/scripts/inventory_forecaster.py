@@ -12476,11 +12476,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             if isinstance(meta, dict):
                 meta.setdefault("drivers", []).append(
                     f"F_AMZ_RPL Active Replen override: "
-                    f"demand={_rpl_demand:.0f}/wk "
-                    f"({'POS-primary 65/35 blend' if _rpl_pos_primary else ('max(POS,Ord) -- accel' if _rpl_item_accel else 'max(POS,Ord)')}; "
+                    f"demand={_rpl_demand:.0f}/wk ({_rpl_baseline_src}; "
                     f"POS L13W={_rpl_pos_l13:.0f}/wk, "
                     f"POS L4W={_rpl_pos_l4w:.0f}/wk, "
-                    f"Ord L13W all-wks={_rpl_ord_l13:.0f}/wk); "
+                    f"Ord L13W all-wks={_rpl_ord_l13:.0f}/wk -- diagnostic only, "
+                    f"Order history no longer drives baseline); "
                     f"corr basis={_rpl_corr_demand:.0f}/wk; "
                     f"{_rpl_inv_note}.{_rpl_aur_note}{_rpl_t5_note}"
                     f"{_rpl_var_note} "
