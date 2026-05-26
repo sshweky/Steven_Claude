@@ -12919,6 +12919,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         season       = season,
     )
 
+    # [DBG F87] temporary
+    _dbg_k = row.get("Acct_MStyle_Key_","")
+    if "FF12689" in _dbg_k:
+        print(f"  [DBG pre-return] key={_dbg_k} fcst_w14={fcst[13] if len(fcst)>13 else '?'} model={model}")
     return {
         "key":         row["Acct_MStyle_Key_"],
         "mstyle":      row.get("Mstyle", ""),
