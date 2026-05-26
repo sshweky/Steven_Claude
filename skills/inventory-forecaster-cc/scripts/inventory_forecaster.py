@@ -5247,55 +5247,32 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     }
 
     adjusted    = list(fcst)
-    cohorts     = []   # list of [original_qty, age]; new cohorts born at age 0
     adjustments = []
 
     for w in range(min(26, len(fcst))):
-        own = float(fcst[w])
+        demand = float(fcst[w])
 
         # Horizon gate: if this week is at or beyond LT+Trans Days, we can
         # still order from the supplier -- inventory position is irrelevant.
-        # Leave the AI forecast untouched, let any pending cohort backlog
-        # continue aging, but do NOT cap or record an adjustment.
+        # Leave the AI forecast untouched.
         if (w + 1) >= _lt_trans_weeks:
-            # Age and prune cohorts so backlog doesn't pile up past the horizon
-            cohorts = [[q, a + 1] for q, a in cohorts if a + 1 < 4]
             continue
 
         # Capacity = Beg Inv + this week's receipts - this week's open orders.
         # Open Orders are committed customer POs that take priority over the
         # forecast.  Floor at 0 -- if we're already oversold to open orders,
         # the AI forecast simply can't ship anything this week.
-        capacity = beg_inv + rcv[w] - opn[w]
-        capacity = max(0.0, capacity)
+        capacity = max(0.0, beg_inv + rcv[w] - opn[w])
 
-        # Recoverable backlog from prior unmet cohorts -- linear decay against
-        # ORIGINAL cohort qty.  Cohort at age 0 contributes 100% (it's already
-        # baked into own forecast for THIS week; cohorts born here are aged
-        # AFTER they're added so they don't double-count this same week).
-        backlog = sum(q * max(0.0, 1.0 - 0.25 * a) for q, a in cohorts)
-
-        # This week's real demand = own forecast + still-recoverable backlog
-        real_demand = own + backlog
-
-        if capacity >= real_demand:
-            ship = real_demand
-            # Capacity fully satisfied demand -- age existing cohorts and prune
-            # any that hit age 4+ (fully decayed).  We DON'T clear all cohorts
-            # because partial-ship satisfaction doesn't extinguish a cohort
-            # under linear-against-original semantics -- the cohort just keeps
-            # decaying on schedule.
-            cohorts = [[q, a + 1] for q, a in cohorts if a + 1 < 4]
+        # Cap-only model (no rollforward): we ship min(demand, capacity).
+        # Unmet demand in this week is NOT rolled into future weeks -- Amazon
+        # will simply order less in W and re-order at its normal cadence
+        # later.  Event-driven lifts (T5 / Prime Day / etc.) still land in
+        # their scheduled weeks because we don't manufacture phantom catch-up.
+        if capacity >= demand:
+            ship = demand
         else:
-            ship  = capacity
-            unmet = real_demand - capacity
-            # Age existing cohorts first (drop age 4+)
-            cohorts = [[q, a + 1] for q, a in cohorts if a + 1 < 4]
-            # Create a new cohort for this week's unmet at age 0 (will contribute
-            # 100% if not satisfied next week -- we then immediately age it to 1
-            # for the next iteration).
-            if unmet > 0:
-                cohorts.append([unmet, 1])
+            ship = capacity
 
         adjusted[w] = int(round(ship))
 
@@ -5303,13 +5280,13 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
         ending_inv = beg_inv + rcv[w] - ship - opn[w]
         beg_inv = max(0.0, ending_inv)
 
-        if adjusted[w] != int(round(own)):
+        if adjusted[w] != int(round(demand)):
             adjustments.append({
                 "week":     w + 1,
-                "original": int(round(own)),
+                "original": int(round(demand)),
                 "adjusted": adjusted[w],
                 "capacity": int(round(capacity)),
-                "backlog":  int(round(backlog)),
+                "backlog":  0,   # legacy field, always 0 -- no rollforward
             })
 
     return adjusted, adjustments, lt_info
@@ -10436,13 +10413,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _changed_weeks = sorted({a["week"] for a in _f37_adjustments})
                 _lt_wks = _f37_lt_info["lt_trans_weeks"]
                 meta.setdefault("drivers", []).append(
-                    f"F37 OH-shortfall adjustment (v2 fresh-cascade): "
-                    f"{len(_f37_adjustments)} weeks capped at available inv "
+                    f"F37 OH-shortfall adjustment (v2 cap-only, no rollforward): "
+                    f"{len(_f37_adjustments)} weeks capped at warehouse OH "
                     f"(weeks {','.join(map(str, _changed_weeks[:8]))}"
                     f"{'...' if len(_changed_weeks) > 8 else ''}); "
-                    f"constraint lifted from W{_lt_wks}+ (LT+Trans={_f37_lt_info['lt_trans_days']}d); "
-                    f"unmet demand rolled forward with linear 25%/wk decay vs "
-                    f"original cohort qty, expiring at age 4."
+                    f"constraint lifted from W{_lt_wks}+ (LT+Trans={_f37_lt_info['lt_trans_days']}d). "
+                    f"Unmet demand in capped weeks is NOT rolled forward -- Amazon "
+                    f"orders that week's reduced amount and re-orders on its normal "
+                    f"cadence; downstream event lifts (Prime Day, T5, Black Friday) "
+                    f"land on their scheduled ordering weeks rather than being masked "
+                    f"by phantom catch-up cohorts."
                 )
     elif _f37_skip and isinstance(meta, dict):
         if not _inv_flow_rec:
