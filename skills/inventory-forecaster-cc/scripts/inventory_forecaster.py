@@ -11393,7 +11393,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _fdclag_opo        = float(amz_catalog.get("Inv_OPO") or 0)
             _fdclag_lw_pos     = float(pos_data.get("Ordered_Units_LW") or 0)
             _fdclag_rate       = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
-            _fdclag_target_wos = (AMZ_WOS_TARGET_MIN + AMZ_WOS_TARGET_MAX) / 2.0
+            _fdclag_target_wos = AMZ_WOS_TARGET_MIN   # 10.0 wks
         elif not is_amazon and rtl_pos:
             _fdclag_dc_oh  = float(rtl_pos.get("OH_Units_LW")  or 0)
             _fdclag_opo    = 0.0   # open PO not tracked in retailer POS table
