@@ -10025,13 +10025,20 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _pog_iso_placed = _pog_iso_hist or _pog_iso_open_po
 
                 # --- ramp base ---
-                if _pog_stores > 0 and _pog_upspw > 0:
+                # No L13W fallback: for a future POG the only prior order is the
+                # ISO fill, which is a one-time event and not a velocity signal.
+                # If either Store_Count or UPSPW is missing we cannot compute a
+                # rate -- set to 0 and surface a planner warning.
+                _pog_missing_fields = []
+                if _pog_stores <= 0:
+                    _pog_missing_fields.append("Store Count")
+                if _pog_upspw <= 0:
+                    _pog_missing_fields.append("UPSPW")
+
+                if not _pog_missing_fields:
                     _pog_ramp_base = float(snap(_pog_stores * _pog_upspw * 0.75, mp))
                 else:
-                    # fallback: L13W shipment avg
-                    _pog_l13_vals  = [float(v or 0) for v in hist[-13:]]
-                    _pog_l13_avg   = sum(_pog_l13_vals) / 13 if _pog_l13_vals else 0
-                    _pog_ramp_base = float(snap(_pog_l13_avg, mp)) if _pog_l13_avg >= mp else 0.0
+                    _pog_ramp_base = 0.0   # cannot forecast ramp without both fields
 
                 # --- POS adjustment ---
                 _pog_pos_lw = float((rtl_pos or {}).get("POS_Units_LW") or 0)
@@ -10081,11 +10088,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"Est. ISO {_pog_iso_qty:,}u" if _pog_est_iso > 0
                         else f"Stores({_pog_stores}) x MP({mp}) = {_pog_iso_qty:,}u"
                     )
-                    _pramp_src = (
-                        f"Stores({_pog_stores}) x UPSPW({_pog_upspw:.1f}) x 75% = {int(_pog_ramp_base):,}u/wk"
-                        if _pog_stores > 0 and _pog_upspw > 0
-                        else f"L13W fallback = {int(_pog_ramp_base):,}u/wk"
-                    )
                     _piso_note = (
                         "ISO already placed (skipped)"
                         if _pog_iso_placed
@@ -10095,13 +10097,29 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"; POS_LW={int(_pog_pos_lw):,}u -> adjusted {_pog_pos_adj}"
                         if _pog_pos_adj else ""
                     )
-                    meta.setdefault("drivers", []).append(
-                        f"F_POG_FUTURE: POG starts W{_pog_w_idx_f + 1} "
-                        f"({_pog_launch_str_f}). {_piso_note}. "
-                        f"Dead zone W{_pog_iso_idx + 2}-W{_pog_ramp_idx} "
-                        f"(3 wks). Ramp W{_pog_ramp_idx + 1}+: {_pramp_src}"
-                        f"{_ppos_note}."
-                    )
+                    if _pog_missing_fields:
+                        # Cannot compute ramp -- warn planner to fill in the fields
+                        _miss_str = " and ".join(_pog_missing_fields)
+                        meta.setdefault("drivers", []).append(
+                            f"F_POG_FUTURE WARNING: POG starts W{_pog_w_idx_f + 1} "
+                            f"({_pog_launch_str_f}). {_piso_note}. "
+                            f"RAMP FORECAST IS ZERO -- {_miss_str} not set on this record. "
+                            f"Ship history cannot substitute (the only prior order is the "
+                            f"ISO fill, not a repeating velocity signal). "
+                            f"Please enter {_miss_str} in Quickbase to generate a ramp forecast."
+                        )
+                    else:
+                        _pramp_src = (
+                            f"Stores({_pog_stores}) x UPSPW({_pog_upspw:.1f}) x 75% "
+                            f"= {int(_pog_ramp_base):,}u/wk"
+                        )
+                        meta.setdefault("drivers", []).append(
+                            f"F_POG_FUTURE: POG starts W{_pog_w_idx_f + 1} "
+                            f"({_pog_launch_str_f}). {_piso_note}. "
+                            f"Dead zone W{_pog_iso_idx + 2}-W{_pog_ramp_idx} "
+                            f"(3 wks). Ramp W{_pog_ramp_idx + 1}+: {_pramp_src}"
+                            f"{_ppos_note}."
+                        )
         except (ValueError, AttributeError, TypeError):
             pass   # malformed POG date or missing fields — fall through to normal model
 
