@@ -8371,6 +8371,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _baseline_override = 0.0   # fall through to normal model selection
             _EXPIRED_OVERRIDES.append(row.get("Acct_MStyle_Key_", ""))
 
+    # Track whether an active override was suppressed by another rule (new-launch
+    # ramp).  Surfaced in the AI Analysis narrative so a planner who set an
+    # override but sees the AI ignoring it understands why.
+    _ovr_suppressed_by_ramp = (_baseline_override > 0 and _f73_new_ramp)
+
     _rtl_wos_r = None
     if (rtl_pos is not None
             and float(rtl_pos.get("OH_WOS") or 0) > 0
