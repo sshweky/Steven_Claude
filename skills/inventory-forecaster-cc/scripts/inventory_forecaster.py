@@ -11018,9 +11018,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _f59a_floor = 0.0
     _f59a_momentum = False
     _f59_f18_capped = False
-    # [DBG F87]
-    if "FF12689" in (row.get("Acct_MStyle_Key_","") or ""):
-        print(f"  [DBG line-11007] fcst_w14={fcst[13] if len(fcst)>13 else '?'}")
     if is_amazon and not model.startswith("Inactive") and not model.startswith("OTB"):
 
         # ── Velocity baselines with OOS-week exclusion (F59c) ────────────────
@@ -11678,10 +11675,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"inventory noise. Model: {model}."
                         )
                 else:
-                    # [DBG F87]
-                    if "FF12689" in (row.get("Acct_MStyle_Key_","") or ""):
-                        _dbg_fcst14 = fcst[13] if len(fcst)>13 else "?"
-                        print(f"  [DBG mid-11643] fcst_w14={_dbg_fcst14}")
                     if _f59i_ratio > 1.40 and _f59i_ec_override:
                         # EC-transition anchor: inherited parent history
                         # over-represents forward demand for the new EC ASIN.
