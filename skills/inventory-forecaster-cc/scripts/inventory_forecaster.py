@@ -5138,16 +5138,28 @@ def nz_rate(history, window=26):
 
 def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     """
-    F37 v2 — Forward inventory-shortfall adjustment (2026-05-26 rewrite).
+    F37 v2 — Forward inventory-shortfall adjustment (rewritten 2026-05-26).
 
-    NEW DESIGN (replaces 2026-05-05 version):
-      - Reads RAW components from Inventory_Flow table (Beg_Inv_Wk1,
-        RcvWk0..RcvWk26, OpnWk0..OpnWk26) via `inv_flow` dict passed in.
-      - Computes the 26-week cascade FRESH in Python using THIS run's AI
-        forecast, instead of reading stale Inv_Wk* fields on Projections
-        that were derived from the PREVIOUS run's AI projection.
-      - Removes the F37h-cat bypass entirely -- cat-profile items no longer
-        need to skip F37 since the cascade is no longer stale.
+    Two-stage forecast model (per planner directive 2026-05-26):
+      Stage 1 (upstream of F37) -- DEMAND generation.
+        AI forecast = what Amazon will order from us, driven by Amazon's DC
+        level + POS rate.  Independent of OUR warehouse capacity.
+      Stage 2 (THIS function) -- SUPPLY constraint.
+        Cap each week's forecast at what we CAN ship from our warehouse.
+        capacity_w = max(0, beg_inv_w + rcv[w] - opn[w])
+        ship_w     = min(demand_w, capacity_w)
+        beg_inv_{w+1} = max(0, beg_inv_w + rcv[w] - ship_w - opn[w])
+
+      KEY CHANGE FROM PRIOR VERSION (2026-05-26):
+        NO cohort rollforward.  Unmet demand in week W is LOST (Amazon will
+        order less that week, not double-order to make up).  The previous
+        version created phantom catch-up cohorts that decayed 25%/wk for 4
+        weeks -- those produced fake mid-horizon spikes (e.g. W5 = 11,513
+        when warehouse was empty W1-W4) that landed on the wrong weeks and
+        masked the real event-driven lift schedule (Prime Day pre-buy, T5,
+        Black Friday).  Without rollforward, capped weeks show the actual
+        warehouse cap, and downstream event lifts (W22-W26 T5, etc.) land
+        on the correct ordering weeks.
 
     `inv_flow` dict (passed by caller from `fetch_inv_flow_qb_rest()` output):
         {
