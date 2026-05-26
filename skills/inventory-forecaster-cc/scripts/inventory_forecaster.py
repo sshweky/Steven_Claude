@@ -8317,6 +8317,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             description, product_category, product_subcategory,
             brand, brand_pt, season)
 
+    # Check expiry: auto-dismiss overrides older than 30 days.
+    _ovr_date_str = str(row.get("Baseline_Override_Date") or "").strip()
+    _ovr_expired  = False
+    if _baseline_override > 0 and _ovr_date_str:
+        try:
+            _ovr_set = date.fromisoformat(_ovr_date_str[:10])
+            if (date.today() - _ovr_set).days > 30:
+                _ovr_expired      = True
+                _baseline_override = 0.0   # fall through to normal model
+                _EXPIRED_OVERRIDES.append(row.get("Acct_MStyle_Key_", ""))
+        except (ValueError, TypeError):
+            pass   # malformed date — treat as no expiry, proceed normally
+
     if _baseline_override > 0 and not _f73_new_ramp:
         _fire("F_BASELINE_OVR")
         _ovr_mults = _category_week_multipliers(
