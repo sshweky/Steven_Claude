@@ -8611,6 +8611,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f85_synth = {
                 "Avg_Units_Wk_L4w":  pos_data.get("Avg_Units_Wk_L4w")  or 0,
                 "Avg_Units_Wk_L13w": _f85_pos_l13,
+                "Ordered_Units_LW":  pos_data.get("Ordered_Units_LW")  or 0,   # LW POS proxy
                 "OH_Units_LW":       _f85_soh,
                 "OH_WOS":            _f85_wos,
             }
@@ -12457,8 +12458,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             "aur_l4w":   float((amz_catalog or {}).get("AUR_L4w")   or 0),
             "map_price": float((amz_catalog or {}).get("MAP_Price") or 0),
         }
+        _rpl_pos_lw   = float(pos_data.get("Ordered_Units_LW") or 0)   # LW POS proxy
         _rpl_demand, _rpl_baseline_src = _compute_pos_baseline(
-            _rpl_pos_l4, _rpl_pos_l13, amz_aur_data=_rpl_aur_data
+            _rpl_pos_l4, _rpl_pos_l13, lw=_rpl_pos_lw, amz_aur_data=_rpl_aur_data
         )
 
         _rpl_pos_primary = True   # always POS-primary now
