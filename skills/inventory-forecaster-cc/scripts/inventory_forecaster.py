@@ -8344,6 +8344,18 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #   3. Compute the POS-WOS result -- skipped when override is still active
     #      OR when this is a new-launch ramp (those have their own logic).
     #   4. Branch: F_BASELINE_OVR > F_RTL_POS_WOS > pattern-based routing.
+    #
+    # Composition with downstream rules (deliberate, not accidental):
+    #   - F_RTL_WOS post-correction: EXCLUDED for "Manual Baseline (override)"
+    #     (already applies its own WOS fill, double-correction would be wrong).
+    #   - F37 OH-shortfall caps: APPLIES.  Override is a demand signal; F37 is
+    #     a supply-side reality check.  Both must compose.
+    #   - F58 Tell-AI comment replay: APPLIES.  Override sets the baseline;
+    #     F58 is the tactical event layer (e.g. "zero W13-W26 for transition").
+    #     User explicitly asked for AI to "adjust for promo lifts etc." -- F58
+    #     IS that adjustment layer.
+    #   - F65, F68, F69, F70, F72, F73 ramp, snap-to-MP, bi-weekly: APPLY.
+    #     These shape WHEN the demand lands; override sets HOW MUCH per week.
     _opn_w1            = float(row.get("Opn_W1")           or 0)
     _baseline_override = float(row.get("Baseline_Override") or 0)
 
