@@ -1433,7 +1433,7 @@ def fetch_projections_qb_rest(prj_cols, args):
         ["Acct_MStyle_Key_", "Mstyle", "Customr_Name", "Description", "Status_Cust",
          "PT_Item_Status", "Div", "Shpd_Wk_L13W_cust_", "Last_Ord_Date", "Last_Shp_Date",
          "Inventory_Manager", "Flagged", "Auto_Project", "POG_Launch_Date", "POG_End_Date",
-         "Store_Count",
+         "Store_Count", "Estimated_ISO", "UPSPW",
          "Product_Category", "Product_Subcategory", "Brand",
          "Baseline_Override",           # FID 1614 — planner-set manual baseline (units/wk)
          "Baseline_Override_Date"]      # FID 1615 — date the override was set; auto-expires after 30 days
@@ -8174,6 +8174,17 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     baseline_pps, _baseline_src = _compute_pos_baseline(
         l4w, l13w, lw=lw, amz_aur_data=amz_aur_data
     )
+    # F88 (2026-05-26): POS snap-to-zero guard.
+    # When the POS rate is so low that it rounds to zero against the master
+    # pack (e.g. 4 consumer units/wk vs MP=48), projecting 26 × snap(4,48)=0
+    # gives an all-zero forecast that triggers G2 and shows the item as
+    # "Inactive (zeroed by guards)" -- misleading for an item whose wholesale
+    # ORDER history shows real replenishment events.
+    # Fix: return None so forecast_record falls through to the order-history
+    # model (Sparse Intermittent), which anchors on actual batch order events
+    # rather than consumer sell-through too small to fill even one master pack.
+    if snap(baseline_pps, mp) == 0:
+        return None   # POS baseline snaps to 0 at this MP -- fall through to order-history model
     # -- Step 2: WOS fill ----------------------------------------------------
     # F86 (2026-05-25) OH data guard: if oh_lw == 0 AND oh_wos == 0, the
     # retailer did not report DC inventory for this item this week.  Don't
