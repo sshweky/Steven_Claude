@@ -11773,6 +11773,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"{_f59i_desc}. Model: {model}."
                         )
 
+    _f35d_f59j_fired = False   # set True below if F59j fires; used by F35d to skip
     # ── F59j — Amazon DC understock: POS floor + early-week restock lift ──
     # When Amazon DC WOS < 8 (below target range of 8-12 wks), Amazon will
     # order ABOVE consumer POS rate to rebuild DC inventory.  The AI should:
@@ -11820,6 +11821,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     _f59j_changed = True
             if _f59j_changed:
                 _fire("F59j")
+                _f35d_f59j_fired = True   # F35d must not double-count Amazon restock
                 if isinstance(meta, dict):
                     meta.setdefault("drivers", []).append(
                         f"F59j DC restock: WOS={_f59h_wos:.1f}wks below 8wk "
@@ -11831,6 +11833,87 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                            if _f59j_deficit > 0 else "OPO already covers 8 WOS target. ") +
                         f"All weeks floored at POS L4W {_f59j_pos_l4:,.0f}/wk."
                     )
+
+    # ── F35d — OOS-triggered DC restock to 8 WOS (2026-05-26) ───────────────
+    # Companion to F35 stockout normalization: when F35 identified a recent
+    # stockout in order history (within L13W) -- specifically the week-1 "25%
+    # cut" where 25% of demand was permanently lost -- the DC was recently OOS.
+    # If DC inventory is still below 8 WOS, this rule calculates the deficit
+    # and adds the replenishment qty to W1-W3 of the forward forecast so the
+    # buy plan includes the DC restock alongside the demand projection.
+    #
+    # Demand rate : F35 pre-stockout baseline (orders/wk before OOS onset).
+    # DC source   : Amazon Inv_SOH + Inv_OPO, or retailer OH_Units_LW.
+    # WOS target  : RTL_WOS_TARGET (8.0 wks) -- same target as F59j/F_RTL_WOS.
+    # Spread      : deficit / 3 weeks (W1-W3), skipping VP-Q4 confirmed-PO wks.
+    #
+    # Guards (any one skips F35d):
+    #   - No F35 correction within L13W (stockout not recent enough to matter)
+    #   - F59j already fired (Amazon DC restock already handled for this record)
+    #   - Model with integrated WOS fill (Retailer WOS / Amazon POS-WOS / etc.)
+    #   - No DC inventory data available
+    #   - DC already at or above 8 WOS (deficit == 0)
+    #   - Pre-OOS demand rate < 10/wk (too sparse to calculate meaningfully)
+    _F35D_WOS_TARGET  = RTL_WOS_TARGET   # 8.0
+    _F35D_RESTOCK_WKS = 3
+    _f35d_skip_models = {
+        "Retailer WOS (POS)", "Amazon POS-WOS",
+        "Inactive", "OTB (zero)",
+        "Pre-launch NEW (manual passthrough)",
+        "Manual Baseline (override)",
+    }
+    _f35d_recent = [
+        c for c in (_f35_corrections or [])
+        if c.get("start", 0) >= 39   # hist[39..51] = last 13 weeks
+    ]
+    if (_f35d_recent
+            and not _f35d_f59j_fired
+            and model not in _f35d_skip_models
+            and isinstance(fcst, list) and len(fcst) >= 3):
+        _f35d_corr   = max(_f35d_recent, key=lambda c: c["start"])
+        _f35d_demand = float(_f35d_corr.get("baseline") or 0)
+        _f35d_dc_oh  = 0.0
+        _f35d_opo    = 0.0
+        _f35d_has_dc = False
+        _f35d_src    = "none"
+        if is_amazon and amz_catalog:
+            _f35d_dc_oh  = float(amz_catalog.get("Inv_SOH") or 0)
+            _f35d_opo    = float(amz_catalog.get("Inv_OPO") or 0)
+            _f35d_has_dc = (_f35d_dc_oh > 0 or _f35d_opo > 0)
+            _f35d_src    = "Amazon Inv SOH/OPO"
+        elif rtl_pos:
+            _f35d_dc_oh  = float(rtl_pos.get("OH_Units_LW") or 0)
+            _f35d_has_dc = (_f35d_dc_oh > 0
+                            or float(rtl_pos.get("OH_WOS") or 0) > 0)
+            _f35d_src    = "RTL OH"
+        if _f35d_has_dc and _f35d_demand >= 10:
+            _f35d_pipeline   = _f35d_dc_oh + _f35d_opo
+            _f35d_target_inv = _F35D_WOS_TARGET * _f35d_demand
+            _f35d_deficit    = max(0.0, _f35d_target_inv - _f35d_pipeline)
+            if _f35d_deficit > 0:
+                _f35d_lift    = snap(_f35d_deficit / _F35D_RESTOCK_WKS, mp)
+                _f35d_changed = False
+                if _f35d_lift > 0:
+                    for _wi in range(_F35D_RESTOCK_WKS):
+                        if _wi < len(fcst) and _wi not in _vp_q4_zeroed_idx:
+                            _f35d_prev = fcst[_wi]
+                            fcst[_wi]  = snap(fcst[_wi] + _f35d_lift, mp)
+                            if fcst[_wi] != _f35d_prev:
+                                _f35d_changed = True
+                if _f35d_changed:
+                    _fire("F35d")
+                    _f35d_cur_wos = _f35d_pipeline / max(_f35d_demand, 1)
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"F35d OOS-triggered DC restock: recent stockout at "
+                            f"hist[{_f35d_corr['start']}] (pre-OOS baseline "
+                            f"{_f35d_demand:.0f}/wk, 25%+ demand permanently lost). "
+                            f"DC pipeline {_f35d_pipeline:,.0f}u = "
+                            f"{_f35d_cur_wos:.1f}wks < {_F35D_WOS_TARGET:.0f}wks "
+                            f"target ({_f35d_src}). Deficit "
+                            f"{_f35d_deficit:,.0f}u spread over "
+                            f"W1-W{_F35D_RESTOCK_WKS} (+{_f35d_lift:,.0f}u/wk each)."
+                        )
 
     # ── F59k — Amazon L4W=0 + POS also declining: EOL wind-down correction ──
     # When Amazon L4W orders have gone completely to zero AND consumer POS
