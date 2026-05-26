@@ -8027,9 +8027,9 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
 
     if l4w >= l13w * 1.075 and not _event_overlap:
         spike_pct = (l4w / l13w - 1) * 100 if l13w > 0 else 0
-        return 0.60 * l4w + 0.40 * l13w, (
-            f"L4W blend (spike +{spike_pct:.1f}% L4W vs L13W, threshold 7.5%, "
-            f"no event overlap)"
+        return 0.70 * l4w + 0.30 * l13w, (
+            f"L4W/L13W 70/30 blend (spike +{spike_pct:.1f}% L4W vs L13W, "
+            f"threshold 7.5%, no event overlap)"
         )
     if _event_overlap:
         _ev_hit = sorted(_l4w_months & _event_months)
