@@ -2791,9 +2791,12 @@ function autoFlagOnComment(key) {
   const isEmpty = !txt || !txt.value.trim();
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   // FYI comments are informational — undo auto-flag when textarea is cleared OR FYI is checked
-  const _fyiChkAuto = document.getElementById('cmt-fyi-' + key);
-  const flagSel     = document.getElementById('cmt-flag-' + key);
-  const _isFyi      = (_fyiChkAuto && _fyiChkAuto.checked) || (flagSel && flagSel.value === 'FYI');
+  const _fyiChkAuto     = document.getElementById('cmt-fyi-'     + key);
+  const _aiTrainChkAuto = document.getElementById('cmt-aitrain-' + key);
+  const flagSel         = document.getElementById('cmt-flag-'    + key);
+  const _isFyi = (_fyiChkAuto     && _fyiChkAuto.checked)
+              || (_aiTrainChkAuto && _aiTrainChkAuto.checked)
+              || (flagSel && (flagSel.value === 'FYI' || flagSel.value === 'AI training'));
   if (isEmpty || _isFyi) {
     // Comment cleared or marked FYI — undo the pre-flag (UI only; no QB call since we haven't
     // written to QB yet — that only happens on Save).
@@ -4267,6 +4270,9 @@ async function toggleDetail(key) {
           ${_USER_IS_PLANNER
             ? `<label style="font-size:11px;color:#616161;display:flex;align-items:center;gap:4px;cursor:pointer;">
                  <input type="checkbox" id="cmt-fyi-${safeKey}" onchange="autoFlagOnComment('${safeKey}')" style="cursor:pointer;"> Mark as FYI
+               </label>
+               <label style="font-size:11px;color:#6a1b9a;display:flex;align-items:center;gap:4px;cursor:pointer;" title="Tag this comment as AI Training feedback so the forecaster can use it to improve future projections">
+                 <input type="checkbox" id="cmt-aitrain-${safeKey}" onchange="autoFlagOnComment('${safeKey}')" style="cursor:pointer;"> AI Training
                </label>`
             : `<label style="font-size:11px;color:#555;">Type:
                  <select id="cmt-flag-${safeKey}" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;margin-left:4px;">
@@ -5346,10 +5352,13 @@ async function loadCommentHistory(key, force) {
 // -- Add comment > INSERT into Projection Comments table --------------------
 async function addComment(key) {
   const txt    = document.getElementById('cmt-text-'   + key).value.trim();
-  // Planners only get a FYI checkbox — flag is always "Planner Response" unless checked
-  const _fyiChk = document.getElementById('cmt-fyi-' + key);
+  // Planners get FYI and AI Training checkboxes; managers get the full type dropdown
+  const _fyiChk     = document.getElementById('cmt-fyi-'     + key);
+  const _aiTrainChk = document.getElementById('cmt-aitrain-' + key);
   const flag = _fyiChk
-    ? (_fyiChk.checked ? 'FYI' : 'Planner Response')
+    ? (_aiTrainChk && _aiTrainChk.checked ? 'AI training'
+       : _fyiChk.checked ? 'FYI'
+       : 'Planner Response')
     : (document.getElementById('cmt-flag-' + key) || {value: 'Needs Action'}).value;
   const btn    = document.getElementById('cmt-btn-'    + key);
   const msg    = document.getElementById('cmt-msg-'    + key);
@@ -5380,7 +5389,7 @@ async function addComment(key) {
     //   "Needs Action"    → planner (inv_manager of the record)
     //   "Planner Response"→ primary manager (Mikey Scott)
     //   "FYI"             → no recipient (informational only)
-    if (flag !== 'FYI' && (CFG.COMMENT_FID.SEND_TO || CFG.COMMENT_FID.SEND_TO_USER)) {
+    if (flag !== 'FYI' && flag !== 'AI training' && (CFG.COMMENT_FID.SEND_TO || CFG.COMMENT_FID.SEND_TO_USER)) {
       const _recForTo = ALL_RECORDS.find(x => x.key === key);
       let _sendToText  = '';
       let _sendToEmail = '';
@@ -5438,14 +5447,16 @@ async function addComment(key) {
   msg.style.color = '#2e7d32';
   document.getElementById('cmt-text-' + key).value = '';
   // Reset comment form flag control after save
-  const _fyiChkReset = document.getElementById('cmt-fyi-' + key);
+  const _fyiChkReset     = document.getElementById('cmt-fyi-'     + key);
+  const _aiTrainChkReset = document.getElementById('cmt-aitrain-' + key);
   if (_fyiChkReset) { _fyiChkReset.checked = false; }
-  else { const _sel = document.getElementById('cmt-flag-' + key); if (_sel) _sel.value = (rec && rec.manager_reply_pending) ? 'Planner Response' : (rec && rec.planner_reply_pending) ? 'Manager Response' : 'Needs Action'; }
+  if (_aiTrainChkReset) { _aiTrainChkReset.checked = false; }
+  if (!_fyiChkReset) { const _sel = document.getElementById('cmt-flag-' + key); if (_sel) _sel.value = (rec && rec.manager_reply_pending) ? 'Planner Response' : (rec && rec.planner_reply_pending) ? 'Manager Response' : 'Needs Action'; }
   const rec    = ALL_RECORDS.find(x => x.key === key);
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   // Deferred auto-flag QB write: only now that the comment is saved do we
   // write Flagged=true to QB (autoFlagOnComment updated UI only, not QB).
-  if (rec && rec._auto_flagged && rec.flagged && flag !== 'FYI') {
+  if (rec && rec._auto_flagged && rec.flagged && flag !== 'FYI' && flag !== 'AI training') {
     try {
       const pf = {};
       pf[CFG.FID.KEY]     = { value: key };
