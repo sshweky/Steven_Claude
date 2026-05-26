@@ -7071,6 +7071,8 @@ function resetAllFilters() {
   //  -  they're filters from their perspective, even if they live in their own buttons.
   DUPES_ONLY = false;
   _syncDupesOnlyButton();
+  CLOSE_ONLY = false;
+  _syncCloseOnlyButton();
   FLAGGED_ONLY = false;
   try { sessionStorage.setItem('flaggedOnly', '0'); } catch (e) { /* ignore */ }
   _syncFlaggedOnlyButton();
@@ -7276,6 +7278,35 @@ function _syncSnoozedOnlyButton() {
   }
 }
 
+// Toggle for "Show PRJ to be Closed" toolbar button.  When true,
+// applyFilters() retains only records that look inactive but are still
+// active in QB — either:
+//   (a) r.fcst_status === 'Inactive'  (AI: no orders in 13 weeks), or
+//   (b) SWITCHOVER_MAP.has(r.key)     (COS/EC variant took over; detail
+//       pane shows the "Mark as CLOSED" button).
+// Both are signals that the projection should be closed.
+let CLOSE_ONLY = false;
+
+function toggleCloseOnly() {
+  CLOSE_ONLY = !CLOSE_ONLY;
+  _syncCloseOnlyButton();
+  applyFilters();
+}
+
+function _syncCloseOnlyButton() {
+  const btn = document.getElementById('closeOnlyBtn');
+  if (!btn) return;
+  if (CLOSE_ONLY) {
+    btn.style.background = '#6d4c41';
+    btn.style.color = '#fff';
+    btn.title = 'Currently showing PRJ-to-be-closed only  -  click to show all';
+  } else {
+    btn.style.background = '#fff';
+    btn.style.color = '#6d4c41';
+    btn.title = 'Show projections that look inactive (AI: no orders in 13 weeks) or have a switchover alert — active in QB but flagged to be closed';
+  }
+}
+
 function applyFilters() {
   const search    = document.getElementById('search').value.toLowerCase();
   const volSet        = _msSel('volFilter');
@@ -7294,12 +7325,14 @@ function applyFilters() {
   _syncDupesOnlyButton();
   _syncFlaggedOnlyButton();
   _syncSnoozedOnlyButton();
+  _syncCloseOnlyButton();
 
   FILTERED_RECORDS = ALL_RECORDS.filter(r => {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
     if (DUPES_ONLY         && !r.has_po_prj_conflict)   return false;
     if (FLAGGED_ONLY       && !r.flagged)               return false;
     if (SNOOZED_ONLY       && !r._snoozed)              return false;
+    if (CLOSE_ONLY         && r.fcst_status !== 'Inactive' && !SWITCHOVER_MAP.has(r.key)) return false;
     if (SHOW_REPLY_ONLY    && !r.planner_reply_pending) return false;
     if (SHOW_FOR_ME_ONLY && !_FOR_ME_KEYS.has(r.key)) return false;
     if (search) {
