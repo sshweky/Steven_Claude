@@ -15896,8 +15896,11 @@ def main():
             for _ekey in set(k for k in _EXPIRED_OVERRIDES if k):
                 _ed = {}
                 _ed[merge_fid]  = {"value": _ekey}
+                # QB numeric fields accept null for clearing; date fields often
+                # reject null and require an empty string instead.  Use both
+                # idioms here so the write succeeds regardless of field config.
                 _ed[_ovr_fid]   = {"value": None}
-                _ed[_ovrd_fid]  = {"value": None}
+                _ed[_ovrd_fid]  = {"value": ""}
                 _exp_data.append(_ed)
             if _exp_data:
                 try:
