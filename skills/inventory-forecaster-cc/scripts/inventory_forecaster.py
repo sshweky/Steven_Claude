@@ -7968,20 +7968,23 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
 
     Two paths depending on whether AUR (Average Unit Retail) data is provided:
 
+    Both paths share threshold = 7.5% and blend weights 70/30 (2026-05-26).
+
     Amazon path (amz_aur_data dict supplied):
       Spike detection: L4W >= L13W * 1.075 (>= 7.5% above L13W)
       If spike, check AUR_L4W vs MAP_Price:
         - AUR < MAP  → promotional pricing was active.  The spike is promo-
           driven and won't persist at full price.  Use L13W as baseline.
-        - AUR >= MAP → no promo, real demand growth.  Use a 50/50 blend of
-          L4W and L13W (lean recent but anchor to longer history).
+        - AUR >= MAP → no promo, real demand growth.  Use 0.70 * L4W +
+          0.30 * L13W -- lean heavily recent since the AUR check has
+          already confirmed the growth is at full price.
       No spike → L13W.
 
     Retailer path (amz_aur_data is None):
-      Spike rule (aligned with Amazon threshold 2026-05-26):
+      Spike rule (aligned with Amazon threshold + weights 2026-05-26):
         - L4W >= L13W * 1.075 (>= 7.5% spike) AND L4W window doesn't
           overlap event months (Jan/Jul/Nov/Dec):
-              baseline = 0.60 * L4W + 0.40 * L13W
+              baseline = 0.70 * L4W + 0.30 * L13W
           (Retailers lack AUR/MAP data so the event-month skip is the only
           guardrail against false-positive acceleration during predictable
           promo cycles -- it stays in place.)
