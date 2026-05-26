@@ -12683,6 +12683,41 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             "preserved). Clear the override or wait until the item exits ramp."
         )
 
+    # F_AMZ_W1_CADENCE — Amazon Tue/Wed pre-10am order-cadence guard.
+    # Amazon's regular weekly PO transmission lands around 10am on Tue or Wed.
+    # When the forecaster runs before that cutoff, Opn_W1 = 0 for an Amazon
+    # item does NOT mean "Amazon won't order this week" -- it just means the
+    # PO hasn't transmitted yet.  Downstream rules (F36 burn-off, F38f offline,
+    # F67 buybox, VP-Q4 PO-zero, etc.) may have zeroed W1 on the assumption
+    # that a missing PO confirms "no W1 order."  Restore W1 to the model's
+    # original value so the planner sees the expected recommendation.
+    # Conditions to restore:
+    #   - Account is Amazon
+    #   - Current local time is Tue or Wed BEFORE 10:00am
+    #   - Opn_W1 is 0 (no confirmed PO yet)
+    #   - fcst[0] is currently 0 (was zeroed by an earlier rule)
+    #   - _model_w1 > 0 (primary model originally produced a non-zero W1)
+    # If F_AMZ_RPL or another rule already restored W1 to non-zero, this guard
+    # is a no-op (fcst[0] > 0 fails the check).
+    if (is_amazon
+            and isinstance(fcst, list) and len(fcst) >= 1
+            and fcst[0] == 0
+            and _opn_w1 == 0
+            and _model_w1 > 0):
+        _now_local = datetime.now()
+        # weekday(): Mon=0, Tue=1, Wed=2
+        if _now_local.weekday() in (1, 2) and _now_local.hour < 10:
+            fcst[0] = _model_w1
+            _fire("F_AMZ_W1_CADENCE")
+            if isinstance(meta, dict):
+                _dow_name = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")[_now_local.weekday()]
+                meta.setdefault("drivers", []).append(
+                    f"F_AMZ_W1_CADENCE: restored AI W1 to {_model_w1:,} "
+                    f"(it's {_dow_name} {_now_local.hour:02d}:{_now_local.minute:02d} -- "
+                    f"before 10am Amazon PO cutoff). Opn_W1=0 here likely means the PO "
+                    f"hasn't transmitted yet, not that Amazon won't order this week."
+                )
+
     alert = ""
     if model == "Inactive" and prior > 0:
         alert = _build_alert(model, new, prior, pct, cap, mp, meta,
