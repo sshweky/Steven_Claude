@@ -8335,14 +8335,41 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         pass
 
     # -- F_BASELINE_OVR / F_RTL_POS_WOS -- Primary model selection ----------
-    # F_BASELINE_OVR fires first when a planner has manually set a baseline
-    # (units/wk) in the viewer.  The override rate is treated as the computed
-    # baseline; all downstream shaping still applies: category seasonal
-    # multipliers, snap to master pack, and (for retailer accounts with OH)
-    # WOS fill logic.  Skips the POS-WOS compute entirely when active.
-    # F_RTL_POS_WOS fires next when POS + OH data are available (no override).
+    # Order of operations (important for correctness):
+    #   1. Read both signals from the row.
+    #   2. Check Baseline Override expiry FIRST.  If the override's set-date is
+    #      more than 30 days old, zero it out and queue the key for bulk-clear.
+    #      Doing this before step 3 means an expired override correctly falls
+    #      through to POS-WOS (or whatever) instead of being treated as active.
+    #   3. Compute the POS-WOS result -- skipped when override is still active
+    #      OR when this is a new-launch ramp (those have their own logic).
+    #   4. Branch: F_BASELINE_OVR > F_RTL_POS_WOS > pattern-based routing.
     _opn_w1            = float(row.get("Opn_W1")           or 0)
     _baseline_override = float(row.get("Baseline_Override") or 0)
+
+    # 30-day expiry check (BUG-2 fix: must run before _rtl_wos_r compute).
+    # QB may return the date as an ISO string ("2026-05-25"), an ISO datetime
+    # ("2026-05-25T00:00:00"), or in some legacy configs as US-format
+    # ("05/25/2026").  Try ISO first (handles both pure date and datetime via
+    # the [:10] slice), then fall back to US-format.  A malformed value just
+    # means we can't determine expiry; we leave the override active rather
+    # than guessing.
+    _ovr_date_raw = row.get("Baseline_Override_Date")
+    _ovr_date_str = str(_ovr_date_raw or "").strip()
+    _ovr_set      = None
+    if _baseline_override > 0 and _ovr_date_str:
+        for _fmt_try in ("iso", "us"):
+            try:
+                if _fmt_try == "iso":
+                    _ovr_set = date.fromisoformat(_ovr_date_str[:10])
+                else:
+                    _ovr_set = datetime.strptime(_ovr_date_str.split(" ")[0], "%m/%d/%Y").date()
+                break
+            except (ValueError, TypeError):
+                continue
+        if _ovr_set is not None and (date.today() - _ovr_set).days > 30:
+            _baseline_override = 0.0   # fall through to normal model selection
+            _EXPIRED_OVERRIDES.append(row.get("Acct_MStyle_Key_", ""))
 
     _rtl_wos_r = None
     if (rtl_pos is not None
@@ -8353,19 +8380,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             rtl_pos, mp, _opn_w1,
             description, product_category, product_subcategory,
             brand, brand_pt, season)
-
-    # Check expiry: auto-dismiss overrides older than 30 days.
-    _ovr_date_str = str(row.get("Baseline_Override_Date") or "").strip()
-    _ovr_expired  = False
-    if _baseline_override > 0 and _ovr_date_str:
-        try:
-            _ovr_set = date.fromisoformat(_ovr_date_str[:10])
-            if (date.today() - _ovr_set).days > 30:
-                _ovr_expired      = True
-                _baseline_override = 0.0   # fall through to normal model
-                _EXPIRED_OVERRIDES.append(row.get("Acct_MStyle_Key_", ""))
-        except (ValueError, TypeError):
-            pass   # malformed date — treat as no expiry, proceed normally
 
     if _baseline_override > 0 and not _f73_new_ramp:
         _fire("F_BASELINE_OVR")
