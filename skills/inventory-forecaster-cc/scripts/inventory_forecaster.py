@@ -8512,13 +8512,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         biweekly = False
 
     elif _rtl_wos_r is not None:
-        _fire("F_RTL_POS_WOS")
+        # F85 (2026-05-25) fires for Amazon POS+DC records; F_RTL_POS_WOS for other retailers.
+        _f85_active = is_amazon and _rtl_wos_r is not None
+        _fire("F85" if _f85_active else "F_RTL_POS_WOS")
         fcst     = _rtl_wos_r["fcst"]
         cap      = _rtl_wos_r["cap"]
-        model    = "Retailer WOS (POS)"
+        model    = "Amazon POS-WOS" if _f85_active else "Retailer WOS (POS)"
         biweekly = False
+        _f85_flag_str = "F85 Amazon POS-WOS" if _f85_active else "F_RTL_POS_WOS"
         meta     = {
-            "model":         "Retailer WOS (POS)",
+            "model":         model,
             "baseline_pps":  _rtl_wos_r["baseline_pps"],
             "baseline_src":  _rtl_wos_r["baseline_src"],
             "oh_wos":        round(_rtl_wos_r["oh_wos"], 2),
@@ -8530,7 +8533,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             "has_opn_w1":    _rtl_wos_r["has_opn_w1"],
             "has_cat_mults": _rtl_wos_r["has_cat_mults"],
             "drivers": [
-                f"F_RTL_POS_WOS: POS baseline {_rtl_wos_r['baseline_pps']:,.0f}/wk "
+                f"{_f85_flag_str}: POS baseline {_rtl_wos_r['baseline_pps']:,.0f}/wk "
                 f"({_rtl_wos_r['baseline_src']}); "
                 f"DC OH {_rtl_wos_r['oh_wos']:.1f}wks ({_rtl_wos_r['oh_lw']:,.0f}u); "
                 f"fill {_rtl_wos_r['fill_units']:,.0f}u in "
