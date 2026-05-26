@@ -8411,8 +8411,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _ovr_suppressed_by_ramp = (_baseline_override > 0 and _f73_new_ramp)
 
     _rtl_wos_r = None
+    # F86 (2026-05-25) — gate changed from OH_WOS > 0 to L13W > 0.
+    # Original gate required retailer OH data to be present before routing to
+    # _retailer_wos_forecast().  Retailers that don't report DC OH weekly (e.g.
+    # Walmart on some items) had OH_WOS = 0 and fell through to Seasonal Baseline
+    # with only a 65/35 F15 blend, under-anchoring on POS.
+    # New behavior: fire whenever POS L13W > 0, regardless of OH availability.
+    # The OH guard inside _retailer_wos_forecast() (F86) handles the no-OH case
+    # by skipping the WOS fill (fill_units = 0) while still using POS as baseline.
     if (rtl_pos is not None
-            and float(rtl_pos.get("OH_WOS") or 0) > 0
+            and float(rtl_pos.get("Avg_Units_Wk_L13w") or 0) > 0
             and not _f73_new_ramp
             and not _baseline_override):   # skip POS compute when override active
         _rtl_wos_r = _retailer_wos_forecast(
