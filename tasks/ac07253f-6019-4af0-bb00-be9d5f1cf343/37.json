@@ -1,0 +1,9 @@
+{
+  "id": "37",
+  "subject": "Debug F87: find actual l4w/l13w values for FF12689",
+  "description": "Debug run with print in _compute_pos_baseline to see what l4w and l13w are actually being passed for 1864-FF12689. Task b2v9cfudo.",
+  "activeForm": "Running debug dry-run",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
