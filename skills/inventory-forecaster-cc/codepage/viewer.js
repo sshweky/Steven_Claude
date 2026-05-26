@@ -1182,6 +1182,70 @@ async function _fetchAtsForMstyle(r) {
   }
 }
 
+// -- POS History from Retailer Sales (bv2izcn5b) ----------------------------
+// On-demand fetch for a single customer+mstyle.  Returns
+//   { units:[26], oh:[26], instock:[26] }  oldest->newest (slot 0 = 26w ago,
+//   slot 25 = 1w ago), aligned with W1_DATE the same way hist_ord is.
+// Returns null when no matching rows exist.  Cached on r.pos_hist so
+// re-opening the same panel does not re-fetch.
+const _POS_HIST_TID        = 'bv2izcn5b';
+const _POS_HIST_DATE_FID   = 6;
+const _POS_HIST_CUST_FID   = 7;
+const _POS_HIST_MSTYLE_FID = 9;
+const _POS_HIST_UNITS_FID  = 10;
+const _POS_HIST_OH_FID     = 12;
+const _POS_HIST_INST_FID   = 15;
+
+async function _fetchPosHistForRecord(r) {
+  if (!r || !r.mstyle || !r.cust) return null;
+  if (r.pos_hist !== undefined) return r.pos_hist || null;
+  r.pos_hist = null; // sentinel - prevents duplicate in-flight fetches
+  try {
+    const escM = String(r.mstyle).replace(/'/g, "''");
+    const escC = String(r.cust).replace(/'/g, "''");
+    const resp = await qb('/records/query', {
+      from:    _POS_HIST_TID,
+      select:  [_POS_HIST_DATE_FID, _POS_HIST_UNITS_FID, _POS_HIST_OH_FID, _POS_HIST_INST_FID],
+      where:   `{${_POS_HIST_MSTYLE_FID}.EX.'${escM}'} AND {${_POS_HIST_CUST_FID}.EX.'${escC}'}`,
+      sortBy:  [{ fieldId: _POS_HIST_DATE_FID, order: 'DESC' }],
+      options: { top: 35, skip: 0 },
+    });
+    const rows = (resp && resp.data) || [];
+    if (!rows.length) return null;
+    const units   = Array(26).fill(null);
+    const oh      = Array(26).fill(null);
+    const instock = Array(26).fill(null);
+    const seen    = new Set();
+    if (!W1_DATE) return null;
+    const getNum = (row, fid) => {
+      const c = row[String(fid)];
+      if (!c || c.value == null || c.value === '') return null;
+      const n = Number(c.value);
+      return Number.isFinite(n) ? n : null;
+    };
+    for (const row of rows) {
+      const dateStr = row[String(_POS_HIST_DATE_FID)] && row[String(_POS_HIST_DATE_FID)].value;
+      if (!dateStr || seen.has(dateStr)) continue;
+      seen.add(dateStr);
+      const d       = new Date(dateStr + 'T00:00:00');
+      const diffMs  = W1_DATE.getTime() - d.getTime();
+      const diffWks = Math.round(diffMs / (7 * 86400000));
+      const slot    = 26 - diffWks; // slot 25 = 1w before W1, slot 0 = 26w before W1
+      if (slot < 0 || slot > 25) continue;
+      units[slot]   = getNum(row, _POS_HIST_UNITS_FID);
+      oh[slot]      = getNum(row, _POS_HIST_OH_FID);
+      instock[slot] = getNum(row, _POS_HIST_INST_FID);
+    }
+    const hasData = units.some(v => v !== null);
+    if (!hasData) return null;
+    r.pos_hist = { units, oh, instock };
+    return r.pos_hist;
+  } catch (e) {
+    console.warn('[PosHist] fetch failed:', e);
+    return null;
+  }
+}
+
 async function attachAtsHistory(records) {
   if (!records.length) return {};
   if (!_invFlowCacheBypassed()) {
@@ -3931,6 +3995,16 @@ async function toggleDetail(key) {
       toggleDetail(key);
     });
   }
+  // POS History: kick off on-demand fetch if not yet cached; re-render when it lands.
+  if (r.pos_hist === undefined) {
+    _fetchPosHistForRecord(r).then(ph => {
+      if (!ph) return;
+      if (_openDetailKey !== key) return;
+      el.dataset.loaded = '';
+      el.style.display = 'none';
+      toggleDetail(key);
+    });
+  }
   let histHtml  = '';
   if (histShp.length || histOrd.length || atsHist.length) {
     let histHdrCells = '<th class="row-label" style="width:1%;white-space:nowrap"></th>';
@@ -4103,6 +4177,7 @@ async function toggleDetail(key) {
                    <option value="Reviewed"         style="color:#5c6bc0;">Reviewed</option>
                    <option value="Resolved">Resolved</option>
                    <option value="Snoozed"          style="color:#888;">Snoozed</option>
+                   <option value="AI training"      style="color:#6a1b9a;">AI training</option>
                  </select>
                </label>`
           }
