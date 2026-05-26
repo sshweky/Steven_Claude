@@ -1436,7 +1436,8 @@ def fetch_projections_qb_rest(prj_cols, args):
          "PT_Item_Status", "Div", "Shpd_Wk_L13W_cust_", "Last_Ord_Date", "Last_Shp_Date",
          "Inventory_Manager", "Flagged", "Auto_Project", "POG_Launch_Date", "POG_End_Date",
          "Store_Count",
-         "Product_Category", "Product_Subcategory", "Brand"]
+         "Product_Category", "Product_Subcategory", "Brand",
+         "Baseline_Override"]          # FID 1614 — planner-set manual baseline (units/wk)
         + [f"AI_PRJ_W{w}" for w in range(1, 27)]
         + list(prj_cols)    # MAN_PRJ date-stamped columns (rolling weekly)
         + ORD_COLS
