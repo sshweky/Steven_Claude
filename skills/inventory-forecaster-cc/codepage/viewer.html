@@ -99,7 +99,8 @@ window.QB_CONFIG = {
     ACCT_NUM:              11, // numeric   -  Account # (used when inserting new Projections records)
     ACCT_TXT:            1187, // text      -  Account # (txt) mirror
     DI_ORD_HIST:         1613, // text  -  26 comma-sep L26W DI (Direct Import) weekly order qtys, written by F69
-    BASELINE_OVERRIDE:   1614, // numeric  -  planner-set manual baseline (units/wk); AI applies seasonality + snap on top
+    BASELINE_OVERRIDE:      1614, // numeric  -  planner-set manual baseline (units/wk); AI applies seasonality + snap on top
+    BASELINE_OVERRIDE_DATE: 1615, // date     -  when the override was set; auto-expires after 30 days
     // AI PRJ W1..W26 are consecutive: 1511..1536
     AI_PRJ_W1:    1511,
     // Suggested Projection Wk1..Wk26 (NON-consecutive  -  see arrays below)
