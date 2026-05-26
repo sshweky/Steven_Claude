@@ -5642,6 +5642,312 @@ def _build_switchover_index(rows):
     return result, variant_result, vacated_bases
 
 
+# Switchover backfill suffixes -- includes the F70 suffixes PLUS PX (the new
+# multi-pack replacement format that goes with PCS).  PCS is the OLD pattern
+# the planner is migrating AWAY from, so it isn't a "variant suffix" itself --
+# instead, the PCS->PX auto-link handles that case explicitly.
+_SWITCHOVER_BACKFILL_SUFFIXES = tuple(set(SWITCHOVER_SUFFIXES) | {"PX"})
+_PCS_PATTERN = re.compile(r'^(.+?)PCS(\d+)$', re.IGNORECASE)
+
+
+def _switchover_backfill(rows, prj_cols):
+    """
+    Phase 1.5 -- Amazon (acct 1864) switchover auto-link + Switchover_Date
+    backfill.
+
+    Two operations, both Amazon-only:
+
+      A. PCS{N} -> PX{N} auto-link.
+         Detect Amazon items whose mstyle ends in PCS<N> (e.g. FF12508PCS3).
+         If a cousin <core>PX<N> record (e.g. FF12508PX3) exists at the same
+         account AND the PCS record does NOT yet have a Switchover To MStyle
+         set, auto-set Switchover_To_MStyle = PX style and Switchover_Active
+         = True.
+
+      B. Switchover_Date computation (all switchover suffixes -- EC, COS,
+         AMZ, DS, DTC, PX, plus any PCS->PX link from step A).
+         For every Amazon record with a Switchover_To_MStyle set:
+           1. Look up the variant record at the same account.
+           2. If variant doesn't exist -> queue INSERT (copy Inventory Manager,
+              Brand, Description, Master Pack, PT Item Status, Status @ Cust
+              from base).  Leave Switchover_Date EMPTY and add an alert that
+              the planner must enter projections on the variant.
+           3. If variant exists, find the earliest non-zero weekly MAN PRJ
+              column.  Parse its MM_DD date.  Set Switchover_Date on the
+              base record to that ISO date.
+           4. If variant exists but ALL its MAN PRJ columns are zero, leave
+              Switchover_Date EMPTY and add an alert.
+
+    Updates `rows` in-place so downstream rules (F70 in particular) see the
+    auto-linked Switchover_To_MStyle values immediately.
+
+    Returns: dict with:
+        updates: list of {"key": acct_mstyle, "fields": {label: value}}  -- existing records to update
+        inserts: list of {"fields": {label: value}}                       -- new variant records to create
+        alerts:  list of {"key": acct_mstyle, "msg": text}                -- alerts to attach to AI Analysis
+    """
+    AMAZON_ACCT = "1864"
+    out = {"updates": [], "inserts": [], "alerts": []}
+
+    # Index by (acct, mstyle) for O(1) cousin lookup
+    by_acct_ms = {}
+    for r in rows:
+        k = r.get("Acct_MStyle_Key_", "")
+        if "-" not in k:
+            continue
+        acct, ms = k.split("-", 1)
+        by_acct_ms[(acct, ms)] = r
+
+    # Parse the MM_DD calendar date for each weekly MAN PRJ column.
+    # prj_cols entries look like "05_24_W1", "05_31_W2", ..., "11_15_W26".
+    # Determine the year for each (handle Dec -> Jan wrap relative to today).
+    _today      = date.today()
+    _col_to_date  = {}
+    _col_to_week  = {}
+    for col in prj_cols:
+        m = re.match(r'^(\d{2})_(\d{2})_W(\d+)$', col)
+        if not m:
+            continue
+        mm, dd, wn = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        try:
+            d = date(_today.year, mm, dd)
+            if (d - _today).days < -180:
+                d = date(_today.year + 1, mm, dd)
+            _col_to_date[col] = d
+            _col_to_week[col] = wn
+        except ValueError:
+            pass
+
+    # Order MAN PRJ columns by week number (W1 first).
+    sorted_cols = sorted(
+        (c for c in prj_cols if c in _col_to_week),
+        key=lambda c: _col_to_week[c]
+    )
+
+    # ---- Operation A: PCS{N} -> PX{N} auto-link --------------------------
+    pcs_linked = 0
+    for r in rows:
+        k = r.get("Acct_MStyle_Key_", "")
+        if not k.startswith(f"{AMAZON_ACCT}-"):
+            continue
+        ms = (r.get("Mstyle") or "")
+        m = _PCS_PATTERN.match(ms)
+        if not m:
+            continue
+        # Skip if a Switchover_To_MStyle is already set (planner-driven wins)
+        if (r.get("Switchover_To_MStyle") or "").strip():
+            continue
+        base_core, pcs_n = m.group(1), m.group(2)
+        candidate = f"{base_core}PX{pcs_n}"
+        if (AMAZON_ACCT, candidate) not in by_acct_ms:
+            continue
+        # Cousin exists -- auto-link
+        r["Switchover_To_MStyle"] = candidate
+        r["Switchover_Active"]    = True
+        out["updates"].append({
+            "key": k,
+            "fields": {
+                "Switchover To MStyle": candidate,
+                "Switchover Active":    True,
+            },
+        })
+        pcs_linked += 1
+    if pcs_linked:
+        print(f"      [Switchover] PCS->PX auto-linked: {pcs_linked} record(s)")
+
+    # ---- Operation B: Switchover_Date computation -----------------------
+    date_computed = 0
+    date_cleared  = 0
+    no_proj_alert = 0
+    variant_to_create = 0
+    for r in rows:
+        k = r.get("Acct_MStyle_Key_", "")
+        if not k.startswith(f"{AMAZON_ACCT}-"):
+            continue
+        variant_ms = (r.get("Switchover_To_MStyle") or "").strip()
+        if not variant_ms:
+            continue
+        acct = k.split("-", 1)[0]
+
+        # Look up variant in pulled rows
+        v_row = by_acct_ms.get((acct, variant_ms))
+
+        if v_row is None:
+            # Variant record doesn't exist -- queue INSERT with metadata copy
+            new_fields = {
+                "Acct# - MStyle (Key)": f"{acct}-{variant_ms}",
+                "Mstyle":               variant_ms,
+                "Customer Name":        r.get("Customr_Name") or "",
+                "Inventory Manager":    r.get("Inventory_Manager") or "",
+                "Brand":                r.get("Brand") or "",
+                "Description":          r.get("Description") or "",
+                "PT Item Status":       r.get("PT_Item_Status") or "",
+                "Status @ Cust":        r.get("Status_Cust") or "A",
+            }
+            # Numeric account # required; copy if available.  Otherwise QB
+            # will surface a field-required error.
+            _acct_num = r.get("Acct_")
+            if _acct_num not in (None, "", 0):
+                new_fields["Acct #"] = _acct_num
+            _mp = r.get("Master_Pack")
+            if _mp not in (None, "", 0):
+                new_fields["Master Pack"] = _mp
+            out["inserts"].append({"fields": new_fields})
+            out["alerts"].append({
+                "key": k,
+                "msg": (
+                    f"[ALERT-SWITCHOVER] Variant record {acct}-{variant_ms} "
+                    f"will be created (copied metadata from base). Planner "
+                    f"must enter projections on {variant_ms} to establish a "
+                    f"Switchover_Date."
+                ),
+            })
+            variant_to_create += 1
+            continue
+
+        # Variant exists -- find earliest non-zero MAN PRJ week
+        first_nonzero_col = None
+        for col in sorted_cols:
+            try:
+                if float(v_row.get(col) or 0) > 0:
+                    first_nonzero_col = col
+                    break
+            except (ValueError, TypeError):
+                pass
+
+        if first_nonzero_col is None:
+            # No projections set on variant yet -- alert + leave Switchover_Date empty
+            existing_date = (r.get("Switchover_Date") or "").strip()
+            if existing_date:
+                # Clear any stale value
+                out["updates"].append({
+                    "key": k,
+                    "fields": {"Switchover Date": ""},
+                })
+                r["Switchover_Date"] = ""
+                date_cleared += 1
+            out["alerts"].append({
+                "key": k,
+                "msg": (
+                    f"[ALERT-SWITCHOVER] Switchover to {variant_ms} configured but "
+                    f"no manual projections set on {variant_ms} yet -- enter "
+                    f"projections on the variant style to establish a Switchover_Date."
+                ),
+            })
+            no_proj_alert += 1
+            continue
+
+        # Compute Switchover_Date from the column's calendar date
+        d_iso = _col_to_date[first_nonzero_col].isoformat()
+        existing_date = (r.get("Switchover_Date") or "")[:10]
+        if existing_date != d_iso:
+            out["updates"].append({
+                "key": k,
+                "fields": {"Switchover Date": d_iso},
+            })
+            r["Switchover_Date"] = d_iso
+            date_computed += 1
+
+    if date_computed:
+        print(f"      [Switchover] Switchover_Date auto-set: {date_computed} record(s)")
+    if date_cleared:
+        print(f"      [Switchover] Switchover_Date cleared (stale): {date_cleared} record(s)")
+    if no_proj_alert:
+        print(f"      [Switchover] Alerts (no variant projections): {no_proj_alert} record(s)")
+    if variant_to_create:
+        print(f"      [Switchover] Variant records to create: {variant_to_create}")
+
+    return out
+
+
+def _apply_switchover_backfill(backfill, dry_run=False):
+    """
+    Write the switchover-backfill changes back to QB.
+
+    backfill: dict returned by _switchover_backfill().
+    Updates and inserts both go through POST /v1/records on the Projections
+    table.  Inserts are differentiated by passing a fresh Acct#-MStyle key
+    that doesn't exist yet; the mergeFieldId upsert semantic handles both
+    update-existing and insert-new in the same call.
+    """
+    if dry_run:
+        if backfill["updates"] or backfill["inserts"]:
+            print(f"      [Switchover] DRY RUN -- skipping writeback of "
+                  f"{len(backfill['updates'])} update(s) + "
+                  f"{len(backfill['inserts'])} insert(s)")
+        return
+
+    if not (backfill["updates"] or backfill["inserts"]):
+        return
+
+    # Build the field-label -> FID map once
+    fmap = qb_get_field_map(QB_PROJ_TABLE)
+    if not fmap:
+        print("      [WARN] [Switchover] qb_get_field_map() returned empty -- skip writeback")
+        return
+    merge_fid = (fmap.get("Acct# - MStyle (Key)")
+                 or fmap.get("Acct - MStyle Key")
+                 or fmap.get("Acct_MStyle_Key_"))
+    if not merge_fid:
+        print("      [WARN] [Switchover] Missing Acct-MStyle key field -- skip writeback")
+        return
+
+    # Build payload: updates and inserts both shape into the same {fid: {value}} dicts
+    payload_data = []
+    for op in backfill["updates"]:
+        rec = {merge_fid: {"value": op["key"]}}
+        for label, val in op["fields"].items():
+            fid = fmap.get(label)
+            if fid is None:
+                continue   # silently skip unmappable labels
+            rec[fid] = {"value": val if val is not None else ""}
+        if len(rec) > 1:
+            payload_data.append(rec)
+    for op in backfill["inserts"]:
+        rec = {}
+        # The merge field must be populated for inserts so QB knows the key
+        key_val = op["fields"].get("Acct# - MStyle (Key)")
+        if key_val:
+            rec[merge_fid] = {"value": key_val}
+        for label, val in op["fields"].items():
+            if label == "Acct# - MStyle (Key)":
+                continue   # already set above
+            fid = fmap.get(label)
+            if fid is None:
+                continue
+            rec[fid] = {"value": val}
+        if len(rec) > 1:
+            payload_data.append(rec)
+
+    if not payload_data:
+        return
+
+    # POST in batches of 500 (well below QB's 1000-record-per-call limit)
+    _BATCH = 500
+    n_ok = 0
+    n_fail = 0
+    for i in range(0, len(payload_data), _BATCH):
+        body = json.dumps({
+            "to":             QB_PROJ_TABLE,
+            "data":           payload_data[i:i + _BATCH],
+            "mergeFieldId":   merge_fid,
+            "fieldsToReturn": [],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            "https://api.quickbase.com/v1/records",
+            data=body, headers=_QB_PROJ_HEADERS, method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                _ = resp.read()
+                n_ok += len(payload_data[i:i + _BATCH])
+        except Exception as e:
+            n_fail += len(payload_data[i:i + _BATCH])
+            print(f"      [WARN] [Switchover] batch write failed: {e}")
+    print(f"      [Switchover] writeback: {n_ok} ok, {n_fail} fail "
+          f"({len(backfill['updates'])} update(s) + {len(backfill['inserts'])} insert(s))")
+
+
 def _build_cust_baseline_index(rows):
     """
     Per-customer median L52 weekly order rate across that customer's active
