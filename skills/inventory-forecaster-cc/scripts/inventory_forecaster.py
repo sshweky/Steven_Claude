@@ -8411,15 +8411,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _ovr_suppressed_by_ramp = (_baseline_override > 0 and _f73_new_ramp)
 
     _rtl_wos_r = None
-    # DEBUG (temp) — log rtl_pos state for diagnosis
-    _dbg_key = row.get("Acct_MStyle_Key_", "")
-    if _dbg_key in ("23011-FF38640",):
-        print(f"  [DBG F86] {_dbg_key}: rtl_pos={rtl_pos is not None}, "
-              f"L13W={float((rtl_pos or {}).get('Avg_Units_Wk_L13w') or 0):.0f}, "
-              f"L4W={float((rtl_pos or {}).get('Avg_Units_Wk_L4w') or 0):.0f}, "
-              f"OH_WOS={float((rtl_pos or {}).get('OH_WOS') or 0):.2f}, "
-              f"OH_LW={float((rtl_pos or {}).get('OH_Units_LW') or 0):.0f}, "
-              f"f73_ramp={_f73_new_ramp}, baseline_ovr={_baseline_override}", flush=True)
     # F86 (2026-05-25) — gate changed from OH_WOS > 0 to L13W > 0.
     # Original gate required retailer OH data to be present before routing to
     # _retailer_wos_forecast().  Retailers that don't report DC OH weekly (e.g.
@@ -8428,9 +8419,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # New behavior: fire whenever POS L13W > 0, regardless of OH availability.
     # The OH guard inside _retailer_wos_forecast() (F86) handles the no-OH case
     # by skipping the WOS fill (fill_units = 0) while still using POS as baseline.
+    # F73 note: _f73_new_ramp is NOT in the gate here (nor in F85 below).
+    # Rationale: POS L13W > 0 means the item has 13 weeks of proven consumer
+    # sell-through at the retailer -- by definition it is NOT a new launch.
+    # Lumpy DI order history can look like a ramp to F73 even on established
+    # items.  POS is the ground truth; F73 yields to it.
     if (rtl_pos is not None
             and float(rtl_pos.get("Avg_Units_Wk_L13w") or 0) > 0
-            and not _f73_new_ramp
             and not _baseline_override):   # skip POS compute when override active
         _rtl_wos_r = _retailer_wos_forecast(
             rtl_pos, mp, _opn_w1,
@@ -8440,8 +8435,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     elif (is_amazon
           and pos_data is not None
           and float(pos_data.get("Avg_Units_Wk_L13w") or 0) > 0
-          and not _f73_new_ramp
-          and not _baseline_override):
+          and not _baseline_override):  # F73 yields to Amazon POS (same rationale as F86)
         # F85 (2026-05-25) — Amazon POS-WOS primary model.
         #
         # Rule (user-defined): for ANY Amazon account with consumer POS data
