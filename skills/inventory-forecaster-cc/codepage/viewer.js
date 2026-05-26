@@ -4171,8 +4171,9 @@ async function toggleDetail(key) {
                    value="${r.baseline_override > 0 ? r.baseline_override : ''}"
                    placeholder="e.g. 240"
                    style="width:90px;padding:4px 6px;border:1px solid #1565c0;border-radius:4px;font-size:12px;"
-                   onblur="saveBaselineOverride('${safeKey}', this.value)"
-                   onkeydown="if(event.key==='Enter'){this.blur();}"/>
+                   onkeydown="if(event.key==='Enter'){saveBaselineOverride('${safeKey}', this.value);}"/>
+            <button onclick="saveBaselineOverride('${safeKey}', document.getElementById('baseline-ovr-${safeId}').value)"
+                    style="font-size:11px;padding:4px 12px;background:#1565c0;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600;">Set</button>
             <button onclick="saveBaselineOverride('${safeKey}', 0)"
                     style="font-size:11px;padding:4px 10px;background:#fff;color:#888;border:1px solid #ccc;border-radius:4px;cursor:pointer;"
                     title="Clear override - AI will compute its own baseline on the next run">Clear</button>
