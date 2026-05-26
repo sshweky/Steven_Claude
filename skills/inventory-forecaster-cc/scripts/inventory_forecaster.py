@@ -9967,6 +9967,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 if _snap_f32 > 0:
                     fcst = [_snap_f32] * 26
 
+    # Snapshot W1 BEFORE any W1-zeroing rule runs.  Used by the Amazon
+    # order-cadence guard at the end of forecast_record() to restore W1
+    # when it was zeroed before the Tue/Wed 10am Amazon PO cutoff window
+    # (the PO simply hasn't transmitted yet -- we shouldn't infer "Amazon
+    # isn't ordering this week" from a missing PO before that cutoff).
+    _model_w1 = int(fcst[0]) if (isinstance(fcst, list) and fcst) else 0
+
     # F36 — Stock-up burn-off suppression (Amazon-only) (2026-05-05).
     # When a recent big shipment cluster has put the customer in stocked-up
     # state, they won't replenish from us until POS sell-through burns down

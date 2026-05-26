@@ -1,0 +1,1753 @@
+      Amazon POS-WOS: 991  Croston's: 313  Heuristic: 102  Heuristic (F72 new-launch ramp): 4  Inactive: 948  Inactive (F68): 1  Inactive (zero order history): 101  Inactive (zeroed by guards): 649  Inactive+Floor: 3  Inactive+S6 (off-price): 1  OTB (zero): 476  Pre-launch NEW (manual passthrough): 89  Reactivating: 26  Retailer WOS (POS): 227  Seasonal Baseline: 436  Seasonal Baseline (burst): 147  Sparse Intermittent: 1061  Bi-weekly enforced: 258  Alerts (>7.5%): 3945
+  COMPLETE  |  5575 records  |  Total 26w demand: 15,398,313
+  Models -- Seasonal: 436  Croston's: 313  Heuristic: 102  Inactive: 948  Bi-weekly: 258
+  2953-FF7258                        +45.5%  Croston's      [BW]         552       1,013
+  2953-FF7260                        +63.9%  Croston's      [BW]         144         399
+  2953-FF7261                        +67.4%  Croston's                   132         405
+  2953-FF7263                        +38.9%  Croston's      [BW]         342         560
+  3466-FF7612                       +119.0%  Croston's                   600         274
+  3466-FF7613                        +44.6%  Sparse Intermittent               72         130
+  3466-FF8425                        +65.4%  Sparse Intermittent              180         520
+  3466-FF8991                         +8.5%  Heuristic (F72 new-launch ramp)            1,428       1,560
+  3882-FF4771                        +41.9%  Sparse Intermittent              738         520
+  3882-FF7258                        +74.2%  Sparse Intermittent              906         520
+  3882-FF7260                        +50.8%  Sparse Intermittent              588         390
+  3882-FF7266                        +61.5%  Sparse Intermittent              840         520
+  3892-BB0096                        +41.1%  Sparse Intermittent [BW]       1,524       1,080
+  3892-BB0102                        +18.0%  Sparse Intermittent [BW]       1,476       1,800
+  3102-FF4936                        +84.6%  Croston's                   576         312
+  3102-FF5716                        +44.6%  Sparse Intermittent              216         390
+  3102-FF6639                        +41.9%  Sparse Intermittent [BW]          18          31
+  3102-FF7260                        +50.0%  Heuristic (F72 new-launch ramp)              150         100
+  3102-FF7540                         +7.7%  Sparse Intermittent              144         156
+  3102-FF7541                       +100.0%  OTB (zero)                    0        52.0
+  3102-FF7549                        +71.2%  Sparse Intermittent               72         250
+  3102-FF8287                        +52.0%  Sparse Intermittent              180         375
+  3102-FF8433                         +7.7%  Sparse Intermittent              192         208
+  3102-FF9362                        +69.2%  Sparse Intermittent               96         312
+  4524-BB0079                        +34.0%  Sparse Intermittent            1,584       2,400
+  7291-BB0018                        +42.9%  Sparse Intermittent            1,440       2,520
+  7291-BB0216                        +42.9%  Sparse Intermittent            1,440       2,520
+  8919-FF7110                       +230.5%  Sparse Intermittent            3,966       1,200
+  8919-FF7112                       +306.5%  Sparse Intermittent            3,780         930
+  8919-FF7115                         +0.0%  OTB (zero)                    0         0.0
+  9278-FF4771                        +42.4%  Sparse Intermittent [BW]         216         375
+  9278-FF5766                        +27.8%  Sparse Intermittent [BW]       1,278       1,000
+  9278-FF7258                        +84.8%  Sparse Intermittent [BW]         924         500
+  9278-FF7297                        +26.6%  Croston's      [BW]       1,266       1,000
+  9278-FF8298                        +56.8%  Sparse Intermittent [BW]         108         250
+  9278-FF8425                        +13.6%  Sparse Intermittent              216         250
+  19790-FF4934                       +31.2%  Croston's      [BW]         984         750
+  19790-FF4936                       +26.2%  Sparse Intermittent [BW]         576         780
+  19790-FF6637                       +20.0%  Sparse Intermittent              300         375
+  19790-FF7263                       +32.0%  Sparse Intermittent              330         250
+  19790-SF8169                       +38.5%  Sparse Intermittent [BW]         720         520
+  19790-SF8170                       +10.8%  Sparse Intermittent [BW]         576         520
+  13646-FF7110                        +0.0%  OTB (zero)                    0         0.0
+  13646-FF7112                       +36.8%  Sparse Intermittent            3,420       2,500
+  13646-FF7115                        +0.0%  OTB (zero)                    0         0.0
+  13149-FF4775                       +21.9%  Sparse Intermittent [BW]       2,760       3,532
+  13149-FF4849                       +15.2%  Croston's                   864         750
+  13149-FF4923                      +453.6%  Heuristic                 1,218         220
+  13149-FF5776                       +77.2%  Croston's                   444       1,950
+  13149-FF7258                       +47.0%  Sparse Intermittent            2,664       5,026
+  13149-FF7261                       +33.5%  Sparse Intermittent            1,728       2,600
+  13149-FF7266                       +36.1%  Sparse Intermittent            1,662       2,600
+  13149-FF7297                       +61.0%  Croston's                 1,014       2,600
+  13149-FF7372                       +70.6%  Sparse Intermittent            1,260       4,292
+  13149-FF7488                       +44.0%  Croston's      [BW]       2,700       4,823
+  13149-FF8258                       +44.7%  Croston's                   396         716
+  13032-BB0496                       +96.3%  Croston's                    24         650
+  13825-BB0096                      +297.5%  Sparse Intermittent            1,908         480
+  13825-BB0100                        +7.7%  Sparse Intermittent            3,456       3,744
+  13825-BB0102                       +77.4%  Sparse Intermittent              264       1,170
+  13825-BB0496                       +89.5%  Sparse Intermittent [BW]          96         910
+  13825-FF7258                       +40.5%  Croston's      [BW]         372         625
+  13825-FF7260                       +20.8%  Croston's      [BW]         396         500
+  13825-FF7261                       +34.2%  Sparse Intermittent [BW]         342         520
+  13825-FF7263                       +54.9%  Croston's      [BW]         282         625
+  13825-FF7266                       +21.9%  Croston's      [BW]         762         625
+  13825-FF7267                       +19.6%  Croston's      [BW]         402         500
+  13825-FF8654                       +42.4%  Croston's      [BW]         288         500
+  13825-FF8990                       +36.8%  Sparse Intermittent [BW]         888       1,404
+  13825-FF8991                       +71.2%  Croston's      [BW]         252         875
+  14023-FF8990                       +19.1%  Croston's                   708         875
+  16820-FF5766                       +44.2%  Croston's                 1,932       3,465
+  16820-FF7258                       +19.2%  Sparse Intermittent [BW]       8,202      10,151
+  16820-FF7266                       +40.7%  Croston's      [BW]       5,406       9,121
+  16820-FF7297                       +29.1%  Croston's                 3,240       4,568
+  3466-FF7488                        +69.8%  Croston's                 1,536       5,087
+  1587-FF7258                        +16.3%  Croston's                 3,024       2,600
+  1587-FF7263                        +52.3%  Croston's                   186         390
+  1587-FF7266                        +32.0%  Sparse Intermittent            1,326       1,950
+  1587-FF7267                        +52.9%  Croston's                   612       1,300
+  1587-FF7297                        +39.7%  Croston's                 1,254       2,080
+  1587-FF7488                        +18.5%  Sparse Intermittent              318         390
+  20474-FF4849                       +39.4%  Croston's                   630       1,040
+  20474-FF7258                       +76.9%  Croston's                   420       1,820
+  19726-FF7297                       +71.7%  Sparse Intermittent            1,116         650
+  23685-FF7260                       +30.8%  Sparse Intermittent            1,440       2,080
+  23685-FF7263                       +90.1%  Sparse Intermittent              180       1,820
+  23685-FF7266                       +61.5%  Sparse Intermittent            2,520       1,560
+  23685-FF7267                       +78.3%  Sparse Intermittent              282       1,300
+  23685-FF7297                        +7.7%  Sparse Intermittent [BW]       1,920       2,080
+  23685-FF8256                       +13.5%  Sparse Intermittent [BW]       1,620       1,872
+  23685-FF8258                       +18.5%  Sparse Intermittent            1,908       2,340
+  13646-FF4936                        +0.0%  OTB (zero)                    0         0.0
+  13825-FF7297                       +40.0%  Sparse Intermittent [BW]         300         500
+  14719-FF4936                        +0.0%  OTB (zero)                    0         0.0
+  19726-FF7258                       +47.7%  Sparse Intermittent              408         780
+  19790-FF4923                       +15.4%  Sparse Intermittent              300         260
+  19790-SF8167                       +16.9%  Sparse Intermittent              432         520
+  9278-FF5769                        +47.5%  Croston's      [BW]         918       1,750
+  9278-FF8990                        +78.4%  Sparse Intermittent [BW]         108         500
+  13646-FF4934                        +0.0%  OTB (zero)                    0         0.0
+  14719-FF4934                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB0018                        +40.0%  Sparse Intermittent            2,160       3,600
+  4524-BB0081                        +40.0%  Sparse Intermittent              576         960
+  4524-BB0083                        +40.0%  Sparse Intermittent            1,440       2,400
+  7291-BB0409                        +70.0%  Sparse Intermittent              540       1,800
+  12002-FF10530                    +1474.4%  Sparse Intermittent [BW]       1,968         125
+  19726-FF7266                       +29.2%  Sparse Intermittent              672         520
+  23685-FF7258                       +50.7%  Sparse Intermittent            3,918       2,600
+  3466-FF8423                        +86.2%  Sparse Intermittent              108         780
+  2953-FF4771                        +59.1%  Croston's      [BW]         168         411
+  19790-FF4771                       +15.4%  Sparse Intermittent              150         130
+  23011-FF5952                       +93.8%  Heuristic                 4,032       2,080
+  13825-FF7372                       +43.5%  Sparse Intermittent [BW]         294         520
+  13825-FF9298                      +176.9%  Sparse Intermittent              432         156
+  26175-FF7258                       +61.9%  Sparse Intermittent              198         520
+  13825-BB0094                      +196.2%  Sparse Intermittent            1,848         624
+  2342-FF7258                         +0.0%  OTB (zero)                    0         0.0
+  2342-FF7266                         +0.0%  OTB (zero)                    0         0.0
+  20474-FF7263                       +71.6%  Croston's                   258         910
+  19790-FF5777                       +71.2%  Sparse Intermittent [BW]          72         250
+  20474-FF4771                       +74.3%  Croston's                   234         910
+  20474-FF7612                       +63.8%  Croston's      [BW]       2,064       1,260
+  4524-BB0131                         +0.0%  OTB (zero)                    0         0.0
+  4524-BB0149                        +50.0%  Sparse Intermittent            1,200       2,400
+  4524-BB0151                        +34.0%  Sparse Intermittent            1,584       2,400
+  4524-BB0216                        +40.0%  Sparse Intermittent            1,152       1,920
+  8940-FF4577                      +1013.6%  Sparse Intermittent            2,784         250
+  8940-FF5952                        +32.0%  Sparse Intermittent            3,168       2,400
+  8940-FF8287                       +114.3%  Sparse Intermittent [BW]       1,200         560
+  8940-SF8173                        +23.3%  Sparse Intermittent              888         720
+  8940-SF8174                        +20.0%  Sparse Intermittent [BW]       3,840       3,200
+  4524-BB0152                        +50.0%  Sparse Intermittent            1,200       2,400
+  18360-BB0151                        +0.0%  OTB (zero)                    0         0.0
+  18360-BB0152                        +0.0%  OTB (zero)                    0         0.0
+  1587-BB13457                        +0.0%  OTB (zero)                    0         0.0
+  26175-FF4775                       +44.3%  Sparse Intermittent [BW]         348         625
+  12002-FF5952                       +66.2%  Sparse Intermittent              216         130
+  22008-BB13455                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB13461                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB13449                       +0.0%  OTB (zero)                    0         0.0
+  4524-BB0191                        +53.4%  Sparse Intermittent            2,238       4,800
+  26175-FF7266                       +49.6%  Sparse Intermittent [BW]         252         500
+  3892-BB0092                        +15.0%  Sparse Intermittent [BW]         408         480
+  3892-BB0098                        +10.8%  Sparse Intermittent            1,284       1,440
+  13825-BB0332                       +57.7%  Sparse Intermittent [BW]       1,435         910
+  20474-FF4930                       +41.5%  Croston's                 2,208       1,560
+  4524-BB0409                        +60.0%  Sparse Intermittent              768       1,920
+  1587-FF7260                        +40.0%  Sparse Intermittent              312         520
+  13646-FF11349                       +0.0%  OTB (zero)                    0         0.0
+  14719-FF11349                       +0.0%  OTB (zero)                    0         0.0
+  23685-FF13154                      +33.0%  Sparse Intermittent [BW]       6,918       5,200
+  23685-FF8990                       +57.1%  Sparse Intermittent            3,012       7,020
+  3892-BB0082                        +64.0%  Sparse Intermittent              180         500
+  4524-BB0217                        +24.7%  Sparse Intermittent            2,394       1,920
+  18360-BB12752                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB11150                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB12028                       +0.0%  OTB (zero)                    0         0.0
+  19790-FF5766                       +66.4%  Croston's      [BW]         126         375
+  19790-FF7297                       +74.4%  Croston's                    96         375
+  3102-FF11349                       +92.3%  Sparse Intermittent               12         156
+  13640-FF11143                       +0.0%  OTB (zero)                    0         0.0
+  19718-FF8990                       +22.1%  Sparse Intermittent [BW]       1,056       1,356
+  19718-FF8991                       +56.7%  Sparse Intermittent              468       1,080
+  2953-FF4936                        +57.9%  Croston's      [BW]         168         399
+  2953-FF5952                        +73.7%  Croston's                   144         548
+  2953-FF8287                        +84.6%  Sparse Intermittent [BW]         720         390
+  2953-SF8167                         +7.7%  Sparse Intermittent [BW]         360         390
+  2953-SF8173                        +26.2%  Sparse Intermittent [BW]         288         390
+  2953-SF8168                        +67.9%  Croston's      [BW]         336       1,048
+  23685-FF9297PDQ                    +59.2%  Sparse Intermittent            3,312       2,080
+  2342-FF12849                      +100.0%  OTB (zero)                    0     1,800.0
+  23651-FF8287                      +260.0%  Sparse Intermittent            1,080         300
+  13177-FF10159                      +95.4%  Croston's                    12         260
+  18360-FF12843                      +17.0%  Sparse Intermittent            4,980       6,000
+  13825-BB0131                      +113.5%  Sparse Intermittent              888         416
+  13825-BB12022                      +40.0%  Sparse Intermittent [BW]          60         100
+  12002-FF12655                     +276.2%  Sparse Intermittent [BW]         978         260
+  23651-FF12655                      +10.8%  Sparse Intermittent            1,152       1,040
+  13177-FF7260                       +38.5%  Sparse Intermittent               72          52
+  3102-FF10475                       +80.0%  Croston's                   312       1,560
+  23651-FF10162                       +0.0%  OTB (zero)                    0         0.0
+  3102-FF12354                       +69.2%  Sparse Intermittent [BW]          24          78
+  12002-FF8287                       +56.8%  Sparse Intermittent [BW]         540       1,250
+  4524-BB12479                       +60.0%  Sparse Intermittent              384         960
+  13149-FF4936                       +95.4%  Croston's                    72       1,560
+  13149-FF17290                      +79.9%  Sparse Intermittent            1,008       5,025
+  18360-BB0083                        +0.0%  OTB (zero)                    0         0.0
+  12893-FF15134                       +0.0%  OTB (zero)                    0         0.0
+  12002-FF12825                       +0.0%  OTB (zero)                    0         0.0
+  14224-BB17004                      +93.3%  Croston's                    12         180
+  4524-BB16450                       +50.0%  Sparse Intermittent            1,200       2,400
+  21152-BB0131                       +10.8%  Sparse Intermittent              288         260
+  20227-BB0080                       +92.8%  Sparse Intermittent               18         250
+  13640-FF4933                        +0.0%  OTB (zero)                    0         0.0
+  2953-FF7297                        +58.6%  Croston's                   180         435
+  16014-BB0126                       +19.7%  Sparse Intermittent            2,418       2,020
+  16014-BB0098                       +51.4%  Sparse Intermittent           10,080       6,660
+  16014-BB0234                       +27.0%  Sparse Intermittent            2,910       2,292
+  16014-BB0235                       +72.9%  Sparse Intermittent            3,528       2,040
+  13177-FF7261                       +73.1%  Sparse Intermittent               90          52
+  12002-FF5716                       +10.8%  Sparse Intermittent            1,440       1,300
+  13825-FF10477                      +11.1%  Croston's      [BW]         972         875
+  13825-FF10159                      +59.6%  Croston's      [BW]         798         500
+  13825-FF12837                      +82.4%  Croston's      [BW]         228         125
+  13825-FF10162                      +44.0%  Croston's      [BW]         720         500
+  13825-FF10475                      +30.4%  Croston's      [BW]         978         750
+  13032-BB12022                      +64.5%  Sparse Intermittent              120         338
+  13032-BB11981                      +38.5%  Sparse Intermittent              192         312
+  13149-FF17285                      +90.4%  Sparse Intermittent              288       3,000
+  13149-FF17287                      +90.1%  Sparse Intermittent              744       7,500
+  13149-FF17289                      +79.9%  Sparse Intermittent [BW]       1,056       5,250
+  13640-FF15583                       +0.0%  OTB (zero)                    0         0.0
+  1025-FF4771                         +0.0%  OTB (zero)                    0         0.0
+  13640-FF11899                       +0.0%  OTB (zero)                    0         0.0
+  13032-BB12383                     +121.5%  Sparse Intermittent              576         260
+  3102-FF16342                       +28.6%  Croston's                    90         126
+  3102-FF16341                       +69.2%  Sparse Intermittent               24          78
+  13177-FF4775                        +7.7%  Sparse Intermittent              120         130
+  4524-BB0150                        +45.0%  Sparse Intermittent            1,320       2,400
+  19975-BB16997                      +84.0%  Croston's      [BW]         288       1,800
+  18504-BB16997                      +73.3%  Sparse Intermittent               24          90
+  19975-BB17000                      +82.4%  Croston's                   120         680
+  16820-FF18741                      +66.6%  Croston's                 4,140      12,385
+  13177-FF11353                      +30.8%  Sparse Intermittent               36          52
+  18504-BB17000                      +52.0%  Sparse Intermittent              108         225
+  9278-FF10159                       +69.1%  Sparse Intermittent              540       1,750
+  9278-FF10479                        +0.0%  OTB (zero)                    0         0.0
+  13640-FF4935                        +0.0%  OTB (zero)                    0         0.0
+  20474-FF10162                      +18.5%  Croston's      [BW]       3,696       3,120
+  20474-FF10159                      +48.0%  Croston's                 8,238      15,850
+  21152-BB0235                       +76.9%  Sparse Intermittent               60         260
+  3102-FF15718                       +70.5%  Sparse Intermittent [BW]         384       1,300
+  9278-FF13154                      +166.7%  Sparse Intermittent               96          36
+  3466-FF15134                       +47.4%  Croston's                   288         548
+  2342-FF8433                         +0.0%  OTB (zero)                    0         0.0
+  12835-BB16316                      +25.0%  Sparse Intermittent               12          16
+  13032-BB16537                      +76.9%  Sparse Intermittent              240       1,040
+  13640-BB12479                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB19109                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB19110                       +0.0%  OTB (zero)                    0         0.0
+  20474-FF12846                      +70.2%  Croston's                 9,384       5,512
+  2342-FF15585                      +100.0%  OTB (zero)                    0     1,600.0
+  3892-FF4776                        +19.2%  Sparse Intermittent              168         208
+  3892-FF5776                        +22.0%  Sparse Intermittent              222         182
+  3892-FF7258                        +36.9%  Sparse Intermittent              534         390
+  3892-FF7263                       +186.2%  Sparse Intermittent              372         130
+  3892-FF7266                        +56.9%  Sparse Intermittent              204         130
+  12428-FF5952                      +100.0%  OTB (zero)                    0       390.0
+  12428-FF7618                       +84.6%  Sparse Intermittent              240         130
+  3102-FF18959                       +64.8%  Croston's                   360       1,024
+  4524-FF13875                        +0.0%  OTB (zero)                    0         0.0
+  23651-FF6989                       +21.4%  Sparse Intermittent              816         672
+  12002-SF8168                       +33.8%  Sparse Intermittent            1,392       1,040
+  12002-FF6989                       +55.2%  Sparse Intermittent              672       1,500
+  23651-SF8168                       +23.8%  Sparse Intermittent            1,584       2,080
+  13640-FF12649                      +24.0%  Sparse Intermittent           11,904       9,600
+  1864-BB13436PCS6                   +93.6%  Heuristic                     8         125
+  1864-BB0236PCS6                    +79.2%  Heuristic                    26         125
+  1864-BB0083AMZ2                    +31.6%  Heuristic                   171         250
+  1864-FF7112AMZ2                    +33.9%  Croston's                   162         245
+  13825-BB0466                       +64.8%  Sparse Intermittent [BW]       1,500         910
+  4524-BB11603                       +40.0%  Sparse Intermittent            1,728       2,880
+  4524-BB12018                        +0.0%  OTB (zero)                    0         0.0
+  2342-FF5776                         +0.0%  OTB (zero)                    0         0.0
+  7919-FF7488                         +0.0%  OTB (zero)                    0         0.0
+  1864-FF4933PCS24                   +36.8%  Heuristic                    26          19
+  1864-FF5716PCS72                   +81.6%  Heuristic                     7          38
+  1864-FF5769PCS6                    +65.3%  Heuristic                    26          75
+  1864-BB14500PCS6                   +79.2%  Croston's                    26         125
+  1864-BB16535PCS12                 +290.0%  Heuristic                    78          20
+  1864-FF11927PCS24                  +58.3%  Sparse Intermittent                5          12
+  1864-FF12283PCS6                   +89.4%  Croston's                    26         245
+  1864-FF8287PCS60                   +30.0%  Heuristic                    26          20
+  1864-FF6305PCS24                   +42.0%  Croston's                    29          50
+  1864-FF18956PCS24                  +88.4%  Croston's                    29         250
+  1864-FF12378PCS6                   +56.0%  Croston's                    78          50
+  3466-FF9291PDQ                     +67.2%  Croston's                   384       1,170
+  4651-BB0131                        +95.7%  Sparse Intermittent               36         840
+  4651-BB0490                        +28.0%  Croston's                    72         100
+  4651-BB16532                       +76.2%  Croston's                    30         126
+  4651-BB19242                       +64.1%  Sparse Intermittent [BW]         140         390
+  4524-BB19110                       +76.0%  Sparse Intermittent              240       1,000
+  4524-BB19112                       +76.0%  Sparse Intermittent              240       1,000
+  4524-BB19113                       +76.0%  Sparse Intermittent              240       1,000
+  16014-BB0094                       +57.5%  Sparse Intermittent            3,780       2,400
+  13149-FF5807                       +52.0%  Croston's                   600       1,250
+  3892-BB11417                       +72.2%  Sparse Intermittent            1,488         864
+  23011-FF17828                      +75.4%  Croston's                   192         780
+  16415-FF9298                       +26.2%  Sparse Intermittent              480         650
+  16415-SF8169                       +66.2%  Sparse Intermittent            1,296         780
+  16645-FF18959                      +38.5%  Sparse Intermittent               48          78
+  18360-BB21949                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB21950                       +0.0%  OTB (zero)                    0         0.0
+  12428-FF8287                       +84.6%  Sparse Intermittent              240         130
+  18360-FF4923                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF7110                       +59.9%  Sparse Intermittent            4,008      10,000
+  18360-FF7112                       +18.7%  Sparse Intermittent            8,130      10,000
+  18360-FF7115                       +51.9%  Sparse Intermittent            6,078       4,000
+  18360-FF7258                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF7260                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF7263                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF4771                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF7118                       +66.5%  Sparse Intermittent            3,330       2,000
+  4524-BB21237                       +45.0%  Sparse Intermittent            1,980       3,600
+  4524-BB21644                       +50.0%  Sparse Intermittent            1,200       2,400
+  11169-FF11927                       +0.0%  OTB (zero)                    0         0.0
+  11169-FF13154                     +100.0%  OTB (zero)                    0        42.0
+  11169-FF15718                     +100.0%  OTB (zero)                    0        70.0
+  11169-FF8256                      +100.0%  OTB (zero)                    0        70.0
+  11169-FF8258                      +100.0%  OTB (zero)                    0        70.0
+  11169-FF8831                        +0.0%  OTB (zero)                    0         0.0
+  13640-FF12653                      +20.0%  Sparse Intermittent            5,760       4,800
+  8940-FF10162                       +40.0%  Sparse Intermittent [BW]         336         240
+  23651-FF12653                     +100.0%  OTB (zero)                    0       260.0
+  18504-BB16998                      +60.0%  Sparse Intermittent [BW]          36          90
+  21152-BB0100                       +35.4%  Sparse Intermittent              252         390
+  3700-BB0092                        +31.4%  Croston's                   900         685
+  8940-FF10475                       +80.0%  Sparse Intermittent [BW]         432         240
+  12002-FF12656                      +19.6%  Sparse Intermittent              732         910
+  8940-FF10159                       +33.3%  Sparse Intermittent [BW]         480         360
+  1885-FF17554                       +25.0%  Croston's                35,424      47,250
+  16820-FF26976                      +32.0%  Croston's                 8,130      11,954
+  20474-FF10475                      +38.9%  Croston's                 5,742       9,400
+  20474-FF10530                      +20.6%  Croston's      [BW]       1,032       1,300
+  3700-BB0096                        +83.3%  Croston's      [BW]         636         347
+  3700-BB25518                       +15.4%  Croston's                   264         312
+  3700-BB0235                        +13.1%  Sparse Intermittent [BW]         294         260
+  20474-FF13876                      +64.8%  Croston's                 2,742       7,800
+  20474-FF13878                      +46.0%  Croston's      [BW]       4,212       7,800
+  4524-FF10530                       +90.0%  Sparse Intermittent              240       2,400
+  4524-BB21235                       +45.0%  Sparse Intermittent            1,980       3,600
+  21152-BB11483                      +20.0%  Sparse Intermittent              312         390
+  16820-FF26973                      +73.2%  Croston's                 2,580       9,637
+  16820-FF26974                      +59.7%  Croston's                 2,466       6,119
+  1864-FF4577PCS24                  +160.0%  Croston's                    52          20
+  1864-FF8831PCS12                   +82.5%  Heuristic                    35         200
+  9278-FF12842                       +47.7%  Sparse Intermittent [BW]         768         520
+  1587-FF15718                       +40.9%  Sparse Intermittent [BW]         384         650
+  5330-FF7215                        +36.6%  Sparse Intermittent            1,812       2,860
+  5330-FF9060                        +62.5%  Sparse Intermittent            1,464       3,900
+  5330-FF7541                        +39.1%  Sparse Intermittent              792       1,300
+  23219-FF11926                      +39.4%  Croston's      [BW]       2,520       4,160
+  13825-BB0490                       +53.8%  Sparse Intermittent [BW]         300         650
+  12002-FF9298                       +60.0%  Sparse Intermittent            1,248         780
+  23651-FF15588                      +17.8%  Sparse Intermittent            1,176       1,430
+  12002-FF10479                      +28.0%  Sparse Intermittent [BW]         960         750
+  23651-FF10479                     +205.0%  Sparse Intermittent              732         240
+  23651-FF10530                      +70.0%  Sparse Intermittent            1,224         720
+  16820-FF26965                      +62.6%  Croston's                 2,760       7,378
+  12835-BB21626                      +10.0%  Croston's                   702         780
+  12835-BB22095                      +21.5%  Croston's                   612         780
+  12835-BB22093                      +53.8%  Sparse Intermittent              180         390
+  18360-FF5776                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB0012                        +40.0%  Sparse Intermittent            2,160       3,600
+  4524-BB12019                       +56.0%  Sparse Intermittent            1,056       2,400
+  4524-BB11917                        +0.0%  OTB (zero)                    0         0.0
+  23011-BB0082                      +100.0%  OTB (zero)                    0        52.0
+  18360-BB0150                        +0.0%  OTB (zero)                    0         0.0
+  16820-FF27259                      +19.2%  Croston's      [BW]       5,328       4,471
+  11169-FF22070                       +0.0%  OTB (zero)                    0         0.0
+  16014-BB15068                     +100.0%  OTB (zero)                    0     1,720.0
+  16820-FF26972                      +60.1%  Croston's                 1,470       3,683
+  16820-FF26977                      +64.7%  Croston's                 2,052       5,819
+  23651-FF10475                     +122.0%  Sparse Intermittent              444         200
+  23651-FF9298                      +100.0%  OTB (zero)                    0       576.0
+  23651-FF10477                      +62.2%  Sparse Intermittent              168         444
+  3700-BB0083                        +47.3%  Sparse Intermittent              192         364
+  3700-BB0424                        +92.1%  Croston's                    66         832
+  3700-BB0079                        +87.0%  Croston's                   108         832
+  3700-BB21641                       +88.1%  Croston's                   108         910
+  3700-BB18835                       +79.2%  Croston's                   108         520
+  3700-BB0150                        +88.3%  Croston's                   168       1,430
+  18360-BB19113                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB19112                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB19110                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB26921                       +0.0%  OTB (zero)                    0         0.0
+  4524-BB26922                       +76.0%  Sparse Intermittent              240       1,000
+  4524-BB21643                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB16534                       +50.0%  Sparse Intermittent            2,400       4,800
+  4524-BB16537                       +66.5%  Sparse Intermittent              804       2,400
+  12428-FF10475                     +100.0%  OTB (zero)                    0       260.0
+  18360-BB21641                       +0.0%  OTB (zero)                    0         0.0
+  3466-FF10159                       +38.3%  Sparse Intermittent            1,110       1,800
+  16128-FF28226                      +76.7%  Croston's                   408       1,750
+  16128-FF28229                      +75.5%  Croston's                 1,536         875
+  16128-FF28225                      +59.2%  Croston's                   408       1,000
+  4524-BB0722                        +33.8%  Sparse Intermittent            1,272       1,920
+  18360-FF10477                      +23.2%  Sparse Intermittent           12,324      10,000
+  16554-FF27261                      +37.8%  Croston's                   600         965
+  9108-FF14364                       +44.6%  Sparse Intermittent              144         260
+  9108-FF12849                       +85.4%  Sparse Intermittent               72         492
+  9108-FF4775                       +140.0%  Heuristic                   312         130
+  9108-FF5766                        +28.0%  Sparse Intermittent               90         125
+  9108-FF7297                        +10.8%  Sparse Intermittent              144         130
+  9108-FF8831                        +46.5%  Heuristic                   348         650
+  9108-FF4776                        +61.6%  Sparse Intermittent               48         125
+  9108-FF4935                        +13.6%  Sparse Intermittent              216         250
+  9108-FF4936                        +10.8%  Sparse Intermittent              288         260
+  9108-FF7266                       +227.7%  Heuristic                   426         130
+  9108-FF4771                        +24.8%  Croston's      [BW]         156         125
+  9108-FF4930                        +81.5%  Sparse Intermittent               24         130
+  9108-FF7115                        +57.4%  Croston's      [BW]         156         366
+  18360-FF5777                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF7261                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF7266                        +0.0%  OTB (zero)                    0         0.0
+  16820-FF26975                      +61.9%  Croston's                 2,430       6,370
+  12428-FF7619                       +84.6%  Sparse Intermittent              240         130
+  4524-BB0494                         +0.0%  OTB (zero)                    0         0.0
+  1745-FF15718                       +70.5%  Sparse Intermittent              192         650
+  4524-BB26924                       +73.3%  Sparse Intermittent              384       1,440
+  4524-BB16535                       +34.0%  Sparse Intermittent            3,168       4,800
+  4524-BB13457                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB13603                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB22272                       +10.0%  Sparse Intermittent            3,240       3,600
+  18360-FF10530                      +18.3%  Sparse Intermittent            9,804      12,000
+  18360-FF20208                      +30.7%  Sparse Intermittent            9,708      14,000
+  13640-FF10159                      +15.3%  Sparse Intermittent [BW]       8,646       7,500
+  4524-BB29713                       +70.0%  Sparse Intermittent            1,440       4,800
+  4524-BB29714                       +60.0%  Sparse Intermittent            1,152       2,880
+  1745-FF4771                        +17.7%  Sparse Intermittent              612         520
+  1745-FF4775                        +61.9%  Croston's                   198         520
+  3080-FF6560                        +11.6%  Croston's                 2,370       2,682
+  3080-FF6634                        +38.8%  Sparse Intermittent [BW]       1,932       1,392
+  3080-FF6635                        +48.2%  Sparse Intermittent [BW]       5,220       3,522
+  3080-FF6636                        +29.9%  Sparse Intermittent [BW]       5,028       3,870
+  3080-FF6637                        +83.8%  Sparse Intermittent [BW]       5,040       2,742
+  3080-FF6638                        +23.7%  Sparse Intermittent [BW]       4,224       3,414
+  3080-FF6639                        +47.5%  Sparse Intermittent [BW]       4,584       3,108
+  3080-FF9398                         +8.0%  Sparse Intermittent            2,208       2,400
+  3102-FF27260                       +69.2%  Sparse Intermittent               24          78
+  20474-FF14365                      +25.5%  Croston's      [BW]       3,876       5,200
+  20474-FF9291PDQ                    +48.9%  Sparse Intermittent              864       1,690
+  13640-BB0473                       +64.3%  Sparse Intermittent            1,428       4,000
+  13640-BB16534                      +74.1%  Sparse Intermittent              324       1,250
+  13640-BB29714                       +0.0%  OTB (zero)                    0         0.0
+  4524-BB21641                       +34.0%  Sparse Intermittent            1,584       2,400
+  4524-BB21642                       +50.0%  Sparse Intermittent            1,200       2,400
+  7199-BB0080                        +92.0%  Sparse Intermittent              192       2,400
+  7199-BB0081                        +91.9%  Sparse Intermittent              156       1,920
+  7199-BB0082                        +91.9%  Sparse Intermittent               78         960
+  7199-BB0473                        +92.1%  Sparse Intermittent              114       1,440
+  7199-BB0760                        +92.1%  Sparse Intermittent              114       1,440
+  7199-BB16535                       +91.7%  Sparse Intermittent              120       1,440
+  7199-BB16537                       +91.7%  Sparse Intermittent              120       1,440
+  7199-BB19109                       +91.9%  Sparse Intermittent               78         960
+  7199-BB19110                       +91.9%  Sparse Intermittent               78         960
+  7199-BB19112                       +91.9%  Sparse Intermittent               78         960
+  7199-BB22118                       +92.1%  Sparse Intermittent              114       1,440
+  7199-BB26921                       +91.7%  Sparse Intermittent               60         720
+  7199-BB26922                       +91.7%  Sparse Intermittent               60         720
+  7199-BB26923                       +91.9%  Sparse Intermittent              116       1,440
+  7199-BB26924                       +91.9%  Sparse Intermittent              116       1,440
+  16001-BB11150                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB12752                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB16316                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB21949                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB21950                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB21951                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB29120                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB29120                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB0473                       +61.8%  Sparse Intermittent            2,100       5,500
+  22008-BB22116                      +43.8%  Sparse Intermittent            5,058       9,000
+  22008-BB0435                       +35.6%  Sparse Intermittent            2,898       4,500
+  22008-BB29712                      +51.5%  Sparse Intermittent            3,150       6,500
+  22008-BB16534                      +66.4%  Sparse Intermittent            2,016       6,000
+  22008-BB16535                      +43.3%  Sparse Intermittent            4,080       7,200
+  22008-BB16537                      +22.1%  Sparse Intermittent            5,064       6,500
+  22008-BB0018                       +43.3%  Sparse Intermittent            3,402       6,000
+  22008-BB0216                       +84.0%  Sparse Intermittent              480       3,000
+  22008-BB0217                       +67.6%  Sparse Intermittent              972       3,000
+  22008-BB0081                       +72.0%  Sparse Intermittent              840       3,000
+  22008-BB0083                       +31.3%  Sparse Intermittent            1,512       2,200
+  23651-FF12656                     +196.9%  Sparse Intermittent            1,158         390
+  23651-FF5952                      +100.0%  OTB (zero)                    0       600.0
+  23651-FF12825                       +0.0%  OTB (zero)                    0         0.0
+  12002-FF10159                      +10.8%  Sparse Intermittent              288         260
+  12428-FF9298                      +100.0%  OTB (zero)                    0     1,040.0
+  12002-FF20206                      +47.2%  Sparse Intermittent            1,104         750
+  7199-BB29122                       +92.1%  Sparse Intermittent              114       1,440
+  12002-FF20208                     +100.0%  OTB (zero)                    0       130.0
+  19645-SF8168                      +136.9%  Sparse Intermittent            3,696       1,560
+  12002-FF20210                       +7.7%  Sparse Intermittent              120         130
+  23651-FF20210                      +70.8%  Sparse Intermittent              666         390
+  1587-FF7372                        +32.7%  Sparse Intermittent            1,380       1,040
+  13825-FF8425                       +58.5%  Sparse Intermittent              324         780
+  12002-SF8170                       +36.0%  Sparse Intermittent              960       1,500
+  23651-SF8170                       +13.6%  Sparse Intermittent            1,296       1,500
+  13646-SF8170                       +54.9%  Sparse Intermittent            2,208       4,896
+  14719-SF8170                       +23.1%  Sparse Intermittent            5,760       7,488
+  3466-FF10477                       +60.1%  Sparse Intermittent            2,208       5,536
+  4524-BB30279                       +34.0%  Sparse Intermittent            1,584       2,400
+  4524-BB29561                       +45.0%  Sparse Intermittent            1,320       2,400
+  4524-BB30276                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB30587                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB30930                       +34.0%  Sparse Intermittent            1,584       2,400
+  4524-BB27359                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB30424                        +0.0%  OTB (zero)                    0         0.0
+  21152-BB0149                       +11.2%  Sparse Intermittent              540         608
+  1864-BB0191PCS6                    +87.0%  Heuristic                    26         200
+  13032-BB16534                      +76.9%  Sparse Intermittent              240       1,040
+  22008-BB28473                      +10.0%  Sparse Intermittent [BW]      50,400      45,816
+  22008-BB28480                      +15.6%  Sparse Intermittent [BW]      71,904      62,196
+  3837-FF12858MX                     +16.9%  Sparse Intermittent            5,884       5,032
+  3837-FF20001MX                    +112.6%  Sparse Intermittent            4,893       2,301
+  3837-FF12659MX                     +61.3%  Sparse Intermittent            2,580       1,600
+  3837-FF19592MX                     +24.0%  Sparse Intermittent            1,860       1,500
+  12002-FF10475                     +118.5%  Sparse Intermittent              852         390
+  3837-FF15718MX                     +14.9%  Sparse Intermittent            4,020       3,500
+  13646-FF12353COS                    +0.0%  OTB (zero)                    0         0.0
+  13646-FF12354COS                    +0.0%  OTB (zero)                    0         0.0
+  13646-FF6553COS                     +0.0%  OTB (zero)                    0         0.0
+  13646-FF6554COS                     +0.0%  OTB (zero)                    0         0.0
+  13640-FF10477                      +22.7%  Sparse Intermittent            9,204       7,500
+  14719-FF12353COS                    +0.0%  OTB (zero)                    0         0.0
+  14719-FF12354COS                    +0.0%  OTB (zero)                    0         0.0
+  14719-FF6553COS                     +0.0%  OTB (zero)                    0         0.0
+  14719-FF6554COS                     +0.0%  OTB (zero)                    0         0.0
+  13640-FF10475                      +41.4%  Sparse Intermittent [BW]       3,516       6,000
+  3837-FF4933MX                      +47.0%  Sparse Intermittent            1,764       1,200
+  3837-FF4934MX                      +29.6%  Sparse Intermittent            1,296       1,000
+  3837-FF4935MX                     +115.1%  Sparse Intermittent            1,506         700
+  3837-FF8423MX                      +18.6%  Sparse Intermittent            4,068       5,000
+  13640-BB21626                      +39.7%  Sparse Intermittent            5,976       9,912
+  13640-BB22095                      +40.2%  Sparse Intermittent            7,056      11,808
+  13640-BB24711                      +26.2%  Croston's                22,720      18,000
+  18360-FF5716                        +0.0%  OTB (zero)                    0         0.0
+  15339-BB0018                       +35.4%  Sparse Intermittent              336         520
+  15339-BB0424                      +100.0%  OTB (zero)                    0       520.0
+  15339-BB0080                       +40.0%  Sparse Intermittent               60         100
+  15339-BB0409                      +213.0%  Sparse Intermittent              144          46
+  15339-BB0236                      +153.5%  Sparse Intermittent            1,014         400
+  15339-BB0237                      +108.0%  Croston's                   780         375
+  15339-BB25519                     +534.2%  Croston's                 8,244       1,300
+  15339-BB0102                       +20.0%  Croston's                   900         750
+  15339-BB0131                       +24.8%  Croston's                 1,128       1,500
+  15339-BB12021                      +72.3%  Sparse Intermittent               36         130
+  15339-BB19242                      +70.0%  Sparse Intermittent              105         350
+  15339-BB0081                       +52.2%  Croston's                   348         728
+  12835-BB22094                      +16.9%  Croston's                   432         520
+  22008-BB26924                      +47.3%  Sparse Intermittent            3,424       6,500
+  22008-BB19154                       +0.0%  OTB (zero)                    0         0.0
+  7291-BB0424                        +75.0%  Sparse Intermittent              450       1,800
+  8919-SF8170                         +0.0%  OTB (zero)                    0         0.0
+  13640-BB23576                       +0.0%  OTB (zero)                    0         0.0
+  13640-FF8654                        +0.0%  OTB (zero)                    0         0.0
+  13640-FF13885                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF12376                      +80.0%  Sparse Intermittent            2,004      10,000
+  18360-BB11917                       +0.0%  OTB (zero)                    0         0.0
+  12428-SF8167                       +10.8%  Sparse Intermittent              864         780
+  23651-FF20209                     +100.0%  OTB (zero)                    0       390.0
+  18360-BB32329                      +72.0%  Sparse Intermittent            2,238       8,000
+  13640-FF26777                      +20.0%  Sparse Intermittent            5,760       7,200
+  13640-FF31062                      +30.8%  Sparse Intermittent            6,648       9,600
+  3837-FF10477MX                     +16.6%  Sparse Intermittent            5,628       4,828
+  3837-FF10479MX                     +17.7%  Sparse Intermittent            6,792       5,770
+  3837-FF9291MX                      +28.8%  Sparse Intermittent            7,326       5,688
+  3837-FF9297MX                      +66.5%  Sparse Intermittent           15,036       9,030
+  3837-FF9298MX                      +61.3%  Sparse Intermittent            3,096       1,920
+  13640-BB22025                      +18.7%  Sparse Intermittent            2,928       3,600
+  13640-BB22094                      +90.2%  Sparse Intermittent            7,608       4,000
+  1587-FF22321                       +32.3%  Croston's      [BW]         264         390
+  1587-FF22323                       +44.6%  Sparse Intermittent              216         390
+  1587-FF22070                       +44.6%  Sparse Intermittent              144         260
+  16001-BB12028                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB0191                        +0.0%  OTB (zero)                    0         0.0
+  9108-FF12655                       +98.2%  Croston's                    12         650
+  13640-FF10162                      +10.9%  Sparse Intermittent            8,016       9,000
+  13640-FF20208                      +67.6%  Croston's                10,056       6,000
+  3837-FF13198MX                    +100.0%  OTB (zero)                    0     3,600.0
+  13640-BB19112                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB30276                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF8991                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB23576                       +66.8%  Sparse Intermittent              798       2,400
+  4524-BB30461                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB30462                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF4775                        +0.0%  OTB (zero)                    0         0.0
+  14719-FF4775                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF10479                      +12.6%  Sparse Intermittent           10,920      12,500
+  18360-FF31061                      +19.9%  Sparse Intermittent            3,204       4,000
+  18360-FF31062                      +12.3%  Sparse Intermittent            4,494       4,000
+  18360-FF19546                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF22187                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF27687                       +0.0%  OTB (zero)                    0         0.0
+  4524-FF20208                       +90.0%  Sparse Intermittent              240       2,400
+  4524-FF22187                        +0.0%  OTB (zero)                    0         0.0
+  4524-FF11349                        +0.0%  OTB (zero)                    0         0.0
+  13640-FF20207                      +15.0%  Heuristic                 2,550       3,000
+  13640-FF31061                     +117.0%  Sparse Intermittent [BW]       7,812       3,600
+  18360-FF12375                     +516.5%  Sparse Intermittent            7,398       1,200
+  18360-FF12378                      +45.5%  Sparse Intermittent            5,820       4,000
+  13640-BB0009                       +82.2%  Sparse Intermittent              480       2,700
+  13640-BB0015                       +85.5%  Sparse Intermittent              480       3,300
+  13640-BB0018                       +80.0%  Sparse Intermittent              480       2,400
+  13640-BB11603                       +0.0%  OTB (zero)                    0         0.0
+  4651-BB0096                       +100.0%  Croston's                   300         150
+  6579-FF22077                       +38.5%  Sparse Intermittent            3,960       2,860
+  23011-FF10556                      +72.2%  Croston's                   217         780
+  14719-FF19986                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB22117                      +36.0%  Sparse Intermittent            6,528      10,200
+  18360-FF18826                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF18828                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF18825                       +0.0%  OTB (zero)                    0         0.0
+  13640-FF20209                      +18.7%  Sparse Intermittent            9,612       8,100
+  8940-FF4517PS                     +135.6%  Sparse Intermittent [BW]       2,544       1,080
+  12002-SF8173                      +269.2%  Heuristic                 1,920         520
+  9108-FF11348                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF4934                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF12377                       +0.0%  OTB (zero)                    0         0.0
+  23651-FF26777                     +155.4%  Sparse Intermittent              996         390
+  13640-BB19113                       +0.0%  OTB (zero)                    0         0.0
+  16820-FF4775                       +30.0%  Croston's      [BW]       6,132       8,763
+  1864-BB25519PCS6                   +52.8%  Heuristic                    59         125
+  16645-FF6989                      +453.8%  Sparse Intermittent            1,440         260
+  16645-FF12823                       +0.0%  OTB (zero)                    0         0.0
+  16645-FF22317                      +66.2%  Sparse Intermittent              216         130
+  16645-FF22318                      +66.2%  Sparse Intermittent              216         130
+  16645-FF22321                      +44.6%  Sparse Intermittent               72         130
+  16645-FF22323                     +232.3%  Sparse Intermittent              432         130
+  16645-FF5952                       +24.6%  Sparse Intermittent            1,296       1,040
+  16645-FF9298                      +232.3%  Sparse Intermittent            1,296         390
+  16645-SF8169                      +315.4%  Sparse Intermittent            2,160         520
+  16645-SF8170                      +103.1%  Sparse Intermittent              528         260
+  16645-FF12837                      +30.8%  Sparse Intermittent              180         260
+  7919-FF8991                         +0.0%  OTB (zero)                    0         0.0
+  13640-BB26922                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB26921                       +0.0%  OTB (zero)                    0         0.0
+  3892-BB28480                       +42.3%  Sparse Intermittent [BW]       1,080       1,872
+  3892-BB28473                       +73.8%  Sparse Intermittent              720       2,750
+  3892-BB28719                       +40.7%  Sparse Intermittent            1,080       1,820
+  3892-BB29477                       +42.8%  Sparse Intermittent              744       1,300
+  3700-BB0234                       +100.0%  OTB (zero)                    0       130.0
+  3700-BB0236                        +24.8%  Croston's                   318         423
+  9278-FF4933                        +42.4%  Sparse Intermittent [BW]         144         250
+  22008-BB29714                      +15.6%  Sparse Intermittent            5,064       6,000
+  23651-FF20206                      +57.9%  Sparse Intermittent            1,776       1,125
+  23651-FF31061                     +146.2%  Sparse Intermittent              960         390
+  14719-FF19988                       +0.0%  OTB (zero)                    0         0.0
+  13825-FF8424                       +66.2%  Sparse Intermittent [BW]         216         130
+  3080-FF9291CA                      +54.4%  Croston's                   912       2,000
+  3080-FF11899CA                     +45.1%  Sparse Intermittent              960       1,750
+  3080-FF9290CA                      +44.6%  Sparse Intermittent [BW]         720       1,300
+  13640-FF8882                        +0.0%  OTB (zero)                    0         0.0
+  13640-FF14584                       +0.0%  OTB (zero)                    0         0.0
+  14719-FF19786                       +0.0%  OTB (zero)                    0         0.0
+  13646-FF19786                       +0.0%  OTB (zero)                    0         0.0
+  14719-FF19789                       +0.0%  OTB (zero)                    0         0.0
+  13646-FF19789                       +0.0%  OTB (zero)                    0         0.0
+  13646-FF12355COS                    +0.0%  OTB (zero)                    0         0.0
+  14719-FF12355COS                    +0.0%  OTB (zero)                    0         0.0
+  9278-FF22070                       +61.6%  Sparse Intermittent [BW]         144         375
+  12835-FF33094                      +95.0%  Croston's                60,948      31,250
+  3102-FF7218                       +140.0%  Croston's                   300         125
+  16820-FF16704                      +46.8%  Sparse Intermittent            2,352       4,420
+  16820-FF25895                      +34.2%  Sparse Intermittent            3,504       5,325
+  2953-FF5766                        +31.0%  Croston's      [BW]         120         174
+  2953-FF7372                        +65.4%  Croston's      [BW]         138         399
+  16128-FF6636                        +9.5%  Croston's                 1,584       1,750
+  22008-FF10159                      +36.0%  Sparse Intermittent            6,390       4,700
+  22008-FF10162                      +42.2%  Sparse Intermittent            2,718       4,700
+  22008-FF10477                      +47.2%  Sparse Intermittent            3,192       6,050
+  22008-FF10475                      +13.7%  Sparse Intermittent            5,220       6,050
+  22008-FF10479                      +42.1%  Croston's      [BW]       6,312      10,900
+  13646-SF8168                       +46.7%  Sparse Intermittent            2,688       5,040
+  13646-FF18825                       +0.0%  OTB (zero)                    0         0.0
+  14719-FF18828                       +0.0%  OTB (zero)                    0         0.0
+  14719-FF18825                       +0.0%  OTB (zero)                    0         0.0
+  14719-SF8168                       +79.0%  Sparse Intermittent            1,248       5,952
+  3102-FF25934                      +100.0%  OTB (zero)                    0       520.0
+  18360-FF17588                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF17828                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF30426                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF31605                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF8990                        +0.0%  OTB (zero)                    0         0.0
+  1864-BB14647                       +23.4%  Heuristic                 4,884       6,375
+  3102-FF22317                       +22.2%  Croston's                   336         432
+  3102-FF27332                      +284.6%  Heuristic                   600         156
+  3466-FF10475                       +41.5%  Croston's      [BW]       1,470       2,514
+  13825-FF4771                       +12.4%  Croston's      [BW]         438         500
+  8940-SF8169PS                      +60.0%  Sparse Intermittent [BW]       4,608       2,880
+  6386-FF7619                        +53.8%  Sparse Intermittent               60         130
+  6386-FF7613                        +44.6%  Sparse Intermittent               72         130
+  16645-FF26777                      +12.3%  Sparse Intermittent              228         260
+  16645-FF31062                     +105.4%  Sparse Intermittent              534         260
+  16645-FF5715                       +44.6%  Sparse Intermittent              144         260
+  16645-FF8287                       +30.8%  Sparse Intermittent              180         260
+  16645-FF18958                      +38.5%  Sparse Intermittent               48          78
+  1587-FF15592                       +82.1%  Croston's                   156         870
+  1587-FF4933                        +51.6%  Croston's                   456         942
+  16645-SF8170PS                    +100.0%  OTB (zero)                    0       260.0
+  22008-BB21951                      +57.2%  Sparse Intermittent            3,420       8,000
+  22008-BB0152                       +71.0%  Sparse Intermittent            1,392       4,800
+  22008-BB0150                       +42.2%  Sparse Intermittent            2,196       3,799
+  22008-BB21641                      +53.7%  Sparse Intermittent            2,544       5,500
+  22008-BB0424                       +55.5%  Sparse Intermittent            1,602       3,600
+  22008-BB21237                      +59.2%  Sparse Intermittent            2,244       5,500
+  22008-BB21644                      +37.2%  Sparse Intermittent            3,768       6,000
+  22008-BB26922                      +42.1%  Sparse Intermittent            1,158       2,000
+  22008-BB0079                       +20.9%  Sparse Intermittent            2,532       3,200
+  1864-BB26587PCS10                  +76.4%  Heuristic                    26         110
+  11169-FF25576KL                   +288.9%  Heuristic                   840         216
+  3102-FF12825                       +41.1%  Croston's                   132         224
+  3102-FF30784                       +65.4%  Sparse Intermittent               72         208
+  1864-BB21237PCS12                  +80.9%  Heuristic                    29         152
+  1864-BB23576PCS6                   +89.4%  Croston's                    26         245
+  7919-BB0705                         +0.0%  OTB (zero)                    0         0.0
+  13149-FF17288                      +89.7%  Sparse Intermittent              360       3,500
+  14719-FF4933                        +0.0%  OTB (zero)                    0         0.0
+  1864-BB33249PCS12                  +30.0%  Heuristic                    26          20
+  14023-FF5807                       +25.0%  Croston's                   156         208
+  13640-BB0759                        +0.0%  OTB (zero)                    0         0.0
+  13640-BB0216                       +80.0%  Sparse Intermittent              360       1,800
+  13640-BB12019                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB21237                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB0080                        +0.0%  OTB (zero)                    0         0.0
+  13640-BB0409                       +88.8%  Sparse Intermittent              360       3,200
+  13640-BB16537                      +54.3%  Sparse Intermittent              960       2,100
+  13640-BB30279                       +8.0%  Sparse Intermittent              324         300
+  23651-FF31062                     +326.2%  Sparse Intermittent            1,662         390
+  1864-FF31606PCS12                  +68.0%  Heuristic                     8          25
+  13032-BB0102                       +52.0%  Sparse Intermittent [BW]       1,800       3,750
+  13032-BB0234                       +39.0%  Croston's                   762       1,250
+  13032-BB25519                      +32.0%  Sparse Intermittent            1,716       1,300
+  19790-FF28226                      +42.4%  Sparse Intermittent               72         125
+  19790-FF28227                      +56.8%  Sparse Intermittent              108         250
+  19790-FF28228                      +67.7%  Croston's      [BW]          42         130
+  12002-FF26777                     +278.5%  Sparse Intermittent              492         130
+  12835-BB12383/6                    +35.2%  Croston's                 7,206       5,328
+  13032-BB0237                       +35.4%  Sparse Intermittent [BW]       1,056         780
+  8940-SF8170PS                      +92.0%  Sparse Intermittent [BW]       2,304       1,200
+  13032-BB15841                     +100.0%  Croston's                   624         312
+  13032-BB0492                       +69.2%  Sparse Intermittent               96         312
+  11169-FF25667KL                   +100.0%  OTB (zero)                    0        48.0
+  2342-FF11348/6                    +100.0%  OTB (zero)                    0     2,000.0
+  11169-FF13115KL                     +0.0%  OTB (zero)                    0         0.0
+  11169-FF15134KL                     +0.0%  OTB (zero)                    0         0.0
+  16645-SF8167                       +44.6%  Sparse Intermittent              144         260
+  7919-FF7297                         +0.0%  OTB (zero)                    0         0.0
+  12002-FF28039                       +0.0%  OTB (zero)                    0         0.0
+  12002-FF9297PDQ                   +143.7%  Sparse Intermittent            1,584         650
+  12002-FF31061                      +17.7%  Sparse Intermittent              642         780
+  12002-FF31062                     +753.8%  Sparse Intermittent            1,110         130
+  13640-BB21644                       +0.0%  OTB (zero)                    0         0.0
+  9278-FF22071                       +32.8%  Croston's      [BW]         336         500
+  13640-FF7267                        +0.0%  OTB (zero)                    0         0.0
+  13640-FF7115                       +60.0%  Sparse Intermittent              960       2,400
+  33011-BB26413                      +81.5%  Sparse Intermittent               24         130
+  13640-BB0151                        +0.0%  OTB (zero)                    0         0.0
+  8940-SF8168PS                     +100.0%  OTB (zero)                    0       768.0
+  16001-BB0081                        +0.0%  OTB (zero)                    0         0.0
+  16001-BB0082                        +0.0%  OTB (zero)                    0         0.0
+  18109-BB0761CAN                   +133.3%  Sparse Intermittent [BW]       6,720       2,880
+  13894-BB13453CAN                   +49.1%  Croston's                 4,992       9,800
+  13894-BB13457CAN                   +51.8%  Sparse Intermittent            3,468       7,200
+  13640-FF30506                       +0.0%  OTB (zero)                    0         0.0
+  8940-FF5715PS                      +80.0%  Sparse Intermittent [BW]       1,440         800
+  8940-FF5716PS                     +200.0%  Sparse Intermittent [BW]         864         288
+  8940-SF8167PS                      +68.0%  Sparse Intermittent [BW]       4,032       2,400
+  8940-FF4577PS                      +80.0%  Sparse Intermittent [BW]       2,160       1,200
+  2659-BB0079                        +60.8%  Heuristic                   918       2,340
+  2659-BB0424                        +63.6%  Heuristic                 1,230       3,380
+  2659-BB0080                        +44.6%  Heuristic                   576       1,040
+  3892-BB28720                       +49.2%  Sparse Intermittent              660       1,300
+  2659-FF30755                       +60.0%  Croston's                   312         780
+  1864-FF6634PCS6                    +30.0%  Croston's                    26          20
+  13640-BB33532                      +25.8%  Sparse Intermittent            5,472       4,350
+  13640-BB33534                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB33525                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB33526                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB33528                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB33530                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB33532                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB33534                       +0.0%  OTB (zero)                    0         0.0
+  2342-FF9757                         +0.0%  OTB (zero)                    0         0.0
+  16128-FF27262CA                    +20.0%  Croston's                   600         750
+  16128-FF27264CA                    +83.2%  Croston's                   168       1,000
+  16128-FF27266CA                    +49.6%  Croston's                   504       1,000
+  1420-BB35043                       +41.8%  Heuristic                 2,340       4,020
+  1587-BB35097                       +70.0%  Croston's                   375       1,250
+  1587-BB35098                       +68.2%  Croston's                 3,162       9,940
+  1587-BB35039                       +82.2%  Croston's                   408       2,290
+  1587-BB35032                       +81.5%  Croston's                   342       1,850
+  1587-BB35101                       +85.0%  Sparse Intermittent               60         400
+  1587-BB35043                       +52.2%  Sparse Intermittent [BW]       1,548       3,236
+  13640-FF7110                       +59.8%  Sparse Intermittent            3,834       2,400
+  4524-SF8170                        +81.5%  Sparse Intermittent              240       1,300
+  4524-FF9298                        +56.0%  Sparse Intermittent              264         600
+  13640-BB34751                      +61.6%  Sparse Intermittent              960       2,500
+  13640-BB34389                      +34.7%  Sparse Intermittent            7,512      11,502
+  13640-BB34390                      +59.2%  Sparse Intermittent            5,316      13,020
+  13640-BB34403                      +16.7%  Croston's                30,330      26,000
+  4524-BB34389                       +17.3%  Heuristic                 1,488       1,800
+  13640-FF28547                       +0.0%  OTB (zero)                    0         0.0
+  16651-FF12717AU                    +48.8%  Croston's                   576       1,125
+  16648-FF15588AU                    +16.9%  Croston's      [BW]         216         260
+  16651-FF27260AU                    +28.5%  Croston's                   372         520
+  16651-FF4771AU                     +63.1%  Croston's                    48         130
+  16651-FF4775AU                     +81.5%  Sparse Intermittent               24         130
+  16651-FF4936AU                     +81.5%  Croston's      [BW]          24         130
+  16648-FF15585AU                    +58.5%  Croston's                   108         260
+  16648-FF15589AU                    +65.7%  Croston's                   312         910
+  16648-FF4775AU                     +58.5%  Croston's                   162         390
+  16648-FF4776AU                     +40.0%  Croston's                    78         130
+  16648-FF4849AU                     +79.2%  Croston's                    54         260
+  16648-FF5766AU                     +53.8%  Sparse Intermittent [BW]          60         130
+  16648-FF7372AU                     +69.2%  Croston's                   120         390
+  16648-FF4934AU                     +52.0%  Croston's                   120         250
+  16648-FF7258AU                     +37.7%  Heuristic                   162         260
+  23651-FF18404/4                     +0.0%  OTB (zero)                    0         0.0
+  1745-FF7266                        +72.3%  Croston's                   108         390
+  13872-BB16854                      +44.6%  Sparse Intermittent               72         130
+  3340-BB0473                       +100.0%  OTB (zero)                    0     1,200.0
+  21025-FF12843                      +32.8%  Sparse Intermittent [BW]       1,680       2,500
+  21025-FF14364                      +16.5%  Sparse Intermittent            2,088       2,500
+  21025-FF10479                      +31.6%  Sparse Intermittent [BW]       2,772       4,050
+  21025-FF28457                      +16.0%  Sparse Intermittent            4,356       5,184
+  3466-FF8258                        +81.5%  Sparse Intermittent               72         390
+  21025-FF10159                      +51.1%  Sparse Intermittent            2,862       5,850
+  21025-FF10475                      +16.3%  Sparse Intermittent [BW]       3,012       3,600
+  21025-FF10477                      +25.4%  Sparse Intermittent            3,468       4,650
+  21025-FF7612                       +10.0%  Sparse Intermittent              648         720
+  21025-FF8423                       +33.5%  Sparse Intermittent [BW]         864       1,300
+  21025-FF8991                       +31.6%  Sparse Intermittent [BW]       1,368       2,000
+  3102-FF12824                        +7.7%  Sparse Intermittent               84          78
+  12835-BB0015                       +25.0%  Sparse Intermittent               12          16
+  13640-BB27359                       +0.0%  OTB (zero)                    0         0.0
+  13640-BB26923                      +58.4%  Sparse Intermittent            2,496       6,000
+  13640-BB26924                      +56.8%  Sparse Intermittent            1,296       3,000
+  3892-BB35100                       +52.7%  Croston's                   522       1,104
+  11393-BB35100                      +11.4%  Sparse Intermittent            2,028       1,820
+  21152-BB13457                       +0.0%  OTB (zero)                    0         0.0
+  1003-BB35097                       +24.4%  Sparse Intermittent            1,617       1,300
+  1003-BB35039                       +32.5%  Sparse Intermittent              108         160
+  3892-BB35039                       +57.6%  Croston's                 1,194       2,814
+  7291-BB35039                       +20.0%  Sparse Intermittent [BW]       1,920       2,400
+  8055-BB35039                       +35.7%  Sparse Intermittent            1,140         840
+  13825-BB35039                      +84.6%  Sparse Intermittent [BW]         480         260
+  22008-BB35039                      +34.7%  Sparse Intermittent [BW]       1,692       2,592
+  3892-BB35093                       +79.0%  Croston's                   702       3,344
+  4524-BB35093                        +0.0%  OTB (zero)                    0         0.0
+  7291-BB35093                       +40.0%  Sparse Intermittent            2,160       3,600
+  11393-BB35093                      +77.7%  Sparse Intermittent            3,234       1,820
+  11145-BB35093                      +33.3%  Sparse Intermittent            1,440       2,160
+  21152-BB35093                      +16.9%  Sparse Intermittent              108         130
+  8055-BB35093                       +57.1%  Sparse Intermittent              816       1,900
+  3892-BB35098                       +46.1%  Croston's                 1,068       1,980
+  4524-BB35098                        +0.0%  OTB (zero)                    0         0.0
+  11393-BB35098                      +62.5%  Sparse Intermittent            4,224       2,600
+  11145-BB35098                      +20.0%  Sparse Intermittent [BW]       2,016       2,520
+  13872-BB35098                      +50.0%  Sparse Intermittent               12          24
+  13825-BB35098                      +30.8%  Sparse Intermittent [BW]         360         520
+  21152-BB35098                      +24.6%  Sparse Intermittent              162         130
+  3466-FF8651/8                      +53.7%  Croston's                 2,224       4,800
+  13640-FF30755                      +20.0%  Sparse Intermittent            1,920       2,400
+  14023-FF22187                      +75.0%  Croston's                   156         625
+  4524-FF34428                        +0.0%  OTB (zero)                    0         0.0
+  13640-FF16342                       +0.0%  OTB (zero)                    0         0.0
+  12428-FF5715                       +10.8%  Sparse Intermittent              864         780
+  1003-BB35041                       +20.0%  Sparse Intermittent              120         150
+  3892-BB35041                       +41.3%  Sparse Intermittent [BW]         690       1,176
+  1587-BB35041                       +15.1%  Sparse Intermittent              594         700
+  21152-BB35041                       +0.0%  OTB (zero)                    0         0.0
+  22020-BB35041                       +0.0%  OTB (zero)                    0         0.0
+  3892-BB35101                       +31.9%  Sparse Intermittent [BW]         588         864
+  22008-BB35101                      +71.4%  Croston's                   858       3,000
+  3892-BB35032                       +56.6%  Sparse Intermittent [BW]       1,656       3,816
+  7291-BB35032                       +22.5%  Sparse Intermittent            2,082       2,688
+  13825-BB35032                     +183.8%  Sparse Intermittent              738         260
+  3466-BB35043                       +49.7%  Sparse Intermittent [BW]       3,612       7,180
+  3892-BB35043                       +38.0%  Sparse Intermittent            1,488       2,400
+  11393-BB35043                      +74.2%  Sparse Intermittent            1,812       1,040
+  13825-BB35043                      +70.8%  Sparse Intermittent              444         260
+  21152-BB35043                      +20.0%  Sparse Intermittent               48          40
+  13825-BB35097                     +150.4%  Sparse Intermittent              651         260
+  4524-BB35097                        +0.0%  OTB (zero)                    0         0.0
+  3466-BB35097                       +66.6%  Sparse Intermittent              549       1,642
+  22008-BB35097                      +34.0%  Croston's                   951       1,440
+  1003-BB35096                       +35.9%  Sparse Intermittent [BW]       4,350       3,200
+  3466-BB35096                       +14.0%  Sparse Intermittent            5,130       4,500
+  3892-BB35096                       +49.4%  Croston's                 1,914       3,780
+  4524-BB35095                        +0.0%  OTB (zero)                    0         0.0
+  8055-BB35095                       +32.3%  Sparse Intermittent            1,260       1,860
+  11393-BB35095                      +53.3%  Sparse Intermittent            4,782       3,120
+  21152-BB35095                      +92.0%  Sparse Intermittent               48          25
+  1003-BB35094                       +28.0%  Sparse Intermittent              192         150
+  3892-BB35094                       +80.7%  Croston's                   792       4,100
+  4524-BB35094                        +0.0%  OTB (zero)                    0         0.0
+  8055-BB35094                       +22.0%  Sparse Intermittent            1,092       1,400
+  11145-BB35094                      +20.0%  Sparse Intermittent [BW]       2,016       2,520
+  13825-BB35094                      +57.7%  Sparse Intermittent [BW]         492         312
+  21152-BB35094                      +44.0%  Sparse Intermittent               36          25
+  22020-BB35094                       +0.0%  OTB (zero)                    0         0.0
+  11169-FF18908/24KL                +158.3%  Sparse Intermittent [BW]         744         288
+  11169-FF18909/24KL                 +83.3%  Croston's      [BW]       1,584         864
+  3102-FF25667                       +69.3%  Croston's                   168         548
+  3102-FF25708                       +26.2%  Sparse Intermittent              192         260
+  3102-FF28400                       +23.2%  Sparse Intermittent               96         125
+  3102-FF28429                       +10.8%  Croston's                   432         390
+  3102-FF28547                      +103.1%  Heuristic                   264         130
+  3102-FF30363                       +23.2%  Croston's                   192         250
+  3102-FF30364                       +38.5%  Sparse Intermittent [BW]         360         260
+  6386-FF15588                       +69.2%  Sparse Intermittent               48         156
+  1864-BB29489PCS2                  +236.0%  Heuristic                 1,008         300
+  1864-BB26612PCS2                  +648.8%  Heuristic                 1,872         250
+  1884-FF16705AU                     +65.2%  Croston's                   960       2,758
+  1884-FF7372AU                      +28.6%  Croston's                   810       1,134
+  1884-FF12837AU                     +62.7%  Croston's                   336         902
+  1884-FF13874AU                     +79.8%  Croston's                   156         772
+  1884-FF13875AU                     +52.8%  Croston's                   330         699
+  1884-FF13876AU                     +77.4%  Croston's                   156         689
+  1884-FF13877AU                     +70.0%  Heuristic                   156         520
+  1884-FF13880AU                     +40.2%  Croston's                   156         261
+  1884-FF13881AU                     +31.4%  Croston's                   162         236
+  16648-FF6989AU                     +44.6%  Croston's                   864       1,560
+  16648-FF10479AU                   +115.4%  Croston's                   168          78
+  16648-FF10159AU                    +53.8%  Croston's                    36          78
+  16648-FF5952AU                     +86.2%  Croston's                    72         520
+  16648-FF4577AU                     +26.2%  Sparse Intermittent               96         130
+  16648-SF8174AU                   +1766.7%  Croston's                   168           9
+  16648-FF8433AU                     +81.5%  Sparse Intermittent               24         130
+  23011-FF23346                      +21.5%  Sparse Intermittent              204         260
+  21025-FF20207                      +14.4%  Sparse Intermittent [BW]         822         960
+  18109-BB26437CAN                  +116.0%  Sparse Intermittent [BW]       5,616       2,600
+  22008-FF14365                      +13.8%  Croston's                 2,952       2,595
+  18109-BB0235CAN                    +52.0%  Sparse Intermittent [BW]       2,736       1,800
+  4167-BB0098                         +0.0%  OTB (zero)                    0         0.0
+  4524-BB35096                        +0.0%  OTB (zero)                    0         0.0
+  7291-BB35096                       +33.6%  Sparse Intermittent [BW]       2,232       3,360
+  8055-BB35096                       +70.0%  Sparse Intermittent              720       2,400
+  11393-BB35096                      +59.7%  Sparse Intermittent            4,824       3,020
+  13825-BB35096                      +44.2%  Sparse Intermittent [BW]         750         520
+  21152-BB35096                      +20.0%  Sparse Intermittent               48          40
+  3892-BB35095                       +44.4%  Croston's      [BW]       2,190       3,940
+  11145-BB35095                      +55.0%  Sparse Intermittent            1,134       2,520
+  8055-BB35098                      +100.0%  OTB (zero)                    0     1,704.0
+  1003-BB35100                      +100.0%  OTB (zero)                    0        50.0
+  4524-BB15065                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB15075                        +0.0%  OTB (zero)                    0         0.0
+  1770-FF5952                       +284.0%  Sparse Intermittent            4,608       1,200
+  1770-SF8173                       +113.3%  Sparse Intermittent            7,680       3,600
+  1770-FF8991                       +119.0%  Heuristic                28,902      13,200
+  1770-FF6989                       +361.3%  Heuristic                16,608       3,600
+  21152-BB15073                      +30.8%  Sparse Intermittent              180         260
+  21152-BB0096                       +16.9%  Sparse Intermittent              108         130
+  21152-BB0237                       +53.8%  Sparse Intermittent               36          78
+  21152-BB25519                      +81.5%  Sparse Intermittent               24         130
+  21152-BB0098                       +63.1%  Sparse Intermittent               48         130
+  3102-FF36249                      +100.0%  OTB (zero)                    0        78.0
+  3102-FF36250                        +7.7%  Sparse Intermittent               72          78
+  15339-BB0481                       +16.9%  Croston's                   456         390
+  15339-BB19935                      +53.8%  Sparse Intermittent              600       1,300
+  15339-BB35043                     +163.1%  Sparse Intermittent              684         260
+  15339-BB35098                      +58.5%  Sparse Intermittent              108         260
+  15339-BB35096                      +49.6%  Sparse Intermittent              126         250
+  15339-BB35095                      +71.2%  Sparse Intermittent               36         125
+  15339-BB35093                      +64.4%  Sparse Intermittent              342         208
+  15339-BB35094                     +350.0%  Sparse Intermittent            1,170         260
+  12002-FF31324                      +37.7%  Sparse Intermittent              486         780
+  1770-FF13874                      +849.4%  Heuristic                 3,228         340
+  1770-FF13875                      +803.5%  Heuristic                 3,072         340
+  9278-FF12853                       +15.4%  Sparse Intermittent [BW]         300         260
+  1770-FF4577PS                      +66.7%  Sparse Intermittent              600       1,800
+  23011-FF25556                       +7.7%  Croston's                   120         130
+  23011-FF30364                     +343.1%  Sparse Intermittent              576         130
+  3102-FF30758PCS3                  +100.0%  OTB (zero)                    0        26.0
+  14023-FF9298                       +53.8%  Croston's                   120         260
+  23011-FF25667                     +232.3%  Heuristic                   432         130
+  6386-FF12300/24                    +10.8%  Sparse Intermittent              144         130
+  13825-FF12300/24                  +115.4%  Sparse Intermittent [BW]         840         390
+  20614-FF12300/24                  +100.0%  OTB (zero)                    0        26.0
+  13149-FF12301/24                   +61.0%  Croston's                   624       1,600
+  3102-FF34468                      +100.0%  OTB (zero)                    0       104.0
+  9108-FF34468                      +100.0%  OTB (zero)                    0       260.0
+  20474-FF34468                      +30.7%  Sparse Intermittent [BW]       1,248       1,800
+  3102-FF36251                       +40.3%  Croston's                   174         124
+  13825-FF12302/24                  +232.3%  Sparse Intermittent [BW]         432         130
+  22008-FF12302/24                   +44.6%  Croston's                 2,568       4,632
+  19054-FF17828KIT                   +12.4%  Croston's                 4,819       5,500
+  3102-FF31196                       +30.8%  Sparse Intermittent [BW]          54          78
+  1864-BB0102PCS2                    +24.8%  Heuristic                   156         125
+  3460-BB35032                       +37.1%  Sparse Intermittent              132         210
+  3460-BB35039                       +44.0%  Sparse Intermittent              216         150
+  3460-BB35043                       +20.0%  Sparse Intermittent              192         240
+  3460-BB35093                       +50.0%  Sparse Intermittent              360         240
+  3460-BB35094                       +77.5%  Sparse Intermittent              504         284
+  3460-BB35095                       +10.0%  Sparse Intermittent              378         420
+  3460-BB35096                      +109.3%  Sparse Intermittent              720         344
+  3460-BB35098                       +26.7%  Sparse Intermittent              252         344
+  4524-BB36976                        +0.0%  OTB (zero)                    0         0.0
+  3340-BB0759                       +100.0%  Sparse Intermittent            2,400       1,200
+  3340-BB29122                       +25.0%  Sparse Intermittent              900       1,200
+  3340-BB33528                       +25.0%  Sparse Intermittent              900       1,200
+  4524-BB19242/12                     +0.0%  OTB (zero)                    0         0.0
+  14719-FF15588                       +0.0%  OTB (zero)                    0         0.0
+  13646-FF15588                       +0.0%  OTB (zero)                    0         0.0
+  12002-FF31325                     +303.2%  Sparse Intermittent [BW]         504         125
+  23651-FF31325                     +111.2%  Sparse Intermittent              792         375
+  16001-BB33526                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB22025                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB33530                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB21626                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB0083                        +0.0%  OTB (zero)                    0         0.0
+  16001-BB22095                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB33525                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB22094                       +0.0%  OTB (zero)                    0         0.0
+  16001-BB0079                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB25518                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB31108                        +0.0%  OTB (zero)                    0         0.0
+  1770-FF5715                       +284.0%  Heuristic                 2,304         600
+  4524-BB26413                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB30134                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB34711                        +0.0%  OTB (zero)                    0         0.0
+  19054-FF6553KIT                    +38.5%  Croston's                   538         875
+  13640-FF8652                        +0.0%  OTB (zero)                    0         0.0
+  12835-BB21058/6                    +23.1%  Sparse Intermittent              360         468
+  13149-FF31196                      +58.9%  Sparse Intermittent [BW]         720       1,750
+  13177-FF7488                       +30.8%  Sparse Intermittent               36          52
+  12428-FF9297/24                    +84.6%  Sparse Intermittent              960         520
+  19054-FF12279                       +0.0%  OTB (zero)                    0         0.0
+  19054-FF36727                      +51.0%  Sparse Intermittent               98         200
+  13825-BB35041                      +33.1%  Sparse Intermittent              174         260
+  12893-FF9757                        +0.0%  OTB (zero)                    0         0.0
+  12893-FF7263                        +0.0%  OTB (zero)                    0         0.0
+  12893-FF4849                        +0.0%  OTB (zero)                    0         0.0
+  12893-FF14364                     +100.0%  OTB (zero)                    0     1,440.0
+  12893-FF31185                       +0.0%  OTB (zero)                    0         0.0
+  12893-FF34430                     +100.0%  OTB (zero)                    0       390.0
+  12893-FF4923                      +100.0%  OTB (zero)                    0       450.0
+  12893-FF13338                       +0.0%  OTB (zero)                    0         0.0
+  12893-FF20210                     +100.0%  OTB (zero)                    0     1,440.0
+  12893-FF22768                       +0.0%  OTB (zero)                    0         0.0
+  12893-FF26777                     +100.0%  OTB (zero)                    0       130.0
+  12893-FF30517                       +0.0%  OTB (zero)                    0         0.0
+  12893-FF31068                       +0.0%  OTB (zero)                    0         0.0
+  12893-FF4775                        +0.0%  OTB (zero)                    0         0.0
+  12893-FF7110                        +0.0%  OTB (zero)                    0         0.0
+  12893-FF10159                     +100.0%  OTB (zero)                    0     1,440.0
+  12893-FF10477                     +100.0%  OTB (zero)                    0     1,440.0
+  12893-FF18956                     +100.0%  OTB (zero)                    0       520.0
+  13640-FF34428                       +0.0%  OTB (zero)                    0         0.0
+  13640-FF31326                       +7.5%  Sparse Intermittent [BW]       8,322       9,000
+  2953-FF9290/24                     +11.0%  Sparse Intermittent              192         173
+  16645-FF9290/24                   +176.9%  Sparse Intermittent              720         260
+  23011-FF9290/24                   +100.0%  OTB (zero)                    0     6,630.0
+  1884-FF20206AU                     +10.4%  Croston's                   690         625
+  4524-FF5952                        +12.0%  Sparse Intermittent              528         600
+  4524-SF8168                         +8.4%  Sparse Intermittent            2,016       2,200
+  4524-FF5716                        +80.8%  Sparse Intermittent              288       1,500
+  13646-FF15589                       +0.0%  OTB (zero)                    0         0.0
+  14719-FF15589                       +0.0%  OTB (zero)                    0         0.0
+  14023-FF8991                       +25.0%  Croston's                   150         200
+  1770-FF10479                       +94.6%  Sparse Intermittent            2,724       1,400
+  1770-FF31324                       +92.0%  Sparse Intermittent [BW]       6,912       3,600
+  1770-FF6305                       +144.0%  Heuristic                 1,464         600
+  19054-FF36726                      +80.0%  Sparse Intermittent               40         200
+  13640-FF31068                      +32.2%  Sparse Intermittent            5,472       8,074
+  14224-BB16999                      +80.0%  Croston's                    24         120
+  13640-FF34974                       +0.0%  OTB (zero)                    0         0.0
+  16554-FF5715                       +81.3%  Sparse Intermittent              936       5,000
+  33012-BB25518                       +0.0%  OTB (zero)                    0         0.0
+  1770-FF4577                       +100.0%  OTB (zero)                    0       600.0
+  3102-FF34467                       +15.4%  Pre-launch NEW (manual passthrough)              110         130
+  1770-FF8990                       +100.0%  OTB (zero)                    0       900.0
+  8423-FF7258HL                      +76.0%  Sparse Intermittent [BW]       1,848       1,050
+  8423-FF7267HL                      +25.2%  Sparse Intermittent [BW]       1,122       1,500
+  8423-FF7488HL                      +36.0%  Sparse Intermittent            1,224         900
+  16648-FF30749AU                    +58.5%  Croston's                   216         520
+  16648-FF5772AU                     +40.0%  Croston's      [BW]         156         260
+  19742-FF17588                     +100.0%  OTB (zero)                    0        52.0
+  19742-FF19341                     +100.0%  OTB (zero)                    0        52.0
+  13825-FF9297/24                    +76.6%  Croston's      [BW]       1,104         625
+  3466-BB35098                      +100.0%  OTB (zero)                    0     1,550.0
+  3466-BB35100                      +100.0%  OTB (zero)                    0     1,400.0
+  9108-FF31481                      +100.0%  Sparse Intermittent               72          36
+  9108-FF30880                      +500.0%  Sparse Intermittent              240          40
+  9108-FF29833                      +300.0%  Sparse Intermittent               96          24
+  9108-FF28459                       +12.5%  Sparse Intermittent              108          96
+  13872-FF9290/24                    +20.0%  Heuristic                   624         520
+  2953-FF9291/24                     +19.5%  Sparse Intermittent              120         149
+  2659-BB33045                        +0.0%  OTB (zero)                    0         0.0
+  2659-BB33048                        +0.0%  OTB (zero)                    0         0.0
+  2659-BB31641                        +0.0%  OTB (zero)                    0         0.0
+  2659-BB34711                        +0.0%  OTB (zero)                    0         0.0
+  13872-FF5773                       +64.6%  Sparse Intermittent              276         780
+  13872-FF7297                       +73.8%  Sparse Intermittent              204         780
+  9108-FF7217                        +95.2%  Sparse Intermittent               48       1,000
+  9108-FF7215                        +89.2%  Sparse Intermittent              108       1,000
+  9108-FF26385                       +97.7%  Sparse Intermittent               24       1,040
+  9108-FF9281                        +41.2%  Croston's                   612       1,040
+  9108-FF30749                       +63.1%  Sparse Intermittent               48         130
+  9108-FF33413                       +88.3%  Sparse Intermittent              108         924
+  9108-FF33546                       +71.2%  Sparse Intermittent               36         125
+  13640-FF33637                       +7.6%  Sparse Intermittent            4,992       5,400
+  13640-FF33638                      +31.9%  Sparse Intermittent            6,540       9,600
+  8423-FF4775HL                     +130.9%  Sparse Intermittent [BW]       2,424       1,050
+  23011-FF32364                      +21.8%  Croston's                   610         780
+  13640-BB36796                       +0.0%  OTB (zero)                    0         0.0
+  20595-FF14584                     +100.0%  OTB (zero)                    0       260.0
+  20595-FF31293                     +100.0%  OTB (zero)                    0       182.0
+  18360-BB31256                      +12.7%  Sparse Intermittent            9,918       8,800
+  21152-BB35039                      +60.0%  Sparse Intermittent               24          15
+  21152-BB35032                      +44.0%  Sparse Intermittent               36          25
+  23011-BB26413PCS2                  +10.4%  Heuristic (F72 new-launch ramp)              138         125
+  18360-BB34389                       +0.0%  OTB (zero)                    0         0.0
+  16820-FF31198                      +36.5%  Croston's                 2,010       3,165
+  1884-FF31327AU                     +51.1%  Heuristic                   624         413
+  20595-FF15482                      +42.4%  Croston's      [BW]         288         500
+  20595-FF19341                      +69.6%  Croston's      [BW]         114         375
+  20595-FF8256                        +7.7%  Sparse Intermittent [BW]         360         390
+  20595-FF8258                       +13.6%  Sparse Intermittent [BW]         216         250
+  20595-FF8423                       +49.6%  Croston's      [BW]         252         500
+  20595-FF8651/8                     +43.5%  Croston's      [BW]         816       1,445
+  20595-FF8652                       +57.2%  Croston's      [BW]         672       1,570
+  20595-FF8991                       +41.9%  Croston's      [BW]         366         630
+  22008-BB15775                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB15776                      +11.7%  Sparse Intermittent           23,736      21,252
+  20595-FF10479                      +18.1%  Croston's      [BW]       1,434       1,750
+  20595-FF4923                       +28.0%  Croston's      [BW]         324         450
+  3102-FF31451                        +0.0%  OTB (zero)                    0         0.0
+  1884-FF31063AU                     +51.3%  Croston's                   624       1,282
+  13177-FF8990                       +72.3%  Sparse Intermittent               72         260
+  13177-FF8654                       +33.3%  Sparse Intermittent              104         156
+  13177-FF8653                       +26.2%  Sparse Intermittent [BW]          96         130
+  13177-FF8652                       +58.5%  Sparse Intermittent              108         260
+  13177-FF31287                      +79.5%  Sparse Intermittent               48         234
+  13177-FF15589                      +53.8%  Sparse Intermittent              144         312
+  13177-FF15588                      +76.9%  Sparse Intermittent [BW]          72         312
+  16648-FF31185AU                    +74.6%  Croston's                   165         650
+  2659-BB33030                        +0.0%  OTB (zero)                    0         0.0
+  2659-BB36083                        +0.0%  OTB (zero)                    0         0.0
+  2659-BB36086                        +0.0%  OTB (zero)                    0         0.0
+  22008-BB30276                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB0760                       +38.8%  Sparse Intermittent            1,500       2,450
+  22008-BB0009                       +32.0%  Sparse Intermittent            1,020       1,500
+  22008-BB0231                       +87.4%  Sparse Intermittent            5,622       3,000
+  22008-BB0759                       +24.2%  Sparse Intermittent            5,454       7,200
+  22008-BB18835                      +58.0%  Sparse Intermittent            1,764       4,200
+  22008-BB19113                      +66.4%  Sparse Intermittent              906       2,700
+  22008-BB21235                      +40.0%  Sparse Intermittent            2,700       4,500
+  22008-BB26921                      +63.7%  Sparse Intermittent            1,308       3,600
+  2342-FF4930                         +0.0%  OTB (zero)                    0         0.0
+  7919-FF12850                        +0.0%  OTB (zero)                    0         0.0
+  7919-FF19987                        +0.0%  OTB (zero)                    0         0.0
+  7919-FF31198                        +0.0%  OTB (zero)                    0         0.0
+  18360-BB36671                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB36558                       +0.0%  OTB (zero)                    0         0.0
+  18360-BB35237                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB0080                        +0.0%  OTB (zero)                    0         0.0
+  22008-BB0082                       +85.8%  Sparse Intermittent              510       3,600
+  22008-BB0520                      +214.6%  Sparse Intermittent            5,034       1,600
+  22008-BB12479                      +78.0%  Sparse Intermittent              396       1,800
+  22008-BB19109                      +83.2%  Sparse Intermittent              804       4,800
+  22008-BB29713                      +69.1%  Sparse Intermittent              834       2,700
+  22008-BB30587                      +83.6%  Sparse Intermittent              444       2,700
+  7291-BB28480                       +16.9%  Sparse Intermittent            6,480       7,800
+  7291-BB28473                        +7.7%  Sparse Intermittent            6,480       7,020
+  7291-BB29477                       +43.7%  Sparse Intermittent            4,392       7,800
+  7291-BB28720                       +26.2%  Sparse Intermittent            5,184       7,020
+  13640-FF4930                        +0.0%  OTB (zero)                    0         0.0
+  3102-FF33876                       +40.7%  Sparse Intermittent               48          81
+  1864-BB31204PCS6                   +36.8%  Heuristic                    60          95
+  1864-BB31203PCS4                  +160.0%  Croston's                    52          20
+  12002-FF11348                       +0.0%  OTB (zero)                    0         0.0
+  12428-FF12887                      +41.5%  Sparse Intermittent              552         390
+  12428-FF16705                      +44.6%  Sparse Intermittent               72         130
+  12428-FF19341                      +26.2%  Sparse Intermittent               96         130
+  23651-FF9757                        +0.0%  OTB (zero)                    0         0.0
+  13640-FF30758                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF20207                      +53.8%  Sparse Intermittent            8,322      18,000
+  18360-FF16341                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF4936                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF7267                        +0.0%  OTB (zero)                    0         0.0
+  33012-BB0332                        +0.0%  OTB (zero)                    0         0.0
+  16502-FF7118                        +0.0%  OTB (zero)                    0         0.0
+  12002-FF9757                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF15584                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF15588                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF7120                       +20.0%  Sparse Intermittent              960       1,200
+  3700-BB28360                      +100.0%  OTB (zero)                    0       130.0
+  18360-FF31063                       +0.0%  OTB (zero)                    0         0.0
+  1864-FF31453                       +51.6%  Heuristic                   720         475
+  13640-FF5777                        +0.0%  OTB (zero)                    0         0.0
+  3700-BB24877                      +100.0%  OTB (zero)                    0       130.0
+  3700-BB36058CLR                    +80.6%  Sparse Intermittent               32         165
+  1864-BB13436CLR                    +59.7%  Heuristic                 1,776       4,410
+  3700-BB27206                      +100.0%  OTB (zero)                    0       130.0
+  7291-BB35094                       +11.4%  Sparse Intermittent [BW]       2,232       2,520
+  3700-BB30134                      +100.0%  OTB (zero)                    0       130.0
+  3700-BB13435CLR                    +72.5%  Croston's                   108         393
+  3700-BB13437CLR                    +68.9%  Croston's                   126         405
+  3700-BB13436CLR                    +82.5%  Sparse Intermittent               24         137
+  3700-BB28361                      +100.0%  OTB (zero)                    0       130.0
+  22258-BB34751                      +88.5%  Sparse Intermittent                6          52
+  1884-FF20209AU                     +38.7%  Heuristic                   312         509
+  13640-BB0707                        +0.0%  OTB (zero)                    0         0.0
+  7291-BB35043                       +62.1%  Sparse Intermittent              636       1,680
+  23651-FF31065                       +0.0%  OTB (zero)                    0         0.0
+  12002-FF12008/4                     +0.0%  OTB (zero)                    0         0.0
+  19645-SF8170                       +68.5%  Sparse Intermittent            3,504       2,080
+  3700-BB35093                       +46.0%  Sparse Intermittent [BW]         222         411
+  3700-BB35096                       +12.3%  Sparse Intermittent              456         520
+  3700-BB35095                       +29.6%  Sparse Intermittent              366         520
+  23011-BB13448CLR/12                +46.2%  Heuristic                 2,796       5,200
+  8692-FF8423                        +53.8%  Sparse Intermittent               36          78
+  23011-FF5716                      +218.5%  Croston's                 1,656         520
+  12835-BB12022/12                  +442.6%  Sparse Intermittent           62,640      11,544
+  12835-BB0712                       +35.0%  Sparse Intermittent            3,408       5,244
+  23011-BB29490/6                    +35.0%  Pre-launch NEW (manual passthrough)          110,344      81,750
+  3466-FF22317                       +32.2%  Croston's                   624         920
+  3466-FF22323                       +52.0%  Sparse Intermittent              432         900
+  2659-BB28720                       +98.8%  Sparse Intermittent               48       3,900
+  2659-BB28719                       +21.2%  Croston's                 2,364       3,000
+  2659-BB27359                       +82.4%  Sparse Intermittent              180       1,020
+  2659-BB16534                       +98.6%  Sparse Intermittent               48       3,380
+  2659-BB30424                       +66.7%  Sparse Intermittent              300         900
+  16415-FF12301/24                   +72.3%  Sparse Intermittent               72         260
+  1003-BB35043                      +100.0%  OTB (zero)                    0       180.0
+  13177-FF8423                       +30.8%  Sparse Intermittent              108         156
+  9278-FF9297PDQ                     +46.2%  Croston's      [BW]         672       1,250
+  21025-FF12852                     +197.6%  Sparse Intermittent [BW]       1,116         375
+  18360-FF33641                      +23.4%  Sparse Intermittent            9,570      12,500
+  18360-FF33876                      +66.8%  Sparse Intermittent           10,008       6,000
+  18360-FF33637                      +82.2%  Sparse Intermittent            1,602       9,000
+  18360-FF33638                      +41.4%  Sparse Intermittent            5,622       9,600
+  9108-FF30879                       +14.3%  Croston's                    96          84
+  21023-FF13875                     +100.0%  OTB (zero)                    0        52.0
+  21023-FF16704                      +53.8%  Sparse Intermittent               24          52
+  21023-FF19341                      +53.8%  Sparse Intermittent               12          26
+  21023-FF8652                       +30.8%  Sparse Intermittent              180         260
+  11169-FF12843KL                     +0.0%  OTB (zero)                    0         0.0
+  11169-FF12849KL                     +0.0%  OTB (zero)                    0         0.0
+  11169-FF14364KL                     +0.0%  OTB (zero)                    0         0.0
+  11169-FF4849KL                      +0.0%  OTB (zero)                    0         0.0
+  16651-FF9291/24                    +33.3%  Sparse Intermittent              864         648
+  16651-FF9297/24                    +14.9%  Sparse Intermittent            1,776       2,088
+  3102-FF32654                       +63.1%  Sparse Intermittent [BW]          96         260
+  3102-FF32655                       +23.2%  Croston's                   192         250
+  3102-FF32656                       +90.8%  Heuristic                    24         260
+  13149-FF9290/24                    +20.8%  Croston's                   768         970
+  14023-FF12302/24                   +80.8%  Croston's                    96         500
+  22008-BB30279                      +23.3%  Sparse Intermittent            1,776       1,440
+  6386-FF12302/24                   +269.2%  Sparse Intermittent               96          26
+  3102-FF32824                       +48.8%  Sparse Intermittent              192         375
+  3102-FF31293                       +40.3%  Croston's                   108          77
+  3102-FF31295                       +30.8%  Croston's                   102          78
+  23011-FF12508                      +63.1%  Sparse Intermittent              144         390
+  23685-BB37431                      +87.7%  Sparse Intermittent            1,440      11,700
+  23685-BB37432                      +54.8%  Sparse Intermittent            6,696      14,820
+  23685-BB37433                      +55.6%  Sparse Intermittent            6,696      15,080
+  18360-BB34390                      +34.8%  Sparse Intermittent           16,824      25,800
+  12893-FF28402                       +0.0%  OTB (zero)                    0         0.0
+  30000-FF10159                       +0.0%  OTB (zero)                    0         0.0
+  30000-FF10162                     +100.0%  OTB (zero)                    0       260.0
+  30000-FF10475                     +100.0%  OTB (zero)                    0       260.0
+  30000-FF10477                       +0.0%  OTB (zero)                    0         0.0
+  30000-FF12837                     +100.0%  OTB (zero)                    0       130.0
+  30000-FF20210                     +100.0%  OTB (zero)                    0       260.0
+  30000-FF31326                     +100.0%  OTB (zero)                    0       260.0
+  30000-FF9297PDQ                   +100.0%  OTB (zero)                    0       130.0
+  30000-FF9298                      +100.0%  OTB (zero)                    0       130.0
+  30000-FF13874                     +100.0%  OTB (zero)                    0     2,080.0
+  30000-FF13875                     +100.0%  OTB (zero)                    0     2,080.0
+  30000-FF19546                     +100.0%  OTB (zero)                    0     2,600.0
+  20595-FF18958                      +52.0%  Sparse Intermittent [BW]       1,440       3,000
+  20595-FF18959                      +48.0%  Sparse Intermittent [BW]       1,560       3,000
+  12835-BB38259                     +100.0%  OTB (zero)                    0    18,932.0
+  3102-FF36326                       +62.2%  Sparse Intermittent              246         650
+  3102-FF36327                       +73.2%  Sparse Intermittent              174         650
+  3102-FF36328                       +63.1%  Sparse Intermittent               96         260
+  3102-FF36329                       +63.1%  Sparse Intermittent               96         260
+  30000-FF12848                     +100.0%  OTB (zero)                    0     2,080.0
+  30000-FF14365                     +100.0%  OTB (zero)                    0     2,080.0
+  22008-BB34751                      +73.3%  Sparse Intermittent              480       1,800
+  6111-FF12300/24                    +47.7%  Sparse Intermittent            1,152         780
+  2659-BB28480                       +64.5%  Croston's                 1,776       5,000
+  1864-BB38261                       +47.6%  Heuristic                 1,092         740
+  1864-BB38259                       +31.6%  Croston's                 2,388       1,815
+  1864-BB36982PCS6                   +30.0%  Heuristic                    26          20
+  1864-BB36140PCS6                  +120.0%  Heuristic                   209          95
+  1864-BB36089PCS12                  +72.6%  Heuristic                    26          95
+  1864-BB36083PCS8                   +72.6%  Heuristic                    26          95
+  13872-BB35094                      +50.0%  Sparse Intermittent               12          24
+  22008-BB29120                      +50.2%  Sparse Intermittent            1,794       3,600
+  22008-BB36670                      +48.7%  Sparse Intermittent              924       1,800
+  13149-FF33413                     +100.0%  OTB (zero)                    0       330.0
+  2659-BB35098                        +0.0%  OTB (zero)                    0         0.0
+  18360-SF8168                       +41.1%  Sparse Intermittent            8,832      15,000
+  18360-FF34428                       +0.0%  OTB (zero)                    0         0.0
+  12428-FF8298                       +25.2%  Sparse Intermittent              144         115
+  12428-FF13874                      +30.8%  Sparse Intermittent               90         130
+  2659-BB21058/6                     +67.9%  Sparse Intermittent              834       2,600
+  12835-BB38261                      +57.0%  Sparse Intermittent           14,340       9,132
+  12893-FF9297/24                   +100.0%  OTB (zero)                    0     1,440.0
+  2659-FF33573                       +55.0%  Croston's                   468       1,040
+  8423-FF28457                      +100.0%  OTB (zero)                    0     1,350.0
+  8423-FF30114                      +100.0%  OTB (zero)                    0     1,350.0
+  1587-FF9297PDQ                     +13.8%  Sparse Intermittent [BW]         672         780
+  3466-FF12656                      +100.0%  OTB (zero)                    0       400.0
+  1745-FF9291PDQ                     +84.6%  Sparse Intermittent              240         130
+  13640-FF33877                       +9.6%  Sparse Intermittent            3,288       3,000
+  16554-FF33872                      +23.5%  Sparse Intermittent            2,280       2,980
+  16554-FF33868                      +54.6%  Heuristic                   600       1,322
+  1420-BB15230                       +55.8%  Croston's                 4,310       9,750
+  1420-BB20227                      +293.6%  Croston's                17,712       4,500
+  1420-BB20228                      +241.3%  Croston's                15,360       4,500
+  2342-FF12380/6                    +100.0%  OTB (zero)                    0        78.0
+  1864-BB36979                       +16.8%  Heuristic                   312         375
+  22008-BB35100                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB35096                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB35094                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB35043                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB35032                     +316.0%  Sparse Intermittent            2,496         600
+  22008-BB35095                      +30.7%  Sparse Intermittent            2,496       3,600
+  22008-BB35098                     +236.0%  Sparse Intermittent            2,016         600
+  13149-FF33872                     +180.3%  Croston's                10,512       3,750
+  12446-FF8651/8CA                   +29.6%  Croston's      [BW]      11,704      16,630
+  12446-FF8652CA                     +15.8%  Croston's      [BW]       7,656       9,090
+  12446-FF8653CA                     +24.4%  Croston's      [BW]       4,188       5,540
+  12446-FF8654CA                     +26.8%  Croston's      [BW]       3,932       5,370
+  23011-FF7216                       +76.0%  Croston's                   156         650
+  18360-FF31198                       +0.0%  OTB (zero)                    0         0.0
+  3700-BB22272                       +71.0%  Sparse Intermittent              528       1,820
+  6111-FF16704                       +87.3%  Sparse Intermittent              132       1,040
+  21025-FF9297/24                    +23.3%  Sparse Intermittent            1,656       2,160
+  7919-FF31324                        +0.0%  OTB (zero)                    0         0.0
+  3700-BB35904                       +38.5%  Heuristic                   360         260
+  1579-BB35094                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB31256                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB36796                        +0.0%  OTB (zero)                    0         0.0
+  22008-FF28036                       +0.0%  OTB (zero)                    0         0.0
+  22008-FF12824                       +0.0%  OTB (zero)                    0         0.0
+  22008-FF12823                       +0.0%  OTB (zero)                    0         0.0
+  22008-FF12848                       +0.0%  OTB (zero)                    0         0.0
+  1587-FF8649/24                     +30.8%  Croston's                   216         312
+  13825-FF8649/24                    +55.2%  Croston's      [BW]         672       1,500
+  12893-FF11348/6                   +100.0%  OTB (zero)                    0     1,440.0
+  12893-FF12300/24                  +100.0%  OTB (zero)                    0     1,440.0
+  12893-FF33543                       +0.0%  OTB (zero)                    0         0.0
+  12893-FF5780                        +0.0%  OTB (zero)                    0         0.0
+  12893-FF9756                      +100.0%  OTB (zero)                    0     1,440.0
+  12893-FF15588                     +100.0%  OTB (zero)                    0     1,440.0
+  16579-FF7613                      +100.0%  OTB (zero)                    0     4,966.0
+  7919-FF34942                        +0.0%  OTB (zero)                    0         0.0
+  16820-FF12846                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF5716PS                     +78.1%  Sparse Intermittent            4,608      21,000
+  33011-BB26584                      +75.4%  Sparse Intermittent              456         260
+  2659-FF33567                       +67.7%  Croston's                   336       1,040
+  6478-FF30749                       +15.4%  Pre-launch NEW (manual passthrough)              360         312
+  11169-FF13063KL                     +0.0%  OTB (zero)                    0         0.0
+  11169-FF13069KL                     +0.0%  OTB (zero)                    0         0.0
+  11169-FF36356KL                     +0.0%  OTB (zero)                    0         0.0
+  16415-FF9757                        +7.7%  Sparse Intermittent              144         156
+  6478-FF34428                        +0.0%  OTB (zero)                    0         0.0
+  6478-FF31065                        +0.0%  OTB (zero)                    0         0.0
+  6478-FF31064                        +0.0%  OTB (zero)                    0         0.0
+  6478-FF31063                        +0.0%  OTB (zero)                    0         0.0
+  6478-FF31068                        +0.0%  OTB (zero)                    0         0.0
+  6478-FF7228                         +0.0%  OTB (zero)                    0         0.0
+  6478-FF9059                         +0.0%  OTB (zero)                    0         0.0
+  6478-FF7716                         +0.0%  OTB (zero)                    0         0.0
+  6478-FF7717                         +0.0%  OTB (zero)                    0         0.0
+  6478-FF7210                         +0.0%  OTB (zero)                    0         0.0
+  6478-FF7216                         +0.0%  OTB (zero)                    0         0.0
+  2659-BB26924                       +50.2%  Sparse Intermittent [BW]       1,076       2,160
+  6478-FF31325                       +15.4%  Pre-launch NEW (manual passthrough)              110         130
+  6478-FF20208                       +15.4%  Pre-launch NEW (manual passthrough)              110         130
+  6478-FF10530                       +15.4%  Pre-launch NEW (manual passthrough)              110         130
+  16579-FF36213                     +100.0%  OTB (zero)                    0       130.0
+  16579-FF36214                     +100.0%  OTB (zero)                    0       130.0
+  16579-FF36211                     +100.0%  OTB (zero)                    0       130.0
+  16579-FF36212                     +100.0%  OTB (zero)                    0       130.0
+  1864-FF8649PCS48                   +28.0%  Croston's                    54          75
+  22008-BB30176                      +38.0%  Sparse Intermittent            2,232       3,600
+  16415-FF9291PDQ                   +100.0%  OTB (zero)                    0       130.0
+  23651-FF9297PDQ                   +380.0%  Sparse Intermittent            1,152         240
+  11145-BB35032                     +100.0%  OTB (zero)                    0     1,340.0
+  11145-BB35039                      +37.5%  Sparse Intermittent            1,980       1,440
+  1864-BB35520PCS2                   +10.2%  Heuristic                   270         245
+  1864-BB16180PCS2                   +27.3%  Croston's                   312         245
+  1864-BB0191PCS2                    +14.7%  Croston's                   384         450
+  16651-FF33384AU                     +0.0%  OTB (zero)                    0         0.0
+  16651-FF33390AU                     +0.0%  OTB (zero)                    0         0.0
+  16651-FF33393AU                     +0.0%  OTB (zero)                    0         0.0
+  1864-FF9297PCS2                   +590.4%  Croston's                 2,520         365
+  1864-FF7531PCS3                   +324.5%  Croston's                 1,040         245
+  1864-FF23348PCS2                   +36.3%  Heuristic                   156         245
+  1864-FF18956PCS2                  +311.4%  Croston's                 1,008         245
+  1864-FF12850PCS2                  +282.0%  Croston's                   936         245
+  1864-FF12279PCS2                  +324.9%  Croston's                 1,041         245
+  1864-BB16691PCS2                   +27.3%  Croston's                   312         245
+  22008-BB35093                       +0.0%  OTB (zero)                    0         0.0
+  4524-BB35100                        +0.0%  OTB (zero)                    0         0.0
+  4524-BB35103                        +0.0%  OTB (zero)                    0         0.0
+  20006-BB38638                      +11.1%  Heuristic                88,992     100,153
+  20006-BB38659                     +124.2%  Heuristic                 5,052       2,253
+  20006-BB38662                      +67.7%  Heuristic                 5,238       3,123
+  20006-BB38635                      +75.0%  Heuristic                58,104      33,202
+  20006-BB38484                      +55.6%  Heuristic                53,724      34,518
+  20006-BB38674                      +22.8%  Heuristic                50,436      41,079
+  20006-BB38671                      +44.9%  Heuristic                61,560      42,484
+  20006-BB38661                     +117.5%  Heuristic                 5,364       2,466
+  20006-BB38634                      +76.7%  Heuristic                50,940      28,833
+  20006-BB38673                      +46.6%  Heuristic                48,348      32,989
+  20006-BB38660                     +114.0%  Heuristic                 6,096       2,848
+  20006-BB38489                      +80.2%  Heuristic                57,084      31,674
+  20006-BB38672                      +52.3%  Heuristic                58,272      38,264
+  33011-BB26587                     +188.5%  Sparse Intermittent              750         260
+  33011-BB26739                      +41.5%  Sparse Intermittent              368         260
+  33011-BB28361                      +75.4%  Sparse Intermittent [BW]         160         650
+  33011-BB30139                      +78.5%  Sparse Intermittent               56         260
+  2659-BB34389                       +62.1%  Sparse Intermittent            1,422       3,750
+  23018-FF6560                       +65.4%  Heuristic                   900       2,600
+  13894-BB35094CAN                   +75.3%  Sparse Intermittent              444       1,800
+  13640-FF38488                      +34.0%  Sparse Intermittent            4,824       3,600
+  1003-BB35095                      +152.0%  Sparse Intermittent              252         100
+  1420-BB13437CLR/12                +128.7%  Croston's                 6,312       2,760
+  1420-BB31552CLR/9                 +108.7%  Croston's                 7,515       3,600
+  19054-FF12279SAM                   +46.3%  Croston's                 2,708       5,040
+  33011-BB35904                     +100.0%  OTB (zero)                    0       520.0
+  8940-FF33688PS                     +18.3%  Sparse Intermittent [BW]       1,278       1,080
+  8940-FF34436PS                     +46.7%  Heuristic                   192         360
+  19718-FF28457                      +29.5%  Sparse Intermittent            2,736       2,112
+  19718-FF29833                      +84.6%  Sparse Intermittent            2,400       1,300
+  19718-FF29834                      +27.3%  Sparse Intermittent [BW]         576         792
+  16645-FF9291PDQ                   +176.9%  Sparse Intermittent              720         260
+  16554-FF5715PS                    +100.0%  OTB (zero)                    0     5,000.0
+  7919-FF28459                        +0.0%  OTB (zero)                    0         0.0
+  3102-FF34436PS                    +100.0%  OTB (zero)                    0        78.0
+  4167-BB36317                        +0.0%  OTB (zero)                    0         0.0
+  18360-FF37780                      +31.4%  Sparse Intermittent            7,200      10,500
+  18360-FF31068                       +0.0%  OTB (zero)                    0         0.0
+  3102-FF33541                      +100.0%  OTB (zero)                    0       130.0
+  3102-FF33542                       +94.2%  Sparse Intermittent              144       2,496
+  1587-FF9291/24                     +20.0%  Heuristic                   624         780
+  1864-FF12279PX6                    +87.0%  Heuristic                    26         200
+  33011-BB26737                      +23.1%  Sparse Intermittent              200         260
+  33011-BB15230                    +1569.2%  Croston's                 2,170         130
+  14023-FF9297/24                    +15.2%  Sparse Intermittent              576         500
+  6111-FF10159                       +60.0%  Sparse Intermittent [BW]         624         390
+  6111-FF10475                       +96.9%  Sparse Intermittent [BW]         768         390
+  6111-FF10477                       +24.6%  Sparse Intermittent              324         260
+  6111-FF10479                       +67.7%  Sparse Intermittent               42         130
+  6111-FF12301/24                    +10.8%  Sparse Intermittent              864         780
+  6111-FF12302/24                    +66.2%  Sparse Intermittent [BW]       1,080         650
+  6111-FF12837                      +100.0%  OTB (zero)                    0       390.0
+  6111-FF33568                      +100.0%  OTB (zero)                    0       130.0
+  6111-FF33569                      +100.0%  OTB (zero)                    0       130.0
+  6111-FF33868                       +74.1%  Sparse Intermittent [BW]       1,584         910
+  6111-FF4517PS                     +100.0%  OTB (zero)                    0       130.0
+  6111-FF5952                       +121.5%  Sparse Intermittent            1,440         650
+  6111-FF9290/24                     +44.6%  Sparse Intermittent              576       1,040
+  6111-FF9291PDQ                    +100.0%  OTB (zero)                    0       910.0
+  6111-FF9298                        +24.1%  Sparse Intermittent [BW]       3,552       4,680
+  6111-SF8169                        +32.9%  Sparse Intermittent              864         650
+  12002-FF33872                     +324.6%  Sparse Intermittent [BW]       1,104         260
+  12428-FF11899/24                   +18.8%  Sparse Intermittent              528         650
+  12428-FF4577                       +58.2%  Sparse Intermittent              288         182
+  12893-FF22317                     +100.0%  OTB (zero)                    0       260.0
+  12893-FF22318                     +100.0%  OTB (zero)                    0       390.0
+  12893-FF6305                      +100.0%  OTB (zero)                    0       390.0
+  16645-FF31324                     +100.0%  OTB (zero)                    0       130.0
+  16645-FF4577                      +315.4%  Sparse Intermittent            1,080         260
+  16851-FF10479                     +213.8%  Sparse Intermittent              408         130
+  16851-FF12301/24                   +63.1%  Sparse Intermittent               48         130
+  16851-FF8287                      +176.9%  Sparse Intermittent              360         130
+  16851-FF9298                      +109.2%  Sparse Intermittent              816         390
+  16851-SF8167                      +100.0%  OTB (zero)                    0       130.0
+  16851-SF8169                      +100.0%  OTB (zero)                    0       260.0
+  16851-SF8174                      +232.3%  Sparse Intermittent              432         130
+  16415-FF9297/24                    +72.3%  Sparse Intermittent              672         390
+  1587-FF10159                      +100.0%  OTB (zero)                    0       780.0
+  22233-FF4517PS                    +100.0%  OTB (zero)                    0       390.0
+  22233-FF4577PS                    +100.0%  OTB (zero)                    0       260.0
+  22233-FF5716PS                     +10.8%  Sparse Intermittent              144         130
+  22233-SF8168                      +121.5%  Sparse Intermittent              864         390
+  22233-SF8168PS                    +100.0%  OTB (zero)                    0       286.0
+  23651-FF34430                     +100.0%  OTB (zero)                    0       260.0
+  19054-FF31608/6                   +186.6%  Sparse Intermittent            2,508         875
+  22233-SF8169PS                     +51.0%  Sparse Intermittent              432         286
+  2342-FF33137                      +100.0%  OTB (zero)                    0     1,200.0
+  2342-FF31068                      +100.0%  OTB (zero)                    0     2,000.0
+  21025-FF37259                      +52.0%  Sparse Intermittent              720       1,500
+  21025-FF26756                       +0.0%  OTB (zero)                    0         0.0
+  19718-FF28459                      +92.3%  Sparse Intermittent            3,000       1,560
+  21025-FF33689PS                     +0.0%  OTB (zero)                    0         0.0
+  12002-FF11899/24                   +44.0%  Sparse Intermittent              168         300
+  21025-FF35147                       +0.0%  OTB (zero)                    0         0.0
+  1864-FF36213                       +24.8%  Heuristic                   156         125
+  13640-FF37778                      +47.8%  Sparse Intermittent            7,092       4,800
+  13640-FF33641                      +12.2%  Sparse Intermittent            2,106       2,400
+  8423-FF25895HL                    +100.0%  OTB (zero)                    0     1,600.0
+  8423-FF16704HL                    +100.0%  OTB (zero)                    0     5,120.0
+  33011-FF31823                      +37.3%  Sparse Intermittent              840       1,340
+  33011-FF32365                      +32.7%  Sparse Intermittent [BW]         350         520
+  3102-FF36295                       +53.8%  Sparse Intermittent [BW]          72         156
+  3102-FF36294                       +31.0%  Sparse Intermittent              120         174
+  3102-FF31186                       +50.6%  Croston's                   642       1,300
+  19054-FF31606/6                   +186.6%  Sparse Intermittent            2,508         875
+  8919-FF30746                        +0.0%  OTB (zero)                    0         0.0
+  8919-FF26385                        +0.0%  OTB (zero)                    0         0.0
+  33011-FF30399                      +23.8%  Sparse Intermittent              396         520
+  33011-FF30426                     +301.8%  Croston's                 2,250         560
+  3102-FF37636                       +61.5%  Sparse Intermittent              126          78
+  3102-FF37780                      +192.3%  Croston's                   228          78
+  3102-FF37638                       +23.1%  Sparse Intermittent               60          78
+  3102-FF20207                      +624.6%  Croston's                   942         130
+  3102-FF38488                      +135.4%  Croston's                   612         260
+  14721-FF28036AU                    +30.8%  Sparse Intermittent              540         780
+  14721-FF20206AU                     +0.0%  OTB (zero)                    0         0.0
+  14721-FF4933AU                      +7.7%  Sparse Intermittent              600         650
+  3102-FF31455                      +100.0%  OTB (zero)                    0        26.0
+  3102-FF31456                      +100.0%  OTB (zero)                    0        26.0
+  3102-FF34466                      +976.9%  Sparse Intermittent              840          78
+  3102-FF31452                      +100.0%  OTB (zero)                    0       925.0
+  3102-FF31453                      +100.0%  OTB (zero)                    0       925.0
+  3102-FF31454                      +100.0%  OTB (zero)                    0       925.0
+  3102-FF33495                      +423.1%  Heuristic                   408          78
+  8919-FF27266                        +0.0%  OTB (zero)                    0         0.0
+  1579-BB38259                      +176.9%  Croston's                 8,208       2,964
+  13825-BB38259                      +30.8%  Sparse Intermittent              540         780
+  1864-FF8831N                       +10.0%  Heuristic                    36          40
+  1864-FF7297AMZN                  +7130.0%  Croston's                 2,892          40
+  1864-FF7267AMZN                  +6020.0%  Heuristic                 2,448          40
+  1864-FF7263AMZN                    +89.8%  Heuristic                   156       1,530
+  1864-FF7261PCS2N                   +80.0%  Heuristic                    72          40
+  1864-FF5807AMZN                  +2750.4%  Croston's                11,544         405
+  1864-FF31198N                    +1820.0%  Croston's                   768          40
+  1864-FF30879N                    +2570.0%  Heuristic                 1,068          40
+  1864-FF28459N                      +60.0%  Croston's                   288         720
+  1864-FF28036N                     +260.0%  Heuristic                   144          40
+  13640-FF37779                      +35.7%  Sparse Intermittent            1,608       2,500
+  13640-FF37780                     +125.0%  Sparse Intermittent [BW]       5,400       2,400
+  1768-FF13874                      +100.0%  OTB (zero)                    0        30.0
+  1768-FF13875                        +0.0%  OTB (zero)                    0         0.0
+  1768-FF13877                        +0.0%  OTB (zero)                    0         0.0
+  1768-FF13879                        +0.0%  OTB (zero)                    0         0.0
+  1768-FF13880                        +0.0%  OTB (zero)                    0         0.0
+  1768-FF13881                        +0.0%  OTB (zero)                    0         0.0
+  1768-FF16705                        +0.0%  OTB (zero)                    0         0.0
+  16553-FF31064                     +100.0%  Sparse Intermittent               48          24
+  16553-FF15584                     +100.0%  Sparse Intermittent               48          24
+  16553-FF31063                     +100.0%  Sparse Intermittent               48          24
+  1864-BB31552CLR/9                  +48.6%  Heuristic                   810       1,575
+  22008-BB32329                      +73.2%  Sparse Intermittent              804       3,000
+  22008-BB19112                      +77.8%  Sparse Intermittent              798       3,600
+  22008-BB12028                      +73.3%  Sparse Intermittent              480       1,800
+  22008-BB12752                      +73.3%  Sparse Intermittent              480       1,800
+  22008-BB11603                      +73.0%  Sparse Intermittent              324       1,200
+  22008-BB35237                      +79.8%  Sparse Intermittent              243       1,200
+  22008-BB0149                       +86.7%  Sparse Intermittent              240       1,800
+  22008-BB21643                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB36671                      +84.2%  Sparse Intermittent              189       1,200
+  22008-BB0015                        +0.0%  OTB (zero)                    0         0.0
+  1864-BB14500CLR/9                  +87.2%  Heuristic                 2,340      18,351
+  6111-FF27261                       +49.0%  Sparse Intermittent [BW]         894         600
+  23685-BB37434                     +100.0%  OTB (zero)                    0     8,000.0
+  23685-BB37435                     +100.0%  OTB (zero)                    0     8,000.0
+  22008-BB22272                      +46.7%  Sparse Intermittent            1,920       3,600
+  22008-BB24711                      +51.1%  Sparse Intermittent            1,760       3,600
+  22008-BB27359                      +90.0%  Sparse Intermittent              240       2,400
+  22008-BB30424                      +90.0%  Sparse Intermittent              240       2,400
+  6111-FF11348/6                     +50.0%  Sparse Intermittent            2,280       4,560
+  2342-FF33637                      +100.0%  OTB (zero)                    0     1,300.0
+  22008-BB33703                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB35041                      +27.2%  Sparse Intermittent            1,092       1,500
+  22008-BB36237                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB36981                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB36982                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB36989                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB36990                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB37426                       +0.0%  OTB (zero)                    0         0.0
+  2973-FF12853                       +87.9%  Sparse Intermittent              120         988
+  2973-FF12842                       +87.9%  Sparse Intermittent              120         988
+  21025-FF37637                       +0.0%  OTB (zero)                    0         0.0
+  21025-FF31456                      +17.8%  Sparse Intermittent [BW]      11,304       9,600
+  21025-SF8174                        +0.0%  OTB (zero)                    0         0.0
+  21025-FF33573                     +199.0%  Sparse Intermittent            3,588       1,200
+  21025-FF36214                      +40.0%  Sparse Intermittent            2,400       4,000
+  21025-FF33567                      +42.5%  Sparse Intermittent            2,736       1,920
+  21025-FF33570                      +43.0%  Sparse Intermittent            2,736       4,800
+  21025-FF33571                      +41.8%  Sparse Intermittent            2,796       4,800
+  21025-FF4517PS                     +39.2%  Sparse Intermittent            2,916       4,800
+  21025-FF34468                      +33.3%  Sparse Intermittent              480         720
+  21025-FF20206                      +17.5%  Sparse Intermittent            1,980       2,400
+  21025-FF33876                     +100.0%  OTB (zero)                    0     2,400.0
+  21025-FF36212                      +37.0%  Sparse Intermittent            1,512       2,400
+  21025-FF36213                      +37.0%  Sparse Intermittent            1,512       2,400
+  21025-FF37636                      +78.0%  Sparse Intermittent              528       2,400
+  21025-FF31455                      +13.5%  Sparse Intermittent [BW]      10,896       9,600
+  13032-BB16535                      +85.0%  Sparse Intermittent              156       1,040
+  13032-BB21641                      +85.0%  Sparse Intermittent              156       1,040
+  13032-BB18835                      +85.0%  Sparse Intermittent              156       1,040
+  13032-BB0150                       +85.0%  Sparse Intermittent              156       1,040
+  13032-BB12479                      +80.4%  Sparse Intermittent              102         520
+  13032-BB16316                      +80.4%  Sparse Intermittent              102         520
+  1047-FF4775                       +100.0%  OTB (zero)                    0       468.0
+  1047-FF7266                       +100.0%  OTB (zero)                    0       598.0
+  2973-FF7266                        +86.7%  Sparse Intermittent               90         676
+  2973-FF4775                        +85.8%  Sparse Intermittent               96         676
+  2973-FF7258                        +87.8%  Sparse Intermittent              168       1,378
+  2973-FF7267                        +85.8%  Sparse Intermittent               96         676
+  2973-FF4936                        +87.8%  Sparse Intermittent              168       1,378
+  2973-FF4930                        +85.8%  Sparse Intermittent               96         676
+  2973-FF33413                       +85.8%  Sparse Intermittent               96         676
+  1047-FF7258                        +59.5%  Sparse Intermittent [BW]         954         598
+  2973-FF20206                       +85.8%  Sparse Intermittent               96         676
+  2973-FF31324                       +86.7%  Sparse Intermittent               90         676
+  2973-FF31326                       +85.8%  Sparse Intermittent               96         676
+  2973-FF20210                       +85.8%  Sparse Intermittent               96         676
+  2973-FF31327                       +85.8%  Sparse Intermittent               96         676
+  1864-BB38925                     +3245.0%  Sparse Intermittent            1,338          40
+  13032-BB38261                      +48.8%  Sparse Intermittent            1,332       2,600
+  13825-BB38261                      +24.6%  Sparse Intermittent            2,592       2,080
+  18360-FF20209                      +25.4%  Sparse Intermittent            3,732       5,000
+  1864-FF38368                     +1340.0%  Heuristic                   576          40
+  1864-BB38924                     +3530.0%  Croston's                 1,452          40
+  14719-FF27268                       +0.0%  OTB (zero)                    0         0.0
+  18360-FF7218                       +86.7%  Sparse Intermittent              960       7,200
+  18360-FF7541                       +90.0%  Sparse Intermittent              480       4,800
+  18360-FF7221                       +90.0%  Sparse Intermittent              960       9,600
+  3700-BB31704                       +47.3%  Sparse Intermittent            1,440       2,730
+  3700-BB38466                       +48.1%  Sparse Intermittent            1,416       2,730
+  22008-BB29944                       +0.0%  OTB (zero)                    0         0.0
+  4524-BB21038                       +80.0%  Sparse Intermittent              180         900
+  16554-FF36328                      +34.9%  Heuristic                   900       1,382
+  16554-FF36326                      +32.8%  Heuristic                   912       1,358
+  12428-FF4517PS                     +41.5%  Sparse Intermittent              552         390
+  6111-FF11899/24                    +28.0%  Sparse Intermittent              768         600
+  6111-SF8173                        +80.0%  Sparse Intermittent              288         160
+  6111-FF13874                      +100.0%  OTB (zero)                    0        24.0
+  6111-FF13876                      +100.0%  OTB (zero)                    0         6.0
+  6111-FF13877                      +100.0%  OTB (zero)                    0        18.0
+  6111-FF13878                      +100.0%  OTB (zero)                    0        18.0
+  6111-FF13879                      +100.0%  OTB (zero)                    0        36.0
+  1864-BB38937                     +2825.0%  Croston's                 1,170          40
+  16554-FF33573                      +42.5%  Sparse Intermittent            2,004       1,406
+  23651-FF12302/24                  +100.0%  OTB (zero)                    0       260.0
+  16645-FF5716                      +315.4%  Sparse Intermittent            1,080         260
+  16645-FF10162                     +100.0%  OTB (zero)                    0       520.0
+  16645-SF8168                      +453.8%  Sparse Intermittent            1,440         260
+  16645-FF10159                     +100.0%  OTB (zero)                    0       260.0
+  16645-FF31326                     +100.0%  OTB (zero)                    0       260.0
+  16645-FF9297PDQ                   +343.1%  Sparse Intermittent            1,152         260
+  16645-FF4517PS                    +176.9%  Sparse Intermittent              720         260
+  16645-SF8174                       +66.2%  Sparse Intermittent              432         260
+  16645-FF12301/24                   +35.4%  Sparse Intermittent              168         260
+  16645-FF33567                     +149.2%  Sparse Intermittent              324         130
+  16645-FF33570                     +149.2%  Sparse Intermittent              324         130
+  16645-FF33572                     +149.2%  Sparse Intermittent              324         130
+  16645-SF8173                       +26.2%  Sparse Intermittent               96         130
+  16645-FF33568                     +176.9%  Sparse Intermittent              216          78
+  16645-FF33569                     +176.9%  Sparse Intermittent              216          78
+  16645-FF33573                     +176.9%  Sparse Intermittent              216          78
+  12428-FF33449                       +7.7%  Sparse Intermittent               24          26
+  12428-FF10465                       +7.7%  Sparse Intermittent               24          26
+  12428-SF8168                       +10.8%  Sparse Intermittent              288         260
+  12428-SF8169                       +66.2%  Sparse Intermittent              432         260
+  12428-SF8170                       +10.8%  Sparse Intermittent              288         260
+  12428-FF5807                      +130.8%  Sparse Intermittent              180          78
+  22008-BB38466                      +81.5%  Sparse Intermittent            6,072      32,800
+  4524-BB33249                        +0.0%  OTB (zero)                    0         0.0
+  22233-SF8170PS                      +7.7%  Sparse Intermittent               48          52
+  22233-FF5715PS                    +176.9%  Sparse Intermittent              216          78
+  3102-FF36291                      +361.5%  Sparse Intermittent              480         104
+  3102-FF36663                       +28.0%  Sparse Intermittent [BW]          96          75
+  2659-BB16316                       +60.4%  Sparse Intermittent              792       2,002
+  18360-FF7540                        +0.0%  OTB (zero)                    0         0.0
+  8919-FF30784                      +100.0%  OTB (zero)                    0     1,200.0
+  8919-FF7215                       +100.0%  OTB (zero)                    0     2,400.0
+  8919-FF7218                       +100.0%  OTB (zero)                    0     2,400.0
+  8919-FF7217                       +100.0%  OTB (zero)                    0     2,400.0
+  8919-FF9060                       +100.0%  OTB (zero)                    0     2,400.0
+  6111-FF27263                       +40.0%  Sparse Intermittent              240         400
+  6111-FF27266                       +20.0%  Sparse Intermittent              480         400
+  6111-FF27265                       +65.0%  Sparse Intermittent              660         400
+  9108-FF12655EC                     +71.4%  Croston's                    12          42
+  2953-FF11899/24                    +12.1%  Pre-launch NEW (manual passthrough)              333         297
+  8919-SF8168                        +46.4%  Sparse Intermittent            2,880       5,376
+  8423-FF9297/24HL                  +100.0%  OTB (zero)                    0     5,120.0
+  8423-FF9298HL                     +100.0%  OTB (zero)                    0     1,600.0
+  8423-FF33573HL                    +100.0%  OTB (zero)                    0     1,600.0
+  8423-FF34468HL                    +100.0%  OTB (zero)                    0     1,600.0
+  21025-FF12655                      +60.2%  Sparse Intermittent              954       2,400
+  3102-FF38368                      +515.4%  Sparse Intermittent              480          78
+  6111-FF9291/24                     +21.5%  Sparse Intermittent            1,224       1,560
+  8940-FF9291/24                     +20.0%  Heuristic                 1,248       1,560
+  8940-FF33689PS                     +15.6%  Sparse Intermittent            1,248       1,080
+  8940-FF33568                       +62.5%  Sparse Intermittent              180         480
+  8940-FF33569                       +62.5%  Sparse Intermittent              180         480
+  8940-FF33570                       +62.5%  Sparse Intermittent              180         480
+  8940-FF33571                       +62.5%  Sparse Intermittent              180         480
+  8940-FF33572                       +62.5%  Sparse Intermittent              180         480
+  14182-FF28457                      +53.8%  Sparse Intermittent [BW]         480       1,040
+  14182-FF29833                      +58.5%  Sparse Intermittent [BW]         432       1,040
+  14182-FF29834                      +58.5%  Sparse Intermittent [BW]         432       1,040
+  6579-FF7540                       +150.0%  Sparse Intermittent              960         384
+  6579-FF7541                        +93.8%  Sparse Intermittent              744         384
+  6579-FF9256                       +212.5%  Sparse Intermittent            1,200         384
+  6579-FF33567                       +40.9%  Sparse Intermittent              984       1,664
+  6579-FF33568                       +42.1%  Sparse Intermittent            2,364       1,664
+  6579-FF33569                      +184.9%  Sparse Intermittent            4,740       1,664
+  6579-FF33571                       +54.6%  Sparse Intermittent              756       1,664
+  6579-FF33572                       +56.0%  Sparse Intermittent              732       1,664
+  6579-FF33573                      +113.5%  Sparse Intermittent            3,552       1,664
+  3892-BB36058CLR/12                 +46.2%  Sparse Intermittent              672       1,250
+  3892-BB13436CLR/12                 +53.9%  Sparse Intermittent              576       1,250
+  3892-BB13437CLR/12                 +53.9%  Sparse Intermittent              576       1,250
+  3892-BB13447CLR/12                 +46.2%  Sparse Intermittent              672       1,250
+  3892-BB31552CLR/9                  +61.1%  Sparse Intermittent              486       1,250
+  3892-BB14500CLR/9                  +61.1%  Sparse Intermittent              486       1,250
+  1864-FF38676                       +73.6%  Heuristic                 1,050         605
+  4524-BB28163                       +80.0%  Sparse Intermittent              360       1,800
+  12002-SF8170PS                     +63.1%  Sparse Intermittent              480       1,300
+  2342-FF31063                      +100.0%  OTB (zero)                    0       600.0
+  2342-FF12848                      +100.0%  OTB (zero)                    0     1,200.0
+  16851-FF10475                       +7.7%  Sparse Intermittent              120         130
+  16851-FF12655                      +28.5%  Sparse Intermittent              372         520
+  16851-FF31324                      +29.2%  Sparse Intermittent              276         390
+  16851-FF5716                       +44.6%  Sparse Intermittent              216         390
+  16851-SF8170                        +7.7%  Sparse Intermittent              720         780
+  16851-FF12300/24                  +100.0%  Sparse Intermittent              144          72
+  16851-FF12302/24                  +232.3%  Sparse Intermittent              432         130
+  12893-FF12508                     +100.0%  OTB (zero)                    0     1,440.0
+  16851-FF33689PS                    +81.5%  Sparse Intermittent               48         260
+  16851-SF8168                       +10.8%  Sparse Intermittent              288         260
+  13640-FF28457                       +0.0%  OTB (zero)                    0         0.0
+  22008-BB37368                       +0.0%  OTB (zero)                    0         0.0
+  12893-FF30759                     +100.0%  OTB (zero)                    0     1,440.0
+  16852-FF7267                       +17.5%  Sparse Intermittent            1,410       1,200
+  3102-FF38327                       +81.5%  Sparse Intermittent              240       1,300
+  13646-FF11899/24                   +61.4%  Sparse Intermittent              816       2,112
+  13640-BB36235                      +92.0%  Sparse Intermittent            3,840       2,000
+  13640-BB36237                     +164.0%  Sparse Intermittent            2,640       1,000
+  7199-BB16534                       +91.7%  Sparse Intermittent              120       1,440
+  7199-BB16702                       +92.2%  Sparse Intermittent              126       1,608
+  7199-BB30279                       +91.7%  Sparse Intermittent              120       1,440
+  7199-BB33528                       +92.1%  Sparse Intermittent              114       1,440
+  7199-BB33534                       +92.1%  Sparse Intermittent              114       1,440
+  7199-BB34389                       +92.1%  Sparse Intermittent              114       1,440
+  7199-BB34751                       +92.1%  Sparse Intermittent              228       2,880
+  7199-BB35237                       +92.0%  Sparse Intermittent              153       1,920
+  7199-BB36558                       +92.0%  Sparse Intermittent              153       1,920
+  23011-FF32365                      +15.4%  Pre-launch NEW (manual passthrough)              150         130
+  23011-FF32826                      +15.4%  Pre-launch NEW (manual passthrough)              110         130
+  3340-BB0150                        +25.0%  Sparse Intermittent              900       1,200
+  3340-BB21642                       +25.0%  Sparse Intermittent              900       1,200
+  3340-BB22117                       +25.0%  Sparse Intermittent              900       1,200
+  3340-BB22025                       +24.0%  Sparse Intermittent              456         600
+  3340-BB22094                       +24.0%  Sparse Intermittent              456         600
+  3102-FF25895FB                    +153.3%  Sparse Intermittent            1,824         720
