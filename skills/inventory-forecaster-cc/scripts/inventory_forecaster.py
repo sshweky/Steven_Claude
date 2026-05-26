@@ -8117,9 +8117,6 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     baseline_pps, _baseline_src = _compute_pos_baseline(
         l4w, l13w, lw=lw, amz_aur_data=amz_aur_data
     )
-    # [DBG F87] temporary
-    print(f"  [DBG WOS] baseline_pps={baseline_pps:.0f} src='{_baseline_src[:50]}' mp={mp} snap={snap(baseline_pps,mp)}")
-
     # -- Step 2: WOS fill ----------------------------------------------------
     # F86 (2026-05-25) OH data guard: if oh_lw == 0 AND oh_wos == 0, the
     # retailer did not report DC inventory for this item this week.  Don't
@@ -10386,10 +10383,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _ms_for_inv = (row.get("Mstyle") or "").strip()
     _inv_flow_rec = (inv_flow_data or {}).get(_ms_for_inv)
     _f37_skip = _f37_status_new or (not _inv_flow_rec)
-    # [DBG F87] temporary
-    _dbg_key = row.get("Acct_MStyle_Key_","")
-    if "FF12689" in _dbg_key:
-        print(f"  [DBG F37-pre] key={_dbg_key} model={model} fcst_w14={fcst[13] if len(fcst)>13 else '?'} skip={_f37_skip}")
     if model not in ("Inactive",) and not _f37_skip:
         _adjusted_f37, _f37_adjustments, _f37_lt_info = apply_oh_shortfall_adjustment(
             row, fcst, inv_flow=_inv_flow_rec)
@@ -10437,10 +10430,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             f"P6 OH-shortfall guard activated: {_f37_skip_reason} -- "
             f"NEW-launch / missing-data items bypass F37 inventory constraint"
         )
-
-    # [DBG F87] temporary
-    if "FF12689" in (row.get("Acct_MStyle_Key_","") or ""):
-        print(f"  [DBG post-F37] fcst_w14={fcst[13] if len(fcst)>13 else '?'}")
 
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
     #
