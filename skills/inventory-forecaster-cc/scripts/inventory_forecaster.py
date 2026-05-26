@@ -11282,6 +11282,85 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         )
             # Near-target (7.5-10.5 WOS): no adjustment needed.
 
+    # ── F_DC_LAG — DC Inventory Lag Correction (2026-05-26) ──────────────────
+    # POS and DC inventory data both carry a 1-week reporting lag.  We cannot
+    # correct for the POS lag, but we CAN adjust the DC OH figure forward by
+    # one week using known shipment and receiving movements:
+    #
+    #   adj_dc_oh = DC_OH_LW + Open_PO_LW - LW_POS_Sales
+    #
+    # where:
+    #   DC_OH_LW     -- on-hand at DC from last week's data snapshot
+    #   Open_PO_LW   -- open PO inbound to DC (adds back arriving stock)
+    #   LW_POS_Sales -- consumer sell-through last week (deducts shipped-out units)
+    #
+    # adj_dc_oh estimates true DC OH entering this week.  Compare to the target
+    # WOS to decide if W1-W2 should be boosted (understocked after lag adj) or
+    # reduced (overstocked after lag adj).  The delta is split evenly: half
+    # applied to W1, half to W2.
+    #
+    # Amazon  : dc_oh=Inv_SOH, open_po=Inv_OPO, lw_pos=Ordered_Units_LW
+    # Retailer: dc_oh=OH_Units_LW, open_po=0 (not tracked), lw_pos=POS_Units_LW
+    #
+    # Excluded models: Inactive, OTB (zero), Pre-launch NEW, Retailer WOS (POS)
+    #   (Retailer WOS model has its own integrated OH fill logic; others have
+    #    no meaningful forecast to adjust.)
+    #
+    # Guard: only fires when |adj_wos - raw_wos| >= 0.5 wks AND
+    #        |delta/2| >= 1 master pack (avoids sub-pack noise adjustments).
+    _FDCLAG_SKIP_MODELS = {
+        "Inactive", "OTB (zero)",
+        "Pre-launch NEW (manual passthrough)",
+        "Retailer WOS (POS)",
+    }
+    if model not in _FDCLAG_SKIP_MODELS:
+        _fdclag_dc_oh      = 0.0
+        _fdclag_opo        = 0.0
+        _fdclag_lw_pos     = 0.0
+        _fdclag_rate       = 0.0
+        _fdclag_target_wos = RTL_WOS_TARGET   # overridden per channel below
+
+        if is_amazon and amz_catalog and pos_data:
+            _fdclag_dc_oh      = float(amz_catalog.get("Inv_SOH") or 0)
+            _fdclag_opo        = float(amz_catalog.get("Inv_OPO") or 0)
+            _fdclag_lw_pos     = float(pos_data.get("Ordered_Units_LW") or 0)
+            _fdclag_rate       = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
+            _fdclag_target_wos = (AMZ_WOS_TARGET_MIN + AMZ_WOS_TARGET_MAX) / 2.0
+        elif not is_amazon and rtl_pos:
+            _fdclag_dc_oh  = float(rtl_pos.get("OH_Units_LW")  or 0)
+            _fdclag_opo    = 0.0   # open PO not tracked in retailer POS table
+            _fdclag_lw_pos = float(rtl_pos.get("POS_Units_LW") or 0)
+            _fdclag_rate   = float(rtl_pos.get("Avg_Units_Wk_L4w") or 0)
+            _fdclag_target_wos = RTL_WOS_TARGET
+
+        if _fdclag_rate > 0 and _fdclag_lw_pos > 0:
+            _fdclag_adj_oh  = max(0.0, _fdclag_dc_oh + _fdclag_opo - _fdclag_lw_pos)
+            _fdclag_raw_wos = _fdclag_dc_oh / _fdclag_rate
+            _fdclag_adj_wos = _fdclag_adj_oh  / _fdclag_rate
+            _fdclag_tgt_oh  = _fdclag_target_wos * _fdclag_rate
+            _fdclag_delta   = _fdclag_tgt_oh - _fdclag_adj_oh
+            _fdclag_per_wk  = _fdclag_delta / 2.0
+            # Only fire when the lag-adjusted WOS shifts by >= 0.5 wks AND
+            # the per-week change is at least 1 master pack
+            if (abs(_fdclag_adj_wos - _fdclag_raw_wos) >= 0.5
+                    and abs(_fdclag_per_wk) >= mp):
+                _fdclag_dir = "boost" if _fdclag_delta > 0 else "reduc"
+                for _wi in range(2):
+                    fcst[_wi] = snap(max(0.0, fcst[_wi] + _fdclag_per_wk), mp)
+                _fire("F_DC_LAG")
+                if isinstance(meta, dict):
+                    _fdclag_ch = "Amazon" if is_amazon else "Retailer"
+                    meta.setdefault("drivers", []).append(
+                        f"F_DC_LAG ({_fdclag_ch}): "
+                        f"raw_OH={_fdclag_dc_oh:,.0f}u "
+                        f"OPO={_fdclag_opo:,.0f}u "
+                        f"LW_POS={_fdclag_lw_pos:,.0f}u "
+                        f"-> adj_OH={_fdclag_adj_oh:,.0f}u "
+                        f"adj_WOS={_fdclag_adj_wos:.1f}wks "
+                        f"(raw {_fdclag_raw_wos:.1f}wks, target {_fdclag_target_wos:.0f}wks) "
+                        f"-> W1-W2 {_fdclag_dir}ed {abs(_fdclag_per_wk):,.0f}u/wk"
+                    )
+
     # ── F59i — POS anchor for Amazon items with healthy DC WOS ───────────
     # EC = "Ecomm Ready" -- standard Amazon DC items in poly-bag packaging.
     # They have their own ASINs, own order history, own DC inventory.
