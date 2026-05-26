@@ -11334,7 +11334,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         # Amazon's target range is 8-12 wks; after burn-down,
                         # anchor remaining weeks to POS L13W (true consumer velocity).
                         _f59h_burn = min(int(round(_f59h_wos - 12)), 16)
-                        _f59h_pv   = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+                        # F88: respect F87 deceleration on post-burn anchor velocity.
+                        # If L4W POS is >20% below L13W POS (structural decline),
+                        # anchor the post-burn period to L4W rather than L13W so we
+                        # do not project at the inflated historical rate on a falling
+                        # item (e.g. 3,667/wk L13W vs 1,693/wk current L4W).
+                        _f59h_pv_raw = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+                        _f59h_l4w    = float((pos_data or {}).get("Avg_Units_Wk_L4w")  or 0)
+                        _f59h_f88    = (
+                            _f59h_l4w > 0
+                            and _f59h_pv_raw > 0
+                            and _f59h_l4w < _f59h_pv_raw * 0.80
+                        )
+                        _f59h_pv = _f59h_l4w if _f59h_f88 else _f59h_pv_raw
                         for i in range(min(_f59h_burn, len(fcst))):
                             fcst[i] = 0
                         if _f59h_pv >= 50:
@@ -11342,8 +11354,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 fcst[i] = snap(_f59h_pv, mp)
                         _fire("F59h")
                         if isinstance(meta, dict):
+                            if _f59h_f88:
+                                _f59h_vel_desc = (
+                                    f"L4W POS {_f59h_pv:.0f}/wk (F88 decel: L4W is "
+                                    f"{(1 - _f59h_l4w / _f59h_pv_raw) * 100:.0f}% "
+                                    f"below L13W {_f59h_pv_raw:.0f})"
+                                )
+                            else:
+                                _f59h_vel_desc = f"POS L13W {_f59h_pv:.0f}/wk"
                             _f59h_post = (
-                                f"W{_f59h_burn + 1}-W26 anchored to POS L13W {_f59h_pv:.0f}/wk"
+                                f"W{_f59h_burn + 1}-W26 anchored to {_f59h_vel_desc}"
                                 if _f59h_pv >= 50 else "post-burn held at model baseline"
                             )
                             meta.setdefault("drivers", []).append(
