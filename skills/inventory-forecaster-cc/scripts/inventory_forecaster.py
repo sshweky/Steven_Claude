@@ -8999,13 +8999,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         biweekly = bool(_cadence_gap)
         fcst     = apply_ordering_pattern(fcst, hist_for_model, mp)
 
-        # F84 annotation: record why Seasonal Baseline was forced for acct 1864.
+        # F84 annotation: Amazon POS-primary fallback (POS data present, no DC inventory data).
+        # F85 handles Amazon POS+DC records upstream; F84 fires only when DC data is absent.
         if _f84_1864_pos_primary and isinstance(meta, dict):
             _fire("F84")
             meta.setdefault("drivers", []).append(
-                f"F84 Acct-1864 POS-primary: DI order history is lumpy -- "
+                f"F84 Amazon POS-primary: DI order history is lumpy -- "
                 f"POS L13W {_f84_pos_l13:.0f}/wk is the true demand signal; "
-                f"routed to Seasonal Baseline (bypassed Croston's / Sparse Intermittent)"
+                f"routed to Seasonal Baseline (bypassed Croston's / Sparse Intermittent); "
+                f"no DC inventory data available (F85 DC-fill path not triggered)"
             )
 
         # F76 -- Seasonal Baseline thin-history ceiling guard (2026-05-24).
