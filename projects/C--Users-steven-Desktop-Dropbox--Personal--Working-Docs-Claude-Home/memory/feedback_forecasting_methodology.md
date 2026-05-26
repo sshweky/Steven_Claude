@@ -16,6 +16,18 @@ originSessionId: ef36e6c4-ceed-4be8-808f-d35dfe3766a0
 
 **How to apply:** Next session should focus on adding a post-model rescaling step: after any model (HW or Croston's) produces its 26-week forecast, scale the total so the weekly average matches the L13W all-weeks average. This preserves the week-to-week shape from the model while anchoring the volume to reality.
 
+## AUR / Price Change Signal (May 2026)
+
+**Rule: When LW POS deviates >=5% from L4W avg, always check AUR data to determine if a price change is driving the shift.**
+
+- If AUR change is confirmed as the cause, use **LW POS as the new baseline** (not L4W avg) — the price change represents a structural break in demand, not noise.
+- Alert the planner explicitly: state the price change magnitude, the resulting demand shift, and the updated WOS using the LW-based baseline.
+- Apply symmetrically: price increases driving demand down AND price decreases driving demand up both warrant a baseline reset.
+
+**Why:** A >=5% LW-vs-L4W divergence that is AUR-driven is a regime change, not weekly variation. Averaging it into L4W would mask the true new run rate and overstate demand. Example: BB13437 had AUR jump from $2.84 L52W to $3.80 L4W (+34%), driving POS from ~1,104/wk to 665/wk LW (-40%). Using L4W as baseline would overproject by 66% and show 13 WOS when true WOS is 21.5.
+
+**How to apply:** In Amazon POS-WOS model — when building the forecast baseline, check if abs((LW_POS - L4W_POS) / L4W_POS) >= 0.05. If yes, compare AUR_L4W vs AUR_L13W. If AUR shifted >=5% in the same direction as POS (inverse for price increases), flag as price-driven baseline reset, use LW_POS as new weekly run rate, and include in the AI ALERT: "Price change detected: AUR [L13W] -> [L4W] ([+/-X%]); demand reset from [L4W] to [LW]/wk. Using LW as new baseline."
+
 ## Validation Baseline
 
 Changed from L13W non-zero avg to **L13W all-weeks avg** (including zeros). This is correct — zeros are real weeks where the customer didn't order, and the baseline should reflect that.
