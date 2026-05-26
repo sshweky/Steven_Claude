@@ -15468,9 +15468,10 @@ def main():
     # Bucketed by acct-mstyle key.  Most-recent comment per key wins.
     ai_comments = _f58_fetch_active_comments(lookback_days=60)
 
-    # Collects Acct-MStyle keys whose Baseline Override expired (>30 days old).
-    # After Phase 4 write-back, these are bulk-cleared in a single REST call.
-    _EXPIRED_OVERRIDES = []
+    # Reset the module-level expired-override collector for this run.
+    # forecast_record() will .append() any keys it finds with stale (>30 day)
+    # Baseline Override Date; the bulk-clear after Phase 4 drains it.
+    _EXPIRED_OVERRIDES.clear()
 
     results = []
     for row in rows:
