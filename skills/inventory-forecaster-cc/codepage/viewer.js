@@ -4165,7 +4165,6 @@ async function toggleDetail(key) {
         <div style="margin-top:10px;padding-top:8px;border-top:1px solid #c5d9f0;">
           <div style="font-size:11px;color:#444;margin-bottom:4px;font-weight:600;">
             Baseline Override (units/wk)
-            <span style="font-weight:400;color:#888;font-size:10px;"> - AI applies seasonality + snap on next run</span>
           </div>
           <div style="display:flex;gap:6px;align-items:center;">
             <input type="number" id="baseline-ovr-${safeId}" min="0" step="1"
@@ -4177,6 +4176,23 @@ async function toggleDetail(key) {
             <button onclick="saveBaselineOverride('${safeKey}', 0)"
                     style="font-size:11px;padding:4px 10px;background:#fff;color:#888;border:1px solid #ccc;border-radius:4px;cursor:pointer;"
                     title="Clear override - AI will compute its own baseline on the next run">Clear</button>
+          </div>
+          <div id="baseline-ovr-status-${safeId}" style="margin-top:5px;font-size:10px;color:#555;line-height:1.4;">
+            ${(function() {
+              if (r.baseline_override > 0 && r.baseline_override_date) {
+                const setDate = new Date(r.baseline_override_date);
+                const expDate = new Date(setDate.getTime() + 30 * 86400 * 1000);
+                const daysLeft = Math.ceil((expDate - Date.now()) / 86400000);
+                const expStr   = (expDate.getMonth()+1) + '/' + expDate.getDate() + '/' + String(expDate.getFullYear()).slice(2);
+                if (daysLeft <= 0) {
+                  return '<span style="color:#c62828;">Override expired - will be cleared on next forecast run.</span>';
+                }
+                const urgColor = daysLeft <= 7 ? '#e65100' : '#555';
+                return '<span style="color:' + urgColor + ';">Expires ' + expStr + ' (' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + ' remaining). </span>'
+                     + '<span style="color:#1565c0;">Takes effect on next forecast run.</span>';
+              }
+              return '<span style="color:#888;">Takes effect on next forecast run. Auto-clears after 30 days.</span>';
+            })()}
           </div>
         </div>
       </div>
