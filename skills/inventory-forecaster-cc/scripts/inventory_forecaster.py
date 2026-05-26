@@ -7992,6 +7992,10 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
 
     Returns: (baseline_pps, baseline_src_text)
     """
+    # [DBG F87] temporary — remove after verification
+    import traceback as _tb
+    _caller = ''.join(_tb.format_stack()[-4:-1]).replace('\n',' ')
+    print(f"  [DBG F87] _compute_pos_baseline: l4w={l4w:.0f} l13w={l13w:.0f} amz={amz_aur_data is not None}")
     if amz_aur_data is not None:
         # ── Amazon AUR-aware spike logic ────────────────────────────────
         # F87 (2026-05-26) — deceleration guard.
