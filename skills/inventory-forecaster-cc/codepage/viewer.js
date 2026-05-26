@@ -6944,8 +6944,10 @@ function resetAllFilters() {
   CURRENT_SORT_KEY = null;
   CURRENT_SORT_DIR = 0;
   _updateSortIndicators();
-  // Also clear the Flagged-Only toggle when planners hit "Clear Filters"
-  //  -  it's a filter from their perspective, even if it lives in its own button.
+  // Also clear the Flagged-Only / Dupes-Only toggles when planners hit "Clear Filters"
+  //  -  they're filters from their perspective, even if they live in their own buttons.
+  DUPES_ONLY = false;
+  _syncDupesOnlyButton();
   FLAGGED_ONLY = false;
   try { sessionStorage.setItem('flaggedOnly', '0'); } catch (e) { /* ignore */ }
   _syncFlaggedOnlyButton();
@@ -7096,6 +7098,31 @@ function _syncFlaggedOnlyButton() {
   }
 }
 
+// Sticky toggle for the "Show Duplicates" toolbar button.  When true,
+// applyFilters() only retains records where r.has_po_prj_conflict === true
+// (a Manual Projection and an Open Customer PO overlap in the same week).
+let DUPES_ONLY = false;
+
+function toggleDupesOnly() {
+  DUPES_ONLY = !DUPES_ONLY;
+  _syncDupesOnlyButton();
+  applyFilters();
+}
+
+function _syncDupesOnlyButton() {
+  const btn = document.getElementById('dupesOnlyBtn');
+  if (!btn) return;
+  if (DUPES_ONLY) {
+    btn.style.background = '#e65100';
+    btn.style.color = '#fff';
+    btn.title = 'Currently showing duplicate MAN PRJ + Open Order weeks only  -  click to show all';
+  } else {
+    btn.style.background = '#fff';
+    btn.style.color = '#e65100';
+    btn.title = 'Show only records where a Manual Projection and an Open Order fall in the same week (potential double-count)';
+  }
+}
+
 // Sticky toggle for the "Show Snoozed Only" toolbar button.  When true,
 // applyFilters() only retains records with r._snoozed === true.  Persists in
 // sessionStorage so the toggle survives page reloads.
@@ -7141,11 +7168,13 @@ function applyFilters() {
 
   // Reflect sticky-toggle state on the button each time filters re-apply
   // (also covers the initial render after the page hydrates).
+  _syncDupesOnlyButton();
   _syncFlaggedOnlyButton();
   _syncSnoozedOnlyButton();
 
   FILTERED_RECORDS = ALL_RECORDS.filter(r => {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
+    if (DUPES_ONLY         && !r.has_po_prj_conflict)   return false;
     if (FLAGGED_ONLY       && !r.flagged)               return false;
     if (SNOOZED_ONLY       && !r._snoozed)              return false;
     if (SHOW_REPLY_ONLY    && !r.planner_reply_pending) return false;

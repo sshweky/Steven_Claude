@@ -13127,6 +13127,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"with confirmed Open POs -- {_detail_str}. "
                     f"PO is the demand; AI on top would double-count."
                 )
+                # Merge into po_zeroed_weeks so writeback + alert logic see
+                # all zeroed weeks, including any VP-Q4 missed due to re-inflation.
+                _existing_zeroed = set(meta.get("po_zeroed_weeks") or [])
+                _new_zeroed_wks  = sorted(_existing_zeroed | set(_po_zero_removed.keys()))
+                meta["po_zeroed_weeks"] = _new_zeroed_wks
+                # Also update cumulative totals
+                _new_removed = sum(ai for ai, _ in _po_zero_removed.values())
+                _new_po_qty  = sum(po for _, po in _po_zero_removed.values())
+                meta["po_total_removed"] = meta.get("po_total_removed", 0) + _new_removed
+                meta["po_total_qty"]     = meta.get("po_total_qty", 0) + _new_po_qty
 
     alert = ""
     if model == "Inactive" and prior > 0:
