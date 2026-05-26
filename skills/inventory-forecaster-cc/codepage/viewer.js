@@ -458,6 +458,8 @@ function buildSelectFids() {
   LY_SHP_HIST_FIDS.forEach(fid => sel.push(fid));
   // DI Ord History — sparse text field, small enough to include in the initial pull
   if (F.DI_ORD_HIST) sel.push(F.DI_ORD_HIST);
+  // Baseline Override — planner-set manual baseline (FID 1614)
+  if (F.BASELINE_OVERRIDE) sel.push(F.BASELINE_OVERRIDE);
   return sel;
 }
 
