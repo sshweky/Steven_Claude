@@ -7962,73 +7962,102 @@ def _f58_fetch_active_comments(lookback_days=60):
     return by_key
 
 
-def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
+def _compute_pos_baseline(l4w, l13w, lw=0, amz_aur_data=None):
     """
     Compute the POS-anchored demand baseline.
 
-    Two paths depending on whether AUR (Average Unit Retail) data is provided:
+    Layered decision (Amazon path, when amz_aur_data is supplied):
 
-    Both paths share threshold = 7.5% and blend weights 70/30 (2026-05-26).
+    Layer 0 -- F87 deceleration guard:
+      If L4W has dropped >20% below L13W, use L4W directly.  The item is
+      declining; the 13-week historical average overstates current demand.
+      Runs BEFORE spike checks so a declining item never lands on L13W.
 
-    Amazon path (amz_aur_data dict supplied):
-      Spike detection: L4W >= L13W * 1.075 (>= 7.5% above L13W)
-      If spike, check AUR_L4W vs MAP_Price:
-        - AUR < MAP  → promotional pricing was active.  The spike is promo-
-          driven and won't persist at full price.  Use L13W as baseline.
-        - AUR >= MAP → no promo, real demand growth.  Use 0.70 * L4W +
-          0.30 * L13W -- lean heavily recent since the AUR check has
-          already confirmed the growth is at full price.
-      No spike → L13W.
+    Layer 1 -- L4W mid-term spike (default when no LW spike):
+      If L4W >= L13W * 1.075 (>= 7.5% above L13W), baseline =
+      0.70 * L4W + 0.30 * L13W (recent-heavy blend).  AUR check still
+      applies -- if AUR < MAP the spike is promo-driven and we fall back
+      to L13W.
+
+    Layer 2 -- LW short-term spike (Amazon only, OVERRIDES Layer 1):
+      If LW >= L13W * 1.075 (>= 7.5% LW above L13W), check AUR vs MAP:
+        - AUR < MAP (promo active):  baseline = L13W.  The most-recent
+          week is discount-driven and won't persist at full price.
+        - AUR >= MAP (real demand):  baseline = 0.50 * LW + 0.50 * L4W.
+          Both very recent and recent-4-weeks signal real acceleration;
+          weight them equally.
+
+    If neither spike fires -> baseline = L13W.
 
     Retailer path (amz_aur_data is None):
-      Spike rule (aligned with Amazon threshold + weights 2026-05-26):
-        - L4W >= L13W * 1.075 (>= 7.5% spike) AND L4W window doesn't
-          overlap event months (Jan/Jul/Nov/Dec):
-              baseline = 0.70 * L4W + 0.30 * L13W
-          (Retailers lack AUR/MAP data so the event-month skip is the only
-          guardrail against false-positive acceleration during predictable
-          promo cycles -- it stays in place.)
+      Layer 1 only (no LW data, no AUR), with event-month skip:
+        - L4W >= L13W * 1.075 AND L4W window doesn't overlap event months
+          (Jan/Jul/Nov/Dec):  baseline = 0.70 * L4W + 0.30 * L13W
         - Else:  baseline = L13W
 
     Returns: (baseline_pps, baseline_src_text)
     """
     if amz_aur_data is not None:
         # ── Amazon AUR-aware spike logic ────────────────────────────────
-        # F87 (2026-05-26) — deceleration guard.
-        # When L4W has dropped >20% below L13W, the current sell-through rate
-        # is the demand signal -- not the 13-week historical average.  Use L4W
-        # directly so the baseline reflects where the item is NOW, not where it
-        # was 3 months ago.  Checked BEFORE spike detection so a declining item
-        # doesn't fall through to L13W via the "no spike" branch.
+
+        # Layer 0: F87 deceleration guard.  Runs first so a declining item
+        # never falls through to L13W via the "no spike" branch.
         if l4w > 0 and l4w < l13w * 0.80:
             _decline_pct = (1 - l4w / l13w) * 100
             return l4w, (
                 f"L4W anchor (F87 declining: L4W {l4w:.0f} is {_decline_pct:.1f}% "
                 f"below L13W {l13w:.0f} -- current sell-through is the demand signal)"
             )
-        spike = l4w >= l13w * 1.075
-        if not spike:
-            return l13w, (
-                f"L13W anchor (no spike: L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.075)"
-            )
+
         aur_l4w   = float(amz_aur_data.get("aur_l4w")   or 0)
         map_price = float(amz_aur_data.get("map_price") or 0)
         promo_active = (map_price > 0 and aur_l4w > 0 and aur_l4w < map_price)
-        spike_pct = (l4w / l13w - 1) * 100 if l13w > 0 else 0
+
+        # Layer 2: LW short-term spike override.  When the most-recent week
+        # is hot, it carries more signal than the 4-week average -- but only
+        # if AUR confirms full-price selling.  Otherwise the LW spike is a
+        # promo flash and won't carry forward.  Overrides Layer 1.
+        lw_spike = (lw > 0 and l13w > 0 and lw >= l13w * 1.075)
+        if lw_spike:
+            lw_spike_pct = (lw / l13w - 1) * 100
+            if promo_active:
+                return l13w, (
+                    f"L13W anchor (LW spike +{lw_spike_pct:.1f}% LW {lw:.0f} vs "
+                    f"L13W {l13w:.0f}, but AUR_L4W ${aur_l4w:.2f} < MAP "
+                    f"${map_price:.2f} -- promo-driven, won't persist at full price)"
+                )
+            _lw_aur_note = (
+                f"AUR_L4W ${aur_l4w:.2f} >= MAP ${map_price:.2f}"
+                if (map_price > 0 and aur_l4w > 0) else
+                "no AUR data -- treated as no-promo"
+            )
+            return 0.50 * lw + 0.50 * l4w, (
+                f"LW/L4W 50/50 blend (LW spike +{lw_spike_pct:.1f}% LW {lw:.0f} vs "
+                f"L13W {l13w:.0f}, {_lw_aur_note} -- real demand acceleration)"
+            )
+
+        # Layer 1: L4W mid-term spike (when no LW spike triggered Layer 2).
+        l4w_spike = (l4w > 0 and l13w > 0 and l4w >= l13w * 1.075)
+        if not l4w_spike:
+            return l13w, (
+                f"L13W anchor (no spike: L4W {l4w:.0f} <= L13W {l13w:.0f} x 1.075"
+                + (f", LW {lw:.0f} <= L13W x 1.075" if lw > 0 else "")
+                + ")"
+            )
+        l4w_spike_pct = (l4w / l13w - 1) * 100
         if promo_active:
             return l13w, (
-                f"L13W anchor (spike +{spike_pct:.1f}% L4W vs L13W, but "
-                f"AUR_L4W ${aur_l4w:.2f} < MAP ${map_price:.2f} -- "
-                f"promo-driven, won't persist at full price)"
+                f"L13W anchor (L4W spike +{l4w_spike_pct:.1f}% but "
+                f"AUR_L4W ${aur_l4w:.2f} < MAP ${map_price:.2f} -- promo-driven)"
             )
-        _aur_note = (
+        _l4w_aur_note = (
             f"AUR_L4W ${aur_l4w:.2f} >= MAP ${map_price:.2f}"
             if (map_price > 0 and aur_l4w > 0) else
             "no AUR data -- treated as no-promo"
         )
         return 0.70 * l4w + 0.30 * l13w, (
-            f"L4W/L13W 70/30 blend (spike +{spike_pct:.1f}% L4W vs L13W, "
-            f"{_aur_note} -- real demand growth)"
+            f"L4W/L13W 70/30 blend (L4W spike +{l4w_spike_pct:.1f}% L4W {l4w:.0f} vs "
+            f"L13W {l13w:.0f}, {_l4w_aur_note} -- real demand growth)"
         )
 
     # ── Retailer (non-Amazon) path ──────────────────────────────────────
@@ -8085,6 +8114,7 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     """
     l4w    = float(rtl_pos.get("Avg_Units_Wk_L4w")  or 0)
     l13w   = float(rtl_pos.get("Avg_Units_Wk_L13w") or 0)
+    lw     = float(rtl_pos.get("Ordered_Units_LW")  or 0)   # most-recent week (Amazon path only)
     oh_lw  = float(rtl_pos.get("OH_Units_LW")        or 0)
     oh_wos = float(rtl_pos.get("OH_WOS")              or 0)
 
@@ -8095,7 +8125,9 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
         wos_target = AMZ_WOS_TARGET_MIN if amz_aur_data is not None else RTL_WOS_TARGET
 
     # -- Step 1: POS baseline ------------------------------------------------
-    baseline_pps, _baseline_src = _compute_pos_baseline(l4w, l13w, amz_aur_data=amz_aur_data)
+    baseline_pps, _baseline_src = _compute_pos_baseline(
+        l4w, l13w, lw=lw, amz_aur_data=amz_aur_data
+    )
     # [DBG F87] temporary
     print(f"  [DBG WOS] baseline_pps={baseline_pps:.0f} src='{_baseline_src[:50]}' mp={mp} snap={snap(baseline_pps,mp)}")
 
