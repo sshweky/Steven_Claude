@@ -12413,6 +12413,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"Surfaced as Inactive so the narrative reflects reality."
             )
 
+    # Surface a note when an active Baseline Override was bypassed by the
+    # new-launch ramp.  Without this, a planner who sets an override on a
+    # NEW/launching item would see the AI silently ignore it.
+    if _ovr_suppressed_by_ramp and isinstance(meta, dict):
+        meta.setdefault("drivers", []).append(
+            "F_BASELINE_OVR suppressed: a manual baseline override is set on "
+            "this record but the AI used the new-launch ramp logic instead "
+            "(launch items follow F73 / F31 paths so the early ramp shape is "
+            "preserved). Clear the override or wait until the item exits ramp."
+        )
+
     alert = ""
     if model == "Inactive" and prior > 0:
         alert = _build_alert(model, new, prior, pct, cap, mp, meta,
