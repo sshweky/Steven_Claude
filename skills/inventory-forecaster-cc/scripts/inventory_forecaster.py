@@ -12245,6 +12245,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"(Prime Day depletes DI stock faster)"
                         if _f73_accel > 0 else ""
                     )
+                    _f73_vel_note = (
+                        f" [F88 decel: L4W {_f73_pos_l4:.0f} vs L13W {_f73_pos_l13:.0f}]"
+                        if _f73_f88 else ""
+                    )
                     meta.setdefault("drivers", []).append(
                         f"F73 DI post-receipt: last DI ship "
                         f"{_f73_ship_wks_ago:.0f}wks ago (transit complete); "
@@ -12252,7 +12256,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         f"{_f73_suppress_int}wk drawdown suppress "
                         f"(floor {_f73_floor:.0f}/wk); "
                         f"post-suppress {_f73_post_rate:.0f}/wk POS rate "
-                        f"(no DI restock ~6mo)"
+                        f"(no DI restock ~6mo){_f73_vel_note}"
                         + _f73_pd_note
                     )
 
