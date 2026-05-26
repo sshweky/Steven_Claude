@@ -5447,6 +5447,14 @@ MSTYLE_FAMILY_INDEX = {}   # Mstyle  -> {"median_wk_rate": float, "n": int}
 CUST_BASELINE_INDEX = {}   # Cust    -> {"median_wk_rate": float, "n": int}
 GLOBAL_WK_RATE      = 10.0  # fallback scalar when a cust has no active peers
 
+# Baseline Override expiry collector.  Module-level so forecast_record() (a
+# top-level function) can append to it across all records in a Phase 3 pass.
+# main() clears it at the start of each run; the bulk-clear after Phase 4
+# write-back drains it.  This is per-process state; safe under the single-
+# thread Phase 3 loop.  If you ever parallelize forecast_record, replace
+# with a queue or guard with a lock.
+_EXPIRED_OVERRIDES = []
+
 
 def _build_mstyle_family_index(rows):
     """
