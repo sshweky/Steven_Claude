@@ -11004,6 +11004,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _f59a_floor = 0.0
     _f59a_momentum = False
     _f59_f18_capped = False
+    # [DBG F87]
+    if "FF12689" in (row.get("Acct_MStyle_Key_","") or ""):
+        print(f"  [DBG line-11007] fcst_w14={fcst[13] if len(fcst)>13 else '?'}")
     if is_amazon and not model.startswith("Inactive") and not model.startswith("OTB"):
 
         # ── Velocity baselines with OOS-week exclusion (F59c) ────────────────
