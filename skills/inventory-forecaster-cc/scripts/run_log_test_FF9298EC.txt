@@ -1,0 +1,84 @@
+
+============================================================
+  [watchdog] Starting forecaster (inner attempt 1/3)
+============================================================
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_24_W1 -> 11_15_W26
+
+[1/4] Pulling projections from Quickbase ...
+      [QB REST] fetching field map ...
+      1 records retrieved (QB REST API)
+
+[2/4] Pulling master pack + Season from Styles ...
+      [QB REST] fetching Styles field map ...
+      1 master pack records loaded (0 with Season tag) (QB REST API)
+
+[2.5] Pulling Amazon catalog POS for 2 mstyles ...
+      1 mstyles with POS data loaded (QB REST API)
+      viewer_pos_cache.json refreshed (1 mstyles)
+
+[2.6] Pulling Amazon Catalog US (F38 signals) for 2 mstyles ...
+      1 mstyles with Amazon Catalog US signals loaded (QB REST API)
+
+[2.6b] Pulling Amazon Inventory Health for 1 ASINs ...
+      1 mstyles enriched with DC inventory health data (QB REST API)
+
+[2.6c] Retailer POS skipped (no non-Amazon records in scope)
+
+[2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 1 mstyles ...
+      1 mstyles with Inv Flow data loaded (QB REST API)
+      viewer_amz_cache.json refreshed (1 mstyles)
+
+[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 1 keys (w1_date=2026-05-24) ...
+      [vp-q4] BULK fetch: running QB report #27 on table bp8r4dejr (replaces per-account loop) ...
+      [vp-q4] 10,058 rows in 2.8s (1 API call vs ~1 per-account calls)
+      [vp-q4] cached → open_pos_report.json (reused for 0h)
+      [vp-q4] bucketed 0 in-scope rows across 0 keys (skipped: 10,058 out-of-scope · 0 zero-qty · 0 no-date · 0 outside-26w)
+      0 keys have confirmed forward POs (total open qty: 0 units)
+
+[2.9] VP-ATS: fetching ATS L26W history for 1 mstyles ...
+      [vp-ats] fetching ATS L26W history from bv2sxg2ji (1 mstyles) ...
+      [vp-ats] 0 mstyles with ATS history loaded  (1000 filtered out)
+      0 mstyles loaded, 0 with at least one non-zero ATS week
+      Mstyle-family index: 1 mstyles with active siblings
+      Customer-baseline  : 1 customers  (global median wk-rate: 1711.8)
+      Account-cadence    : 0 accounts indexed
+
+[3/4] Running forecasts ...
+
+[2.9] F60 -- EC transition history inheritance ...
+      0 EC variants inherited parent history
+
+[2.9b] F69 — DI direct-import sibling history pull ...
+      0 DI sibling variant(s) blended into 0 base record(s)
+  [F58] Loaded 14 active AI adjustments (last 60 days)
+      1 forecasts complete in 3.0s
+      Seasonal Baseline: 1  Bi-weekly enforced: 0  Alerts (>7.5%): 0
+      Saved → forecast_results.json
+      Open viewer: python scripts/viewer.py --results forecast_results.json
+
+[DRY RUN] Skipping write-back.
+
+==================================================================
+  COMPLETE  |  1 records  |  Total 26w demand: 86,880
+  Models -- Seasonal: 1  Croston's: 0  Heuristic: 0  Inactive: 0  Bi-weekly: 0
+
+==================================================================
+  WEEKLY DETAIL — AI vs Manual projections
+  Key / Model                  W 1 W 2 W 3 W 4 W 5 W 6 W 7 W 8 W 9 W10 W11 W12 W13 W14 W15 W16 W17 W18 W19 W20 W21 W22 W23 W24 W25 W26  Avg/wk   Δ%
+  -------------------------------------------------------------------------------------------------------------------------------------------------
+  AI  1864-FF9298EC            4416 2928 2928 2928 2928 2928 2928 2928 2928 2928 2928 2928 2928 2928 2928 3816 2928 2928 2928 3744 3744 3744 3744 4632 4632 4632   3,342  +4.3% 
+  Man 1864-FF9298EC               0 3530 4000 4000 4000    0    0    0    0 3250 3210 3210 3210 3210 3210 3900 3900 3900 3900 4695 4695 4695 4695 4695 4695 4695   3,204
+  -------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+  [watchdog] Forecaster completed (exit 0).
+
+  [outer-retry] SUCCESS on outer attempt 1.

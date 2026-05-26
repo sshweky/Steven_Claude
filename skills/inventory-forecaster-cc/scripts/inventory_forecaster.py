@@ -8286,6 +8286,35 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         pattern != "inactive"
     )
 
+    # F84 (2026-05-25) — Amazon acct 1864 POS-primary model override.
+    # Acct 1864 (AMAZON.COM.KYDC) ships via Direct Import (DI) — orders arrive
+    # in large infrequent batches that order-history classifiers see as Croston's
+    # or Sparse Intermittent.  But consumer POS (L13W sell-through) is the true
+    # demand signal for DI.  When any POS L13W > 0, bypass Croston's / Sparse
+    # Intermittent and route to Seasonal Baseline so F15 anchors the baseline on
+    # POS rate rather than lumpy order history.
+    #
+    # Scope: acct 1864 only + is_amazon + POS L13W > 0.  Inactive records are
+    # left alone -- zero orders AND zero POS together means legitimately paused;
+    # no POS anchor to project from.  force_heuristic (post-ISO settle) is also
+    # cleared when POS is credible so the ISO path doesn't divert to Heuristic.
+    _f84_pos_l13          = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
+    _f84_acct             = (row.get("Acct_MStyle_Key_") or "").split("-")[0].strip()
+    _f84_1864_pos_primary = (
+        is_amazon
+        and _f84_acct == "1864"
+        and _f84_pos_l13 > 0
+        and pattern != "inactive"
+    )
+    if _f84_1864_pos_primary:
+        # Force Seasonal Baseline path through the model cascade:
+        # is_dense=True  → skip "not is_dense" Croston's branch
+        # is_croston=True → skip "not is_croston" Sparse Intermittent branch
+        # Then only the dense else: block remains → seasonal_baseline() with F15 POS anchor
+        is_dense        = True
+        is_croston      = True
+        force_heuristic = False   # POS is credible; don't divert to Heuristic
+
     # F5 — PT_Item_Status routing override.  If the item is explicitly
     # flagged "Launching / New / Pilot" in PT_Item_Status and classify()
     # decided Inactive purely because L13 = 0, skip Inactive so the F1/F2/F3
