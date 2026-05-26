@@ -8316,15 +8316,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # Intermittent and route to Seasonal Baseline so F15 anchors the baseline on
     # POS rate rather than lumpy order history.
     #
-    # Scope: acct 1864 only + is_amazon + POS L13W > 0.  Inactive records are
-    # left alone -- zero orders AND zero POS together means legitimately paused;
-    # no POS anchor to project from.  force_heuristic (post-ISO settle) is also
-    # cleared when POS is credible so the ISO path doesn't divert to Heuristic.
+    # Scope: ANY Amazon account with POS L13W > 0 (widened from acct 1864 only on
+    # 2026-05-25 per F85 rollout).  F85 handles Amazon POS+DC records upstream via
+    # _retailer_wos_forecast(); F84 is the fallback for POS-only records where DC
+    # inventory data is absent.  Inactive records are left alone -- zero orders AND
+    # zero POS together means legitimately paused; no POS anchor to project from.
+    # force_heuristic (post-ISO settle) is also cleared when POS is credible so the
+    # ISO path doesn't divert to Heuristic.
     _f84_pos_l13          = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
-    _f84_acct             = (row.get("Acct_MStyle_Key_") or "").split("-")[0].strip()
     _f84_1864_pos_primary = (
         is_amazon
-        and _f84_acct == "1864"
         and _f84_pos_l13 > 0
         and pattern != "inactive"
     )
