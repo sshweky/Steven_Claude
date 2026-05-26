@@ -15970,6 +15970,19 @@ def main():
     rows = [{k: clean_html(v) for k, v in r.items()} for r in raw_rows]
     print(f"      {len(rows)} records retrieved (QB REST API)", flush=True)
 
+    # ── Phase 1.5: Amazon switchover auto-link + Switchover_Date backfill ──
+    # PCS{N} -> PX{N} auto-detect, Switchover_Date computed from variant's
+    # first non-zero MAN PRJ week, missing variant records auto-created with
+    # metadata copied from the base.  Runs before Phase 2 so downstream
+    # F70 / F70c rules see the auto-linked variant relationships in the
+    # current run's rows.  Writeback happens immediately so the change lands
+    # in QB even when the forecast itself is dry-run -- the auto-link and
+    # date are metadata fixes, not forecast values.
+    print(f"\n[1.5] Amazon switchover auto-link + Switchover_Date backfill ...",
+          flush=True)
+    _sw_backfill = _switchover_backfill(rows, list(prj_cols))
+    _apply_switchover_backfill(_sw_backfill, dry_run=bool(getattr(args, "dry_run", False)))
+
     # ── Phase 2: Pull master pack + Season ─────────────────────────
     # 2026-05-25: migrated from CData to QB direct REST API.  The legacy CData
     # query "SELECT ... FROM Styles WHERE Mstyle IN (...)" looked narrow but
