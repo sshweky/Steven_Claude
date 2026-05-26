@@ -7994,6 +7994,18 @@ def _compute_pos_baseline(l4w, l13w, amz_aur_data=None):
     """
     if amz_aur_data is not None:
         # ── Amazon AUR-aware spike logic ────────────────────────────────
+        # F87 (2026-05-26) — deceleration guard.
+        # When L4W has dropped >20% below L13W, the current sell-through rate
+        # is the demand signal -- not the 13-week historical average.  Use L4W
+        # directly so the baseline reflects where the item is NOW, not where it
+        # was 3 months ago.  Checked BEFORE spike detection so a declining item
+        # doesn't fall through to L13W via the "no spike" branch.
+        if l4w > 0 and l4w < l13w * 0.80:
+            _decline_pct = (1 - l4w / l13w) * 100
+            return l4w, (
+                f"L4W anchor (F87 declining: L4W {l4w:.0f} is {_decline_pct:.1f}% "
+                f"below L13W {l13w:.0f} -- current sell-through is the demand signal)"
+            )
         spike = l4w >= l13w * 1.075
         if not spike:
             return l13w, (
