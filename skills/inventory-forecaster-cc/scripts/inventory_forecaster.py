@@ -12701,9 +12701,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             )
 
             fcst[:] = _rpl_new
-            # [DBG F87] temporary
-            if "FF12689" in (row.get("Acct_MStyle_Key_","") or ""):
-                print(f"  [DBG post-RPL] fcst_w14={fcst[13]} _rpl_demand={_rpl_demand:.0f} _rpl_rates13={_rpl_rates[13]} _rpl_new13={_rpl_new[13]}")
             _fire("F_AMZ_RPL")
             _rpl_t5_note = (
                 f" T5/seasonal boost applied on W{',W'.join(str(w) for w in sorted(_rpl_t5_applied))}"
@@ -12957,10 +12954,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         season       = season,
     )
 
-    # [DBG F87] temporary
-    _dbg_k = row.get("Acct_MStyle_Key_","")
-    if "FF12689" in _dbg_k:
-        print(f"  [DBG pre-return] key={_dbg_k} fcst_w14={fcst[13] if len(fcst)>13 else '?'} model={model}")
     return {
         "key":         row["Acct_MStyle_Key_"],
         "mstyle":      row.get("Mstyle", ""),
