@@ -1193,6 +1193,7 @@ def _fetch_retailer_pos(rows):
 
         lw_data  = date_dict[sorted_dates[0]]
         oh_lw    = lw_data["oh_u"]
+        pos_lw   = lw_data["pos_u"]   # raw POS units from the most recent week (F_DC_LAG)
         inst_lw  = lw_data["instock"]
         l4w      = _avg_pos(4)
         l13w     = _avg_pos(13)
@@ -1207,6 +1208,7 @@ def _fetch_retailer_pos(rows):
             "Avg_Units_Wk_L26w": l26w,
             "Avg_Units_Wk_L52w": l52w,
             "OH_Units_LW":       oh_lw,
+            "POS_Units_LW":      pos_lw,
             "Instock_LW":        inst_lw,
             "OH_WOS":            oh_wos,
         }
