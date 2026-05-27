@@ -1020,95 +1020,43 @@ def estimate_systemic_impact(all_recs, man_fids):
         })
 
     # ------------------------------------------------------------------
-    # Combined row: query the union of all unique model keywords so the
-    # user can see the total impact of implementing all fixes together.
+    # Combined row: sum individual results directly.
+    # Each model type is non-overlapping (a record has exactly one AI model),
+    # so the true simultaneous effect of all fixes is additive across the
+    # individual rows -- each of which already uses its own winning criterion
+    # and estimation function.  A re-query with merged criteria would apply
+    # the wrong estimation to cross-model records and produce misleading numbers.
     unique_kws = list(dict.fromkeys(
         r["model_keyword"] for r in results
         if r["model_keyword"] and r["model_keyword"] != "all"
     ))
     if len(unique_kws) > 1:
-        print(f"    Combined ({' + '.join(unique_kws)}): fetching union scope...",
-              flush=True)
-        _comb_kw_filter = "OR".join(
-            f"{{1580.CT.'{kw}'}}" for kw in unique_kws)
-        _comb_where = f"{{10.SW.'A'}}AND({_comb_kw_filter})"
-
-        _comb_select = (
-            [P_KEY, P_AI_MODEL, P_L13W, 1417]
-            + AI_PRJ_FIDS + ORD_FIDS[:13] + man_fid_list
-        )
-        _comb_rows, _comb_skip = [], 0
-        try:
-            while True:
-                _r = _qb_post("records/query", {
-                    "from":    PROJ_TABLE,
-                    "select":  _comb_select,
-                    "where":   _comb_where,
-                    "options": {"top": 2000, "skip": _comb_skip},
-                })
-                _b = _r.get("data", [])
-                _comb_rows.extend(_b)
-                if len(_b) < 2000:
-                    break
-                _comb_skip += 2000
-                time.sleep(0.15)
-        except Exception as _e:
-            print(f"  [WARN] Combined scope fetch failed: {_e}", flush=True)
-            _comb_rows = []
-
-        if _comb_rows:
-            _comb_ai   = sum(sum(fval(r, fid) for fid in AI_PRJ_FIDS) for r in _comb_rows)
-            _comb_cc = _comb_fmt = _comb_fat = _comb_fae = 0
-            for r in _comb_rows:
-                l13w   = fval(r, P_L13W)
-                l4w    = fval(r, 1417)
-                ord_wk = [fval(r, fid) for fid in ORD_FIDS[:13]]
-                ai_26w = sum(fval(r, fid) for fid in AI_PRJ_FIDS)
-                man_26w = sum(fval(r, fid) for fid in man_fid_list) if man_fid_list else 0.0
-                trend  = l4w / l13w if l13w > 0 else 1.0
-                # Flag if matches ANY individual recommendation's criteria
-                flagged = False
-                for r2 in results:
-                    ct2 = next(
-                        (rec["change_type"] for _n, _i, _f, rec, *_ in all_recs
-                         if _n == r2["rec_num"]),
-                        "threshold"
-                    )
-                    fit2 = r2["direction"]
-                    if ct2 == "threshold" and fit2 == "down":
-                        if l13w > 0 and any(w >= l13w * 3 for w in ord_wk):
-                            flagged = True; break
-                        if l4w > 0 and trend < 0.80:
-                            flagged = True; break
-                    elif fit2 == "up" and l4w > 0 and trend > 1.15:
-                        flagged = True; break
-                    elif ct2 == "model_switch" and l4w > 0 and (trend > 1.20 or trend < 0.80):
-                        flagged = True; break
-                if flagged:
-                    _comb_cc  += 1
-                    _comb_fmt += man_26w
-                    _comb_fat += ai_26w
-                    _comb_fae += _estimate_new_ai_26w("threshold", "over_projecting",
-                                                      ai_26w, l13w, l4w)
-
-            _comb_vb = int(_comb_fmt) - int(_comb_fat)
-            _comb_va = int(_comb_fmt) - int(_comb_fae)
-            print(f"    Combined: {len(_comb_rows):,} records, {_comb_cc:,} flagged | "
-                  f"MAN-AI before={_comb_vb:+,}u  after={_comb_va:+,}u", flush=True)
-            results.append({
-                "rec_num":            "ALL",
-                "model_keyword":      " + ".join(unique_kws),
-                "scope_count":        len(_comb_rows),
-                "scope_ai_total":     int(_comb_ai),
-                "criteria_count":     _comb_cc,
-                "flagged_man_total":  int(_comb_fmt),
-                "flagged_ai_total":   int(_comb_fat),
-                "flagged_ai_estimate": int(_comb_fae),
-                "variance_before":    _comb_vb,
-                "variance_after":     _comb_va,
-                "direction":          "mixed",
-                "is_combined":        True,
-            })
+        _ind = [r for r in results if not r.get("is_combined")]
+        _comb_scope = sum(r["scope_count"]        for r in _ind)
+        _comb_ai    = sum(r["scope_ai_total"]     for r in _ind)
+        _comb_cc    = sum(r["criteria_count"]     for r in _ind)
+        _comb_fmt   = sum(r["flagged_man_total"]  for r in _ind)
+        _comb_fat   = sum(r["flagged_ai_total"]   for r in _ind)
+        _comb_fae   = sum(r["flagged_ai_estimate"] for r in _ind)
+        _comb_vb    = _comb_fmt - _comb_fat
+        _comb_va    = _comb_fmt - _comb_fae
+        print(f"    Combined ({' + '.join(unique_kws)}): {_comb_scope:,} records, "
+              f"{_comb_cc:,} flagged (additive) | "
+              f"MAN-AI before={_comb_vb:+,}u  after={_comb_va:+,}u", flush=True)
+        results.append({
+            "rec_num":             "ALL",
+            "model_keyword":       " + ".join(unique_kws),
+            "scope_count":         _comb_scope,
+            "scope_ai_total":      int(_comb_ai),
+            "criteria_count":      _comb_cc,
+            "flagged_man_total":   int(_comb_fmt),
+            "flagged_ai_total":    int(_comb_fat),
+            "flagged_ai_estimate": int(_comb_fae),
+            "variance_before":     _comb_vb,
+            "variance_after":      _comb_va,
+            "direction":           "mixed",
+            "is_combined":         True,
+        })
 
     return results
 

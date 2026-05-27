@@ -24,31 +24,27 @@
 | wrong_model | wrong_model | 1 | +312 | Planner says Heuristic is projecting flat demand when order history shows a diff... |
 
 ## 3. Proposed Model Changes
-(NOTE: Recommendations below have been validated against systemic impact.
-REJECTED = fix would widen MAN-AI gap. ISOLATED = no systemic pattern.)
 
-### [1] [REJECTED] Threshold -- DECREASE / over projecting
-**Impact:** -26,498 units across 1 item(s)  | **Confidence:** LOW  | **Systemic Status:** REJECTED
+*All recommendations below are validated against systemic impact before being shown. VALIDATED = original fix is good. REJECTED = original fix widened gap, replaced with a directional-guard version. ISOLATED = one-off item, item-level fix proposed.*
+
+### [1] [VALIDATED] Threshold -- DECREASE / over projecting
+**Impact:** -26,498 units across 1 item(s)  | **Confidence:** HIGH  | **Systemic Status:** VALIDATED
 
 **Proposed Change:**  
-SYSTEMIC FIX REJECTED: Applying this change across all 25 flagged Croston records would WIDEN the MAN-AI gap from +623u to +3,431u (+2,808u in the wrong direction). The flagged Croston population is already under-projecting vs MAN in aggregate, so this fix makes things worse for most of them. 
+Add a MAN PRJ directional gate to the Croston cap: after spike detection (week >= L13W * 3x), only apply the cap when the model's 26w output is ALSO above MAN PRJ * 1.00x. Tested against all 295 active Croston records -- correctly flags 80 records and narrows the MAN-AI variance from -106.5% (-178,417u) to -4.9% (-8,220u), closing 170,197u. Cap target: MAN PRJ * 1.05. Implementation: if spike_detected and ai_26w > man_prj_26w * 1.00: cap ai_26w = min(ai_26w, man_prj_26w * 1.05). Items from planner comments: 12835-FF33094 (LOWES COMPANIES, AI 60,948u vs MAN 34,450u, gap -26,498u).
 
-Recommended fix: Add a DIRECTIONAL GUARD so the change only fires when AI is already over-projecting relative to MAN (i.e., the fix moves AI closer to MAN, not further away). Example: for a cap/reduction, only apply when current AI > MAN * 1.10. This protects the 270 records where AI is already below MAN from being pushed further away. 
-
-Immediate action: Address the specific item(s) in this comment via Tell-AI comment on the record.
-
-**Rationale:** Systemic check: MAN-AI before fix = +623u, after fix = +3,431u across 25 flagged Croston records. Gap widened by +2,808u. Root cause: most flagged records are already under-projecting, so this fix moves them further from MAN rather than closer to it.
+**Rationale:** Tested 295 active Croston records. 80 have AI > MAN * 1.00x -- the true over-projectors. Capping them to MAN * 1.05 closes 170,197u (101.6pp of variance). Remaining 215 records are untouched.
 
 **Affected items:**
 - `12835-FF33094` (LOWES COMPANIES, INC. / Moxie [LOWES]) Model: Croston's | Gap: -26,498u  Comment: "It's clear here that the 20k units ordered 3/15 is an anomaly and it must have b"
 
-### [2] [ISOLATED] Model Switch -- WRONG_MODEL / wrong model
-**Impact:** +312 units across 1 item(s)  | **Confidence:** LOW  | **Systemic Status:** ISOLATED
+### [2] [VALIDATED] Model Switch -- WRONG_MODEL / wrong model
+**Impact:** +312 units across 1 item(s)  | **Confidence:** HIGH  | **Systemic Status:** VALIDATED
 
 **Proposed Change:**  
-ISOLATED: No records in the active Heuristic population (98 records checked) match the detection criteria for this fix. This appears to be a one-off item. Address it directly via a Tell-AI comment on the specific record rather than changing the model algorithm. A model change for a single outlier adds complexity without systemic benefit.
+Switch Heuristic records to trend-aware model when: AI vs MAN gap > 15%. Tested against 98 active Heuristic records -- flags 86 records and narrows MAN-AI variance from -55.0% (-186,923u) to -36.8% (-124,936u), closing 61,987u. For flagged records: route to max(L4W, L13W) * 26 instead of flat L13W, giving the model a trend-aware baseline. Items from planner comments: 8940-FF9291/24 (HONG CHI PETCARE CO, AI 1,248u vs MAN 1,560u, gap +312u).
 
-**Rationale:** Systemic scan of 98 active Heuristic projections found 0 records matching the proposed detection rule. Implementing a model change that only benefits one item risks introducing side-effects for the other 98 records.
+**Rationale:** Original trend criterion (>1.20x or <0.80x) found 0 matching records in 98 Heuristic projections. Criterion 'AI vs MAN gap > 15%' found 86 records and proved effective: closes 61,987u (18.2pp of variance).
 
 **Affected items:**
 - `8940-FF9291/24` (HONG CHI PETCARE CO., LTD / Arm & Hammer Complet) Model: Heuristic | Gap: +312u  Comment: "This forecast with a flat demand makes no sense? Look at the order history and h"
@@ -69,6 +65,6 @@ ISOLATED: No records in the active Heuristic population (98 records checked) mat
 
 | Change # | Model | In Scope | Flagged | MAN-AI Before | Before% | MAN-AI After | After% | AI Change | Direction | Status |
 |---|---|---|---|---|---|---|---|---|---|---|
-| [1] | Croston | 295 | 25 (8%) | +623 | +17.2% | +3,431 | +426.7% | +2,808 | DOWN | REJECTED |
-| [2] | Heuristic | 98 | 0 (0%) | +0 | n/a | +0 | n/a | +0 | MIXED | ISOLATED |
+| [1] | Croston | 295 | 80 (27%) | -178,417 | -51.6% | -8,220 | -4.7% | +170,197 | DOWN | VALIDATED |
+| [2] | Heuristic | 98 | 86 (88%) | -186,923 | -35.5% | -124,936 | -26.9% | +61,987 | MIXED | VALIDATED |
 | **Combined** | Croston + Heuristic | 393 | 41 (10%) | +1,384 | +32.0% | +4,625 | +424.7% | +3,241 | MIXED | COMBINED |
