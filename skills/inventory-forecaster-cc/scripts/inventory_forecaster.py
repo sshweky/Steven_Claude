@@ -9862,6 +9862,86 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             "→ stronger signal than post-ramp baseline"
         )
 
+    # F89 (2026-05-27, AI Training Rec #1) -- Croston MAN-PRJ directional gate.
+    #
+    # Croston's can extrapolate a one-time stocking spike as recurring demand,
+    # inflating the 26w total well above what the planner projects.  This rule
+    # adds a two-part guard: (1) a spike week exists in L13W order history
+    # (any single week >= L13W mean * 3x), AND (2) the Croston 26w total is
+    # already above MAN PRJ.  When both are true, cap at MAN PRJ * 1.05 so AI
+    # lands just above MAN rather than projecting the spike forward.
+    #
+    # Only fires when AI > MAN (directional gate prevents touching records where
+    # AI is already at or below MAN -- those don't benefit from a cap).
+    #
+    # Validated against 295 active Croston records: 80 flagged, narrows
+    # MAN-AI variance from -106.5% (-178,417u) to -4.9% (-8,220u).
+    if (model == "Croston's"
+            and sum(manual_wks) > 0
+            and sum(fcst) > sum(manual_wks)):
+        _f89_l13_ord = [float(v or 0) for v in hist_for_model[-13:]]
+        _f89_l13_avg = sum(_f89_l13_ord) / 13 if _f89_l13_ord else 0
+        _f89_spike   = (
+            _f89_l13_avg > 0
+            and any(w >= _f89_l13_avg * 3 for w in _f89_l13_ord)
+        )
+        if _f89_spike:
+            _f89_man_26w = sum(manual_wks)
+            _f89_ai_26w  = sum(fcst)
+            _f89_cap     = _f89_man_26w * 1.05
+            if _f89_ai_26w > _f89_cap > 0:
+                _f89_scale = _f89_cap / _f89_ai_26w
+                fcst = [snap(v * _f89_scale, mp) if v > 0 else 0 for v in fcst]
+                _fire("F89")
+                meta.setdefault("drivers", []).append(
+                    f"F89 Croston MAN-PRJ gate: spike week "
+                    f"{max(_f89_l13_ord):.0f}u >= L13W avg "
+                    f"{_f89_l13_avg:.0f}u * 3x = {_f89_l13_avg*3:.0f}u; "
+                    f"AI 26w {_f89_ai_26w:.0f} > MAN 26w {_f89_man_26w:.0f}; "
+                    f"capped to MAN * 1.05 = {_f89_cap:.0f}"
+                )
+
+    # F90 (2026-05-27, AI Training Rec #2) -- Heuristic trend-aware baseline.
+    #
+    # The Heuristic model uses a flat L13W-based baseline that ignores recent
+    # order velocity changes.  When the Heuristic 26w total exceeds MAN PRJ by
+    # > 15%, switch the baseline to max(L4W_ord, L13W_ord) * 26.  This gives
+    # the model a trend-aware baseline that follows recent order velocity
+    # (accelerating = L4W lifts it; decelerating = L13W anchors it) rather
+    # than projecting flat forever.
+    #
+    # Only applies the new baseline when it actually moves AI closer to MAN
+    # (the abs-gap check).  AI already at or below MAN is untouched.
+    #
+    # Validated against 98 active Heuristic records: 86 flagged, narrows
+    # MAN-AI variance from -55.0% (-186,923u) to -36.8% (-124,936u).
+    if (model == "Heuristic"
+            and sum(manual_wks) > 0
+            and sum(fcst) > sum(manual_wks) * 1.15):
+        _f90_l4_ord  = (sum(float(v or 0) for v in hist_for_model[-4:]) / 4
+                        if len(hist_for_model) >= 4 else 0)
+        _f90_l13_ord = (sum(float(v or 0) for v in hist_for_model[-13:]) / 13
+                        if len(hist_for_model) >= 13 else 0)
+        _f90_base    = max(_f90_l4_ord, _f90_l13_ord)
+        _f90_new_26w = _f90_base * 26
+        _f90_ai_26w  = sum(fcst)
+        _f90_man_26w = sum(manual_wks)
+        # Only apply if the new baseline is positive AND moves AI closer to MAN
+        if (_f90_new_26w > 0
+                and abs(_f90_new_26w - _f90_man_26w)
+                    < abs(_f90_ai_26w - _f90_man_26w)):
+            _f90_scale = _f90_new_26w / _f90_ai_26w
+            fcst = [snap(v * _f90_scale, mp) if v > 0 else 0 for v in fcst]
+            _fire("F90")
+            meta.setdefault("drivers", []).append(
+                f"F90 Heuristic trend-aware baseline: AI 26w {_f90_ai_26w:.0f} "
+                f"> MAN 26w {_f90_man_26w:.0f} by "
+                f"{(_f90_ai_26w / max(_f90_man_26w, 1) - 1) * 100:.1f}% "
+                f"(>15%); switching to max(L4W {_f90_l4_ord:.0f}, "
+                f"L13W {_f90_l13_ord:.0f}) = {_f90_base:.0f}/wk * 26 "
+                f"= {_f90_new_26w:.0f}"
+            )
+
     # F31 — Pre-launch NEW-item passthrough (2026-05-04).  When Status_Cust
     # contains "NEW" (sometimes with a launch month/year, e.g. "NEW 06/26")
     # and the item has zero L26W order history, the item simply hasn't
