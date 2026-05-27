@@ -5725,8 +5725,16 @@ def _switchover_backfill(rows, prj_cols):
         key=lambda c: _col_to_week[c]
     )
 
-    # ---- Operation A: PCS{N} -> PX{N} auto-link --------------------------
-    pcs_linked = 0
+    # ---- Operation A: PCS{N} -> PX{N} auto-detect (in-memory only) -------
+    # The PCS/PX relationship is detected at runtime by the viewer's
+    # buildSwitchoverMap() too -- here we only stash a per-row note for the
+    # downstream Switchover_Date computation in Operation B.  We do NOT write
+    # Switchover_To_MStyle back to QB, matching the EC/COS/AMZ/DS behavior
+    # (those are also runtime-detected only).
+    # The PCS record gets r["_pcs_px_variant"] = "FF12508PX3" stashed so
+    # Operation B can compute the Switchover_Date from the PX sibling's
+    # earliest non-zero MAN PRJ week.
+    pcs_detected = 0
     for r in rows:
         k = r.get("Acct_MStyle_Key_", "")
         if not k.startswith(f"{AMAZON_ACCT}-"):
@@ -5742,19 +5750,12 @@ def _switchover_backfill(rows, prj_cols):
         candidate = f"{base_core}PX{pcs_n}"
         if (AMAZON_ACCT, candidate) not in by_acct_ms:
             continue
-        # Cousin exists -- auto-link
-        r["Switchover_To_MStyle"] = candidate
-        r["Switchover_Active"]    = True
-        out["updates"].append({
-            "key": k,
-            "fields": {
-                "Switchover To MStyle": candidate,
-                "Switchover Active":    True,
-            },
-        })
-        pcs_linked += 1
-    if pcs_linked:
-        print(f"      [Switchover] PCS->PX auto-linked: {pcs_linked} record(s)")
+        # PX sibling exists -- stash for date computation, don't write to QB
+        r["_pcs_px_variant"] = candidate
+        pcs_detected += 1
+    if pcs_detected:
+        print(f"      [Switchover] PCS<->PX siblings detected (runtime only): "
+              f"{pcs_detected} record(s)")
 
     # ---- Operation B: Switchover_Date computation -----------------------
     date_computed = 0
