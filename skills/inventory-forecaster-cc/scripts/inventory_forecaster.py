@@ -5787,7 +5787,15 @@ def _switchover_backfill(rows, prj_cols):
         v_row = by_acct_ms.get((acct, variant_ms))
 
         if v_row is None:
-            # Variant record doesn't exist -- queue INSERT with metadata copy
+            # Variant doesn't exist as a record.
+            # For PLANNER-SET (explicit Switchover_To_MStyle): queue an INSERT
+            # with metadata copied from base, since the planner is asking the
+            # system to track this variant going forward.
+            # For AUTO-DETECTED PCS<->PX: skip silently -- if the PX sibling
+            # isn't in scope yet, there's nothing to write; runtime detection
+            # will pick it up automatically once both records exist.
+            if not is_planner_set:
+                continue
             new_fields = {
                 "Acct# - MStyle (Key)": f"{acct}-{variant_ms}",
                 "Mstyle":               variant_ms,
