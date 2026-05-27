@@ -512,6 +512,8 @@ const INV_FLOW_CACHE_KEY    = 'pp_invflow_v8';  // bumped: IDB-primary cache, 24
 const INV_FLOW_CACHE_TTL_MS = 24 * 60 * 60 * 1000;  // 24 hours (InvFlow updates once/day)
 const ATS_HIST_CACHE_KEY    = 'pp_ats_v1';
 const ATS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours
+const POS_HIST_CACHE_KEY    = 'pp_pos_hist_v1';
+const POS_HIST_CACHE_TTL_MS = 6 * 60 * 60 * 1000;  // 6 hours (Retailer Sales refreshes weekly)
 
 // Background load promise  -  resolves when inv flow is attached to ALL_RECORDS.
 // Boot fires this without awaiting so the table renders immediately.
