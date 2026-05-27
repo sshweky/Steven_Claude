@@ -121,7 +121,12 @@ var IF_F = {
   // Alt Supplier 3
   Alt3Name:1704, Alt3FOB:1707, Alt3MOQ:1710, Alt3LT:1713,
   Alt3ELC_NJ:1818, Alt3ELC_LA:1815, Alt3MU_NJ:1821, Alt3MU_LA:1824,
-  Alt3QtyOrd:1837, Alt3PctOrd:1840
+  Alt3QtyOrd:1837, Alt3PctOrd:1840,
+  // Need-to-order per supplier (created 2026-05-27)
+  NeedQtyMain:1918, NeedETDMain:1919,
+  NeedQtyAlt1:1920, NeedETDAlt1:1921,
+  NeedQtyAlt2:1922, NeedETDAlt2:1923,
+  NeedQtyAlt3:1924, NeedETDAlt3:1925
 };
 // Supplier FIDs that are only needed for the detail panel (phase 2 load)
 var IF_SUPP_FIDS = [
@@ -135,7 +140,11 @@ var IF_SUPP_FIDS = [
   IF_F.Alt2QtyOrd, IF_F.Alt2PctOrd,
   IF_F.Alt3Name, IF_F.Alt3FOB, IF_F.Alt3MOQ, IF_F.Alt3LT,
   IF_F.Alt3ELC_NJ, IF_F.Alt3ELC_LA, IF_F.Alt3MU_NJ, IF_F.Alt3MU_LA,
-  IF_F.Alt3QtyOrd, IF_F.Alt3PctOrd
+  IF_F.Alt3QtyOrd, IF_F.Alt3PctOrd,
+  IF_F.NeedQtyMain, IF_F.NeedETDMain,
+  IF_F.NeedQtyAlt1, IF_F.NeedETDAlt1,
+  IF_F.NeedQtyAlt2, IF_F.NeedETDAlt2,
+  IF_F.NeedQtyAlt3, IF_F.NeedETDAlt3
 ];
 // Main scalar FIDs: everything in IF_F except supplier detail fields
 var IF_F_MAIN_FIDS = Object.values(IF_F).filter(function(fid) {
@@ -345,7 +354,7 @@ var selMgrs       = new Set();
 var selPriorities = new Set();
 var selStockStatus = new Set();
 var recoSheet = [];
-var purchaseSelections = {};   // keyed by mstyle; { needQty: number, chosenSupplier: string }
+var purchaseSelections = {};   // keyed by mstyle; { main:{checked,needQty,etd}, alt1:{...}, alt2:{...}, alt3:{...} }
 
 // -- Multi-select dropdown helpers ---------------------------------------------
 function toggleDd(evt, ddId) {
@@ -647,7 +656,11 @@ async function attachDetailData(records) {
       alt2_qty_ord:toNum(gv(IF_F.Alt2QtyOrd)), alt2_pct_ord:toNum(gv(IF_F.Alt2PctOrd)),
       alt3_name: String(gv(IF_F.Alt3Name)||''), alt3_fob:toNum(gv(IF_F.Alt3FOB)), alt3_moq:toNum(gv(IF_F.Alt3MOQ)), alt3_lt:toNum(gv(IF_F.Alt3LT)),
       alt3_elc_nj:toNum(gv(IF_F.Alt3ELC_NJ)), alt3_elc_la:toNum(gv(IF_F.Alt3ELC_LA)), alt3_mu_nj:toNum(gv(IF_F.Alt3MU_NJ)), alt3_mu_la:toNum(gv(IF_F.Alt3MU_LA)),
-      alt3_qty_ord:toNum(gv(IF_F.Alt3QtyOrd)), alt3_pct_ord:toNum(gv(IF_F.Alt3PctOrd))
+      alt3_qty_ord:toNum(gv(IF_F.Alt3QtyOrd)), alt3_pct_ord:toNum(gv(IF_F.Alt3PctOrd)),
+      need_qty_main:toNum(gv(IF_F.NeedQtyMain)), need_etd_main:String(gv(IF_F.NeedETDMain)||''),
+      need_qty_alt1:toNum(gv(IF_F.NeedQtyAlt1)), need_etd_alt1:String(gv(IF_F.NeedETDAlt1)||''),
+      need_qty_alt2:toNum(gv(IF_F.NeedQtyAlt2)), need_etd_alt2:String(gv(IF_F.NeedETDAlt2)||''),
+      need_qty_alt3:toNum(gv(IF_F.NeedQtyAlt3)), need_etd_alt3:String(gv(IF_F.NeedETDAlt3)||'')
     };
   });
   _applyDetailMap(records, map);
@@ -682,6 +695,10 @@ function _applyDetailMap(records, map) {
     rec.alt3_name = d.alt3_name; rec.alt3_fob = d.alt3_fob; rec.alt3_moq = d.alt3_moq; rec.alt3_lt = d.alt3_lt;
     rec.alt3_elc_nj = d.alt3_elc_nj; rec.alt3_elc_la = d.alt3_elc_la; rec.alt3_mu_nj = d.alt3_mu_nj; rec.alt3_mu_la = d.alt3_mu_la;
     rec.alt3_qty_ord = d.alt3_qty_ord; rec.alt3_pct_ord = d.alt3_pct_ord;
+    rec.need_qty_main = d.need_qty_main; rec.need_etd_main = d.need_etd_main;
+    rec.need_qty_alt1 = d.need_qty_alt1; rec.need_etd_alt1 = d.need_etd_alt1;
+    rec.need_qty_alt2 = d.need_qty_alt2; rec.need_etd_alt2 = d.need_etd_alt2;
+    rec.need_qty_alt3 = d.need_qty_alt3; rec.need_etd_alt3 = d.need_etd_alt3;
     rec._detail_loaded = true;
     // Re-run purchase_rec computation now that supplier data is available
     computeDerived(rec, today);
@@ -1397,9 +1414,10 @@ function renderDetail(r) {
   var begCells = '<td class="lbl" style="color:#6d4c00;font-weight:600;background:#fffbea" title="Beginning-of-week projected warehouse inventory (Wk1..Wk26)">Beg Inv</td>';
   var prjCells = '<td class="lbl" style="color:#2e7d32;font-weight:600;background:#f1f8e9" title="Projected demand this week (Prj Wk1..Prj Wk26) - hover for customer breakdown">Prj Demand</td>';
   var rcvCells = '<td class="lbl" style="color:#1565c0;font-weight:600;background:#f0f7ff" title="Expected supplier receipts that week (RcvWk1..RcvWk26) - hover for PO detail">Expected Receipts</td>';
-  var opnCells = '<td class="lbl" style="color:#00695c;font-weight:600;background:#e0f2f1" title="Open supplier PO qty landing this week (I/T + I/W by warehouse ETA)">Open Supplier POs</td>';
+  var cpoCells = '<td class="lbl" style="color:#6a1b9a;font-weight:600;background:#f3e5f5" title="Total open customer PO qty awaiting shipment (not broken out by week)">Open Customer POs</td>';
+  var endCells = '<td class="lbl" style="color:#37474f;font-weight:600;background:#eceff1" title="Ending Inv = Beg Inv - Prj Demand - Open Customer POs + Expected Receipts (per-week: Beg - Prj + Rcv; Total col includes Open Cust POs)">Ending Inv</td>';
   var wosCells = '<td class="lbl" style="color:#4a148c;font-weight:600;background:#f8f0fb" title="Weeks of Supply Onhand: forward simulation from Beg Inv over projected demand">WOS OH</td>';
-  var begTot = 0, prjTot = 0, rcvTot = 0, opnTot = 0;
+  var begTot = 0, prjTot = 0, rcvTot = 0;
 
   for (var i = 0; i < 26; i++) {
     // -- Beg Inv: color-coded by health vs projected demand --
@@ -1430,14 +1448,13 @@ function renderDetail(r) {
     var rcvHlS = rcvHL(i) || '';
     rcvCells += '<td style="color:'+rcvClr+';font-size:10px;background:#f0f7ff;'+(rcvTip?'cursor:help;':'')+rcvHlS+'"'+rcvTA+'>'+(rv>0?fmt(rv):'&#8212;')+'</td>';
 
-    // -- Open Supplier POs: I/T + I/W quantities landing this week by ETA --
-    var opnQty = 0;
-    var opnPos = poByWeek[i] || [];
-    for (var opi = 0; opi < opnPos.length; opi++) {
-      opnQty += (opnPos[opi].in_transit_qty || 0) + (opnPos[opi].in_work_qty || 0);
-    }
-    opnTot += opnQty;
-    opnCells += '<td style="color:'+(opnQty>0?'#00695c':'#bbb')+';font-size:10px;background:#e0f2f1;">'+(opnQty>0?fmt(opnQty):'&#8212;')+'</td>';
+    // -- Open Customer POs: scalar total, no per-week breakdown --
+    cpoCells += '<td style="color:#bbb;font-size:10px;background:#f3e5f5;">&#8212;</td>';
+
+    // -- Ending Inv per week: Beg - Prj + Receipts (lump-sum Open Cust PO in Total only) --
+    var ev = Math.round(bv - pv + rv);
+    var evClr = ev < 0 ? '#c62828' : (ev === 0 ? '#bbb' : '#37474f');
+    endCells += '<td style="color:'+evClr+';font-size:10px;background:#eceff1;">'+fmt(ev)+'</td>';
 
     // -- WOS OH: forward simulation; gap weeks highlighted in red --
     var wosVal, wosTxt, wosClr, wosCellBg = '#f8f0fb';
@@ -1468,7 +1485,11 @@ function renderDetail(r) {
   begCells += '<td style="font-weight:700;color:#6d4c00;background:#fffbea">'+fmt(Math.round(begTot))+'</td>';
   prjCells += '<td style="font-weight:700;color:#2e7d32;background:#f1f8e9">'+fmt(Math.round(prjTot))+'</td>';
   rcvCells += '<td style="font-weight:700;color:#1565c0;background:#f0f7ff">'+fmt(Math.round(rcvTot))+'</td>';
-  opnCells += '<td style="font-weight:700;color:#00695c;background:#e0f2f1">'+fmt(opnTot)+'</td>';
+  var cpTot = r.open_cust_po_qty || 0;
+  cpoCells += '<td style="font-weight:700;color:#6a1b9a;background:#f3e5f5;">'+fmt(Math.round(cpTot))+'</td>';
+  var endTot = Math.round((r.beg_inv[0]||0) - prjTot - cpTot + rcvTot);
+  var endTotClr = endTot < 0 ? '#c62828' : '#37474f';
+  endCells += '<td style="font-weight:700;color:'+endTotClr+';background:#eceff1;">'+fmt(endTot)+'</td>';
   wosCells += '<td style="color:#bbb;background:#f8f0fb" title="WOS total not meaningful"> - </td>';
 
   // Header row with MM/DD week dates
@@ -1488,7 +1509,8 @@ function renderDetail(r) {
     +'<tr>'+begCells+'</tr>'
     +'<tr>'+prjCells+'</tr>'
     +'<tr>'+rcvCells+'</tr>'
-    +'<tr>'+opnCells+'</tr>'
+    +'<tr>'+cpoCells+'</tr>'
+    +'<tr>'+endCells+'</tr>'
     +'<tr>'+wosCells+'</tr>'
     +'</table>';
 
@@ -1501,10 +1523,11 @@ function renderDetail(r) {
       : 'unknown';
     var _nrWkStr = (_ifGap.nextRcptWeekIdx >= 0 && _ifGap.nextRcptWeekIdx <= 25)
       ? '(W'+(_ifGap.nextRcptWeekIdx+1)+')' : (_ifGap.nextRcptWeekIdx > 25 ? '(beyond W26)' : '');
+    var _fmLink = '<a href="https://pim.quickbase.com/db/bpd24h9wy?a=dbpage&pageID=50&search='+encodeURIComponent(r.mstyle)+'" target="_blank" style="color:inherit;font-weight:700;text-decoration:underline;">View in Forecast Manager &#8599;</a>';
     if (_ifGap.weeks.length === 0) {
-      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;font-size:11px;color:#1b5e20;">&#10003; <b>No gaps:</b> all weeks through next receipt '+_nrStr+' '+_nrWkStr+' maintain '+_optStr+' WOS (Opt WOS).</div>';
+      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;font-size:11px;color:#1b5e20;">&#10003; <b>No gaps:</b> all weeks through next receipt '+_nrStr+' '+_nrWkStr+' maintain '+_optStr+' WOS (Opt WOS). &nbsp;'+_fmLink+'</div>';
     } else {
-      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;font-size:11px;color:#b71c1c;">&#x26a0; <b>Inventory Gap:</b> '+_ifGap.weeks.length+' week'+(_ifGap.weeks.length===1?'':'s')+' below Opt WOS ('+_optStr+') before next receipt '+_nrStr+' '+_nrWkStr+'. Moving up open POs may close this gap.</div>';
+      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;font-size:11px;color:#b71c1c;">&#x26a0; <b>Inventory Gap:</b> '+_ifGap.weeks.length+' week'+(_ifGap.weeks.length===1?'':'s')+' below Opt WOS ('+_optStr+') before next receipt '+_nrStr+' '+_nrWkStr+'. Moving up open POs may close this gap. &nbsp;'+_fmLink+'</div>';
     }
   } else if (!r.is_replen) {
     invGapBanner = '<div style="margin-top:6px;padding:4px 10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;color:#888;font-style:italic;">Gap analysis only runs on Replen items (Status: '+esc(r.item_status_flow||'unknown')+').</div>';
