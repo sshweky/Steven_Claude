@@ -1232,9 +1232,9 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
                 change_type="model_switch",
                 proposed_change=(
                     f"Switch {kw} records to trend-aware model when: {crit_label}. "
-                    f"Tested against {sc:,} active {kw} records -- this criterion flags "
-                    f"{cc_new} record(s) and narrows the MAN-AI gap from {vb_new:+,}u to "
-                    f"{va_new:+,}u (closes {gap_closed:,}u). "
+                    f"Tested against {sc:,} active {kw} records -- flags {cc_new} records "
+                    f"and narrows MAN-AI variance from {vb_pct:+.1f}% ({vb_new:+,}u) to "
+                    f"{va_pct:+.1f}% ({va_new:+,}u), closing {gap_closed:,}u. "
                     f"For flagged records: route to max(L4W, L13W) * 26 instead of flat "
                     f"L13W, giving the model a trend-aware baseline. "
                     f"Items from planner comments: {item_str}."
@@ -1243,7 +1243,8 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
                 rationale=(
                     f"Original trend criterion (>1.20x or <0.80x) found 0 matching records "
                     f"in {sc:,} {kw} projections. Criterion '{crit_label}' found {cc_new} "
-                    f"records and proved effective: closes {gap_closed:,}u of gap."
+                    f"records and proved effective: closes {gap_closed:,}u "
+                    f"({abs(vb_pct - va_pct):.1f}pp of variance)."
                 ),
             )
 
