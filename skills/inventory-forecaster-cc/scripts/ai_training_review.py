@@ -1253,7 +1253,7 @@ def main():
     # Estimate systemic impact across ALL active projections for each recommendation
     print("\n[5/5] Estimating systemic impact across all active projections...",
           flush=True)
-    systemic_impacts = estimate_systemic_impact(all_recs)
+    systemic_impacts = estimate_systemic_impact(all_recs, man_fids)
 
     # Append systemic impact section to the markdown report
     if systemic_impacts:
