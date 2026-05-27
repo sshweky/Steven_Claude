@@ -822,7 +822,12 @@ async function _lazyLoadDetail(r) {
 
   const forecast = CFG.AI_PRJ_FIDS.map(fid => num(row, fid));
   const manual   = MAN_PRJ_FIDS  .map(fid => num(row, fid));
+  // F-Wed: re-apply cutoff override (detail load fetches fresh QB data that
+  // would otherwise restore the pre-override Wk1 value set by adaptRow).
+  if (_pastWedCutoffEST() && manual[0] === 0) forecast[0] = 0;
   r.ai_fcst   = forecast;
+  r.ai_total  = forecast.reduce((a, b) => a + b, 0);   // keep total consistent with override
+  r.ai_wk     = Math.round(((r.ai_total + (r.opn_total || 0)) / 26) * 10) / 10;
   r.opn_w     = CFG.OPN_FIDS.map(fid => num(row, fid));
   // Recompute conflict with fresh PO + manual data (r.is_offprice preserved from adaptRow)
   const { conflicts: _lazyCfls, hasConflict: _lazyCfl } =
@@ -2208,6 +2213,27 @@ function _buildOrderTrendInsight(histOrd, lyOrd, custLabel) {
   return `${header} ${expl}`;
 }
 
+// F-Wed: Returns true when the current local time is on or past Wednesday 9am
+// US Eastern Time -- the weekly order cutoff.  Used to suppress AI Wk1 when
+// no order / MAN PRJ has been entered by that deadline.
+function _pastWedCutoffEST() {
+  try {
+    const now   = new Date();
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      weekday:  'short',
+      hour:     'numeric',
+      hour12:   false,
+    }).formatToParts(now);
+    const wd  = parts.find(p => p.type === 'weekday').value;  // 'Sun','Mon',...
+    const hr  = parseInt(parts.find(p => p.type === 'hour').value, 10);
+    const day = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 }[wd] ?? 0;
+    return day > 3 || (day === 3 && hr >= 9);
+  } catch (_) {
+    return false;  // timezone API unavailable -- don't suppress AI forecast
+  }
+}
+
 function adaptRow(row) {
   const F = CFG.FID;
   const forecast = CFG.AI_PRJ_FIDS.map(fid => num(row, fid));
@@ -2252,6 +2278,10 @@ function adaptRow(row) {
       break;
     }
   }
+
+  // F-Wed: order window closed (Wed 9am EST passed) with no MAN PRJ entered --
+  // zero out AI Wk1 so the planner doesn't see a phantom open-order suggestion.
+  if (_pastWedCutoffEST() && manual[0] === 0) forecast[0] = 0;
 
   const ai_total     = forecast.reduce((a,b) => a+b, 0);
   const manual_total = manual.reduce((a,b) => a+b, 0);
