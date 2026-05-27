@@ -1263,22 +1263,27 @@ def main():
             "",
             ("*Estimated effect if proposed changes are deployed across all active "
              "projections. Scope = all records with that AI model type. "
-             "Flagged = records that match the detection criteria for the fix.*"),
+             "Flagged = records matching the detection criteria. "
+             "Variance = MAN PRJ 26w - AI PRJ 26w (flagged records only). "
+             "After = MAN - estimated new AI once fix is applied.*"),
             "",
-            ("| Change # | Model Targeted | Records in Scope | AI Units in Scope "
-             "| Flagged by Criteria | Direction |"),
-            "|---|---|---|---|---|---|",
+            ("| Change # | Model | In Scope | Flagged | MAN-AI Before | "
+             "MAN-AI After | Delta | Direction |"),
+            "|---|---|---|---|---|---|---|---|",
         ]
         for si in systemic_impacts:
-            num = si["rec_num"]
-            kw  = si["model_keyword"] or "all"
-            sc  = si["scope_count"]
-            at  = si["scope_ai_total"]
-            cc  = si["criteria_count"]
-            di  = si["direction"].upper()
-            pct = f" ({cc/sc*100:.0f}%)" if sc > 0 else ""
+            num   = si["rec_num"]
+            kw    = si["model_keyword"] or "all"
+            sc    = si["scope_count"]
+            cc    = si["criteria_count"]
+            vb    = si["variance_before"]
+            va    = si["variance_after"]
+            delta = va - vb
+            di    = si["direction"].upper()
+            pct   = f" ({cc/sc*100:.0f}%)" if sc > 0 else ""
             sys_lines.append(
-                f"| [{num}] | {kw} | {sc:,} | {at:,} | {cc:,}{pct} | {di} |"
+                f"| [{num}] | {kw} | {sc:,} | {cc:,}{pct} | "
+                f"{vb:+,} | {va:+,} | {delta:+,} | {di} |"
             )
         report_md += "\n" + "\n".join(sys_lines) + "\n"
 
