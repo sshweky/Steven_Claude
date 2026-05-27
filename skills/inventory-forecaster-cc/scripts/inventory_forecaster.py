@@ -5758,6 +5758,13 @@ def _switchover_backfill(rows, prj_cols):
               f"{pcs_detected} record(s)")
 
     # ---- Operation B: Switchover_Date computation -----------------------
+    # Two sources for the (base, variant) relationship:
+    #   (1) Explicit -- Switchover_To_MStyle field is set on the base (planner-driven)
+    #   (2) Auto-detected -- PCS<->PX sibling found in Operation A
+    # In both cases, compute Switchover_Date from the variant's earliest
+    # non-zero MAN PRJ week.  Variant-record creation only fires for case
+    # (1) since auto-detected pairs only exist when both sides are already
+    # in scope.
     date_computed = 0
     date_cleared  = 0
     no_proj_alert = 0
@@ -5766,7 +5773,12 @@ def _switchover_backfill(rows, prj_cols):
         k = r.get("Acct_MStyle_Key_", "")
         if not k.startswith(f"{AMAZON_ACCT}-"):
             continue
+        # Source (1): explicit planner-set field
         variant_ms = (r.get("Switchover_To_MStyle") or "").strip()
+        is_planner_set = bool(variant_ms)
+        # Source (2): PCS<->PX auto-detected
+        if not variant_ms:
+            variant_ms = r.get("_pcs_px_variant") or ""
         if not variant_ms:
             continue
         acct = k.split("-", 1)[0]
