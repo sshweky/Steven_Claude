@@ -61,7 +61,8 @@ Planner says Heuristic is projecting flat demand when order history shows a diff
 
 *Estimated effect if proposed changes are deployed across all active projections. Scope = all records with that AI model type. Flagged = records matching the detection criteria. Variance = MAN PRJ 26w - AI PRJ 26w (flagged records only). After = MAN - estimated new AI once fix is applied.*
 
-| Change # | Model | In Scope | Flagged | MAN-AI Before | MAN-AI After | Delta | Direction |
-|---|---|---|---|---|---|---|---|
-| [1] | Croston | 295 | 25 (8%) | +653 | +3,431 | +2,778 | DOWN |
-| [2] | Croston | 295 | 25 (8%) | +653 | +3,431 | +2,778 | MIXED |
+| Change # | Model | In Scope | Flagged | MAN-AI Before | Before% | MAN-AI After | After% | AI Change | Direction |
+|---|---|---|---|---|---|---|---|---|---|
+| [1] | Croston | 295 | 25 (8%) | +623 | +17.2% | +3,431 | +426.7% | +2,808 | DOWN |
+| [2] | Heuristic | 98 | 0 (0%) | +0 | n/a | +0 | n/a | +0 | MIXED |
+| **Combined** | Croston + Heuristic | 393 | 41 (10%) | +1,384 | +32.0% | +4,625 | +424.7% | +3,241 | MIXED |
