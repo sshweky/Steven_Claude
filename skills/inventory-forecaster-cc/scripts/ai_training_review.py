@@ -1261,7 +1261,7 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
                 change_type="model_switch",
                 proposed_change=(
                     f"Item-level model fix: no systemic criterion found across {sc:,} "
-                    f"{kw} records that narrows the gap. Targeted fix for {count} item(s): "
+                    f"{kw} records that narrows the gap. Targeted fix for {len(items)} item(s): "
                     f"(1) Check if '{cat_hint}' is in derived_category_profiles.json -- "
                     f"if missing, add it to route to Seasonal or Croston's. "
                     f"(2) Immediate: add a Tell-AI comment targeting MAN PRJ level. "
