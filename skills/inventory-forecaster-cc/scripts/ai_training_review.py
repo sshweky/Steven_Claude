@@ -297,7 +297,8 @@ def assess_model_fit(intent, ai_model, ai_total, man_total, l13w, l4w, item_stat
     """
     model_lo = (ai_model or "").lower()
     gap_pct  = ((man_total - ai_total) / max(ai_total, 1)) * 100 if ai_total else 0
-    trend    = (l4w / l13w) if l13w > 0 else 1.0
+    # Only compute trend when we have a real L4W value (FID found + non-zero)
+    trend    = (l4w / l13w) if (l13w > 0 and l4w > 0) else None
 
     if intent == "eol":
         if ai_total > 0:
