@@ -1564,7 +1564,7 @@ def _build_systemic_html(systemic_impacts, all_recs):
   VALIDATED = fix narrows MAN-AI gap and is recommended.
   REJECTED = fix widens gap; recommendation has been replaced with directional-guard guidance.
   ISOLATED = 0 records match criteria; individual fix only.
-  Each row tests its fix <i>in isolation</i>. The shaded Combined row shows simultaneous effect.
+  Each row tests its fix <i>in isolation</i>. The shaded Combined row is the additive sum of individual rows (no re-query -- each model type is non-overlapping so the true simultaneous effect is additive).
   <i>Variance = MAN PRJ minus AI PRJ (flagged records only). % = gap as % of current AI.</i>
 </p>
 <table style="width:100%;border-collapse:collapse;font-size:13px">
