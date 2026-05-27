@@ -340,14 +340,15 @@ def assess_model_fit(intent, ai_model, ai_total, man_total, l13w, l4w, item_stat
 
     if intent == "decrease":
         if ai_total > man_total * 1.15:
-            # Check if trend is declining
-            if trend < 0.80:
+            # Check if trend is declining (only when L4W data available)
+            if trend is not None and trend < 0.80:
                 return ("over_projecting",
                         f"AI={ai_total:,}u vs MAN={man_total:,}u ({gap_pct:+.0f}%). "
                         f"L4W/L13W={trend:.2f} -- declining trend not reflected in model.")
+            trend_note = f"L4W/L13W={trend:.2f}" if trend is not None else "L4W unavailable"
             return ("over_projecting",
                     f"AI={ai_total:,}u vs MAN={man_total:,}u ({gap_pct:+.0f}%). "
-                    f"Model over-projects. L4W/L13W={trend:.2f}.")
+                    f"Model over-projects. {trend_note}.")
         return ("needs_context",
                 f"Small decrease (gap {gap_pct:+.0f}%). May be minor planner adjustment.")
 
