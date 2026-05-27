@@ -3628,8 +3628,10 @@ async function toggleDetail(key) {
   let hdrCells  = '<th class="row-label"></th>';
   let projCells = '<td class="row-label">Projection</td>';
   let aiCells   = `<td class="row-label" style="color:#1565c0;font-weight:600">AI Forecast<br><span style="font-weight:normal;font-size:10px">${aiMdl}</span></td>`;
+  let diffCells = '<td class="row-label" style="color:#555;font-weight:600">MAN - AI<br><span style="font-weight:normal;font-size:10px;color:#888">unit gap</span></td>';
   let opnCells  = '<td class="row-label" style="color:#6d4c00;font-weight:600">Open POs</td>';
-  let opnTot = 0;
+  let opnTot    = 0;
+  let diffTotal = 0;
 
   // Pre-compute the safe-id we use for both the Total cell and the input
   // dataset attributes (key may contain hyphens that are fine in attrs but
