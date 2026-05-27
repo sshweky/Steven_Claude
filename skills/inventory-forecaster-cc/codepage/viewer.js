@@ -5131,8 +5131,48 @@ async function _loadAmzDcInv(r, safeId) {
     ul.appendChild(aurLi);
   }
 
-  // ATS cards are now sourced from Inventory Flow and rendered inline —
-  // nothing left for _loadAmzDcInv to do after the bullets above.
+  // ATS cards are now sourced from Inventory Flow and rendered inline.
+
+  // -- Amazon Consumer POS summary table ----------------------------------------
+  // Inject a compact table below the L26W history section (the placeholder
+  // <div id="amz-pos-section-{safeId}"> was set in the detail-pane template).
+  // Shows LW / L4W / L13W / L26W / L52W consumer sell-through velocity so
+  // planners can compare order cadence against actual consumer demand.
+  const posSection = document.getElementById('amz-pos-section-' + safeId);
+  if (posSection) {
+    const fmtP = n => n === 0 ? '<span style="color:#bbb">-</span>'
+                               : `<span style="color:#1565c0;font-weight:600">${fmtPos(n)}</span>`;
+    if (!fetchOk) {
+      posSection.innerHTML = `
+      <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e3f2fd;">
+        <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS</div>
+        <div style="font-size:11px;color:#999;font-style:italic;padding:2px 0 4px 0;">No catalog data available for this style.</div>
+      </div>`;
+    } else {
+      posSection.innerHTML = `
+      <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e3f2fd;">
+        <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS</div>
+        <table class="dtbl">
+          <tr>
+            <th class="row-label" style="width:1%;white-space:nowrap"></th>
+            <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L1W</th>
+            <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L4W avg</th>
+            <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L13W avg</th>
+            <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L26W avg</th>
+            <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L52W avg</th>
+          </tr>
+          <tr>
+            <td class="row-label" style="color:#1565c0;font-weight:600;white-space:nowrap">POS Units</td>
+            <td>${fmtP(posLw)}</td>
+            <td>${fmtP(posL4w)}</td>
+            <td>${fmtP(posL13w)}</td>
+            <td>${fmtP(posL26w)}</td>
+            <td>${fmtP(posL52w)}</td>
+          </tr>
+        </table>
+      </div>`;
+    }
+  }
 }
 
 // -- Retailer POS live fetch --------------------------------------------------
