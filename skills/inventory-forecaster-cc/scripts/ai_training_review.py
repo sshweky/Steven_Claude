@@ -937,8 +937,7 @@ def main():
     # Fetch AI Training comments (FLAG='AI Training' -- already-reviewed ones
     # have FLAG='Reviewed' in QB and will not match this query)
     print("\n[1/4] Fetching AI Training comments...", flush=True)
-    comments, note_fid = fetch_ai_training_comments(
-        args.days, note_fid, set())
+    comments, note_fid = fetch_ai_training_comments(args.days, note_fid)
 
     if not comments:
         print("  No new AI Training comments to process.\n")
