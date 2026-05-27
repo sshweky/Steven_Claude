@@ -1242,52 +1242,173 @@ const _POS_HIST_UNITS_FID  = 10;
 const _POS_HIST_OH_FID     = 12;
 const _POS_HIST_INST_FID   = 15;
 
+// Convert a list of Retailer Sales rows for a SINGLE (cust, mstyle) pair into
+// the {units[26], oh[26], instock[26]} shape the detail panel renders.
+// Returns null when no rows yield data within the 26-week window.
+function _bucketPosRows(rows) {
+  if (!W1_DATE) return null;
+  const units   = Array(26).fill(null);
+  const oh      = Array(26).fill(null);
+  const instock = Array(26).fill(null);
+  const seen    = new Set();
+  const getNum = (row, fid) => {
+    const c = row[String(fid)];
+    if (!c || c.value == null || c.value === '') return null;
+    const n = Number(c.value);
+    return Number.isFinite(n) ? n : null;
+  };
+  for (const row of rows) {
+    const dateStr = row[String(_POS_HIST_DATE_FID)] && row[String(_POS_HIST_DATE_FID)].value;
+    if (!dateStr || seen.has(dateStr)) continue;
+    seen.add(dateStr);
+    const d       = new Date(dateStr + 'T00:00:00');
+    const diffMs  = W1_DATE.getTime() - d.getTime();
+    const diffWks = Math.round(diffMs / (7 * 86400000));
+    const slot    = 26 - diffWks;
+    if (slot < 0 || slot > 25) continue;
+    units[slot]   = getNum(row, _POS_HIST_UNITS_FID);
+    oh[slot]      = getNum(row, _POS_HIST_OH_FID);
+    instock[slot] = getNum(row, _POS_HIST_INST_FID);
+  }
+  const hasData = units.some(v => v !== null);
+  return hasData ? { units, oh, instock } : null;
+}
+
+// Bulk pre-fetch ALL POS history (Retailer Sales bv2izcn5b) for all retailer
+// records in the current scope.  Runs once per session in the background after
+// the main projections load lands.  Results are cached in localStorage
+// (sessionStorage primary + localStorage fallback) with a 6-hour TTL --
+// Retailer Sales refreshes weekly so this is conservative.
+//
+// Strategy: pull the last ~30 weeks of Retailer Sales (date >= today - 210d)
+// in paginated batches of 1000.  Bucket by `${cust}|${mstyle}` client-side.
+// One round-trip pulls ~1000 rows of POS data covering 30-40 (cust,mstyle)
+// pairs simultaneously, vs. one round-trip per pair under the legacy
+// on-demand fetcher.  Typical Walmart/Petsmart/Petco/Target/Kohls scope
+// = ~600 pairs * 26 wks = ~15.6K rows = 16 paginated calls = ~5s total
+// (vs ~600s if every panel opens fired its own query on demand).
+async function attachPosHistory(records) {
+  if (!records || !records.length) return {};
+
+  // Cache check
+  const cached = _loadPosHistCache();
+  if (cached && cached.map) {
+    let n = 0;
+    for (const r of records) {
+      if (!r || !r.cust || !r.mstyle) continue;
+      const key = `${r.cust}|${r.mstyle}`;
+      if (cached.map[key]) { r.pos_hist = cached.map[key]; n++; }
+    }
+    const ageStr = _fmtCacheAge ? _fmtCacheAge(cached.ageMs) : (Math.round(cached.ageMs/1000) + 's');
+    console.info(`[PosHist] loaded from cache (age ${ageStr}) - ${n} records attached`);
+    return cached.map;
+  }
+
+  // Bulk fetch
+  if (!W1_DATE) {
+    console.warn('[PosHist] W1_DATE not set yet -- skipping bulk pre-fetch');
+    return {};
+  }
+  const cutoff = new Date(Date.now() - 35 * 7 * 86400000);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  const TOP = 1000;
+  const buckets = {};   // `${cust}|${mstyle}` -> [raw rows]
+  let skip = 0;
+  let totalRows = 0;
+  const t0 = Date.now();
+  while (true) {
+    let resp;
+    try {
+      resp = await qb('/records/query', {
+        from:    _POS_HIST_TID,
+        select:  [_POS_HIST_DATE_FID, _POS_HIST_CUST_FID, _POS_HIST_MSTYLE_FID,
+                  _POS_HIST_UNITS_FID, _POS_HIST_OH_FID, _POS_HIST_INST_FID],
+        where:   `{${_POS_HIST_DATE_FID}.OAF.'${cutoffStr}'}`,
+        sortBy:  [{ fieldId: _POS_HIST_DATE_FID, order: 'DESC' }],
+        options: { top: TOP, skip: skip },
+      });
+    } catch (e) {
+      console.warn('[PosHist] bulk pre-fetch failed at skip', skip, e);
+      return {};
+    }
+    const rows = (resp && resp.data) || [];
+    if (!rows.length) break;
+    for (const row of rows) {
+      const cust   = (row[String(_POS_HIST_CUST_FID)]   || {}).value || '';
+      const mstyle = (row[String(_POS_HIST_MSTYLE_FID)] || {}).value || '';
+      if (!cust || !mstyle) continue;
+      const key = `${cust}|${mstyle}`;
+      (buckets[key] = buckets[key] || []).push(row);
+    }
+    totalRows += rows.length;
+    if (rows.length < TOP) break;
+    skip += TOP;
+  }
+
+  // Convert buckets to the {units, oh, instock} shape
+  const map = {};
+  for (const key of Object.keys(buckets)) {
+    const slotted = _bucketPosRows(buckets[key]);
+    if (slotted) map[key] = slotted;
+  }
+
+  // Attach to records
+  let nMatched = 0;
+  for (const r of records) {
+    if (!r || !r.cust || !r.mstyle) continue;
+    const key = `${r.cust}|${r.mstyle}`;
+    if (map[key]) { r.pos_hist = map[key]; nMatched++; }
+  }
+
+  const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+  console.info(`[PosHist] bulk fetched ${totalRows} rows / ${Object.keys(map).length} unique pairs in ${elapsed}s, ${nMatched} attached`);
+
+  if (Object.keys(map).length > 0) _savePosHistCache(map);
+  return map;
+}
+
 async function _fetchPosHistForRecord(r) {
   if (!r || !r.mstyle || !r.cust) return null;
   if (r.pos_hist !== undefined) return r.pos_hist || null;
-  r.pos_hist = null; // sentinel - prevents duplicate in-flight fetches
+
+  // Try cache first -- if the bulk pre-fetch ran (this run or a recent
+  // one), the answer is here and we can skip the round-trip entirely.
+  const cached = _loadPosHistCache();
+  if (cached && cached.map) {
+    const key = `${r.cust}|${r.mstyle}`;
+    const hit = cached.map[key];
+    if (hit) {
+      r.pos_hist = hit;
+      return hit;
+    }
+    // Cache exists but this pair isn't in it -- record has no POS history.
+    // Mark with null so we don't retry on every detail open.
+    r.pos_hist = null;
+    return null;
+  }
+
+  // Cache miss -- fall back to single-record fetch (legacy path, used when
+  // bulk pre-fetch failed or hasn't completed yet).
+  r.pos_hist = null;   // sentinel to prevent duplicate in-flight fetches
   try {
     const escM = String(r.mstyle).replace(/'/g, "''");
     const escC = String(r.cust).replace(/'/g, "''");
     const resp = await qb('/records/query', {
       from:    _POS_HIST_TID,
-      select:  [_POS_HIST_DATE_FID, _POS_HIST_UNITS_FID, _POS_HIST_OH_FID, _POS_HIST_INST_FID],
+      select:  [_POS_HIST_DATE_FID, _POS_HIST_CUST_FID, _POS_HIST_MSTYLE_FID,
+                _POS_HIST_UNITS_FID, _POS_HIST_OH_FID, _POS_HIST_INST_FID],
       where:   `{${_POS_HIST_MSTYLE_FID}.EX.'${escM}'} AND {${_POS_HIST_CUST_FID}.EX.'${escC}'}`,
       sortBy:  [{ fieldId: _POS_HIST_DATE_FID, order: 'DESC' }],
       options: { top: 35, skip: 0 },
     });
     const rows = (resp && resp.data) || [];
     if (!rows.length) return null;
-    const units   = Array(26).fill(null);
-    const oh      = Array(26).fill(null);
-    const instock = Array(26).fill(null);
-    const seen    = new Set();
-    if (!W1_DATE) return null;
-    const getNum = (row, fid) => {
-      const c = row[String(fid)];
-      if (!c || c.value == null || c.value === '') return null;
-      const n = Number(c.value);
-      return Number.isFinite(n) ? n : null;
-    };
-    for (const row of rows) {
-      const dateStr = row[String(_POS_HIST_DATE_FID)] && row[String(_POS_HIST_DATE_FID)].value;
-      if (!dateStr || seen.has(dateStr)) continue;
-      seen.add(dateStr);
-      const d       = new Date(dateStr + 'T00:00:00');
-      const diffMs  = W1_DATE.getTime() - d.getTime();
-      const diffWks = Math.round(diffMs / (7 * 86400000));
-      const slot    = 26 - diffWks; // slot 25 = 1w before W1, slot 0 = 26w before W1
-      if (slot < 0 || slot > 25) continue;
-      units[slot]   = getNum(row, _POS_HIST_UNITS_FID);
-      oh[slot]      = getNum(row, _POS_HIST_OH_FID);
-      instock[slot] = getNum(row, _POS_HIST_INST_FID);
-    }
-    const hasData = units.some(v => v !== null);
-    if (!hasData) return null;
-    r.pos_hist = { units, oh, instock };
-    return r.pos_hist;
+    const slotted = _bucketPosRows(rows);
+    if (!slotted) return null;
+    r.pos_hist = slotted;
+    return slotted;
   } catch (e) {
-    console.warn('[PosHist] fetch failed:', e);
+    console.warn('[PosHist] single-record fetch failed:', e);
     return null;
   }
 }
