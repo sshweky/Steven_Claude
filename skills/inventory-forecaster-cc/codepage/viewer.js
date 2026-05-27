@@ -6060,8 +6060,8 @@ function onManEdit(inputEl) {
   // Live-update the detail-pane Total and Avg/Wk cells for this record
   const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   const totEl  = document.getElementById('man-total-' + safeId);
+  let sum = 0;
   if (totEl) {
-    let sum = 0;
     document.querySelectorAll(`.man-edit[data-key="${key.replace(/"/g,'\\"')}"]`).forEach(el => {
       const v = parseInt(el.value, 10);
       sum += (isFinite(v) && v >= 0) ? v : 0;
@@ -6069,6 +6069,34 @@ function onManEdit(inputEl) {
     totEl.textContent = fmtN(sum);
     const avgWkEl = document.getElementById('man-avgwk-' + safeId);
     if (avgWkEl) avgWkEl.textContent = fmtN(Math.round(sum / 26));
+  }
+  // Live-update the MAN - AI diff row (cell + total + avg) so the unit gap
+  // tracks the planner's edit in real time.
+  const diffCell = document.getElementById(`diff-${safeId}-${weekIdx}`);
+  if (diffCell && diffCell.dataset.locked !== '1') {
+    const aiVal = parseFloat(diffCell.dataset.ai) || 0;
+    const diff  = newVal - aiVal;
+    const clr   = diff > 0 ? '#2e7d32' : diff < 0 ? '#c62828' : '#888';
+    const sign  = diff > 0 ? '+' : '';
+    diffCell.style.color  = clr;
+    diffCell.textContent  = sign + fmtN(diff);
+  }
+  const diffTotEl = document.getElementById('diff-total-' + safeId);
+  if (diffTotEl) {
+    const aiTotal  = parseFloat(diffTotEl.dataset.aiTotal) || 0;
+    const newDiff  = sum - aiTotal;
+    const clr      = newDiff > 0 ? '#2e7d32' : newDiff < 0 ? '#c62828' : '#555';
+    const sign     = newDiff > 0 ? '+' : '';
+    diffTotEl.style.color = clr;
+    diffTotEl.textContent = sign + fmtN(newDiff);
+    const diffAvgEl = document.getElementById('diff-avg-' + safeId);
+    if (diffAvgEl) {
+      const newAvg = Math.round(newDiff / 26);
+      const aClr   = newAvg > 0 ? '#2e7d32' : newAvg < 0 ? '#c62828' : '#555';
+      const aSign  = newAvg > 0 ? '+' : '';
+      diffAvgEl.style.color = aClr;
+      diffAvgEl.textContent = aSign + fmtN(newAvg);
+    }
   }
   updateSaveAllBadge();
 }
