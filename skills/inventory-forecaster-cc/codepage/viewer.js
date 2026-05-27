@@ -447,6 +447,7 @@ function buildSelectFids() {
     ...(F.SWITCHOVER_ACTIVE      ? [F.SWITCHOVER_ACTIVE]      : []),
     ...(F.SWITCHOVER_TO_MSTYLE   ? [F.SWITCHOVER_TO_MSTYLE]   : []),
     ...(F.SWITCHOVER_DATE        ? [F.SWITCHOVER_DATE]        : []),
+    ...(F.SWITCHOVER_FROM        ? [F.SWITCHOVER_FROM]        : []),
   ];
   CFG.AI_PRJ_FIDS.forEach(fid => sel.push(fid));
   CFG.OPN_FIDS.forEach(fid => sel.push(fid));
@@ -2405,6 +2406,7 @@ function adaptRow(row) {
     switchover_active:   F.SWITCHOVER_ACTIVE    ? bool(row, F.SWITCHOVER_ACTIVE)    : false,
     switchover_to_mstyle:F.SWITCHOVER_TO_MSTYLE ? str(row, F.SWITCHOVER_TO_MSTYLE)  : '',
     switchover_date:     F.SWITCHOVER_DATE      ? str(row, F.SWITCHOVER_DATE)        : '',
+    switchover_from:     F.SWITCHOVER_FROM      ? str(row, F.SWITCHOVER_FROM)        : '',
     opn_w:             opn,           // [Opn_W1..Opn_W26] open customer PO quantities
     opn_total:         opn_total,    // sum of opn_w; used in proj_wk/ai_wk recalcs
     inv_flow_beg:        null,        // [Wk1..Wk26] beginning balances
@@ -3267,6 +3269,8 @@ async function saveSwitchoverField(key, field, value) {
   if (statusEl) statusEl.textContent = 'Saving...';
   const fields = {};
   fields[CFG.FID.KEY] = { value: key };
+  // Capture old mstyle before overwriting so we can clear switchover_from on the old variant
+  const _prevSwToMstyle = rec.switchover_to_mstyle || '';
   if (field === 'active') {
     rec.switchover_active = !!value;
     fields[CFG.FID.SWITCHOVER_ACTIVE] = { value: !!value };
@@ -3282,6 +3286,48 @@ async function saveSwitchoverField(key, field, value) {
   }
   try {
     await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
+
+    // Auto-write switchover_from on the variant record (fire-and-forget secondary writes).
+    // Fires whenever the base style is active + has a target mstyle set.
+    if (CFG.FID.SWITCHOVER_FROM) {
+      const _swActive    = rec.switchover_active;
+      const _swToMstyle  = (rec.switchover_to_mstyle || '').trim();
+      const _baseMstyle  = rec.mstyle || rec.key.split('-').slice(1).join('-');
+      const _acct        = rec.key.split('-', 1)[0];
+      if (_swActive && _swToMstyle && _baseMstyle) {
+        const _variantKey = _acct + '-' + _swToMstyle;
+        const _variantRec = ALL_RECORDS.find(x => x.key === _variantKey);
+        const _vFields    = {};
+        _vFields[CFG.FID.KEY]             = { value: _variantKey };
+        _vFields[CFG.FID.SWITCHOVER_FROM] = { value: _baseMstyle };
+        qb('/records', { to: CFG.PROJECTIONS_TID, data: [_vFields], mergeFieldId: CFG.FID.KEY })
+          .then(() => { if (_variantRec) _variantRec.switchover_from = _baseMstyle; })
+          .catch(err => console.warn('[Switchover] switchover_from write failed:', err));
+      }
+      // Clear switchover_from on the old variant when the mstyle target changed
+      if (field === 'mstyle' && _prevSwToMstyle && _prevSwToMstyle !== _swToMstyle) {
+        const _oldVariantKey = _acct + '-' + _prevSwToMstyle;
+        const _oldVariantRec = ALL_RECORDS.find(x => x.key === _oldVariantKey);
+        const _clrFields     = {};
+        _clrFields[CFG.FID.KEY]             = { value: _oldVariantKey };
+        _clrFields[CFG.FID.SWITCHOVER_FROM] = { value: '' };
+        qb('/records', { to: CFG.PROJECTIONS_TID, data: [_clrFields], mergeFieldId: CFG.FID.KEY })
+          .then(() => { if (_oldVariantRec) _oldVariantRec.switchover_from = ''; })
+          .catch(err => console.warn('[Switchover] clear old switchover_from failed:', err));
+      }
+      // Also clear switchover_from when deactivating the switchover
+      if (field === 'active' && !value && _prevSwToMstyle) {
+        const _deactKey = _acct + '-' + _prevSwToMstyle;
+        const _deactRec = ALL_RECORDS.find(x => x.key === _deactKey);
+        const _clrF     = {};
+        _clrF[CFG.FID.KEY]             = { value: _deactKey };
+        _clrF[CFG.FID.SWITCHOVER_FROM] = { value: '' };
+        qb('/records', { to: CFG.PROJECTIONS_TID, data: [_clrF], mergeFieldId: CFG.FID.KEY })
+          .then(() => { if (_deactRec) _deactRec.switchover_from = ''; })
+          .catch(err => console.warn('[Switchover] clear deactivated switchover_from failed:', err));
+      }
+    }
+
     // Rebuild the switchover map so week locking reflects the change immediately.
     // Invalidate the week-date cache in case date changed.
     if (field === 'date') _weekDateCache = null;
