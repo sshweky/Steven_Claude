@@ -1772,9 +1772,9 @@ def main():
           flush=True)
     systemic_impacts = estimate_systemic_impact(all_recs, man_fids)
 
-    # Step 4c: Validate -- reject or flag recommendations that widen MAN-AI gap
+    # Step 4c: Validate -- replace any fix that widens the gap with a new rec
     print("\n[4c/5] Validating recommendations against systemic impact...", flush=True)
-    all_recs = validate_and_override_recs(all_recs, systemic_impacts)
+    all_recs = validate_and_override_recs(all_recs, systemic_impacts, grouped)
     for num, intent, fit, rec, impact, count, *_ in all_recs:
         status = rec.get("systemic_status", "NEUTRAL")
         print(f"  [{num}] {intent}/{fit} -> {status}")
