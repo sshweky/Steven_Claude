@@ -5757,6 +5757,49 @@ def _switchover_backfill(rows, prj_cols):
         print(f"      [Switchover] PCS<->PX siblings detected (runtime only): "
               f"{pcs_detected} record(s)")
 
+    # ---- Operation C: EC/COS/AMZ/DS auto-detected parents ---------------
+    # When the forecaster auto-detects that a base style has a variant suffix
+    # sibling in scope (EC, COS, AMZ, DS, DTC) it zeroes the base AI forecast
+    # but historically did NOT write Switchover_To_MStyle / Switchover_Active
+    # back to QB -- so the viewer never showed the switchover badge (double
+    # arrow).  This operation writes those fields so:
+    #   - The viewer badge appears immediately on next load
+    #   - Operation B below picks up the auto-linked mstyle and computes
+    #     Switchover_Date from the variant's first non-zero MAN PRJ week
+    # Planner-set values always win (skip if already populated in QB).
+    ec_auto_linked = 0
+    for r in rows:
+        k = r.get("Acct_MStyle_Key_", "")
+        if not k.startswith(f"{AMAZON_ACCT}-"):
+            continue
+        # Planner-set wins -- don't overwrite
+        if (r.get("Switchover_To_MStyle") or "").strip():
+            continue
+        ms   = (r.get("Mstyle") or "").strip()
+        acct = k.split("-", 1)[0]
+        # Find the first variant suffix whose sibling exists in scope
+        variant_found = None
+        for sfx in sorted(_SWITCHOVER_BACKFILL_SUFFIXES, key=len, reverse=True):
+            if (acct, f"{ms}{sfx}") in by_acct_ms:
+                variant_found = f"{ms}{sfx}"
+                break
+        if not variant_found:
+            continue
+        # Stash in-memory so Operation B computes Switchover_Date
+        r["Switchover_To_MStyle"] = variant_found
+        # Queue QB writeback for Switchover_Active + Switchover_To_MStyle
+        out["updates"].append({
+            "key":    k,
+            "fields": {
+                "Switchover To MStyle": variant_found,
+                "Switchover Active":    True,
+            },
+        })
+        ec_auto_linked += 1
+    if ec_auto_linked:
+        print(f"      [Switchover] EC/COS/AMZ auto-linked Switchover_To_MStyle+Active: "
+              f"{ec_auto_linked} record(s)")
+
     # ---- Operation B: Switchover_Date computation -----------------------
     # Two sources for the (base, variant) relationship:
     #   (1) Explicit -- Switchover_To_MStyle field is set on the base (planner-driven)
