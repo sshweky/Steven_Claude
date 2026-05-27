@@ -1181,9 +1181,41 @@ def main():
 
     grouped = aggregate(analyses)
 
-    # Build report
-    print("\n[4/4] Building report and sending email...", flush=True)
+    # Build report (first pass -- produces all_recs list for systemic estimator)
+    print("\n[4/5] Building report...", flush=True)
     report_md, all_recs = build_report(analyses, grouped, run_date, args.days)
+
+    # Estimate systemic impact across ALL active projections for each recommendation
+    print("\n[5/5] Estimating systemic impact across all active projections...",
+          flush=True)
+    systemic_impacts = estimate_systemic_impact(all_recs)
+
+    # Append systemic impact section to the markdown report
+    if systemic_impacts:
+        sys_lines = [
+            "",
+            "## 5. Systemic Impact Estimate",
+            "",
+            ("*Estimated effect if proposed changes are deployed across all active "
+             "projections. Scope = all records with that AI model type. "
+             "Flagged = records that match the detection criteria for the fix.*"),
+            "",
+            ("| Change # | Model Targeted | Records in Scope | AI Units in Scope "
+             "| Flagged by Criteria | Direction |"),
+            "|---|---|---|---|---|---|",
+        ]
+        for si in systemic_impacts:
+            num = si["rec_num"]
+            kw  = si["model_keyword"] or "all"
+            sc  = si["scope_count"]
+            at  = si["scope_ai_total"]
+            cc  = si["criteria_count"]
+            di  = si["direction"].upper()
+            pct = f" ({cc/sc*100:.0f}%)" if sc > 0 else ""
+            sys_lines.append(
+                f"| [{num}] | {kw} | {sc:,} | {at:,} | {cc:,}{pct} | {di} |"
+            )
+        report_md += "\n" + "\n".join(sys_lines) + "\n"
 
     report_path = ANALYSIS_DIR / f"ai_training_{run_date}.md"
     report_path.write_text(report_md, encoding="utf-8")
@@ -1192,7 +1224,10 @@ def main():
     # Send email
     subject    = (f"AI Training Review {run_date} -- "
                   f"{len(analyses)} comments, {len(all_recs)} recommendations")
-    email_html = build_email_html(analyses, all_recs, report_path, run_date, args.days)
+    email_html = build_email_html(
+        analyses, all_recs, report_path, run_date, args.days,
+        systemic_impacts=systemic_impacts,
+    )
     send_email(subject, email_html, report_path, args.dry_run)
 
     # Mark processed comments as Reviewed in QB so they don't re-appear
