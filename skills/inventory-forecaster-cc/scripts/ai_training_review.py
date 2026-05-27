@@ -958,47 +958,70 @@ def _build_systemic_html(systemic_impacts, all_recs):
         "mixed": ("background:#fff8e1;color:#e65100", "MIXED"),
     }
 
-    rows = ""
-    for si in systemic_impacts:
-        num   = si["rec_num"]
-        kw    = si["model_keyword"] or "all"
-        sc    = si["scope_count"]
-        at    = si["scope_ai_total"]
-        cc    = si["criteria_count"]
-        di    = si["direction"]
-        vb    = si["variance_before"]   # MAN - AI (current, flagged records)
-        va    = si["variance_after"]    # MAN - estimated new AI (flagged records)
-        delta = va - vb                 # how much the gap closes (positive = closer to MAN)
-        label, intent, impact = rec_labels.get(num, ("", "", 0))
-        badge_style, badge_txt = dir_badge.get(di, ("", di.upper()))
-        pct = f"{cc/sc*100:.0f}%" if sc > 0 else "n/a"
+    def _pct(num, denom):
+        """Return (MAN-AI)/AI as a % string, or 'n/a'."""
+        if denom and denom != 0:
+            return f"{num / abs(denom) * 100:+.1f}%"
+        return "n/a"
 
-        # Variance coloring: before is bad (red if big gap), after should be smaller
-        vb_col = "#c62828" if vb < 0 else "#2e7d32"
-        va_col = "#c62828" if va < 0 else "#2e7d32"
-        # Delta: green if gap shrank (|after| < |before|), red if it grew
+    def _render_row(num_label, kw, sc, cc, vb, va, fat, di, is_combined=False):
+        delta     = va - vb
+        flagged_pct = f"{cc/sc*100:.0f}%" if sc > 0 else "n/a"
+        pct_b     = _pct(vb, fat)           # (MAN-AI)/AI before
+        pct_a_denom = fat + (vb - va)       # estimated new AI total = fat + AI_change
+        pct_a     = _pct(va, pct_a_denom)   # (MAN-newAI)/newAI after
+        badge_style, badge_txt = dir_badge.get(di, ("", di.upper()))
+        vb_col    = "#c62828" if vb < 0 else "#2e7d32"
+        va_col    = "#c62828" if va < 0 else "#2e7d32"
         delta_col = "#2e7d32" if abs(va) < abs(vb) else "#c62828"
         delta_str = f"{delta:+,}" if cc > 0 else "n/a"
-
-        rows += f"""
-<tr>
-  <td style="{TD}"><b>[{num}]</b> {label}</td>
+        row_style = f'style="background:#f5f5f5"' if is_combined else ""
+        label, intent, impact = rec_labels.get(num_label, ("", "", 0))
+        display_label = ("<b>Combined</b>" if is_combined
+                        else f"<b>[{num_label}]</b> {label}")
+        return f"""
+<tr {row_style}>
+  <td style="{TD}">{display_label}</td>
   <td style="{TD}">{kw}</td>
   <td style="{TDR}">{sc:,}</td>
-  <td style="{TDR}">{cc:,} <span style="color:#9e9e9e">({pct})</span></td>
-  <td style="{TDR};color:{vb_col}">{vb:+,}</td>
-  <td style="{TDR};color:{va_col}">{va:+,}</td>
+  <td style="{TDR}">{cc:,} <span style="color:#9e9e9e">({flagged_pct})</span></td>
+  <td style="{TDR};color:{vb_col}">{vb:+,} <span style="color:#9e9e9e;font-size:11px">({pct_b})</span></td>
+  <td style="{TDR};color:{va_col}">{va:+,} <span style="color:#9e9e9e;font-size:11px">({pct_a})</span></td>
   <td style="{TDR};color:{delta_col};font-weight:bold">{delta_str}</td>
   <td style="{TDC}"><span style="padding:2px 8px;border-radius:3px;font-weight:bold;font-size:11px;{badge_style}">{badge_txt}</span></td>
 </tr>"""
+
+    rows = ""
+    for si in systemic_impacts:
+        if si.get("is_combined"):
+            continue   # render combined last
+        rows += _render_row(
+            si["rec_num"], si["model_keyword"] or "all",
+            si["scope_count"], si["criteria_count"],
+            si["variance_before"], si["variance_after"],
+            si["flagged_ai_total"], si["direction"],
+        )
+
+    # Combined row (if present)
+    for si in systemic_impacts:
+        if si.get("is_combined"):
+            rows += _render_row(
+                "ALL", si["model_keyword"],
+                si["scope_count"], si["criteria_count"],
+                si["variance_before"], si["variance_after"],
+                si["flagged_ai_total"], si["direction"],
+                is_combined=True,
+            )
+            break
 
     return f"""
 <h3 style="margin:28px 0 6px 0;font-size:15px;color:#37474f;border-top:2px solid #eceff1;
            padding-top:18px">Systemic Impact Estimate</h3>
 <p style="margin:0 0 10px 0;font-size:12px;color:#757575">
-  If the proposed model changes are deployed, how many active projections would be affected?
-  <i>Variance = MAN PRJ 26w minus AI PRJ 26w across flagged records only.
-  Before = current gap. After = estimated gap once fix is applied. Delta = improvement.</i>
+  Each row tests that fix <i>in isolation</i> across all active projections with that model.
+  The shaded <b>Combined</b> row shows the effect of implementing all fixes simultaneously.
+  <i>Variance = MAN PRJ minus AI PRJ (flagged records only). % = gap as % of current AI.
+  Before = current state. After = estimated state once fix is applied.</i>
 </p>
 <table style="width:100%;border-collapse:collapse;font-size:13px">
   <thead>
@@ -1009,8 +1032,8 @@ def _build_systemic_html(systemic_impacts, all_recs):
       <th style="{THR}">Flagged</th>
       <th style="{THR}">MAN-AI Before</th>
       <th style="{THR}">MAN-AI After</th>
-      <th style="{THR}">Delta</th>
-      <th style="{TH};text-align:center">Direction</th>
+      <th style="{THR}">AI Change</th>
+      <th style="{TH};text-align:center">AI Impact</th>
     </tr>
   </thead>
   <tbody>{rows}
