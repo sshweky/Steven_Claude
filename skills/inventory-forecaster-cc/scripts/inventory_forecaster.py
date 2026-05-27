@@ -8621,15 +8621,15 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
             break
     fill_end = fill_start + 2   # always a 2-week fill window
 
-    # Project DC OH forward to fill_start: for each wait week, the DC receives
-    # the open PO units but also sells through at the baseline rate.  Without
-    # this, fill_units is computed against today's stale OH and UNDER-estimates
-    # the order needed once the DC has depleted its inventory over the wait period.
-    # Example: W1+W2 have POs -> DC sells ~2x baseline before fill lands -> OH
-    # at W3 is materially lower than today's snapshot.
+    # Project DC OH to fill_start: deduct consumer demand for each wait week.
+    # Do NOT add the incoming PO deliveries -- those are already committed
+    # shipments the planner cannot change.  The fill-order decision for W3
+    # should reflect how depleted the DC will be after selling through the
+    # wait period, independent of what P&P is already shipping in W1-W2.
+    # Without this deduction the AI uses today's OH and under-estimates the
+    # order needed once the DC has sold down over the wait period.
     _proj_oh = oh_lw
     for _wi in range(fill_start):
-        _proj_oh += (_opn_wl[_wi] if _wi < len(_opn_wl) else 0.0)
         _proj_oh -= baseline_pps
         _proj_oh  = max(0.0, _proj_oh)
 
@@ -9157,13 +9157,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     break
             _fe = _fs + 2   # always a 2-week fill window
 
-            # Project DC OH to fill window start so the fill reflects the
-            # retailer's inventory level when the order actually arrives,
-            # not today's stale snapshot.  Each wait week: DC receives the
-            # open PO and depletes inventory at the baseline sell-through rate.
+            # Project DC OH to fill window start: deduct consumer demand for
+            # each wait week.  Do NOT add the incoming PO deliveries -- those
+            # are already committed shipments the planner cannot change.  The
+            # W3 order should reflect DC depletion during the wait period,
+            # not an inflated OH that counts in-transit POs as available stock.
             _proj_oh_ovr = _oh_lw_o
             for _wi in range(_fs):
-                _proj_oh_ovr += float(row.get(f"Opn_W{_wi + 1}") or 0)
                 _proj_oh_ovr -= _baseline_override
                 _proj_oh_ovr  = max(0.0, _proj_oh_ovr)
             _fill_u = max(0.0, RTL_WOS_TARGET * _baseline_override - _proj_oh_ovr)
