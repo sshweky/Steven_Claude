@@ -179,11 +179,19 @@ def _discover_man_fids():
 def _discover_l4w_fid():
     """Return the FID of the Ord/Wk L4w numeric field on Projections."""
     fields = _qb_get("fields", {"tableId": PROJ_TABLE})
+    candidates = []
     for f in fields:
         lbl = f.get("label", "").strip().lower()
-        # Match common label variants: "Ord/Wk L4w", "Ord/Wk L4w #", "L4w", etc.
-        if re.match(r'^(ord/wk\s+)?l4w\s*#?$', lbl):
-            return f["id"]
+        ftype = f.get("fieldType", "")
+        # Match any numeric field whose label contains "l4w" and not "ord_lw"
+        if "l4w" in lbl and ftype in ("numeric", "duration"):
+            candidates.append((f["id"], f.get("label", "")))
+    if candidates:
+        # Prefer the one that also contains "ord" or "wk"
+        for fid, lbl in candidates:
+            if "ord" in lbl.lower() or "wk" in lbl.lower():
+                return fid
+        return candidates[0][0]
     return None
 
 
