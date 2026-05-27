@@ -4739,12 +4739,16 @@ async function toggleDetail(key) {
           Switchover Active
         </label>
         <label style="display:flex;align-items:center;gap:6px;">
-          <span style="color:#555;">New MStyle:</span>
+          <span style="color:#555;">Switchover to MStyle:</span>
           <input type="text" id="sw-mstyle-${safeKey}" value="${_swToVal}" placeholder="e.g. BB38259"
             style="font-size:12px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;width:110px;text-transform:uppercase;"
             onblur="saveSwitchoverField('${r.key.replace(/'/g,"\\'")}','mstyle',this.value)"
             onkeydown="if(event.key==='Enter')this.blur()">
         </label>
+        ${r.switchover_from ? `<label style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#555;">Switchover from MStyle:</span>
+          <span style="font-size:12px;font-weight:600;color:#1565c0;">${_esc(r.switchover_from)}</span>
+        </label>` : ''}
         <label style="display:flex;align-items:center;gap:6px;">
           <span style="color:#555;">Switch Date:</span>
           <input type="date" id="sw-date-${safeKey}" value="${_swDateVal}"
