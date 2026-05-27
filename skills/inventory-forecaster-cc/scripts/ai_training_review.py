@@ -1169,6 +1169,8 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
         vb_new      = bc["vb"]
         va_new      = bc["va"]
         gap_closed  = abs(vb_new) - abs(va_new)
+        vb_pct      = bc.get("vb_pct", vb_new / bc["fmt"] * 100 if bc.get("fmt") else 0.0)
+        va_pct      = bc.get("va_pct", va_new / bc["fmt"] * 100 if bc.get("fmt") else 0.0)
 
         if change_type == "threshold" and fit == "over_projecting":
             man_mult = bc.get("man_mult", 1.0)
