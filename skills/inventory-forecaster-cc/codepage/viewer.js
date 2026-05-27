@@ -1232,14 +1232,16 @@ function _parseNormL13w(narrative) {
 // detail pane.  Shows the normalized value with unit diff vs raw.  When they
 // differ a tooltip provides the detailed explanation of what was stripped.
 function _buildNormL13wHtml(r) {
-  const rawL13 = Math.round(r.shp_wk || 0);
-  if (!rawL13) return '';
+  const rawL13  = Math.round(r.shp_wk || 0);
   const parsed  = _parseNormL13w(r.narrative || '');
   const normL13 = parsed ? parsed.norm : rawL13;
   const diff    = normL13 - rawL13;
   const normFmt = fmtN(normL13);
   let diffHtml  = '';
-  if (diff !== 0) {
+  if (rawL13 === 0) {
+    // Item has no orders in last 13 weeks -- still render the bar so it's visible
+    diffHtml = ' <span style="color:#aaa;font-size:11px">(no recent order history)</span>';
+  } else if (diff !== 0) {
     const sign    = diff > 0 ? '+' : '';
     const diffClr = diff < 0 ? '#c62828' : '#2e7d32';
     const reason  = (parsed && parsed.reason) ? parsed.reason : 'adjustments applied';

@@ -1,0 +1,137 @@
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:3:backfill_switchover.py -- One-time backfill of Switchover_To_MStyle,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:4:Switchover_Active, and Switchover_Date for Amazon (acct 1864) projections
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:93:    print("\n=== Switchover Backfill ===")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:103:    fid_sw_act = l2f.get("Switchover_Active") or 1602
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:104:    fid_sw_ms  = l2f.get("Switchover_To_MStyle") or 1603
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:105:    fid_sw_dt  = l2f.get("Switchover_Date")   or 1604
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:151:    # ── Step 4: Detect ec_parents and compute switchover fields ───────────────
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:152:    print("[3] Detecting EC/COS/AMZ variant siblings and computing switchover fields...")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:162:        # Skip if planner already set Switchover_To_MStyle
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:164:        existing_sw_ms = (r.get("Switchover To MStyle") or r.get("Switchover_To_MStyle") or "").strip()
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:167:            existing_sw_dt = (r.get("Switchover_Date") or "")[:10]
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:197:        # Find Switchover_Date from variant's first non-zero MAN PRJ week
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\backfill_switchover.py:229:    print(f"\n[4] Writing switchover fields to QB ({len(updates)} records)...")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\audit_rules.py:52:#     f"F70 Switchover variant ..."
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:97:# F70 — Switchover variant suffixes.
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1442:         "Switchover_Active",           # FID 1602 — checkbox: base style is being switched over
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1443:         "Switchover_To_MStyle",        # FID 1603 — target variant mstyle (planner-set OR PCS-PX auto-link)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:1444:         "Switchover_Date",             # FID 1604 — date planning shifts to variant (auto-computed)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5571:def _build_switchover_index(rows):
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5573:    F70 -- Switchover variant conflict detection.
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5631:        # the planner has already signaled the switchover -- zero the base AI
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5640:    # the switchover (i.e. weeks where the base style is still active).
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5665:# Switchover backfill suffixes -- includes the F70 suffixes PLUS PX (the new
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5673:def _switchover_backfill(rows, prj_cols):
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5675:    Phase 1.5 -- Amazon (acct 1864) switchover auto-link + Switchover_Date
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5683:         account AND the PCS record does NOT yet have a Switchover To MStyle
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5684:         set, auto-set Switchover_To_MStyle = PX style and Switchover_Active
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5687:      B. Switchover_Date computation (all switchover suffixes -- EC, COS,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5689:         For every Amazon record with a Switchover_To_MStyle set:
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5693:              from base).  Leave Switchover_Date EMPTY and add an alert that
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5696:              column.  Parse its MM_DD date.  Set Switchover_Date on the
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5699:              Switchover_Date EMPTY and add an alert.
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5702:    auto-linked Switchover_To_MStyle values immediately.
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5749:    # buildSwitchoverMap() too -- here we only stash a per-row note for the
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5750:    # downstream Switchover_Date computation in Operation B.  We do NOT write
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5751:    # Switchover_To_MStyle back to QB, matching the EC/COS/AMZ/DS behavior
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5754:    # Operation B can compute the Switchover_Date from the PX sibling's
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5765:        # Skip if a Switchover_To_MStyle is already set (planner-driven wins)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5766:        if (r.get("Switchover_To_MStyle") or "").strip():
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5776:        print(f"      [Switchover] PCS<->PX siblings detected (runtime only): "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5782:    # but historically did NOT write Switchover_To_MStyle / Switchover_Active
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5783:    # back to QB -- so the viewer never showed the switchover badge (double
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5787:    #     Switchover_Date from the variant's first non-zero MAN PRJ week
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5795:        if (r.get("Switchover_To_MStyle") or "").strip():
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5807:        # Stash in-memory so Operation B computes Switchover_Date
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5808:        r["Switchover_To_MStyle"] = variant_found
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5809:        # Queue QB writeback for Switchover_Active + Switchover_To_MStyle
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5813:                "Switchover To MStyle": variant_found,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5814:                "Switchover Active":    True,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5819:        print(f"      [Switchover] EC/COS/AMZ auto-linked Switchover_To_MStyle+Active: "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5822:    # ---- Operation B: Switchover_Date computation -----------------------
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5824:    #   (1) Explicit -- Switchover_To_MStyle field is set on the base (planner-driven)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5826:    # In both cases, compute Switchover_Date from the variant's earliest
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5839:        variant_ms = (r.get("Switchover_To_MStyle") or "").strip()
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5853:            # For PLANNER-SET (explicit Switchover_To_MStyle): queue an INSERT
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5887:                    f"Switchover_Date."
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5904:            # No projections set on variant yet -- alert + leave Switchover_Date empty
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5905:            existing_date = (r.get("Switchover_Date") or "").strip()
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5910:                    "fields": {"Switchover Date": ""},
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5912:                r["Switchover_Date"] = ""
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5917:                    f"[ALERT-SWITCHOVER] Switchover to {variant_ms} configured but "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5919:                    f"projections on the variant style to establish a Switchover_Date."
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5925:        # Compute Switchover_Date from the column's calendar date
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5927:        existing_date = (r.get("Switchover_Date") or "")[:10]
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5931:                "fields": {"Switchover Date": d_iso},
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5933:            r["Switchover_Date"] = d_iso
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5937:        print(f"      [Switchover] Switchover_Date auto-set: {date_computed} record(s)")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5939:        print(f"      [Switchover] Switchover_Date cleared (stale): {date_cleared} record(s)")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5941:        print(f"      [Switchover] Alerts (no variant projections): {no_proj_alert} record(s)")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5943:        print(f"      [Switchover] Variant records to create: {variant_to_create}")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5948:def _apply_switchover_backfill(backfill, dry_run=False):
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5950:    Write the switchover-backfill changes back to QB.
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5952:    backfill: dict returned by _switchover_backfill().
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5960:            print(f"      [Switchover] DRY RUN -- skipping writeback of "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5971:        print("      [WARN] [Switchover] qb_get_field_map() returned empty -- skip writeback")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:5977:        print("      [WARN] [Switchover] Missing Acct-MStyle key field -- skip writeback")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:6031:            print(f"      [WARN] [Switchover] batch write failed: {e}")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:6032:    print(f"      [Switchover] writeback: {n_ok} ok, {n_fail} fail "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:8665:                    switchover_weeks=None, variant_zero_weeks=None,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13191:    # ── F70 — Switchover variant conflict (2026-05-21) ───────────────────────────
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13201:    # must not be overridden by the switchover heuristic.  Pre-launch items
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13214:    if switchover_weeks and not _f70_planner_protected:
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13215:        _sw_entry = switchover_weeks.get(row.get("Acct_MStyle_Key_", ""))
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13228:                        f"F70 Switchover conflict: variant style(s) "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13234:    # ── F70b — Reverse switchover: zero VARIANT for base-active weeks ────────────────
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13253:                        f"F70b Reverse-switchover: base style(s) {', '.join(_base_names)} "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13255:                        f"pre-switchover weeks to prevent double-counting."
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13609:    # all-zeros, the planner has already signaled the switchover.  Zero all weeks
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13623:                    f"switchover; AI zeroed all weeks."
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13763:                f"F70 switchover / F_PO_CUTOFF / F36 burnoff / F38f offline). "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13778:    # Surface any Phase-1.5 switchover backfill alerts (missing variant
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13781:    _sw_alert = row.get("_switchover_alert")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13947:        # F70 -- Switchover conflict maps.  build_ai_analysis() uses these to
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13948:        # prepend the switchover narrative bullet.  Empty dicts when no conflict.
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13949:        # `f70_switchover`        = full variant-active weeks (man_prj>0 or opn_w>0)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13952:        "f70_switchover":        dict(_f70_sw_entry),
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:13970:                    switchover_weeks=None, amazon_pos=None, season_map=None,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14032:    # F70 -- resolve switchover conflict weeks for this base style (if any)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14034:    if switchover_weeks:
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14035:        _f70_sw_entry = switchover_weeks.get(row.get("Acct_MStyle_Key_", ""), {})
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14078:        # F70 -- Switchover conflict check (highest priority; overrides other flags).
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14084:            flag     = "switchover_conflict"
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14088:                f"Switchover conflict: variant style(s) {_var_str} already "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14198:    # M4 (2026-05-21): When F70 switchover conflicts cover >= 50% of weeks,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14199:    # surface "switchover_closed" so planners see a single record-level
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14200:    # explanation (matches the per-week CRITICAL switchover_conflict flags).
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14201:    _f70_wk_count = sum(1 for w in weeks_out if w.get("flag") == "switchover_conflict")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14203:        qb_pattern = "switchover_closed"
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14470:                   ats_data=None, switchover_weeks=None, acct_cadences=None,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14477:    switchover_weeks    = switchover_weeks or {}
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14494:                            switchover_weeks=switchover_weeks,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:14506:                             switchover_weeks=switchover_weeks,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:15431:    # ── Critical: F70 Switchover variant conflict ─────────────────────────────
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:15433:    # specific weeks, prepend a top-of-analysis bullet explaining the switchover
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:15435:    # Uses f70_switchover (all conflict weeks) for the "as of" week, and
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:15437:    _f70 = rec.get("f70_switchover") or {}
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16145:    # ── Phase 1.5: Amazon switchover auto-link + Switchover_Date backfill ──
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16146:    # PCS{N} -> PX{N} auto-detect, Switchover_Date computed from variant's
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16153:    print(f"\n[1.5] Amazon switchover auto-link + Switchover_Date backfill ...",
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16155:    _sw_backfill = _switchover_backfill(rows, list(ORIG_PRJ_COLS))
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16156:    _apply_switchover_backfill(_sw_backfill, dry_run=bool(getattr(args, "dry_run", False)))
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16158:    # Stash switchover alerts on the originating rows so forecast_record()
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16165:                _r["_switchover_alert"] = _sw_alert_by_key[_k]
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16495:    # F70 -- Switchover variant conflict index.
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16499:    switchover_index, variant_zero_index, vacated_base_index = _build_switchover_index(rows)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16500:    _sw_conflict_ct  = len(switchover_index)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16502:        print(f"\n[F70] Switchover index: {_sw_conflict_ct} base style(s) "
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16506:              f"pre-switchover weeks to zero (F70b)", flush=True)
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16533:                                     switchover_weeks=switchover_index,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:16984:                            switchover_weeks=switchover_index,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py:17052:                                     switchover_weeks=switchover_index,
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\pipeline.py:13:    PhaseF  HardConstraints          VP-Q4 PO-zero, F70 switchover, F_PO_CUTOFF
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\rule_aliases.py:99:    ("HRD-002", "F70",   "Switchover variant conflict"),
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\rule_aliases.py:100:    ("HRD-003", "F70b",  "Reverse-switchover"),
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\_check_ff12655.py:80:    print(f"  Switchover Active: {sw_act}")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\_check_ff12655.py:81:    print(f"  Switchover To MStyle: {sw_ms}")
+C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\_check_ff12655.py:82:    print(f"  Switchover Date: {sw_dt}")
