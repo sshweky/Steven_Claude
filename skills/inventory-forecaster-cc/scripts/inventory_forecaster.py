@@ -9055,26 +9055,41 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #
         # DC inventory sources (in order of preference):
         #   Inv_WOS  — direct WOS field in Amazon Catalog (most authoritative)
-        #   Inv_SOH  — sellable SOH; compute WOS = (SOH + OPO) / POS_L13W
-        #   Inv_OPO  — open PO qty already inbound (included in WOS calc)
+        #   Inv_SOH  — sellable SOH; WOS = (SOH + W1+W2 open orders) / POS_L13W
+        #   Inv_OPO  — aggregate open PO qty (legacy fallback when no inv_flow data)
+        #
+        # F89 (2026-05-27): W1+W2 open orders from Inventory Flow are added to
+        # effective SOH before computing WOS.  Amazon's Inv_WOS / WOS_OH only
+        # reflects their current DC SOH; our open orders committed to ship in
+        # W1-W2 represent real near-term coverage and should count toward WOS.
+        # We always recompute from (SOH + opn_w1 + opn_w2) when SOH data is
+        # present so the fill-units calc also benefits from the fuller picture.
         #
         # Guard: only engage when at least one DC signal is present.  If all
-        # three are zero / missing, we can't tell "DC is empty" from "no data"
-        # and should not trigger an erroneous 8-WOS fill-up; fall through to
+        # signals are zero / missing, we can't tell "DC is empty" from "no data"
+        # and should not trigger an erroneous fill-up; fall through to
         # F84 (Seasonal Baseline + F15 POS anchor) instead.
-        _f85_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-        _f85_soh     = float((amz_catalog or {}).get("Inv_SOH") or 0)
-        _f85_opo     = float((amz_catalog or {}).get("Inv_OPO") or 0)
-        _f85_wos     = float((amz_catalog or {}).get("Inv_WOS") or 0)
-        if _f85_wos <= 0 and _f85_pos_l13 > 0:
-            _f85_wos = (_f85_soh + _f85_opo) / _f85_pos_l13
-        _f85_has_dc = _f85_wos > 0 or _f85_soh > 0 or _f85_opo > 0
+        _f85_pos_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _f85_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
+        _f85_opo      = float((amz_catalog or {}).get("Inv_OPO") or 0)
+        _f85_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
+        # F89: W1+W2 open orders from Inventory Flow
+        _f85_if_rec   = (inv_flow_data or {}).get(row.get("Mstyle", ""))
+        _f85_opn_list = (_f85_if_rec or {}).get("opn") or []
+        _f85_opn_w12  = ((_f85_opn_list[0] if len(_f85_opn_list) > 0 else 0.0)
+                       + (_f85_opn_list[1] if len(_f85_opn_list) > 1 else 0.0))
+        _f85_eff_soh  = _f85_soh + _f85_opn_w12
+        if _f85_pos_l13 > 0 and _f85_eff_soh > 0:
+            _f85_wos = _f85_eff_soh / _f85_pos_l13
+        elif _f85_wos <= 0 and _f85_pos_l13 > 0 and _f85_opo > 0:
+            _f85_wos = (_f85_soh + _f85_opo) / _f85_pos_l13  # legacy: no inv_flow, use agg OPO
+        _f85_has_dc = _f85_wos > 0 or _f85_eff_soh > 0 or _f85_opo > 0
         if _f85_has_dc:
             _f85_synth = {
                 "Avg_Units_Wk_L4w":  pos_data.get("Avg_Units_Wk_L4w")  or 0,
                 "Avg_Units_Wk_L13w": _f85_pos_l13,
                 "Ordered_Units_LW":  pos_data.get("Ordered_Units_LW")  or 0,   # LW POS proxy
-                "OH_Units_LW":       _f85_soh,
+                "OH_Units_LW":       _f85_eff_soh,   # SOH + W1+W2 open orders (F89)
                 "OH_WOS":            _f85_wos,
             }
             # Amazon-only: pass AUR + MAP so the baseline rule applies the
