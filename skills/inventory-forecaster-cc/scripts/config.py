@@ -309,13 +309,18 @@ RTL_WOS_TARGET          = float(os.environ.get("RTL_WOS_TARGET",           "8.0"
 F_RTL_WOS adjusts the forecast up when OH_WOS < target and down when > target.
 8 weeks = standard retailer replenishment buffer (covers ~2 ordering cycles)."""
 
-AMZ_WOS_TARGET_MIN      = float(os.environ.get("AMZ_WOS_TARGET_MIN",       "10.0"))
-"""Amazon DC WOS lower bound of healthy target range (10-12 wks).
-When Amazon DC WOS >= AMZ_WOS_TARGET_MIN - 2 (i.e. >= 8), the DC is at or
-above equilibrium and ordering converges to the consumer POS rate."""
+AMZ_WOS_TARGET_MIN      = float(os.environ.get("AMZ_WOS_TARGET_MIN",        "8.0"))
+"""Amazon DC WOS fill target (order up to this many WOS when DC is understocked).
+Lowered 10 -> 8 wks (2026-05-27): 8 wks still covers Amazon's 2-replen-cycle buffer
+while leaving less idle capital sitting in the DC.
+When Amazon DC WOS >= AMZ_WOS_TARGET_MIN - 2 (i.e. >= 6), the DC is at or
+above equilibrium and ordering converges to the consumer POS rate (F66i gate)."""
 
-AMZ_WOS_TARGET_MAX      = float(os.environ.get("AMZ_WOS_TARGET_MAX",       "12.0"))
-"""Amazon DC WOS upper bound of healthy target range (10-12 wks)."""
+AMZ_WOS_TARGET_MAX      = float(os.environ.get("AMZ_WOS_TARGET_MAX",       "10.0"))
+"""Amazon DC WOS suppress trigger -- start tapering/zeroing orders above this.
+Lowered 12 -> 10 wks (2026-05-27): narrows the healthy band to 8-10 wks so
+overstocked DCs deplete faster before new orders are placed.
+Hysteresis: fill to MIN (8), neutral 8-10, suppress above MAX (10)."""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
