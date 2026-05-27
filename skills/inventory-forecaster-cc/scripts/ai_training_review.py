@@ -84,9 +84,9 @@ RECIPIENT     = "s.shweky@petspeople.com"
 EOL_RE      = re.compile(r'\beol\b|wind.?down|discontinu|phase.?out|end.of.life|last.order|closing.out|deleting|delete', re.I)
 ZERO_RE     = re.compile(r'\bzero\b|no.orders?|covered.by.po|po.covers?|cancel.all|set.to.zero', re.I)
 INCREASE_RE = re.compile(r'\bincrease\b|boost|bump|lift|ramp.up|new.customer|new.distribution|dist.gain|adding|expand|grow', re.I)
-DECREASE_RE = re.compile(r'\bdecrease\b|cut\b|reduc|lost.customer|lost.distrib|cancel|lower|pull.back|slow|soften', re.I)
+DECREASE_RE = re.compile(r'\bdecrease\b|cut\b|reduc|lost.customer|lost.distrib|cancel|lower|pull.back|slow|soften|anomaly|one.time|spike', re.I)
 LAUNCH_RE   = re.compile(r'\blaunch\b|new.item|new.sku|pre.launch|first.order|initial.order', re.I)
-MODEL_RE    = re.compile(r'wrong.model|bad.model|should.be.seasonal|use.pos|use.history|use.amazon|not.seasonal', re.I)
+MODEL_RE    = re.compile(r'wrong.model|bad.model|should.be.seasonal|use.pos|use.history|use.amazon|not.seasonal|makes.no.sense|doesn.t.make.sense|look.at.the.order|look.at.history|incorrect.model|flat.demand|flat.forecast', re.I)
 
 
 # ---------------------------------------------------------------------------
