@@ -1116,7 +1116,7 @@ def build_email_html(analyses, all_recs, report_path, run_date, days,
     <span style="background:#e3f2fd;color:#0d47a1;padding:2px 7px;border-radius:3px;font-size:12px">{a['ai_model']}</span>
   </td>
   <td style="{TDR};color:{gap_col};font-weight:bold">{gap:+,}u</td>
-  <td style="{TD};font-size:12px;max-width:260px">{rec['proposed_change'][:180]}{"..." if len(rec['proposed_change'])>180 else ""}</td>
+  <td style="{TD};font-size:12px;max-width:300px;word-wrap:break-word">{rec['proposed_change']}</td>
   <td style="{TD};text-align:center"><span style="color:{conf_col};font-weight:bold;font-size:12px">{conf}</span></td>
 </tr>"""
 
