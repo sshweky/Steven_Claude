@@ -1256,21 +1256,24 @@ function _buildNormL13wHtml(r) {
   if (rawL13 === 0) {
     diffHtml = ' <span style="color:#aaa;font-size:11px">(no recent order history)</span>';
   } else if (diff !== 0) {
-    const sign    = diff > 0 ? '+' : '';
+    const sign    = diff > 0 ? '+' : '-';
     const diffClr = diff < 0 ? '#c62828' : '#2e7d32';
-    const reason  = (parsed && parsed.reason) ? parsed.reason : 'adjustments applied';
+    const pct     = (diff / rawL13 * 100).toFixed(1);
     const f35     = _parseF35Corrections(r.narrative || '');
-    let tip = 'Normalization: ' + reason + '. '
-      + 'Raw L13W: ' + fmtN(rawL13) + '/wk. '
-      + 'Normalized: ' + normFmt + '/wk. '
-      + 'Diff: ' + sign + fmtN(Math.abs(diff)) + '/wk ('
-      + (diff / rawL13 * 100).toFixed(1) + '%).';
+    // Lead with the precise before/after and percentage, then list each strip.
+    let tip = 'Raw Ord/Wk L13W: ' + fmtN(rawL13) + '/wk'
+      + ' -- Normalized to: ' + normFmt + '/wk'
+      + ' (' + sign + fmtN(Math.abs(diff)) + '/wk, ' + pct + '%).';
     if (f35.length) {
-      tip += ' F35 stockout strips: '
+      tip += ' Stripped by F35 stockout-backlog correction:'
         + f35.map(c =>
-            c.length + 'w gap at hist[' + c.start + '], stripped '
-            + fmtN(Math.round(c.removed)) + 'u'
-          ).join('; ') + '.';
+            ' ' + c.length + '-wk gap at hist[' + c.start + ']:'
+            + ' ' + fmtN(Math.round(c.removed)) + 'u removed'
+            + ' (baseline ' + fmtN(Math.round(c.baseline)) + '/wk)'
+          ).join(';') + '.';
+    } else {
+      const reason = (parsed && parsed.reason) ? parsed.reason : 'demand adjustments applied';
+      tip += ' Reason: ' + reason + '.';
     }
     const tipEsc = tip.replace(/"/g, '&quot;');
     diffHtml = ' <span style="color:' + diffClr + ';font-size:11px;cursor:help"'
