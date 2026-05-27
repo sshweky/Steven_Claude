@@ -628,8 +628,8 @@ function _savePosHistCache(map) {
 
 // Clear every local cache and reload fresh from QB
 function clearAllCaches() {
-  const _ckAll = [INV_FLOW_CACHE_KEY, ATS_HIST_CACHE_KEY, FID_SESS_KEY,
-                  _prjCacheKey(), PRJ_CACHE_KEY_ALL];
+  const _ckAll = [INV_FLOW_CACHE_KEY, ATS_HIST_CACHE_KEY, POS_HIST_CACHE_KEY,
+                  FID_SESS_KEY, _prjCacheKey(), PRJ_CACHE_KEY_ALL];
   _ckAll.forEach(k => {
     try { localStorage.removeItem(k); }   catch (e) { /* ignore */ }
     try { sessionStorage.removeItem(k); } catch (e) { /* ignore */ }
