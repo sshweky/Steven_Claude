@@ -5088,6 +5088,7 @@ async function _loadAmzDcInv(r, safeId) {
     aurBulletHtml = '<b>Amazon AUR:</b> <span style="color:#999;font-style:italic">no pricing data</span>';
   } else {
     const aurItems = [];
+    if (aurLw   > 0) aurItems.push(`<b>LW</b> ${fmtAur(aurLw)}`);
     if (aurL4w  > 0) aurItems.push(`<b>L4W avg</b> ${fmtAur(aurL4w)}`);
     if (aurL13w > 0) {
       // If L13W catalog value was 0/null and we computed it from L4W+L26W,
