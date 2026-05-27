@@ -3748,7 +3748,7 @@ async function toggleDetail(key) {
   const _diffAvg = Math.round(diffTotal / _wkCount);
   const _diffAvgClr  = _diffAvg > 0 ? 'color:#2e7d32' : _diffAvg < 0 ? 'color:#c62828' : 'color:#555';
   const _diffAvgSign = _diffAvg > 0 ? '+' : '';
-  diffCells += `<td style="font-weight:700;${_diffAvgClr}">${_diffAvgSign}${fmtN(_diffAvg)}</td>`;
+  diffCells += `<td id="diff-avg-${safeIdForTotal}" data-ai-avg="${Math.round(r.ai_total / _wkCount)}" style="font-weight:700;${_diffAvgClr}">${_diffAvgSign}${fmtN(_diffAvg)}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(Math.round(opnTot / _wkCount))}</td>`;
 
   // LY actuals  -  Ordered LY (green) + Shipped LY (blue), W1..W26 alignment.
