@@ -1221,12 +1221,23 @@ function _parseNormL13w(narrative) {
   // after 2026-05-27).  Attribute order is fixed by the forecaster so a single
   // pass captures norm, raw, and reason reliably.
   const spanM = narrative.match(
-    /class="norm-l13w-data"\s+data-norm="(\d+)"\s+data-raw="(\d+)"\s+data-reason="([^"]*)"/i
+    /class="norm-l13w-data"\s+data-norm="(\d+)"\s+data-raw="(\d+)"\s+data-reason="([^"]*)"\s+data-strips="([^"]*)"/i
   );
   if (spanM) return {
     norm:   parseInt(spanM[1], 10),
     raw:    parseInt(spanM[2], 10),
     reason: spanM[3] || null,
+    strips: spanM[4] ? spanM[4].split('|').filter(Boolean) : [],
+  };
+  // Fallback for spans without data-strips (older narratives before 2026-05-27).
+  const spanOld = narrative.match(
+    /class="norm-l13w-data"\s+data-norm="(\d+)"\s+data-raw="(\d+)"\s+data-reason="([^"]*)"/i
+  );
+  if (spanOld) return {
+    norm:   parseInt(spanOld[1], 10),
+    raw:    parseInt(spanOld[2], 10),
+    reason: spanOld[3] || null,
+    strips: [],
   };
   // Fallback: text format for older narratives.
   // Use [^0-9]+ to skip the </b> tag the forecaster places between the label
@@ -1259,23 +1270,20 @@ function _buildNormL13wHtml(r) {
     const sign    = diff > 0 ? '+' : '-';
     const diffClr = diff < 0 ? '#c62828' : '#2e7d32';
     const pct     = (diff / rawL13 * 100).toFixed(1);
-    const f35     = _parseF35Corrections(r.narrative || '');
-    // Lead with the precise before/after and percentage, then list each strip.
-    let tip = 'Raw Ord/Wk L13W: ' + fmtN(rawL13) + '/wk'
-      + ' -- Normalized to: ' + normFmt + '/wk'
-      + ' (' + sign + fmtN(Math.abs(diff)) + '/wk, ' + pct + '%).';
-    if (f35.length) {
-      tip += ' Stripped by F35 stockout-backlog correction:'
-        + f35.map(c =>
-            ' ' + c.length + '-wk gap at hist[' + c.start + ']:'
-            + ' ' + fmtN(Math.round(c.removed)) + 'u removed'
-            + ' (baseline ' + fmtN(Math.round(c.baseline)) + '/wk)'
-          ).join(';') + '.';
+    const strips  = (parsed && parsed.strips && parsed.strips.length) ? parsed.strips : [];
+    let tip;
+    if (strips.length) {
+      // Pre-formatted business-language sentences from the forecaster.
+      tip = strips.join('\n');
     } else {
+      // Fallback for older narratives that predate data-strips (before 2026-05-27).
       const reason = (parsed && parsed.reason) ? parsed.reason : 'demand adjustments applied';
-      tip += ' Reason: ' + reason + '.';
+      tip = 'Raw Ord/Wk L13W: ' + fmtN(rawL13) + '/wk'
+        + ' -- Normalized to: ' + normFmt + '/wk'
+        + ' (' + sign + fmtN(Math.abs(diff)) + '/wk, ' + pct + '%)'
+        + '. Reason: ' + reason + '.';
     }
-    const tipEsc = tip.replace(/"/g, '&quot;');
+    const tipEsc = tip.replace(/"/g, '&quot;').replace(/\n/g, '&#10;');
     diffHtml = ' <span style="color:' + diffClr + ';font-size:11px;cursor:help"'
       + ' title="' + tipEsc + '">(' + sign + fmtN(Math.abs(diff)) + ' vs raw)</span>';
   } else {

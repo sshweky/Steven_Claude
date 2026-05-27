@@ -13900,6 +13900,38 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         season       = season,
     )
 
+    # Build business-language strip log so the codepage tooltip can show
+    # sentences like "Stripped out 5,512 pcs due to Phantom Demand created
+    # by OOS" instead of raw rule names.  Pipe-delimited; no quotes inside
+    # sentences so the string is safe as an HTML data-* attribute value.
+    _norm_strips_parts = []
+    for _c in _f35_corrections:
+        if _c.get("removed", 0) > 0:
+            _norm_strips_parts.append(
+                f"Stripped out {int(round(_c['removed'])):,} pcs due to Phantom Demand created by OOS"
+            )
+    for _c in _f47_corrections:
+        if _c.get("removed_total", 0) > 0:
+            _norm_strips_parts.append(
+                f"Removed {int(round(_c['removed_total'])):,} pcs due to OOS Rebuild Ramp order inflation"
+            )
+    for _c in _f41_corrections:
+        if _c.get("zeroed_value", 0) > 0:
+            _norm_strips_parts.append(
+                f"Removed {int(round(_c['zeroed_value'])):,} pcs due to phantom or unshipped order"
+            )
+    for _c in _f39_corrections:
+        _dup_qty = _c.get("value", 0) * max(0, _c.get("length", 1) - 1)
+        if _dup_qty > 0:
+            _norm_strips_parts.append(
+                f"Removed {int(round(_dup_qty)):,} pcs due to duplicate order run"
+            )
+    if iso.get("is_iso") and iso.get("iso_qty", 0) > 0:
+        _norm_strips_parts.append(
+            f"Removed {int(round(iso['iso_qty'])):,} pcs due to ISO order (Initial Stocking Order)"
+        )
+    _norm_strips_str = "|".join(_norm_strips_parts)
+
     return {
         "key":         row["Acct_MStyle_Key_"],
         "mstyle":      row.get("Mstyle", ""),
@@ -13922,6 +13954,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # can surface a "Normalized Ord/Wk L13w" bullet when it differs
         # materially from the raw L13W order rate (2026-05-25).
         "norm_l13w":   round(sum(float(v) for v in hist[-13:]) / 13, 1),
+        # Business-language strip sentences for codepage tooltip (2026-05-27).
+        # Pipe-delimited; viewer parses via split('|').
+        "norm_strips": _norm_strips_str,
         # F56 — surface VP-Q4 PO-zeroed context so narrative can show
         # "Total forward demand = AI + confirmed POs" alongside visible AI.
         "po_zeroed_weeks":   (meta.get("po_zeroed_weeks", []) if isinstance(meta, dict) else []),
@@ -15858,11 +15893,13 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
             if abs(_raw_l13w_val - _norm_l13w_val) > max(50.0, 0.05 * _raw_l13w_val)
             else 'no adjustment -- history is clean'
         )
+        _strips_attr = (rec.get("norm_strips") or "").replace('"', "''")
         _norm_span = (
             f'<span class="norm-l13w-data"'
             f' data-norm="{int(round(_norm_l13w_val))}"'
             f' data-raw="{int(round(_raw_l13w_val))}"'
-            f' data-reason="{_norm_reason}" hidden></span>'
+            f' data-reason="{_norm_reason}"'
+            f' data-strips="{_strips_attr}" hidden></span>'
         )
     # Visible bullet (threshold-gated so clean items stay uncluttered)
     if (_norm_l13w_val is not None
