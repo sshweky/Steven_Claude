@@ -941,7 +941,7 @@ def _build_systemic_html(systemic_impacts, all_recs):
 
     # Build a quick lookup: rec_num -> (change_type label from all_recs)
     rec_labels = {}
-    for num, intent, fit, rec, impact, count in all_recs:
+    for num, intent, fit, rec, impact, count, *_rest in all_recs:
         label = rec["change_type"].replace("_", " ").title()
         rec_labels[num] = (label, intent, impact)
 
