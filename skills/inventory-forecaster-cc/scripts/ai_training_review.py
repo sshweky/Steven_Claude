@@ -181,7 +181,8 @@ def _discover_l4w_fid():
     fields = _qb_get("fields", {"tableId": PROJ_TABLE})
     for f in fields:
         lbl = f.get("label", "").strip().lower()
-        if lbl in ("ord/wk l4w", "ord/wk l4w #", "l4w", "ord_l4w"):
+        # Match common label variants: "Ord/Wk L4w", "Ord/Wk L4w #", "L4w", etc.
+        if re.match(r'^(ord/wk\s+)?l4w\s*#?$', lbl):
             return f["id"]
     return None
 
