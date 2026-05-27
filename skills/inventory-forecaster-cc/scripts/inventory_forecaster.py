@@ -8620,6 +8620,7 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
         else:
             break
     fill_end = fill_start + 2   # always a 2-week fill window
+    _has_opn_w1 = fill_start > 0   # True when W1 is already covered by a confirmed open PO
 
     # Project DC OH to fill_start: deduct consumer demand for each wait week.
     # Do NOT add the incoming PO deliveries -- those are already committed
