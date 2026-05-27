@@ -148,6 +148,50 @@ When the user says **"analyze manual vs AI"**, **"compare manual projections to 
 
 ---
 
+## Trigger: "AI Training Review"
+
+When the user says **"ai training review"**, **"review ai training comments"**, **"process training comments"**, **"what are planners flagging as AI training"**, **"analyze AI training feedback"**, or any request to review Projection Comments with FLAG='AI Training' and extract model improvement signals:
+
+1. Run the review pipeline:
+   ```bash
+   cd <skill_directory>
+   python scripts/ai_training_review.py [--days N] [--dry-run] [--reset]
+   ```
+   - `--days N` -- look back N days (default: 30)
+   - `--dry-run` -- analyze but skip email and state update
+   - `--reset` -- reprocess all comments (clears processed-IDs cache)
+
+2. **What the script does:**
+   - **Step 1 -- Field discovery** -- discovers Note FID, MAN PRJ FIDs, and L4W FID dynamically at runtime (no hard-coded column names)
+   - **Step 2 -- Fetch AI Training comments** -- reads `bpt35zccg` WHERE `Flag = 'AI Training'` since cutoff date, excluding already-processed Record IDs
+   - **Step 3 -- Fetch projections** -- batch REST fetch from `bpd237tvm` (AI PRJ W1-W26, MAN PRJ W1-W26, AI Model, L13W, order history) for all comment keys
+   - **Step 4 -- Deep analyze each comment** -- classifies planner intent (eol / zero / increase / decrease / launch / wrong_model), assesses model fit, and generates a specific rule-change proposal per comment
+   - **Step 5 -- Aggregate** -- groups by (intent, fit), sums unit gap, deduplicates recommendations
+   - **Step 6 -- Report + email** -- saves `analysis/ai_training_YYYY-MM-DD.md`, sends HTML email to `s.shweky@petspeople.com` via Outlook COM (smtplib fallback)
+   - **Step 7 -- State update** -- writes processed Record IDs to `analysis/ai_training_processed.json` so comments are not re-sent
+
+3. **Output files:**
+
+   | File | Contents |
+   |---|---|
+   | `analysis/ai_training_YYYY-MM-DD.md` | Full report: exec summary, pattern groups, numbered recommendations, comment detail |
+   | `analysis/ai_training_processed.json` | State file: Record IDs already emailed (prevents duplicate sends) |
+
+4. **Intent classification keywords:**
+   - `eol` -- eol, wind-down, discontinue, phase-out, end-of-life, last order, closing out
+   - `zero` -- zero, no orders, covered by PO, cancel all
+   - `decrease` -- decrease, cut, reduce, lost customer, anomaly, one-time, spike
+   - `increase` -- increase, boost, new customer, distribution gain, ramp up
+   - `launch` -- launch, new item, new SKU, pre-launch, first order
+   - `wrong_model` -- wrong model, flat demand, makes no sense, look at history, should be seasonal
+
+5. **Approval workflow:** After reviewing the emailed report, open Claude Code and say:
+   "Implement AI training recommendation #N" (or list multiple). Claude Code reads the latest `analysis/ai_training_*.md` file and implements the approved changes in `inventory_forecaster.py`.
+
+6. **Cadence:** Designed for daily 5am run via Task Scheduler. Not scheduled until user approves.
+
+---
+
 ## Prerequisites (one-time)
 
 ```bash
