@@ -913,9 +913,7 @@ def main():
     parser.add_argument("--days",    type=int, default=30,
                         help="Look back N days (default: 30)")
     parser.add_argument("--dry-run", action="store_true",
-                        help="Analyze but skip email + state update")
-    parser.add_argument("--reset",   action="store_true",
-                        help="Clear processed-IDs cache before running")
+                        help="Analyze but skip email and QB write-back")
     args = parser.parse_args()
 
     run_date = datetime.now().strftime("%Y-%m-%d")
@@ -923,11 +921,6 @@ def main():
     print(f"  AI Training Review  |  {run_date}  |  last {args.days} days",
           flush=True)
     print(f"{'='*60}\n", flush=True)
-
-    # Load / reset state
-    processed_ids = set() if args.reset else load_processed_ids()
-    if args.reset:
-        print("  [RESET] Cleared processed-IDs cache.\n")
 
     # Discover dynamic fields
     print("[SETUP] Discovering field IDs...")
