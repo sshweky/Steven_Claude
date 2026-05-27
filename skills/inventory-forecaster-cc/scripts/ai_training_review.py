@@ -1310,26 +1310,38 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
         kw  = si["model_keyword"] or "model"
         sc  = si["scope_count"]
 
-        if cc == 0:
-            # ISOLATED: generate a targeted item-level fix
-            rec["systemic_status"] = "ISOLATED"
-            new_rec = _new_rec_for_isolated(rec, intent, fit, kw, sc, items)
-            rec["change_type"]    = new_rec["change_type"]
+        best_crit = si.get("best_criterion")
+
+        if best_crit:
+            # Iterative variation testing found a winning criterion -- VALIDATED
+            rec["systemic_status"] = "VALIDATED"
+            new_rec = _new_rec_using_best_criterion(rec, fit, kw, sc, si, items)
+            rec["change_type"]     = new_rec["change_type"]
             rec["proposed_change"] = new_rec["proposed_change"]
-            rec["rationale"]      = new_rec["rationale"]
-            rec["confidence"]     = new_rec["confidence"]
+            rec["rationale"]       = new_rec["rationale"]
+            rec["confidence"]      = new_rec["confidence"]
+
+        elif cc == 0:
+            # ISOLATED: no records matched any criterion -- item-level fix only
+            rec["systemic_status"] = "ISOLATED"
+            new_rec = _new_rec_no_criterion_found(rec, intent, fit, kw, sc, items)
+            rec["change_type"]     = new_rec["change_type"]
+            rec["proposed_change"] = new_rec["proposed_change"]
+            rec["rationale"]       = new_rec["rationale"]
+            rec["confidence"]      = new_rec["confidence"]
 
         elif abs(va) > abs(vb):
-            # REJECTED: generate a directional-guard version of the fix
+            # REJECTED: original criterion widens gap; exhaustive testing also
+            # found nothing better -- item-level fallback
             rec["systemic_status"] = "REJECTED"
-            new_rec = _new_rec_for_rejected(rec, fit, kw, sc, cc, vb, va, items)
-            rec["change_type"]    = new_rec["change_type"]
+            new_rec = _new_rec_no_criterion_found(rec, intent, fit, kw, sc, items)
+            rec["change_type"]     = new_rec["change_type"]
             rec["proposed_change"] = new_rec["proposed_change"]
-            rec["rationale"]      = new_rec["rationale"]
-            rec["confidence"]     = new_rec["confidence"]
+            rec["rationale"]       = new_rec["rationale"]
+            rec["confidence"]      = new_rec["confidence"]
 
         elif abs(va) < abs(vb):
-            # VALIDATED: original fix is good, prepend a confirmation note
+            # VALIDATED: original criterion narrows gap without needing variation
             gap_closed = abs(vb) - abs(va)
             rec["systemic_status"] = "VALIDATED"
             orig = rec["proposed_change"]
