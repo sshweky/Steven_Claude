@@ -436,7 +436,8 @@ def generate_recommendation(intent, fit, ai_model, diagnosis, note):
         )
 
     if intent == "wrong_model":
-        if "seasonal" in (note or "").lower():
+        note_lo = (note or "").lower()
+        if "seasonal" in note_lo:
             return dict(
                 change_type="model_switch",
                 proposed_change=(
@@ -448,6 +449,22 @@ def generate_recommendation(intent, fit, ai_model, diagnosis, note):
                 confidence="medium",
                 rationale="Seasonal model gate may be excluding the item due to "
                           "insufficient history or missing category keyword.",
+            )
+        if "flat" in note_lo or "look at" in note_lo or "order history" in note_lo:
+            return dict(
+                change_type="model_switch",
+                proposed_change=(
+                    f"Planner says {ai_model} is projecting flat demand when order "
+                    "history shows a different pattern. "
+                    "Check: (1) Is this a Heuristic fallback that should be Seasonal or "
+                    "Croston's? (2) Does the item have seasonal keywords in its description? "
+                    "(3) Is the L13W avg being used as a flat baseline when L26/L52 shows "
+                    "trend? Consider using max(L4W, L13W, trend_projection) as baseline "
+                    "for Heuristic path when growth is detected."
+                ),
+                confidence="medium",
+                rationale="Flat-demand Heuristic is appropriate for stable items but "
+                          "misses items with clear cyclical or trending order patterns.",
             )
         return dict(
             change_type="model_switch",
