@@ -962,32 +962,237 @@ def estimate_systemic_impact(all_recs, man_fids):
 # ---------------------------------------------------------------------------
 # Step 4c -- Validate recommendations against systemic impact
 # ---------------------------------------------------------------------------
-def validate_and_override_recs(all_recs, systemic_impacts):
+def validate_and_override_recs(all_recs, systemic_impacts, grouped):
     """
     Check each recommendation against its computed systemic impact BEFORE
-    finalizing it. Replaces recommendations that would WIDEN the MAN-AI gap
-    with guidance that focuses on directional guards or individual fixes.
+    finalizing it. Generates a NEW, directionally-correct recommendation for
+    every case -- REJECTED and ISOLATED cases get genuinely new proposals
+    (not just "fix rejected") that ARE expected to close the MAN-AI gap.
 
     Status values (stored in rec["systemic_status"]):
-      VALIDATED -- fix narrows the aggregate MAN-AI gap -> keep the recommendation
-      REJECTED  -- fix widens the gap -> replace with directional-guard guidance
-      ISOLATED  -- 0 flagged records in broader population -> address individually
+      VALIDATED -- original fix narrows gap, keep it (with a confirmation banner)
+      REJECTED  -- original fix widens gap; replaced with directional-guard rec
+      ISOLATED  -- 0 flagged records; replaced with item-specific model fix rec
       NEUTRAL   -- gap unchanged or no systemic data available
 
-    This function is the core of the "validate before recommend" pipeline.
-    It ensures every recommendation we show actually moves AI closer to MAN.
+    grouped : output of aggregate() -- needed to access the specific items
+              affected by each recommendation so we can write targeted guidance.
     """
     si_lookup = {
         si["rec_num"]: si
         for si in (systemic_impacts or [])
         if not si.get("is_combined")
     }
+    # Items lookup: (intent, fit) -> list of analysis dicts for that group
+    items_by_key = {(intent, fit): grp["items"] for (intent, fit), grp in grouped}
 
+    # -----------------------------------------------------------------------
+    def _item_list_str(items, max_show=3):
+        """Build a short item description string for embedding in recommendations."""
+        parts = []
+        for a in items[:max_show]:
+            cust_short = re.sub(r'\b(INC\.?|LLC|CORP\.?|LTD\.?|CO\.?)\s*$',
+                                '', a.get("customer", ""), flags=re.I).strip().rstrip(",.")
+            parts.append(
+                f"{a['key']} ({cust_short[:20]}, "
+                f"AI {a['ai_total']:,}u vs MAN {a['man_total']:,}u, gap {a['unit_gap']:+,}u)"
+            )
+        if len(items) > max_show:
+            parts.append(f"+{len(items) - max_show} more")
+        return "; ".join(parts)
+
+    # -----------------------------------------------------------------------
+    def _new_rec_for_rejected(rec, fit, kw, sc, cc, vb, va, items):
+        """Generate a new, directionally-correct recommendation for a REJECTED fix."""
+        change_type = rec["change_type"]
+        delta_bad   = va - vb
+        item_str    = _item_list_str(items)
+        safe_zone   = sc - cc   # records that already have AI < MAN -- must not be harmed
+
+        if change_type == "threshold" and fit == "over_projecting":
+            # Croston / over-projection cap that fired on wrong population.
+            # New rec: add a MAN-PRJ comparison guard so cap only fires when AI > MAN.
+            return dict(
+                change_type="threshold",
+                proposed_change=(
+                    f"Add a MAN-PRJ-aware directional cap to {kw}: run the existing spike "
+                    f"detection (week >= L13W * 3x), but only apply the cap when the model's "
+                    f"26w output is ALSO above MAN PRJ * 1.10. This two-gate approach ensures "
+                    f"the cap only fires on true over-projectors (AI >> MAN), leaving the "
+                    f"{safe_zone:,} records where AI is already below MAN completely untouched. "
+                    f"Implementation: in the Croston post-processing block, add: "
+                    f"if spike_detected and croston_26w > man_prj_26w * 1.10: apply_cap(). "
+                    f"Items driving this recommendation: {item_str}."
+                ),
+                confidence="medium",
+                rationale=(
+                    f"The original cap (spike detection alone) affected {cc:,} records and "
+                    f"widened MAN-AI from {vb:+,}u to {va:+,}u ({delta_bad:+,}u worse) because "
+                    f"most flagged records already have AI < MAN. Adding the MAN * 1.10 gate "
+                    f"restricts the cap to only the outliers where AI genuinely over-projects "
+                    f"vs the planner's target, which is the actual problem these comments describe."
+                ),
+            )
+
+        if change_type == "threshold" and fit == "under_projecting":
+            # Under-projecting cap / boost that fired on wrong population.
+            # New rec: only boost when AI is below MAN by a meaningful margin.
+            return dict(
+                change_type="threshold",
+                proposed_change=(
+                    f"Add a MAN-PRJ-aware floor to {kw}: run the existing growth detection "
+                    f"(L4W/L13W > 1.15x), but only apply the boost when AI 26w is ALSO below "
+                    f"MAN PRJ * 0.90 (meaning AI is meaningfully under the planner's target). "
+                    f"This prevents inflating records where AI is already at or above MAN. "
+                    f"Items driving this recommendation: {item_str}."
+                ),
+                confidence="medium",
+                rationale=(
+                    f"The original boost affected {cc:,} records and widened MAN-AI from "
+                    f"{vb:+,}u to {va:+,}u ({delta_bad:+,}u worse). Adding the MAN * 0.90 "
+                    f"gate restricts the boost to only items where the model is meaningfully "
+                    f"below the planner's target."
+                ),
+            )
+
+        if change_type == "model_switch":
+            # Model switch that fired on wrong population.
+            # New rec: switch only items where the trend diverges from the current model's output.
+            return dict(
+                change_type="model_switch",
+                proposed_change=(
+                    f"Targeted model switch for {kw}: instead of switching all trend-divergent "
+                    f"records, add a combined gate -- switch the model only when "
+                    f"(1) L4W/L13W trend is outside 0.80-1.20 AND "
+                    f"(2) current AI is on the wrong side of MAN PRJ by >15%. "
+                    f"This avoids switching records where the trend diverges but AI is already "
+                    f"close to MAN. Items to review first: {item_str}."
+                ),
+                confidence="medium",
+                rationale=(
+                    f"The original model-switch criterion matched {cc:,} records but widened "
+                    f"MAN-AI from {vb:+,}u to {va:+,}u. A combined trend + MAN-proximity gate "
+                    f"targets only the records where both the model AND its output direction "
+                    f"disagree with the planner."
+                ),
+            )
+
+        # Fallback for other change types
+        return dict(
+            change_type=change_type,
+            proposed_change=(
+                f"Original {change_type} fix would widen MAN-AI gap. "
+                f"New approach: add a MAN PRJ comparison gate so the fix only fires when "
+                f"AI is already on the wrong side of MAN by >10%. "
+                f"Items to address directly: {item_str}."
+            ),
+            confidence="low",
+            rationale=(
+                f"Systemic check showed the original fix widened MAN-AI from {vb:+,}u "
+                f"to {va:+,}u across {cc:,} flagged {kw} records."
+            ),
+        )
+
+    # -----------------------------------------------------------------------
+    def _new_rec_for_isolated(rec, intent, fit, kw, sc, items):
+        """Generate an item-specific fix recommendation when no systemic pattern exists."""
+        change_type = rec["change_type"]
+        item_str    = _item_list_str(items)
+
+        if fit == "wrong_model" or change_type == "model_switch":
+            # Item is using the wrong model but no systemic pattern -- item-level override
+            first = items[0] if items else {}
+            man_target = first.get("man_total", 0)
+            mstyle     = first.get("mstyle", "")
+            cat_hint   = mstyle.split("-")[0] if "-" in mstyle else mstyle[:4]
+            return dict(
+                change_type="model_switch",
+                proposed_change=(
+                    f"Item-level model fix for {count} item(s) -- no systemic pattern in "
+                    f"{sc:,} {kw} records checked, so this is a targeted override: "
+                    f"(1) Check if the item's category keyword (search '{cat_hint}' in "
+                    f"derived_category_profiles.json) is registered -- if missing, add it "
+                    f"to route this item to Seasonal or Croston's instead of flat Heuristic. "
+                    f"(2) If the item is intermittent/sparse (many zero-order weeks), switch "
+                    f"to Croston's model via the item's category profile. "
+                    f"(3) Immediate fix while model logic is updated: add a Tell-AI comment "
+                    f"on each affected record targeting MAN PRJ level. "
+                    f"Affected: {item_str}."
+                ),
+                confidence="medium",
+                rationale=(
+                    f"Systemic scan of {sc:,} active {kw} projections found 0 records "
+                    f"matching the detection criteria -- this is an item-specific model "
+                    f"selection issue. Fixing the category registration for these specific "
+                    f"mstyles closes the gap without touching the broader {kw} population."
+                ),
+            )
+
+        if fit == "over_projecting":
+            return dict(
+                change_type="threshold",
+                proposed_change=(
+                    f"Item-level correction for {count} over-projecting item(s) -- no "
+                    f"matching pattern found in {sc:,} {kw} records, so a targeted fix "
+                    f"is appropriate: "
+                    f"(1) Add a Tell-AI comment on each affected record with a target "
+                    f"projection at or near MAN PRJ level to override the AI for the next "
+                    f"forecast run. "
+                    f"(2) Check if this item's order history has a one-time spike that "
+                    f"inflated the model -- if so, flag the spike week in the history table "
+                    f"as non-recurring. "
+                    f"Affected: {item_str}."
+                ),
+                confidence="medium",
+                rationale=(
+                    f"No other {kw} records show this over-projection pattern ({sc:,} checked). "
+                    f"The root cause is item-specific (e.g., a one-time order in history). "
+                    f"A Tell-AI comment is the fastest path to alignment."
+                ),
+            )
+
+        if fit == "under_projecting":
+            return dict(
+                change_type="threshold",
+                proposed_change=(
+                    f"Item-level correction for {count} under-projecting item(s) -- no "
+                    f"matching growth pattern found in {sc:,} {kw} records: "
+                    f"(1) Add a Tell-AI comment on each affected record targeting MAN PRJ level. "
+                    f"(2) If the item has a known distribution gain, verify that the new "
+                    f"account/channel is included in the order history window (check if recent "
+                    f"orders from the new channel have posted to this key). "
+                    f"Affected: {item_str}."
+                ),
+                confidence="medium",
+                rationale=(
+                    f"No other {kw} records show this growth pattern ({sc:,} checked). "
+                    f"The distribution gain or ramp is item-specific and not visible to "
+                    f"the model yet -- a Tell-AI override bridges the gap."
+                ),
+            )
+
+        # Generic isolated fallback
+        return dict(
+            change_type=change_type,
+            proposed_change=(
+                f"Item-specific fix required for {count} item(s) -- no systemic pattern "
+                f"found in {sc:,} {kw} records. Add a Tell-AI comment on each affected "
+                f"record with the target projection: {item_str}."
+            ),
+            confidence="low",
+            rationale=(
+                f"Systemic scan found 0 matching records out of {sc:,} active {kw} "
+                f"projections. This is a one-off item requiring individual attention."
+            ),
+        )
+
+    # -----------------------------------------------------------------------
     updated = []
     for tup in all_recs:
         num, intent, fit, rec, impact, count, *_rest = tup
         ai_model = _rest[0] if _rest else ""
-        rec = dict(rec)   # copy -- do not mutate the original
+        rec      = dict(rec)   # copy -- do not mutate the original
+        items    = items_by_key.get((intent, fit), [])
 
         si = si_lookup.get(num)
         if si is None:
@@ -1000,81 +1205,37 @@ def validate_and_override_recs(all_recs, systemic_impacts):
         va  = si["variance_after"]
         kw  = si["model_keyword"] or "model"
         sc  = si["scope_count"]
-        fat = si["flagged_ai_total"]
 
         if cc == 0:
-            # ----------------------------------------------------------------
-            # ISOLATED: no records in the population match the detection
-            # criteria. The comment is a one-off. Don't touch the model.
-            # ----------------------------------------------------------------
+            # ISOLATED: generate a targeted item-level fix
             rec["systemic_status"] = "ISOLATED"
-            rec["proposed_change"] = (
-                f"ISOLATED: No records in the active {kw} population ({sc:,} records "
-                f"checked) match the detection criteria for this fix. This appears to be "
-                f"a one-off item. Address it directly via a Tell-AI comment on the specific "
-                f"record rather than changing the model algorithm. A model change for a "
-                f"single outlier adds complexity without systemic benefit."
-            )
-            rec["rationale"] = (
-                f"Systemic scan of {sc:,} active {kw} projections found 0 records matching "
-                f"the proposed detection rule. Implementing a model change that only benefits "
-                f"one item risks introducing side-effects for the other {sc:,} records."
-            )
-            rec["confidence"] = "low"
+            new_rec = _new_rec_for_isolated(rec, intent, fit, kw, sc, items)
+            rec["change_type"]    = new_rec["change_type"]
+            rec["proposed_change"] = new_rec["proposed_change"]
+            rec["rationale"]      = new_rec["rationale"]
+            rec["confidence"]     = new_rec["confidence"]
 
         elif abs(va) > abs(vb):
-            # ----------------------------------------------------------------
-            # REJECTED: the proposed fix moves AI in the wrong direction for
-            # the flagged population in aggregate. This happens when most
-            # flagged records already have AI under MAN, so a cap/reduction
-            # makes the gap wider instead of narrower.
-            # ----------------------------------------------------------------
-            delta_bad  = va - vb   # how much worse (positive = gap grew)
-            dir_word   = "under-projecting" if vb > 0 else "over-projecting"
-            not_dir    = "over-projecting" if vb > 0 else "under-projecting"
-            unchanged  = sc - cc   # records not flagged (safe zone)
+            # REJECTED: generate a directional-guard version of the fix
             rec["systemic_status"] = "REJECTED"
-            rec["proposed_change"] = (
-                f"SYSTEMIC FIX REJECTED: Applying this change across all {cc:,} flagged "
-                f"{kw} records would WIDEN the MAN-AI gap from {vb:+,}u to {va:+,}u "
-                f"({delta_bad:+,}u in the wrong direction). "
-                f"The flagged {kw} population is already {dir_word} vs MAN in aggregate, "
-                f"so this fix makes things worse for most of them. "
-                f"\n\nRecommended fix: Add a DIRECTIONAL GUARD so the change only fires "
-                f"when AI is already {not_dir} relative to MAN (i.e., the fix moves AI "
-                f"closer to MAN, not further away). Example: for a cap/reduction, only "
-                f"apply when current AI > MAN * 1.10. This protects the {unchanged:,} "
-                f"records where AI is already below MAN from being pushed further away. "
-                f"\n\nImmediate action: Address the specific item(s) in this comment "
-                f"via Tell-AI comment on the record."
-            )
-            rec["rationale"] = (
-                f"Systemic check: MAN-AI before fix = {vb:+,}u, after fix = {va:+,}u "
-                f"across {cc:,} flagged {kw} records. Gap widened by {delta_bad:+,}u. "
-                f"Root cause: most flagged records are already {dir_word}, so this fix "
-                f"moves them further from MAN rather than closer to it."
-            )
-            rec["confidence"] = "low"
+            new_rec = _new_rec_for_rejected(rec, fit, kw, sc, cc, vb, va, items)
+            rec["change_type"]    = new_rec["change_type"]
+            rec["proposed_change"] = new_rec["proposed_change"]
+            rec["rationale"]      = new_rec["rationale"]
+            rec["confidence"]     = new_rec["confidence"]
 
         elif abs(va) < abs(vb):
-            # ----------------------------------------------------------------
-            # VALIDATED: the fix narrows the gap. Keep the original proposal
-            # and prepend a validation banner so the user sees confirmation.
-            # ----------------------------------------------------------------
+            # VALIDATED: original fix is good, prepend a confirmation note
             gap_closed = abs(vb) - abs(va)
             rec["systemic_status"] = "VALIDATED"
-            orig_change = rec["proposed_change"]
+            orig = rec["proposed_change"]
             rec["proposed_change"] = (
-                f"VALIDATED: This fix narrows the MAN-AI gap from {vb:+,}u to "
-                f"{va:+,}u (closes {gap_closed:,}u of gap) across {cc:,} flagged "
-                f"{kw} records. "
-                f"Original proposal: {orig_change}"
+                f"[VALIDATED: narrows MAN-AI gap from {vb:+,}u to {va:+,}u, "
+                f"closing {gap_closed:,}u across {cc:,} {kw} records] "
+                f"{orig}"
             )
 
         else:
-            # ----------------------------------------------------------------
-            # NEUTRAL: before == after, no meaningful systemic effect.
-            # ----------------------------------------------------------------
             rec["systemic_status"] = "NEUTRAL"
 
         updated.append((num, intent, fit, rec, impact, count, ai_model))
