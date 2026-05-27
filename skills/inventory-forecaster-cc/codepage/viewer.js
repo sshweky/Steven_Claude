@@ -3712,6 +3712,17 @@ async function toggleDetail(key) {
       }
     }
     aiCells   += `<td style="${_aiBg}${aiCls};font-weight:600"${_aiTitle}>${fmtN(aiVal)}</td>`;
+    // MAN - AI row: positive (planner above AI) green, negative (planner below AI) red.
+    // Locked weeks don't get a meaningful diff -- show a dash to avoid confusion.
+    const diffVal = locked ? null : (cellVal - aiVal);
+    if (diffVal === null) {
+      diffCells += `<td style="color:#bbb;font-size:11px">-</td>`;
+    } else {
+      diffTotal += diffVal;
+      const diffClr  = diffVal > 0 ? 'color:#2e7d32' : diffVal < 0 ? 'color:#c62828' : 'color:#888';
+      const diffSign = diffVal > 0 ? '+' : '';
+      diffCells += `<td style="${diffClr};font-size:11px">${diffSign}${fmtN(diffVal)}</td>`;
+    }
     const opnVal = (r.opn_w || [])[i] || 0;
     opnTot    += opnVal;
     opnCells  += `<td style="${opnVal === 0 ? 'color:#bbb' : 'color:#6d4c00;font-weight:600'};font-size:10px">${fmtN(opnVal)}</td>`;
