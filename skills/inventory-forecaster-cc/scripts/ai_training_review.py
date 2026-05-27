@@ -864,20 +864,44 @@ def build_email_html(analyses, all_recs, report_path, run_date, days):
 
 
 # ---------------------------------------------------------------------------
-# State management
+# QB write-back: mark comments as Reviewed
 # ---------------------------------------------------------------------------
-def load_processed_ids():
-    if STATE_FILE.exists():
+def mark_reviewed_in_qb(comment_rids, dry_run):
+    """Flip FLAG from 'AI Training' -> 'Reviewed' on each processed comment.
+
+    Uses QB REST upsert with mergeFieldId=3 (Record ID#).
+    Once FLAG='Reviewed', the next run's query {31.EX.'AI Training'}
+    will naturally exclude these records -- no local state file needed.
+    """
+    if dry_run:
+        print(f"  [DRY RUN] Would mark {len(comment_rids)} comments as Reviewed in QB.")
+        return
+
+    rids = [int(r) for r in comment_rids if r]
+    if not rids:
+        return
+
+    batch_size = 500
+    total_ok   = 0
+    for i in range(0, len(rids), batch_size):
+        batch = rids[i:i + batch_size]
         try:
-            return set(json.loads(STATE_FILE.read_text(encoding="utf-8")))
-        except Exception:
-            pass
-    return set()
+            result = _qb_post("records", {
+                "to":          COMMENTS_TABLE,
+                "mergeFieldId": C_RECORD_ID,
+                "data": [
+                    {str(C_RECORD_ID): {"value": rid},
+                     str(C_FLAG):      {"value": "Reviewed"}}
+                    for rid in batch
+                ],
+                "fieldsToReturn": [],
+            })
+            n = result.get("metadata", {}).get("totalNumberOfRecordsProcessed", len(batch))
+            total_ok += n
+        except Exception as e:
+            print(f"  [WARN] QB write-back failed for batch {i//batch_size + 1}: {e}")
 
-
-def save_processed_ids(ids):
-    STATE_FILE.write_text(
-        json.dumps(sorted(ids), indent=2), encoding="utf-8")
+    print(f"  Marked {total_ok}/{len(rids)} comments as Reviewed in QB.")
 
 
 # ---------------------------------------------------------------------------
