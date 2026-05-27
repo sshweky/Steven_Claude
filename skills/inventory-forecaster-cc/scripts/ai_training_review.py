@@ -621,6 +621,149 @@ def aggregate(analyses):
 
 
 # ---------------------------------------------------------------------------
+# Step 4b -- Estimate systemic impact across ALL active projections
+# ---------------------------------------------------------------------------
+def estimate_systemic_impact(all_recs):
+    """
+    For each unique (model_keyword, change_type, fit) in the recommendations,
+    query ALL active Projections with that model and compute:
+      - Total record count in scope
+      - Total AI PRJ 26-week units across those records
+      - Estimated affected count + direction based on fit + detection criteria
+
+    Returns list of dicts keyed by rec_num.
+    """
+    # Build a map: rec_num -> (model_keyword, fit, change_type, confidence)
+    impacts = {}
+    queried_models = {}   # cache: model_keyword -> (count, ai_total, criteria_count)
+
+    # Detection criteria per change_type + fit:
+    # We fetch L13W (1593) + L4W (1417) + order history to apply criteria.
+    # ord_fids[0] = most recent week (Ord_LW); we look for spike weeks.
+
+    def _fetch_model_scope(model_keyword, change_type, fit):
+        """Query all active projections where AI_MODEL contains model_keyword."""
+        cache_key = model_keyword.lower()
+        if cache_key in queried_models:
+            return queried_models[cache_key]
+
+        select_fids = [P_KEY, P_AI_MODEL, P_L13W, 1417] + AI_PRJ_FIDS + ORD_FIDS[:13]
+        # Filter: active status AND model contains keyword
+        # QB: {10.SW.'A'} AND {1580.CT.'<keyword>'}
+        kw_safe = model_keyword.replace("'", "''")
+        where   = f"{{10.SW.'A'}}AND{{1580.CT.'{kw_safe}'}}"
+
+        rows, skip = [], 0
+        try:
+            while True:
+                result = _qb_post("records/query", {
+                    "from":    PROJ_TABLE,
+                    "select":  select_fids,
+                    "where":   where,
+                    "options": {"top": 2000, "skip": skip},
+                })
+                batch = result.get("data", [])
+                rows.extend(batch)
+                if len(batch) < 2000:
+                    break
+                skip += 2000
+                time.sleep(0.15)
+        except Exception as e:
+            print(f"  [WARN] Systemic impact fetch for '{model_keyword}' failed: {e}")
+            queried_models[cache_key] = (0, 0, 0)
+            return (0, 0, 0)
+
+        total_count = len(rows)
+        ai_total    = sum(
+            sum(fval(r, fid) for fid in AI_PRJ_FIDS)
+            for r in rows
+        )
+
+        # Apply change-specific detection criteria to count "directly affected"
+        criteria_count = 0
+        for r in rows:
+            l13w   = fval(r, P_L13W)
+            l4w    = fval(r, 1417)   # L4W FID discovered earlier, hardcode 1417 here
+            ord_wk = [fval(r, fid) for fid in ORD_FIDS[:13]]
+            trend  = l4w / l13w if l13w > 0 else 1.0
+
+            if change_type == "threshold" and fit == "over_projecting":
+                # Croston's anomaly: any order week >= 3x L13W
+                if l13w > 0 and any(w >= l13w * 3 for w in ord_wk):
+                    criteria_count += 1
+                # Non-Croston over-projection: L4W/L13W < 0.80 (declining)
+                elif "croston" not in model_keyword.lower() and l4w > 0 and trend < 0.80:
+                    criteria_count += 1
+            elif change_type == "threshold" and fit == "under_projecting":
+                # Under-projection: L4W/L13W > 1.15 (growing) with no spike
+                if l4w > 0 and trend > 1.15:
+                    criteria_count += 1
+            elif change_type == "model_switch":
+                # Heuristic flat: L4W and L13W diverge meaningfully (trend != 1)
+                if l4w > 0 and (trend > 1.20 or trend < 0.80):
+                    criteria_count += 1
+            elif change_type == "missed_lifecycle":
+                # EOL missed: L4W/L13W < 0.65 and AI still projecting
+                ai_sum = sum(fval(r, fid) for fid in AI_PRJ_FIDS)
+                if l4w > 0 and trend < 0.65 and ai_sum > 0:
+                    criteria_count += 1
+            else:
+                criteria_count = total_count  # investigate -- all in scope
+
+        queried_models[cache_key] = (total_count, int(ai_total), criteria_count)
+        return queried_models[cache_key]
+
+    print("  Computing systemic impact across all active projections...", flush=True)
+    results = []
+    seen_keywords = set()
+
+    for num, intent, fit, rec, unit_impact, count in all_recs:
+        # Derive model keyword from the analyses that triggered this rec
+        model_keyword = ""
+        if "Croston" in rec["proposed_change"]:
+            model_keyword = "Croston"
+        elif "Heuristic" in rec["proposed_change"] or "heuristic" in rec["proposed_change"].lower():
+            model_keyword = "Heuristic"
+        elif "POS-WOS" in rec["proposed_change"] or "Amazon POS" in rec["proposed_change"]:
+            model_keyword = "POS-WOS"
+        elif "Seasonal" in rec["proposed_change"]:
+            model_keyword = "Seasonal"
+
+        if not model_keyword:
+            results.append({
+                "rec_num": num, "model_keyword": "all",
+                "scope_count": 0, "scope_ai_total": 0,
+                "criteria_count": 0, "direction": "unknown",
+            })
+            continue
+
+        if model_keyword in seen_keywords:
+            # Reuse cached result
+            sc, at, cc = queried_models.get(model_keyword.lower(), (0, 0, 0))
+        else:
+            seen_keywords.add(model_keyword)
+            sc, at, cc = _fetch_model_scope(model_keyword, rec["change_type"], fit)
+            print(f"    {model_keyword}: {sc:,} records, {at:,} AI units, "
+                  f"{cc:,} match detection criteria", flush=True)
+
+        direction = (
+            "down" if fit in ("over_projecting", "missed_lifecycle") else
+            "up"   if fit == "under_projecting" else
+            "mixed"
+        )
+        results.append({
+            "rec_num":       num,
+            "model_keyword": model_keyword,
+            "scope_count":   sc,
+            "scope_ai_total": at,
+            "criteria_count": cc,
+            "direction":     direction,
+        })
+
+    return results
+
+
+# ---------------------------------------------------------------------------
 # Step 5 -- Generate markdown report
 # ---------------------------------------------------------------------------
 def build_report(analyses, grouped, run_date, days):
