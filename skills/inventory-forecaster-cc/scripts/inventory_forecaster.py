@@ -13948,12 +13948,14 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "prior_total": int(prior),
         "pct_diff":    round(pct * 100, 1),
         "confidence":  _confidence,
-        # Normalized L13W avg (post-F35/F41/F43/F47/ATS normalization).
-        # This is the per-week order rate with duplicates, catch-up stock-up
-        # orders, and OOS distortion removed.  Stored so build_ai_analysis()
-        # can surface a "Normalized Ord/Wk L13w" bullet when it differs
-        # materially from the raw L13W order rate (2026-05-25).
+        # Normalized Ord/Wk L4w / L13w / L26w (post-F35/F41/F43/F47/ATS normalization).
+        # Per-week order rate with duplicates, catch-up stock-up orders, and OOS
+        # distortion removed.  All three are written to QB Projections each run so
+        # planners can compare normalized demand across time horizons.  L13w is also
+        # surfaced in build_ai_analysis() when it differs materially from the raw rate.
+        "norm_l4w":    round(sum(float(v) for v in hist[-4:])  / 4,  1),
         "norm_l13w":   round(sum(float(v) for v in hist[-13:]) / 13, 1),
+        "norm_l26w":   round(sum(float(v) for v in hist[-26:]) / 26, 1),
         # Business-language strip sentences for codepage tooltip (2026-05-27).
         # Pipe-delimited; viewer parses via split('|').
         "norm_strips": _norm_strips_str,
@@ -17304,6 +17306,18 @@ def main():
         ai_analysis_fid   = fmap.get("AI Analysis")  # fid 1590 — rich-text narrative
         ai_confidence_fid = fmap.get("AI_Confidence") or fmap.get("AI Confidence") or 1612
         di_ord_hist_fid   = fmap.get("DI Ord History") or 1613  # L26W DI weekly qtys for codepage highlight
+        # Normalized Ord/Wk fields — discovered at runtime; graceful skip if not yet created.
+        # Create these as Numeric (1 decimal) fields in Projections before first run.
+        norm_ord_l4w_fid  = fmap.get("Normalized Ord/Wk L4w")
+        norm_ord_l13w_fid = fmap.get("Normalized Ord/Wk L13w")
+        norm_ord_l26w_fid = fmap.get("Normalized Ord/Wk L26w")
+        _norm_missing = [n for n, f in [("Normalized Ord/Wk L4w",  norm_ord_l4w_fid),
+                                        ("Normalized Ord/Wk L13w", norm_ord_l13w_fid),
+                                        ("Normalized Ord/Wk L26w", norm_ord_l26w_fid)] if not f]
+        if _norm_missing:
+            print(f"      [WARN] Normalized Ord/Wk fields not found in QB Projections -- "
+                  f"skipping writeback for: {', '.join(_norm_missing)}. "
+                  f"Create them as Numeric (1 decimal) in the Projections table first.")
         wk_fids           = [fmap.get(f"AI PRJ W{i}") or fmap.get(f"AI_PRJ_W{i}")
                            for i in range(1, 27)]
         if not all(wk_fids) or not ai_alert_fid:
@@ -17409,6 +17423,13 @@ def main():
                     row[pog_end_fid] = _default_pog_end
                 except ValueError:
                     pass  # malformed date — skip silently
+            # Normalized Ord/Wk L4w / L13w / L26w (post-normalization avg weekly order rate)
+            if norm_ord_l4w_fid  and rec.get("norm_l4w")  is not None:
+                row[norm_ord_l4w_fid]  = rec["norm_l4w"]
+            if norm_ord_l13w_fid and rec.get("norm_l13w") is not None:
+                row[norm_ord_l13w_fid] = rec["norm_l13w"]
+            if norm_ord_l26w_fid and rec.get("norm_l26w") is not None:
+                row[norm_ord_l26w_fid] = rec["norm_l26w"]
             payload.append(row)
         n_ok, n_fail, errors = qb_bulk_update(QB_PROJ_TABLE, payload, merge_fid)
         # Audit Finding #7 (2026-05-25): tighten the resumability rule -- a key

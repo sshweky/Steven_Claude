@@ -1,0 +1,962 @@
+125-# Liveness signal:
+126-#   • Amazon path: Avg_Units_Wk_L52w > 0  (consumers still buying at retail)
+127:#   • Non-Amazon path: last non-zero order in hist within 26 weeks
+128-# Velocity cap on the floor:
+129-#   • Amazon: POS L52 × 26 (consumer demand ceiling)
+--
+2274-
+2275-
+2276:def _burst_postprocess(forecast, history, mp, l13_zero_count):
+2277-    """F_BURST (2026-05-24): Re-cluster a smooth Seasonal Baseline forecast
+2278-    into burst POs that match the customer's historical ordering cadence.
+--
+2364-
+2365-
+2366:def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=None,
+2367-                      product_category=None, product_subcategory=None,
+2368-                      brand=None, brand_pt=None, shpd_l13=0.0, season=None,
+--
+2605-    #
+2606-    # Empirical callout (planner-flagged 2026-05-08):
+2607:    #   1864-FF7120EC (Amazon): L13 hist had 12/13 active wks averaging
+2608-    #   1492/wk steadily for months. Last 4 wks = [168, 0, 18, 84] (3 zeros
+2609-    #   or near-zeros) -- classic stockout signature. F6b applied 0.65x to a
+--
+4154-
+4155-
+4156:def get_history(row, oos_entry=None):
+4157-    """Return 52-week order history (oldest→newest) as the demand signal.
+4158-    Orders capture true demand even when stockouts cause partial shipments.
+--
+4180-
+4181-
+4182:def make_weighted_series(history):
+4183-    """
+4184-    Build 78-observation weighted series: full 52w + L13W repeated twice.
+--
+4190-
+4191-
+4192:def detect_ramp(history):
+4193-    """
+4194-    Identify new-item ramp period.
+--
+4202-
+4203-
+4204:def detect_biweekly(history):
+4205-    """VP-Q3 (2026-05-03): Generalized to "low-cadence" detection.
+4206-    Bi-weekly (every-other-week) is now treated as effectively weekly — the
+--
+4258-
+4259-
+4260:def apply_ordering_pattern(forecast, history, mp):
+4261-    """
+4262-    Post-process forecast to enforce LOW-CADENCE cadence (monthly+) if detected.
+--
+4298-
+4299-
+4300:def normalize_stockout_recovery(hist):
+4301-    """
+4302-    F35 — Stockout backlog normalization (2026-05-05).
+--
+4331-        Each correction = {start, length, baseline, removed}.
+4332-    """
+4333:    n = len(hist)
+4334:    out = [float(v or 0) for v in hist]
+4335-    corrections = []
+4336-    if n < 8:
+--
+4381-
+4382-
+4383:def normalize_ats_oos_weeks(hist, ats_l26):
+4384-    """
+4385-    VP-ATS (2026-05-17) — ATS-confirmed OOS zero-week fill.
+--
+4397-    OOS-induced gaps.
+4398-
+4399:    hist:     52-week order history list (oldest→newest, indices 0..51).
+4400-    ats_l26:  26-week ATS list (oldest→newest, indices 0..25), where
+4401:              ats_l26[k] aligns with hist[26+k].  Typically from
+4402-              oos_history.fetch_ats_history() — one record per Mstyle.
+4403-
+4404:    Detection criteria for an ATS-confirmed OOS week at hist-index i (26..51):
+4405:      1. Orders near-zero: hist[i] < max(10, 10% of prior L13 nz-avg)
+4406-      2. ATS constrained:  ats_l26[i-26] < max(10, 25% of prior L13 nz-avg)
+4407-         (we had less than a quarter-week of supply available to ship)
+--
+4416-
+4417-    Returns:
+4418:        (normalized_hist, corrections)
+4419-        corrections: list of {week_idx, ats_val, baseline, filled_to}
+4420-    """
+4421:    n    = len(hist)
+4422:    orig = [float(v or 0) for v in hist]   # immutable baseline source
+4423-    out  = list(orig)
+4424-    corrections = []
+--
+4463-
+4464-
+4465:def normalize_ats_catchup_spikes(hist, ats_l26):
+4466-    """
+4467-    VP-ATS-Catch (2026-05-17) — Cap post-OOS catch-up order spikes using ATS data.
+--
+4481-      • ATS restoration: ats_l26[k] >= ats_thresh * 2 (supply meaningfully returned)
+4482-      • Pre-OOS baseline: L13 nz-avg from order history before the OOS onset
+4483:      • Catch-up spike: hist[26+k+offset] > pre_baseline * 1.5 for offset 0..2
+4484-
+4485-    Action: Cap those catch-up weeks to pre_baseline (strip the backlog excess).
+--
+4492-
+4493-    Returns:
+4494:        (normalized_hist, corrections)
+4495-        corrections: list of {week_idx, orig_val, capped_to, ats_at_restoration}
+4496-    """
+4497:    n = len(hist)
+4498:    orig = [float(v or 0) for v in hist]
+4499-    out  = list(orig)
+4500-    corrections = []
+--
+4512-            continue
+4513-
+4514:        # Pre-OOS baseline: orders from before the OOS onset (before week k-2 in hist)
+4515-        hist_oos_onset = 26 + k - 2
+4516-        pre_lo = max(0, hist_oos_onset - 13)
+--
+4548-
+4549-
+4550:def get_ship_history(row):
+4551-    """Return 52-week shipment history (oldest→newest), aligned 1:1 with
+4552-    get_history() order-side output.  Reads Shp_LW_n columns the same way
+--
+4557-
+4558-
+4559:def normalize_phantom_orders(hist, ships, protected_indices=None):
+4560-    """
+4561-    F41 — Shipment-confirmed phantom-order dedupe (2026-05-06).
+--
+4575-      baseline gets multiplied 2-3×.
+4576-
+4577:    Detection (operates on the L26 window, requires hist[i] ≥ 100):
+4578-      • Compute ship_window = ships[i] + ships[i+1] (1-week lag tolerance)
+4579:      • If ship_window < 0.30 × hist[i] → order i is "unfulfilled"
+4580-      • Look ahead 1-2 weeks (j ∈ {i+1, i+2}) for next non-zero order
+4581:      • If hist[j] within ±15% of hist[i] → phantom reorder, zero hist[j]
+4582-
+4583-    More permissive than F39 (±15% vs ±5%) because shipment evidence is
+--
+4593-      ordered.  Second order was a phantom reorder.
+4594-
+4595:    Returns (hist, corrections-list).  Each correction:
+4596-      {kept_idx, zeroed_idx, kept_value, zeroed_value, ship_window,
+4597-       ship_pct, qty_diff_pct}
+4598-    """
+4599:    if not hist or not ships:
+4600:        return list(hist), []
+4601:    if len(hist) != len(ships):
+4602:        return list(hist), []
+4603:    if len(hist) < 3:
+4604:        return list(hist), []
+4605:    out = list(hist)
+4606-    n = len(out)
+4607-    L26_start = max(0, n - 26)
+--
+4654-
+4655-
+4656:def normalize_oos_rebuild_ramp(hist, ships):
+4657-    """
+4658-    F47 — OOS rebuild-ramp normalization (2026-05-07).
+--
+4697-      {gap_start, gap_len, baseline, removed_total, weeks_capped}.
+4698-    """
+4699:    n = len(hist)
+4700-    if n < 8 or len(ships) != n:
+4701:        return hist, []
+4702-
+4703:    out = [int(round(v)) for v in hist]
+4704-    s = [float(v or 0) for v in ships]
+4705-    corrections = []
+--
+4778-
+4779-
+4780:def attenuate_recent_spikes(hist, pos_data=None):
+4781-    """
+4782-    F43 — Recent-spike attenuation (2026-05-06).
+--
+4799-      • Require ≥ 8 non-zero values in that excluded baseline (else skip — too
+4800-        sparse to call any value an "outlier" reliably)
+4801:      • For each of the last 4 weeks (hist[-4:]):
+4802-          if value > 2.5 × median_pre  →  spike anomaly
+4803-          cap value to 2.0 × median_pre
+--
+4816-      weekly forecast distribution instead of W10/W11 bunch.
+4817-
+4818:    Returns (hist, corrections-list).  Each correction:
+4819-      {idx, original, capped, median_pre, ratio}
+4820-    """
+4821:    if not hist or len(hist) < 12:
+4822:        return list(hist), []
+4823:    out = list(hist)
+4824-    n = len(out)
+4825-    last4_start = n - 4
+--
+4844-    #
+4845-    # Empirical callouts (planner-flagged 2026-05-08):
+4846:    #   1864-BB30930 (Amazon): hist[-4:] = [0, 3024, 3984, 4692]; baseline
+4847-    #     median ~1100. Three consecutive caps would clamp 3024/3984/4692
+4848-    #     down to ~2200 each, killing the +55% L4-vs-L13 acceleration that
+4849-    #     POS independently confirms (l4=2616/wk, l13=1686/wk).
+4850:    #   1864-BB22272 (Amazon): hist[-4:] = [0, 2328, 720, 3264]; bursts
+4851-    #     +103% accelerating per POS (l4=1279/wk, l13=631/wk).
+4852-    #
+--
+4971-
+4972-
+4973:def normalize_duplicate_orders(hist, protected_indices=None):
+4974-    """
+4975-    F39 — Duplicate-order run dedupe (2026-05-06).
+--
+4990-      flat near 0 — buyer placed three POs but only one was real.
+4991-
+4992:    Detection (operates on the 52-week hist array):
+4993-      • Run length:    ≥ 2 consecutive non-zero weeks with values within ±5%
+4994-      • Cadence-aware magnitude gate (revised 2026-05-06):
+--
+5007-      • Operates on L26 window so dedup also fixes L26 fallback baselines
+5008-
+5009:    Returns (hist, corrections-list).  Corrections list each have:
+5010-      {start, length, value, median_excl, kept_idx}
+5011-    """
+5012:    if not hist or len(hist) < 2:
+5013:        return list(hist), []
+5014:    out = list(hist)
+5015-    corrections = []
+5016-    n = len(out)
+--
+5074-            mag_threshold = 1.0 if nz_fraction < 0.35 else 2.0
+5075-            if median_excl > 0 and v >= mag_threshold * median_excl:
+5076:                # Keep first (oldest, hist[i]); zero the rest of the run.
+5077-                for k in range(i + 1, j):
+5078-                    out[k] = 0
+--
+5092-
+5093-
+5094:def detect_stockup_burnoff(hist, row, pos_data, big_mult=3.0):
+5095-    """
+5096-    F36 — Stock-up burn-off detection (Amazon-only) (2026-05-05).
+--
+5148-    # cases like FF12853 where a big shipment landed the same week as
+5149-    # ramping orders (L4 ord 2,600/wk vs POS 1,700/wk = 1.53× POS).
+5150:    if len(hist) >= 4:
+5151:        _l4_ord_avg = sum(hist[-4:]) / 4.0
+5152-        if _l4_ord_avg >= 0.70 * pos_rate:
+5153-            return {"applied": False}
+--
+5179-    # burn-off — don't suppress.
+5180-    if weeks_since_big >= 1:
+5181:        post_orders = hist[-weeks_since_big:]
+5182-        if post_orders:
+5183-            avg_post = sum(post_orders) / len(post_orders)
+--
+5203-
+5204-
+5205:def nz_rate(history, window=26):
+5206-    """Fraction of non-zero weeks over the last `window` weeks."""
+5207-    h = history[-window:]
+--
+5382-
+5383-
+5384:def detect_iso(history):
+5385-    """
+5386-    Detect an Initial Stocking Order (ISO) pattern.
+--
+5508-        key    = row.get("Acct_MStyle_Key_", "")
+5509-        prefix = key.split("-")[0] if "-" in key else key
+5510:        hist   = get_history(row)
+5511-
+5512-        # Only sparse items inform the account cadence
+5513:        if nz_rate(hist, 26) >= DENSE_THRESHOLD:
+5514-            continue
+5515-
+5516:        events = _cluster_order_events(hist, gap=2)
+5517-        if len(events) < 2:
+5518-            continue
+--
+5557-        mstyle = r.get("Mstyle", "")
+5558-        if not mstyle: continue
+5559:        hist   = get_history(r)
+5560:        wk     = sum(hist) / 52.0
+5561-        bucket.setdefault(mstyle, []).append(wk)
+5562-    idx = {}
+--
+6059-        cust = (r.get("Customr_Name") or "").strip()
+6060-        if not cust: continue
+6061:        hist = get_history(r)
+6062:        wk   = sum(hist) / 52.0
+6063-        bucket.setdefault(cust, []).append(wk)
+6064-    idx = {}
+--
+6107-
+6108-
+6109:def new_launch_signals(row, history):
+6110-    """
+6111-    Centralized new-launch detector (audit item #4, 2026-05-24).
+--
+6196-
+6197-
+6198:def _get_shp_history(row):
+6199-    """52-week shipment history (oldest→newest) used by F8 corroboration."""
+6200-    return [float(row.get(c) or 0) for c in SHP_COLS]
+6201-
+6202-
+6203:def sparse_intermittent_forecast(history, mp, account_interval=None, is_offprice=False):
+6204-    """
+6205-    For items that order infrequently (non-zero rate < DENSE_THRESHOLD):
+--
+6383-    # For very thin items (nz <= 4 of L26), prevent the forecast from
+6384-    # projecting MORE non-zero events than the item has shown historically.
+6385:    # Catches 12835-BB12022/12 type cases (nz=3 hist, AI projecting 5 events
+6386-    # = +390% over manual).  Cap forecast nz_count to historical L26 nz_count;
+6387-    # if forecast has more events, zero the smallest extras so quantity is
+--
+6425-
+6426-
+6427:def classify(history):
+6428-    """
+6429-    Classify demand pattern.
+--
+6506-
+6507-
+6508:def seasonal_profile(history, n=26):
+6509-    """
+6510-    26-week multiplicative seasonal indices built only from active history
+--
+6552-
+6553-
+6554:def crostens(history, mp, is_amazon=False, description=None,
+6555-             product_category=None, product_subcategory=None,
+6556-             brand=None, brand_pt=None, pos_data=None, season=None,
+--
+7183-
+7184-
+7185:def heuristic(history, mp, l13w, is_amazon=False, description=None,
+7186-              product_category=None, product_subcategory=None,
+7187-              brand=None, brand_pt=None, pos_data=None, season=None,
+--
+7650-
+7651-
+7652:def _detect_otb(history, is_amazon=False, is_offprice=False, manual_total=None):
+7653-    """
+7654-    R1 — One-Time-Buy pattern detector.  Pure order-history signal.
+--
+7766-    """
+7767-    mp        = float(master_pack.get(row.get("Mstyle"), 1) or 1)
+7768:    hist      = get_history(row, oos_entry=oos_entry)
+7769-    cust_name = row.get("Customr_Name") or ""
+7770-    is_amazon = AMAZON_CUST_SUBSTR in cust_name.upper()
+--
+7850-    # post-stockout catch-up weeks so the rest of the pipeline sees real
+7851-    # demand intent, not "base + accumulated owe".
+7852:    hist, f35_corrections = normalize_stockout_recovery(hist)
+7853-    # VP-ATS — ATS-confirmed OOS zero-week fill.  Runs AFTER F35 (so F35
+7854-    # can first normalize any post-gap catch-up spike) and BEFORE F47/F41
+7855-    # (so those normalizations see ATS-corrected demand intent).
+7856:    hist, f_ats_corrections = normalize_ats_oos_weeks(hist, ats_hist_l26)
+7857-    # VP-ATS-Catch — cap post-OOS catch-up spike weeks.  Runs immediately
+7858-    # after VP-ATS so the cap sees ATS-filled (not raw-zero) history for
+7859-    # pre-OOS baseline, then the rest of the pipeline (F47/F41/F39/F43)
+7860-    # sees a clean signal without inflated catch-up orders.
+7861:    hist, f_ats_catch_corrections = normalize_ats_catchup_spikes(hist, ats_hist_l26)
+7862-    # F41 — Shipment-confirmed phantom-order dedupe.  Pull per-week ship
+7863-    # history and cross-check: if order N wasn't fulfilled within the 1-wk
+--
+7873-    # pre-OOS baseline, F41/F39 must SKIP those weeks (else uniform caps
+7874-    # look like phantom reorders / duplicate-runs and get zeroed twice).
+7875:    hist, f47_corrections = normalize_oos_rebuild_ramp(hist, ships)
+7876-    _f47_protected = set()
+7877-    for _c in f47_corrections:
+7878-        _f47_protected.update(_c.get("capped_indices", []))
+7879:    hist, f41_corrections = normalize_phantom_orders(hist, ships, _f47_protected)
+7880-    # F39 — Duplicate-order run dedupe.  When the same large order qty
+7881-    # repeats ≥2 weeks in a row (buyer error / phantom PO), keep only the
+7882-    # first occurrence and zero the rest.  Operates on L26 window.
+7883:    hist, f39_corrections = normalize_duplicate_orders(hist, _f47_protected)
+7884-    # F43 — Recent-spike attenuation.  When the last 4 weeks contain a
+7885-    # spike >2.5× the prior L26 nz median, cap it to 2.0× to prevent
+--
+7888-    # F49 (2026-05-08): pass pos_data so F43 can skip when POS-confirmed
+7889-    # acceleration (l4/l13 ≥ 1.20) explains the recent "spikes".
+7890:    hist, f43_corrections = attenuate_recent_spikes(hist, pos_data=pos_data)
+7891-    return {
+7892-        "mp":               mp,
+7893:        "hist":             hist,
+7894-        "cust_name":        cust_name,
+7895-        "is_amazon":        is_amazon,
+--
+8674-def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
+8675-                    season_map=None, oos_entry=None, open_po_wk=None,
+8676:                    amazon_catalog_us=None, ai_comments=None, ats_hist=None,
+8677-                    switchover_weeks=None, variant_zero_weeks=None,
+8678-                    retailer_pos=None, vacated_bases=None, inv_flow_data=None):
+8679-    # Reset rule-fire tracker for this record (used by deck-harvest tooling).
+8680-    _start_rule_fires()
+8681:    # Shared prep (mp, hist + F35 stockout normalization, customer flags,
+8682-    # POS lookup, season tag) — kept identical across forecast and validate
+8683-    # via _prep_record_signals().
+--
+8685-                                amazon_pos=amazon_pos, season_map=season_map,
+8686-                                amazon_catalog_us=amazon_catalog_us,
+8687:                                ats_hist_l26=ats_hist,
+8688-                                retailer_pos=retailer_pos)
+8689-    mp               = _sig["mp"]
+8690:    hist             = _sig["hist"]
+8691-    cust_name        = _sig["cust_name"]
+8692-    is_amazon        = _sig["is_amazon"]
+--
+8735-    #   • For Croston's z and p: anchor on weeks-since-first-activity only
+8736-    #   • Tag the alert so planners see why decline rules were skipped
+8737:    _f34_l52_26_sum = sum(float(v or 0) for v in hist[-52:-26]) if len(hist) >= 52 else 0
+8738:    _f34_l26_sum   = sum(float(v or 0) for v in hist[-26:])   if len(hist) >= 26 else 0
+8739-    _f34_is_new_launch = (
+8740-        _f34_l26_sum > 0 and
+--
+8744-    _f34_first_nz_idx = None
+8745-    if _f34_is_new_launch:
+8746:        for _i, _v in enumerate(hist):
+8747-            if float(_v or 0) > 0:
+8748-                _f34_first_nz_idx = _i
+8749-                break
+8750:    _f34_active_weeks = (len(hist) - _f34_first_nz_idx) if _f34_first_nz_idx is not None else 0
+8751-
+8752-    # F73 (2026-05-24) — New-launch recency anchor.
+--
+8759-    # inside crostens() anchors against the L13W nz-avg instead of the
+8760-    # all-weeks avg (which is zero-diluted and pulls the forecast too low).
+8761:    _f73_l26_nz_wks  = sum(1 for v in hist[-26:] if float(v or 0) > 0)
+8762-    _f73_sc_new      = "NEW" in (row.get("Status_Cust") or "").upper()
+8763-    _f73_new_ramp    = (
+--
+8778-    _otb_is_offprice = _is_offprice_cust(cust_name)
+8779-    _otb_manual_total = sum(float(row.get(c) or 0) for c in ORIG_PRJ_COLS)
+8780:    _otb_is, _otb_meta = _detect_otb(hist, is_amazon=is_amazon,
+8781-                                     is_offprice=_otb_is_offprice,
+8782-                                     manual_total=_otb_manual_total)
+--
+8823-    # Detect ISO before any classification so we can strip the stocking spike
+8824-    # from the history used for baseline/nz_rate calculations.
+8825:    iso   = detect_iso(hist)
+8826-    if iso["is_iso"]:
+8827-        # Zero out the ISO week so it doesn't inflate baselines or nz_rate
+8828:        hist_for_model = list(hist)
+8829-        hist_for_model[iso["iso_week_idx"]] = 0.0
+8830-    else:
+8831:        hist_for_model = hist
+8832-
+8833-    description = (row.get("Description") or "").strip()
+--
+9332-        #   (A) Amazon path — Avg_Units_Wk_L52w > 0 (consumer-side POS).
+9333-        #       Velocity cap = POS L52 × 26.
+9334:        #   (B) Non-Amazon path — last non-zero order in hist within 26
+9335-        #       weeks (item ordered recently enough to be considered
+9336-        #       paused-not-dead).  Velocity cap = L52 order total ÷ 2.
+--
+9344-            # so we look for any non-zero week up to 26 weeks back)
+9345-            _weeks_since_last_f19 = None
+9346:            for _idx, _v in enumerate(reversed(hist)):
+9347-                if float(_v) > 0:
+9348-                    _weeks_since_last_f19 = _idx
+--
+9358-                    _vel_label_f19 = f"POS L52 × 26 = {_vel_cap_f19:.0f}"
+9359-                else:
+9360:                    _l52_sum_f19   = sum(float(v) for v in hist[-52:]) if len(hist) >= 52 else sum(float(v) for v in hist)
+9361-                    _vel_cap_f19   = _l52_sum_f19 / 2.0
+9362-                    _vel_label_f19 = f"L52 order total ÷ 2 = {_vel_cap_f19:.0f}"
+--
+9400-            # but shipments were going out recently, treat L13 shipments as a
+9401-            # demand signal (orders may be lagging or suppressed).
+9402:            _fx_shp_hist = _get_shp_history(row)
+9403:            _fx_shp_l13  = sum(_fx_shp_hist[-13:]) if len(_fx_shp_hist) >= 13 else 0
+9404:            _fx_shp_l52  = sum(_fx_shp_hist) if _fx_shp_hist else 0
+9405-            _fx_shp_wk   = _fx_shp_l52 / 52.0 if _fx_shp_l52 > 0 else 0
+9406-
+--
+9725-        for _c in _f35_corrections:
+9726-            meta.setdefault("drivers", []).append(
+9727:                f"F35 Stockout backlog removed: {_c['length']}w gap at hist[{_c['start']}], "
+9728-                f"baseline={_c['baseline']:.0f}/wk; stripped {_c['removed']:.0f} units of "
+9729-                f"pent-up backlog from post-gap catch-up weeks (true demand intent restored)"
+--
+9770-            for _c in _f43_corrections:
+9771-                meta.setdefault("drivers", []).append(
+9772:                    f"F49b Internal-spike cap: hist[{_c['idx']}]={_c['original']:.0f} "
+9773-                    f"({_c['ratio']:.1f}x L4W inner-median {_c['median_pre']:.0f}/wk) "
+9774-                    f"-> {_c['capped']:.0f} (2.0x inner-median); "
+--
+9779-            for _c in _f43_corrections:
+9780-                meta.setdefault("drivers", []).append(
+9781:                    f"F43 Recent-spike capped: hist[{_c['idx']}]={_c['original']:.0f} "
+9782-                    f"({_c['ratio']:.1f}x L26-prior nz median {_c['median_pre']:.0f}) "
+9783-                    f"-> {_c['capped']:.0f} (2.0x median); prevents Croston's mis-classify "
+--
+9807-            meta.setdefault("drivers", []).append(
+9808-                f"F47 OOS rebuild-ramp capped: {_c['gap_len']}w ship-zero gap at "
+9809:                f"hist[{_c['gap_start']}] → {_c['weeks_capped']}w rebuild orders "
+9810-                f"capped at pre-OOS baseline {_c['baseline']:.0f}/wk "
+9811-                f"(removed {_c['removed_total']:,} compounded units); "
+--
+9820-        for _c in _f41_corrections:
+9821-            meta.setdefault("drivers", []).append(
+9822:                f"F41 Phantom order zeroed: hist[{_c['zeroed_idx']}]={_c['zeroed_value']:.0f} "
+9823:                f"(prev order at hist[{_c['kept_idx']}]={_c['kept_value']:.0f} "
+9824-                f"only shipped {_c['ship_window']:.0f} units in 1-wk lag window = "
+9825-                f"{_c['ship_pct']*100:.0f}% fulfilled; reorder qty within "
+--
+9834-            meta.setdefault("drivers", []).append(
+9835-                f"F39 Duplicate-order run dedup'd: {_c['length']}w of "
+9836:                f"{_c['value']:.0f} units at hist[{_c['start']}] "
+9837-                f"(L26 nz-median excl run = {_c['median_excl']:.0f}, ratio "
+9838-                f"{_c['value']\max(_c['median_excl'],1):.1f}×); kept first, "
+--
+10021-    # signal.  Defer to manual when L26W=0 AND manual exists.
+10022-    _f31_status_cust = (row.get("Status_Cust") or "").upper()
+10023:    _f31_l26_ord_total = sum(float(v or 0) for v in hist[-26:]) if hist else 0
+10024-    _f31_status_cust_new = "NEW" in _f31_status_cust
+10025-    _f31_pt_launching    = _is_launching(row)
+--
+10062-    # of the OTB-zeroed states.  F31 (above) runs first so pre-launch NEW
+10063-    # items get manual passthrough rather than zero.
+10064:    _f30_l26_ord_total = sum(float(v or 0) for v in hist[-26:]) if hist else 0
+10065-    if (model in ("Sparse Intermittent", "New/Relaunch", "Reactivating",
+10066-                  "New/Relaunch (launch-tagged)", "Heuristic", "Croston's")
+--
+10158-        _first_nz = next((i for i, v in enumerate(fcst) if v > 0), None)
+10159-        if _first_nz is not None and _first_nz > 0:
+10160:            _l13_nz_f17  = [v for v in hist[-13:] if v > 0]
+10161-            _l13_avg_f17 = (sum(_l13_nz_f17) / len(_l13_nz_f17)) if _l13_nz_f17 else 0.0
+10162-            _pos_l13_f17b = float(pos_data.get("Avg_Units_Wk_L13w") or 0) if (is_amazon and pos_data) else 0.0
+--
+10194-    # moderate 1.5-2× over-projections were passing through.  If long-run
+10195-    # total is very small (<1000) skip (brand-new / ramps need headroom).
+10196:    _m1_l26_total = sum(float(v) for v in hist[-26:])
+10197:    _m1_l52_total = sum(float(v) for v in hist[-52:])
+10198-    _m1_ceiling = max(_m1_l52_total * 1.25, _m1_l26_total * 1.25)
+10199-    # F34 — skip M1 ceiling on new launches: L52 total is dominated by pre-launch
+--
+10228-
+10229-    # Stale-order signal: L13 zero AND last non-zero week was ≥ 26 weeks ago
+10230:    _m2_l13_ord = sum(float(v) for v in hist[-13:])
+10231-    _m2_last_nz_weeks_ago = None
+10232:    for _i in range(len(hist) - 1, -1, -1):
+10233:        if float(hist[_i]) > 0:
+10234:            _m2_last_nz_weeks_ago = (len(hist) - 1) - _i
+10235-            break
+10236-    _m2_stale_order = (_m2_l13_ord == 0 and _m2_last_nz_weeks_ago is not None
+--
+10278-                _f66_mult  = _b_mult
+10279-                break
+10280:        _f66g_l4  = sum(hist[-4:])  / 4  if len(hist) >= 4  else 0
+10281:        _f66g_l13_nz = [v for v in hist[-13:] if v > 0]
+10282-        _f66g_l13_nz_avg = (sum(_f66g_l13_nz) / len(_f66g_l13_nz)) if _f66g_l13_nz else 0
+10283-        _f66g_in_decline = (
+--
+10373-            and not _f34_is_new_launch
+10374-            and not (isinstance(meta, dict) and meta.get("steady_buyer"))):
+10375:        _f62_l4_nz  = [float(v) for v in hist[-4:]  if float(v or 0) > 0]
+10376:        _f62_l13_nz = [float(v) for v in hist[-13:] if float(v or 0) > 0]
+10377-        if len(_f62_l4_nz) >= 2 and len(_f62_l13_nz) >= 3:
+10378-            _f62_l4_avg  = sum(_f62_l4_nz) / len(_f62_l4_nz)
+--
+10381-            # Spike guard for acceleration: if any single L4W week is >= 2.5x
+10382-            # the L13W nz avg, the L4W average is spike-inflated, not a real trend.
+10383:            _f62_l4_all = [float(v or 0) for v in hist[-4:]]
+10384-            _f62_has_spike = (_f62_l13_avg > 0 and
+10385-                              any(w >= _f62_l13_avg * 2.5 for w in _f62_l4_all))
+--
+10414-    if ("MULTI-PK" in _f63_item_status or "MULTI PK" in _f63_item_status) and \
+10415-            model != "Inactive" and sum(fcst) > 0 and not _f34_is_new_launch:
+10416:        _f63_l13_nz = [float(v) for v in hist[-13:] if float(v or 0) > 0]
+10417:        _f63_l26_nz = [float(v) for v in hist[-26:] if float(v or 0) > 0]
+10418-        _f63_l13_avg = sum(_f63_l13_nz) / len(_f63_l13_nz) if _f63_l13_nz else 0
+10419-        _f63_l26_avg = sum(_f63_l26_nz) / len(_f63_l26_nz) if _f63_l26_nz else 0
+--
+10512-                # --- ISO already placed? ---
+10513-                # Backward: large order (>= 50% of ISO qty) in last 8 weeks of history
+10514:                _pog_hist_l8  = [float(v or 0) for v in hist[-8:]]
+10515:                _pog_iso_hist = (
+10516-                    _pog_iso_qty > 0
+10517-                    and max(_pog_hist_l8, default=0) >= _pog_iso_qty * 0.5
+--
+10526-                    _pog_opn_wk[i] > 0 for i in _pog_ship_window
+10527-                )
+10528:                _pog_iso_placed = _pog_iso_hist or _pog_iso_open_po
+10529-
+10530-                # --- ramp base ---
+--
+10709-    # active growth -- back-half should not decay).
+10710-    _f61_status_new = "NEW" in (row.get("Status_Cust") or "").upper()
+10711:    _f61_l4_avg     = sum(float(v or 0) for v in hist[-4:])  / 4  if len(hist) >= 4  else 0
+10712:    _f61_l13_avg    = sum(float(v or 0) for v in hist[-13:]) / 13 if len(hist) >= 13 else 0
+10713-    _f61_active_growth = (_f61_l13_avg > 0 and _f61_l4_avg >= _f61_l13_avg * 0.80)
+10714-    if (not is_amazon and not _f34_is_new_launch and not _f61_is_seasonal
+--
+10748-    # clamps don't claw back the manual we just deferred to.
+10749-    _f29_manual_deferred = False
+10750:    _total_nz_f29 = sum(1 for v in hist if float(v) > 0)
+10751-    # classify() emits "inactive" | "sparse_intermittent" | "active" -- the
+10752-    # legacy "new_item" / "sparse" values were dead checks (audit 2026-05-21).
+--
+10770-            )
+10771-    elif _is_new_or_sparse and sum(fcst) >= 0:
+10772:        _recent_nz_f29 = [v for v in hist[-8:] if v > 0]
+10773-        if len(_recent_nz_f29) >= 1:
+10774-            _recent_avg_f29 = sum(_recent_nz_f29) / len(_recent_nz_f29)
+--
+10798-    # the deferral.
+10799-    if len(fcst) >= 1 and fcst[0] > 0 and not _f29_manual_deferred:
+10800:        _l4_f71  = sum(hist[-4:])  / 4 if len(hist) >= 4 else 0
+10801:        _l13_f71 = sum(hist[-13:]) / 13 if len(hist) >= 13 else 0
+10802-        _ref_f71 = max(_l4_f71, _l13_f71, cap or 0)
+10803-        if _ref_f71 > 0:
+--
+10824-    # planner manual we deferred to.
+10825-    if pattern == "sparse_intermittent" and not _f29_manual_deferred:
+10826:        _l13_avg_f32 = sum(hist[-13:]) / 13.0
+10827:        _l26_sum_f32 = sum(hist[-26:])
+10828-        # (a) per-week clamp
+10829-        if _l13_avg_f32 > 0:
+--
+10858-    # keep the model's projection so we resume normal replenishment cadence.
+10859-    if is_amazon and pos_data:
+10860:        _f36 = detect_stockup_burnoff(hist, row, pos_data)
+10861-        if _f36.get("applied") and model not in ("Inactive",):
+10862-            _suppress = _f36["wos_remaining"]
+--
+10900-            and not meta.get("stockup_burnoff")
+10901-            and not meta.get("f38f_offline")):
+10902:        _l13 = hist[-13:] if len(hist) >= 13 else hist
+10903-        _l13_nz = [v for v in _l13 if v > 0]
+10904-        # Last 3 NON-ZERO orders (skips zero weeks; reflects actual recent
+10905-        # ordering rate, not zero-week noise).
+10906-        _last3_nz = []
+10907:        for v in reversed(hist):
+10908-            if v > 0:
+10909-                _last3_nz.append(v)
+--
+11261-            and not meta.get("stockup_burnoff")
+11262-            and not meta.get("f38f_offline")):
+11263:        _l26_f45 = hist[-26:] if len(hist) >= 26 else hist
+11264-        _l26_nz_f45 = [v for v in _l26_f45 if v > 0]
+11265-        if len(_l26_nz_f45) >= 6:
+--
+11329-            and not meta.get("stockup_burnoff")
+11330-            and not meta.get("f38f_offline")):
+11331:        _l26_f46 = hist[-26:] if len(hist) >= 26 else hist
+11332-        _l26_nz_f46 = [v for v in _l26_f46 if v > 0]
+11333-        if len(_l26_nz_f46) >= 6:
+11334-            _baseline_f46 = sum(_l26_nz_f46) / len(_l26_nz_f46)
+11335:            # Compute per-week seasonal indices from L26 hist, damped.
+11336-            _l26_mean_f46 = float(np.mean(_l26_f46)) if float(np.mean(_l26_f46)) > 0 else 1.0
+11337-            _raw_seasonal_f46 = [v / _l26_mean_f46 for v in _l26_f46]
+--
+11489-        if len(_bulk_avail) >= 2 and _bulk_total >= mp:
+11490-            # Compute inter-order interval from L26W non-zero weeks (newest=index 0)
+11491:            _op_hist_nz_idx = [i for i, v in enumerate(hist[-26:]) if v > 0]
+11492-            if len(_op_hist_nz_idx) >= 2:
+11493-                # Gaps between consecutive non-zero weeks; filter out 1-week adjacencies
+--
+11556-    _vfl_ord_lw    = float(row.get("Ord_LW")  or 0)
+11557-    _vfl_spike_qty = max(_vfl_opn_w1, _vfl_ord_lw)
+11558:    # L13W average from cleaned hist (non-zero weeks only, more robust than all-weeks)
+11559:    _vfl_hist13 = [float(v or 0) for v in hist[-13:]] if len(hist) >= 13 else list(hist)
+11560-    _vfl_hist13_nz = [v for v in _vfl_hist13 if v > 0]
+11561-    _vfl_l13w_avg  = sum(_vfl_hist13_nz) / len(_vfl_hist13_nz) if _vfl_hist13_nz else 0
+--
+11826-        _f59_oos_active = _f59_oos_days >= 7
+11827-
+11828:        _f59_l4w_raw    = hist[-4:]  if len(hist) >= 4  else list(hist)
+11829-        _f59_l4w_nz     = [v for v in _f59_l4w_raw  if v > 0]
+11830-        _f59_l4w_avg    = (
+--
+11834-        )
+11835-
+11836:        _f59_l8w_raw    = hist[-8:]  if len(hist) >= 8  else list(hist)
+11837-        _f59_l8w_nz     = [v for v in _f59_l8w_raw  if v > 0]
+11838-        _f59_l8w_avg    = (
+--
+11842-        )
+11843-
+11844:        _f59_l13w_raw   = hist[-13:] if len(hist) >= 13 else list(hist)
+11845-        _f59_l13w_nz    = [v for v in _f59_l13w_raw if v > 0]
+11846-        _f59_l13w_avg   = (
+--
+12220-                # the drawdown is in progress and fewer additional weeks are needed.
+12221-                _rtl_excess_wos  = _rtl_oh_wos - _RTL_WOS_TARGET_HIGH
+12222:                _rtl_ord_l4w     = sum(float(v) for v in hist[-4:]) / 4.0
+12223-                _rtl_fill_ratio  = (_rtl_ord_l4w / _rtl_pos_l4w
+12224-                                    if _rtl_pos_l4w > 0 else 1.0)
+--
+12637-    _f35d_recent = [
+12638-        c for c in (_f35_corrections or [])
+12639:        if c.get("start", 0) >= 39   # hist[39..51] = last 13 weeks
+12640-    ]
+12641-    if (_f35d_recent
+--
+12679-                        meta.setdefault("drivers", []).append(
+12680-                            f"F35d OOS-triggered DC restock: recent stockout at "
+12681:                            f"hist[{_f35d_corr['start']}] (pre-OOS baseline "
+12682-                            f"{_f35d_demand:.0f}/wk, 25%+ demand permanently lost). "
+12683-                            f"DC pipeline {_f35d_pipeline:,.0f}u = "
+--
+12811-                              "Pre-launch NEW (manual passthrough)")
+12812-            and 0 < _f59h_wos < 8):
+12813:        _f59n_lw_ord  = float(hist[-1]) if hist else 0
+12814:        _f59n_l13_ord = sum(hist[-13:]) / 13.0 if len(hist) >= 13 else 0
+12815-        _f59n_pos_lw  = float(pos_data.get("Ordered_Units_LW")  or 0)
+12816-        _f59n_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+--
+13339-        _rpl_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+13340-        _rpl_pos_l4  = float(pos_data.get("Avg_Units_Wk_L4w")  or 0)
+13341:        # Fix A (2026-05-24): use normalized hist (post F41/F35/F43) so phantom
+13342-        # stock-up orders removed by F41 are not counted in the demand baseline.
+13343-        # Order L13W is retained for diagnostics / driver-narrative only -- it
+13344-        # NO LONGER drives the baseline (see POS-only rule below).
+13345:        _rpl_ord_l13 = sum(float(v) for v in hist[-13:]) / 13  # all-weeks avg (normalized)
+13346-
+13347-        # POS-only baseline (per planner directive, 2026-05-26).
+--
+13422-            # so the pattern projects a normal steady-state week there instead.
+13423-            # Non-outlier on-weeks retain their natural variability ratios.
+13424:            _rpl_l13w_raw  = [float(v) for v in hist[-13:]]
+13425-            _rpl_l13w_nz   = sum(1 for v in _rpl_l13w_raw if v > 0)
+13426-            _rpl_l13w_mean = sum(_rpl_l13w_raw) / 13   # all-weeks avg incl. zeros
+--
+13587-            # records when ATS data is absent or all-zero (normalizers couldn't
+13588-            # run → history may still contain uncapped catch-up orders).
+13589:            if _rpl_var_ratios and row.get("_ec_transition") and not any(ats_hist or []):
+13590-                _rpl_var_ratios = None   # safer flat baseline than cycling bad ratios
+13591-            if _rpl_var_ratios:
+--
+13663-    #              + TRADE_FALL_SEASON2_WEEKS (W21-W22 holiday pre-order)
+13664-    #
+13665:    # LY mapping: ORD_COLS ordered oldest->newest; hist[0]=Ord_LW_51=52 wks ago
+13666:    # = LY-W1, ..., hist[n-1]=LY-Wn.  Forecast week W_n -> hist[n-1].
+13667-    #
+13668:    # Full-YoY gate: at least 3 non-zero order weeks in hist[:26] (LY-W1..W26)
+13669-    # confirms the item was actively ordering one full year ago.  The specific LY
+13670-    # window must also have total > 0 (LY event was active for this item).
+--
+13690-            and isinstance(fcst, list) and len(fcst) >= 26
+13691-            and sum(fcst) > 0):
+13692:        # Full-YoY gate: meaningful order activity in the LY period (hist[:26])
+13693-        _fyoy_ly_active = sum(1 for v in hist_for_model[:26] if float(v) > 0) >= 3
+13694-        if _fyoy_ly_active:
+--
+13715-                if len(_fyoy_wks) < 2:
+13716-                    continue
+13717:                # 0-indexed positions (same offset into both fcst and hist[:26])
+13718-                _fyoy_fc_idx  = [w - 1 for w in _fyoy_wks]
+13719:                # LY order values for this window (hist[w-1] = LY week w)
+13720-                _fyoy_ly_vals = [float(hist_for_model[i]) for i in _fyoy_fc_idx]
+13721-                _fyoy_ly_tot  = sum(_fyoy_ly_vals)
+--
+13884-    if model == "Inactive" and prior > 0:
+13885-        alert = _build_alert(model, new, prior, pct, cap, mp, meta,
+13886:                             fcst=fcst, manual=manual_wks, row=row, history=hist)
+13887-    elif prior > 0 and pct > ALERT_THRESHOLD:
+13888-        alert = _build_alert(model, new, prior, pct, cap, mp, meta,
+13889:                             fcst=fcst, manual=manual_wks, row=row, history=hist)
+13890-
+13891-    # Confidence score (0-100) ------------------------------------------------
+--
+13893-        model        = model,
+13894-        meta         = meta,
+13895:        hist         = hist,
+13896-        manual       = manual_wks,
+13897-        pct_diff     = round(pct * 100, 1),
+--
+13954-        # can surface a "Normalized Ord/Wk L13w" bullet when it differs
+13955-        # materially from the raw L13W order rate (2026-05-25).
+13956:        "norm_l13w":   round(sum(float(v) for v in hist[-13:]) / 13, 1),
+13957-        # Business-language strip sentences for codepage tooltip (2026-05-27).
+13958-        # Pipe-delimited; viewer parses via split('|').
+--
+14029-def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
+14030-                    low_mult=VALID_LOW_MULT, spike_mult=VALID_SPIKE_MULT,
+14031:                    oos_entry=None, open_po_wk=None, ats_hist=None,
+14032-                    switchover_weeks=None, amazon_pos=None, season_map=None,
+14033-                    amazon_catalog_us=None, retailer_pos=None):
+--
+14041-    # computed against true demand intent, not pile-up artifacts.
+14042-    # 2026-05-25 (Finding #3): pass POS/catalog/season/retailer signals so the
+14043:    # validator's hist normalization (F43 spike attenuation, F41/F47 backfill,
+14044-    # POS-aware logic) sees the SAME view the forecaster does.  Without these
+14045-    # the validator over-attenuated spikes that POS confirmed, producing false
+--
+14049-                                               season_map=season_map,
+14050-                                               amazon_catalog_us=amazon_catalog_us,
+14051:                                               ats_hist_l26=ats_hist,
+14052-                                               retailer_pos=retailer_pos)
+14053-    mp                  = _sig["mp"]
+14054:    hist                = _sig["hist"]
+14055-    is_amazon           = _sig["is_amazon"]
+14056-    _f35_corrections_v  = _sig["f35_corrections"]
+14057-
+14058-    # Detect ISO first; strip the stocking spike from history used for baselines.
+14059:    iso  = detect_iso(hist)
+14060:    hist_for_model = list(hist)
+14061-    if iso["is_iso"]:
+14062-        hist_for_model[iso["iso_week_idx"]] = 0.0
+--
+14072-    bw_active_parity = None
+14073-    if biweekly:
+14074:        h26 = hist[-26:]
+14075-        even_sum = sum(h26[i] for i in range(0, len(h26), 2))
+14076-        odd_sum  = sum(h26[i] for i in range(1, len(h26), 2))
+--
+14550-        oos_ent  = oos_data.get(key)
+14551-        po_wk    = open_pos_data.get(key)
+14552:        ats_hist = ats_data.get(row.get("Mstyle", ""))
+14553-        r = validate_record(row, master_pack, high_mult=high,
+14554-                            oos_entry=oos_ent, open_po_wk=po_wk,
+14555:                            ats_hist=ats_hist,
+14556-                            switchover_weeks=switchover_weeks,
+14557-                            amazon_pos=amazon_pos, season_map=season_map,
+--
+14565-                             oos_entry=oos_ent, open_po_wk=po_wk,
+14566-                             amazon_catalog_us=amazon_catalog_us,
+14567:                             ats_hist=ats_hist,
+14568-                             switchover_weeks=switchover_weeks,
+14569-                             retailer_pos=retailer_pos,
+--
+14651-
+14652-    for row in rows:
+14653:        hist  = get_history(row)
+14654-        key   = row.get("Acct_MStyle_Key_", "?")
+14655-        cust  = clean_html(row.get("Customr_Name", ""))
+--
+14657-
+14658-        # ── Quality audit ──────────────────────────────────────────
+14659:        active_weeks  = sum(1 for v in hist if v > 0)
+14660-        zero_weeks    = 52 - active_weeks
+14661:        first_nz      = next((i for i, v in enumerate(hist) if v > 0), None)
+14662-        leading_zeros = first_nz if first_nz is not None else 52
+14663:        l13_active    = sum(1 for v in hist[-13:] if v > 0)
+14664:        l13_sum       = sum(hist[-13:])
+14665-        max_gap       = 0
+14666-        cur_gap       = 0
+14667:        for v in hist:
+14668-            if v == 0:
+14669-                cur_gap += 1
+--
+14681-        # ── Stationarity (rolling mean coefficient of variation) ───
+14682-        # Simple proxy: CV of rolling 4-week means across active history
+14683:        active_vals = [float(v) for v in hist if v > 0]
+14684-        if len(active_vals) >= 8:
+14685-            windows = [float(np.mean(active_vals[i:i+4])) for i in range(0, len(active_vals) - 3, 4)]
+--
+14720-            iqr = q3 - q1
+14721-            upper_fence = q3 + 3.0 * iqr
+14722:            for i, v in enumerate(hist):
+14723-                if float(v) > upper_fence:
+14724-                    findings["outliers"].append({
+--
+14729-
+14730-        # ── Calendar: accumulate weekly demand ─────────────────────
+14731:        for i, v in enumerate(hist):
+14732-            if float(v) > 0:
+14733-                week_totals[i].append(float(v))
+--
+14782-    recs = {"Seasonal Baseline": 0, "Croston's": 0, "Heuristic": 0, "Inactive": 0}
+14783-    for row in rows:
+14784:        hist = get_history(row)
+14785:        pat  = classify(hist)
+14786-        if pat == "inactive":
+14787-            recs["Inactive"] += 1
+--
+14790-        else:
+14791-            # active: Seasonal Baseline vs Croston's based on nz density
+14792:            if nz_rate(hist, window=26) >= DENSE_THRESHOLD:
+14793-                recs["Seasonal Baseline"] += 1
+14794-            else:
+--
+15068-
+15069-
+15070:def compute_forecast_confidence(model, meta, hist, manual, pct_diff,
+15071-                                is_new_launch=False, is_otb=False,
+15072-                                season=None):
+--
+15090-
+15091-    # C1: History depth (0-20) ------------------------------------------------
+15092:    l13    = hist[-13:] if len(hist) >= 13 else hist
+15093-    l13_nz = sum(1 for v in l13 if float(v or 0) > 0)
+15094-    if   l13_nz >= 10: c1 = 20
+--
+15164-
+15165-
+15166:def _smart_order_trend(hist_l26, ly_hist_26=None, cust_label="this account"):
+15167-    """Build a 2-sentence data-backed Order trend explanation from order history.
+15168-
+--
+15193-    lw = h[-1]; pw = h[-2] if len(h) >= 2 else 0
+15194-    medium_flat = (abs(l26_avg - l13_avg) / max(l13_avg, 1)) < 0.15
+15195:    # L52: from full history when available (hist is 52w); fallback to LY+L26 splice
+15196-    l52_avg = None
+15197-    if len(h) >= 52:
+--
+15443-
+15444-    # L26W order history from raw row fields (Ord LW + Ord LW-1..Ord LW-25)
+15445:    hist = []
+15446-    for col in ORD_L26_COLS:  # already-computed list, oldest→newest
+15447-        try:
+15448:            hist.append(float(row.get(col) or 0))
+15449-        except Exception:
+15450:            hist.append(0.0)
+15451:    hist_total = sum(hist)
+15452-
+15453-    import re as _re
+--
+15718-        # Amazon: pinned alongside POS Sales/DC Inv/AUR so it always renders.
+15719-        # Non-Amazon: goes to specific (subject to MAX_BULLETS cap).
+15720:        if len(hist) >= 4:
+15721-            _ly_hist_pos = rec.get("history_ly_ord") or []
+15722:            _smart_ord = _smart_order_trend(hist,
+15723-                                            ly_hist_26=_ly_hist_pos if _ly_hist_pos else None,
+15724-                                            cust_label=_cust_label)
+--
+15738-            )
+15739-            # Still show order history even when POS is missing
+15740:            if len(hist) >= 4:
+15741-                _ly_hist_npos = rec.get("history_ly_ord") or []
+15742-                _smart_ord_npos = _smart_order_trend(
+15743:                    hist,
+15744-                    ly_hist_26=_ly_hist_npos if _ly_hist_npos else None,
+15745-                    cust_label=_cust_label)
+15746-                if _smart_ord_npos:
+15747-                    pinned_last.insert(0, _smart_ord_npos)
+15748:        if not is_amazon and len(hist) >= 4:
+15749:            _ly_hist = rec.get("history_ly_ord") or []
+15750:            _smart_ord = _smart_order_trend(hist,
+15751:                                            ly_hist_26=_ly_hist if _ly_hist else None,
+15752-                                            cust_label=_cust_label)
+15753-            if _smart_ord:
+--
+15880-    # bullet fires.  Visible bullet: only when diff > 5% of raw OR > 50 u/wk
+15881-    # (threshold keeps the narrative uncluttered for clean-history items).
+15882:    _raw_l13w_val  = sum(hist[-13:]) / 13   # raw from ORD_L26_COLS (last 13 weeks)
+15883-    _norm_l13w_val = rec.get("norm_l13w")
+15884-    # Build hidden span (piggybacked on last bullet -- no extra blank <li>)
+--
+17063-        oos_ent  = oos_data.get(key) if oos_data else None
+17064-        po_wk    = open_pos_data.get(key) if open_pos_data else None
+17065:        ats_hist = ats_data.get(row.get("Mstyle", "")) if ats_data else None
+17066-        r = forecast_record(row, master_pack, account_interval=acct_iv,
+17067-                            amazon_pos=amazon_pos, season_map=season_map,
+17068-                            oos_entry=oos_ent, open_po_wk=po_wk,
+17069-                            amazon_catalog_us=amazon_catalog_us,
+17070:                            ai_comments=ai_comments, ats_hist=ats_hist,
+17071-                            switchover_weeks=switchover_index,
+17072-                            inv_flow_data=inv_flow_data,
+--
+17136-            try:
+17137-                _v = validate_record(row, master_pack, oos_entry=oos_ent,
+17138:                                     open_po_wk=po_wk, ats_hist=ats_hist,
+17139-                                     switchover_weeks=switchover_index,
+17140-                                     amazon_pos=amazon_pos,
