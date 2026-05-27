@@ -977,12 +977,9 @@ def main():
     email_html = build_email_html(analyses, all_recs, report_path, run_date, args.days)
     send_email(subject, email_html, report_path, args.dry_run)
 
-    # Update state
-    if not args.dry_run:
-        new_ids = {str(int(fval(c, C_RECORD_ID))) for c in comments}
-        processed_ids.update(new_ids)
-        save_processed_ids(processed_ids)
-        print(f"  Marked {len(new_ids)} comment IDs as processed.")
+    # Mark processed comments as Reviewed in QB so they don't re-appear
+    comment_rids = [str(int(fval(c, C_RECORD_ID))) for c in comments]
+    mark_reviewed_in_qb(comment_rids, args.dry_run)
 
     # Print summary
     total_gap = sum(a["unit_gap"] for a in analyses)
