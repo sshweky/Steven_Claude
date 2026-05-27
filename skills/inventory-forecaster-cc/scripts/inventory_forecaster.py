@@ -5784,6 +5784,7 @@ def _switchover_backfill(rows, prj_cols):
                 "Description":          r.get("Description") or "",
                 "PT Item Status":       r.get("PT_Item_Status") or "",
                 "Status @ Cust":        r.get("Status_Cust") or "A",
+                "Cust SKU#":            r.get("Cust_SKU_") or "",
             }
             # Numeric account # required; copy if available.  Otherwise QB
             # will surface a field-required error.
