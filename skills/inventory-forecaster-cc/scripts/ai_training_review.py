@@ -9,7 +9,7 @@ Usage:
     python scripts/ai_training_review.py [--days N] [--dry-run] [--reset]
 
     --days N     Look back N days for AI Training comments (default: 30)
-    --dry-run    Analyze but skip email and processed-ID update
+    --dry-run    Analyze but skip email and QB write-back
     --reset      Clear processed-IDs cache so everything is reprocessed
 
 QB connections (all REST API, no CData):
@@ -19,6 +19,20 @@ QB connections (all REST API, no CData):
 Output:
     analysis/ai_training_YYYY-MM-DD.md   Full report
     analysis/ai_training_processed.json  State: processed comment Record IDs
+
+Pipeline order (as of 2026-05-27):
+  1. Fetch unreviewed AI Training comments (FLAG='AI Training')
+  2. Fetch projection records for the comment keys
+  3. Analyze each comment (intent, fit, raw recommendation)
+  4a. Build flat recommendation list (_build_all_recs)
+  4b. Estimate systemic impact FIRST (before finalizing recommendations)
+  4c. Validate/override recommendations against systemic impact
+       -- VALIDATED:  fix narrows MAN-AI gap, keep it
+       -- REJECTED:   fix widens gap, replace with directional-guard guidance
+       -- ISOLATED:   0 flagged records, address individually
+  5.  Build report with validated recommendations
+  6.  Email report
+  7.  Mark comments Reviewed in QB
 """
 
 import sys
@@ -367,6 +381,9 @@ def generate_recommendation(intent, fit, ai_model, diagnosis, note):
     """
     Return a dict with keys: change_type, proposed_change, confidence, rationale.
     Maps (intent, fit, model) -> specific rule/threshold change proposal.
+    NOTE: This generates the RAW recommendation before systemic validation.
+          validate_and_override_recs() may replace proposed_change after checking
+          whether the fix actually narrows the MAN-AI gap in the broader population.
     """
     model_lo = (ai_model or "").lower()
     is_amz   = "pos-wos" in model_lo or "amazon" in model_lo
@@ -621,6 +638,37 @@ def aggregate(analyses):
 
 
 # ---------------------------------------------------------------------------
+# Step 4a -- Build flat recommendation list (extracted for early pipeline use)
+# ---------------------------------------------------------------------------
+def _build_all_recs(grouped):
+    """Build the deduplicated recommendation list from grouped analyses.
+
+    Returns list of 7-tuples:
+      (rec_num, intent, fit, rec_dict, unit_impact, count, ai_model)
+
+    This is extracted from build_report() so it can be called BEFORE systemic
+    impact estimation -- allowing recommendations to be validated and overridden
+    based on real data before the final report is built.
+    """
+    seen_recs = set()
+    rec_num   = 0
+    all_recs  = []
+    for (intent, fit), grp in grouped:
+        if not grp["items"]:
+            continue
+        rec = grp["items"][0]["recommendation"]
+        dedup_key = rec["proposed_change"][:60]
+        if dedup_key in seen_recs:
+            continue
+        seen_recs.add(dedup_key)
+        rec_num  += 1
+        impact    = grp["unit_gap"]
+        _ai_model = grp["items"][0].get("ai_model", "") if grp["items"] else ""
+        all_recs.append((rec_num, intent, fit, dict(rec), impact, grp["count"], _ai_model))
+    return all_recs
+
+
+# ---------------------------------------------------------------------------
 # Step 4b -- Estimate systemic impact across ALL active projections
 # ---------------------------------------------------------------------------
 def estimate_systemic_impact(all_recs, man_fids):
@@ -820,7 +868,6 @@ def estimate_systemic_impact(all_recs, man_fids):
     # ------------------------------------------------------------------
     # Combined row: query the union of all unique model keywords so the
     # user can see the total impact of implementing all fixes together.
-    # Uses an OR clause: {10.SW.'A'}AND({1580.CT.'Kw1'}OR{1580.CT.'Kw2'})
     unique_kws = list(dict.fromkeys(
         r["model_keyword"] for r in results
         if r["model_keyword"] and r["model_keyword"] != "all"
@@ -828,11 +875,6 @@ def estimate_systemic_impact(all_recs, man_fids):
     if len(unique_kws) > 1:
         print(f"    Combined ({' + '.join(unique_kws)}): fetching union scope...",
               flush=True)
-        # Derive a representative change_type + fit from the first rec
-        first = next((r for r in results if r["model_keyword"] == unique_kws[0]), None)
-        _comb_change = (first["model_keyword"].lower()
-                        if first else "threshold")  # fallback
-        # Build combined fetch by temporarily overriding the where clause
         _comb_kw_filter = "OR".join(
             f"{{1580.CT.'{kw}'}}" for kw in unique_kws)
         _comb_where = f"{{10.SW.'A'}}AND({_comb_kw_filter})"
@@ -918,11 +960,151 @@ def estimate_systemic_impact(all_recs, man_fids):
 
 
 # ---------------------------------------------------------------------------
-# Step 5 -- Generate markdown report
+# Step 4c -- Validate recommendations against systemic impact
 # ---------------------------------------------------------------------------
-def build_report(analyses, grouped, run_date, days):
+def validate_and_override_recs(all_recs, systemic_impacts):
+    """
+    Check each recommendation against its computed systemic impact BEFORE
+    finalizing it. Replaces recommendations that would WIDEN the MAN-AI gap
+    with guidance that focuses on directional guards or individual fixes.
+
+    Status values (stored in rec["systemic_status"]):
+      VALIDATED -- fix narrows the aggregate MAN-AI gap -> keep the recommendation
+      REJECTED  -- fix widens the gap -> replace with directional-guard guidance
+      ISOLATED  -- 0 flagged records in broader population -> address individually
+      NEUTRAL   -- gap unchanged or no systemic data available
+
+    This function is the core of the "validate before recommend" pipeline.
+    It ensures every recommendation we show actually moves AI closer to MAN.
+    """
+    si_lookup = {
+        si["rec_num"]: si
+        for si in (systemic_impacts or [])
+        if not si.get("is_combined")
+    }
+
+    updated = []
+    for tup in all_recs:
+        num, intent, fit, rec, impact, count, *_rest = tup
+        ai_model = _rest[0] if _rest else ""
+        rec = dict(rec)   # copy -- do not mutate the original
+
+        si = si_lookup.get(num)
+        if si is None:
+            rec["systemic_status"] = "NEUTRAL"
+            updated.append((num, intent, fit, rec, impact, count, ai_model))
+            continue
+
+        cc  = si["criteria_count"]
+        vb  = si["variance_before"]
+        va  = si["variance_after"]
+        kw  = si["model_keyword"] or "model"
+        sc  = si["scope_count"]
+        fat = si["flagged_ai_total"]
+
+        if cc == 0:
+            # ----------------------------------------------------------------
+            # ISOLATED: no records in the population match the detection
+            # criteria. The comment is a one-off. Don't touch the model.
+            # ----------------------------------------------------------------
+            rec["systemic_status"] = "ISOLATED"
+            rec["proposed_change"] = (
+                f"ISOLATED: No records in the active {kw} population ({sc:,} records "
+                f"checked) match the detection criteria for this fix. This appears to be "
+                f"a one-off item. Address it directly via a Tell-AI comment on the specific "
+                f"record rather than changing the model algorithm. A model change for a "
+                f"single outlier adds complexity without systemic benefit."
+            )
+            rec["rationale"] = (
+                f"Systemic scan of {sc:,} active {kw} projections found 0 records matching "
+                f"the proposed detection rule. Implementing a model change that only benefits "
+                f"one item risks introducing side-effects for the other {sc:,} records."
+            )
+            rec["confidence"] = "low"
+
+        elif abs(va) > abs(vb):
+            # ----------------------------------------------------------------
+            # REJECTED: the proposed fix moves AI in the wrong direction for
+            # the flagged population in aggregate. This happens when most
+            # flagged records already have AI under MAN, so a cap/reduction
+            # makes the gap wider instead of narrower.
+            # ----------------------------------------------------------------
+            delta_bad  = va - vb   # how much worse (positive = gap grew)
+            dir_word   = "under-projecting" if vb > 0 else "over-projecting"
+            not_dir    = "over-projecting" if vb > 0 else "under-projecting"
+            unchanged  = sc - cc   # records not flagged (safe zone)
+            rec["systemic_status"] = "REJECTED"
+            rec["proposed_change"] = (
+                f"SYSTEMIC FIX REJECTED: Applying this change across all {cc:,} flagged "
+                f"{kw} records would WIDEN the MAN-AI gap from {vb:+,}u to {va:+,}u "
+                f"({delta_bad:+,}u in the wrong direction). "
+                f"The flagged {kw} population is already {dir_word} vs MAN in aggregate, "
+                f"so this fix makes things worse for most of them. "
+                f"\n\nRecommended fix: Add a DIRECTIONAL GUARD so the change only fires "
+                f"when AI is already {not_dir} relative to MAN (i.e., the fix moves AI "
+                f"closer to MAN, not further away). Example: for a cap/reduction, only "
+                f"apply when current AI > MAN * 1.10. This protects the {unchanged:,} "
+                f"records where AI is already below MAN from being pushed further away. "
+                f"\n\nImmediate action: Address the specific item(s) in this comment "
+                f"via Tell-AI comment on the record."
+            )
+            rec["rationale"] = (
+                f"Systemic check: MAN-AI before fix = {vb:+,}u, after fix = {va:+,}u "
+                f"across {cc:,} flagged {kw} records. Gap widened by {delta_bad:+,}u. "
+                f"Root cause: most flagged records are already {dir_word}, so this fix "
+                f"moves them further from MAN rather than closer to it."
+            )
+            rec["confidence"] = "low"
+
+        elif abs(va) < abs(vb):
+            # ----------------------------------------------------------------
+            # VALIDATED: the fix narrows the gap. Keep the original proposal
+            # and prepend a validation banner so the user sees confirmation.
+            # ----------------------------------------------------------------
+            gap_closed = abs(vb) - abs(va)
+            rec["systemic_status"] = "VALIDATED"
+            orig_change = rec["proposed_change"]
+            rec["proposed_change"] = (
+                f"VALIDATED: This fix narrows the MAN-AI gap from {vb:+,}u to "
+                f"{va:+,}u (closes {gap_closed:,}u of gap) across {cc:,} flagged "
+                f"{kw} records. "
+                f"Original proposal: {orig_change}"
+            )
+
+        else:
+            # ----------------------------------------------------------------
+            # NEUTRAL: before == after, no meaningful systemic effect.
+            # ----------------------------------------------------------------
+            rec["systemic_status"] = "NEUTRAL"
+
+        updated.append((num, intent, fit, rec, impact, count, ai_model))
+
+    return updated
+
+
+# ---------------------------------------------------------------------------
+# Step 5 -- Generate markdown report (uses pre-validated all_recs)
+# ---------------------------------------------------------------------------
+def build_report(analyses, grouped, all_recs, run_date, days):
+    """Build the full markdown report.
+
+    Parameters
+    ----------
+    analyses   : list of per-comment analysis dicts
+    grouped    : output of aggregate(analyses) -- used for pattern-groups table
+                 and for fetching affected items per recommendation
+    all_recs   : pre-built and pre-validated 7-tuples from _build_all_recs()
+                 followed by validate_and_override_recs(). Each rec dict already
+                 has 'systemic_status' and possibly overridden 'proposed_change'.
+    run_date   : str date label
+    days       : int lookback window
+
+    Returns
+    -------
+    str  -- full markdown text (save to file; systemic section appended in main)
+    """
     lines = [
-        f"# AI Training Comment Review",
+        "# AI Training Comment Review",
         f"**Generated:** {run_date}",
         f"**Lookback:** {days} days",
         f"**Comments analyzed:** {len(analyses)}",
@@ -933,15 +1115,15 @@ def build_report(analyses, grouped, run_date, days):
         "",
     ]
 
-    total_gap = sum(a["unit_gap"] for a in analyses)
+    total_gap   = sum(a["unit_gap"] for a in analyses)
     over_count  = sum(1 for a in analyses if a["unit_gap"] < -100)
     under_count = sum(1 for a in analyses if a["unit_gap"] > 100)
     eol_count   = sum(1 for a in analyses if a["intent"] == "eol")
     zero_count  = sum(1 for a in analyses if a["intent"] == "zero")
 
     lines += [
-        f"| Metric | Value |",
-        f"|---|---|",
+        "| Metric | Value |",
+        "|---|---|",
         f"| Total comments | {len(analyses)} |",
         f"| Net unit gap (MAN - AI) | {total_gap:+,} |",
         f"| AI over-projects (planner cut >100u) | {over_count} |",
@@ -966,49 +1148,43 @@ def build_report(analyses, grouped, run_date, days):
     lines += [
         "",
         "## 3. Proposed Model Changes",
+        "(NOTE: Recommendations below have been validated against systemic impact.",
+        "REJECTED = fix would widen MAN-AI gap. ISOLATED = no systemic pattern.)",
         "",
     ]
 
-    # Deduplicate recommendations by change_type + proposed_change[:60]
-    seen_recs = set()
-    rec_num   = 0
-    all_recs  = []
-    for (intent, fit), grp in grouped:
-        if not grp["items"]:
-            continue
-        rec = grp["items"][0]["recommendation"]
-        key = rec["proposed_change"][:60]
-        if key in seen_recs:
-            continue
-        seen_recs.add(key)
-        rec_num += 1
-        impact   = grp["unit_gap"]
-        conf     = rec["confidence"].upper()
-        _ai_model = grp["items"][0].get("ai_model", "") if grp["items"] else ""
-        all_recs.append((rec_num, intent, fit, rec, impact, grp["count"], _ai_model))
+    # Build a lookup from (intent, fit) -> group items for affected-item display
+    items_by_key = {(intent, fit): grp["items"] for (intent, fit), grp in grouped}
+
+    for rec_num, intent, fit, rec, impact, count, *_rest in all_recs:
+        conf          = rec["confidence"].upper()
+        status        = rec.get("systemic_status", "")
+        status_str    = f" [{status}]" if status else ""
+        change_label  = rec["change_type"].replace("_", " ").title()
+        grp_items     = items_by_key.get((intent, fit), [])
 
         lines += [
-            f"### [{rec_num}] {rec['change_type'].replace('_', ' ').title()} "
-            f"-- {intent.upper()} / {fit.replace('_', ' ')}",
-            f"**Impact:** {impact:+,} units across {grp['count']} item(s)  "
-            f"| **Confidence:** {conf}",
+            f"### [{rec_num}]{status_str} {change_label} -- "
+            f"{intent.upper()} / {fit.replace('_', ' ')}",
+            f"**Impact:** {impact:+,} units across {count} item(s)  "
+            f"| **Confidence:** {conf}  | **Systemic Status:** {status}",
             "",
-            f"**Proposed Change:**  ",
+            "**Proposed Change:**  ",
             rec["proposed_change"],
             "",
             f"**Rationale:** {rec['rationale']}",
             "",
-            f"**Affected items:**",
+            "**Affected items:**",
         ]
-        for a in grp["items"][:5]:
+        for a in grp_items[:5]:
             gap_str = f"{a['unit_gap']:+,}u"
             lines.append(
                 f"- `{a['key']}` ({a['customer'][:30]} / {a['brand'][:20]}) "
                 f"Model: {a['ai_model']} | Gap: {gap_str}  "
                 f'Comment: "{a["note"][:80]}"'
             )
-        if len(grp["items"]) > 5:
-            lines.append(f"- ... and {len(grp['items']) - 5} more")
+        if len(grp_items) > 5:
+            lines.append(f"- ... and {len(grp_items) - 5} more")
         lines.append("")
 
     lines += [
@@ -1031,7 +1207,7 @@ def build_report(analyses, grouped, run_date, days):
         f"*Report generated by `scripts/ai_training_review.py` on {run_date}*",
     ]
 
-    return "\n".join(lines), all_recs
+    return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
@@ -1042,15 +1218,18 @@ def _build_systemic_html(systemic_impacts, all_recs):
     if not systemic_impacts:
         return ""
 
-    # Build a quick lookup: rec_num -> (change_type label from all_recs)
+    # Build lookups from all_recs
     rec_labels = {}
+    status_lookup = {}
     for num, intent, fit, rec, impact, count, *_rest in all_recs:
         label = rec["change_type"].replace("_", " ").title()
-        rec_labels[num] = (label, intent, impact)
+        rec_labels[num]   = (label, intent, impact)
+        status_lookup[num] = rec.get("systemic_status", "NEUTRAL")
 
-    TH = ("padding:8px 12px;text-align:left;white-space:nowrap;"
-          "background:#37474f;color:#fff;font-size:12px")
+    TH  = ("padding:8px 12px;text-align:left;white-space:nowrap;"
+           "background:#37474f;color:#fff;font-size:12px")
     THR = TH + ";text-align:right"
+    THC = TH + ";text-align:center"
     TD  = "padding:7px 12px;border-bottom:1px solid #eceff1;font-size:12px;vertical-align:top"
     TDR = TD + ";text-align:right"
     TDC = TD + ";text-align:center"
@@ -1060,28 +1239,44 @@ def _build_systemic_html(systemic_impacts, all_recs):
         "up":    ("background:#e8f5e9;color:#2e7d32", "UP"),
         "mixed": ("background:#fff8e1;color:#e65100", "MIXED"),
     }
+    status_badge = {
+        "VALIDATED": ("background:#e8f5e9;color:#1b5e20", "VALIDATED"),
+        "REJECTED":  ("background:#ffebee;color:#b71c1c", "REJECTED"),
+        "ISOLATED":  ("background:#fff8e1;color:#e65100", "ISOLATED"),
+        "NEUTRAL":   ("background:#f5f5f5;color:#616161", "NEUTRAL"),
+        "":          ("background:#f5f5f5;color:#616161", "--"),
+    }
 
     def _pct(num, denom):
-        """Return (MAN-AI)/AI as a % string, or 'n/a'."""
         if denom and denom != 0:
             return f"{num / abs(denom) * 100:+.1f}%"
         return "n/a"
 
     def _render_row(num_label, kw, sc, cc, vb, va, fat, di, is_combined=False):
-        delta     = va - vb
+        delta       = va - vb
         flagged_pct = f"{cc/sc*100:.0f}%" if sc > 0 else "n/a"
-        pct_b     = _pct(vb, fat)           # (MAN-AI)/AI before
-        pct_a_denom = fat + (vb - va)       # estimated new AI total = fat + AI_change
-        pct_a     = _pct(va, pct_a_denom)   # (MAN-newAI)/newAI after
+        pct_b       = _pct(vb, fat)
+        pct_a_denom = fat + (vb - va)
+        pct_a       = _pct(va, pct_a_denom)
         badge_style, badge_txt = dir_badge.get(di, ("", di.upper()))
         vb_col    = "#c62828" if vb < 0 else "#2e7d32"
         va_col    = "#c62828" if va < 0 else "#2e7d32"
         delta_col = "#2e7d32" if abs(va) < abs(vb) else "#c62828"
         delta_str = f"{delta:+,}" if cc > 0 else "n/a"
-        row_style = f'style="background:#f5f5f5"' if is_combined else ""
+        row_style = 'style="background:#f5f5f5"' if is_combined else ""
         label, intent, impact = rec_labels.get(num_label, ("", "", 0))
         display_label = ("<b>Combined</b>" if is_combined
                         else f"<b>[{num_label}]</b> {label}")
+
+        # Status badge (only for individual rows, not combined)
+        if is_combined:
+            st_html = ""
+        else:
+            st = status_lookup.get(num_label, "NEUTRAL")
+            st_style, st_txt = status_badge.get(st, ("", st))
+            st_html = (f'<td style="{TDC}"><span style="padding:2px 8px;border-radius:3px;'
+                       f'font-weight:bold;font-size:11px;{st_style}">{st_txt}</span></td>')
+
         return f"""
 <tr {row_style}>
   <td style="{TD}">{display_label}</td>
@@ -1092,12 +1287,13 @@ def _build_systemic_html(systemic_impacts, all_recs):
   <td style="{TDR};color:{va_col}">{va:+,} <span style="color:#9e9e9e;font-size:11px">({pct_a})</span></td>
   <td style="{TDR};color:{delta_col};font-weight:bold">{delta_str}</td>
   <td style="{TDC}"><span style="padding:2px 8px;border-radius:3px;font-weight:bold;font-size:11px;{badge_style}">{badge_txt}</span></td>
+  {st_html}
 </tr>"""
 
     rows = ""
     for si in systemic_impacts:
         if si.get("is_combined"):
-            continue   # render combined last
+            continue
         rows += _render_row(
             si["rec_num"], si["model_keyword"] or "all",
             si["scope_count"], si["criteria_count"],
@@ -1121,10 +1317,12 @@ def _build_systemic_html(systemic_impacts, all_recs):
 <h3 style="margin:28px 0 6px 0;font-size:15px;color:#37474f;border-top:2px solid #eceff1;
            padding-top:18px">Systemic Impact Estimate</h3>
 <p style="margin:0 0 10px 0;font-size:12px;color:#757575">
-  Each row tests that fix <i>in isolation</i> across all active projections with that model.
-  The shaded <b>Combined</b> row shows the effect of implementing all fixes simultaneously.
-  <i>Variance = MAN PRJ minus AI PRJ (flagged records only). % = gap as % of current AI.
-  Before = current state. After = estimated state once fix is applied.</i>
+  Systemic impact is computed <b>before</b> recommendations are finalized.
+  VALIDATED = fix narrows MAN-AI gap and is recommended.
+  REJECTED = fix widens gap; recommendation has been replaced with directional-guard guidance.
+  ISOLATED = 0 records match criteria; individual fix only.
+  Each row tests its fix <i>in isolation</i>. The shaded Combined row shows simultaneous effect.
+  <i>Variance = MAN PRJ minus AI PRJ (flagged records only). % = gap as % of current AI.</i>
 </p>
 <table style="width:100%;border-collapse:collapse;font-size:13px">
   <thead>
@@ -1136,7 +1334,8 @@ def _build_systemic_html(systemic_impacts, all_recs):
       <th style="{THR}">MAN-AI Before</th>
       <th style="{THR}">MAN-AI After</th>
       <th style="{THR}">AI Change</th>
-      <th style="{TH};text-align:center">AI Impact</th>
+      <th style="{THC}">AI Impact</th>
+      <th style="{THC}">Status</th>
     </tr>
   </thead>
   <tbody>{rows}
@@ -1188,23 +1387,41 @@ def send_email(subject, body_html, report_path, dry_run):
 def build_email_html(analyses, all_recs, report_path, run_date, days,
                      systemic_impacts=None):
     total_gap = sum(a["unit_gap"] for a in analyses)
-    n = len(analyses)
     gap_color = "#c62828" if total_gap < 0 else "#2e7d32"
 
-    # Build one row per comment (main table)
+    # Build status lookup: (intent, fit) -> systemic_status
+    status_by_group = {}
+    for num, intent, fit, rec, impact, count, *_rest in all_recs:
+        status_by_group[(intent, fit)] = rec.get("systemic_status", "NEUTRAL")
+
+    status_badge_style = {
+        "VALIDATED": ("background:#e8f5e9;color:#1b5e20", "VALIDATED"),
+        "REJECTED":  ("background:#ffebee;color:#b71c1c", "REJECTED"),
+        "ISOLATED":  ("background:#fff8e1;color:#e65100", "ISOLATED"),
+        "NEUTRAL":   ("background:#f0f0f0;color:#616161", "NEUTRAL"),
+    }
+
+    # Build comment rows
     TD  = "padding:8px 12px;border-bottom:1px solid #e0e0e0;vertical-align:top"
     TDR = TD + ";text-align:right"
 
     comment_rows = ""
     for a in sorted(analyses, key=lambda x: abs(x["unit_gap"]), reverse=True):
-        rec       = a["recommendation"]
-        gap       = a["unit_gap"]
-        gap_col   = "#c62828" if gap < 0 else "#2e7d32"
-        conf      = rec["confidence"].upper()
-        conf_col  = {"HIGH": "#1b5e20", "MEDIUM": "#e65100", "LOW": "#757575"}.get(conf, "#000")
+        rec      = a["recommendation"]
+        gap      = a["unit_gap"]
+        gap_col  = "#c62828" if gap < 0 else "#2e7d32"
+        conf     = rec["confidence"].upper()
+        conf_col = {"HIGH": "#1b5e20", "MEDIUM": "#e65100", "LOW": "#757575"}.get(conf, "#000")
         note_full = a["note"] or ""
-        # Customer short name (strip INC/LLC/CORP suffixes for brevity)
-        cust = re.sub(r'\b(INC\.?|LLC|CORP\.?|LTD\.?|CO\.?)\s*$', '', a.get("customer",""), flags=re.I).strip().rstrip(",.")
+        cust = re.sub(r'\b(INC\.?|LLC|CORP\.?|LTD\.?|CO\.?)\s*$', '',
+                      a.get("customer", ""), flags=re.I).strip().rstrip(",.")
+
+        # Per-comment systemic status badge
+        st     = status_by_group.get((a["intent"], a["fit"]), "NEUTRAL")
+        st_sty, st_txt = status_badge_style.get(st, ("background:#f0f0f0;color:#616161", st))
+        st_badge = (f'<span style="{st_sty};padding:1px 6px;border-radius:3px;'
+                    f'font-weight:bold;font-size:10px;margin-bottom:4px;'
+                    f'display:inline-block">{st_txt}</span><br>')
 
         comment_rows += f"""
 <tr>
@@ -1213,21 +1430,23 @@ def build_email_html(analyses, all_recs, report_path, run_date, days,
     <span style="color:#616161;font-size:12px">{a.get('mstyle','')} &nbsp;|&nbsp; {a.get('brand','')[:28]}</span>
   </td>
   <td style="{TD};font-size:12px;color:#424242;max-width:220px">
-    <i>"{note_full[:120]}{"..." if len(note_full)>120 else ""}"</i>
+    <i>"{note_full[:120]}{"..." if len(note_full) > 120 else ""}"</i>
   </td>
   <td style="{TD}">
     <span style="background:#e3f2fd;color:#0d47a1;padding:2px 7px;border-radius:3px;font-size:12px">{a['ai_model']}</span>
   </td>
   <td style="{TDR};color:{gap_col};font-weight:bold">{gap:+,}u</td>
-  <td style="{TD};font-size:12px;max-width:300px;word-wrap:break-word">{rec['proposed_change']}</td>
+  <td style="{TD};font-size:12px;max-width:300px;word-wrap:break-word">
+    {st_badge}{rec['proposed_change']}
+  </td>
   <td style="{TD};text-align:center"><span style="color:{conf_col};font-weight:bold;font-size:12px">{conf}</span></td>
 </tr>"""
 
     report_path_str = str(report_path)
-    claude_cmd = f'implement ai training recommendations'
+    claude_cmd = "implement ai training recommendations"
 
     html = f"""<html>
-<body style="font-family:Arial,sans-serif;font-size:14px;color:#212121;max-width:980px;margin:0 auto">
+<body style="font-family:Arial,sans-serif;font-size:14px;color:#212121;max-width:1000px;margin:0 auto">
 
 <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
 <tr>
@@ -1241,6 +1460,16 @@ def build_email_html(analyses, all_recs, report_path, run_date, days,
   </td>
 </tr>
 </table>
+
+<p style="margin:0 0 10px 0;font-size:12px;color:#616161;background:#f5f5f5;padding:8px 12px;border-radius:4px">
+  <b>How to read this:</b> Recommendations are validated against systemic impact before being shown.
+  <span style="background:#e8f5e9;color:#1b5e20;padding:1px 6px;border-radius:3px;font-weight:bold;font-size:10px">VALIDATED</span>
+  = fix narrows MAN-AI gap.
+  <span style="background:#ffebee;color:#b71c1c;padding:1px 6px;border-radius:3px;font-weight:bold;font-size:10px">REJECTED</span>
+  = fix would widen gap; see directional-guard alternative.
+  <span style="background:#fff8e1;color:#e65100;padding:1px 6px;border-radius:3px;font-weight:bold;font-size:10px">ISOLATED</span>
+  = one-off item, no systemic pattern.
+</p>
 
 <table style="width:100%;border-collapse:collapse;font-size:13px">
   <thead>
@@ -1345,9 +1574,8 @@ def main():
         print(f"  [WARN] Only {len(man_fids)} MAN PRJ FIDs found (expected 26).",
               flush=True)
 
-    # Fetch AI Training comments (FLAG='AI Training' -- already-reviewed ones
-    # have FLAG='Reviewed' in QB and will not match this query)
-    print("\n[1/4] Fetching AI Training comments...", flush=True)
+    # Step 1: Fetch AI Training comments
+    print("\n[1/5] Fetching AI Training comments...", flush=True)
     comments, note_fid = fetch_ai_training_comments(args.days, note_fid)
 
     if not comments:
@@ -1355,13 +1583,13 @@ def main():
         print("Done.", flush=True)
         return
 
-    # Fetch projections
-    print("\n[2/4] Fetching projection records...", flush=True)
+    # Step 2: Fetch projections
+    print("\n[2/5] Fetching projection records...", flush=True)
     keys = {sval(c, C_ACCT_MSTYLE) for c in comments if sval(c, C_ACCT_MSTYLE)}
     projections = fetch_projections(keys, man_fids, l4w_fid)
 
-    # Analyze each comment
-    print("\n[3/4] Analyzing comments...", flush=True)
+    # Step 3: Analyze each comment (raw recommendations, not yet validated)
+    print("\n[3/5] Analyzing comments...", flush=True)
     analyses = []
     for c in comments:
         key  = sval(c, C_ACCT_MSTYLE)
@@ -1373,14 +1601,26 @@ def main():
 
     grouped = aggregate(analyses)
 
-    # Build report (first pass -- produces all_recs list for systemic estimator)
-    print("\n[4/5] Building report...", flush=True)
-    report_md, all_recs = build_report(analyses, grouped, run_date, args.days)
+    # Step 4a: Build flat recommendation list FIRST (before systemic check)
+    print("\n[4a/5] Building recommendation list...", flush=True)
+    all_recs = _build_all_recs(grouped)
+    print(f"  {len(all_recs)} unique recommendation(s) identified.")
 
-    # Estimate systemic impact across ALL active projections for each recommendation
-    print("\n[5/5] Estimating systemic impact across all active projections...",
+    # Step 4b: Estimate systemic impact across ALL active projections
+    print("\n[4b/5] Estimating systemic impact across all active projections...",
           flush=True)
     systemic_impacts = estimate_systemic_impact(all_recs, man_fids)
+
+    # Step 4c: Validate -- reject or flag recommendations that widen MAN-AI gap
+    print("\n[4c/5] Validating recommendations against systemic impact...", flush=True)
+    all_recs = validate_and_override_recs(all_recs, systemic_impacts)
+    for num, intent, fit, rec, impact, count, *_ in all_recs:
+        status = rec.get("systemic_status", "NEUTRAL")
+        print(f"  [{num}] {intent}/{fit} -> {status}")
+
+    # Step 5: Build report with validated recommendations
+    print("\n[5/5] Building report and sending email...", flush=True)
+    report_md = build_report(analyses, grouped, all_recs, run_date, args.days)
 
     # Append systemic impact section to the markdown report
     if systemic_impacts:
@@ -1388,15 +1628,15 @@ def main():
             "",
             "## 5. Systemic Impact Estimate",
             "",
-            ("*Estimated effect if proposed changes are deployed across all active "
-             "projections. Scope = all records with that AI model type. "
-             "Flagged = records matching the detection criteria. "
+            ("*Systemic impact was computed BEFORE recommendations were finalized. "
+             "VALIDATED = fix narrows MAN-AI gap. REJECTED = fix widens gap. "
+             "ISOLATED = 0 records match criteria. "
              "Variance = MAN PRJ 26w - AI PRJ 26w (flagged records only). "
              "After = MAN - estimated new AI once fix is applied.*"),
             "",
             ("| Change # | Model | In Scope | Flagged | "
-             "MAN-AI Before | Before% | MAN-AI After | After% | AI Change | Direction |"),
-            "|---|---|---|---|---|---|---|---|---|---|",
+             "MAN-AI Before | Before% | MAN-AI After | After% | AI Change | Direction | Status |"),
+            "|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for si in systemic_impacts:
             num   = si["rec_num"]
@@ -1414,9 +1654,15 @@ def main():
             pct_a = f"{va/new_ai_est*100:+.1f}%" if new_ai_est else "n/a"
             is_comb = si.get("is_combined", False)
             label = "**Combined**" if is_comb else f"[{num}]"
+            # Get status for this rec_num
+            st = next(
+                (rec.get("systemic_status", "") for n, i, f, rec, *_ in all_recs
+                 if n == num),
+                "COMBINED" if is_comb else ""
+            )
             sys_lines.append(
                 f"| {label} | {kw} | {sc:,} | {cc:,}{pct_flagged} | "
-                f"{vb:+,} | {pct_b} | {va:+,} | {pct_a} | {delta:+,} | {di} |"
+                f"{vb:+,} | {pct_b} | {va:+,} | {pct_a} | {delta:+,} | {di} | {st} |"
             )
         report_md += "\n" + "\n".join(sys_lines) + "\n"
 
@@ -1439,10 +1685,16 @@ def main():
 
     # Print summary
     total_gap = sum(a["unit_gap"] for a in analyses)
+    statuses  = [rec.get("systemic_status", "NEUTRAL")
+                 for _, _, _, rec, *_ in all_recs]
     print(f"\n{'='*60}", flush=True)
     print(f"  COMPLETE  |  {len(analyses)} comments  |  "
           f"Net gap: {total_gap:+,}u  |  {len(all_recs)} recommendations",
           flush=True)
+    for s in ["VALIDATED", "REJECTED", "ISOLATED", "NEUTRAL"]:
+        n = statuses.count(s)
+        if n:
+            print(f"    {s}: {n}", flush=True)
     print(f"{'='*60}\n", flush=True)
 
 
