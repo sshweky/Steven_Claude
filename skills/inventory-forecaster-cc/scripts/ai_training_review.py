@@ -764,14 +764,17 @@ def _try_wrong_model_variations(rows, man_fid_list):
                 # Trend-aware switch: use max(L4W, L13W) * 26
                 base = max(l4w, l13w) if l4w > 0 else l13w
                 fae += base * 26
-        if cc > 0:
+        if cc >= MIN_SYSTEMIC_RECORDS:   # must flag enough records to be truly systemic
             vb = int(fmt) - int(fat)
             va = int(fmt) - int(fae)
             if abs(va) < abs(vb):
+                vb_pct = vb / fmt * 100 if fmt else 0.0
+                va_pct = va / fmt * 100 if fmt else 0.0
                 return (
                     {"cc": int(cc), "vb": vb, "va": va, "fmt": int(fmt),
                      "fat": int(fat), "fae": int(fae),
-                     "crit_type": crit_type, **params},
+                     "crit_type": crit_type, "vb_pct": vb_pct, "va_pct": va_pct,
+                     **params},
                     label
                 )
     return None, None
