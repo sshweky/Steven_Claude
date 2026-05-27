@@ -1394,9 +1394,9 @@ def main():
              "Variance = MAN PRJ 26w - AI PRJ 26w (flagged records only). "
              "After = MAN - estimated new AI once fix is applied.*"),
             "",
-            ("| Change # | Model | In Scope | Flagged | MAN-AI Before | "
-             "MAN-AI After | Delta | Direction |"),
-            "|---|---|---|---|---|---|---|---|",
+            ("| Change # | Model | In Scope | Flagged | "
+             "MAN-AI Before | Before% | MAN-AI After | After% | AI Change | Direction |"),
+            "|---|---|---|---|---|---|---|---|---|---|",
         ]
         for si in systemic_impacts:
             num   = si["rec_num"]
@@ -1405,12 +1405,18 @@ def main():
             cc    = si["criteria_count"]
             vb    = si["variance_before"]
             va    = si["variance_after"]
+            fat   = si["flagged_ai_total"]
             delta = va - vb
             di    = si["direction"].upper()
-            pct   = f" ({cc/sc*100:.0f}%)" if sc > 0 else ""
+            pct_flagged = f" ({cc/sc*100:.0f}%)" if sc > 0 else ""
+            pct_b = f"{vb/fat*100:+.1f}%" if fat else "n/a"
+            new_ai_est = fat + (vb - va)
+            pct_a = f"{va/new_ai_est*100:+.1f}%" if new_ai_est else "n/a"
+            is_comb = si.get("is_combined", False)
+            label = "**Combined**" if is_comb else f"[{num}]"
             sys_lines.append(
-                f"| [{num}] | {kw} | {sc:,} | {cc:,}{pct} | "
-                f"{vb:+,} | {va:+,} | {delta:+,} | {di} |"
+                f"| {label} | {kw} | {sc:,} | {cc:,}{pct_flagged} | "
+                f"{vb:+,} | {pct_b} | {va:+,} | {pct_a} | {delta:+,} | {di} |"
             )
         report_md += "\n" + "\n".join(sys_lines) + "\n"
 
