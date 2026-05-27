@@ -482,6 +482,23 @@ def generate_recommendation(intent, fit, ai_model, diagnosis, note):
         )
 
     if intent == "decrease" and fit == "over_projecting":
+        note_lo = (note or "").lower()
+        if is_crost and ("anomaly" in note_lo or "one.time" in note_lo
+                         or "spike" in note_lo or "anomaly" in note_lo):
+            return dict(
+                change_type="threshold",
+                proposed_change=(
+                    "Croston's model ingested a one-time spike order as a demand signal. "
+                    "Fix: add outlier-trimming to Croston's history input -- if any single "
+                    "week >= 3x the L13W mean, cap that week at the L13W mean before "
+                    "feeding Croston's. Alternatively, add a post-Croston guard: "
+                    "if Croston output > L13W * 2.5x, cap at L13W * 1.5x."
+                ),
+                confidence="high",
+                rationale="Croston's is designed for sparse/intermittent demand. "
+                          "A large one-time order inflates the z (demand-per-event) "
+                          "estimate for all future forecasts until history rolls off.",
+            )
         return dict(
             change_type="threshold",
             proposed_change=(
