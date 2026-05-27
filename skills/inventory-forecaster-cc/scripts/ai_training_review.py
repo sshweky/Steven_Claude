@@ -780,67 +780,85 @@ def send_email(subject, body_html, report_path, dry_run):
 def build_email_html(analyses, all_recs, report_path, run_date, days):
     total_gap = sum(a["unit_gap"] for a in analyses)
     n = len(analyses)
+    gap_color = "#c62828" if total_gap < 0 else "#2e7d32"
 
-    rec_rows = ""
-    for num, intent, fit, rec, impact, count in all_recs[:10]:
-        conf_color = {"HIGH": "#1b5e20", "MEDIUM": "#e65100", "LOW": "#757575"}.get(
-            rec["confidence"].upper(), "#000")
-        rec_rows += (
-            f"<tr>"
-            f"<td style='padding:6px 10px;border-bottom:1px solid #eee'><b>[{num}]</b></td>"
-            f"<td style='padding:6px 10px;border-bottom:1px solid #eee'>"
-            f"{intent} / {fit.replace('_',' ')}</td>"
-            f"<td style='padding:6px 10px;border-bottom:1px solid #eee'>"
-            f"{impact:+,}u / {count} items</td>"
-            f"<td style='padding:6px 10px;border-bottom:1px solid #eee;color:{conf_color}'>"
-            f"{rec['confidence'].upper()}</td>"
-            f"<td style='padding:6px 10px;border-bottom:1px solid #eee;font-size:12px'>"
-            f"{rec['proposed_change'][:120]}...</td>"
-            f"</tr>"
-        )
+    # Build one row per comment (main table)
+    TD  = "padding:8px 12px;border-bottom:1px solid #e0e0e0;vertical-align:top"
+    TDR = TD + ";text-align:right"
 
-    report_path_str = str(report_path).replace("\\", "/")
-    claude_prompt   = (
-        f"I have a new AI training review report at {report_path_str}. "
-        f"Please read it and implement the approved changes."
-    )
+    comment_rows = ""
+    for a in sorted(analyses, key=lambda x: abs(x["unit_gap"]), reverse=True):
+        rec       = a["recommendation"]
+        gap       = a["unit_gap"]
+        gap_col   = "#c62828" if gap < 0 else "#2e7d32"
+        conf      = rec["confidence"].upper()
+        conf_col  = {"HIGH": "#1b5e20", "MEDIUM": "#e65100", "LOW": "#757575"}.get(conf, "#000")
+        note_full = a["note"] or ""
+        # Customer short name (strip INC/LLC/CORP suffixes for brevity)
+        cust = re.sub(r'\b(INC\.?|LLC|CORP\.?|LTD\.?|CO\.?)\s*$', '', a.get("customer",""), flags=re.I).strip().rstrip(",.")
 
-    html = f"""
-<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#212121;max-width:900px">
-<h2 style="color:#1565c0">AI Training Comment Review &mdash; {run_date}</h2>
-<p>
-  <b>{n} unreviewed AI Training comment(s)</b> analyzed from the last {days} days.<br>
-  Net projection gap: <b style="color:{'#c62828' if total_gap < 0 else '#2e7d32'}">{total_gap:+,} units</b>
-</p>
+        comment_rows += f"""
+<tr>
+  <td style="{TD}">
+    <b style="font-size:13px">{cust}</b><br>
+    <span style="color:#616161;font-size:12px">{a.get('mstyle','')} &nbsp;|&nbsp; {a.get('brand','')[:28]}</span>
+  </td>
+  <td style="{TD};font-size:12px;color:#424242;max-width:220px">
+    <i>"{note_full[:120]}{"..." if len(note_full)>120 else ""}"</i>
+  </td>
+  <td style="{TD}">
+    <span style="background:#e3f2fd;color:#0d47a1;padding:2px 7px;border-radius:3px;font-size:12px">{a['ai_model']}</span>
+  </td>
+  <td style="{TDR};color:{gap_col};font-weight:bold">{gap:+,}u</td>
+  <td style="{TD};font-size:12px;max-width:260px">{rec['proposed_change'][:180]}{"..." if len(rec['proposed_change'])>180 else ""}</td>
+  <td style="{TD};text-align:center"><span style="color:{conf_col};font-weight:bold;font-size:12px">{conf}</span></td>
+</tr>"""
 
-<h3 style="color:#1565c0">Proposed Model Changes</h3>
-<table style="border-collapse:collapse;width:100%">
-  <tr style="background:#1565c0;color:#fff">
-    <th style="padding:8px 10px">#</th>
-    <th style="padding:8px 10px">Pattern</th>
-    <th style="padding:8px 10px">Impact</th>
-    <th style="padding:8px 10px">Confidence</th>
-    <th style="padding:8px 10px">Proposed Change</th>
-  </tr>
-  {rec_rows}
+    report_path_str = str(report_path)
+    claude_cmd = f'implement ai training recommendations'
+
+    html = f"""<html>
+<body style="font-family:Arial,sans-serif;font-size:14px;color:#212121;max-width:980px;margin:0 auto">
+
+<table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+<tr>
+  <td style="padding:16px 0 8px 0">
+    <span style="font-size:20px;font-weight:bold;color:#1565c0">AI Training Review</span>
+    &nbsp;&nbsp;<span style="color:#757575;font-size:14px">{run_date} &nbsp;|&nbsp; last {days} days</span>
+  </td>
+  <td style="text-align:right;padding:16px 0 8px 0">
+    <span style="font-size:22px;font-weight:bold;color:{gap_color}">{total_gap:+,} units</span><br>
+    <span style="font-size:11px;color:#9e9e9e">net MAN - AI gap</span>
+  </td>
+</tr>
 </table>
 
-<h3 style="color:#1565c0;margin-top:24px">To Review and Approve</h3>
-<ol>
-  <li>Open the full report: <code>{report_path_str}</code></li>
-  <li>Open Claude Code and paste:<br>
-      <code style="background:#f5f5f5;padding:4px 8px;display:inline-block;margin:4px 0">
-        {claude_prompt}
-      </code>
-  </li>
-  <li>Tell Claude which changes (#1, #2, ...) to implement.</li>
-</ol>
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+  <thead>
+    <tr style="background:#1565c0;color:#fff">
+      <th style="padding:9px 12px;text-align:left;white-space:nowrap">Customer / Item</th>
+      <th style="padding:9px 12px;text-align:left">Planner Comment</th>
+      <th style="padding:9px 12px;text-align:left;white-space:nowrap">Model</th>
+      <th style="padding:9px 12px;text-align:right;white-space:nowrap">Gap</th>
+      <th style="padding:9px 12px;text-align:left">Recommendation</th>
+      <th style="padding:9px 12px;text-align:center;white-space:nowrap">Confidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    {comment_rows}
+  </tbody>
+</table>
 
-<hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0">
-<p style="font-size:11px;color:#9e9e9e">
-  Generated by scripts/ai_training_review.py &mdash; {run_date}<br>
+<p style="margin-top:24px;font-size:13px;color:#424242">
+  <b>To approve and implement:</b> Open Claude Code and say
+  <code style="background:#f5f5f5;border:1px solid #e0e0e0;padding:3px 8px;border-radius:3px">{claude_cmd}</code>
+  &mdash; Claude will read the full report and ask which changes to implement.
+</p>
+
+<p style="margin-top:4px;font-size:11px;color:#9e9e9e">
   Full report: {report_path_str}
 </p>
+
 </body></html>"""
     return html
 
