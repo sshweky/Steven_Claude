@@ -920,7 +920,8 @@ def send_email(subject, body_html, report_path, dry_run):
         print(f"  Report saved at: {report_path}")
 
 
-def build_email_html(analyses, all_recs, report_path, run_date, days):
+def build_email_html(analyses, all_recs, report_path, run_date, days,
+                     systemic_impacts=None):
     total_gap = sum(a["unit_gap"] for a in analyses)
     n = len(analyses)
     gap_color = "#c62828" if total_gap < 0 else "#2e7d32"
