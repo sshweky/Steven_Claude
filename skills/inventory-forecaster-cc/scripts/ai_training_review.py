@@ -880,6 +880,79 @@ def build_report(analyses, grouped, run_date, days):
 
 
 # ---------------------------------------------------------------------------
+# Step 5b -- Systemic impact HTML block (injected into email)
+# ---------------------------------------------------------------------------
+def _build_systemic_html(systemic_impacts, all_recs):
+    """Return an HTML block (string) with the systemic impact table, or '' if no data."""
+    if not systemic_impacts:
+        return ""
+
+    # Build a quick lookup: rec_num -> (change_type label from all_recs)
+    rec_labels = {}
+    for num, intent, fit, rec, impact, count in all_recs:
+        label = rec["change_type"].replace("_", " ").title()
+        rec_labels[num] = (label, intent, impact)
+
+    TH = ("padding:8px 12px;text-align:left;white-space:nowrap;"
+          "background:#37474f;color:#fff;font-size:12px")
+    THR = TH + ";text-align:right"
+    TD  = "padding:7px 12px;border-bottom:1px solid #eceff1;font-size:12px;vertical-align:top"
+    TDR = TD + ";text-align:right"
+    TDC = TD + ";text-align:center"
+
+    dir_badge = {
+        "down":  ("background:#ffebee;color:#c62828", "DOWN"),
+        "up":    ("background:#e8f5e9;color:#2e7d32", "UP"),
+        "mixed": ("background:#fff8e1;color:#e65100", "MIXED"),
+    }
+
+    rows = ""
+    for si in systemic_impacts:
+        num   = si["rec_num"]
+        kw    = si["model_keyword"] or "all"
+        sc    = si["scope_count"]
+        at    = si["scope_ai_total"]
+        cc    = si["criteria_count"]
+        di    = si["direction"]
+        label, intent, impact = rec_labels.get(num, ("", "", 0))
+        badge_style, badge_txt = dir_badge.get(di, ("", di.upper()))
+        pct = f"{cc/sc*100:.0f}%" if sc > 0 else "n/a"
+
+        rows += f"""
+<tr>
+  <td style="{TD}"><b>[{num}]</b> {label}</td>
+  <td style="{TD}">{kw}</td>
+  <td style="{TDR}">{sc:,}</td>
+  <td style="{TDR}">{at:,}</td>
+  <td style="{TDR}">{cc:,} <span style="color:#9e9e9e">({pct})</span></td>
+  <td style="{TDC}"><span style="padding:2px 8px;border-radius:3px;font-weight:bold;font-size:11px;{badge_style}">{badge_txt}</span></td>
+</tr>"""
+
+    return f"""
+<h3 style="margin:28px 0 6px 0;font-size:15px;color:#37474f;border-top:2px solid #eceff1;
+           padding-top:18px">Systemic Impact Estimate</h3>
+<p style="margin:0 0 10px 0;font-size:12px;color:#757575">
+  If the proposed model changes are deployed, how many active projections would be affected?
+  <i>Scope = records with that AI model type. Flagged = records that match the detection
+  criteria for the fix (i.e. would actually change).</i>
+</p>
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+  <thead>
+    <tr>
+      <th style="{TH}">Change</th>
+      <th style="{TH}">Model</th>
+      <th style="{THR}">Records in Scope</th>
+      <th style="{THR}">AI Units in Scope</th>
+      <th style="{THR}">Flagged by Criteria</th>
+      <th style="{TH};text-align:center">Direction</th>
+    </tr>
+  </thead>
+  <tbody>{rows}
+  </tbody>
+</table>"""
+
+
+# ---------------------------------------------------------------------------
 # Step 6 -- Send email via Outlook COM
 # ---------------------------------------------------------------------------
 def send_email(subject, body_html, report_path, dry_run):
