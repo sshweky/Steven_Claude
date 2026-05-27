@@ -5827,9 +5827,10 @@ def _switchover_backfill(rows, prj_cols):
     # non-zero MAN PRJ week.  Variant-record creation only fires for case
     # (1) since auto-detected pairs only exist when both sides are already
     # in scope.
-    date_computed = 0
-    date_cleared  = 0
-    no_proj_alert = 0
+    date_computed    = 0
+    date_cleared     = 0
+    active_activated = 0
+    no_proj_alert    = 0
     variant_to_create = 0
     for r in rows:
         k = r.get("Acct_MStyle_Key_", "")
@@ -5922,21 +5923,32 @@ def _switchover_backfill(rows, prj_cols):
             no_proj_alert += 1
             continue
 
-        # Compute Switchover_Date from the column's calendar date
-        d_iso = _col_to_date[first_nonzero_col].isoformat()
-        existing_date = (r.get("Switchover_Date") or "")[:10]
-        if existing_date != d_iso:
-            out["updates"].append({
-                "key": k,
-                "fields": {"Switchover Date": d_iso},
-            })
-            r["Switchover_Date"] = d_iso
-            date_computed += 1
+        # Compute Switchover_Date from the column's calendar date.
+        # Also ensure Switchover_Active is True on the base record -- the
+        # forecaster auto-configured the switchover, so the field should
+        # reflect that automatically (user request 2026-05-27).
+        d_iso          = _col_to_date[first_nonzero_col].isoformat()
+        existing_date  = (r.get("Switchover_Date") or "")[:10]
+        already_active = bool(r.get("Switchover_Active"))
+        date_changed   = (existing_date != d_iso)
+        if date_changed or not already_active:
+            upd_fields = {}
+            if date_changed:
+                upd_fields["Switchover Date"] = d_iso
+                r["Switchover_Date"] = d_iso
+                date_computed += 1
+            if not already_active:
+                upd_fields["Switchover Active"] = True
+                r["Switchover_Active"] = True
+                active_activated += 1
+            out["updates"].append({"key": k, "fields": upd_fields})
 
     if date_computed:
         print(f"      [Switchover] Switchover_Date auto-set: {date_computed} record(s)")
     if date_cleared:
         print(f"      [Switchover] Switchover_Date cleared (stale): {date_cleared} record(s)")
+    if active_activated:
+        print(f"      [Switchover] Switchover_Active auto-set True: {active_activated} record(s)")
     if no_proj_alert:
         print(f"      [Switchover] Alerts (no variant projections): {no_proj_alert} record(s)")
     if variant_to_create:
