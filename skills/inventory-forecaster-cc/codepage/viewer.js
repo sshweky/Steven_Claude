@@ -1217,8 +1217,22 @@ async function _fetchAtsForMstyle(r) {
 // Returns { norm, raw, reason } or null when the bullet is not present.
 function _parseNormL13w(narrative) {
   if (!narrative) return null;
+  // Primary: machine-readable hidden span (always present in narratives written
+  // after 2026-05-27).  Attribute order is fixed by the forecaster so a single
+  // pass captures norm, raw, and reason reliably.
+  const spanM = narrative.match(
+    /class="norm-l13w-data"\s+data-norm="(\d+)"\s+data-raw="(\d+)"\s+data-reason="([^"]*)"/i
+  );
+  if (spanM) return {
+    norm:   parseInt(spanM[1], 10),
+    raw:    parseInt(spanM[2], 10),
+    reason: spanM[3] || null,
+  };
+  // Fallback: text format for older narratives.
+  // Use [^0-9]+ to skip the </b> tag the forecaster places between the label
+  // and the value -- [:\s]+ would fail on the '<' character.
   const m = narrative.match(
-    /Normalized Ord\/Wk L13w[:\s]+([\d,]+)\/wk\s*\(raw L13W[:\s]+([\d,]+)\/wk\s*--\s*([^)]+)\)/i
+    /Normalized Ord\/Wk L13w[^0-9]+([\d,]+)\/wk[^(]*\(raw L13W[^0-9]+([\d,]+)\/wk\s*--\s*([^)]+)\)/i
   );
   if (!m) return null;
   return {

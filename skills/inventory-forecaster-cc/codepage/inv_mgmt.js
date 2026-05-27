@@ -18,7 +18,7 @@ var QB_TOKEN  = 'QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s';
 var INVF_TID  = 'bpsaju5pm';
 var PROJ_TID  = 'bpd237tvm';
 var CACHE_KEY     = 'pp_inv_mgmt_v3';          // main (phase 1) IDB key
-var CACHE_KEY_DTL = 'pp_inv_mgmt_dtl_v3';      // detail (phase 2) IDB key
+var CACHE_KEY_DTL = 'pp_inv_mgmt_dtl_v4';      // detail (phase 2) IDB key -- v4: added need_qty/etd per supplier
 var CACHE_KEY_SS  = 'pp_inv_mgmt_ss_v4';       // sessionStorage fast-path key (bump to evict v3 stale data)
 var CACHE_TTL     = 24 * 60 * 60 * 1000;       // 24h (was 6h)
 // Pre-filter: exclude truly inactive items (qty_oh=0 AND opt_wos=0).
@@ -1644,12 +1644,23 @@ function renderDetail(r) {
   if (!r.is_replen || r.prj_wk <= 0 || r.moq <= 0 || r.lt_trans_days <= 0 || r.opt_oh <= 0) {
     purRecSection = '';
   } else if (r.purchase_rec > 0) {
-    // Retrieve persisted selections for this mstyle
-    var purSel = purchaseSelections[r.mstyle] || {};
-    var needQtyVal = purSel.needQty != null ? purSel.needQty : r.purchase_rec;
-    var chosenSupplier = purSel.chosenSupplier || '';
+    // Initialize purchaseSelections from QB-stored values on first render
+    var _msId = r.mstyle.replace(/[^a-zA-Z0-9]/g, '_');
+    if (!purchaseSelections[r.mstyle]) {
+      purchaseSelections[r.mstyle] = {
+        main: { checked:(r.need_qty_main||0)>0, needQty:r.need_qty_main||0, etd:r.need_etd_main||'' },
+        alt1: { checked:(r.need_qty_alt1||0)>0, needQty:r.need_qty_alt1||0, etd:r.need_etd_alt1||'' },
+        alt2: { checked:(r.need_qty_alt2||0)>0, needQty:r.need_qty_alt2||0, etd:r.need_etd_alt2||'' },
+        alt3: { checked:(r.need_qty_alt3||0)>0, needQty:r.need_qty_alt3||0, etd:r.need_etd_alt3||'' }
+      };
+    }
+    var purSel = purchaseSelections[r.mstyle];
 
-    // Summary bar: Rec Qty | Need Qty | Required ETD | Receipt Needed By
+    // Compute total need qty across checked suppliers
+    var totalNeedQty = 0;
+    ['main','alt1','alt2','alt3'].forEach(function(k){var ss=purSel[k]||{};if(ss.checked)totalNeedQty+=(ss.needQty||0);});
+
+    // Summary bar: Rec Qty | Total Need Qty (read-only) | Required ETD (baseline) | Receipt Needed By
     var etdColor = r.purchase_rec_push_supplier ? '#c62828' : '#e65100';
     var etdDisplay = r.purchase_rec_etd ? fmtDate(r.purchase_rec_etd) : '&#8212;';
     var pushBadge = r.purchase_rec_push_supplier
@@ -1660,28 +1671,22 @@ function renderDetail(r) {
       : '';
 
     var purSummary = '<div style="display:flex;gap:0;flex-wrap:wrap;align-items:stretch;background:#e8eaf6;border:1px solid #c5cae9;border-radius:6px;margin-bottom:16px;overflow:hidden;">'
-      // Rec Qty
       +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
         +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Recommended Qty</div>'
         +'<div style="font-size:24px;font-weight:700;color:#1a237e;line-height:1;">'+fmtInt(r.purchase_rec)+'</div>'
         +'<div style="font-size:10px;color:#888;margin-top:1px;">units</div>'
       +'</div>'
-      // Need Qty (editable)
       +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
-        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Need Qty</div>'
-        +'<input type="number" id="needQty_'+esc(r.mstyle)+'" value="'+needQtyVal+'" min="0" step="1" '
-          +'style="width:110px;font-size:18px;font-weight:700;color:#1a237e;border:2px solid #7986cb;border-radius:4px;padding:2px 6px;text-align:right;font-family:inherit;background:#fff;" '
-          +'onchange="(function(el){var ms=\''+esc(r.mstyle)+'\';if(!purchaseSelections[ms])purchaseSelections[ms]={};purchaseSelections[ms].needQty=parseInt(el.value)||0;})(this)">'
-        +'<div style="font-size:10px;color:#888;margin-top:1px;">&nbsp;</div>'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Total Need Qty</div>'
+        +'<div style="font-size:24px;font-weight:700;color:#1a237e;line-height:1;" id="purTotalNeedQty_'+_msId+'">'+(totalNeedQty||0).toLocaleString()+'</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">sum of checked suppliers</div>'
       +'</div>'
-      // Required ETD
       +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
-        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Required ETD</div>'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Baseline Required ETD</div>'
         +'<div style="font-size:18px;font-weight:700;color:'+etdColor+';">'+etdDisplay+pushBadge+'</div>'
         +nxtAvlNote
-        +'<div style="font-size:10px;color:#888;margin-top:1px;">Receipt - '+r.transit_days+'d transit</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">use to set per-supplier ETD below</div>'
       +'</div>'
-      // Receipt Needed By
       +'<div style="flex:0 0 auto;padding:12px 20px;">'
         +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Receipt Needed By</div>'
         +'<div style="font-size:18px;font-weight:700;color:#333;">'+(r.purchase_rec_receipt_date?fmtDate(r.purchase_rec_receipt_date):'&#8212;')+'</div>'
@@ -1689,7 +1694,7 @@ function renderDetail(r) {
       +'</div>'
       +'</div>';
 
-    // Build supplier columns - extract main name from before first <br> in supplier_info
+    // Build supplier columns
     var suppCols = [];
     var mainName = '';
     if (r.supplier_info) {
@@ -1716,49 +1721,52 @@ function renderDetail(r) {
       elc_nj:r.alt3_elc_nj, elc_la:r.alt3_elc_la, mu_nj:r.alt3_mu_nj, mu_la:r.alt3_mu_la,
       qty_ord:r.alt3_qty_ord, pct_ord:r.alt3_pct_ord });
 
-    // Best MU% NJ for green highlight
     var bestMU = suppCols.reduce(function(b, s){ return (s.mu_nj||0) > b ? (s.mu_nj||0) : b; }, 0);
 
-    // Card row helpers
     function scRow(lbl, val, hl) {
       var vStyle = hl ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
       return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
-        +'<span style="color:#666;">'+lbl+'</span>'
-        +'<span style="'+vStyle+'">'+val+'</span>'
-        +'</div>';
+        +'<span style="color:#666;">'+lbl+'</span><span style="'+vStyle+'">'+val+'</span></div>';
     }
-    // Two values on one line, each with its own sub-label
     function scRowPair(lbl1, val1, lbl2, val2, hl1, hl2) {
       var s1 = hl1 ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
       var s2 = hl2 ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
       return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
-        +'<span style="color:#666;">'+lbl1+'</span>'
-        +'<span style="'+s1+'margin-right:10px;">'+val1+'</span>'
-        +'<span style="color:#666;">'+lbl2+'</span>'
-        +'<span style="'+s2+'">'+val2+'</span>'
-        +'</div>';
+        +'<span style="color:#666;">'+lbl1+'</span><span style="'+s1+'margin-right:10px;">'+val1+'</span>'
+        +'<span style="color:#666;">'+lbl2+'</span><span style="'+s2+'">'+val2+'</span></div>';
     }
-    // Section divider with label inside the card body
     function scSection(lbl) {
       return '<div style="font-size:9px;font-weight:700;color:#9e9e9e;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 2px;">'+lbl+'</div>';
     }
+
+    // Receipt date ISO string for ETD default calculation
+    var _rcptIso = r.purchase_rec_receipt_date ? r.purchase_rec_receipt_date.toISOString().slice(0,10) : '';
 
     var suppCards = '<div style="display:flex;gap:12px;flex-wrap:wrap;">';
     if (suppCols.length === 0) {
       suppCards += '<div style="color:#888;font-style:italic;font-size:12px;">No supplier data available for this item.</div>';
     } else {
       suppCols.forEach(function(s) {
-        var isChosen = chosenSupplier === s.key;
+        var ss = purSel[s.key] || { checked:false, needQty:0, etd:'' };
         var isBestMU = (s.mu_nj||0) === bestMU && bestMU > 0;
-        var cardBorder = isChosen ? '2px solid #1b5e20' : (isBestMU ? '2px solid #43a047' : '1px solid #ddd');
-        var cardBg = isChosen ? '#f1f8e9' : '#fff';
-        var hdrBg = s.key === 'main' ? '#283593' : '#3f51b5';
-        var btnStyle = isChosen
-          ? 'width:100%;padding:7px;font-size:11px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:#1b5e20;color:#fff;font-family:inherit;'
-          : 'width:100%;padding:7px;font-size:11px;font-weight:600;border:1px solid #7986cb;border-radius:4px;cursor:pointer;background:#fff;color:#3f51b5;font-family:inherit;';
-        var btnLabel = isChosen ? '&#10003; Selected' : 'Choose this Supplier';
+        var cardBorder = ss.checked ? '2px solid #1b5e20' : (isBestMU ? '2px solid #43a047' : '1px solid #ddd');
+        var cardBg     = ss.checked ? '#f1f8e9' : '#fff';
+        var hdrBg      = s.key === 'main' ? '#283593' : '#3f51b5';
 
-        suppCards += '<div style="flex:1;min-width:190px;max-width:260px;border:'+cardBorder+';border-radius:6px;background:'+cardBg+';overflow:hidden;">'
+        // Default ETD: receipt date minus this supplier's lead time
+        var defaultEtd = ss.etd || (_rcptIso && s.lt ? (function(){
+          var d = new Date(_rcptIso); d.setDate(d.getDate() - s.lt);
+          return d.toISOString().slice(0,10);
+        })() : '');
+
+        var cardId    = 'suppCard_'+_msId+'_'+s.key;
+        var inputsId  = 'suppInputs_'+_msId+'_'+s.key;
+        var chkId     = 'suppChk_'+_msId+'_'+s.key;
+        var nqId      = 'suppNQ_'+_msId+'_'+s.key;
+        var etdId     = 'suppETD_'+_msId+'_'+s.key;
+        var msEsc     = esc(r.mstyle);
+
+        suppCards += '<div id="'+cardId+'" style="flex:1;min-width:190px;max-width:270px;border:'+cardBorder+';border-radius:6px;background:'+cardBg+';overflow:hidden;">'
           +'<div style="background:'+hdrBg+';color:#fff;padding:8px 10px;">'
             +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;opacity:0.8;margin-bottom:2px;">'+esc(s.badge)+'</div>'
             +'<div style="font-size:13px;font-weight:700;line-height:1.25;">'+esc(s.label)+'</div>'
@@ -1772,21 +1780,45 @@ function renderDetail(r) {
             +scRowPair('Units', s.qty_ord ? fmtInt(s.qty_ord) : '&#8212;', '% Total', s.pct_ord ? fmtPct(s.pct_ord) : '&#8212;')
           +'</div>'
           +'<div style="padding:8px 10px;border-top:1px solid #eee;">'
-            +'<button style="'+btnStyle+'" '
-              +'onclick="(function(){var ms=\''+esc(r.mstyle)+'\';var key=\''+s.key+'\';'
-                +'if(!purchaseSelections[ms])purchaseSelections[ms]={};'
-                +'purchaseSelections[ms].chosenSupplier=key;'
-                +'renderDetailForMstyle(ms);})()">'
-            +btnLabel+'</button>'
+            // Use this Supplier checkbox
+            +'<label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;cursor:pointer;color:'+(ss.checked?'#1b5e20':'#3f51b5')+';margin-bottom:8px;">'
+              +'<input type="checkbox" id="'+chkId+'" '+(ss.checked?'checked':'')+' '
+                +'onchange="toggleSuppSelection(\''+msEsc+'\',\''+s.key+'\',this.checked)" '
+                +'style="cursor:pointer;accent-color:#1b5e20;width:14px;height:14px;">'
+              +'Use this Supplier'
+            +'</label>'
+            // Need Qty + Needed ETD inputs (shown when checked)
+            +'<div id="'+inputsId+'" style="display:'+(ss.checked?'block':'none')+';margin-top:4px;">'
+              +'<div style="margin-bottom:6px;">'
+                +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;">Need Qty</div>'
+                +'<input type="number" id="'+nqId+'" value="'+(ss.needQty||0)+'" min="0" step="1" '
+                  +'style="width:100%;font-size:15px;font-weight:700;color:#1a237e;border:2px solid #7986cb;border-radius:4px;padding:3px 6px;text-align:right;font-family:inherit;background:#fff;" '
+                  +'oninput="updateSuppNeedQty(\''+msEsc+'\',\''+s.key+'\',this.value)">'
+              +'</div>'
+              +'<div>'
+                +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;">Needed ETD</div>'
+                +'<input type="date" id="'+etdId+'" value="'+esc(defaultEtd)+'" '
+                  +'style="width:100%;font-size:13px;font-weight:600;color:#e65100;border:2px solid #ffcc80;border-radius:4px;padding:3px 6px;font-family:inherit;background:#fff;" '
+                  +'oninput="updateSuppETD(\''+msEsc+'\',\''+s.key+'\',this.value)">'
+              +'</div>'
+            +'</div>'
           +'</div>'
           +'</div>';
       });
     }
     suppCards += '</div>';
 
+    // Save to QB button
+    var saveBtnHtml = '<div style="margin-top:14px;display:flex;align-items:center;gap:12px;">'
+      +'<button onclick="saveSupplierSelections(\''+esc(r.mstyle)+'\')" '
+        +'style="padding:8px 20px;font-size:12px;font-weight:700;background:#1565c0;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:inherit;">&#128190; Save to QB</button>'
+      +'<span id="purSaveStatus_'+_msId+'" style="font-size:11px;color:#888;"></span>'
+      +'</div>';
+
     purRecSection = '<div class="section"><h3>&#128722; Recommended Purchase</h3>'
       +purSummary
       +suppCards
+      +saveBtnHtml
       +'</div>';
   } else {
     purRecSection = '<div class="section"><h3>&#128722; Recommended Purchase</h3>'
@@ -1829,6 +1861,69 @@ function generateRecoSheet() {
   var csv=[headers].concat(rows).map(function(row){return row.map(function(v){return'"'+String(v!=null?v:'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
   var blob=new Blob([''+csv],{type:'text/csv;charset=utf-8;'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PO_Recommendations_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+
+// -- Supplier selection helpers (called from inline event handlers) ------------
+function toggleSuppSelection(ms, key, checked) {
+  if (!purchaseSelections[ms]) purchaseSelections[ms] = {};
+  if (!purchaseSelections[ms][key]) purchaseSelections[ms][key] = { checked:false, needQty:0, etd:'' };
+  purchaseSelections[ms][key].checked = checked;
+  var _id = ms.replace(/[^a-zA-Z0-9]/g,'_');
+  var inp = document.getElementById('suppInputs_'+_id+'_'+key);
+  if (inp) inp.style.display = checked ? 'block' : 'none';
+  var lbl = document.getElementById('suppChk_'+_id+'_'+key);
+  if (lbl && lbl.parentNode) lbl.parentNode.style.color = checked ? '#1b5e20' : '#3f51b5';
+  if (lbl && lbl.parentNode) lbl.parentNode.style.fontWeight = checked ? '700' : '600';
+  var card = document.getElementById('suppCard_'+_id+'_'+key);
+  if (card) { card.style.border = checked ? '2px solid #1b5e20' : '1px solid #ddd'; card.style.background = checked ? '#f1f8e9' : '#fff'; }
+  updatePurTotalNeedQty(ms);
+}
+function updateSuppNeedQty(ms, key, val) {
+  if (!purchaseSelections[ms]) purchaseSelections[ms] = {};
+  if (!purchaseSelections[ms][key]) purchaseSelections[ms][key] = { checked:true, needQty:0, etd:'' };
+  purchaseSelections[ms][key].needQty = parseInt(val) || 0;
+  updatePurTotalNeedQty(ms);
+}
+function updateSuppETD(ms, key, val) {
+  if (!purchaseSelections[ms]) purchaseSelections[ms] = {};
+  if (!purchaseSelections[ms][key]) purchaseSelections[ms][key] = { checked:true, needQty:0, etd:'' };
+  purchaseSelections[ms][key].etd = val;
+}
+function updatePurTotalNeedQty(ms) {
+  var purSel = purchaseSelections[ms] || {};
+  var total = 0;
+  ['main','alt1','alt2','alt3'].forEach(function(k){var ss=purSel[k]||{};if(ss.checked)total+=(ss.needQty||0);});
+  var el = document.getElementById('purTotalNeedQty_'+ms.replace(/[^a-zA-Z0-9]/g,'_'));
+  if (el) el.textContent = total.toLocaleString();
+}
+function saveSupplierSelections(ms) {
+  var purSel = purchaseSelections[ms];
+  if (!purSel) { return; }
+  var statusEl = document.getElementById('purSaveStatus_'+ms.replace(/[^a-zA-Z0-9]/g,'_'));
+  if (statusEl) { statusEl.textContent = 'Saving...'; statusEl.style.color = '#888'; }
+  var data = {};
+  data[IF_F.Mstyle]     = { value: ms };
+  data[IF_F.NeedQtyMain] = { value: (purSel.main&&purSel.main.checked) ? (purSel.main.needQty||0) : 0 };
+  data[IF_F.NeedETDMain] = { value: (purSel.main&&purSel.main.checked&&purSel.main.etd) ? purSel.main.etd : null };
+  data[IF_F.NeedQtyAlt1] = { value: (purSel.alt1&&purSel.alt1.checked) ? (purSel.alt1.needQty||0) : 0 };
+  data[IF_F.NeedETDAlt1] = { value: (purSel.alt1&&purSel.alt1.checked&&purSel.alt1.etd) ? purSel.alt1.etd : null };
+  data[IF_F.NeedQtyAlt2] = { value: (purSel.alt2&&purSel.alt2.checked) ? (purSel.alt2.needQty||0) : 0 };
+  data[IF_F.NeedETDAlt2] = { value: (purSel.alt2&&purSel.alt2.checked&&purSel.alt2.etd) ? purSel.alt2.etd : null };
+  data[IF_F.NeedQtyAlt3] = { value: (purSel.alt3&&purSel.alt3.checked) ? (purSel.alt3.needQty||0) : 0 };
+  data[IF_F.NeedETDAlt3] = { value: (purSel.alt3&&purSel.alt3.checked&&purSel.alt3.etd) ? purSel.alt3.etd : null };
+  fetch('https://api.quickbase.com/v1/records', {
+    method: 'POST',
+    headers: { 'QB-Realm-Hostname':QB_REALM, 'Authorization':QB_TOKEN, 'Content-Type':'application/json', 'User-Agent':'petspeople-inv-mgmt-viewer/1.0' },
+    body: JSON.stringify({ to: INVF_TID, data: [data], mergeFieldId: IF_F.Mstyle, fieldsToReturn: [] })
+  })
+  .then(function(resp){return resp.json().then(function(j){return{ok:resp.ok,body:j};});})
+  .then(function(res){
+    if (statusEl) {
+      statusEl.textContent = res.ok ? 'Saved to QB' : 'Save failed: '+(res.body.message||'unknown');
+      statusEl.style.color = res.ok ? '#1b5e20' : '#c62828';
+    }
+  })
+  .catch(function(e){if(statusEl){statusEl.textContent='Error: '+e.message;statusEl.style.color='#c62828';}});
 }
 
 // -- Boot ----------------------------------------------------------------------

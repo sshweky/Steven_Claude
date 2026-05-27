@@ -15825,12 +15825,31 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         )
         parts.append(_conf_badge)
     # Normalized Ord/Wk L13w bullet (2026-05-25).
-    # Show when normalization (F35/F41/F43/F47/ATS) removed meaningful demand
-    # from the raw L13W order rate -- e.g. phantom duplicates, catch-up stock-up
-    # orders after a stockout, or OOS ramp distortion.  Threshold: differs by
-    # > 5% of raw L13W OR > 50 units/wk (whichever is larger).
+    # Always embed a hidden machine-readable span so the codepage viewer can
+    # display the exact normalized value regardless of whether the visible
+    # bullet fires.  Visible bullet: only when diff > 5% of raw OR > 50 u/wk
+    # (threshold keeps the narrative uncluttered for clean-history items).
     _raw_l13w_val  = sum(hist[-13:]) / 13   # raw from ORD_L26_COLS (last 13 weeks)
     _norm_l13w_val = rec.get("norm_l13w")
+    # Build hidden span (piggybacked on last bullet -- no extra blank <li>)
+    _norm_span = ''
+    if _norm_l13w_val is not None:
+        _norm_diff_pct = (
+            abs(_raw_l13w_val - _norm_l13w_val) / _raw_l13w_val * 100
+            if _raw_l13w_val > 0 else 0.0
+        )
+        _norm_reason = (
+            'duplicates and spikes removed'
+            if abs(_raw_l13w_val - _norm_l13w_val) > max(50.0, 0.05 * _raw_l13w_val)
+            else 'no adjustment -- history is clean'
+        )
+        _norm_span = (
+            f'<span class="norm-l13w-data"'
+            f' data-norm="{int(round(_norm_l13w_val))}"'
+            f' data-raw="{int(round(_raw_l13w_val))}"'
+            f' data-reason="{_norm_reason}" hidden></span>'
+        )
+    # Visible bullet (threshold-gated so clean items stay uncluttered)
     if (_norm_l13w_val is not None
             and _raw_l13w_val > 0
             and abs(_raw_l13w_val - _norm_l13w_val) > max(50.0, 0.05 * _raw_l13w_val)):
@@ -15849,7 +15868,11 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
     parts.extend(pinned_last)                           # always last
 
     if not parts:
-        return ""
+        # No bullets at all -- still surface norm data for the codepage bar
+        return _sanitize_for_qb(_norm_span)
+    # Piggyback hidden span on the last bullet so no extra blank <li> is created
+    if _norm_span:
+        parts[-1] = parts[-1] + _norm_span
     # Join paragraphs with <br><br> for QB rich-text display
     return _sanitize_for_qb("<br><br>".join(parts))
 
