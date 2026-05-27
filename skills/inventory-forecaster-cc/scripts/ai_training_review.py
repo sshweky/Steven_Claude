@@ -999,6 +999,8 @@ def build_email_html(analyses, all_recs, report_path, run_date, days,
   &mdash; Claude will read the full report and ask which changes to implement.
 </p>
 
+{_build_systemic_html(systemic_impacts, all_recs)}
+
 <p style="margin-top:4px;font-size:11px;color:#9e9e9e">
   Full report: {report_path_str}
 </p>
