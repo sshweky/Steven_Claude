@@ -1309,8 +1309,10 @@ def build_report(analyses, grouped, all_recs, run_date, days):
     lines += [
         "",
         "## 3. Proposed Model Changes",
-        "(NOTE: Recommendations below have been validated against systemic impact.",
-        "REJECTED = fix would widen MAN-AI gap. ISOLATED = no systemic pattern.)",
+        "",
+        ("*All recommendations below are validated against systemic impact before being shown. "
+         "VALIDATED = original fix is good. REJECTED = original fix widened gap, replaced with "
+         "a directional-guard version. ISOLATED = one-off item, item-level fix proposed.*"),
         "",
     ]
 
