@@ -934,10 +934,11 @@ def main():
         print(f"  [WARN] Only {len(man_fids)} MAN PRJ FIDs found (expected 26).",
               flush=True)
 
-    # Fetch AI Training comments
+    # Fetch AI Training comments (FLAG='AI Training' -- already-reviewed ones
+    # have FLAG='Reviewed' in QB and will not match this query)
     print("\n[1/4] Fetching AI Training comments...", flush=True)
     comments, note_fid = fetch_ai_training_comments(
-        args.days, note_fid, processed_ids)
+        args.days, note_fid, set())
 
     if not comments:
         print("  No new AI Training comments to process.\n")
