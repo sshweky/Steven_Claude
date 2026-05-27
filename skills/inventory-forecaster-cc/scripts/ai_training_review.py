@@ -92,7 +92,8 @@ ANALYSIS_DIR  = SCRIPT_DIR.parent / "analysis"
 STATE_FILE    = ANALYSIS_DIR / "ai_training_processed.json"
 ANALYSIS_DIR.mkdir(exist_ok=True)
 
-RECIPIENT     = "s.shweky@petspeople.com"
+RECIPIENT            = "s.shweky@petspeople.com"
+MIN_SYSTEMIC_RECORDS = 2   # variations flagging fewer records are item-level, not systemic
 
 # Intent keywords
 EOL_RE      = re.compile(r'\beol\b|wind.?down|discontinu|phase.?out|end.of.life|last.order|closing.out|deleting|delete', re.I)
