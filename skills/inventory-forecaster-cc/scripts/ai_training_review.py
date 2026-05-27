@@ -198,8 +198,12 @@ def _discover_l4w_fid():
 # ---------------------------------------------------------------------------
 # Step 1 -- Fetch unreviewed AI Training comments
 # ---------------------------------------------------------------------------
-def fetch_ai_training_comments(days, note_fid, processed_ids):
-    """Page through Projection Comments WHERE Flag = 'AI Training' in last N days."""
+def fetch_ai_training_comments(days, note_fid):
+    """Page through Projection Comments WHERE Flag = 'AI Training' in last N days.
+
+    Already-reviewed comments have FLAG='Reviewed' in QB and are excluded
+    naturally by the query -- no local state file needed.
+    """
     cutoff_iso = (date.today() - timedelta(days=days)).isoformat()
     rows, skip = [], 0
     select_fids = [C_RECORD_ID, C_DATE, C_ACCT_MSTYLE, C_FLAG]
@@ -222,12 +226,8 @@ def fetch_ai_training_comments(days, note_fid, processed_ids):
         skip += 1000
         time.sleep(0.2)
 
-    # Filter out already-processed RIDs
-    new_rows = [r for r in rows
-                if str(int(fval(r, C_RECORD_ID))) not in processed_ids]
-    print(f"  Found {len(rows)} total AI Training comments, "
-          f"{len(new_rows)} unprocessed.")
-    return new_rows, note_fid
+    print(f"  Found {len(rows)} unreviewed AI Training comments.")
+    return rows, note_fid
 
 
 # ---------------------------------------------------------------------------
