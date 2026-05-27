@@ -1204,15 +1204,16 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
                 proposed_change=(
                     f"Add a MAN PRJ floor gate to {kw}: apply the growth boost only when "
                     f"AI 26w is ALSO below MAN PRJ * {1/man_mult:.2f}x. Tested against "
-                    f"{sc:,} active {kw} records -- flags {cc_new} record(s) and narrows "
-                    f"gap from {vb_new:+,}u to {va_new:+,}u (closes {gap_closed:,}u). "
+                    f"{sc:,} active {kw} records -- flags {cc_new} records and narrows "
+                    f"MAN-AI variance from {vb_pct:+.1f}% ({vb_new:+,}u) to "
+                    f"{va_pct:+.1f}% ({va_new:+,}u), closing {gap_closed:,}u. "
                     f"Items from planner comments: {item_str}."
                 ),
                 confidence="high",
                 rationale=(
                     f"Tested {sc:,} active {kw} records. MAN PRJ gate restricts the boost "
-                    f"to only the {cc_new} records where AI is genuinely under the planner "
-                    f"target, closing {gap_closed:,}u of gap."
+                    f"to the {cc_new} records where AI is genuinely below planner target, "
+                    f"closing {gap_closed:,}u ({abs(vb_pct - va_pct):.1f}pp of variance)."
                 ),
             )
 
