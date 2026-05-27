@@ -91,11 +91,19 @@ def start_server():
 
 
 def js_snippet(filename):
+    # For viewer.js: replace %%BUILD_TS%% with the current epoch so the
+    # IndexedDB projection-cache key changes on every deploy and all users
+    # get a fresh QB fetch automatically (no manual ?nocache=1 required).
+    build_ts_sub = (
+        "  const content = (await r.text()).replace(/%%BUILD_TS%%/g, String(Date.now()));\n"
+        if filename.endswith('.js') else
+        "  const content = await r.text();\n"
+    )
     return (
         f"(async () => {{\n"
         f"  const r = await fetch('http://localhost:{PORT}/{filename}');\n"
         f"  if (!r.ok) return console.error('fetch failed:', r.status);\n"
-        f"  const content = await r.text();\n"
+        f"{build_ts_sub}"
         f"  ace.edit(document.querySelector('.ace_editor')).setValue(content);\n"
         f"  document.getElementById('pagetext').value = content;\n"
         f"  document.getElementById('btnSaveDone').click();\n"
