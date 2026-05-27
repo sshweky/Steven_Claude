@@ -980,13 +980,15 @@ def estimate_systemic_impact(all_recs, man_fids):
         if model_keyword in seen_keywords:
             sc, at, cc, fmt, fat, fae = queried_models.get(
                 model_keyword.lower(), (0, 0, 0, 0, 0, 0))
+            best_crit = best_crit_cache.get(model_keyword.lower())
         else:
             seen_keywords.add(model_keyword)
-            sc, at, cc, fmt, fat, fae = _fetch_model_scope(
+            (sc, at, cc, fmt, fat, fae), best_crit = _fetch_model_scope(
                 model_keyword, rec["change_type"], fit)
             var_b = fmt - fat
             var_a = fmt - fae
-            print(f"    [{num}] {model_keyword}: {sc:,} records, {cc:,} flagged | "
+            crit_note = " [variation]" if best_crit else ""
+            print(f"    [{num}] {model_keyword}: {sc:,} records, {cc:,} flagged{crit_note} | "
                   f"MAN-AI before={var_b:+,}u  after={var_a:+,}u", flush=True)
 
         direction = (
@@ -1006,6 +1008,7 @@ def estimate_systemic_impact(all_recs, man_fids):
             "variance_before":    fmt - fat,
             "variance_after":     fmt - fae,
             "direction":          direction,
+            "best_criterion":     best_crit,   # None if original worked, else winning variant
         })
 
     # ------------------------------------------------------------------
