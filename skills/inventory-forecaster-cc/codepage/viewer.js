@@ -1242,9 +1242,10 @@ function _parseNormL13w(narrative) {
   };
 }
 
-// Builds the always-visible "Normalized Ord/Wk L13W" metric chip for the
-// detail pane.  Shows the normalized value with unit diff vs raw.  When they
-// differ a tooltip provides the detailed explanation of what was stripped.
+// Builds the Normalized Ord/Wk L13W bullet as a plain HTML string (no outer
+// wrapper) for injection as the first <li> in the AI Analysis section.
+// Always returns a non-empty string so planners see the metric on every expanded
+// row regardless of history depth.
 function _buildNormL13wHtml(r) {
   const rawL13  = Math.round(r.shp_wk || 0);
   const parsed  = _parseNormL13w(r.narrative || '');
@@ -1253,7 +1254,6 @@ function _buildNormL13wHtml(r) {
   const normFmt = fmtN(normL13);
   let diffHtml  = '';
   if (rawL13 === 0) {
-    // Item has no orders in last 13 weeks -- still render the bar so it's visible
     diffHtml = ' <span style="color:#aaa;font-size:11px">(no recent order history)</span>';
   } else if (diff !== 0) {
     const sign    = diff > 0 ? '+' : '';
@@ -1278,10 +1278,7 @@ function _buildNormL13wHtml(r) {
   } else {
     diffHtml = ' <span style="color:#aaa;font-size:11px">(no adjustments)</span>';
   }
-  return '<div style="padding:3px 12px;background:#f5f5f5;'
-    + 'border-top:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;font-size:12px;">'
-    + '<span style="font-weight:600;color:#333">Normalized Ord/Wk L13W: '
-    + normFmt + '/wk</span>' + diffHtml + '</div>';
+  return '<b>Normalized Ord/Wk L13W:</b> ' + normFmt + '/wk' + diffHtml;
 }
 
 // -- F35 normalization note --------------------------------------------------
@@ -4566,7 +4563,12 @@ async function toggleDetail(key) {
   let _narParts = (r.narrative || '')
     .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n')
     .replace(/<br\s*\/?>/gi, '\n')
-    .split('\n').filter(s => s.trim());
+    .split('\n').filter(s => s.trim())
+    // Remove any existing Normalized Ord/Wk L13w bullet from the narrative --
+    // it will be re-injected first (via _buildNormL13wHtml) to guarantee position.
+    .filter(s => !/Normalized Ord\/Wk L13w/i.test(s));
+  // Always the first bullet so planners see the normalized rate at a glance.
+  _narParts.unshift(_buildNormL13wHtml(r));
   // Seasonal / off-price bullet: inject into AI Analysis for any item that is
   // A: OffPrice OR has a Season tag.  These items have lumpy demand and need
   // cadence context so planners know when to expect the next buy window.
@@ -4895,7 +4897,10 @@ async function toggleDetail(key) {
   // -- PO / Manual Projection conflict alert ----------------------------------
   let poPrjAlertHtml = '';
   if (r.has_po_prj_conflict && r.po_prj_conflicts && r.po_prj_conflicts.length) {
-    const _isOP = r.is_offprice;
+    const _isOP      = r.is_offprice;
+    const _ignored   = _PO_DUP_IGNORED.has(r.key);
+    const _sk        = r.key.replace(/[^a-zA-Z0-9]/g, '_');
+    const _safeK     = r.key.replace(/'/g, "\\'");
     const _conflictLines = r.po_prj_conflicts.map(c => {
       if (c.poWk === c.prjWk) {
         return `W${c.poWk}: Open PO ${fmtN(c.poQty)} units  |  Manual Prj ${fmtN(c.prjQty)} units  (same week)`;
@@ -4904,27 +4909,47 @@ async function toggleDetail(key) {
         return `Open PO ${fmtN(c.poQty)} units (W${c.poWk})  +  Manual Prj ${fmtN(c.prjQty)} units (W${c.prjWk})  -- ${gap} wk apart`;
       }
     });
-    const _alertTitle = _isOP
-      ? 'DUPLICATE DEMAND: Off-Price Open PO + Manual Projection overlap'
-      : 'DUPLICATE DEMAND: Open PO and Manual Projection in the Same Week';
-    const _alertDesc = _isOP
-      ? 'Off-price POs ship the same or following week. A Manual Projection within 4 weeks of an Open PO double-counts that demand and overstates replenishment requirements. Zero out the overlapping Manual Projection weeks unless you expect a completely separate additional order.'
-      : 'One or more weeks have BOTH a confirmed Open Customer PO and a Manual Projection. The PO is already a committed order -- the Manual Projection on top of it double-counts demand. Zero out the Manual Projection for conflicting weeks unless you expect a second independent order in the same week.';
-    const _safeKeyForBtn = r.key.replace(/[^a-zA-Z0-9]/g, '_');
-    poPrjAlertHtml = `
-      <div id="po-prj-alert-${_safeKeyForBtn}" style="margin:10px 12px 0 12px;padding:14px 16px;background:#ffebee;border:3px solid #c62828;border-radius:6px;">
-        <div style="font-weight:700;font-size:14px;color:#b71c1c;margin-bottom:6px;">&#9888; ${escHtml(_alertTitle)}</div>
-        <div style="font-size:12px;color:#7f0000;line-height:1.6;margin-bottom:10px;">${escHtml(_alertDesc)}</div>
-        <div style="font-size:11px;font-family:monospace;line-height:1.8;color:#7f0000;background:#fff8f8;padding:8px 12px;border-radius:4px;border:1px solid #ef9a9a;margin-bottom:10px;">
-          ${_conflictLines.map(l => escHtml(l)).join('<br>')}
-        </div>
-        <button id="zero-dup-btn-${_safeKeyForBtn}"
-          onclick="zeroDuplicateManPrj('${r.key.replace(/'/g, "\\'")}', '${_safeKeyForBtn}')"
-          style="background:#c62828;color:#fff;border:none;padding:7px 16px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;">
-          Zero Duplicate MAN PRJ Weeks
-        </button>
-        <span style="font-size:10px;color:#b71c1c;margin-left:10px;">Changes will be staged -- click Save All to write to QB.</span>
-      </div>`;
+    if (_ignored) {
+      // Grayed-out / silenced state -- planner expects a separate additional order
+      poPrjAlertHtml = `
+        <div id="po-prj-alert-${_sk}" style="margin:10px 12px 0 12px;padding:10px 16px;background:#f5f5f5;border:2px solid #bdbdbd;border-radius:6px;opacity:0.75;">
+          <div style="font-weight:600;font-size:12px;color:#9e9e9e;margin-bottom:4px;">&#x26A0; Duplicate demand warning IGNORED</div>
+          <div style="font-size:11px;font-family:monospace;color:#bdbdbd;line-height:1.8;margin-bottom:8px;">
+            ${_conflictLines.map(l => escHtml(l)).join('<br>')}
+          </div>
+          <button onclick="unignorePoPrj('${_safeK}','${_sk}')"
+            style="background:#fff;color:#757575;border:1px solid #bdbdbd;padding:5px 14px;font-size:11px;font-weight:600;border-radius:4px;cursor:pointer;">
+            Unignore
+          </button>
+          <span style="font-size:10px;color:#bdbdbd;margin-left:10px;">Re-enable this warning if additional orders are no longer expected.</span>
+        </div>`;
+    } else {
+      // Active warning state
+      const _alertTitle = _isOP
+        ? 'DUPLICATE DEMAND: Off-Price Open PO + Manual Projection overlap'
+        : 'DUPLICATE DEMAND: Open PO and Manual Projection in the Same Week';
+      const _alertDesc = _isOP
+        ? 'Off-price POs ship the same or following week. A Manual Projection within 4 weeks of an Open PO double-counts that demand and overstates replenishment requirements. Zero out the overlapping Manual Projection weeks unless you expect a completely separate additional order.'
+        : 'One or more weeks have BOTH a confirmed Open Customer PO and a Manual Projection. The PO is already a committed order -- the Manual Projection on top of it double-counts demand. Zero out the Manual Projection for conflicting weeks unless you expect a second independent order in the same week.';
+      poPrjAlertHtml = `
+        <div id="po-prj-alert-${_sk}" style="margin:10px 12px 0 12px;padding:14px 16px;background:#ffebee;border:3px solid #c62828;border-radius:6px;">
+          <div style="font-weight:700;font-size:14px;color:#b71c1c;margin-bottom:6px;">&#9888; ${escHtml(_alertTitle)}</div>
+          <div style="font-size:12px;color:#7f0000;line-height:1.6;margin-bottom:10px;">${escHtml(_alertDesc)}</div>
+          <div style="font-size:11px;font-family:monospace;line-height:1.8;color:#7f0000;background:#fff8f8;padding:8px 12px;border-radius:4px;border:1px solid #ef9a9a;margin-bottom:10px;">
+            ${_conflictLines.map(l => escHtml(l)).join('<br>')}
+          </div>
+          <button id="zero-dup-btn-${_sk}"
+            onclick="zeroDuplicateManPrj('${_safeK}','${_sk}')"
+            style="background:#c62828;color:#fff;border:none;padding:7px 16px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;">
+            Zero Duplicate MAN PRJ Weeks
+          </button>
+          <button onclick="ignorePoPrj('${_safeK}','${_sk}')"
+            style="background:#fff;color:#e65100;border:1px solid #e65100;padding:7px 14px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;margin-left:8px;">
+            Ignore
+          </button>
+          <span style="font-size:10px;color:#b71c1c;margin-left:10px;">Zero changes will be staged -- click Save All to write to QB.</span>
+        </div>`;
+    }
   }
 
   el.innerHTML = `<td colspan="22" style="padding:0">
@@ -4933,7 +4958,6 @@ async function toggleDetail(key) {
     ${fdStatusHtml}
     ${seasonHtml}
     ${isAmazonRec ? _buildAmzInfoBlockHtml(r) : _buildPogBlockHtml(r)}
-    ${_buildNormL13wHtml(r)}
     ${narrativeHtml}
     <div style="overflow-x:auto;padding:8px 12px;">
       ${editToolbar}
@@ -7816,8 +7840,24 @@ function _syncFlaggedOnlyButton() {
 
 // Sticky toggle for the "Show Duplicates" toolbar button.  When true,
 // applyFilters() only retains records where r.has_po_prj_conflict === true
-// (a Manual Projection and an Open Customer PO overlap in the same week).
+// AND the conflict has not been explicitly ignored by the planner.
 let DUPES_ONLY = false;
+
+// Per-browser localStorage set of Acct-MStyle keys whose PO+PRJ duplicate
+// conflict warning has been explicitly ignored.  Planners mark Ignore when
+// they expect a separate second order in the same week.  Stored as a JSON
+// array under 'pp_po_prj_ignored_v1'.
+const _PO_DUP_IGNORED_LSKEY = 'pp_po_prj_ignored_v1';
+let _PO_DUP_IGNORED = (() => {
+  try {
+    const raw = localStorage.getItem(_PO_DUP_IGNORED_LSKEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (_) { return new Set(); }
+})();
+function _savePoDupIgnored() {
+  try { localStorage.setItem(_PO_DUP_IGNORED_LSKEY, JSON.stringify([..._PO_DUP_IGNORED])); }
+  catch (_) {}
+}
 
 function toggleDupesOnly() {
   DUPES_ONLY = !DUPES_ONLY;
