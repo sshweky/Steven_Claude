@@ -3095,9 +3095,11 @@ async function toggleAutoProject(key) {
 }
 
 function updateFlagCount() {
-  const n = ALL_RECORDS.filter(r => r.flagged).length;
+  // Directors see ALL records with an active comment flag.
+  // Planners see only records where they are the Sent-To recipient.
+  const n = _isDirector() ? _ALL_COMMENT_FLAGGED_KEYS.size : _FOR_ME_KEYS.size;
   const el = document.getElementById('flagCount');
-  if (el) el.textContent = n + ' flagged for manager';
+  if (el) el.textContent = n + ' flagged';
 }
 
 // -- Unified attention banner ------------------------------------------------
@@ -3551,6 +3553,36 @@ async function refreshForMeKeys() {
     );
     updateForMeCount();
   } catch (_) { /* non-fatal — filter falls back to empty set */ }
+}
+
+// -- All-comment-flagged keys (Director/VP view for "Show Flagged" button) -----
+// Projection keys where ANY active comment flag exists (Needs Action, Manager
+// Response, Planner Response) regardless of SEND_TO.  Used by "Show Flagged"
+// when the current user is a Director/VP so they see ALL open flags, not just
+// ones addressed to them personally.  Refreshed alongside refreshForMeKeys().
+let _ALL_COMMENT_FLAGGED_KEYS = new Set();
+
+async function refreshAllCommentFlaggedKeys() {
+  // Only Directors/VPs need this set -- planners use _FOR_ME_KEYS instead.
+  if (!_isDirector()) { updateFlagCount(); return; }
+  try {
+    const F = CFG.COMMENT_FID;
+    const activeFlags = ['Needs Action', 'Planner Response', 'Manager Response'];
+    const where = activeFlags.map(f => `{${F.FLAG}.EX.'${f}'}`).join('OR');
+    const resp = await qb('/records/query', {
+      from:    CFG.COMMENTS_TID,
+      select:  [F.ACCT_MSTYLE],
+      where,
+      options: { top: 5000 },
+    });
+    _ALL_COMMENT_FLAGGED_KEYS = new Set(
+      (resp.data || [])
+        .map(row => row[F.ACCT_MSTYLE] && row[F.ACCT_MSTYLE].value)
+        .filter(Boolean)
+    );
+    updateFlagCount();
+    if (FLAGGED_ONLY) applyFilters();  // refresh visible rows if filter is active
+  } catch (_) { /* non-fatal */ }
 }
 
 let SHOW_FOR_ME_ONLY = false;
@@ -5861,7 +5893,7 @@ async function addComment(key) {
         badgeCell.insertAdjacentHTML('beforeend', '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>');
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) tr.classList.add('row-mgr-pending');
-      refreshForMeKeys();
+      refreshForMeKeys(); refreshAllCommentFlaggedKeys();
     }
 
     if (flag === 'Planner Response') {
@@ -5904,7 +5936,7 @@ async function addComment(key) {
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) { tr.classList.add('row-reply-pending'); tr.classList.remove('row-mgr-pending'); }
       updateReplyCount();
-      refreshForMeKeys();
+      refreshForMeKeys(); refreshAllCommentFlaggedKeys();
     }
 
     if (flag === 'Manager Response' && CFG.FID.MANAGER_REPLY_PENDING) {
@@ -5925,7 +5957,7 @@ async function addComment(key) {
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) { tr.classList.add('row-mgr-pending'); tr.classList.remove('row-reply-pending'); }
       updateReplyCount();
-      refreshForMeKeys();
+      refreshForMeKeys(); refreshAllCommentFlaggedKeys();
     }
 
     if (flag === 'Resolved') {
@@ -5945,7 +5977,7 @@ async function addComment(key) {
         const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
         if (tr) tr.classList.remove('row-reply-pending', 'row-mgr-pending');
         updateReplyCount();
-        refreshForMeKeys();
+        refreshForMeKeys(); refreshAllCommentFlaggedKeys();
       }
     }
   } catch (e) {
@@ -7672,14 +7704,19 @@ function toggleFlaggedOnly() {
 function _syncFlaggedOnlyButton() {
   const btn = document.getElementById('flaggedOnlyBtn');
   if (!btn) return;
+  const _isDir = _isDirector();
   if (FLAGGED_ONLY) {
     btn.style.background = '#c62828';
     btn.style.color = '#fff';
-    btn.title = 'Currently showing flagged records only  -  click to show all';
+    btn.title = _isDir
+      ? 'Showing all records with any active comment flag -- click to show all'
+      : 'Showing records flagged for your attention (Sent To: you) -- click to show all';
   } else {
     btn.style.background = '#fff';
     btn.style.color = '#c62828';
-    btn.title = 'Show only records flagged for inventory mgr review (toggle)';
+    btn.title = _isDir
+      ? 'Show all records with any active comment flag (Needs Action / Manager Response / Planner Response)'
+      : 'Show records where you are the Sent-To recipient of an active comment flag';
   }
 }
 
@@ -7790,7 +7827,14 @@ function applyFilters() {
   FILTERED_RECORDS = ALL_RECORDS.filter(r => {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
     if (DUPES_ONLY         && !r.has_po_prj_conflict)   return false;
-    if (FLAGGED_ONLY       && !r.flagged)               return false;
+    // "Show Flagged": Directors see ALL records with any active comment flag;
+    // planners see only records where they are the Sent-To recipient.
+    if (FLAGGED_ONLY) {
+      const _inFlagSet = _isDirector()
+        ? _ALL_COMMENT_FLAGGED_KEYS.has(r.key)
+        : _FOR_ME_KEYS.has(r.key);
+      if (!_inFlagSet) return false;
+    }
     if (SNOOZED_ONLY       && !r._snoozed)              return false;
     if (CLOSE_ONLY         && r.fcst_status !== 'Inactive' && !SWITCHOVER_MAP.has(r.key)) return false;
     if (SHOW_REPLY_ONLY    && !r.planner_reply_pending) return false;
@@ -8173,7 +8217,8 @@ async function bootstrap() {
     renderTable();
     applyFilters();
     updateReplyCount();   // show 💬 banner if planner replies exist (directors)
-    refreshForMeKeys();   // async — populates _FOR_ME_KEYS from SEND_TO on active comments, then calls updateForMeCount
+    refreshForMeKeys();             // async — populates _FOR_ME_KEYS (planner Sent-To), then updateForMeCount
+    refreshAllCommentFlaggedKeys(); // async — populates _ALL_COMMENT_FLAGGED_KEYS (director "Show Flagged" view)
 
     const ms = (performance.now() - t0).toFixed(0);
     console.log(`Codepage viewer bootstrap completed in ${ms}ms`);
