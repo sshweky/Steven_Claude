@@ -3714,14 +3714,16 @@ async function toggleDetail(key) {
     aiCells   += `<td style="${_aiBg}${aiCls};font-weight:600"${_aiTitle}>${fmtN(aiVal)}</td>`;
     // MAN - AI row: positive (planner above AI) green, negative (planner below AI) red.
     // Locked weeks don't get a meaningful diff -- show a dash to avoid confusion.
+    // ID + data-ai stashed so onManEdit() can live-update without re-rendering.
     const diffVal = locked ? null : (cellVal - aiVal);
+    const _diffId = `diff-${safeIdForTotal}-${i}`;
     if (diffVal === null) {
-      diffCells += `<td style="color:#bbb;font-size:11px">-</td>`;
+      diffCells += `<td id="${_diffId}" data-ai="${aiVal}" data-locked="1" style="color:#bbb;font-size:11px">-</td>`;
     } else {
       diffTotal += diffVal;
       const diffClr  = diffVal > 0 ? 'color:#2e7d32' : diffVal < 0 ? 'color:#c62828' : 'color:#888';
       const diffSign = diffVal > 0 ? '+' : '';
-      diffCells += `<td style="${diffClr};font-size:11px">${diffSign}${fmtN(diffVal)}</td>`;
+      diffCells += `<td id="${_diffId}" data-ai="${aiVal}" style="${diffClr};font-size:11px">${diffSign}${fmtN(diffVal)}</td>`;
     }
     const opnVal = (r.opn_w || [])[i] || 0;
     opnTot    += opnVal;
@@ -3733,7 +3735,7 @@ async function toggleDetail(key) {
   // MAN - AI total: color-coded like the per-week cells (green=above, red=below).
   const _diffTotalClr  = diffTotal > 0 ? 'color:#2e7d32' : diffTotal < 0 ? 'color:#c62828' : 'color:#555';
   const _diffTotalSign = diffTotal > 0 ? '+' : '';
-  diffCells += `<td style="font-weight:700;${_diffTotalClr}">${_diffTotalSign}${fmtN(diffTotal)}</td>`;
+  diffCells += `<td id="diff-total-${safeIdForTotal}" data-ai-total="${r.ai_total}" style="font-weight:700;${_diffTotalClr}">${_diffTotalSign}${fmtN(diffTotal)}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(opnTot)}</td>`;
 
   // Avg/Wk column  -  separate header so the invFlow table (which also reuses
