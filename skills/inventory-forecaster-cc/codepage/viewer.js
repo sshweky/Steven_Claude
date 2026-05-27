@@ -3355,12 +3355,13 @@ async function saveSwitchoverField(key, field, value) {
       if (!ALL_RECORDS.some(x => x.key === newKey)) {
         if (statusEl) { statusEl.style.color = '#1565c0'; statusEl.textContent = 'Saved - creating record...'; }
         const nf = {};
-        nf[CFG.FID.KEY]         = { value: newKey };
-        nf[CFG.FID.MSTYLE]      = { value: toMstyle };
-        nf[CFG.FID.ACCT_NUM]    = { value: parseInt(acctNum, 10) || 0 };
-        nf[CFG.FID.ACCT_TXT]    = { value: acctNum };
-        nf[CFG.FID.CUST]        = { value: rec.cust || '' };
-        nf[CFG.FID.STATUS_CUST] = { value: 'AUTO ADD' };
+        nf[CFG.FID.KEY]             = { value: newKey };
+        nf[CFG.FID.MSTYLE]          = { value: toMstyle };
+        nf[CFG.FID.ACCT_NUM]        = { value: parseInt(acctNum, 10) || 0 };
+        nf[CFG.FID.ACCT_TXT]        = { value: acctNum };
+        nf[CFG.FID.CUST]            = { value: rec.cust || '' };
+        nf[CFG.FID.STATUS_CUST]     = { value: 'AUTO ADD' };
+        if (CFG.FID.SWITCHOVER_FROM) nf[CFG.FID.SWITCHOVER_FROM] = { value: rec.mstyle || '' };
         try {
           await qb('/records', { to: CFG.PROJECTIONS_TID, data: [nf], mergeFieldId: CFG.FID.KEY });
           // Add a minimal in-memory stub so the new row is immediately visible in
@@ -3382,6 +3383,7 @@ async function saveSwitchoverField(key, field, value) {
             switchover_active:     false,
             switchover_to_mstyle:  '',
             switchover_date:       '',
+            switchover_from:       rec.mstyle || '',
           });
           buildSwitchoverMap();
           if (statusEl) {
@@ -4683,12 +4685,18 @@ async function toggleDetail(key) {
   const _esc        = s => (s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]);
 
   // Receiving-side banner (shown on the NEW style's row)
+  // _manSwRev comes from MANUAL_SWITCHOVER_REVERSE (base record in current view).
+  // Fallback: use r.switchover_from from QB if the base record is out of scope.
   const _receivingHtml = _manSwRev ? `
     <div style="margin:8px 12px 0 12px;padding:8px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px;font-size:12px;color:#0d47a1;">
       &#x21C4; <b>Receiving switchover from ${_esc(_manSwRev.fromMstyle)}</b>
       ${_manSwRev.date ? '&mdash; effective ' + _manSwRev.date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''}
       &mdash; pre-switchover order history is included in demand calculations.
-    </div>` : '';
+    </div>` : (r.switchover_from ? `
+    <div style="margin:8px 12px 0 12px;padding:8px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px;font-size:12px;color:#0d47a1;">
+      &#x21C4; <b>Switchover from ${_esc(r.switchover_from)}</b>
+      &mdash; this is a variant style; planning has moved here from the base style.
+    </div>` : '');
 
   const _manualSwitchoverCard = `
     <div id="sw-card-${safeKey}" style="margin:8px 12px 0 12px;padding:10px 14px;background:#fafafa;border:1px solid #e0e0e0;border-radius:6px;font-size:12px;">
