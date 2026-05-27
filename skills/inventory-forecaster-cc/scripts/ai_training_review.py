@@ -300,11 +300,13 @@ def assess_model_fit(intent, ai_model, ai_total, man_total, l13w, l4w, item_stat
     # Only compute trend when we have a real L4W value (FID found + non-zero)
     trend    = (l4w / l13w) if (l13w > 0 and l4w > 0) else None
 
+    trend_str = f"{trend:.2f}x" if trend is not None else "n/a"
+
     if intent == "eol":
         if ai_total > 0:
             return ("missed_lifecycle",
                     f"Model ({ai_model}) still projects {ai_total:,}u but planner is "
-                    f"winding down. L4W/L13W trend = {trend:.2f}x. "
+                    f"winding down. L4W/L13W trend = {trend_str}. "
                     f"EOL detection not triggering.")
         return ("correct", "Model already at zero -- may be resolved.")
 
