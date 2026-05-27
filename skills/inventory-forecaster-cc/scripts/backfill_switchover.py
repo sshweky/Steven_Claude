@@ -160,7 +160,8 @@ def main():
         acct = key.split("-", 1)[0]
 
         # Skip if planner already set Switchover_To_MStyle
-        existing_sw_ms = (r.get("Switchover_To_MStyle") or "").strip()
+        # Note: row keys use QB's original label (with spaces), not underscore form
+        existing_sw_ms = (r.get("Switchover To MStyle") or r.get("Switchover_To_MStyle") or "").strip()
         if existing_sw_ms:
             # Check if we still need to compute the date
             existing_sw_dt = (r.get("Switchover_Date") or "")[:10]
