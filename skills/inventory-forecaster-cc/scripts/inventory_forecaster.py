@@ -1441,7 +1441,8 @@ def fetch_projections_qb_rest(prj_cols, args):
          "Acct_",                       # FID 11   — numeric account # (needed when creating variant records)
          "Switchover_Active",           # FID 1602 — checkbox: base style is being switched over
          "Switchover_To_MStyle",        # FID 1603 — target variant mstyle (planner-set OR PCS-PX auto-link)
-         "Switchover_Date"]             # FID 1604 — date planning shifts to variant (auto-computed)
+         "Switchover_Date",             # FID 1604 — date planning shifts to variant (auto-computed)
+         "Cust_SKU_"]                   # FID 821  — Customer SKU# / ASIN (carried over to new variant records)
         + [f"AI_PRJ_W{w}" for w in range(1, 27)]
         + list(prj_cols)    # MAN_PRJ date-stamped columns (rolling weekly)
         + ORD_COLS
