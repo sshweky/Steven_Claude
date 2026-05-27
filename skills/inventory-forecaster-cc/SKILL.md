@@ -54,6 +54,7 @@ All of the above accept scope filters: `--acct`, `--customer`, `--mstyle`, `--br
 **Analysis & Reporting**
 - **Gap analysis** -- `gap_analysis.py --results validation_results.json` -- top-volume manual vs AI gaps, root-cause buckets, model fix proposals
 - **Manual vs AI analysis** -- `analyze_manual_vs_ai.py` -- 12-section audit by customer/brand/manager/vol-tier; outputs markdown + CSV + JSON
+- **AI Training review** -- `ai_training_review.py` -- reads FLAG='AI Training' Projection Comments, deep-analyzes planner intent vs model, proposes rule changes, emails report
 - **Summary dashboard** -- `build_dashboard.py` -- Manual vs AI vs Suggested vs L26 actuals rolled up to `dashboard.html`
 - **Ad-hoc key-set analysis** -- `analyze_36_keys.py` -- drill into a specific list of Acct_MStyle_Key_ values; edit KEYS list before running
 
