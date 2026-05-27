@@ -24,25 +24,31 @@
 | wrong_model | wrong_model | 1 | +312 | Planner says Heuristic is projecting flat demand when order history shows a diff... |
 
 ## 3. Proposed Model Changes
+(NOTE: Recommendations below have been validated against systemic impact.
+REJECTED = fix would widen MAN-AI gap. ISOLATED = no systemic pattern.)
 
-### [1] Threshold -- DECREASE / over projecting
-**Impact:** -26,498 units across 1 item(s)  | **Confidence:** HIGH
+### [1] [REJECTED] Threshold -- DECREASE / over projecting
+**Impact:** -26,498 units across 1 item(s)  | **Confidence:** LOW  | **Systemic Status:** REJECTED
 
 **Proposed Change:**  
-Croston's model ingested a one-time spike order as a demand signal. Fix: add outlier-trimming to Croston's history input -- if any single week >= 3x the L13W mean, cap that week at the L13W mean before feeding Croston's. Alternatively, add a post-Croston guard: if Croston output > L13W * 2.5x, cap at L13W * 1.5x.
+SYSTEMIC FIX REJECTED: Applying this change across all 25 flagged Croston records would WIDEN the MAN-AI gap from +623u to +3,431u (+2,808u in the wrong direction). The flagged Croston population is already under-projecting vs MAN in aggregate, so this fix makes things worse for most of them. 
 
-**Rationale:** Croston's is designed for sparse/intermittent demand. A large one-time order inflates the z (demand-per-event) estimate for all future forecasts until history rolls off.
+Recommended fix: Add a DIRECTIONAL GUARD so the change only fires when AI is already over-projecting relative to MAN (i.e., the fix moves AI closer to MAN, not further away). Example: for a cap/reduction, only apply when current AI > MAN * 1.10. This protects the 270 records where AI is already below MAN from being pushed further away. 
+
+Immediate action: Address the specific item(s) in this comment via Tell-AI comment on the record.
+
+**Rationale:** Systemic check: MAN-AI before fix = +623u, after fix = +3,431u across 25 flagged Croston records. Gap widened by +2,808u. Root cause: most flagged records are already under-projecting, so this fix moves them further from MAN rather than closer to it.
 
 **Affected items:**
 - `12835-FF33094` (LOWES COMPANIES, INC. / Moxie [LOWES]) Model: Croston's | Gap: -26,498u  Comment: "It's clear here that the 20k units ordered 3/15 is an anomaly and it must have b"
 
-### [2] Model Switch -- WRONG_MODEL / wrong model
-**Impact:** +312 units across 1 item(s)  | **Confidence:** MEDIUM
+### [2] [ISOLATED] Model Switch -- WRONG_MODEL / wrong model
+**Impact:** +312 units across 1 item(s)  | **Confidence:** LOW  | **Systemic Status:** ISOLATED
 
 **Proposed Change:**  
-Planner says Heuristic is projecting flat demand when order history shows a different pattern. Check: (1) Is this a Heuristic fallback that should be Seasonal or Croston's? (2) Does the item have seasonal keywords in its description? (3) Is the L13W avg being used as a flat baseline when L26/L52 shows trend? Consider using max(L4W, L13W, trend_projection) as baseline for Heuristic path when growth is detected.
+ISOLATED: No records in the active Heuristic population (98 records checked) match the detection criteria for this fix. This appears to be a one-off item. Address it directly via a Tell-AI comment on the specific record rather than changing the model algorithm. A model change for a single outlier adds complexity without systemic benefit.
 
-**Rationale:** Flat-demand Heuristic is appropriate for stable items but misses items with clear cyclical or trending order patterns.
+**Rationale:** Systemic scan of 98 active Heuristic projections found 0 records matching the proposed detection rule. Implementing a model change that only benefits one item risks introducing side-effects for the other 98 records.
 
 **Affected items:**
 - `8940-FF9291/24` (HONG CHI PETCARE CO., LTD / Arm & Hammer Complet) Model: Heuristic | Gap: +312u  Comment: "This forecast with a flat demand makes no sense? Look at the order history and h"
@@ -59,10 +65,10 @@ Planner says Heuristic is projecting flat demand when order history shows a diff
 
 ## 5. Systemic Impact Estimate
 
-*Estimated effect if proposed changes are deployed across all active projections. Scope = all records with that AI model type. Flagged = records matching the detection criteria. Variance = MAN PRJ 26w - AI PRJ 26w (flagged records only). After = MAN - estimated new AI once fix is applied.*
+*Systemic impact was computed BEFORE recommendations were finalized. VALIDATED = fix narrows MAN-AI gap. REJECTED = fix widens gap. ISOLATED = 0 records match criteria. Variance = MAN PRJ 26w - AI PRJ 26w (flagged records only). After = MAN - estimated new AI once fix is applied.*
 
-| Change # | Model | In Scope | Flagged | MAN-AI Before | Before% | MAN-AI After | After% | AI Change | Direction |
-|---|---|---|---|---|---|---|---|---|---|
-| [1] | Croston | 295 | 25 (8%) | +623 | +17.2% | +3,431 | +426.7% | +2,808 | DOWN |
-| [2] | Heuristic | 98 | 0 (0%) | +0 | n/a | +0 | n/a | +0 | MIXED |
-| **Combined** | Croston + Heuristic | 393 | 41 (10%) | +1,384 | +32.0% | +4,625 | +424.7% | +3,241 | MIXED |
+| Change # | Model | In Scope | Flagged | MAN-AI Before | Before% | MAN-AI After | After% | AI Change | Direction | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| [1] | Croston | 295 | 25 (8%) | +623 | +17.2% | +3,431 | +426.7% | +2,808 | DOWN | REJECTED |
+| [2] | Heuristic | 98 | 0 (0%) | +0 | n/a | +0 | n/a | +0 | MIXED | ISOLATED |
+| **Combined** | Croston + Heuristic | 393 | 41 (10%) | +1,384 | +32.0% | +4,625 | +424.7% | +3,241 | MIXED | COMBINED |

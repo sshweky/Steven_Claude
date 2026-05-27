@@ -3150,18 +3150,58 @@ function buildSwitchoverMap() {
   MANUAL_SWITCHOVER_MAP.clear();
   MANUAL_SWITCHOVER_REVERSE.clear();
 
-  // -- Auto-detect COS/EC variants (Amazon only) ----------------------------
+  // Helper: build the variant's key from a base record + variant mstyle, by
+  // swapping the mstyle portion of the base.key (which already contains the
+  // correct acct prefix).
+  const _swSiblingKey = (baseRec, variantMstyle) =>
+    baseRec.key.replace(baseRec.mstyle, variantMstyle);
+
+  // Build a quick acct-mstyle index so we don't .some() through ALL_RECORDS
+  // 5K+ times per scan.
+  const _swByKey = new Map();
+  for (const r of ALL_RECORDS) {
+    if (r && r.key) _swByKey.set(r.key, r);
+  }
+
+  // -- Auto-detect variants (Amazon only) ----------------------------------
+  // Pattern 1: variant suffix on base style.  Base=FF12508, variant=FF12508EC
+  //   /COS / AMZ / DS / DTC.  Variant ends in suffix, base is mstyle with
+  //   suffix stripped.  The badge shows on the BASE (the OLD style).
+  // Pattern 2: PCS{N} -> PX{N} sibling.  Old=FF12508PCS3, New=FF12508PX3.
+  //   Both share the same root.  The badge shows on the OLD (the PCS).
+  const _swSuffixRe = /^(.+?)(EC|COS|AMZ|DS|DTC)$/i;
+  const _swPcsRe    = /^(.+?)PCS(\d+)$/i;
   for (const r of ALL_RECORDS) {
     if (!/amazon/i.test(r.cust || '')) continue;
-    const m = r.mstyle.match(/^(.+?)(COS|EC)$/i);
-    if (!m) continue;
-    const hasOrders = r.hist_ord  && r.hist_ord.some(v => v > 0);
-    const hasProjs  = r.weeks_slim && r.weeks_slim.some(w => (w.projection || 0) > 0);
-    if (!hasOrders && !hasProjs) continue;
-    const baseMstyle = m[1];
-    const baseKey    = r.key.replace(r.mstyle, baseMstyle);
-    if (ALL_RECORDS.some(b => b.key === baseKey)) {
-      SWITCHOVER_MAP.set(baseKey, r.mstyle);
+
+    // Pattern 1 -- I'm a variant (ends in EC/COS/AMZ/DS/DTC). Look up base.
+    const sfxM = r.mstyle.match(_swSuffixRe);
+    if (sfxM) {
+      const hasOrders = r.hist_ord   && r.hist_ord.some(v => v > 0);
+      const hasProjs  = r.weeks_slim && r.weeks_slim.some(w => (w.projection || 0) > 0);
+      if (hasOrders || hasProjs) {
+        const baseMstyle = sfxM[1];
+        const baseKey    = _swSiblingKey(r, baseMstyle);
+        if (_swByKey.has(baseKey)) {
+          SWITCHOVER_MAP.set(baseKey, r.mstyle);
+        }
+      }
+    }
+
+    // Pattern 2 -- I'm the OLD PCS style. Look up the new PX{N} sibling.
+    const pcsM = r.mstyle.match(_swPcsRe);
+    if (pcsM) {
+      const newMstyle = `${pcsM[1]}PX${pcsM[2]}`;
+      const newKey    = _swSiblingKey(r, newMstyle);
+      const newRec    = _swByKey.get(newKey);
+      if (newRec) {
+        const newHasOrders = newRec.hist_ord   && newRec.hist_ord.some(v => v > 0);
+        const newHasProjs  = newRec.weeks_slim && newRec.weeks_slim.some(w => (w.projection || 0) > 0);
+        if (newHasOrders || newHasProjs) {
+          // The OLD (PCS) record gets the badge; value is the NEW (PX) mstyle.
+          SWITCHOVER_MAP.set(r.key, newMstyle);
+        }
+      }
     }
   }
 
@@ -3179,7 +3219,7 @@ function buildSwitchoverMap() {
   }
 
   console.info(
-    `[Switchover] ${SWITCHOVER_MAP.size} COS/EC auto | ` +
+    `[Switchover] ${SWITCHOVER_MAP.size} auto-detected (EC/COS/AMZ/DS/DTC + PCS->PX) | ` +
     `${MANUAL_SWITCHOVER_MAP.size} manual configured`
   );
 }
