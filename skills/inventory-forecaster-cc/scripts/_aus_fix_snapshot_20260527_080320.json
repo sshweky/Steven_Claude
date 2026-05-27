@@ -1,0 +1,734 @@
+{
+  "ts": "2026-05-27T08:03:20.290613",
+  "count": 28,
+  "records": [
+    {
+      "10": {
+        "value": "CLOSED"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF12300/24AU"
+      },
+      "292": {
+        "value": "1864-FF12300/24AU"
+      },
+      "3": {
+        "value": 39860
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Dropped"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF4517AU"
+      },
+      "292": {
+        "value": "1864-FF4517AU"
+      },
+      "3": {
+        "value": 39861
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF12301/24AU"
+      },
+      "292": {
+        "value": "1864-FF12301/24AU"
+      },
+      "3": {
+        "value": 39862
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "SF8167AU"
+      },
+      "292": {
+        "value": "1864-SF8167AU"
+      },
+      "3": {
+        "value": 39863
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF33135AU"
+      },
+      "292": {
+        "value": "1864-FF33135AU"
+      },
+      "3": {
+        "value": 39864
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF31324AU"
+      },
+      "292": {
+        "value": "1864-FF31324AU"
+      },
+      "3": {
+        "value": 39865
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF6305AU"
+      },
+      "292": {
+        "value": "1864-FF6305AU"
+      },
+      "3": {
+        "value": 39866
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF8608AU"
+      },
+      "292": {
+        "value": "1864-FF8608AU"
+      },
+      "3": {
+        "value": 39867
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF12655AU"
+      },
+      "292": {
+        "value": "1864-FF12655AU"
+      },
+      "3": {
+        "value": 39868
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF33137AU"
+      },
+      "292": {
+        "value": "1864-FF33137AU"
+      },
+      "3": {
+        "value": 39869
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen"
+      }
+    },
+    {
+      "10": {
+        "value": "CLOSED"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF31185AU"
+      },
+      "292": {
+        "value": "1864-FF31185AU"
+      },
+      "3": {
+        "value": 39870
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Future Delete"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF33139AU"
+      },
+      "292": {
+        "value": "1864-FF33139AU"
+      },
+      "3": {
+        "value": 39871
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF4537AU"
+      },
+      "292": {
+        "value": "1864-FF4537AU"
+      },
+      "3": {
+        "value": 39872
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF7942AU"
+      },
+      "292": {
+        "value": "1864-FF7942AU"
+      },
+      "3": {
+        "value": 39873
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "CLOSED"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF16899AU"
+      },
+      "292": {
+        "value": "1864-FF16899AU"
+      },
+      "3": {
+        "value": 39874
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Future Delete"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF28039AU"
+      },
+      "292": {
+        "value": "1864-FF28039AU"
+      },
+      "3": {
+        "value": 39875
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF9315AU"
+      },
+      "292": {
+        "value": "1864-FF9315AU"
+      },
+      "3": {
+        "value": 39876
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF9318AU"
+      },
+      "292": {
+        "value": "1864-FF9318AU"
+      },
+      "3": {
+        "value": 39877
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF13421AU"
+      },
+      "292": {
+        "value": "1864-FF13421AU"
+      },
+      "3": {
+        "value": 39878
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF7110AU"
+      },
+      "292": {
+        "value": "1864-FF7110AU"
+      },
+      "3": {
+        "value": 39879
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF9281AU"
+      },
+      "292": {
+        "value": "1864-FF9281AU"
+      },
+      "3": {
+        "value": 39880
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "CLOSED"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF16898AU"
+      },
+      "292": {
+        "value": "1864-FF16898AU"
+      },
+      "3": {
+        "value": 39881
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Future Delete"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF20208AU"
+      },
+      "292": {
+        "value": "1864-FF20208AU"
+      },
+      "3": {
+        "value": 39882
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF18959AU"
+      },
+      "292": {
+        "value": "1864-FF18959AU"
+      },
+      "3": {
+        "value": 39883
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF9721AU"
+      },
+      "292": {
+        "value": "1864-FF9721AU"
+      },
+      "3": {
+        "value": 39884
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF9314AU"
+      },
+      "292": {
+        "value": "1864-FF9314AU"
+      },
+      "3": {
+        "value": 39885
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF4933AU"
+      },
+      "292": {
+        "value": "1864-FF4933AU"
+      },
+      "3": {
+        "value": 39886
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen"
+      }
+    },
+    {
+      "10": {
+        "value": "A"
+      },
+      "11": {
+        "value": 1884.0
+      },
+      "1187": {
+        "value": "01884"
+      },
+      "196": {
+        "value": "FF7217AU"
+      },
+      "292": {
+        "value": "1864-FF7217AU"
+      },
+      "3": {
+        "value": 39887
+      },
+      "363": {
+        "value": "AMAZON AUSTRALIA"
+      },
+      "374": {
+        "value": "Active: Replen Commt"
+      }
+    }
+  ]
+}

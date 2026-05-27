@@ -1179,21 +1179,21 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
                 proposed_change=(
                     f"Add a MAN PRJ directional gate to the {kw} cap: after spike detection "
                     f"(week >= L13W * 3x), only apply the cap when the model's 26w output "
-                    f"is ALSO above MAN PRJ * {man_mult:.2f}x. This was tested against all "
-                    f"{sc:,} active {kw} records -- it correctly flags {cc_new} record(s) "
-                    f"and narrows the MAN-AI gap from {vb_new:+,}u to {va_new:+,}u "
-                    f"(closes {gap_closed:,}u). Cap target: MAN PRJ * 1.05. "
+                    f"is ALSO above MAN PRJ * {man_mult:.2f}x. Tested against all "
+                    f"{sc:,} active {kw} records -- correctly flags {cc_new} records and "
+                    f"narrows the MAN-AI variance from {vb_pct:+.1f}% ({vb_new:+,}u) to "
+                    f"{va_pct:+.1f}% ({va_new:+,}u), closing {gap_closed:,}u. "
+                    f"Cap target: MAN PRJ * 1.05. "
                     f"Implementation: if spike_detected and ai_26w > man_prj_26w * {man_mult:.2f}: "
                     f"cap ai_26w = min(ai_26w, man_prj_26w * 1.05). "
                     f"Items from planner comments: {item_str}."
                 ),
                 confidence="high",
                 rationale=(
-                    f"Tested {sc:,} active {kw} records. Only {cc_new} have AI > MAN * "
-                    f"{man_mult:.2f}x -- those are the true over-projectors. Capping them to "
-                    f"MAN * 1.05 closes {gap_closed:,}u of gap. The remaining "
-                    f"{sc - cc_new:,} records (where AI is already at or below MAN) are "
-                    f"untouched."
+                    f"Tested {sc:,} active {kw} records. {cc_new} have AI > MAN * "
+                    f"{man_mult:.2f}x -- the true over-projectors. Capping them to MAN * 1.05 "
+                    f"closes {gap_closed:,}u ({abs(vb_pct - va_pct):.1f}pp of variance). "
+                    f"Remaining {sc - cc_new:,} records are untouched."
                 ),
             )
 
