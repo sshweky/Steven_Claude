@@ -879,9 +879,10 @@ def build_report(analyses, grouped, run_date, days):
             continue
         seen_recs.add(key)
         rec_num += 1
-        impact  = grp["unit_gap"]
-        conf    = rec["confidence"].upper()
-        all_recs.append((rec_num, intent, fit, rec, impact, grp["count"]))
+        impact   = grp["unit_gap"]
+        conf     = rec["confidence"].upper()
+        _ai_model = grp["items"][0].get("ai_model", "") if grp["items"] else ""
+        all_recs.append((rec_num, intent, fit, rec, impact, grp["count"], _ai_model))
 
         lines += [
             f"### [{rec_num}] {rec['change_type'].replace('_', ' ').title()} "
