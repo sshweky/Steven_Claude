@@ -602,6 +602,30 @@ function _saveAtsHistCache(map) {
   }
 }
 
+function _loadPosHistCache() {
+  try {
+    const raw = sessionStorage.getItem(POS_HIST_CACHE_KEY);
+    if (raw) { const obj = JSON.parse(raw); if (obj && typeof obj.ts === 'number' && obj.map) return { map: obj.map, ageMs: Date.now() - obj.ts }; }
+  } catch (e) { /* ignore */ }
+  try {
+    const raw = localStorage.getItem(POS_HIST_CACHE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || typeof obj.ts !== 'number' || !obj.map) return null;
+    if (Date.now() - obj.ts > POS_HIST_CACHE_TTL_MS) return null;
+    return { map: obj.map, ageMs: Date.now() - obj.ts };
+  } catch (e) { return null; }
+}
+function _savePosHistCache(map) {
+  const payload = JSON.stringify({ ts: Date.now(), map });
+  try { sessionStorage.setItem(POS_HIST_CACHE_KEY, payload); } catch (e) { /* ignore */ }
+  try {
+    localStorage.setItem(POS_HIST_CACHE_KEY, payload);
+  } catch (e) {
+    try { localStorage.removeItem(POS_HIST_CACHE_KEY); localStorage.setItem(POS_HIST_CACHE_KEY, payload); } catch (e2) { /* ignore */ }
+  }
+}
+
 // Clear every local cache and reload fresh from QB
 function clearAllCaches() {
   const _ckAll = [INV_FLOW_CACHE_KEY, ATS_HIST_CACHE_KEY, FID_SESS_KEY,
