@@ -3730,6 +3730,10 @@ async function toggleDetail(key) {
   hdrCells  += '<th>Total</th>';
   projCells += `<td id="man-total-${safeIdForTotal}" style="font-weight:700">${fmtN(liveProjTotal)}</td>`;
   aiCells   += `<td style="font-weight:700;color:#1565c0">${fmtN(r.ai_total)}</td>`;
+  // MAN - AI total: color-coded like the per-week cells (green=above, red=below).
+  const _diffTotalClr  = diffTotal > 0 ? 'color:#2e7d32' : diffTotal < 0 ? 'color:#c62828' : 'color:#555';
+  const _diffTotalSign = diffTotal > 0 ? '+' : '';
+  diffCells += `<td style="font-weight:700;${_diffTotalClr}">${_diffTotalSign}${fmtN(diffTotal)}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(opnTot)}</td>`;
 
   // Avg/Wk column  -  separate header so the invFlow table (which also reuses
@@ -3739,6 +3743,10 @@ async function toggleDetail(key) {
   const projHdrCells = hdrCells + '<th style="color:#888;font-weight:600">Avg/Wk</th>';
   projCells += `<td id="man-avgwk-${safeIdForTotal}" style="font-weight:700;color:#555">${fmtN(Math.round(liveProjTotal / _wkCount))}</td>`;
   aiCells   += `<td style="font-weight:700;color:#1565c0">${fmtN(Math.round(r.ai_total / _wkCount))}</td>`;
+  const _diffAvg = Math.round(diffTotal / _wkCount);
+  const _diffAvgClr  = _diffAvg > 0 ? 'color:#2e7d32' : _diffAvg < 0 ? 'color:#c62828' : 'color:#555';
+  const _diffAvgSign = _diffAvg > 0 ? '+' : '';
+  diffCells += `<td style="font-weight:700;${_diffAvgClr}">${_diffAvgSign}${fmtN(_diffAvg)}</td>`;
   opnCells  += `<td style="font-weight:700;color:#6d4c00">${fmtN(Math.round(opnTot / _wkCount))}</td>`;
 
   // LY actuals  -  Ordered LY (green) + Shipped LY (blue), W1..W26 alignment.
