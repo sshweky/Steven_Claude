@@ -623,33 +623,60 @@ def aggregate(analyses):
 # ---------------------------------------------------------------------------
 # Step 4b -- Estimate systemic impact across ALL active projections
 # ---------------------------------------------------------------------------
-def estimate_systemic_impact(all_recs):
+def estimate_systemic_impact(all_recs, man_fids):
     """
-    For each unique (model_keyword, change_type, fit) in the recommendations,
-    query ALL active Projections with that model and compute:
-      - Total record count in scope
-      - Total AI PRJ 26-week units across those records
-      - Estimated affected count + direction based on fit + detection criteria
+    For each recommendation, query ALL active Projections with that AI model and:
+      - Count total records in scope
+      - Sum AI PRJ 26w across scope
+      - For records that match detection criteria, compute:
+          variance_before = sum(MAN 26w) - sum(AI 26w)
+          variance_after  = sum(MAN 26w) - sum(estimated_new_AI 26w)
+        so we can show how much the fix closes the MAN vs AI gap.
 
     Returns list of dicts keyed by rec_num.
     """
-    # Build a map: rec_num -> (model_keyword, fit, change_type, confidence)
-    impacts = {}
-    queried_models = {}   # cache: model_keyword -> (count, ai_total, criteria_count)
+    queried_models = {}   # cache: model_keyword -> 6-tuple
+    man_fid_list   = sorted(man_fids.values()) if man_fids else []
 
-    # Detection criteria per change_type + fit:
-    # We fetch L13W (1593) + L4W (1417) + order history to apply criteria.
-    # ord_fids[0] = most recent week (Ord_LW); we look for spike weeks.
+    # -----------------------------------------------------------------------
+    def _estimate_new_ai_26w(change_type, fit, ai_26w, l13w, l4w):
+        """Approximate AI 26w total AFTER the proposed fix is applied."""
+        if change_type == "threshold" and fit == "over_projecting":
+            # Croston post-guard: cap at L13W * 1.5 * 26
+            cap = l13w * 1.5 * 26
+            return min(ai_26w, cap) if cap > 0 else ai_26w
+        if fit == "under_projecting":
+            # Anchor to max(L4W, L13W) -- picks up growing trend
+            base = max(l4w, l13w) if l4w > 0 else l13w
+            return base * 26
+        if fit == "missed_lifecycle":
+            # EOL: anchor to L4W (decelerating toward zero)
+            return l4w * 26 if l4w > 0 else 0.0
+        if change_type == "model_switch" and fit == "wrong_model":
+            # Switch from flat Heuristic to trend-aware: use max(L4W, L13W)
+            base = max(l4w, l13w) if l4w > 0 else l13w
+            return base * 26
+        return ai_26w  # no change for investigate / unknown
 
+    # -----------------------------------------------------------------------
     def _fetch_model_scope(model_keyword, change_type, fit):
-        """Query all active projections where AI_MODEL contains model_keyword."""
+        """Query all active projections where AI_MODEL contains model_keyword.
+
+        Returns 6-tuple:
+          (scope_count, scope_ai_total, criteria_count,
+           flagged_man_total, flagged_ai_total, flagged_ai_estimate)
+        """
         cache_key = model_keyword.lower()
         if cache_key in queried_models:
             return queried_models[cache_key]
 
-        select_fids = [P_KEY, P_AI_MODEL, P_L13W, 1417] + AI_PRJ_FIDS + ORD_FIDS[:13]
-        # Filter: active status AND model contains keyword
-        # QB: {10.SW.'A'} AND {1580.CT.'<keyword>'}
+        EMPTY = (0, 0, 0, 0, 0, 0)
+        select_fids = (
+            [P_KEY, P_AI_MODEL, P_L13W, 1417]
+            + AI_PRJ_FIDS
+            + ORD_FIDS[:13]
+            + man_fid_list          # MAN PRJ weeks for before/after variance
+        )
         kw_safe = model_keyword.replace("'", "''")
         where   = f"{{10.SW.'A'}}AND{{1580.CT.'{kw_safe}'}}"
 
@@ -670,55 +697,67 @@ def estimate_systemic_impact(all_recs):
                 time.sleep(0.15)
         except Exception as e:
             print(f"  [WARN] Systemic impact fetch for '{model_keyword}' failed: {e}")
-            queried_models[cache_key] = (0, 0, 0)
-            return (0, 0, 0)
+            queried_models[cache_key] = EMPTY
+            return EMPTY
 
-        total_count = len(rows)
-        ai_total    = sum(
-            sum(fval(r, fid) for fid in AI_PRJ_FIDS)
-            for r in rows
-        )
+        total_count    = len(rows)
+        scope_ai_total = sum(sum(fval(r, fid) for fid in AI_PRJ_FIDS) for r in rows)
 
-        # Apply change-specific detection criteria to count "directly affected"
-        criteria_count = 0
+        criteria_count      = 0
+        flagged_man_total   = 0.0
+        flagged_ai_total    = 0.0
+        flagged_ai_estimate = 0.0
+
         for r in rows:
             l13w   = fval(r, P_L13W)
-            l4w    = fval(r, 1417)   # L4W FID discovered earlier, hardcode 1417 here
+            l4w    = fval(r, 1417)
             ord_wk = [fval(r, fid) for fid in ORD_FIDS[:13]]
+            ai_26w = sum(fval(r, fid) for fid in AI_PRJ_FIDS)
+            man_26w = sum(fval(r, fid) for fid in man_fid_list) if man_fid_list else 0.0
             trend  = l4w / l13w if l13w > 0 else 1.0
 
+            flagged = False
             if change_type == "threshold" and fit == "over_projecting":
-                # Croston's anomaly: any order week >= 3x L13W
                 if l13w > 0 and any(w >= l13w * 3 for w in ord_wk):
-                    criteria_count += 1
-                # Non-Croston over-projection: L4W/L13W < 0.80 (declining)
+                    flagged = True
                 elif "croston" not in model_keyword.lower() and l4w > 0 and trend < 0.80:
-                    criteria_count += 1
+                    flagged = True
             elif change_type == "threshold" and fit == "under_projecting":
-                # Under-projection: L4W/L13W > 1.15 (growing) with no spike
                 if l4w > 0 and trend > 1.15:
-                    criteria_count += 1
+                    flagged = True
             elif change_type == "model_switch":
-                # Heuristic flat: L4W and L13W diverge meaningfully (trend != 1)
                 if l4w > 0 and (trend > 1.20 or trend < 0.80):
-                    criteria_count += 1
+                    flagged = True
             elif change_type == "missed_lifecycle":
-                # EOL missed: L4W/L13W < 0.65 and AI still projecting
-                ai_sum = sum(fval(r, fid) for fid in AI_PRJ_FIDS)
-                if l4w > 0 and trend < 0.65 and ai_sum > 0:
-                    criteria_count += 1
+                if l4w > 0 and trend < 0.65 and ai_26w > 0:
+                    flagged = True
             else:
-                criteria_count = total_count  # investigate -- all in scope
+                flagged = True  # investigate -- all in scope
 
-        queried_models[cache_key] = (total_count, int(ai_total), criteria_count)
-        return queried_models[cache_key]
+            if flagged:
+                criteria_count      += 1
+                flagged_man_total   += man_26w
+                flagged_ai_total    += ai_26w
+                new_ai = _estimate_new_ai_26w(change_type, fit, ai_26w, l13w, l4w)
+                flagged_ai_estimate += new_ai
 
+        result_tuple = (
+            total_count,
+            int(scope_ai_total),
+            criteria_count,
+            int(flagged_man_total),
+            int(flagged_ai_total),
+            int(flagged_ai_estimate),
+        )
+        queried_models[cache_key] = result_tuple
+        return result_tuple
+
+    # -----------------------------------------------------------------------
     print("  Computing systemic impact across all active projections...", flush=True)
-    results = []
+    results       = []
     seen_keywords = set()
 
     for num, intent, fit, rec, unit_impact, count in all_recs:
-        # Derive model keyword from the analyses that triggered this rec
         model_keyword = ""
         if "Croston" in rec["proposed_change"]:
             model_keyword = "Croston"
@@ -733,18 +772,25 @@ def estimate_systemic_impact(all_recs):
             results.append({
                 "rec_num": num, "model_keyword": "all",
                 "scope_count": 0, "scope_ai_total": 0,
-                "criteria_count": 0, "direction": "unknown",
+                "criteria_count": 0,
+                "flagged_man_total": 0, "flagged_ai_total": 0,
+                "flagged_ai_estimate": 0,
+                "variance_before": 0, "variance_after": 0,
+                "direction": "unknown",
             })
             continue
 
         if model_keyword in seen_keywords:
-            # Reuse cached result
-            sc, at, cc = queried_models.get(model_keyword.lower(), (0, 0, 0))
+            sc, at, cc, fmt, fat, fae = queried_models.get(
+                model_keyword.lower(), (0, 0, 0, 0, 0, 0))
         else:
             seen_keywords.add(model_keyword)
-            sc, at, cc = _fetch_model_scope(model_keyword, rec["change_type"], fit)
-            print(f"    {model_keyword}: {sc:,} records, {at:,} AI units, "
-                  f"{cc:,} match detection criteria", flush=True)
+            sc, at, cc, fmt, fat, fae = _fetch_model_scope(
+                model_keyword, rec["change_type"], fit)
+            var_b = fmt - fat
+            var_a = fmt - fae
+            print(f"    {model_keyword}: {sc:,} records, {cc:,} flagged | "
+                  f"MAN-AI before={var_b:+,}u  after={var_a:+,}u", flush=True)
 
         direction = (
             "down" if fit in ("over_projecting", "missed_lifecycle") else
@@ -752,12 +798,17 @@ def estimate_systemic_impact(all_recs):
             "mixed"
         )
         results.append({
-            "rec_num":       num,
-            "model_keyword": model_keyword,
-            "scope_count":   sc,
-            "scope_ai_total": at,
-            "criteria_count": cc,
-            "direction":     direction,
+            "rec_num":            num,
+            "model_keyword":      model_keyword,
+            "scope_count":        sc,
+            "scope_ai_total":     at,
+            "criteria_count":     cc,
+            "flagged_man_total":  fmt,
+            "flagged_ai_total":   fat,
+            "flagged_ai_estimate": fae,
+            "variance_before":    fmt - fat,
+            "variance_after":     fmt - fae,
+            "direction":          direction,
         })
 
     return results
