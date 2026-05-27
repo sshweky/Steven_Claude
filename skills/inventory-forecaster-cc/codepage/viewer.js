@@ -4745,6 +4745,7 @@ async function toggleDetail(key) {
         <tr>${projHdrCells}</tr>
         <tr>${projCells}</tr>
         <tr>${aiCells}</tr>
+        <tr>${diffCells}</tr>
         <tr><td colspan="29" style="padding:0;height:6px;background:transparent;border:none"></td></tr>
         <tr>${opnCells}</tr>
         <tr>${lyOrdCells}</tr>
