@@ -965,17 +965,29 @@ def _build_systemic_html(systemic_impacts, all_recs):
         at    = si["scope_ai_total"]
         cc    = si["criteria_count"]
         di    = si["direction"]
+        vb    = si["variance_before"]   # MAN - AI (current, flagged records)
+        va    = si["variance_after"]    # MAN - estimated new AI (flagged records)
+        delta = va - vb                 # how much the gap closes (positive = closer to MAN)
         label, intent, impact = rec_labels.get(num, ("", "", 0))
         badge_style, badge_txt = dir_badge.get(di, ("", di.upper()))
         pct = f"{cc/sc*100:.0f}%" if sc > 0 else "n/a"
+
+        # Variance coloring: before is bad (red if big gap), after should be smaller
+        vb_col = "#c62828" if vb < 0 else "#2e7d32"
+        va_col = "#c62828" if va < 0 else "#2e7d32"
+        # Delta: green if gap shrank (|after| < |before|), red if it grew
+        delta_col = "#2e7d32" if abs(va) < abs(vb) else "#c62828"
+        delta_str = f"{delta:+,}" if cc > 0 else "n/a"
 
         rows += f"""
 <tr>
   <td style="{TD}"><b>[{num}]</b> {label}</td>
   <td style="{TD}">{kw}</td>
   <td style="{TDR}">{sc:,}</td>
-  <td style="{TDR}">{at:,}</td>
   <td style="{TDR}">{cc:,} <span style="color:#9e9e9e">({pct})</span></td>
+  <td style="{TDR};color:{vb_col}">{vb:+,}</td>
+  <td style="{TDR};color:{va_col}">{va:+,}</td>
+  <td style="{TDR};color:{delta_col};font-weight:bold">{delta_str}</td>
   <td style="{TDC}"><span style="padding:2px 8px;border-radius:3px;font-weight:bold;font-size:11px;{badge_style}">{badge_txt}</span></td>
 </tr>"""
 
@@ -984,17 +996,19 @@ def _build_systemic_html(systemic_impacts, all_recs):
            padding-top:18px">Systemic Impact Estimate</h3>
 <p style="margin:0 0 10px 0;font-size:12px;color:#757575">
   If the proposed model changes are deployed, how many active projections would be affected?
-  <i>Scope = records with that AI model type. Flagged = records that match the detection
-  criteria for the fix (i.e. would actually change).</i>
+  <i>Variance = MAN PRJ 26w minus AI PRJ 26w across flagged records only.
+  Before = current gap. After = estimated gap once fix is applied. Delta = improvement.</i>
 </p>
 <table style="width:100%;border-collapse:collapse;font-size:13px">
   <thead>
     <tr>
       <th style="{TH}">Change</th>
       <th style="{TH}">Model</th>
-      <th style="{THR}">Records in Scope</th>
-      <th style="{THR}">AI Units in Scope</th>
-      <th style="{THR}">Flagged by Criteria</th>
+      <th style="{THR}">In Scope</th>
+      <th style="{THR}">Flagged</th>
+      <th style="{THR}">MAN-AI Before</th>
+      <th style="{THR}">MAN-AI After</th>
+      <th style="{THR}">Delta</th>
       <th style="{TH};text-align:center">Direction</th>
     </tr>
   </thead>
