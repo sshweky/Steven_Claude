@@ -3694,7 +3694,7 @@ function renderPage(page) {
     const _safeId2 = r.key.replace(/[^a-zA-Z0-9]/g,'_');
     tr.innerHTML = `
       <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">[R]</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>' : ''}${SWITCHOVER_MAP.has(r.key) && !MANUAL_SWITCHOVER_MAP.has(r.key) ? '<span class="switchover-badge" style="color:#2e7d32" title="Auto-detected switchover to ' + (SWITCHOVER_MAP.get(r.key)||'').replace(/"/g,'&quot;') + ' — variant has activity, mark this projection CLOSED">&#x21C4;</span>' : ''}${MANUAL_SWITCHOVER_MAP.has(r.key) ? '<span class="switchover-badge" title="Manual switchover to ' + ((MANUAL_SWITCHOVER_MAP.get(r.key)||{}).toMstyle||'').replace(/"/g,'&quot;') + '">&#x21C4;</span>' : ''}${r.auto_project ? '<span style="display:inline-block;background:#1b5e20;color:#fff;border-radius:3px;padding:0 4px;font-size:10px;font-weight:700;letter-spacing:0.3px;margin-left:2px;" title="Auto Project: AI projections will replace manual projections on each forecast run">[A]</span>' : ''}</td>
-      <td class="clickable" onclick="toggleDetail('${r.key}')"><span id="conflict-badge-${_safeId2}" style="display:${r.has_po_prj_conflict ? 'inline' : 'none'};color:#e65100;font-size:14px;font-weight:700;margin-right:3px;vertical-align:middle;cursor:pointer;" title="Open PO and Manual Projection overlap — potential double-count. Click to see details.">&#x26A0;</span>${r.key}</td>
+      <td class="clickable" onclick="toggleDetail('${r.key}')"><span id="conflict-badge-${_safeId2}" style="display:${r.has_po_prj_conflict && !_PO_DUP_IGNORED.has(r.key) ? 'inline' : 'none'};color:#e65100;font-size:14px;font-weight:700;margin-right:3px;vertical-align:middle;cursor:pointer;" title="Open PO and Manual Projection overlap -- potential double-count. Click to see details.">&#x26A0;</span>${r.key}</td>
       <td style="font-size:11px;white-space:nowrap">${r.inv_manager||''}</td>
       <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.brand||'').replace(/"/g,'&quot;')}">${r.brand||''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.cust}</td>
@@ -6586,6 +6586,71 @@ function zeroDuplicateManPrj(key, safeKey) {
   }
 }
 
+// Ignore / Unignore a PO+PRJ duplicate conflict warning.
+// Persists in localStorage ('pp_po_prj_ignored_v1') so the choice survives
+// page reloads.  Updates the alert div in-place and toggles the row badge.
+function ignorePoPrj(key, safeKey) {
+  _PO_DUP_IGNORED.add(key);
+  _savePoDupIgnored();
+  _refreshPoPrjAlert(key, safeKey);
+}
+
+function unignorePoPrj(key, safeKey) {
+  _PO_DUP_IGNORED.delete(key);
+  _savePoDupIgnored();
+  _refreshPoPrjAlert(key, safeKey);
+}
+
+function _refreshPoPrjAlert(key, safeKey) {
+  const sk      = safeKey || key.replace(/[^a-zA-Z0-9]/g, '_');
+  const safeK   = key.replace(/'/g, "\\'");
+  const ignored = _PO_DUP_IGNORED.has(key);
+
+  // Toggle the conflict badge on the main table row
+  const badge = document.getElementById('conflict-badge-' + sk);
+  if (badge) badge.style.display = ignored ? 'none' : 'inline';
+
+  // Rebuild the alert div if the detail pane is open
+  const alertEl = document.getElementById('po-prj-alert-' + sk);
+  if (!alertEl) { if (DUPES_ONLY) applyFilters(); return; }
+  const r = ALL_RECORDS.find(x => x.key === key);
+  if (!r || !r.po_prj_conflicts || !r.po_prj_conflicts.length) return;
+
+  const _lines = r.po_prj_conflicts.map(c => {
+    if (c.poWk === c.prjWk) {
+      return escHtml(`W${c.poWk}: Open PO ${fmtN(c.poQty)} units  |  Manual Prj ${fmtN(c.prjQty)} units  (same week)`);
+    }
+    const gap = Math.abs(c.poWk - c.prjWk);
+    return escHtml(`Open PO ${fmtN(c.poQty)} units (W${c.poWk})  +  Manual Prj ${fmtN(c.prjQty)} units (W${c.prjWk})  -- ${gap} wk apart`);
+  }).join('<br>');
+
+  if (ignored) {
+    alertEl.style.cssText = 'margin:10px 12px 0 12px;padding:10px 16px;background:#f5f5f5;border:2px solid #bdbdbd;border-radius:6px;opacity:0.75;';
+    alertEl.innerHTML =
+      `<div style="font-weight:600;font-size:12px;color:#9e9e9e;margin-bottom:4px;">&#x26A0; Duplicate demand warning IGNORED</div>` +
+      `<div style="font-size:11px;font-family:monospace;color:#bdbdbd;line-height:1.8;margin-bottom:8px;">${_lines}</div>` +
+      `<button onclick="unignorePoPrj('${safeK}','${sk}')" style="background:#fff;color:#757575;border:1px solid #bdbdbd;padding:5px 14px;font-size:11px;font-weight:600;border-radius:4px;cursor:pointer;">Unignore</button>` +
+      `<span style="font-size:10px;color:#bdbdbd;margin-left:10px;">Re-enable this warning if additional orders are no longer expected.</span>`;
+  } else {
+    const _isOP = r.is_offprice;
+    const _title = _isOP
+      ? 'DUPLICATE DEMAND: Off-Price Open PO + Manual Projection overlap'
+      : 'DUPLICATE DEMAND: Open PO and Manual Projection in the Same Week';
+    const _desc = _isOP
+      ? 'Off-price POs ship the same or following week. A Manual Projection within 4 weeks of an Open PO double-counts that demand and overstates replenishment requirements. Zero out the overlapping Manual Projection weeks unless you expect a completely separate additional order.'
+      : 'One or more weeks have BOTH a confirmed Open Customer PO and a Manual Projection. The PO is already a committed order -- the Manual Projection on top of it double-counts demand. Zero out the Manual Projection for conflicting weeks unless you expect a second independent order in the same week.';
+    alertEl.style.cssText = 'margin:10px 12px 0 12px;padding:14px 16px;background:#ffebee;border:3px solid #c62828;border-radius:6px;';
+    alertEl.innerHTML =
+      `<div style="font-weight:700;font-size:14px;color:#b71c1c;margin-bottom:6px;">&#9888; ${escHtml(_title)}</div>` +
+      `<div style="font-size:12px;color:#7f0000;line-height:1.6;margin-bottom:10px;">${escHtml(_desc)}</div>` +
+      `<div style="font-size:11px;font-family:monospace;line-height:1.8;color:#7f0000;background:#fff8f8;padding:8px 12px;border-radius:4px;border:1px solid #ef9a9a;margin-bottom:10px;">${_lines}</div>` +
+      `<button id="zero-dup-btn-${sk}" onclick="zeroDuplicateManPrj('${safeK}','${sk}')" style="background:#c62828;color:#fff;border:none;padding:7px 16px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;">Zero Duplicate MAN PRJ Weeks</button>` +
+      ` <button onclick="ignorePoPrj('${safeK}','${sk}')" style="background:#fff;color:#e65100;border:1px solid #e65100;padding:7px 14px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;margin-left:8px;">Ignore</button>` +
+      `<span style="font-size:10px;color:#b71c1c;margin-left:10px;">Zero changes will be staged -- click Save All to write to QB.</span>`;
+  }
+  if (DUPES_ONLY) applyFilters();
+}
+
 // Stage AI: copy 26 source values into the editable inputs as
 // unsaved edits. Cells whose new value matches the QB-loaded original stay
 // un-dirty (onManEdit handles that automatically).
@@ -7960,7 +8025,7 @@ function applyFilters() {
 
   FILTERED_RECORDS = ALL_RECORDS.filter(r => {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
-    if (DUPES_ONLY         && !r.has_po_prj_conflict)   return false;
+    if (DUPES_ONLY         && (!r.has_po_prj_conflict || _PO_DUP_IGNORED.has(r.key)))   return false;
     // "Show Flagged": Directors see ALL records with any active comment flag;
     // planners see only records where they are the Sent-To recipient.
     if (FLAGGED_ONLY) {
@@ -8165,6 +8230,8 @@ window.fillRowFromFocused  = fillRowFromFocused;
 window.fillRowConst        = fillRowConst;
 window.resetRow            = resetRow;
 window.clearAllFlags  = clearAllFlags;
+window.ignorePoPrj    = ignorePoPrj;
+window.unignorePoPrj  = unignorePoPrj;
 window.changePage     = changePage;
 
 // -- Bootstrap --------------------------------------------------------------
