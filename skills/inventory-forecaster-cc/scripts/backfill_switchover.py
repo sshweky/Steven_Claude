@@ -170,7 +170,7 @@ def main():
                 # Has mstyle but no date -- compute it
                 sw_date = None
                 for wn in sorted(prj_fids.keys()):
-                    label = f2l.get(prj_fids[wn], "")
+                    label = f2l.get(prj_fids[wn], str(prj_fids[wn]))
                     val   = float(v_row.get(label) or 0)
                     if val > 0:
                         sw_date = col_dates.get(wn)

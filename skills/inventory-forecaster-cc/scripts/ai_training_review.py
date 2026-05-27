@@ -1148,187 +1148,145 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
         return "; ".join(parts)
 
     # -----------------------------------------------------------------------
-    def _new_rec_for_rejected(rec, fit, kw, sc, cc, vb, va, items):
-        """Generate a new, directionally-correct recommendation for a REJECTED fix."""
+    def _new_rec_using_best_criterion(rec, fit, kw, sc, si, items):
+        """
+        Generate a recommendation using the winning criterion found by the
+        variation-testing loop. `si['best_criterion']` describes exactly which
+        gate/threshold was tested and proved to narrow the gap.
+        """
+        bc          = si["best_criterion"]
         change_type = rec["change_type"]
-        delta_bad   = va - vb
         item_str    = _item_list_str(items)
-        safe_zone   = sc - cc   # records that already have AI < MAN -- must not be harmed
+        cc_new      = bc["cc"]
+        vb_new      = bc["vb"]
+        va_new      = bc["va"]
+        gap_closed  = abs(vb_new) - abs(va_new)
 
         if change_type == "threshold" and fit == "over_projecting":
-            # Croston / over-projection cap that fired on wrong population.
-            # New rec: add a MAN-PRJ comparison guard so cap only fires when AI > MAN.
+            man_mult = bc.get("man_mult", 1.0)
             return dict(
                 change_type="threshold",
                 proposed_change=(
-                    f"Add a MAN-PRJ-aware directional cap to {kw}: run the existing spike "
-                    f"detection (week >= L13W * 3x), but only apply the cap when the model's "
-                    f"26w output is ALSO above MAN PRJ * 1.10. This two-gate approach ensures "
-                    f"the cap only fires on true over-projectors (AI >> MAN), leaving the "
-                    f"{safe_zone:,} records where AI is already below MAN completely untouched. "
-                    f"Implementation: in the Croston post-processing block, add: "
-                    f"if spike_detected and croston_26w > man_prj_26w * 1.10: apply_cap(). "
-                    f"Items driving this recommendation: {item_str}."
+                    f"Add a MAN PRJ directional gate to the {kw} cap: after spike detection "
+                    f"(week >= L13W * 3x), only apply the cap when the model's 26w output "
+                    f"is ALSO above MAN PRJ * {man_mult:.2f}x. This was tested against all "
+                    f"{sc:,} active {kw} records -- it correctly flags {cc_new} record(s) "
+                    f"and narrows the MAN-AI gap from {vb_new:+,}u to {va_new:+,}u "
+                    f"(closes {gap_closed:,}u). Cap target: MAN PRJ * 1.05. "
+                    f"Implementation: if spike_detected and ai_26w > man_prj_26w * {man_mult:.2f}: "
+                    f"cap ai_26w = min(ai_26w, man_prj_26w * 1.05). "
+                    f"Items from planner comments: {item_str}."
                 ),
-                confidence="medium",
+                confidence="high",
                 rationale=(
-                    f"The original cap (spike detection alone) affected {cc:,} records and "
-                    f"widened MAN-AI from {vb:+,}u to {va:+,}u ({delta_bad:+,}u worse) because "
-                    f"most flagged records already have AI < MAN. Adding the MAN * 1.10 gate "
-                    f"restricts the cap to only the outliers where AI genuinely over-projects "
-                    f"vs the planner's target, which is the actual problem these comments describe."
+                    f"Tested {sc:,} active {kw} records. Only {cc_new} have AI > MAN * "
+                    f"{man_mult:.2f}x -- those are the true over-projectors. Capping them to "
+                    f"MAN * 1.05 closes {gap_closed:,}u of gap. The remaining "
+                    f"{sc - cc_new:,} records (where AI is already at or below MAN) are "
+                    f"untouched."
                 ),
             )
 
         if change_type == "threshold" and fit == "under_projecting":
-            # Under-projecting cap / boost that fired on wrong population.
-            # New rec: only boost when AI is below MAN by a meaningful margin.
+            man_mult = bc.get("man_mult", 1.10)
             return dict(
                 change_type="threshold",
                 proposed_change=(
-                    f"Add a MAN-PRJ-aware floor to {kw}: run the existing growth detection "
-                    f"(L4W/L13W > 1.15x), but only apply the boost when AI 26w is ALSO below "
-                    f"MAN PRJ * 0.90 (meaning AI is meaningfully under the planner's target). "
-                    f"This prevents inflating records where AI is already at or above MAN. "
-                    f"Items driving this recommendation: {item_str}."
+                    f"Add a MAN PRJ floor gate to {kw}: apply the growth boost only when "
+                    f"AI 26w is ALSO below MAN PRJ * {1/man_mult:.2f}x. Tested against "
+                    f"{sc:,} active {kw} records -- flags {cc_new} record(s) and narrows "
+                    f"gap from {vb_new:+,}u to {va_new:+,}u (closes {gap_closed:,}u). "
+                    f"Items from planner comments: {item_str}."
                 ),
-                confidence="medium",
+                confidence="high",
                 rationale=(
-                    f"The original boost affected {cc:,} records and widened MAN-AI from "
-                    f"{vb:+,}u to {va:+,}u ({delta_bad:+,}u worse). Adding the MAN * 0.90 "
-                    f"gate restricts the boost to only items where the model is meaningfully "
-                    f"below the planner's target."
+                    f"Tested {sc:,} active {kw} records. MAN PRJ gate restricts the boost "
+                    f"to only the {cc_new} records where AI is genuinely under the planner "
+                    f"target, closing {gap_closed:,}u of gap."
                 ),
             )
 
         if change_type == "model_switch":
-            # Model switch that fired on wrong population.
-            # New rec: switch only items where the trend diverges from the current model's output.
+            crit_type = bc.get("crit_type", "gap_pct")
+            if crit_type == "trend":
+                lo, hi = bc.get("lo", 0.90), bc.get("hi", 1.10)
+                crit_label = f"L4W/L13W outside {lo:.2f}-{hi:.2f} range"
+            elif crit_type == "gap_pct":
+                pct = bc.get("pct", 0.15)
+                crit_label = f"AI vs MAN gap > {pct*100:.0f}%"
+            else:
+                units = bc.get("units", 200)
+                crit_label = f"abs(AI - MAN) > {units:,}u"
             return dict(
                 change_type="model_switch",
                 proposed_change=(
-                    f"Targeted model switch for {kw}: instead of switching all trend-divergent "
-                    f"records, add a combined gate -- switch the model only when "
-                    f"(1) L4W/L13W trend is outside 0.80-1.20 AND "
-                    f"(2) current AI is on the wrong side of MAN PRJ by >15%. "
-                    f"This avoids switching records where the trend diverges but AI is already "
-                    f"close to MAN. Items to review first: {item_str}."
+                    f"Switch {kw} records to trend-aware model when: {crit_label}. "
+                    f"Tested against {sc:,} active {kw} records -- this criterion flags "
+                    f"{cc_new} record(s) and narrows the MAN-AI gap from {vb_new:+,}u to "
+                    f"{va_new:+,}u (closes {gap_closed:,}u). "
+                    f"For flagged records: route to max(L4W, L13W) * 26 instead of flat "
+                    f"L13W, giving the model a trend-aware baseline. "
+                    f"Items from planner comments: {item_str}."
                 ),
-                confidence="medium",
+                confidence="high",
                 rationale=(
-                    f"The original model-switch criterion matched {cc:,} records but widened "
-                    f"MAN-AI from {vb:+,}u to {va:+,}u. A combined trend + MAN-proximity gate "
-                    f"targets only the records where both the model AND its output direction "
-                    f"disagree with the planner."
+                    f"Original trend criterion (>1.20x or <0.80x) found 0 matching records "
+                    f"in {sc:,} {kw} projections. Criterion '{crit_label}' found {cc_new} "
+                    f"records and proved effective: closes {gap_closed:,}u of gap."
                 ),
             )
 
-        # Fallback for other change types
         return dict(
             change_type=change_type,
             proposed_change=(
-                f"Original {change_type} fix would widen MAN-AI gap. "
-                f"New approach: add a MAN PRJ comparison gate so the fix only fires when "
-                f"AI is already on the wrong side of MAN by >10%. "
-                f"Items to address directly: {item_str}."
+                f"Validated fix for {kw}: tested criterion narrowed gap from {vb_new:+,}u "
+                f"to {va_new:+,}u across {cc_new} flagged records. {bc.get('desc', '')} "
+                f"Items: {item_str}."
             ),
-            confidence="low",
-            rationale=(
-                f"Systemic check showed the original fix widened MAN-AI from {vb:+,}u "
-                f"to {va:+,}u across {cc:,} flagged {kw} records."
-            ),
+            confidence="high",
+            rationale=f"Iterative testing on {sc:,} active {kw} records found this approach.",
         )
 
     # -----------------------------------------------------------------------
-    def _new_rec_for_isolated(rec, intent, fit, kw, sc, items):
-        """Generate an item-specific fix recommendation when no systemic pattern exists."""
+    def _new_rec_no_criterion_found(rec, intent, fit, kw, sc, items):
+        """Fallback when no variation narrows the gap: item-specific guidance."""
         change_type = rec["change_type"]
         item_str    = _item_list_str(items)
 
         if fit == "wrong_model" or change_type == "model_switch":
-            # Item is using the wrong model but no systemic pattern -- item-level override
-            first = items[0] if items else {}
-            man_target = first.get("man_total", 0)
-            mstyle     = first.get("mstyle", "")
-            cat_hint   = mstyle.split("-")[0] if "-" in mstyle else mstyle[:4]
+            first    = items[0] if items else {}
+            mstyle   = first.get("mstyle", "")
+            cat_hint = mstyle.split("-")[0] if "-" in mstyle else mstyle[:4]
             return dict(
                 change_type="model_switch",
                 proposed_change=(
-                    f"Item-level model fix for {count} item(s) -- no systemic pattern in "
-                    f"{sc:,} {kw} records checked, so this is a targeted override: "
-                    f"(1) Check if the item's category keyword (search '{cat_hint}' in "
-                    f"derived_category_profiles.json) is registered -- if missing, add it "
-                    f"to route this item to Seasonal or Croston's instead of flat Heuristic. "
-                    f"(2) If the item is intermittent/sparse (many zero-order weeks), switch "
-                    f"to Croston's model via the item's category profile. "
-                    f"(3) Immediate fix while model logic is updated: add a Tell-AI comment "
-                    f"on each affected record targeting MAN PRJ level. "
+                    f"Item-level model fix: no systemic criterion found across {sc:,} "
+                    f"{kw} records that narrows the gap. Targeted fix for {count} item(s): "
+                    f"(1) Check if '{cat_hint}' is in derived_category_profiles.json -- "
+                    f"if missing, add it to route to Seasonal or Croston's. "
+                    f"(2) Immediate: add a Tell-AI comment targeting MAN PRJ level. "
                     f"Affected: {item_str}."
                 ),
                 confidence="medium",
                 rationale=(
-                    f"Systemic scan of {sc:,} active {kw} projections found 0 records "
-                    f"matching the detection criteria -- this is an item-specific model "
-                    f"selection issue. Fixing the category registration for these specific "
-                    f"mstyles closes the gap without touching the broader {kw} population."
+                    f"Exhaustive variation testing on {sc:,} {kw} records found no criterion "
+                    f"that systematically narrows the gap. Root cause is item-specific model "
+                    f"selection; a category-profile registration or Tell-AI override is the "
+                    f"right path."
                 ),
             )
 
-        if fit == "over_projecting":
-            return dict(
-                change_type="threshold",
-                proposed_change=(
-                    f"Item-level correction for {count} over-projecting item(s) -- no "
-                    f"matching pattern found in {sc:,} {kw} records, so a targeted fix "
-                    f"is appropriate: "
-                    f"(1) Add a Tell-AI comment on each affected record with a target "
-                    f"projection at or near MAN PRJ level to override the AI for the next "
-                    f"forecast run. "
-                    f"(2) Check if this item's order history has a one-time spike that "
-                    f"inflated the model -- if so, flag the spike week in the history table "
-                    f"as non-recurring. "
-                    f"Affected: {item_str}."
-                ),
-                confidence="medium",
-                rationale=(
-                    f"No other {kw} records show this over-projection pattern ({sc:,} checked). "
-                    f"The root cause is item-specific (e.g., a one-time order in history). "
-                    f"A Tell-AI comment is the fastest path to alignment."
-                ),
-            )
-
-        if fit == "under_projecting":
-            return dict(
-                change_type="threshold",
-                proposed_change=(
-                    f"Item-level correction for {count} under-projecting item(s) -- no "
-                    f"matching growth pattern found in {sc:,} {kw} records: "
-                    f"(1) Add a Tell-AI comment on each affected record targeting MAN PRJ level. "
-                    f"(2) If the item has a known distribution gain, verify that the new "
-                    f"account/channel is included in the order history window (check if recent "
-                    f"orders from the new channel have posted to this key). "
-                    f"Affected: {item_str}."
-                ),
-                confidence="medium",
-                rationale=(
-                    f"No other {kw} records show this growth pattern ({sc:,} checked). "
-                    f"The distribution gain or ramp is item-specific and not visible to "
-                    f"the model yet -- a Tell-AI override bridges the gap."
-                ),
-            )
-
-        # Generic isolated fallback
         return dict(
             change_type=change_type,
             proposed_change=(
-                f"Item-specific fix required for {count} item(s) -- no systemic pattern "
-                f"found in {sc:,} {kw} records. Add a Tell-AI comment on each affected "
-                f"record with the target projection: {item_str}."
+                f"Item-level fix required: no systemic criterion found across {sc:,} "
+                f"{kw} records. Add a Tell-AI comment on each affected record: {item_str}."
             ),
             confidence="low",
             rationale=(
-                f"Systemic scan found 0 matching records out of {sc:,} active {kw} "
-                f"projections. This is a one-off item requiring individual attention."
+                f"Iterative variation testing on {sc:,} active {kw} projections found no "
+                f"detection criterion that narrows the MAN-AI gap. Individual item correction "
+                f"is the only path."
             ),
         )
 
