@@ -1211,6 +1211,63 @@ async function _fetchAtsForMstyle(r) {
   }
 }
 
+// -- Normalized L13w parser --------------------------------------------------
+// Extracts normalized L13W avg from AI_ANALYSIS narrative when the forecaster
+// wrote: "Normalized Ord/Wk L13w: 1,506/wk (raw L13W: 1,900/wk -- reason)"
+// Returns { norm, raw, reason } or null when the bullet is not present.
+function _parseNormL13w(narrative) {
+  if (!narrative) return null;
+  const m = narrative.match(
+    /Normalized Ord\/Wk L13w[:\s]+([\d,]+)\/wk\s*\(raw L13W[:\s]+([\d,]+)\/wk\s*--\s*([^)]+)\)/i
+  );
+  if (!m) return null;
+  return {
+    norm:   parseInt(m[1].replace(/,/g, ''), 10),
+    raw:    parseInt(m[2].replace(/,/g, ''), 10),
+    reason: m[3].trim(),
+  };
+}
+
+// Builds the always-visible "Normalized Ord/Wk L13W" metric chip for the
+// detail pane.  Shows the normalized value with unit diff vs raw.  When they
+// differ a tooltip provides the detailed explanation of what was stripped.
+function _buildNormL13wHtml(r) {
+  const rawL13 = Math.round(r.shp_wk || 0);
+  if (!rawL13) return '';
+  const parsed  = _parseNormL13w(r.narrative || '');
+  const normL13 = parsed ? parsed.norm : rawL13;
+  const diff    = normL13 - rawL13;
+  const normFmt = fmtN(normL13);
+  let diffHtml  = '';
+  if (diff !== 0) {
+    const sign    = diff > 0 ? '+' : '';
+    const diffClr = diff < 0 ? '#c62828' : '#2e7d32';
+    const reason  = (parsed && parsed.reason) ? parsed.reason : 'adjustments applied';
+    const f35     = _parseF35Corrections(r.narrative || '');
+    let tip = 'Normalization: ' + reason + '. '
+      + 'Raw L13W: ' + fmtN(rawL13) + '/wk. '
+      + 'Normalized: ' + normFmt + '/wk. '
+      + 'Diff: ' + sign + fmtN(Math.abs(diff)) + '/wk ('
+      + (diff / rawL13 * 100).toFixed(1) + '%).';
+    if (f35.length) {
+      tip += ' F35 stockout strips: '
+        + f35.map(c =>
+            c.length + 'w gap at hist[' + c.start + '], stripped '
+            + fmtN(Math.round(c.removed)) + 'u'
+          ).join('; ') + '.';
+    }
+    const tipEsc = tip.replace(/"/g, '&quot;');
+    diffHtml = ' <span style="color:' + diffClr + ';font-size:11px;cursor:help"'
+      + ' title="' + tipEsc + '">(' + sign + fmtN(Math.abs(diff)) + ' vs raw)</span>';
+  } else {
+    diffHtml = ' <span style="color:#aaa;font-size:11px">(no adjustments)</span>';
+  }
+  return '<div style="padding:3px 12px;background:#f5f5f5;'
+    + 'border-top:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;font-size:12px;">'
+    + '<span style="font-weight:600;color:#333">Normalized Ord/Wk L13W: '
+    + normFmt + '/wk</span>' + diffHtml + '</div>';
+}
+
 // -- F35 normalization note --------------------------------------------------
 // Parses F35 stockout correction entries from the AI narrative text.
 // The forecaster writes one line per correction window in the format:
@@ -4564,8 +4621,8 @@ async function toggleDetail(key) {
   const safeId   = r.key.replace(/[^a-zA-Z0-9]/g, '_');
   const flagCls2 = 'flag-btn' + (r.flagged ? ' flagged' : '');
   // Comment block  -  Flag/Mgr conversation thread (planner <-> inventory mgr).
-  // 25% Add-a-Comment input | 75% Comment History (filtered to NON-AI
-  // comments only).  Tell-AI dialogue lives in its own block above.
+  // 25% Add-a-Comment input | 75% Comment History (flag comments only).
+  // Tell-AI dialogue lives in its own block above.
   const autoProjectBtn = CFG.FID.AUTO_PROJECT ? `
   <div style="margin:6px 12px 0 12px;">
     <button id="autoproj-${safeId}" onclick="toggleAutoProject('${safeKey}')"
@@ -4611,7 +4668,7 @@ async function toggleDetail(key) {
         </div>
         <div id="cmt-msg-${safeKey}" style="font-size:11px;color:#666;margin-top:4px;"></div>
       </div>
-      <!-- RIGHT: Mgr/Flag comment history (75%)  -  non-AI comments only -->
+      <!-- RIGHT: Mgr/Flag comment history (75%)  -  flag comments only -->
       <div style="flex:1 1 75%;min-width:0;">
         <div style="font-weight:600;color:#8b2252;margin-bottom:6px;font-size:12px;display:flex;align-items:center;justify-content:space-between;">
           <span> Comment History <span style="font-weight:400;color:#999;font-size:10px;">  -  last 90 days, oldest first  |  planner <-> mgr</span></span>
@@ -4860,6 +4917,7 @@ async function toggleDetail(key) {
     ${fdStatusHtml}
     ${seasonHtml}
     ${isAmazonRec ? _buildAmzInfoBlockHtml(r) : _buildPogBlockHtml(r)}
+    ${_buildNormL13wHtml(r)}
     ${narrativeHtml}
     <div style="overflow-x:auto;padding:8px 12px;">
       ${editToolbar}
@@ -5390,7 +5448,27 @@ async function _loadRtlPos(r, safeId) {
       sortBy:  [{ fieldId: RF.DATE, order: 'DESC' }],
       options: { top: 120 },
     });
-    const rawRows = rtlResp.data || [];
+    let rawRows = rtlResp.data || [];
+
+    // Fallback: if acct filter returned nothing, try mstyle-only.
+    // Handles acct# mismatch between Projections key and Retailer Sales table
+    // (e.g. "TARGET CTRL INV PRCSNG" account vs actual store account number).
+    if (!rawRows.length && acctStr) {
+      console.warn('[RTL POS] acct=' + acctStr + ' filter returned 0 rows for ' + mstyle
+        + ' -- trying mstyle-only fallback');
+      try {
+        const _fbResp = await qb('/records/query', {
+          from:    CFG.RTL_POS_TID,
+          select:  selectFids,
+          where:   `{${RF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}`,
+          sortBy:  [{ fieldId: RF.DATE, order: 'DESC' }],
+          options: { top: 120 },
+        });
+        rawRows = _fbResp.data || [];
+      } catch (_fbErr) {
+        console.warn('[RTL POS] mstyle-only fallback also failed:', _fbErr);
+      }
+    }
 
     // Deduplicate by date (each week-ending Sunday appears exactly twice)
     const seen = new Set();

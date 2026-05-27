@@ -4131,6 +4131,25 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if _burst_driver:
         meta.setdefault("drivers", []).append(_burst_driver)
 
+    # F-NORM (2026-05-27): Post-model rescaling -- if the 26-week forecast average
+    # exceeds the normalized L13W avg by more than 5%, scale it back down.
+    # Preserves week-to-week shape while anchoring volume to the normalized order rate.
+    # Skip when: OOS fill-rate anomaly, F4 L52W widening, or F-STEADY buyer (their
+    # baseline adjustments represent legitimate upward corrections).
+    _fnorm_fcst_mean = sum(forecast) / 26 if forecast else 0
+    if (_fnorm_fcst_mean > l13_avg * 1.05
+            and l13_avg > 0
+            and not _has_oos
+            and not _f4_applied
+            and not _is_steady_buyer):
+        _fnorm_scale = l13_avg / _fnorm_fcst_mean
+        forecast = [v * _fnorm_scale for v in forecast]
+        _fnorm_note = (
+            f"F-NORM: model avg {_fnorm_fcst_mean:.0f}/wk scaled to "
+            f"normalized L13W {l13_avg:.0f}/wk (x{_fnorm_scale:.3f})"
+        )
+        meta.setdefault("drivers", []).append(_fnorm_note)
+
     return forecast, round(cap_base, 1), meta
 
 
