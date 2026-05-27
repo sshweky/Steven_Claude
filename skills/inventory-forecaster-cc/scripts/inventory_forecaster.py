@@ -15372,7 +15372,7 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         critical.append(
             f"<span style='color:#c62828'>! EC variant ({_e(rec.get('mstyle',''))}EC) "
             f"exists for this account - this parent SKU is being phased out. "
-            f"AI forecast zeroed; verify in Quickbase before accepting.</span>"
+            f"AI forecast zeroed.</span>"
         )
 
     # ── Critical: Unexplained planner truncation ─────────────────────────────
