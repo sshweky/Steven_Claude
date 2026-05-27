@@ -7896,6 +7896,17 @@ async function bootstrap() {
       _atsHistPromise = null;
     });
 
+    // Bulk pre-fetch retailer POS history (Walmart/Petsmart/Petco/Target/Kohls)
+    // so detail-pane POS tables render instantly instead of waiting ~1-2s per
+    // panel open.  Non-blocking -- table renders immediately; any panel that
+    // opens before this settles falls back to the single-record on-demand
+    // fetcher.  Cached 6h in localStorage.
+    attachPosHistory(ALL_RECORDS).then(map => {
+      if (Object.keys(map || {}).length) _reRenderOpenPanel();
+    }).catch(e => {
+      console.warn('POS History bulk pre-fetch failed (non-fatal):', e);
+    });
+
     _setBoot('Sorting projections...');
     _setDetail(`Ordering ${ALL_RECORDS.length.toLocaleString()} records by Customer > Brand > Mstyle`);
     await new Promise(r => setTimeout(r, 16));
