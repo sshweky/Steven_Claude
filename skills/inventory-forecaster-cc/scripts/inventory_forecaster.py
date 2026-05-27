@@ -9053,10 +9053,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #   2. Fill W1-W2 if DC WOS < RTL_WOS_TARGET (8 wks) to bring it back up.
         #   3. Remaining weeks = baseline x category seasonal / holiday multipliers.
         #
-        # DC inventory sources (in order of preference):
-        #   Inv_WOS  — direct WOS field in Amazon Catalog (most authoritative)
+        # DC inventory sources:
+        #   Inv_WOS  — direct WOS field in Amazon Catalog
         #   Inv_SOH  — sellable SOH; WOS = (SOH + W1+W2 open orders) / POS_L13W
-        #   Inv_OPO  — aggregate open PO qty (legacy fallback when no inv_flow data)
+        #   Inv_OPO  — NOT used: Amazon's aggregate open PO qty is rarely correct
         #
         # F89 (2026-05-27): W1+W2 open orders from Inventory Flow are added to
         # effective SOH before computing WOS.  Amazon's Inv_WOS / WOS_OH only
@@ -9064,6 +9064,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # W1-W2 represent real near-term coverage and should count toward WOS.
         # We always recompute from (SOH + opn_w1 + opn_w2) when SOH data is
         # present so the fill-units calc also benefits from the fuller picture.
+        # Inv_OPO from Amazon POS data is never used -- it is rarely correct.
         #
         # Guard: only engage when at least one DC signal is present.  If all
         # signals are zero / missing, we can't tell "DC is empty" from "no data"
@@ -9071,7 +9072,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # F84 (Seasonal Baseline + F15 POS anchor) instead.
         _f85_pos_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
         _f85_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
-        _f85_opo      = float((amz_catalog or {}).get("Inv_OPO") or 0)
         _f85_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
         # F89: W1+W2 open orders from Inventory Flow
         _f85_if_rec   = (inv_flow_data or {}).get(row.get("Mstyle", ""))
@@ -9081,9 +9081,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _f85_eff_soh  = _f85_soh + _f85_opn_w12
         if _f85_pos_l13 > 0 and _f85_eff_soh > 0:
             _f85_wos = _f85_eff_soh / _f85_pos_l13
-        elif _f85_wos <= 0 and _f85_pos_l13 > 0 and _f85_opo > 0:
-            _f85_wos = (_f85_soh + _f85_opo) / _f85_pos_l13  # legacy: no inv_flow, use agg OPO
-        _f85_has_dc = _f85_wos > 0 or _f85_eff_soh > 0 or _f85_opo > 0
+        # (no OPO fallback -- Amazon Inv_OPO is unreliable)
+        _f85_has_dc = _f85_wos > 0 or _f85_eff_soh > 0
         if _f85_has_dc:
             _f85_synth = {
                 "Avg_Units_Wk_L4w":  pos_data.get("Avg_Units_Wk_L4w")  or 0,
@@ -10309,10 +10308,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _f66i_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
                 if _f66i_wos <= 0:
                     _f66i_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
-                    _f66i_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
                     _f66i_pl  = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
                     if _f66i_pl > 0:
-                        _f66i_wos = (_f66i_soh + _f66i_opo) / _f66i_pl
+                        _f66i_wos = _f66i_soh / _f66i_pl   # Inv_OPO not used (unreliable)
                 _f66i_threshold = AMZ_WOS_TARGET_MIN - 2.0   # 8.0
                 _f66i_target    = f"{AMZ_WOS_TARGET_MIN:.0f}-{AMZ_WOS_TARGET_MAX:.0f}wks"
             else:
@@ -11811,7 +11809,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _f59_oos_active = False
     _f59h_wos = 0.0
     _f59h_soh = 0.0
-    _f59h_opo = 0.0
     _f59a_floor = 0.0
     _f59a_momentum = False
     _f59_f18_capped = False
@@ -12061,19 +12058,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Placement: after F59g (high-vol buffer) but before F58 (AI comment
         # replay), so planners can override via AI comments if needed.
         _f59h_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
-        _f59h_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
         _f59h_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
-        # Fallback: if Inv_WOS not populated (ASIN lookup miss or field absent)
-        # but SOH/OPO are present, derive WOS from position / POS velocity.
-        # Mirrors the same fallback already used in F69-WOS (2026-05-20).
-        if _f59h_wos <= 0 and (_f59h_soh > 0 or _f59h_opo > 0):
+        # Fallback: if Inv_WOS not populated, derive from SOH only.
+        # Inv_OPO not used -- Amazon's aggregate open PO qty is rarely correct.
+        if _f59h_wos <= 0 and _f59h_soh > 0:
             _f59h_pos_fb = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
             if _f59h_pos_fb > 0:
-                _f59h_wos = (_f59h_soh + _f59h_opo) / _f59h_pos_fb
+                _f59h_wos = _f59h_soh / _f59h_pos_fb
 
         if is_amazon and amz_catalog and _f59h_wos > 0:
-            _f59h_vel     = _f59_l13w_avg if _f59_l13w_avg > 0 else max(sum(fcst) / 26, 1)
-            _f59h_opo_wos = _f59h_opo / max(_f59h_vel, 1)
+            _f59h_vel = _f59_l13w_avg if _f59_l13w_avg > 0 else max(sum(fcst) / 26, 1)
             # F59h replen gate: use order BEHAVIOR (model classification) as the
             # primary signal, not just the QB PT_Item_Status label.  Seasonal
             # Baseline = ≥50% non-zero weeks = orders most weeks = replenishment
@@ -12101,7 +12095,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         meta.setdefault("drivers", []).append(
                             f"F59h Amazon-Replen overstock dampen: WOS={_f59h_wos:.1f}wks "
                             f"(target 12wks) — all 26W x{_f59h_dampen:.0%} "
-                            f"(floor 10%); SOH={_f59h_soh:,.0f}u OPO={_f59h_opo:,.0f}u"
+                            f"(floor 10%); SOH={_f59h_soh:,.0f}u"
                         )
                 else:
                     if _f59h_wos > 20:
@@ -12153,7 +12147,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 f"F59h extreme overstock: WOS={_f59h_wos:.1f}wks "
                                 f"(target 12wks) -- W1-W{_f59h_burn} zeroed (burn-down); "
                                 f"{_f59h_post}. "
-                                f"SOH={_f59h_soh:,.0f}u OPO={_f59h_opo:,.0f}u"
+                                f"SOH={_f59h_soh:,.0f}u"
                             )
                     else:
                         # Moderately above target range (12 < WOS <= 20): soft taper.
@@ -12175,14 +12169,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _fire("F59h")
                 if isinstance(meta, dict):
                     meta.setdefault("drivers", []).append(
-                        f"F59h DC low-stock alert: WOS={_f59h_wos:.1f}wks, OPO=0 — "
+                        f"F59h DC low-stock alert: WOS={_f59h_wos:.1f}wks — "
                         f"reorder risk; projections NOT suppressed"
                     )
-            elif _f59h_opo_wos >= 8 and isinstance(meta, dict):
-                meta.setdefault("drivers", []).append(
-                    f"F59h OPO coverage: {_f59h_opo:,.0f}u open PO ≈ {_f59h_opo_wos:.1f}wks "
-                    f"forward supply — near-term gap pre-covered"
-                )
+            # (F59h OPO coverage note removed -- Inv_OPO from Amazon POS is unreliable)
 
     # ── F_RTL_WOS — Retailer OH inventory WOS correction (revised 2026-05-25) ──
     # Phase-aware WOS adjustment for brick-and-mortar retailers with POS + OH data.
@@ -12298,7 +12288,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
         if is_amazon and amz_catalog and pos_data:
             _fdclag_dc_oh      = float(amz_catalog.get("Inv_SOH") or 0)
-            _fdclag_opo        = float(amz_catalog.get("Inv_OPO") or 0)
+            _fdclag_opo        = 0.0   # Inv_OPO not used (Amazon aggregate OPO is unreliable)
             _fdclag_lw_pos     = float(pos_data.get("Ordered_Units_LW") or 0)
             _fdclag_rate       = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
             _fdclag_target_wos = AMZ_WOS_TARGET_MIN   # 10.0 wks
@@ -12329,7 +12319,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     meta.setdefault("drivers", []).append(
                         f"F_DC_LAG ({_fdclag_ch}): "
                         f"raw_OH={_fdclag_dc_oh:,.0f}u "
-                        f"OPO={_fdclag_opo:,.0f}u "
                         f"LW_POS={_fdclag_lw_pos:,.0f}u "
                         f"-> adj_OH={_fdclag_adj_oh:,.0f}u "
                         f"adj_WOS={_fdclag_adj_wos:.1f}wks "
