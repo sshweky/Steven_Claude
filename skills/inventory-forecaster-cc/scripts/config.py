@@ -305,9 +305,13 @@ F59J_POS_FLOOR          = float(os.environ.get("F59J_POS_FLOOR",          "50"))
 """F59j requires POS L13W >= this for the restock lift to fire."""
 
 RTL_WOS_TARGET          = float(os.environ.get("RTL_WOS_TARGET",           "8.0"))
-"""Store/DC on-hand WOS target for all non-Amazon customers.
-F_RTL_WOS adjusts the forecast up when OH_WOS < target and down when > target.
-8 weeks = standard retailer replenishment buffer (covers ~2 ordering cycles)."""
+"""Retailer DC WOS fill target (order up to this when DC is understocked).
+F_RTL_WOS boosts the forecast +4%/wk when OH_WOS < target, capped at +20%."""
+
+RTL_WOS_TARGET_MAX      = float(os.environ.get("RTL_WOS_TARGET_MAX",       "10.0"))
+"""Retailer DC WOS suppress trigger -- start zeroing near-term weeks above this.
+F_RTL_WOS zeros W1-WN (N = excess WOS, capped at 4) when OH_WOS > RTL_WOS_TARGET_MAX.
+Hysteresis: fill to RTL_WOS_TARGET (8wks), neutral 8-10, suppress above RTL_WOS_TARGET_MAX (10wks)."""
 
 AMZ_WOS_TARGET_MIN      = float(os.environ.get("AMZ_WOS_TARGET_MIN",        "8.0"))
 """Amazon DC WOS fill target (order up to this many WOS when DC is understocked).

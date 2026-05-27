@@ -79,7 +79,7 @@ from config import (
     F59K_EOL_POS_DECLINE, F59K_REAL_HISTORY_THRESH, F59K_POS_CREDIBILITY,
     F59J_POS_FLOOR,
     # WOS targets (retailer + Amazon)
-    RTL_WOS_TARGET, AMZ_WOS_TARGET_MIN, AMZ_WOS_TARGET_MAX,
+    RTL_WOS_TARGET, RTL_WOS_TARGET_MAX, AMZ_WOS_TARGET_MIN, AMZ_WOS_TARGET_MAX,
     # Writeback
     SCHEMA_VERSION,
 )
@@ -10364,7 +10364,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             else:
                 _f66i_wos       = float(rtl_pos.get("OH_WOS") or 0) if rtl_pos else 0.0
                 _f66i_threshold = RTL_WOS_TARGET - 2.0        # 6.0
-                _f66i_target    = f"{RTL_WOS_TARGET:.0f}wks"
+                _f66i_target    = f"{RTL_WOS_TARGET:.0f}-{RTL_WOS_TARGET_MAX:.0f}wks"
             if _f66i_wos > 0 and _f66i_wos >= _f66i_threshold:
                 _f66_mult     = 1.0
                 _f66i_clamped = True
@@ -12242,8 +12242,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #     Retailer will accelerate reorders.  Uniform boost:
     #     +4% per wk below RTL_WOS_TARGET, capped at +20%.
     #
-    #   NEAR-TARGET (7.5-10.5 WOS): no adjustment.
-    _RTL_WOS_TARGET_HIGH = 10.0
+    #   NEAR-TARGET (RTL_WOS_TARGET-0.5 to RTL_WOS_TARGET_MAX+0.5 WOS): no adjustment.
+    _RTL_WOS_TARGET_HIGH = RTL_WOS_TARGET_MAX
     if rtl_pos and not is_amazon and model not in ("Inactive", "OTB (zero)",
                                                     "Pre-launch NEW (manual passthrough)",
                                                     "Retailer WOS (POS)",
