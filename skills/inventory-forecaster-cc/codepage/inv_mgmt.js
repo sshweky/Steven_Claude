@@ -158,6 +158,33 @@ var IF_ATS = [716,717,718,719,720,715,722,723,724,725,726,727,728,729,730,731,90
 var PRJ_F = { Mstyle:196, CustName:376, StatusCust:10, PTItemStatus:374, Brand:398, Description:399, AcctMStyleKey:292, POGEndDate:1595 };
 var PRJ_MANUAL = [22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97];
 
+// Orders and Shipments (bphc3vs5h) -- for Open Customer PO per-week data + hover
+var ORDS_TID = 'bphc3vs5h';
+// A-Open W1..W26 FIDs (index 0=W1 .. 25=W26)
+var ORDS_AOPEN_FIDS = [184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209];
+var _custOrderCache = {};  // mstyle -> array of order objects (fetched on panel open)
+
+async function fetchCustOrders(mstyle) {
+  if (_custOrderCache[mstyle]) return _custOrderCache[mstyle];
+  var fids = [11, 76, 7, 14, 15, 10, 80].concat(ORDS_AOPEN_FIDS);
+  // FID 11=Mstyle, 76=CustName, 7=AcctNum, 14=QtyOrd, 15=QtyOpen, 10=CancelDate, 80=StartShip
+  var rows = await qbQuery(ORDS_TID, fids, '{11.EX.\'' + mstyle + '\'}{15.GT.0}', 0, 500);
+  var orders = rows.map(function(row) {
+    var g = function(fid) { var v = row[fid]; return v ? v.value : null; };
+    return {
+      custName:   String(g(76) || ''),
+      acctNum:    toNum(g(7)),
+      qtyOrd:     toNum(g(14)),
+      qtyOpen:    toNum(g(15)),
+      cancelDate: g(10) || null,
+      startShip:  g(80) || null,
+      weekQtys:   ORDS_AOPEN_FIDS.map(function(fid) { return toNum(g(fid)); })
+    };
+  }).filter(function(o) { return o.qtyOpen > 0; });
+  _custOrderCache[mstyle] = orders;
+  return orders;
+}
+
 // -- QB API --------------------------------------------------------------------
 async function qbQuery(tableId, fieldIds, where, skip, top) {
   skip = skip || 0; top = top || 1000;
@@ -1261,6 +1288,25 @@ function goPage(p) {
   if(wrap&&wrap.parentElement)wrap.parentElement.scrollTop=0;
 }
 
+// Fetch Open Customer PO data for a record and re-render its detail panel once loaded.
+// Called after each initial renderDetail() -- no-op if already cached on the record.
+function _loadCustOrdersAndUpdate(r, dtr) {
+  if (r.cust_orders) return;
+  fetchCustOrders(r.mstyle).then(function(orders) {
+    r.cust_orders = orders;
+    if (dtr && dtr.style.display === 'table-row') {
+      try {
+        dtr.querySelector('td').innerHTML = renderDetail(r);
+        dtr.dataset.loaded = '1';
+      } catch(e) {
+        console.error('[InvMgmt] cust-orders re-render failed:', e);
+      }
+    }
+  }).catch(function(e) {
+    console.warn('[InvMgmt] fetchCustOrders failed for ' + r.mstyle + ':', e);
+  });
+}
+
 function toggleDetail(mstyle) {
   var id='detail-'+mstyle.replace(/[^a-zA-Z0-9]/g,'_');
   var dtr=document.getElementById(id);
@@ -1279,6 +1325,7 @@ function toggleDetail(mstyle) {
         try {
           dtr.querySelector('td').innerHTML = renderDetail(r);
           dtr.dataset.loaded = '1';
+          _loadCustOrdersAndUpdate(r, dtr);
         } catch(e) {
           dtr.querySelector('td').innerHTML = '<div style="padding:20px;color:#c62828;">Error rendering detail panel: ' + esc(String(e)) + '</div>';
           dtr.dataset.loaded = '1';
@@ -1291,6 +1338,7 @@ function toggleDetail(mstyle) {
   try {
     dtr.querySelector('td').innerHTML = renderDetail(r);
     dtr.dataset.loaded = '1';
+    _loadCustOrdersAndUpdate(r, dtr);
   } catch(e) {
     dtr.querySelector('td').innerHTML = '<div style="padding:20px;color:#c62828;">Error rendering detail panel: ' + esc(String(e)) + '</div>';
     dtr.dataset.loaded = '1';
@@ -1359,6 +1407,30 @@ function renderDetail(r) {
     sorted.forEach(function(c){h+='- '+(c.customer||'(unknown)')+': '+fmt(c.qty)+'\n';});
     return h;
   }
+  function fmtCpoHover(wi, custOrds) {
+    if (!custOrds.length) return '';
+    var hasData = custOrds.some(function(o){ return (o.weekQtys[wi]||0) > 0; });
+    if (!hasData) return '';
+    var wkDate = (new Date(w1sun.getTime()+wi*7*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    var h = 'Open Cust POs - W'+(wi+1)+' (week of '+wkDate+')\n'+new Array(38).join('-')+'\n';
+    custOrds.forEach(function(o) {
+      var wkQty = Math.round(o.weekQtys[wi]||0);
+      if (!wkQty) return;
+      var cancel = o.cancelDate ? new Date(o.cancelDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '--';
+      h += (o.custName||'Unknown')+': '+fmt(wkQty)+' | Cancel: '+cancel+'\n';
+    });
+    return h;
+  }
+  function fmtCpoTotalHover(custOrds) {
+    if (!custOrds.length) return '';
+    var h = 'Open Customer POs\n'+new Array(38).join('-')+'\n';
+    custOrds.slice().sort(function(a,b){return b.qtyOpen-a.qtyOpen;}).forEach(function(o) {
+      var cancel = o.cancelDate ? new Date(o.cancelDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '--';
+      var start  = o.startShip  ? new Date(o.startShip).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '--';
+      h += (o.custName||'Unknown')+': '+fmt(Math.round(o.qtyOpen))+' open of '+fmt(Math.round(o.qtyOrd))+' ord | Strt: '+start+' | Cancel: '+cancel+'\n';
+    });
+    return h;
+  }
 
   // Rec action by PO for rcv row highlighting
   var recByPo={};
@@ -1414,8 +1486,8 @@ function renderDetail(r) {
   var begCells = '<td class="lbl" style="color:#6d4c00;font-weight:600;background:#fffbea" title="Beginning-of-week projected warehouse inventory (Wk1..Wk26)">Beg Inv</td>';
   var prjCells = '<td class="lbl" style="color:#2e7d32;font-weight:600;background:#f1f8e9" title="Projected demand this week (Prj Wk1..Prj Wk26) - hover for customer breakdown">Prj Demand</td>';
   var rcvCells = '<td class="lbl" style="color:#1565c0;font-weight:600;background:#f0f7ff" title="Expected supplier receipts that week (RcvWk1..RcvWk26) - hover for PO detail">Expected Receipts</td>';
-  var cpoCells = '<td class="lbl" style="color:#6a1b9a;font-weight:600;background:#f3e5f5" title="Total open customer PO qty awaiting shipment (not broken out by week)">Open Customer POs</td>';
-  var endCells = '<td class="lbl" style="color:#37474f;font-weight:600;background:#eceff1" title="Ending Inv = Beg Inv - Prj Demand - Open Customer POs + Expected Receipts (per-week: Beg - Prj + Rcv; Total col includes Open Cust POs)">Ending Inv</td>';
+  var cpoCells = '<td class="lbl" style="color:#6a1b9a;font-weight:600;background:#f3e5f5" title="Open customer PO qty by week (A-Open W1-W26). Hover cells for customer / cancel date detail.">Open Customer POs</td>';
+  var endCells = '<td class="lbl" style="color:#37474f;font-weight:600;background:#eceff1" title="Ending Inv = Beg Inv - Prj Demand - Open Customer POs + Expected Receipts">Ending Inv</td>';
   var wosCells = '<td class="lbl" style="color:#4a148c;font-weight:600;background:#f8f0fb" title="Weeks of Supply Onhand: forward simulation from Beg Inv over projected demand">WOS OH</td>';
   var begTot = 0, prjTot = 0, rcvTot = 0;
 
@@ -1448,11 +1520,18 @@ function renderDetail(r) {
     var rcvHlS = rcvHL(i) || '';
     rcvCells += '<td style="color:'+rcvClr+';font-size:10px;background:#f0f7ff;'+(rcvTip?'cursor:help;':'')+rcvHlS+'"'+rcvTA+'>'+(rv>0?fmt(rv):'&#8212;')+'</td>';
 
-    // -- Open Customer POs: scalar total, no per-week breakdown --
-    cpoCells += '<td style="color:#bbb;font-size:10px;background:#f3e5f5;">&#8212;</td>';
+    // -- Open Customer POs: per-week from A-Open W1..W26 (fetched async on panel open) --
+    var _custOrds = r.cust_orders || [];
+    var cpoWkVal = 0;
+    _custOrds.forEach(function(o){ cpoWkVal += (o.weekQtys[i] || 0); });
+    cpoWkVal = Math.round(cpoWkVal);
+    var cpoTip = fmtCpoHover(i, _custOrds);
+    var cpoTA  = cpoTip ? ' title="'+cpoTip.replace(/"/g,'&quot;')+'"' : '';
+    var cpoClr = cpoWkVal > 0 ? '#6a1b9a' : '#bbb';
+    cpoCells += '<td style="color:'+cpoClr+';font-size:10px;background:#f3e5f5;'+(cpoTip?'cursor:help;':'')+'"'+cpoTA+'>'+(cpoWkVal>0?fmt(cpoWkVal):'&#8212;')+'</td>';
 
-    // -- Ending Inv per week: Beg - Prj + Receipts (lump-sum Open Cust PO in Total only) --
-    var ev = Math.round(bv - pv + rv);
+    // -- Ending Inv per week: Beg - Prj - OpenCustPO + Receipts --
+    var ev = Math.round(bv - pv - cpoWkVal + rv);
     var evClr = ev < 0 ? '#c62828' : (ev === 0 ? '#bbb' : '#37474f');
     endCells += '<td style="color:'+evClr+';font-size:10px;background:#eceff1;">'+fmt(ev)+'</td>';
 
@@ -1485,8 +1564,13 @@ function renderDetail(r) {
   begCells += '<td style="font-weight:700;color:#6d4c00;background:#fffbea">'+fmt(Math.round(begTot))+'</td>';
   prjCells += '<td style="font-weight:700;color:#2e7d32;background:#f1f8e9">'+fmt(Math.round(prjTot))+'</td>';
   rcvCells += '<td style="font-weight:700;color:#1565c0;background:#f0f7ff">'+fmt(Math.round(rcvTot))+'</td>';
-  var cpTot = r.open_cust_po_qty || 0;
-  cpoCells += '<td style="font-weight:700;color:#6a1b9a;background:#f3e5f5;">'+fmt(Math.round(cpTot))+'</td>';
+  var _custOrdsFinal = r.cust_orders || [];
+  var cpTot = _custOrdsFinal.length
+    ? Math.round(_custOrdsFinal.reduce(function(s,o){return s+o.qtyOpen;},0))
+    : (r.open_cust_po_qty || 0);
+  var cpoTotTip = fmtCpoTotalHover(_custOrdsFinal);
+  var cpoTotTA  = cpoTotTip ? ' title="'+cpoTotTip.replace(/"/g,'&quot;')+'"' : '';
+  cpoCells += '<td style="font-weight:700;color:#6a1b9a;background:#f3e5f5;'+(_custOrdsFinal.length?'cursor:help;':'')+'"'+cpoTotTA+'>'+fmt(cpTot)+'</td>';
   var endTot = Math.round((r.beg_inv[0]||0) - prjTot - cpTot + rcvTot);
   var endTotClr = endTot < 0 ? '#c62828' : '#37474f';
   endCells += '<td style="font-weight:700;color:'+endTotClr+';background:#eceff1;">'+fmt(endTot)+'</td>';
