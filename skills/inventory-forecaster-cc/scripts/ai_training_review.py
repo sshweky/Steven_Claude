@@ -1356,10 +1356,14 @@ def validate_and_override_recs(all_recs, systemic_impacts, grouped):
             # VALIDATED: original criterion narrows gap without needing variation
             gap_closed = abs(vb) - abs(va)
             rec["systemic_status"] = "VALIDATED"
+            fmt_val    = si.get("flagged_man_total", 0)
+            vb_pct_val = vb / fmt_val * 100 if fmt_val else 0.0
+            va_pct_val = va / fmt_val * 100 if fmt_val else 0.0
             orig = rec["proposed_change"]
             rec["proposed_change"] = (
-                f"[VALIDATED: narrows MAN-AI gap from {vb:+,}u to {va:+,}u, "
-                f"closing {gap_closed:,}u across {cc:,} {kw} records] "
+                f"[VALIDATED: narrows MAN-AI variance from {vb_pct_val:+.1f}% ({vb:+,}u) "
+                f"to {va_pct_val:+.1f}% ({va:+,}u), closing {gap_closed:,}u across "
+                f"{cc:,} {kw} records] "
                 f"{orig}"
             )
 
