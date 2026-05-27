@@ -249,10 +249,17 @@ def main():
                 "mergeFieldId":   fid_key,
                 "fieldsToReturn": [],
             })
-            created = len(result.get("createdRecordIds") or [])
-            updated = len(result.get("updatedRecordIds") or [])
+            meta    = result.get("metadata") or {}
+            created = len(meta.get("createdRecordIds") or [])
+            updated = len(meta.get("updatedRecordIds") or [])
+            errors  = meta.get("lineErrors") or {}
             n_ok   += created + updated
-            print(f"    Batch {i // batch_size + 1}: {created} created, {updated} updated")
+            n_fail += len(errors)
+            print(f"    Batch {i // batch_size + 1}: {created} created, {updated} updated"
+                  + (f", {len(errors)} errors" if errors else ""))
+            if errors:
+                for line, err in list(errors.items())[:5]:
+                    print(f"      lineError[{line}]: {err}")
         except Exception as e:
             n_fail += len(batch)
             print(f"    Batch {i // batch_size + 1}: FAILED -- {e}")
