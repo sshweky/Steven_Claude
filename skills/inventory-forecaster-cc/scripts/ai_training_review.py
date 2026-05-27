@@ -698,17 +698,21 @@ def _try_over_projecting_variations(rows, man_fid_list):
                 fat += ai_26w
                 # Cap at MAN * 1.05 -- bring AI just above MAN target
                 fae += min(ai_26w, man_26w * 1.05)
-        if cc > 0:
+        if cc >= MIN_SYSTEMIC_RECORDS:   # must flag enough records to be truly systemic
             vb = int(fmt) - int(fat)
             va = int(fmt) - int(fae)
             if abs(va) < abs(vb):   # gap narrowed -- this variation works
+                vb_pct = vb / fmt * 100 if fmt else 0.0
+                va_pct = va / fmt * 100 if fmt else 0.0
                 mult_str = f"{man_mult:.2f}x" if man_mult != 1.0 else "MAN PRJ"
                 desc = (f"Add MAN PRJ directional gate: only cap when AI > MAN * {mult_str}. "
-                        f"Cap target: MAN PRJ * 1.05. Flags {cc} record(s), "
-                        f"narrowing gap from {vb:+,}u to {va:+,}u.")
+                        f"Cap target: MAN PRJ * 1.05. Flags {int(cc)} records, "
+                        f"narrowing gap from {vb_pct:+.1f}% ({vb:+,}u) to "
+                        f"{va_pct:+.1f}% ({va:+,}u).")
                 return (
                     {"cc": int(cc), "vb": vb, "va": va, "fmt": int(fmt),
-                     "fat": int(fat), "fae": int(fae), "man_mult": man_mult},
+                     "fat": int(fat), "fae": int(fae), "man_mult": man_mult,
+                     "vb_pct": vb_pct, "va_pct": va_pct},
                     desc
                 )
     return None, None
