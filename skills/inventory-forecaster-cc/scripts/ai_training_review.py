@@ -669,6 +669,110 @@ def _build_all_recs(grouped):
 
 
 # ---------------------------------------------------------------------------
+# Variation-testing helpers: iterate through alternative criteria to find
+# one that actually narrows the MAN-AI gap before finalizing a recommendation
+# ---------------------------------------------------------------------------
+def _try_over_projecting_variations(rows, man_fid_list):
+    """
+    For a REJECTED over-projection fix (original cap widens the gap because
+    most flagged records already have AI < MAN), try progressively tighter
+    criteria that add a MAN PRJ comparison gate.
+
+    Strategy: only flag records where AI > MAN * threshold. This ensures
+    the cap only fires when it moves AI closer to MAN, not further away.
+    Cap target: MAN PRJ * 1.05 (land just above MAN).
+
+    Returns (result_dict, description_str) for the FIRST variation that
+    narrows the gap, or (None, None) if none found.
+    """
+    for man_mult in [1.0, 1.05, 1.10, 1.15, 1.25, 1.50]:
+        cc = fmt = fat = fae = 0.0
+        for r in rows:
+            l13w    = fval(r, P_L13W)
+            ai_26w  = sum(fval(r, fid) for fid in AI_PRJ_FIDS)
+            man_26w = sum(fval(r, fid) for fid in man_fid_list) if man_fid_list else 0.0
+            if man_26w > 0 and ai_26w > man_26w * man_mult:
+                cc += 1
+                fmt += man_26w
+                fat += ai_26w
+                # Cap at MAN * 1.05 -- bring AI just above MAN target
+                fae += min(ai_26w, man_26w * 1.05)
+        if cc > 0:
+            vb = int(fmt) - int(fat)
+            va = int(fmt) - int(fae)
+            if abs(va) < abs(vb):   # gap narrowed -- this variation works
+                mult_str = f"{man_mult:.2f}x" if man_mult != 1.0 else "MAN PRJ"
+                desc = (f"Add MAN PRJ directional gate: only cap when AI > MAN * {mult_str}. "
+                        f"Cap target: MAN PRJ * 1.05. Flags {cc} record(s), "
+                        f"narrowing gap from {vb:+,}u to {va:+,}u.")
+                return (
+                    {"cc": int(cc), "vb": vb, "va": va, "fmt": int(fmt),
+                     "fat": int(fat), "fae": int(fae), "man_mult": man_mult},
+                    desc
+                )
+    return None, None
+
+
+def _try_wrong_model_variations(rows, man_fid_list):
+    """
+    For an ISOLATED wrong-model fix (0 records matched the original trend
+    criterion), try progressively looser criteria to find records where the
+    model switch would actually help.
+
+    Returns (result_dict, description_str) for the FIRST variation that finds
+    records AND narrows the gap, or (None, None) if none found.
+    """
+    # Try loosened trend bands first, then gap-based criteria
+    variations = [
+        ("trend", {"lo": 0.90, "hi": 1.10},
+         "L4W/L13W trend outside 0.90-1.10 (looser band)"),
+        ("trend", {"lo": 0.95, "hi": 1.05},
+         "L4W/L13W trend outside 0.95-1.05 (tight band)"),
+        ("gap_pct", {"pct": 0.15},
+         "AI vs MAN gap > 15% (MAN significantly differs from AI)"),
+        ("gap_pct", {"pct": 0.20},
+         "AI vs MAN gap > 20%"),
+        ("unit_gap", {"units": 200},
+         "abs(AI - MAN) > 200u"),
+        ("unit_gap", {"units": 100},
+         "abs(AI - MAN) > 100u"),
+    ]
+    for crit_type, params, label in variations:
+        cc = fmt = fat = fae = 0.0
+        for r in rows:
+            l13w    = fval(r, P_L13W)
+            l4w     = fval(r, 1417)
+            ai_26w  = sum(fval(r, fid) for fid in AI_PRJ_FIDS)
+            man_26w = sum(fval(r, fid) for fid in man_fid_list) if man_fid_list else 0.0
+            trend   = l4w / l13w if l13w > 0 else 1.0
+            flagged = False
+            if crit_type == "trend" and l4w > 0:
+                flagged = trend < params["lo"] or trend > params["hi"]
+            elif crit_type == "gap_pct" and man_26w > 0:
+                flagged = abs(ai_26w - man_26w) / man_26w > params["pct"]
+            elif crit_type == "unit_gap":
+                flagged = abs(ai_26w - man_26w) > params["units"]
+            if flagged:
+                cc += 1
+                fmt += man_26w
+                fat += ai_26w
+                # Trend-aware switch: use max(L4W, L13W) * 26
+                base = max(l4w, l13w) if l4w > 0 else l13w
+                fae += base * 26
+        if cc > 0:
+            vb = int(fmt) - int(fat)
+            va = int(fmt) - int(fae)
+            if abs(va) < abs(vb):
+                return (
+                    {"cc": int(cc), "vb": vb, "va": va, "fmt": int(fmt),
+                     "fat": int(fat), "fae": int(fae),
+                     "crit_type": crit_type, **params},
+                    label
+                )
+    return None, None
+
+
+# ---------------------------------------------------------------------------
 # Step 4b -- Estimate systemic impact across ALL active projections
 # ---------------------------------------------------------------------------
 def estimate_systemic_impact(all_recs, man_fids):
@@ -679,51 +783,59 @@ def estimate_systemic_impact(all_recs, man_fids):
       - For records that match detection criteria, compute:
           variance_before = sum(MAN 26w) - sum(AI 26w)
           variance_after  = sum(MAN 26w) - sum(estimated_new_AI 26w)
-        so we can show how much the fix closes the MAN vs AI gap.
 
-    Returns list of dicts keyed by rec_num.
+    If the original criterion widens the gap or flags 0 records, automatically
+    tries alternative criteria (via _try_*_variations) until one is found that
+    actually narrows the gap. Reports based on the WINNING criterion.
+
+    Returns list of dicts keyed by rec_num, each including 'best_criterion'
+    (None if no improvement found, otherwise a dict describing the winning approach).
     """
-    queried_models = {}   # cache: model_keyword -> 6-tuple
-    man_fid_list   = sorted(man_fids.values()) if man_fids else []
+    queried_models  = {}   # cache: model_keyword -> 6-tuple
+    best_crit_cache = {}   # cache: model_keyword -> best_criterion dict or None
+    man_fid_list    = sorted(man_fids.values()) if man_fids else []
 
     # -----------------------------------------------------------------------
     def _estimate_new_ai_26w(change_type, fit, ai_26w, l13w, l4w):
         """Approximate AI 26w total AFTER the proposed fix is applied."""
         if change_type == "threshold" and fit == "over_projecting":
-            # Croston post-guard: cap at L13W * 1.5 * 26
             cap = l13w * 1.5 * 26
             return min(ai_26w, cap) if cap > 0 else ai_26w
         if fit == "under_projecting":
-            # Anchor to max(L4W, L13W) -- picks up growing trend
             base = max(l4w, l13w) if l4w > 0 else l13w
             return base * 26
         if fit == "missed_lifecycle":
-            # EOL: anchor to L4W (decelerating toward zero)
             return l4w * 26 if l4w > 0 else 0.0
         if change_type == "model_switch" and fit == "wrong_model":
-            # Switch from flat Heuristic to trend-aware: use max(L4W, L13W)
             base = max(l4w, l13w) if l4w > 0 else l13w
             return base * 26
-        return ai_26w  # no change for investigate / unknown
+        return ai_26w
 
     # -----------------------------------------------------------------------
     def _fetch_model_scope(model_keyword, change_type, fit):
         """Query all active projections where AI_MODEL contains model_keyword.
 
-        Returns 6-tuple:
-          (scope_count, scope_ai_total, criteria_count,
-           flagged_man_total, flagged_ai_total, flagged_ai_estimate)
+        Tries the original detection criterion first. If it widens the gap or
+        finds 0 records, iterates through alternative criteria until one is
+        found that actually narrows the gap.
+
+        Returns:
+          (6-tuple, best_criterion_dict or None)
+          6-tuple: (scope_count, scope_ai_total, criteria_count,
+                    flagged_man_total, flagged_ai_total, flagged_ai_estimate)
+          best_criterion: None if original criterion was already good, otherwise
+                          a dict describing the winning variation.
         """
         cache_key = model_keyword.lower()
         if cache_key in queried_models:
-            return queried_models[cache_key]
+            return queried_models[cache_key], best_crit_cache.get(cache_key)
 
         EMPTY = (0, 0, 0, 0, 0, 0)
         select_fids = (
             [P_KEY, P_AI_MODEL, P_L13W, 1417]
             + AI_PRJ_FIDS
             + ORD_FIDS[:13]
-            + man_fid_list          # MAN PRJ weeks for before/after variance
+            + man_fid_list
         )
         kw_safe = model_keyword.replace("'", "''")
         where   = f"{{10.SW.'A'}}AND{{1580.CT.'{kw_safe}'}}"
@@ -746,7 +858,8 @@ def estimate_systemic_impact(all_recs, man_fids):
         except Exception as e:
             print(f"  [WARN] Systemic impact fetch for '{model_keyword}' failed: {e}")
             queried_models[cache_key] = EMPTY
-            return EMPTY
+            best_crit_cache[cache_key] = None
+            return EMPTY, None
 
         total_count    = len(rows)
         scope_ai_total = sum(sum(fval(r, fid) for fid in AI_PRJ_FIDS) for r in rows)
@@ -780,14 +893,43 @@ def estimate_systemic_impact(all_recs, man_fids):
                 if l4w > 0 and trend < 0.65 and ai_26w > 0:
                     flagged = True
             else:
-                flagged = True  # investigate -- all in scope
+                flagged = True
 
             if flagged:
                 criteria_count      += 1
                 flagged_man_total   += man_26w
                 flagged_ai_total    += ai_26w
-                new_ai = _estimate_new_ai_26w(change_type, fit, ai_26w, l13w, l4w)
-                flagged_ai_estimate += new_ai
+                flagged_ai_estimate += _estimate_new_ai_26w(
+                    change_type, fit, ai_26w, l13w, l4w)
+
+        # --- Check if the original criterion is already good ----------------
+        orig_vb = int(flagged_man_total) - int(flagged_ai_total)
+        orig_va = int(flagged_man_total) - int(flagged_ai_estimate)
+        original_is_good = (criteria_count > 0 and abs(orig_va) < abs(orig_vb))
+
+        best_criterion = None
+
+        if not original_is_good:
+            # --- Original bad: iterate through variations -------------------
+            print(f"      [{model_keyword}] original criterion {'0 flagged' if criteria_count == 0 else 'widens gap'} "
+                  f"-- trying alternatives...", flush=True)
+            var_result, var_desc = None, None
+            if change_type == "threshold" and fit == "over_projecting":
+                var_result, var_desc = _try_over_projecting_variations(rows, man_fid_list)
+            elif change_type == "model_switch" and fit == "wrong_model":
+                var_result, var_desc = _try_wrong_model_variations(rows, man_fid_list)
+
+            if var_result:
+                # Winning variation found -- use its numbers
+                print(f"      [{model_keyword}] found winning variation: {var_desc}", flush=True)
+                criteria_count      = var_result["cc"]
+                flagged_man_total   = float(var_result["fmt"])
+                flagged_ai_total    = float(var_result["fat"])
+                flagged_ai_estimate = float(var_result["fae"])
+                best_criterion      = {"desc": var_desc, **var_result}
+            else:
+                print(f"      [{model_keyword}] no variation narrows the gap -- "
+                      f"will recommend item-level fix.", flush=True)
 
         result_tuple = (
             total_count,
@@ -797,8 +939,9 @@ def estimate_systemic_impact(all_recs, man_fids):
             int(flagged_ai_total),
             int(flagged_ai_estimate),
         )
-        queried_models[cache_key] = result_tuple
-        return result_tuple
+        queried_models[cache_key]  = result_tuple
+        best_crit_cache[cache_key] = best_criterion
+        return result_tuple, best_criterion
 
     # -----------------------------------------------------------------------
     print("  Computing systemic impact across all active projections...", flush=True)
