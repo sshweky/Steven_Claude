@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
 Populate Retailer Sales FID 30 (FK for relationship 30 to Projections) from
-FID 28 (formula field that already computes the correct Acct#-MStyle key).
+FID 28 (formula field that computes Acct#-MStyle key, e.g. "1864-FF12655").
 
-Relationship 30: Projections (parent, FID 292 key) <- Retailer Sales (child, FID 30 FK)
-FID 28 formula: ToText([Acct #]) & "-" & [Mstyle]  (e.g. "1864-FF12655")
+Streams in pages of 500, writes each page immediately (no large in-memory buffer).
+Checkpoints progress to disk -- safe to Ctrl-C and resume.
 
-This is a one-time backfill. Once complete, summary fields LY POS and CY POS
-will auto-compute on Projections rows.
-
-NOTE: New Retailer Sales records imported in future will also need FID 30 set.
-Re-run this script after each POS data refresh.
+Usage:
+    python populate_retailer_sales_fk.py           # fresh run or resume from checkpoint
+    python populate_retailer_sales_fk.py --reset   # delete checkpoint and restart
 """
 import time
 import json
+import sys
+import os
 import urllib.request
 import urllib.error
 
@@ -22,103 +22,131 @@ QB_TOKEN    = "b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s"
 RS_TABLE    = "bv2izcn5b"   # Retailer Sales
 FID_RECID   = 3
 FID_FORMULA = 28            # Acct# - MStyle (key for Projections) [formula]
-FID_FK      = 30            # Acct# - MStyle (key for Projections)2 [plain text, FK]
+FID_FK      = 30            # Acct# - MStyle (key for Projections)2 [FK for rel 30]
 
 HEADERS = {
     "QB-Realm-Hostname": QB_REALM,
-    "Authorization": f"QB-USER-TOKEN {QB_TOKEN}",
-    "Content-Type": "application/json",
-    "User-Agent": "petspeople-populate-fk/1.0",
+    "Authorization":     f"QB-USER-TOKEN {QB_TOKEN}",
+    "Content-Type":      "application/json",
+    "User-Agent":        "petspeople-populate-fk/1.1",
 }
-PAGE_SIZE  = 1000
-WRITE_BATCH= 1000
-WRITE_DELAY= 0.2   # 5 req/s
+READ_PAGE   = 500    # smaller pages to avoid 504s
+WRITE_BATCH = 500
+READ_DELAY  = 0.25   # ~4 reads/s to avoid hammering QB
+WRITE_DELAY = 0.25   # ~4 writes/s
+CHECKPOINT  = os.path.join(os.path.dirname(__file__), "populate_fk_checkpoint.json")
+MAX_RETRIES = 3
 
 
-def qb_get(url):
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read())
+def save_checkpoint(last_id, written, errors):
+    with open(CHECKPOINT, "w") as f:
+        json.dump({"last_id": last_id, "written": written, "errors": errors}, f)
 
 
-def qb_post(url, body):
+def load_checkpoint():
+    if os.path.exists(CHECKPOINT):
+        with open(CHECKPOINT) as f:
+            return json.load(f)
+    return {"last_id": 0, "written": 0, "errors": 0}
+
+
+def qb_post(url, body, attempt=1):
     data = json.dumps(body).encode()
-    req = urllib.request.Request(url, data=data, headers=HEADERS, method="POST")
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read())
+    req  = urllib.request.Request(url, data=data, headers=HEADERS, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=45) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        if e.code in (429, 502, 504) and attempt <= MAX_RETRIES:
+            wait = 2 ** attempt
+            print(f"\n  HTTP {e.code} — backing off {wait}s (attempt {attempt}/{MAX_RETRIES})")
+            time.sleep(wait)
+            return qb_post(url, body, attempt + 1)
+        raise
 
 
-def read_all_formula_values():
-    """Read all Retailer Sales records: Record ID + FID 28 formula value."""
-    records = []
-    skip = 0
-    total = None
+if __name__ == "__main__":
+    if "--reset" in sys.argv and os.path.exists(CHECKPOINT):
+        os.remove(CHECKPOINT)
+        print("Checkpoint deleted. Starting fresh.")
+
+    cp      = load_checkpoint()
+    last_id = cp["last_id"]
+    written = cp["written"]
+    errors  = cp["errors"]
+
+    print(f"=== Populate Retailer Sales FK (FID 30) from formula (FID 28) ===")
+    if last_id > 0:
+        print(f"Resuming from Record ID > {last_id}  (already written: {written})")
+    print()
+
+    total_read  = 0
+    total_pages = 0
+
     while True:
+        # --- READ one page of records ---
         payload = {
-            "from": RS_TABLE,
-            "select": [FID_RECID, FID_FORMULA],
-            "where": "{3.GT.0}",
-            "options": {"top": PAGE_SIZE, "skip": skip},
+            "from":    RS_TABLE,
+            "select":  [FID_RECID, FID_FORMULA],
+            "where":   f"{{3.GT.{last_id}}}",
+            "sortBy":  [{"fieldId": FID_RECID, "order": "ASC"}],
+            "options": {"top": READ_PAGE},
         }
-        resp = qb_post("https://api.quickbase.com/v1/records/query", payload)
+
+        try:
+            resp = qb_post("https://api.quickbase.com/v1/records/query", payload)
+        except Exception as e:
+            print(f"\nFatal read error: {e}  — checkpoint saved at Record ID {last_id}")
+            save_checkpoint(last_id, written, errors)
+            sys.exit(1)
+
         batch = resp.get("data", [])
-        if total is None:
-            total = resp.get("metadata", {}).get("totalRecords", "?")
-            print(f"Total records to process: {total}")
-        records.extend(batch)
-        skip += len(batch)
-        print(f"  Read {skip} / {total}...", end="\r")
-        if len(batch) < PAGE_SIZE:
-            break
-        time.sleep(0.05)
-    print(f"\nRead complete: {len(records)} records.")
-    return records
+        if not batch:
+            break   # done
 
+        total_pages += 1
+        total_read  += len(batch)
 
-def write_fk_values(records):
-    """Write FID 30 = FID 28 value for all records."""
-    total   = len(records)
-    written = 0
-    errors  = 0
-
-    for i in range(0, total, WRITE_BATCH):
-        batch = records[i : i + WRITE_BATCH]
-        data  = [
+        # --- Compute FK values ---
+        write_data = [
             {
                 str(FID_RECID): {"value": int(r[str(FID_RECID)]["value"])},
-                str(FID_FK):    {"value": r[str(FID_FORMULA)]["value"]},
+                str(FID_FK):    {"value": r.get(str(FID_FORMULA), {}).get("value", "")},
             }
             for r in batch
             if r.get(str(FID_FORMULA), {}).get("value")   # skip blanks
         ]
-        if not data:
-            written += len(batch)
-            continue
 
-        payload = {
-            "to": RS_TABLE,
-            "data": data,
-            "mergeFieldId": FID_RECID,
-            "fieldsToReturn": [],
-        }
-        try:
-            resp = qb_post("https://api.quickbase.com/v1/records", payload)
-            processed = resp.get("metadata", {}).get("lineErrors", {})
-            errors += len(processed)
-        except Exception as e:
-            print(f"\nWrite error at batch {i}: {e}")
-            errors += len(data)
+        max_id_in_batch = max(int(r[str(FID_RECID)]["value"]) for r in batch)
 
-        written += len(batch)
-        pct = written / total * 100
-        print(f"  Wrote {written} / {total} ({pct:.0f}%)  errors={errors}", end="\r")
+        # --- WRITE ---
+        if write_data:
+            write_payload = {
+                "to":          RS_TABLE,
+                "data":        write_data,
+                "mergeFieldId": FID_RECID,
+                "fieldsToReturn": [],
+            }
+            try:
+                wr = qb_post("https://api.quickbase.com/v1/records", write_payload)
+                line_errors = len(wr.get("metadata", {}).get("lineErrors", {}))
+                written += len(write_data) - line_errors
+                errors  += line_errors
+            except Exception as e:
+                print(f"\nWrite error at id {last_id}: {e}")
+                errors += len(write_data)
+
+        last_id = max_id_in_batch
+        save_checkpoint(last_id, written, errors)
+
+        print(f"  Page {total_pages}: read through id {last_id}  "
+              f"cumulative written={written}  errors={errors}", end="\r", flush=True)
+
+        time.sleep(READ_DELAY)
         time.sleep(WRITE_DELAY)
 
-    print(f"\nDone. Written={written}, Errors={errors}")
-
-
-if __name__ == "__main__":
-    print("=== Populate Retailer Sales FK (FID 30) from formula (FID 28) ===\n")
-    rows = read_all_formula_values()
-    write_fk_values(rows)
-    print("\nFID 30 populated. Summary fields on relationship 30 will now compute.")
+    print(f"\nComplete. Pages={total_pages}  Total read={total_read}  "
+          f"Written={written}  Errors={errors}")
+    if os.path.exists(CHECKPOINT):
+        os.remove(CHECKPOINT)
+    print("Checkpoint cleared.")
