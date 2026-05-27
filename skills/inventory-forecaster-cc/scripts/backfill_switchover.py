@@ -238,18 +238,6 @@ def main():
             rec[str(fid_sw_dt)] = {"value": u["sw_date"]}
         payload_data.append(rec)
 
-    # Debug: test single-record write first
-    print(f"\n    DEBUG: Test write for first record: {updates[0]['key']}")
-    test_body = {
-        "to":             QB_PROJ_TABLE,
-        "data":           [payload_data[0]],
-        "mergeFieldId":   fid_key,
-        "fieldsToReturn": [],
-    }
-    print(f"    DEBUG: payload[0] = {payload_data[0]}")
-    test_resp = _qb_post("https://api.quickbase.com/v1/records", test_body)
-    print(f"    DEBUG: QB response = {json.dumps(test_resp)[:500]}")
-
     batch_size = min(QB_BULK_BATCH, 500)
     n_ok = n_fail = 0
     for i in range(0, len(payload_data), batch_size):
