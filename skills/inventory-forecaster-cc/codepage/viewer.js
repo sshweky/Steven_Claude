@@ -1855,7 +1855,7 @@ function _buildPogBlockHtml(r) {
   };
   const safeKey = (r.key || '').replace(/'/g, "&#39;");
   return `
-    <div style="margin:8px 12px 0 12px;padding:10px 12px;background:#f5fbf3;border:1px solid #c7e2bf;border-radius:6px;font-size:11px;color:#2e4f24;">
+    <div id="pog-block-${safeKey}" style="margin:8px 12px 0 12px;padding:10px 12px;background:#f5fbf3;border:1px solid #c7e2bf;border-radius:6px;font-size:11px;color:#2e4f24;">
       <div style="font-weight:700;margin-bottom:6px;color:#1b5e20;"> POG Information</div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #d4ead0;flex-wrap:wrap;">
         <b style="white-space:nowrap;">Inventory Request:</b>
@@ -2186,11 +2186,9 @@ async function attachInvRequest(key, rid) {
     const rec = ALL_RECORDS.find(x => x.key === key);
     if (rec) rec.inv_req_id = rid;
     // Re-render the POG block so the input disappears and "Request #N [Unattach]" appears
-    const detailEl = document.getElementById('detail-' + key.replace(/'/g, '&#39;'));
-    if (detailEl) {
-      const pogBlock = detailEl.querySelector('[data-pog-block]');
-      if (pogBlock && rec) pogBlock.outerHTML = _buildPogBlockHtml(rec);
-    }
+    const safeKey2 = key.replace(/'/g, '&#39;');
+    const pogBlock2 = document.getElementById('pog-block-' + safeKey2);
+    if (pogBlock2 && rec) pogBlock2.outerHTML = _buildPogBlockHtml(rec);
   } catch (e) {
     console.warn('[attachInvRequest] save failed:', e.message || e);
   }
@@ -2200,10 +2198,10 @@ window.attachInvRequest = attachInvRequest;
 // -- Clear the linked Inventory Request ID from Projections ------------------
 async function unattachInvRequest(key) {
   const safeKey = key.replace(/'/g, '&#39;');
-  const msgEl   = document.getElementById('pog-req-msg-' + safeKey);
-  const setMsg  = (txt, color) => { if (msgEl) { msgEl.textContent = txt; msgEl.style.color = color || '#555'; } };
+  // Show a brief "Removing..." on the current (attached-state) message span
+  const oldMsgEl = document.getElementById('pog-req-msg-' + safeKey);
+  if (oldMsgEl) { oldMsgEl.textContent = 'Removing...'; oldMsgEl.style.color = '#888'; }
   if (!CFG.FID.INV_REQ_ID) return;
-  setMsg('Removing...', '#888');
   try {
     const fields = {};
     fields[CFG.FID.KEY]        = { value: key };
@@ -2213,19 +2211,20 @@ async function unattachInvRequest(key) {
       data:         [fields],
       mergeFieldId: CFG.FID.KEY,
     });
-    // Mirror locally
+    // Mirror locally then re-render to restore the input + Load button
     const rec = ALL_RECORDS.find(x => x.key === key);
     if (rec) rec.inv_req_id = 0;
-    setMsg('Inventory Request unattached.', '#1b5e20');
-    setTimeout(() => { if (msgEl) msgEl.textContent = ''; }, 2500);
-    // Re-render the POG block to restore the input + Load button
-    const detailEl = document.getElementById('detail-' + safeKey);
-    if (detailEl) {
-      const pogBlock = detailEl.querySelector('[data-pog-block]');
-      if (pogBlock && rec) pogBlock.outerHTML = _buildPogBlockHtml(rec);
+    const pogBlock3 = document.getElementById('pog-block-' + safeKey);
+    if (pogBlock3 && rec) pogBlock3.outerHTML = _buildPogBlockHtml(rec);
+    // Find the fresh message span in the newly rendered block and show confirmation
+    const newMsgEl = document.getElementById('pog-req-msg-' + safeKey);
+    if (newMsgEl) {
+      newMsgEl.textContent = 'Inventory Request unattached.';
+      newMsgEl.style.color = '#1b5e20';
+      setTimeout(() => { const m = document.getElementById('pog-req-msg-' + safeKey); if (m) m.textContent = ''; }, 2500);
     }
   } catch (e) {
-    setMsg('Unattach failed: ' + (e.message || e), '#c00');
+    if (oldMsgEl) { oldMsgEl.textContent = 'Unattach failed: ' + (e.message || e); oldMsgEl.style.color = '#c00'; }
   }
 }
 window.unattachInvRequest = unattachInvRequest;
