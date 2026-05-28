@@ -2084,9 +2084,13 @@ def main():
         if _api_set:
             print(f"  [!] LLM was tried but didn't return a recognized label.  Review manually in QB.")
         else:
-            print(f"  [!] Set ANTHROPIC_API_KEY in your shell so the LLM classifier runs:")
-            print(f"  [!]   PowerShell:  $env:ANTHROPIC_API_KEY = 'sk-ant-...'")
-            print(f"  [!]   then re-run this script in the SAME shell session.")
+            print(f"  [!] No Anthropic API key found.  Two ways to enable the LLM classifier:")
+            print(f"  [!]   1) ENV VAR (same shell session):")
+            print(f"  [!]        PowerShell:  $env:ANTHROPIC_API_KEY = 'sk-ant-...'")
+            print(f"  [!]        then re-run this script in the SAME shell.")
+            print(f"  [!]   2) KEY FILE (works in any shell, persists across restarts):")
+            print(f"  [!]        echo 'sk-ant-...' > %USERPROFILE%\\.anthropic_api_key")
+            print(f"  [!]        (one line, no quotes, no trailing newline)")
         print()
 
     mark_reviewed_in_qb(understood_rids, args.dry_run)
