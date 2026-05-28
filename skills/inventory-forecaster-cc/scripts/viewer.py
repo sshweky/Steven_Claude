@@ -2934,9 +2934,9 @@ function toggleDetail(key) {{
     const aiDiff = aiVal - w.projection;
     const aiCls  = aiDiff > 0 ? 'color:#2e7d32' : aiDiff < 0 ? 'color:#c62828' : 'color:#888';
     aiCells   += `<td style="${{aiCls}};font-weight:600">${{fmtN(aiVal)}}</td>`;
-    // 2026-05-28: opn_w (Opn_W1..Opn_W26) was always zero (broken process).
-    // Per-week cells show dashes; total column shows Cust Open PO Qty# with hover.
-    opnCells  += `<td style="color:#bbb;font-size:10px;background:#fefaf3">—</td>`;
+    // 2026-05-28: CXL-date bucketed distribution from Cust Open PO Qty hover.
+    const _opnWkVal = _opnWkArr[i] || 0;
+    opnCells  += `<td style="${{_opnWkVal > 0 ? 'color:#6d4c00;font-weight:600' : 'color:#bbb'}};font-size:10px;background:#fefaf3">${{_opnWkVal > 0 ? fmtN(_opnWkVal) : '&mdash;'}}</td>`;
     const lyOrdVal = lyOrd[i] || 0;
     lyOrdTot += lyOrdVal;
     lyOrdCells += `<td style="${{lyOrdVal === 0 ? 'color:#bbb' : 'color:#2e7d32'}};font-size:10px">${{fmtN(lyOrdVal)}}</td>`;
