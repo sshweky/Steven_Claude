@@ -63,88 +63,167 @@ Get-ChildItem "$LogDir\forecast_*.log" |
 # ── Parse log for run stats ───────────────────────────────────────────────────
 $LogText = Get-Content $LogFile -Raw -Encoding UTF8
 
-$RecordsMatch   = [regex]::Match($LogText, '(\d[\d,]+)\s+records?\s+retrieved')
-$Records        = if ($RecordsMatch.Success)   { $RecordsMatch.Groups[1].Value   } else { "?" }
+$RecordsMatch    = [regex]::Match($LogText, '(\d[\d,]+)\s+records?\s+retrieved')
+$Records         = if ($RecordsMatch.Success)    { $RecordsMatch.Groups[1].Value    } else { "?" }
 
-$FcstMatch      = [regex]::Match($LogText, '(\d+)\s+forecasts? complete')
-$Forecasts      = if ($FcstMatch.Success)      { $FcstMatch.Groups[1].Value      } else { "?" }
+$FcstMatch       = [regex]::Match($LogText, '(\d+)\s+forecasts? complete')
+$Forecasts       = if ($FcstMatch.Success)       { $FcstMatch.Groups[1].Value       } else { "?" }
 
-$SeasonalMatch  = [regex]::Match($LogText, 'Seasonal:\s*(\d+)')
-$CrostonsMatch  = [regex]::Match($LogText, "Croston.s:\s*(\d+)")
-$HeuristicMatch = [regex]::Match($LogText, 'Heuristic:\s*(\d+)')
-$InactiveMatch  = [regex]::Match($LogText, 'Inactive:\s*(\d+)')
-$BiweeklyMatch  = [regex]::Match($LogText, 'Bi-weekly:\s*(\d+)')
-$ModelSeasonal  = if ($SeasonalMatch.Success)  { $SeasonalMatch.Groups[1].Value  } else { "-" }
-$ModelCrostons  = if ($CrostonsMatch.Success)  { $CrostonsMatch.Groups[1].Value  } else { "-" }
-$ModelHeuristic = if ($HeuristicMatch.Success) { $HeuristicMatch.Groups[1].Value } else { "-" }
-$ModelInactive  = if ($InactiveMatch.Success)  { $InactiveMatch.Groups[1].Value  } else { "-" }
-$ModelBiweekly  = if ($BiweeklyMatch.Success)  { $BiweeklyMatch.Groups[1].Value  } else { "-" }
+$DemandMatch     = [regex]::Match($LogText, 'Total 26w demand:\s*([\d,]+)')
+$Demand          = if ($DemandMatch.Success)     { $DemandMatch.Groups[1].Value     } else { "?" }
 
-$DemandMatch    = [regex]::Match($LogText, 'Total 26w demand:\s*([\d,]+)')
-$Demand         = if ($DemandMatch.Success)    { $DemandMatch.Groups[1].Value    } else { "?" }
+$WbMatch         = [regex]::Match($LogText, 'ok=(\d+)\s+fail=(\d+)')
+$WbOk            = if ($WbMatch.Success)         { $WbMatch.Groups[1].Value         } else { "?" }
+$WbFail          = if ($WbMatch.Success)         { $WbMatch.Groups[2].Value         } else { "?" }
 
-$WbMatch        = [regex]::Match($LogText, 'ok=(\d+)\s+fail=(\d+)')
-$WbOk           = if ($WbMatch.Success)        { $WbMatch.Groups[1].Value        } else { "?" }
-$WbFail         = if ($WbMatch.Success)        { $WbMatch.Groups[2].Value        } else { "?" }
+# MAN vs AI divergence stats (printed by _print_summary in inventory_forecaster.py)
+$ManTotalMatch   = [regex]::Match($LogText, 'MAN 26w:\s*([\d,]+)')
+$AiTotalMatch    = [regex]::Match($LogText, 'AI 26w:\s*([\d,]+)')
+$OverallDivMatch = [regex]::Match($LogText, 'Overall divergence:\s*([+-]?[\d.]+)%')
+$AvgDivMatch     = [regex]::Match($LogText, 'Avg \|div\|:\s*([\d.]+)%')
+$ManTotal        = if ($ManTotalMatch.Success)   { $ManTotalMatch.Groups[1].Value   } else { "?" }
+$AiTotal         = if ($AiTotalMatch.Success)    { $AiTotalMatch.Groups[1].Value    } else { "?" }
+$OverallDiv      = if ($OverallDivMatch.Success) { $OverallDivMatch.Groups[1].Value } else { "?" }
+$AvgDiv          = if ($AvgDivMatch.Success)     { $AvgDivMatch.Groups[1].Value     } else { "?" }
 
-$AlertMatch     = [regex]::Match($LogText, 'ALERTS\s+\((\d+)\s+records')
-$AlertCount     = if ($AlertMatch.Success)     { $AlertMatch.Groups[1].Value     } else { "0" }
+# Priority breakdown (On-Plan / CRITICAL / HIGH / MID / LOW)
+$PriLineMatch    = [regex]::Match($LogText, 'Priority -- On-Plan:\s*(\d+)\s+CRITICAL:\s*(\d+)\s+HIGH:\s*(\d+)\s+MID:\s*(\d+)\s+LOW:\s*(\d+)')
+$PriOnPlan       = if ($PriLineMatch.Success) { $PriLineMatch.Groups[1].Value } else { "?" }
+$PriCrit         = if ($PriLineMatch.Success) { $PriLineMatch.Groups[2].Value } else { "?" }
+$PriHigh         = if ($PriLineMatch.Success) { $PriLineMatch.Groups[3].Value } else { "?" }
+$PriMid          = if ($PriLineMatch.Success) { $PriLineMatch.Groups[4].Value } else { "?" }
+$PriLow          = if ($PriLineMatch.Success) { $PriLineMatch.Groups[5].Value } else { "?" }
 
-$ErrorLines     = ($LogText -split "`n" | Where-Object { $_ -match 'ERROR|Traceback|NameError|Exception' }) -join "`n"
-$HasErrors      = $ErrorLines.Length -gt 0
+# Model mix
+$SeasonalMatch   = [regex]::Match($LogText, 'Seasonal:\s*(\d+)')
+$CrostonsMatch   = [regex]::Match($LogText, "Croston.s:\s*(\d+)")
+$HeuristicMatch  = [regex]::Match($LogText, 'Heuristic:\s*(\d+)')
+$InactiveMatch   = [regex]::Match($LogText, 'Inactive:\s*(\d+)')
+$BiweeklyMatch   = [regex]::Match($LogText, 'Bi-weekly:\s*(\d+)')
+$ModelSeasonal   = if ($SeasonalMatch.Success)  { $SeasonalMatch.Groups[1].Value  } else { "-" }
+$ModelCrostons   = if ($CrostonsMatch.Success)  { $CrostonsMatch.Groups[1].Value  } else { "-" }
+$ModelHeuristic  = if ($HeuristicMatch.Success) { $HeuristicMatch.Groups[1].Value } else { "-" }
+$ModelInactive   = if ($InactiveMatch.Success)  { $InactiveMatch.Groups[1].Value  } else { "-" }
+$ModelBiweekly   = if ($BiweeklyMatch.Success)  { $BiweeklyMatch.Groups[1].Value  } else { "-" }
+
+$AlertMatch      = [regex]::Match($LogText, 'ALERTS\s+\((\d+)\s+records')
+$AlertCount      = if ($AlertMatch.Success) { $AlertMatch.Groups[1].Value } else { "0" }
+
+$ErrorLines      = ($LogText -split "`n" | Where-Object { $_ -match '\bERROR\b|Traceback|NameError|AttributeError' }) -join "`n"
+$HasErrors       = $ErrorLines.Length -gt 0
 
 # ── Build email ───────────────────────────────────────────────────────────────
-$Status      = if ($ExitCode -eq 0 -and -not $HasErrors) { "OK" } else { "CHECK ERRORS" }
-$StatusColor = if ($Status -eq "OK") { "#2e7d32" } else { "#c62828" }
-$Subject     = "[PP Forecast $Status] $($StartTime.ToString('ddd MM/dd')) - ${Duration}m"
-
-$LogLines   = $LogText -split "`n"
-$TruncNote  = ""
-if ($LogLines.Count -gt 200) {
-    $LogPreview = ($LogLines | Select-Object -Last 200) -join "`n"
-    $TruncNote  = "<p style='color:#888;font-size:12px'>[Log truncated to last 200 lines. Full log: $LogFile]</p>"
+$IsOk        = ($ExitCode -eq 0 -and -not $HasErrors)
+$Status      = if ($IsOk) { "Complete" } else { "Action Required" }
+$StatusColor = if ($IsOk) { "#1b5e20" } else { "#b71c1c" }
+$StatusBg    = if ($IsOk) { "#e8f5e9" } else { "#ffebee" }
+$StatusBdr   = if ($IsOk) { "#66bb6a" } else { "#ef9a9a" }
+$Subject     = if ($IsOk) {
+    "[PP Forecast] $($StartTime.ToString('ddd MM/dd')) -- Complete in ${Duration}m"
 } else {
-    $LogPreview = $LogText
+    "[PP Forecast] $($StartTime.ToString('ddd MM/dd')) -- ACTION REQUIRED"
 }
 
-$AlertRow = if ([int]$AlertCount -gt 0) {
-    "<tr><td style='padding:4px 12px;color:#888'>Alerts</td><td style='padding:4px 12px;color:#e65100;font-weight:bold'>$AlertCount records flagged</td></tr>"
-} else { "" }
+# Divergence hero stat: color based on direction
+$DivDisplay  = if ($OverallDiv -ne "?") { "${OverallDiv}%" } else { "N/A" }
+$DivNum      = if ($OverallDiv -ne "?") { [double]$OverallDiv } else { 0 }
+$DivColor    = if ($DivNum -gt 5) { "#c62828" } elseif ($DivNum -lt -5) { "#1565c0" } else { "#2e7d32" }
+$DivLabel    = if ($DivNum -gt 0) { "AI is projecting MORE than plan" } `
+               elseif ($DivNum -lt 0) { "AI is projecting LESS than plan" } `
+               else { "AI and plan are aligned" }
 
-$ErrorRow = if ($HasErrors) {
-    "<tr><td style='padding:4px 12px;color:#888'>Errors</td><td style='padding:4px 12px;color:#c62828;font-weight:bold'>YES - see log below</td></tr>"
-} else { "" }
+# Priority pill rendering
+function Pill($val, $color, $bg) {
+    "<span style='display:inline-block;padding:2px 10px;border-radius:12px;background:$bg;color:$color;font-weight:700;font-size:13px;margin:0 3px'>$val</span>"
+}
+$PillCrit    = Pill "CRITICAL $PriCrit"  "#b71c1c" "#ffebee"
+$PillHigh    = Pill "HIGH $PriHigh"      "#e65100" "#fff3e0"
+$PillMid     = Pill "MID $PriMid"        "#f57f17" "#fffde7"
+$PillLow     = Pill "LOW $PriLow"        "#2e7d32" "#e8f5e9"
+$PillOnPlan  = Pill "ON-PLAN $PriOnPlan" "#37474f" "#eceff1"
+
+$ErrorBlock  = if ($HasErrors) { @"
+<div style="margin:16px 0;padding:12px 16px;background:#ffebee;border-left:4px solid #c62828;border-radius:4px">
+  <b style="color:#c62828">Errors detected in run log</b><br>
+  <pre style="font-size:11px;color:#555;margin:8px 0 0;white-space:pre-wrap">$([System.Web.HttpUtility]::HtmlEncode($ErrorLines))</pre>
+</div>
+"@ } else { "" }
 
 Add-Type -AssemblyName System.Web | Out-Null
-$LogEncoded = [System.Web.HttpUtility]::HtmlEncode($LogPreview)
 
 $HtmlBody = @"
-<div style="font-family:Calibri,Arial,sans-serif;font-size:14px;max-width:800px">
-  <h2 style="margin-bottom:4px;color:$StatusColor">PP Inventory Forecaster - $Status</h2>
-  <p style="color:#555;margin-top:0">Run completed $($EndTime.ToString('dddd, MMMM d yyyy')) at $($EndTime.ToString('h:mm tt'))</p>
-  <table style="border-collapse:collapse;background:#f9f9f9;border-radius:6px;margin-bottom:20px">
-    <tr><td style="padding:4px 12px;color:#888">Start</td><td style="padding:4px 12px">$($StartTime.ToString('h:mm tt'))</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">End</td><td style="padding:4px 12px">$($EndTime.ToString('h:mm tt'))</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Duration</td><td style="padding:4px 12px">${Duration} min</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Exit Code</td><td style="padding:4px 12px">$ExitCode</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Records Pulled</td><td style="padding:4px 12px">$Records</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Forecasts Run</td><td style="padding:4px 12px">$Forecasts</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Total 26w Demand</td><td style="padding:4px 12px">$Demand units</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Write-back</td><td style="padding:4px 12px">ok=$WbOk  fail=$WbFail</td></tr>
-    $AlertRow
-    $ErrorRow
-  </table>
-  <h3 style="color:#333;margin-bottom:4px">Model Breakdown</h3>
-  <table style="border-collapse:collapse;background:#f9f9f9;border-radius:6px;margin-bottom:20px">
-    <tr><td style="padding:4px 12px;color:#888">Seasonal Baseline</td><td style="padding:4px 12px">$ModelSeasonal</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Croston's</td><td style="padding:4px 12px">$ModelCrostons</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Heuristic</td><td style="padding:4px 12px">$ModelHeuristic</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Inactive</td><td style="padding:4px 12px">$ModelInactive</td></tr>
-    <tr><td style="padding:4px 12px;color:#888">Bi-weekly</td><td style="padding:4px 12px">$ModelBiweekly</td></tr>
-  </table>
-  <h3 style="color:#333;margin-bottom:4px">Run Log</h3>
-  $TruncNote
-  <pre style="background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:6px;font-size:12px;overflow-x:auto;white-space:pre-wrap">$LogEncoded</pre>
+<div style="font-family:'Segoe UI',Calibri,Arial,sans-serif;font-size:14px;color:#212121;max-width:680px;margin:0 auto">
+
+  <!-- Header bar -->
+  <div style="background:$StatusBg;border:1px solid $StatusBdr;border-radius:8px;padding:16px 20px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:22px;font-weight:700;color:$StatusColor">PP Inventory Forecaster</span>
+      <span style="font-size:13px;color:#555;margin-left:auto">$($EndTime.ToString('dddd, MMMM d yyyy'))  &bull;  $($EndTime.ToString('h:mm tt'))  &bull;  ${Duration} min</span>
+    </div>
+    <div style="margin-top:4px;font-size:13px;color:$StatusColor;font-weight:600">$Status</div>
+  </div>
+
+  <!-- HERO: MAN vs AI Divergence -->
+  <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px 24px;margin-bottom:16px;text-align:center">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#757575;margin-bottom:6px">Overall MAN vs AI Divergence (26-Week)</div>
+    <div style="font-size:56px;font-weight:800;color:$DivColor;line-height:1.1;letter-spacing:-1px">${DivDisplay}</div>
+    <div style="font-size:13px;color:#555;margin-top:6px">$DivLabel &nbsp;&bull;&nbsp; Avg per-record gap: ${AvgDiv}%</div>
+    <div style="display:flex;justify-content:center;gap:32px;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0">
+      <div><div style="font-size:11px;color:#9e9e9e;text-transform:uppercase;letter-spacing:.06em">Manual Plan</div><div style="font-size:22px;font-weight:700;color:#37474f">$ManTotal</div><div style="font-size:11px;color:#9e9e9e">units (26w)</div></div>
+      <div style="border-left:1px solid #e0e0e0"></div>
+      <div><div style="font-size:11px;color:#9e9e9e;text-transform:uppercase;letter-spacing:.06em">AI Forecast</div><div style="font-size:22px;font-weight:700;color:#37474f">$AiTotal</div><div style="font-size:11px;color:#9e9e9e">units (26w)</div></div>
+      <div style="border-left:1px solid #e0e0e0"></div>
+      <div><div style="font-size:11px;color:#9e9e9e;text-transform:uppercase;letter-spacing:.06em">Total AI Demand</div><div style="font-size:22px;font-weight:700;color:#37474f">$Demand</div><div style="font-size:11px;color:#9e9e9e">units (all records)</div></div>
+    </div>
+  </div>
+
+  <!-- Review Priority -->
+  <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px 20px;margin-bottom:16px">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#757575;margin-bottom:10px">Review Priority</div>
+    <div style="line-height:2">$PillCrit $PillHigh $PillMid $PillLow $PillOnPlan</div>
+  </div>
+
+  <!-- Run Summary grid -->
+  <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px 20px;margin-bottom:16px">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#757575;margin-bottom:12px">Run Summary</div>
+    <table style="border-collapse:collapse;width:100%">
+      <tr>
+        <td style="padding:5px 8px;color:#757575;width:38%">Records Processed</td>
+        <td style="padding:5px 8px;font-weight:600">$Forecasts of $Records</td>
+        <td style="padding:5px 8px;color:#757575;width:20%">Write-back</td>
+        <td style="padding:5px 8px;font-weight:600">${WbOk} ok &nbsp; ${WbFail} fail</td>
+      </tr>
+      <tr style="background:#fafafa">
+        <td style="padding:5px 8px;color:#757575">Alerts (&gt;threshold)</td>
+        <td style="padding:5px 8px;font-weight:600;color:$(if ([int]$AlertCount -gt 0) {'#e65100'} else {'#2e7d32'})">$AlertCount records</td>
+        <td style="padding:5px 8px;color:#757575">Duration</td>
+        <td style="padding:5px 8px;font-weight:600">${Duration} min</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Model Mix -->
+  <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px 20px;margin-bottom:16px">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#757575;margin-bottom:12px">Model Mix</div>
+    <table style="border-collapse:collapse;width:100%">
+      <tr>
+        <td style="padding:5px 8px;color:#757575">Seasonal Baseline</td><td style="padding:5px 8px;font-weight:600">$ModelSeasonal</td>
+        <td style="padding:5px 8px;color:#757575">Croston's</td><td style="padding:5px 8px;font-weight:600">$ModelCrostons</td>
+      </tr>
+      <tr style="background:#fafafa">
+        <td style="padding:5px 8px;color:#757575">Heuristic</td><td style="padding:5px 8px;font-weight:600">$ModelHeuristic</td>
+        <td style="padding:5px 8px;color:#757575">Inactive</td><td style="padding:5px 8px;font-weight:600">$ModelInactive</td>
+      </tr>
+      <tr>
+        <td style="padding:5px 8px;color:#757575">Bi-weekly</td><td style="padding:5px 8px;font-weight:600">$ModelBiweekly</td>
+        <td colspan="2"></td>
+      </tr>
+    </table>
+  </div>
+
+  $ErrorBlock
+
+  <p style="font-size:11px;color:#9e9e9e;margin-top:20px">Log: $LogFile</p>
 </div>
 "@
 

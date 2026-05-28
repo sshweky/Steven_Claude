@@ -124,7 +124,7 @@ textarea.inp{resize:vertical;min-height:36px}
   </div>
   <div class="header-right">
     <span class="qb-status disconnected" id="qbStatusBadge">QB: Not Connected</span>
-    <button class="btn btn-gray" onclick="showTokenModal()">QB Settings</button>
+    <button class="btn btn-gray" id="qbSettingsBtn" onclick="showTokenModal()">QB Settings</button>
     <button class="btn btn-primary" onclick="window.print()">Print</button>
   </div>
 </div>
@@ -326,7 +326,7 @@ let S = {
   skuData:{}, // {styleNum: [{count,size,unit,flavor,packaging,fop,features,comments}]}
   costingData:{}, // {styleNum: [{finalCosting,addToSales,count,size,unit,flavor,labelType,packType,massMSRP,specMSRP,moqPkg,moldFee,comments}]}
   salesData:{}, // {styleNum:{justification,comments}}
-  qbToken:'', qbRealm:'pim.quickbase.com'
+  qbToken:'', qbRealm:'pim.quickbase.com', qbTempAuth:false
 };
 
 function loadState(){
@@ -339,7 +339,7 @@ function loadState(){
 }
 function saveState(){
   const toSave = Object.assign({}, S);
-  delete toSave.qbToken; delete toSave.qbRealm;
+  delete toSave.qbToken; delete toSave.qbRealm; delete toSave.qbTempAuth; delete toSave._brands;
   localStorage.setItem('costingAnalysis_v1', JSON.stringify(toSave));
 }
 function clearData(){
@@ -353,7 +353,7 @@ function clearData(){
 async function qbFetch(path, opts={}){
   const headers = {
     'QB-Realm-Hostname': S.qbRealm,
-    'Authorization': 'QB-USER-TOKEN ' + S.qbToken,
+    'Authorization': S.qbTempAuth ? S.qbToken : 'QB-USER-TOKEN ' + S.qbToken,
     'Content-Type': 'application/json'
   };
   const resp = await fetch('https://api.quickbase.com/v1' + path, {method:'GET',...opts,headers:{...headers,...(opts.headers||{})}});
@@ -410,6 +410,21 @@ function setStatus(msg,type=''){
   el.style.color = type==='success'?'#155724':type==='error'?'#721c24':type==='warn'?'#856404':'#555';
 }
 
+// ==================== QB TEMP AUTH ====================
+async function tryAutoAuth(){
+  try {
+    const resp = await fetch(`https://${S.qbRealm}/v0/auth/temporary/${QB_PT_STYLES_TABLE}`, {credentials:'include'});
+    if(!resp.ok) return false;
+    const data = await resp.json();
+    if(data.temporaryAuthorization){
+      S.qbToken = data.temporaryAuthorization;
+      S.qbTempAuth = true;
+      return true;
+    }
+  } catch(e){}
+  return false;
+}
+
 // ==================== TOKEN MODAL ====================
 function showTokenModal(){
   document.getElementById('qbTokenInput').value=S.qbToken||'';
@@ -432,8 +447,14 @@ function clearToken(){
 }
 function updateQBStatus(){
   const el=document.getElementById('qbStatusBadge');
-  if(S.qbToken){ el.textContent='QB: Connected'; el.className='qb-status'; }
-  else { el.textContent='QB: Not Connected'; el.className='qb-status disconnected'; }
+  const btn=document.getElementById('qbSettingsBtn');
+  if(S.qbToken){
+    el.textContent='QB: Connected'; el.className='qb-status';
+    if(btn) btn.style.display = S.qbTempAuth ? 'none' : '';
+  } else {
+    el.textContent='QB: Not Connected'; el.className='qb-status disconnected';
+    if(btn) btn.style.display = '';
+  }
 }
 
 // ==================== HELPERS ====================
@@ -1046,8 +1067,10 @@ function saveSalesData(styleNum,key,val){
 }
 
 // ==================== INIT ====================
-function init(){
+async function init(){
   loadState();
+  const authed = await tryAutoAuth();
+  if(!authed && !S.qbToken) showTokenModal();
   updateQBStatus();
   renderCompetitorChecks();
   renderTab1Fields();
@@ -1059,7 +1082,6 @@ function init(){
   document.getElementById('headerTitle').textContent=hn;
   if(S.topBrand) document.getElementById('headerSub').textContent=S.topBrand+(S.petsOrPeople?' | '+S.petsOrPeople:'');
   if(S.qbToken) loadBrands();
-  if(!S.qbToken) showTokenModal();
 }
 
 // Sync input fields back to state on page events

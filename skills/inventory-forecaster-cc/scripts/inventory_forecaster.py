@@ -18172,6 +18172,29 @@ def _print_summary(results, elapsed_wb, failed):
           f"Bi-weekly: {biweekly_ct}")
     if elapsed_wb:
         print(f"  Write-back: {elapsed_wb/60:.1f} min  |  ok={_ok}  fail={failed}")
+
+    # MAN vs AI divergence summary -- parsed by run_scheduled.ps1 for the recap email
+    _recs_w_man  = [r for r in results if r.get("prior_total", 0) > 0]
+    _total_man   = sum(r["prior_total"] for r in _recs_w_man)
+    _total_ai    = sum(r["new_total"]   for r in _recs_w_man)
+    _overall_div = (_total_ai - _total_man) / _total_man * 100 if _total_man > 0 else 0.0
+    _avg_abs_div = (sum(abs(r["pct_diff"]) for r in _recs_w_man) /
+                    len(_recs_w_man)) if _recs_w_man else 0.0
+    _on_plan = sum(1 for r in results
+                   if (r.get("validation") or {}).get("priority") == "On-Plan")
+    _pri_crit = sum(1 for r in results
+                    if (r.get("validation") or {}).get("priority") == "CRITICAL")
+    _pri_high = sum(1 for r in results
+                    if (r.get("validation") or {}).get("priority") == "HIGH")
+    _pri_mid  = sum(1 for r in results
+                    if (r.get("validation") or {}).get("priority") == "MID")
+    _pri_low  = sum(1 for r in results
+                    if (r.get("validation") or {}).get("priority") == "LOW")
+    print(f"  MAN 26w: {_total_man:,}  |  AI 26w: {_total_ai:,}  |  "
+          f"Overall divergence: {_overall_div:+.1f}%  |  Avg |div|: {_avg_abs_div:.1f}%")
+    print(f"  Priority -- On-Plan: {_on_plan}  CRITICAL: {_pri_crit}  "
+          f"HIGH: {_pri_high}  MID: {_pri_mid}  LOW: {_pri_low}")
+
     if alerts:
         print(f"\n  ALERTS ({len(alerts)} records — >{ALERT_THRESHOLD*100:.4g}% variance or inactive):")
         hdr = f"  {'Key':<32} {'Δ%':>7}  {'Model':<14}  {'AI 26w':>10}  {'Manual':>10}"
