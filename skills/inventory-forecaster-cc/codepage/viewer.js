@@ -4327,7 +4327,7 @@ async function toggleDetail(key) {
         const ov = _opn[i];
         opnTot += ov;
         opnCells += ov > 0
-          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help" title="${(r.cust||'').replace(/"/g,'&quot;')}: ${fmtN(ov)} units\n(loading cancel date...)">${fmtN(ov)}</td>`
+          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help" title="All customers: ${fmtN(ov)} units\n(loading cancel date...)">${fmtN(ov)}</td>`
           : `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       } else {
         opnCells += `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
@@ -5266,7 +5266,15 @@ async function _loadOpenOrderDetails(r, safeId) {
 
     const data = (resp && resp.data) || [];
     console.info(`[OrdHist] open orders for ${r.key}: ${data.length} rows  FIDs: acct=${ORD_HIST_ACCT_MSTYLE_FID} cancel=${ORD_HIST_CANCEL_DATE_FID} qty_open=${ORD_HIST_QTY_OPEN_FID} cust=${ORD_HIST_CUST_NAME_FID}`);
-    if (!data.length) return;
+    if (!data.length) {
+      // No open-order detail in Order History — strip the "loading" placeholder
+      // from every opn-cell tooltip so it doesn't appear stuck.
+      for (let _ci = 0; _ci < 26; _ci++) {
+        const _c = document.getElementById('opn-cell-' + safeId + '-' + _ci);
+        if (_c) _c.title = _c.title.replace('\n(loading cancel date...)', '');
+      }
+      return;
+    }
 
     const _sv = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
     const _fmtDate = d => {
