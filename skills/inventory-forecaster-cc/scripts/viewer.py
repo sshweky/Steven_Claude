@@ -2898,7 +2898,7 @@ function toggleDetail(key) {{
   let opnCells  = `<td class="row-label" style="color:#6d4c00;font-weight:600"${{_opnRowTitle}}>Open Customer POs</td>`;
   let lyOrdCells = '<td class="row-label" style="color:#2e7d32;font-weight:600">Ordered LY</td>';
   let lyShpCells = '<td class="row-label" style="color:#1565c0;font-weight:600">Shipped LY</td>';
-  let opnTot = 0, lyOrdTot = 0, lyShpTot = 0;
+  let lyOrdTot = 0, lyShpTot = 0; // opnTot removed 2026-05-28 (now uses _custOpnQty directly)
 
   for (let i = 0; i < wks.length; i++) {{
     const w   = wks[i];
