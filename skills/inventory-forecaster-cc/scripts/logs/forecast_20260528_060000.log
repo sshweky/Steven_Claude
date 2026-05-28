@@ -2410,3 +2410,33 @@ NameError: name '_opn_row_wk' is not defined. Did you mean: 'open_po_wk'?
 [3/4] Running forecasts ...
 
 [2.9] F60 -- EC transition history inheritance ...
+      29 EC variants inherited parent history
+
+[2.9b] F69 ΓÇö DI direct-import sibling history pull ...
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+      42 DI sibling variant(s) blended into 42 base record(s)
+      [F69->F60] 3 EC variant(s) re-inherited DI-enriched parent history
+  [F58] Loaded 19 active AI adjustments (last 60 days)
+      5480 forecasts complete in 53.1s
+      Amazon POS-WOS: 680  Croston's: 295  F_POG_FUTURE: 5  Heuristic: 100  Heuristic (F72 new-launch ramp): 4  Inactive: 996  Inactive (F68): 1  Inactive (zero order history): 105  Inactive (zeroed by guards): 562  Inactive+Floor: 4  Inactive+S6 (off-price): 1  Manual Baseline (override): 4  OTB (zero): 430  On Hold (Status @ Cust = A: HOLD): 6  Pre-launch NEW (manual passthrough): 79  Reactivating: 28  Retailer WOS (POS): 215  Seasonal Baseline: 732  Seasonal Baseline (burst): 161  Sparse Intermittent: 1072  Bi-weekly enforced: 282  Alerts (>7.5%): 3824
+      [cat-profile gate] 37 profile(s) rejected by SKU gate (need >7 consistent SKUs):
+        P2-subcategory 'Grooming||Balm'                         n_skus=6 (filtered 162 records)
+        P2-subcategory 'Cleaning Tools||Sponge'                 n_skus=7 (filtered 138 records)
+        P2-subcategory 'Foils & Pans||Rolled Foil'              n_skus=6 (filtered 134 records)
+        P2-subcategory 'Dental Toys||Toys: Plastic - PP'        n_skus=6 (filtered 126 records)
+        P2-subcategory 'Cleaning Tools||Microfiber Cloths'      n_skus=5 (filtered 116 records)
+        P2-subcategory 'Air Care||Aerosol'                      n_skus=7 (filtered 100 records)
+        P2-subcategory 'Pro Hand Care||Hand Sanitizer'          n_skus=7 (filtered 96 records)
+        P2-subcategory 'Treats & Chews||Mints'                  n_skus=3 (filtered 81 records)
+        P2-subcategory 'Cleaning||Furniture Care'               n_skus=4 (filtered 64 records)
+        P2-subcategory 'Grilling Tools||Fire Starter'           n_skus=3 (filtered 60 records)
+      Saved ΓåÆ forecast_results.json
+      Open viewer: python scripts/viewer.py --results forecast_results.json
+
+[4/4] Writing 5480 records to Quickbase ...
+      5480 records  |  bulk REST ΓåÆ pim.quickbase.com/v1/records, batch=500
+  [watchdog] still running -- 2s since last output | last:       5480 records  |  bulk REST ΓåÆ pim.quickbase.com/v1/records, batch=500
+      Auto Project: 30 records will have manual projections replaced with AI values
+      W1 open POs: 1128 records -- AI PRJ W1 and MAN PRJ W1 zeroed (confirmed PO covers W1 demand)
+      W2 open POs: 554 records have an open PO in W2 (MAN PRJ W2 left as-is -- planner controls via codepage Zero button)
