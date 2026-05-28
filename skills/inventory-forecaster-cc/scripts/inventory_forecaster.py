@@ -10890,13 +10890,14 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #             if POS > ramp_base: adjust up immediately.
     #             if POS < ramp_base: hold for 4 weeks from ISO ship date, then
     #             adjust down to POS rate.
-    # Only fires for non-Amazon, non-Inactive, non-OTB retailers with a future
-    # POG date within the 26-week horizon.
+    # Only fires for non-Amazon, non-OTB retailers with a future POG date within
+    # the 26-week horizon.  Inactive and Pre-launch NEW items are intentionally
+    # allowed so that a valid POG configuration overrides a zero-history model.
     _pog_launch_str_f = (str(row.get("POG_Launch_Date") or "")).strip()[:10]
     if (
         _pog_launch_str_f
         and not is_amazon
-        and model not in ("Inactive", "OTB (zero)", "Pre-launch NEW")
+        and model not in ("OTB (zero)",)
     ):
         try:
             _pog_date_f  = date.fromisoformat(_pog_launch_str_f)
