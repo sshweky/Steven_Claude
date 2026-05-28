@@ -381,12 +381,22 @@ def classify_intent(note, key="", ai_model="", ai_total=0, man_total=0):
     """Return primary planner intent from comment text.
 
     Tries LLM first when ANTHROPIC_API_KEY is set; falls back to regex if the
-    LLM call fails or the key isn't present.  Logs which path was used.
+    LLM call fails or the key isn't present.  Logs which path was used so
+    the operator can verify the LLM actually ran.
     """
-    llm_label = classify_intent_llm(note, key=key, ai_model=ai_model,
-                                    ai_total=ai_total, man_total=man_total)
-    if llm_label is not None:
-        return llm_label
+    api_key_present = bool(os.environ.get("ANTHROPIC_API_KEY"))
+    if api_key_present:
+        llm_label = classify_intent_llm(note, key=key, ai_model=ai_model,
+                                        ai_total=ai_total, man_total=man_total)
+        if llm_label is not None:
+            print(f"  [LLM] {key} -> intent='{llm_label}'")
+            return llm_label
+        # LLM was attempted but returned None -- log and fall through to regex
+        print(f"  [LLM] {key} -> no result (empty note or API error); falling back to regex")
+    else:
+        # API key not set in env -- silent fall-through is intentional but we
+        # log once per comment so the operator sees we're regex-only.
+        print(f"  [classifier] {key} -> regex-only (ANTHROPIC_API_KEY not set in env)")
     return classify_intent_regex(note)
 
 
