@@ -5451,17 +5451,22 @@ async function _loadAmzDcInv(r, safeId) {
   let qtyOh = 0, qtyIw = 0, qtyIt = 0, prjWk = 0, custOo = 0;
   let atsNow = 0, atsOh = 0, atsOo = 0;
   let posL4w = 0, posL13w = 0, posL26w = 0, posL52w = 0, posLw = 0, posL2w = 0;
+  // W1/W2 weekly totals from Amazon Catalog (FID 154/180) -- used to supplement
+  // Daily Metrics when the latter lags and those weeks are missing or zero.
+  let posLwCat = 0, posL2wCat = 0;
   let fetchOk = false;
   // AUR fields (fetched from bqkdjaqi7)
   let aurLw = 0, aurL4w = 0, aurL13w = 0, aurL26w = 0, aurL52w = 0;
   let aurFetchOk = false;
   try {
-    // POS_LW + POS_PRIOR_WK are now sourced from Daily Metrics (brgxdpadi).
-    // L4W/L13W/L26W/L52W avgs remain here (pre-aggregated, accurate).
+    // POS_LW (154) + POS_PRIOR_WK (180) are pre-aggregated weekly totals from
+    // Amazon Catalog, updated weekly via Amazon's API.  Also fetched here as
+    // fallback for Daily Metrics gaps.  L4W/L13W/L26W/L52W avgs remain primary.
     const selectFids = [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH,
                         AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
                         AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO,
                         AF.POS_L4W, AF.POS_L13W, AF.POS_L26W, AF.POS_L52W,
+                        AF.POS_LW, AF.POS_PRIOR_WK,
                        ].filter(v => v != null);
     // Try exact mstyle first, then fallbacks in priority order:
     //   1. Strip /N pack-size suffix  (catalog may store bare mstyle without case-size)
@@ -5505,8 +5510,9 @@ async function _loadAmzDcInv(r, safeId) {
       posL4w  = nv(AF.POS_L4W);
       posL13w = nv(AF.POS_L13W);
       posL26w = nv(AF.POS_L26W);
-      posL52w = nv(AF.POS_L52W);
-      // posLw + posL2w sourced separately from Daily Metrics below
+      posL52w   = nv(AF.POS_L52W);
+      posLwCat  = nv(AF.POS_LW);       // FID 154 -- weekly total, W1 equivalent
+      posL2wCat = nv(AF.POS_PRIOR_WK); // FID 180 -- weekly total, W2 equivalent
       fetchOk = true;
     }
   } catch (e) {
@@ -5577,6 +5583,53 @@ async function _loadAmzDcInv(r, safeId) {
     } catch (e) {
       console.warn('[DM] POS history not applied:', e.message || e);
     }
+  }
+
+  // ── Supplement missing W1/W2 from Amazon Catalog ─────────────────────────
+  // Daily Metrics lags ~2-3 weeks.  Amazon Catalog FID 154 (POS_LW) and
+  // FID 180 (POS_PRIOR_WK) are updated weekly from Amazon's API and are almost
+  // always current.  Inject them into dmWeeks when the most-recent 1-2 Sunday
+  // week slots are absent or zero.
+  let _catSuppApplied = false;
+  if (W1_DATE && fetchOk && (posLwCat > 0 || posL2wCat > 0)) {
+    const _isoFmt = d => {
+      // Use local date components to avoid UTC-vs-local shift on midnight boundaries
+      const y = d.getFullYear(), mo = String(d.getMonth()+1).padStart(2,'0'), dy = String(d.getDate()).padStart(2,'0');
+      return `${y}-${mo}-${dy}`;
+    };
+    // History slot i=25 starts on W1_DATE - 7 days (Sun); slot i=24 starts W1_DATE - 14 days
+    const _w1Sun = new Date(W1_DATE.getTime() - 7  * 86400000);
+    const _w2Sun = new Date(W1_DATE.getTime() - 14 * 86400000);
+    const _w1ISO = _isoFmt(_w1Sun);
+    const _w2ISO = _isoFmt(_w2Sun);
+
+    if (!dmWeeks) dmWeeks = [];
+
+    // W1 slot
+    const _w1Idx = dmWeeks.findIndex(w => w.weekStart === _w1ISO);
+    if (_w1Idx === -1 && posLwCat > 0) {
+      dmWeeks.unshift({ weekStart: _w1ISO, pos: posLwCat, oh: 0, fromCatalog: true });
+      _catSuppApplied = true;
+    } else if (_w1Idx >= 0 && !dmWeeks[_w1Idx].pos && posLwCat > 0) {
+      dmWeeks[_w1Idx] = Object.assign({}, dmWeeks[_w1Idx], { pos: posLwCat, fromCatalog: true });
+      _catSuppApplied = true;
+    }
+
+    // W2 slot (re-find after possible W1 insert)
+    const _w2Idx = dmWeeks.findIndex(w => w.weekStart === _w2ISO);
+    if (_w2Idx === -1 && posL2wCat > 0) {
+      const _ins = dmWeeks.findIndex(w => w.weekStart < _w2ISO);
+      if (_ins === -1) dmWeeks.push({ weekStart: _w2ISO, pos: posL2wCat, oh: 0, fromCatalog: true });
+      else dmWeeks.splice(_ins, 0,  { weekStart: _w2ISO, pos: posL2wCat, oh: 0, fromCatalog: true });
+      _catSuppApplied = true;
+    } else if (_w2Idx >= 0 && !dmWeeks[_w2Idx].pos && posL2wCat > 0) {
+      dmWeeks[_w2Idx] = Object.assign({}, dmWeeks[_w2Idx], { pos: posL2wCat, fromCatalog: true });
+      _catSuppApplied = true;
+    }
+
+    // Also fill posLw/posL2w summaries if DM gave nothing (used in AI bullet)
+    if (!posLw  && posLwCat)  posLw  = posLwCat;
+    if (!posL2w && posL2wCat) posL2w = posL2wCat;
   }
 
   // ── AI Analysis bullets ───────────────────────────────────────────────────
@@ -5695,18 +5748,29 @@ async function _loadAmzDcInv(r, safeId) {
         <div style="font-size:11px;color:#999;font-style:italic;padding:2px 0 4px 0;">No catalog data available for this style.</div>
       </div>`;
     } else if (dmWeeks && dmWeeks.length > 0) {
-      // ── Weekly history from Daily Metrics ──────────────────────────────────
+      // ── Weekly history from Daily Metrics (+ Amazon Catalog fill for W1/W2) ──
       const thCells = dmWeeks.map(w => {
         const d   = new Date(w.weekStart + 'T00:00:00Z');
         const mo  = d.getUTCMonth() + 1;
         const day = d.getUTCDate();
-        return `<th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap;text-align:right">${mo}/${day}</th>`;
+        const catMark = w.fromCatalog ? '<sup style="color:#f57f17">*</sup>' : '';
+        return `<th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap;text-align:right">${mo}/${day}${catMark}</th>`;
       }).join('');
-      const posCells = dmWeeks.map(w => `<td style="text-align:right;padding:2px 5px">${fmtP(w.pos)}</td>`).join('');
-      const ohCells  = dmWeeks.map(w => `<td style="text-align:right;padding:2px 5px">${fmtOH(w.oh)}</td>`).join('');
+      const posCells = dmWeeks.map(w => {
+        const tip = w.fromCatalog ? ' title="From Amazon Catalog (FID 154/180) -- Daily Metrics not yet available for this week"' : '';
+        const bg  = w.fromCatalog ? 'background:#fff8e1;' : '';
+        return `<td style="${bg}text-align:right;padding:2px 5px"${tip}>${fmtP(w.pos)}</td>`;
+      }).join('');
+      const ohCells  = dmWeeks.map(w => {
+        const bg = w.fromCatalog ? 'background:#fff8e1;' : '';
+        return `<td style="${bg}text-align:right;padding:2px 5px">${fmtOH(w.oh)}</td>`;
+      }).join('');
+      const _catNote = _catSuppApplied
+        ? ` <span style="font-weight:400;color:#f57f17;font-size:10px">(*from Amazon Catalog)</span>`
+        : '';
       posSection.innerHTML = `
       <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e3f2fd;">
-        <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS (Weekly)</div>
+        <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS (Weekly)${_catNote}</div>
         <table class="dtbl" style="font-size:11px">
           <thead><tr>
             <th class="row-label" style="width:1%;white-space:nowrap"></th>
