@@ -405,6 +405,53 @@ async function searchPTStyles(query){
   })).filter(r=>r.styleNum);
 }
 
+async function autoLoadMissingQBData(){
+  if(!S.qbToken) return;
+  const missing=S.styles.filter(st=>st&&st.num&&st.num.trim()&&(!st.qb||!st.qb.desc));
+  if(!missing.length) return;
+  setStatus('Loading QB data for '+missing.length+' style(s)...','');
+  let updated=0;
+  for(const st of missing){
+    try{
+      const q=st.num.trim().toUpperCase().replace(/'/g,"\\'");
+      const body={from:QB_PT_STYLES_TABLE,
+        select:[QB_PT.styleNum,QB_PT.description,QB_PT.brand,QB_PT.category,QB_PT.supplier,
+                QB_PT.country,QB_PT.fobCost,QB_PT.landedCost,QB_PT.moq,QB_PT.leadTime,QB_PT.fragrance],
+        where:`{${QB_PT.styleNum}.EX.'${q}'}`,
+        options:{top:1}};
+      const data=await qbFetch('/records/query',{method:'POST',body:JSON.stringify(body)});
+      const row=(data.data||[])[0];
+      if(row){
+        const idx=S.styles.indexOf(st);
+        S.styles[idx].qb={
+          desc:(row[QB_PT.description]||{}).value||'',
+          brand:(row[QB_PT.brand]||{}).value||'',
+          cat:(row[QB_PT.category]||{}).value||'',
+          supplier:(row[QB_PT.supplier]||{}).value||'',
+          country:(row[QB_PT.country]||{}).value||'',
+          fob:(row[QB_PT.fobCost]||{}).value||'',
+          landed:(row[QB_PT.landedCost]||{}).value||'',
+          moq:(row[QB_PT.moq]||{}).value||'',
+          leadTime:(row[QB_PT.leadTime]||{}).value||'',
+          fragrance:(row[QB_PT.fragrance]||{}).value||''
+        };
+        if(!S.topBrand&&S.styles[idx].qb.brand) S.topBrand=S.styles[idx].qb.brand;
+        updated++;
+      }
+    }catch(e){}
+  }
+  if(updated){
+    saveState();
+    renderStylesTable();
+    renderBrandSelect();
+    renderCompStyleSelector();
+    renderSKUTab();
+    renderCostingTab();
+    renderSalesOverview();
+    setStatus('QB data loaded for '+updated+' style(s).','success');
+  }
+}
+
 function setStatus(msg,type=''){
   const el=document.getElementById('loadStatus');
   if(!el) return;
@@ -1100,7 +1147,7 @@ async function init(){
   const hn=S.launchName?'Costing Analysis - '+S.launchName:'Costing Analysis';
   document.getElementById('headerTitle').textContent=hn;
   if(S.topBrand) document.getElementById('headerSub').textContent=S.topBrand+(S.petsOrPeople?' | '+S.petsOrPeople:'');
-  if(S.qbToken) loadBrands();
+  if(S.qbToken){ loadBrands(); autoLoadMissingQBData(); }
 }
 
 // Sync input fields back to state on page events
