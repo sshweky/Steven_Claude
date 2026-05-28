@@ -16721,13 +16721,54 @@ def main():
             amazon_pos = _p25_cached
             print(f"      {len(amazon_pos)} mstyles with POS data from pull cache", flush=True)
         else:
-            try:
-                amazon_pos = fetch_amazon_daily_metrics_pos(amazon_mstyles)
-            except Exception as _p25_err:
-                print(f"      [WARN] Phase 2.5 QB REST fetch failed: {_p25_err}")
-                amazon_pos = {}
+            # ── Daily cache gate (cross-run, persists between forecaster invocations) ──
+            # Pull from QB at most once per 24h, and ONLY before 6 AM.
+            # Daytime runs always reuse the last early-morning pull.
+            import datetime as _dt_mod
+            _now_hour  = _dt_mod.datetime.now().hour
+            _dm_data, _dm_age_h = _dm_daily_cache_load()
+            _dm_fresh  = _dm_age_h < _DM_DAILY_CACHE_MAX_AGE_H    # < 24h old
+            _dm_ok_hr  = _now_hour  < _DM_PULL_CUTOFF_HOUR         # before 6 AM
+
+            if _dm_fresh and _dm_data is not None:
+                # Cache is fresh -- use it regardless of time of day
+                amazon_pos = _dm_data
+                print(f"      [DM-DAILY-CACHE] using cached data "
+                      f"({_dm_age_h:.1f}h old, limit {_DM_DAILY_CACHE_MAX_AGE_H}h) "
+                      f"-- {len(amazon_pos)} mstyles", flush=True)
+            elif _dm_ok_hr:
+                # Before 6 AM and cache is stale (or missing) -- pull fresh
+                print(f"      [DM-DAILY-CACHE] cache is "
+                      f"{'missing' if _dm_data is None else f'{_dm_age_h:.1f}h old (stale)'}"
+                      f" and it is {_now_hour:02d}:xx (before cut-off 06:00) -- pulling from QB",
+                      flush=True)
+                try:
+                    amazon_pos = fetch_amazon_daily_metrics_pos(amazon_mstyles)
+                except Exception as _p25_err:
+                    print(f"      [WARN] Phase 2.5 QB REST fetch failed: {_p25_err}")
+                    amazon_pos = _dm_data or {}
+                _dm_daily_cache_save(amazon_pos)
+            else:
+                # At or after 6 AM and cache is stale -- use stale data, skip QB
+                if _dm_data is not None:
+                    amazon_pos = _dm_data
+                    print(f"      [DM-DAILY-CACHE] NOTICE: cache is {_dm_age_h:.1f}h old "
+                          f"but it is {_now_hour:02d}:xx (at/after cut-off 06:00) -- "
+                          f"using stale cache to protect QB during work hours "
+                          f"({len(amazon_pos)} mstyles)", flush=True)
+                else:
+                    # No cache at all and after 6am -- pull anyway (first-ever run)
+                    print(f"      [DM-DAILY-CACHE] no cache exists and it is after 06:00 -- "
+                          f"pulling from QB (first-ever run)", flush=True)
+                    try:
+                        amazon_pos = fetch_amazon_daily_metrics_pos(amazon_mstyles)
+                    except Exception as _p25_err:
+                        print(f"      [WARN] Phase 2.5 QB REST fetch failed: {_p25_err}")
+                        amazon_pos = {}
+                    _dm_daily_cache_save(amazon_pos)
+
             _pull_cache_save("phase2_5", amazon_pos)
-            print(f"      {len(amazon_pos)} mstyles with POS data loaded (QB REST API)")
+            print(f"      {len(amazon_pos)} mstyles with POS data loaded")
         # Write a viewer-friendly POS cache (lowercase short keys) so the
         # viewer always sees fresh POS data on next launch.  Includes
         # ordered_lw, ordered_prior_wk, l4w, l13w, l26w, l52w (added
