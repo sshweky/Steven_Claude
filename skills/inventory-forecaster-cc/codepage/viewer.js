@@ -6466,24 +6466,59 @@ function _setManRange(key, fromIdx, toIdx, val) {
 }
 
 // VP-Q4 duplicate demand: zero out MAN PRJ weeks that overlap with confirmed
-// Open POs.  Stages changes as dirty edits (yellow) -- user still clicks
-// Save All to write to QB.  Only fires for weeks listed in po_prj_conflicts.
-function zeroDuplicateManPrj(key, safeKey) {
+// Open POs AND auto-save the record to QB (no separate Save All click needed).
+// Only fires for weeks listed in po_prj_conflicts.
+async function zeroDuplicateManPrj(key, safeKey) {
   const r = ALL_RECORDS.find(x => x.key === key);
   if (!r || !r.po_prj_conflicts || !r.po_prj_conflicts.length) return;
-  // Collect unique 0-based week indices from the PRJ side of each conflict
+  const btnId = 'zero-dup-btn-' + (safeKey || key.replace(/[^a-zA-Z0-9]/g, '_'));
+  const btn   = document.getElementById(btnId);
+
+  // Stage zero edits for each conflict week (PRJ side, 0-based).
   const toZero = new Set(r.po_prj_conflicts.map(c => c.prjWk - 1));
   for (const idx of toZero) {
     _setManRange(key, idx, idx, 0);
   }
   updateSaveAllBadge();
-  // Update the button to show action was taken
-  const btn = document.getElementById('zero-dup-btn-' + (safeKey || key.replace(/[^a-zA-Z0-9]/g,'_')));
+
+  // Auto-save just THIS record's edits via saveRecordEdits().
   if (btn) {
-    btn.textContent = 'Zeroed -- click Save All to commit';
+    btn.textContent = 'Zeroing + saving ...';
     btn.disabled = true;
     btn.style.background = '#888';
-    btn.style.cursor = 'default';
+    btn.style.cursor = 'wait';
+  }
+  try {
+    await saveRecordEdits(key);
+    if (btn) {
+      btn.textContent = 'Saved';
+      btn.style.background = '#2e7d32';
+      btn.style.cursor = 'default';
+    }
+    // Recompute conflicts -- they should be gone now that MAN PRJ is 0.
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    if (rec) {
+      const { conflicts, hasConflict } = _computePoPrjConflicts(
+        rec.opn_w || [],
+        (rec.weeks_slim || []).map(w => w.projection || 0),
+        rec.is_offprice || false
+      );
+      rec.po_prj_conflicts    = conflicts;
+      rec.has_po_prj_conflict = hasConflict;
+      // Hide the alert banner + row warning since the conflict is resolved
+      const alertEl = document.getElementById('po-prj-alert-' + (safeKey || key.replace(/[^a-zA-Z0-9]/g,'_')));
+      if (alertEl) alertEl.style.display = 'none';
+      const badgeEl = document.getElementById('conflict-badge-' + key.replace(/[^a-zA-Z0-9]/g, '_'));
+      if (badgeEl && !hasConflict) badgeEl.style.display = 'none';
+    }
+  } catch (e) {
+    console.error('[ZeroDup] auto-save failed:', e);
+    if (btn) {
+      btn.textContent = 'Save failed -- retry with Save All';
+      btn.style.background = '#c62828';
+      btn.style.cursor = 'default';
+      btn.disabled = false;
+    }
   }
 }
 
