@@ -85,6 +85,16 @@ textarea.inp{resize:vertical;min-height:36px}
 .so-cell{padding:5px 7px;border-right:1px solid #ccc;font-size:11px}
 .so-cell:last-child{border-right:none}
 .so-head{background:#BDD7EE;font-weight:bold;text-align:center}
+/* TYPEAHEAD */
+.ta-wrap{position:relative;width:100%}
+.ta-results{position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid #2E75B6;border-top:none;z-index:500;max-height:220px;overflow-y:auto;display:none;box-shadow:0 4px 8px rgba(0,0,0,.2)}
+.ta-results.open{display:block}
+.ta-item{padding:5px 8px;cursor:pointer;font-size:11px;border-bottom:1px solid #eee;line-height:1.4}
+.ta-item:hover,.ta-item.focused{background:#EBF5FB}
+.ta-item.disabled{color:#999;cursor:default;font-style:italic}
+.ta-item strong{color:#1F3864}
+.ta-clear{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#999;font-size:13px;padding:0 3px;line-height:1;display:none}
+.ta-clear.visible{display:block}
 /* PRINT */
 @media print{
   .app-header,.tab-bar,.toolbar,.btn,.modal-overlay{display:none!important}
@@ -130,7 +140,6 @@ textarea.inp{resize:vertical;min-height:36px}
 <!-- ===== TAB 1: INITIAL INFORMATION ===== -->
 <div class="tab-content active" id="tab0">
   <div class="toolbar">
-    <button class="btn btn-green" onclick="loadAllQBData()">Load Style Data from QB</button>
     <button class="btn btn-primary" onclick="renderAll()">Refresh All Tabs</button>
     <button class="btn btn-gray" onclick="clearData()">Clear All Data</button>
     <span id="loadStatus" class="text-muted" style="font-size:11px"></span>
@@ -276,10 +285,11 @@ textarea.inp{resize:vertical;min-height:36px}
 
 <script>
 // ==================== CONSTANTS ====================
-const QB_STYLES_TABLE = 'bphzqfkev';
-const QB_FIELDS = { mstyle:6, description:15, brand:16, category:20, subcategory:21,
-  supplier:118, fragrance:120, fobCost:121, dutyRate:122, landedCost:123,
-  country:140, leadTime:168, moq:173, sizeCount:219 };
+const QB_PT_STYLES_TABLE = 'bn458n7jz';   // ProductTrack Styles
+const QB_BRANDS_TABLE    = 'bn47v5gym';   // ProductTrack Brands
+const QB_PT = { styleNum:7, description:8, brand:102, category:35, subcategory:36,
+  supplier:202, country:205, fragrance:9, fobCost:46, landedCost:52,
+  moq:193, leadTime:194, masterBrand:1012, div:87, sizeCount:29, status:23 };
 
 const RETAILERS = [
   {name:'Amazon',channel:'Direct to Customer'},
@@ -351,67 +361,46 @@ async function qbFetch(path, opts={}){
   return resp.json();
 }
 
-async function fetchStyleDataFromQB(styleNums){
-  if(!S.qbToken) return null;
-  const nums = styleNums.filter(n=>n&&n.trim());
-  if(!nums.length) return {};
-  // Build WHERE clause
-  const where = nums.map(n=>'{6.EX.\''+n.trim().toUpperCase()+'\'}'). join(' OR ');
-  const sel = Object.values(QB_FIELDS);
-  const body = {from:QB_STYLES_TABLE,select:sel,where,options:{top:50}};
-  const data = await qbFetch('/records/query',{method:'POST',body:JSON.stringify(body)});
-  const result = {};
-  (data.data||[]).forEach(row=>{
-    const mstyle = (row[QB_FIELDS.mstyle]||{}).value||'';
-    if(!mstyle) return;
-    result[mstyle.toUpperCase()] = {
-      desc: (row[QB_FIELDS.description]||{}).value||'',
-      brand: (row[QB_FIELDS.brand]||{}).value||'',
-      cat: (row[QB_FIELDS.category]||{}).value||'',
-      supplier: (row[QB_FIELDS.supplier]||{}).value||'',
-      fragrance: (row[QB_FIELDS.fragrance]||{}).value||'',
-      fob: (row[QB_FIELDS.fobCost]||{}).value||'',
-      landed: (row[QB_FIELDS.landedCost]||{}).value||'',
-      moq: (row[QB_FIELDS.moq]||{}).value||'',
-      leadTime: (row[QB_FIELDS.leadTime]||{}).value||'',
-      country: (row[QB_FIELDS.country]||{}).value||''
-    };
-  });
-  return result;
+// Load all brand names for the brand dropdown
+async function loadBrands(){
+  if(!S.qbToken) return;
+  try{
+    const body={from:QB_BRANDS_TABLE,select:[6],where:'{64.EX.true}',options:{top:300,sortBy:[{fieldId:6,order:'ASC'}]}};
+    const data=await qbFetch('/records/query',{method:'POST',body:JSON.stringify(body)});
+    S._brands=(data.data||[]).map(r=>((r[6]||{}).value||'')).filter(Boolean).sort();
+    renderBrandSelect();
+  }catch(e){ console.warn('Brand load failed:',e.message); }
 }
 
-async function loadAllQBData(){
-  if(!S.qbToken){ showTokenModal(); return; }
-  const nums = S.styles.map(s=>s.num).filter(n=>n&&n.trim());
-  if(!nums.length){ setStatus('No styles entered.'); return; }
-  setStatus('Loading from QB...');
-  try{
-    const data = await fetchStyleDataFromQB(nums);
-    S.styles.forEach(st=>{
-      const k = st.num.trim().toUpperCase();
-      if(data[k]) st.qb = data[k];
-    });
-    saveState();
-    renderAll();
-    setStatus('QB data loaded: ' + Object.keys(data).length + ' style(s) found.', 'success');
-  }catch(e){
-    setStatus('QB Error: '+e.message, 'error');
-  }
+function renderBrandSelect(){
+  const sel=document.getElementById('topBrand');
+  if(!sel) return;
+  const cur=S.topBrand||'';
+  sel.innerHTML='<option value="">-- Select Brand --</option>';
+  (S._brands||[]).forEach(b=>{ sel.innerHTML+=`<option value="${esc(b)}" ${b===cur?'selected':''}>${esc(b)}</option>`; });
 }
 
-async function loadSingleStyle(idx){
-  if(!S.qbToken){ showTokenModal(); return; }
-  const st = S.styles[idx];
-  if(!st||!st.num) return;
-  setStatus('Fetching '+st.num+'...');
-  try{
-    const data = await fetchStyleDataFromQB([st.num]);
-    const k = st.num.trim().toUpperCase();
-    if(data[k]){ st.qb=data[k]; setStatus(st.num+' loaded from QB.','success'); }
-    else setStatus(st.num+' not found in QB.','warn');
-    saveState();
-    renderTab1Fields();
-  }catch(e){ setStatus('QB Error: '+e.message,'error'); }
+// Search ProductTrack Styles by style number prefix/contains
+async function searchPTStyles(query){
+  if(!S.qbToken||!query||query.length<2) return [];
+  const q=query.replace(/'/g,"\\'");
+  const where=`{7.CT.'${q}'}`;
+  const sel=Object.values(QB_PT).filter(v=>v<=300);  // skip very high FIDs that are computed
+  const body={from:QB_PT_STYLES_TABLE,select:[QB_PT.styleNum,QB_PT.description,QB_PT.brand,QB_PT.category,QB_PT.subcategory,QB_PT.supplier,QB_PT.country,QB_PT.fobCost,QB_PT.landedCost,QB_PT.moq,QB_PT.leadTime,QB_PT.fragrance,QB_PT.status],where,options:{top:25,sortBy:[{fieldId:QB_PT.styleNum,order:'ASC'}]}};
+  const data=await qbFetch('/records/query',{method:'POST',body:JSON.stringify(body)});
+  return (data.data||[]).map(row=>({
+    styleNum: (row[QB_PT.styleNum]||{}).value||'',
+    desc: (row[QB_PT.description]||{}).value||'',
+    brand: (row[QB_PT.brand]||{}).value||'',
+    cat: (row[QB_PT.category]||{}).value||'',
+    supplier: (row[QB_PT.supplier]||{}).value||'',
+    country: (row[QB_PT.country]||{}).value||'',
+    fragrance: (row[QB_PT.fragrance]||{}).value||'',
+    fob: (row[QB_PT.fobCost]||{}).value||'',
+    landed: (row[QB_PT.landedCost]||{}).value||'',
+    moq: (row[QB_PT.moq]||{}).value||'',
+    leadTime: (row[QB_PT.leadTime]||{}).value||''
+  })).filter(r=>r.styleNum);
 }
 
 function setStatus(msg,type=''){
@@ -533,7 +522,7 @@ function saveAndRefreshHeader(){
 // ==================== TAB 1: RENDER ====================
 function renderTab1Fields(){
   document.getElementById('launchName').value=S.launchName||'';
-  document.getElementById('topBrand').value=S.topBrand||'';
+  renderBrandSelect();
   document.getElementById('petsOrPeople').value=S.petsOrPeople||'';
   document.getElementById('massOrSpecialty').value=S.massOrSpecialty||'';
   renderCompetitorChecks();
@@ -570,25 +559,97 @@ function renderStylesTable(){
   S.styles.forEach((st,i)=>{
     const q=st.qb||{};
     const ev=i%2===1?'tr-even':'';
-    html+=`<tr class="${ev}">
+    const hasStyle=!!(st.num&&st.num.trim());
+    html+=`<tr class="${ev}" id="style-row-${i}">
       <td class="center">${i+1}</td>
-      <td><input class="inp" type="text" value="${esc(st.num)}" onchange="setStyleNum(${i},this.value)" onblur="setStyleNum(${i},this.value)" placeholder="e.g. FFP7258" style="text-transform:uppercase"></td>
-      <td><input class="inp ${q.desc?'qb':''}" type="text" value="${esc(q.desc)}" ${q.desc?'readonly':''} placeholder="(auto-fill from QB)" oninput="setQBField(${i},'desc',this.value)"></td>
-      <td><input class="inp ${q.brand?'qb':''}" type="text" value="${esc(q.brand)}" ${q.brand?'readonly':''} placeholder="Brand" oninput="setQBField(${i},'brand',this.value)"></td>
-      <td><input class="inp ${q.cat?'qb':''}" type="text" value="${esc(q.cat)}" ${q.cat?'readonly':''} placeholder="Category" oninput="setQBField(${i},'cat',this.value)"></td>
-      <td><input class="inp ${q.supplier?'qb':''}" type="text" value="${esc(q.supplier)}" ${q.supplier?'readonly':''} placeholder="Supplier" oninput="setQBField(${i},'supplier',this.value)"></td>
-      <td><input class="inp ${q.country?'qb':''}" type="text" value="${esc(q.country)}" ${q.country?'readonly':''} placeholder="Country" oninput="setQBField(${i},'country',this.value)"></td>
-      <td class="right"><input class="inp ${q.fob!==''&&q.fob!==undefined?'qb':''}" type="number" step="0.01" value="${q.fob||''}" ${q.fob?'readonly':''} placeholder="0.00" oninput="setQBField(${i},'fob',this.value)" style="text-align:right"></td>
-      <td class="right"><input class="inp ${q.landed!==''&&q.landed!==undefined?'qb':''}" type="number" step="0.01" value="${q.landed||''}" ${q.landed?'readonly':''} placeholder="0.00" oninput="setQBField(${i},'landed',this.value)" style="text-align:right"></td>
-      <td class="right"><input class="inp ${q.moq?'qb':''}" type="number" value="${q.moq||''}" ${q.moq?'readonly':''} placeholder="0" oninput="setQBField(${i},'moq',this.value)" style="text-align:right"></td>
-      <td class="center"><input class="inp ${q.leadTime?'qb':''}" type="text" value="${esc(q.leadTime)}" ${q.leadTime?'readonly':''} placeholder="days" oninput="setQBField(${i},'leadTime',this.value)"></td>
-      <td class="center nowrap">
-        <button class="btn btn-primary btn-sm" onclick="loadSingleStyle(${i})" title="Load from QB">QB</button>
-        ${i>0?`<button class="btn btn-red btn-sm" onclick="removeStyle(${i})" title="Remove">x</button>`:''}
+      <td style="min-width:180px">
+        <div class="ta-wrap">
+          <input class="inp" type="text" id="ta-input-${i}" value="${esc(st.num)}"
+            placeholder="Type style #..." autocomplete="off"
+            oninput="onStyleSearch(this,${i})"
+            onfocus="onStyleSearch(this,${i})"
+            onblur="setTimeout(()=>closeTA(${i}),200)"
+            style="padding-right:20px">
+          <button class="ta-clear ${hasStyle?'visible':''}" id="ta-clear-${i}"
+            onclick="clearStyleRow(${i})" title="Clear">&times;</button>
+          <div class="ta-results" id="ta-results-${i}"></div>
+        </div>
       </td>
+      <td><span class="inp ${q.desc?'qb':'text-muted'}" style="display:block;min-height:24px;background:${q.desc?'#E8F4E8':'#f9f9f9'};padding:3px 5px">${esc(q.desc)||'(select style)'}</span></td>
+      <td><span class="inp ${q.brand?'qb':'text-muted'}" style="display:block;background:${q.brand?'#E8F4E8':'#f9f9f9'};padding:3px 5px">${esc(q.brand)||'--'}</span></td>
+      <td><span class="inp ${q.cat?'qb':'text-muted'}" style="display:block;background:${q.cat?'#E8F4E8':'#f9f9f9'};padding:3px 5px">${esc(q.cat)||'--'}</span></td>
+      <td><span class="inp ${q.supplier?'qb':'text-muted'}" style="display:block;background:${q.supplier?'#E8F4E8':'#f9f9f9'};padding:3px 5px">${esc(q.supplier)||'--'}</span></td>
+      <td><span class="inp ${q.country?'qb':'text-muted'}" style="display:block;background:${q.country?'#E8F4E8':'#f9f9f9'};padding:3px 5px">${esc(q.country)||'--'}</span></td>
+      <td class="right"><span class="inp qb" style="display:block;background:${q.fob?'#E8F4E8':'#f9f9f9'};padding:3px 5px;text-align:right">${q.fob?fmt$(q.fob):'--'}</span></td>
+      <td class="right"><span class="inp qb" style="display:block;background:${q.landed?'#E8F4E8':'#f9f9f9'};padding:3px 5px;text-align:right">${q.landed?fmt$(q.landed):'--'}</span></td>
+      <td class="right"><span class="inp qb" style="display:block;background:${q.moq?'#E8F4E8':'#f9f9f9'};padding:3px 5px;text-align:right">${q.moq||'--'}</span></td>
+      <td class="center"><span class="inp qb" style="display:block;background:${q.leadTime?'#E8F4E8':'#f9f9f9'};padding:3px 5px">${esc(q.leadTime)||'--'}</span></td>
+      <td class="center">${i>0?`<button class="btn btn-red btn-sm" onclick="removeStyle(${i})">x</button>`:''}</td>
     </tr>`;
   });
   tbody.innerHTML=html;
+}
+
+// ---- Typeahead logic ----
+let _taTimer={};
+async function onStyleSearch(input,i){
+  const q=input.value.trim();
+  clearTimeout(_taTimer[i]);
+  if(!q){ closeTA(i); return; }
+  _taTimer[i]=setTimeout(async()=>{
+    if(!S.qbToken){ showTAResults(i,[{label:'QB not connected -- click QB Settings',disabled:true}]); return; }
+    showTAResults(i,[{label:'Searching...',disabled:true}]);
+    try{
+      const results=await searchPTStyles(q);
+      if(!results.length){ showTAResults(i,[{label:'No styles found',disabled:true}]); return; }
+      showTAResults(i,results.map(r=>({label:r.styleNum+(r.desc?' — '+r.desc.substring(0,50):''),data:r})));
+    }catch(e){ showTAResults(i,[{label:'Error: '+e.message,disabled:true}]); }
+  },280);
+}
+
+function showTAResults(i,items){
+  const el=document.getElementById('ta-results-'+i);
+  if(!el) return;
+  el.innerHTML=items.map((it,idx)=>
+    `<div class="ta-item ${it.disabled?'disabled':''}" ${it.disabled?'':` onclick="selectStyle(${i},${idx})"`} data-idx="${idx}">
+      ${it.data?`<strong>${esc(it.data.styleNum)}</strong> &mdash; ${esc((it.data.desc||'').substring(0,60))}`:esc(it.label)}
+    </div>`
+  ).join('');
+  el.className='ta-results open';
+  el._items=items;
+}
+
+function closeTA(i){
+  const el=document.getElementById('ta-results-'+i);
+  if(el){ el.className='ta-results'; el._items=[]; }
+}
+
+function selectStyle(rowIdx,itemIdx){
+  const el=document.getElementById('ta-results-'+rowIdx);
+  if(!el||!el._items) return;
+  const item=el._items[itemIdx];
+  if(!item||item.disabled||!item.data) return;
+  const d=item.data;
+  S.styles[rowIdx]={
+    num: d.styleNum,
+    qb: { desc:d.desc, brand:d.brand, cat:d.cat, supplier:d.supplier,
+          country:d.country, fragrance:d.fragrance, fob:d.fob,
+          landed:d.landed, moq:d.moq, leadTime:d.leadTime }
+  };
+  // Auto-set top-level brand if not already set
+  if(!S.topBrand&&d.brand){ S.topBrand=d.brand; }
+  saveState();
+  closeTA(rowIdx);
+  renderStylesTable();
+  renderCompStyleSelector();
+  setStatus(d.styleNum+' loaded from QB.','success');
+}
+
+function clearStyleRow(i){
+  S.styles[i]={num:'',qb:{}};
+  saveState();
+  renderStylesTable();
+  renderCompStyleSelector();
 }
 
 function setStyleNum(i,val){
