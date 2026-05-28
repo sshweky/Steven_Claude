@@ -333,3 +333,19 @@ NameError: name '_opn_row_wk' is not defined. Did you mean: 'open_po_wk'?
       [QB REST] fetching field map ...
       [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
   [watchdog] still running -- 20s since last output | last:       [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+  [watchdog] still running -- 80s since last output | last:       [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+      5480 records retrieved (QB REST API)
+
+[1.5] Amazon switchover auto-link + Switchover_Date backfill ...
+      [Switchover] Alerts (no variant projections): 28 record(s)
+
+[2/4] Pulling master pack + Season from Styles ...
+      [QB REST] fetching Styles field map ...
+      2259 master pack records loaded (168 with Season tag) (QB REST API)
+
+[2.5] Pulling Amazon catalog POS for 1892 mstyles ...
+      [DM-DAILY-CACHE] using cached data (0.3h old, limit 24h) -- 1649 mstyles
+      1649 mstyles with POS data loaded
+      viewer_pos_cache.json refreshed (1649 mstyles)
+
+[2.6] Pulling Amazon Catalog US (F38 signals) for 1892 mstyles ...
