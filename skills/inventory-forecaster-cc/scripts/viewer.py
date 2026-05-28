@@ -1455,6 +1455,11 @@ def build_validation_page_html():
             "pog_end":          r.get("pog_end", "") or "",
             "master_pack":      int(r.get("master_pack") or r.get("mp") or 1),
             "opn_w":            r.get("opn_w") or [],
+            # 2026-05-28: correct open PO fields for projections display and hover.
+            "cust_open_po_qty":   int(r.get("cust_open_po_qty") or 0),
+            "cust_open_po_hover": r.get("cust_open_po_hover") or "",
+            "msty_open_po_qty":   int(r.get("msty_open_po_qty") or 0),
+            "msty_open_po_hover": r.get("msty_open_po_hover") or "",
             # Three parallel 26-week series from QB Inventory Flow + gap scalars
             "inv_flow_beg":       r.get("inv_flow_beg") or None,
             "inv_flow_rcv":       r.get("inv_flow_rcv") or None,
