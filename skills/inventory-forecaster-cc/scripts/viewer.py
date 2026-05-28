@@ -2900,7 +2900,29 @@ function toggleDetail(key) {{
   let opnCells  = `<td class="row-label" style="color:#6d4c00;font-weight:600"${{_opnRowTitle}}>Open Customer POs</td>`;
   let lyOrdCells = '<td class="row-label" style="color:#2e7d32;font-weight:600">Ordered LY</td>';
   let lyShpCells = '<td class="row-label" style="color:#1565c0;font-weight:600">Shipped LY</td>';
-  let lyOrdTot = 0, lyShpTot = 0; // opnTot removed 2026-05-28 (now uses _custOpnQty directly)
+  let lyOrdTot = 0, lyShpTot = 0;
+
+  // Parse CXL-date week distribution from Cust Open PO Qty hover text.
+  // Format inside the title= text: "PO: XXXXX  Opn Qty: N  CXL MM-DD-YYYY"
+  // W1_DATE (global) anchors week 1 so we can bucket each PO into a forecast week.
+  const _opnWkDist = (() => {{
+    const dist = new Array(26).fill(0);
+    if (!_custOpnHover || !W1_DATE) return dist;
+    const re = /Opn Qty:\s*(\d+)\s+CXL\s+(\d{{2}})-(\d{{2}})-(\d{{4}})/g;
+    let m;
+    while ((m = re.exec(_custOpnHover)) !== null) {{
+      const qty = parseInt(m[1], 10);
+      const cxl = new Date(parseInt(m[4], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+      const days = Math.floor((cxl.getTime() - W1_DATE.getTime()) / 86400000);
+      const wk   = Math.max(0, Math.min(25, Math.floor(days / 7)));
+      dist[wk]  += qty;
+    }}
+    return dist;
+  }})();
+  // Fall back: if no CXL dates parsed but we have a total, put it all in W1.
+  const _opnWkHasDist = _opnWkDist.some(v => v > 0);
+  const _opnWkArr = _opnWkHasDist ? _opnWkDist
+    : (_custOpnQty > 0 ? [_custOpnQty, ...new Array(25).fill(0)] : new Array(26).fill(0));
 
   for (let i = 0; i < wks.length; i++) {{
     const w   = wks[i];
