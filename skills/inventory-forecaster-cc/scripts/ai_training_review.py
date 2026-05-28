@@ -686,12 +686,14 @@ def analyze_comment(comment, projection, man_fids, note_fid, l4w_fid):
     item_status = sval(projection, P_ITEM_STATUS)
     mgr         = sval(projection, P_INV_MGR)
 
-    intent = classify_intent(note)
+    intent = classify_intent(note, key=key, ai_model=ai_model,
+                             ai_total=ai_total, man_total=man_total)
     fit, diagnosis = assess_model_fit(
         intent, ai_model, ai_total, man_total, l13w, l4w, item_status)
     rec = generate_recommendation(intent, fit, ai_model, diagnosis, note)
 
     return {
+        "comment_rid": int(rid) if rid else None,
         "key": key, "customer": customer, "brand": brand,
         "mstyle": mstyle, "item_status": item_status, "mgr": mgr,
         "note": note, "ts": ts,
