@@ -24,6 +24,86 @@ Quickbase enforces hidden per-realm and per-table rate limits. The symptom of cr
 8. **Heavy jobs run off-hours (02:00–05:00 local).**
 9. **Sustained per-table write rate ≤ 10 req/s.** Burst ≤ 25 req/s. If unsure, throttle to 5 req/s.
 10. **Direct REST API beats CData beats JSON-RPC.** Use the highest-leverage path you can.
+11. **Ad-hoc chat calls count against the realm exactly like script calls.** Declare budget first. Cap at 5 per conversation turn. Batch wherever possible.
+
+---
+
+## 0. Ad-hoc / conversational QB calls (Claude chat rules)
+
+These rules apply specifically when Claude (or any AI assistant) makes QB calls during a conversation — for data lookups, schema discovery, xref building, diagnostics, etc. The realm does not distinguish between a scheduled script and a chat session.
+
+### 0.1 Declare call budget BEFORE the first call — and keep it tight
+
+Before making any QB call in chat, state the plan:
+
+> "Call budget: 2 calls — field map + 1 data query."
+
+**Hard caps by context:**
+
+| Context | Max calls per turn | Approval needed above |
+|---|---|---|
+| Metadata only (getInstructions, field maps) | 3 | 3 |
+| Data reads (REST query) | 3 | 3 |
+| Mixed (field map + queries) | 4 | 4 |
+| Writes (upserts, updates) | 2 | 2 |
+| **Any context during business hours (8am–7pm local)** | **3 total** | **3** |
+
+If the task requires more calls than the cap, **batch the data into fewer calls first**. If batching is not possible, ask the user before proceeding.
+
+### 0.2 Mandatory 2-second pause between sequential REST calls
+
+Never fire QB REST calls back-to-back in a Python snippet. Always insert a minimum 2-second sleep between calls in any ad-hoc script run during a conversation:
+
+```python
+import time
+
+# Call 1
+d1 = qb_post('/records/query', payload1)
+time.sleep(2)   # MANDATORY between calls
+
+# Call 2
+d2 = qb_post('/records/query', payload2)
+time.sleep(2)
+
+# Call 3
+d3 = qb_post('/records/query', payload3)
+```
+
+This prevents back-to-back bursts that spike realm load even when each individual call is lightweight.
+
+### 0.3 Do a latency check before any multi-call session
+
+If a task requires 3+ QB calls, run a single lightweight latency probe first (one `top:1` query). If response > 1,000ms, **stop and tell the user** before proceeding:
+
+> "QB is currently responding at Xms (elevated). Recommend waiting before running this — proceed anyway?"
+
+### 0.4 Combine what can be combined
+
+Before making separate calls, ask: can this be done in one call?
+
+| Instead of... | Do this |
+|---|---|
+| Field map call + data query on same table | Query with known FIDs; skip field map if FIDs are cached |
+| Separate acct# lookup per retailer | Batch all acct lookups into one query with `OR` filter |
+| Field map for table A + field map for table B | Fetch both in parallel or use cached maps |
+
+### 0.5 Never make QB calls to verify a write you just made
+
+After a bulk upsert, do NOT immediately query the same records to confirm values. Trust the API response. A verify-read after every write doubles the call count for no safety gain.
+
+### 0.6 Business hours are restricted hours
+
+Between **8am and 7pm local time**, 80 users are actively using QB through the UI and scripts. During this window:
+- Cut maximum calls per turn to **3 total** (no exceptions without explicit user approval)
+- Add **3-second pauses** between calls instead of 2
+- Prefer read-only diagnostic calls; defer write operations to off-hours unless urgent
+- If realm latency is already elevated (>500ms on a simple query), **stop all calls** and tell the user
+
+### 0.7 What happened on 2026-05-28 — and why this section exists
+
+During a chat session, Claude made 5 sequential QB REST calls in quick succession (field map + Kohl's KL projection query + two acct# lookups) to build a retailer mstyle cross-reference file. This happened at ~4:40pm during business hours. The metadata latency spiked to 5,477ms immediately after. The calls themselves were each individually lightweight, but fired back-to-back with no delay they created a burst that stressed the shared realm for all 80 users.
+
+**The fix:** batch all acct# lookups into a single OR-filtered query, enforce 2s pauses between calls, and check latency before starting multi-call work.
 
 ---
 
