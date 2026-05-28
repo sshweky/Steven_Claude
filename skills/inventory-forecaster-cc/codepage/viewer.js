@@ -1802,6 +1802,7 @@ function _buildPogBlockHtml(r) {
   const estIso      = Number(r.est_iso_qty   || 0);   // formula field (read-only)
   const estIsoInput = Number(r.est_iso_input || 0);   // planner-entered ISO qty (FID 1606)
   const initUpspw   = Number(r.init_upspw   || 0);    // planner-entered initial UPSPW (FID 1607)
+  const isoShipDate = (r.iso_ship_date || '').slice(0, 10);  // ISO date string (FID 1060) or ''
   // ALWAYS render the block  -  planners need the editable inputs even when
   // QB has no POG/Store data yet (e.g. a new item being set up).
 
@@ -1914,10 +1915,23 @@ function _buildPogBlockHtml(r) {
                  placeholder="0"
                  style="font-size:11px;padding:2px 6px;border:1px solid #c7e2bf;border-radius:3px;background:#fff;color:#2e4f24;font-family:inherit;margin-left:4px;width:70px;">
         </div>
+        <div>
+          <b>ISO Ship Date:</b>
+          <input type="date" id="iso-ship-date-${safeKey}" value="${isoShipDate}"
+                 onchange="savePogDate('${safeKey}','iso_ship',this.value,this)"
+                 title="Date the ISO shipment is expected to arrive at the customer DC. If blank, the AI assumes 4 weeks before POG Launch."
+                 style="font-size:11px;padding:2px 6px;border:1px solid #c7e2bf;border-radius:3px;background:#fff;color:#2e4f24;font-family:inherit;margin-left:4px;">
+        </div>
         <div><b>Master pack:</b> ${mp.toLocaleString()}/case</div>
         ${estIso ? `<div><b>QB Est. ISO Qty:</b> ${estIso.toLocaleString()}</div>` : ''}
         <div id="pog-msg-${safeKey}" style="font-size:10px;color:#1b5e20;"></div>
       </div>
+      ${!isoShipDate && !pogLaunch && (stores > 0 || initUpspw > 0 || estIsoInput > 0) ? `
+      <div style="margin-top:8px;padding:8px 12px;background:#fff3e0;border:2px solid #e65100;border-radius:6px;font-size:11px;color:#bf360c;">
+        <b>&#x26A0; Missing Dates:</b> No ISO Ship Date and no POG Launch Date are set on this item.
+        The AI forecaster cannot apply the new-store ramp model until at least one of these is provided.
+        Set POG Launch Date and the AI will default the ISO shipment to 4 weeks prior, or enter ISO Ship Date directly.
+      </div>` : ''}
       ${stores > 0 ? `
       <div style="margin-top:8px;padding-top:6px;border-top:1px solid #d4ead0;">
         <b>Expected ISO order:</b> ~${fmtN(isoMid)} units (${stores.toLocaleString()} stores x 1.5 MP @ ${mp}/case).
@@ -1959,8 +1973,12 @@ function _buildPogBlockHtml(r) {
 async function savePogDate(key, which, isoValue, el) {
   const safeKey = key.replace(/'/g, '&#39;');
   const msg = document.getElementById('pog-msg-' + safeKey);
-  const fid = which === 'launch' ? CFG.FID.POG_LAUNCH : CFG.FID.POG_END;
-  const label = which === 'launch' ? 'POG Launch' : 'POG End';
+  const fid   = which === 'launch'   ? CFG.FID.POG_LAUNCH
+              : which === 'end'      ? CFG.FID.POG_END
+              :                        CFG.FID.ISO_SHIP_DATE;  // 'iso_ship'
+  const label = which === 'launch'   ? 'POG Launch'
+              : which === 'end'      ? 'POG End'
+              :                        'ISO Ship Date';
   if (msg) { msg.textContent = 'Saving...'; msg.style.color = '#888'; }
   if (el) el.style.background = '#fff9c4';
   try {
@@ -1976,8 +1994,9 @@ async function savePogDate(key, which, isoValue, el) {
     // Mirror to local record so re-expand shows the saved value
     const rec = ALL_RECORDS.find(x => x.key === key);
     if (rec) {
-      if (which === 'launch') rec.pog_launch = isoValue || '';
-      else                    rec.pog_end    = isoValue || '';
+      if      (which === 'launch')   rec.pog_launch    = isoValue || '';
+      else if (which === 'end')      rec.pog_end       = isoValue || '';
+      else                           rec.iso_ship_date = isoValue || '';
     }
     if (msg) { msg.textContent = `\u2713 ${label} saved`; msg.style.color = '#2e7d32'; setTimeout(() => { if (msg) msg.textContent = ''; }, 2500); }
     if (el) el.style.background = '#e8f5e9';
@@ -2102,7 +2121,8 @@ async function lookupInvRequest(key, requestIdStr) {
     const resp = await qb('/records/query', {
       from:    CFG.INV_REQ_DETAIL_TID,
       select:  [F.RELATED_REQ_ID, F.ACCT_MSTYLE, F.POG_SET_DATE, F.POG_END_DATE,
-                F.ISO_UNITS, F.ISO_PIPELINE, F.STORES, F.UPSPW],
+                F.ISO_UNITS, F.ISO_PIPELINE, F.STORES, F.UPSPW,
+                ...(F.ISO_SHIP_DATE ? [F.ISO_SHIP_DATE] : [])],
       where:   `{${F.RELATED_REQ_ID}.EX.${rid}}AND{${F.ACCT_MSTYLE}.EX.'${safeQbKey}'}`,
       options: { top: 1 },
     });
@@ -2118,12 +2138,20 @@ async function lookupInvRequest(key, requestIdStr) {
     // Strip timestamps -- QB dates arrive as "YYYY-MM-DDT..." or plain "YYYY-MM-DD"
     const toIso = v => { if (!v) return ''; const m = String(v).match(/^(\d{4}-\d{2}-\d{2})/); return m ? m[1] : ''; };
 
-    const pogSet   = toIso(row[F.POG_SET_DATE]?.value);
-    const pogEnd   = toIso(row[F.POG_END_DATE]?.value);
-    const isoUnits = Number(row[F.ISO_UNITS]?.value  || 0);
-    const isoPipe  = Number(row[F.ISO_PIPELINE]?.value || 0);
-    const stores   = Number(row[F.STORES]?.value    || 0);
-    const upspw    = Number(row[F.UPSPW]?.value     || 0);
+    const pogSet       = toIso(row[F.POG_SET_DATE]?.value);
+    const pogEnd       = toIso(row[F.POG_END_DATE]?.value);
+    const isoUnits     = Number(row[F.ISO_UNITS]?.value    || 0);
+    const isoPipe      = Number(row[F.ISO_PIPELINE]?.value || 0);
+    const stores       = Number(row[F.STORES]?.value       || 0);
+    const upspw        = Number(row[F.UPSPW]?.value        || 0);
+    // ISO Ship Date: use value from request if present, else derive as POG Set - 28 days
+    const reqIsoShip   = F.ISO_SHIP_DATE ? toIso(row[F.ISO_SHIP_DATE]?.value) : '';
+    let   isoShipToSave = reqIsoShip;
+    if (!isoShipToSave && pogSet) {
+      const _d = new Date(pogSet);
+      _d.setDate(_d.getDate() - 28);
+      isoShipToSave = _d.toISOString().slice(0, 10);
+    }
 
     const filled = [];
 
@@ -2154,6 +2182,13 @@ async function lookupInvRequest(key, requestIdStr) {
     if (upspw) {
       const el = document.getElementById('init-upspw-' + safeKey);
       if (el) { el.value = upspw; await saveInitUpspw(key, upspw, el); filled.push('UPSPW'); }
+    }
+    // ISO Ship Date: save the explicit date from the request, or the POG-derived fallback
+    if (isoShipToSave) {
+      const el = document.getElementById('iso-ship-date-' + safeKey);
+      if (el) { el.value = isoShipToSave; }
+      await savePogDate(key, 'iso_ship', isoShipToSave, el || null);
+      filled.push(reqIsoShip ? 'ISO Ship Date' : 'ISO Ship Date (derived: POG-4wks)');
     }
 
     let msg = `Loaded from Inventory Request #${rid}`;
