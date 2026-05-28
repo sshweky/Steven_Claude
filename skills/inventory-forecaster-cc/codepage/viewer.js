@@ -8662,7 +8662,7 @@ async function npmSave() {
     }, 120);
 
     closeNewPrjModal();
-    _npmToast(`Projection created: ${newKey}`);
+    _npmToast(`Projection created: ${savedKey}`);
   } catch (e) {
     statusEl.style.color = '#c62828';
     statusEl.textContent = (e.message || 'Save failed').slice(0, 160);
