@@ -288,7 +288,7 @@ window.QB_CONFIG = {
            background: #f0f2f5; color: #222; }
   .topbar { background:#4a148c; color:#fff; padding:10px 18px;
              display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-             position:sticky; top:0; z-index:50;
+             position:sticky; top:0; z-index:300;
              box-shadow:0 2px 4px rgba(0,0,0,0.12); }
   .topbar h1 { font-size:16px; font-weight:600; flex:1; }
   .badge { padding:3px 10px; border-radius:12px;
@@ -314,7 +314,7 @@ window.QB_CONFIG = {
   .toolbar { background:#fff; border-bottom:1px solid #ddd; padding:6px 12px;
               display:flex; align-items:center; gap:6px; flex-wrap:nowrap;
               overflow-x:auto;
-              position:sticky; top:var(--topbar-h, 52px); z-index:49;
+              position:sticky; top:var(--topbar-h, 52px); z-index:299;
               box-shadow:0 1px 3px rgba(0,0,0,0.08); }
   .toolbar input, .toolbar select {
     font-size:11px; padding:3px 6px; border:1px solid #ccc; border-radius:4px;
@@ -642,6 +642,7 @@ window.QB_CONFIG = {
   <button onclick="const b=document.getElementById('attnBanner');b.style.display='none';b.dataset.dismissed='1';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);">Dismiss</button>
 </div>
 
+<div id="table-wrap" style="isolation:isolate">
 <table>
 <thead>
   <!-- Each <th> declares the record-field it maps to via data-sort-key.
