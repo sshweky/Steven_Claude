@@ -9134,7 +9134,7 @@ document.addEventListener('keydown', function _selEscHandler(e) {
 async function bulkZeroOut() {
   const keys = [...SELECTED_KEYS];
   if (!keys.length) return;
-  if (!confirm('Zero out MAN PRJ for ' + keys.length + ' selected record(s)?\n\nChanges will be queued -- click "Save All" to write to QB.')) return;
+  if (!confirm('Zero out MAN PRJ for ' + keys.length + ' selected record(s)?')) return;
   let staged = 0;
   for (const key of keys) {
     const rec = ALL_RECORDS.find(x => x.key === key);
