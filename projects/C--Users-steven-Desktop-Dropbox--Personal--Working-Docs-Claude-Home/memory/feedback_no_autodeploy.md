@@ -27,11 +27,13 @@ so each deploy auto-busts the IndexedDB projection cache for all 80 users.
 **Always ask "Ready to deploy to QB now?" after editing any QB-deployable file.**
 
 QB-deployable files (any change to these triggers the prompt):
-- `codepage/viewer.js` (pageID=49)
-- `codepage/viewer.html` (pageID=50)
-- `codepage/inv_mgmt.js` (pageID=56)
-- `codepage/inv_mgmt_full.html` (pageID=52)
-- `scripts/viewer.py` (Python local viewer -- changes here should also prompt deploy since planners use the codepage viewer which mirrors the same features)
+- `codepage/viewer.js` (pageID=49) -- Forecast Manager JS logic
+- `codepage/viewer.html` (pageID=50) -- Forecast Manager HTML shell
+- `codepage/inv_mgmt.js` (pageID=56) -- Inventory Management JS logic
+- `codepage/inv_mgmt_full.html` (pageID=52) -- Inventory Management HTML shell
+- `scripts/viewer.py` -- local Python viewer; mirrors the QB codepage (viewer.js + viewer.html are the 2 QB parts of the same viewer). Changes here trigger the same deploy prompt.
+
+**Deploy only what changed.** If viewer.py changed, deploy viewer.html (page 50) and/or viewer.js (page 49) as appropriate. If viewer.js changed, deploy page 49 only. Do not redeploy files that were not modified.
 
 After every editing session that touches any of the above, end the response with:
 > "Ready to deploy to QB now?"
