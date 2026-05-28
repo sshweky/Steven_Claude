@@ -232,7 +232,10 @@ def _enrich_from_quickbase(recs):
             "[Acct_MStyle_Key_], [Description], [Status_Cust], "
             "[PT_Item_Status], [Inventory_Manager], "
             "[Last_Comment], [Last_Comment_Date], [Flagged], "
-            f"[Store_Count], [POG_Launch_Date], [POG_End_Date], {opn_cols}"
+            "[Store_Count], [POG_Launch_Date], [POG_End_Date], "
+            # 2026-05-28: correct customer-specific open PO fields
+            "[Cust Open PO Qty#], [Cust Open PO Qty], [Msty Open PO Qty], "
+            f"{opn_cols}"
         )
         BATCH = 150
         n_batches = (len(missing) + BATCH - 1) // BATCH
