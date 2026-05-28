@@ -4829,8 +4829,12 @@ async function toggleDetail(key) {
     </div>` : '';
 
   // -- PO / Manual Projection conflict alert ----------------------------------
+  // Skip rendering when the planner has dismissed this exact conflict pattern.
+  // _dupConflictHash captures the current PO+MAN values, so the alert
+  // reappears automatically if those values change after dismissal.
   let poPrjAlertHtml = '';
-  if (r.has_po_prj_conflict && r.po_prj_conflicts && r.po_prj_conflicts.length) {
+  if (r.has_po_prj_conflict && r.po_prj_conflicts && r.po_prj_conflicts.length
+      && !isDupAlertIgnored(r)) {
     const _isOP = r.is_offprice;
     const _conflictLines = r.po_prj_conflicts.map(c => {
       if (c.poWk === c.prjWk) {
