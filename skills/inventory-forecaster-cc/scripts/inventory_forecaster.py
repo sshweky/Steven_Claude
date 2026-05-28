@@ -11834,14 +11834,21 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 meta["oh_shortfall_adjustments"] = _f37_adjustments
                 _changed_weeks = sorted({a["week"] for a in _f37_adjustments})
                 _lt_wks = _f37_lt_info["lt_trans_weeks"]
+                _f37_mode_desc = (
+                    f"MODE A restock-to-{_f37_wos_target:.0f}WOS "
+                    f"(DC inv={_f37_cust_dc_inv:.0f}u, "
+                    f"rate={_f37_weekly_rate:.0f}u/wk): "
+                    f"restock demand fired in first back-in-stock week"
+                    if _f37_cust_dc_inv is not None
+                    else "MODE B 75/50/25% decay cohorts (no DC inv data)"
+                )
                 meta.setdefault("drivers", []).append(
-                    f"F37 OH-shortfall adjustment (v3 cap + 4-wk 25%-decay rollforward): "
-                    f"{len(_f37_adjustments)} weeks adjusted at warehouse OH "
+                    f"F37 OH-shortfall adjustment (v3, {_f37_mode_desc}): "
+                    f"{len(_f37_adjustments)} weeks adjusted "
                     f"(weeks {','.join(map(str, _changed_weeks[:8]))}"
                     f"{'...' if len(_changed_weeks) > 8 else ''}); "
-                    f"constraint lifted from W{_lt_wks}+ (LT+Trans={_f37_lt_info['lt_trans_days']}d). "
-                    f"Unmet demand rolled forward up to 4 weeks at 25% decay/wk "
-                    f"(cohort fully expired by W+5)."
+                    f"constraint lifted from W{_lt_wks}+ "
+                    f"(LT+Trans={_f37_lt_info['lt_trans_days']}d)."
                 )
     elif _f37_skip and isinstance(meta, dict):
         # NOTE: don't start with "F37" -- the rule_fires regex would count it
