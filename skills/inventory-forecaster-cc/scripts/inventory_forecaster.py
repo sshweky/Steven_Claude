@@ -5508,28 +5508,34 @@ def nz_rate(history, window=26):
 
 def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     """
-    F37 v2 — Forward inventory-shortfall adjustment (rewritten 2026-05-26).
+    F37 v3 — Forward inventory-shortfall adjustment with 4-week decay rollforward
+    (restored 2026-05-28 per planner directive).
 
-    Two-stage forecast model (per planner directive 2026-05-26):
+    Two-stage forecast model:
       Stage 1 (upstream of F37) -- DEMAND generation.
         AI forecast = what Amazon will order from us, driven by Amazon's DC
         level + POS rate.  Independent of OUR warehouse capacity.
-      Stage 2 (THIS function) -- SUPPLY constraint.
+      Stage 2 (THIS function) -- SUPPLY constraint + rollforward.
         Cap each week's forecast at what we CAN ship from our warehouse.
-        capacity_w = max(0, beg_inv_w + rcv[w] - opn[w])
-        ship_w     = min(demand_w, capacity_w)
-        beg_inv_{w+1} = max(0, beg_inv_w + rcv[w] - ship_w - opn[w])
+        Unmet demand in week W is rolled forward as a backlog cohort that
+        decays 25% per week for up to 4 weeks (fully expired after W+4).
 
-      KEY CHANGE FROM PRIOR VERSION (2026-05-26):
-        NO cohort rollforward.  Unmet demand in week W is LOST (Amazon will
-        order less that week, not double-order to make up).  The previous
-        version created phantom catch-up cohorts that decayed 25%/wk for 4
-        weeks -- those produced fake mid-horizon spikes (e.g. W5 = 11,513
-        when warehouse was empty W1-W4) that landed on the wrong weeks and
-        masked the real event-driven lift schedule (Prime Day pre-buy, T5,
-        Black Friday).  Without rollforward, capped weeks show the actual
-        warehouse cap, and downstream event lifts (W22-W26 T5, etc.) land
-        on the correct ordering weeks.
+        Per-week math:
+          backlog_demand_w = sum of all active cohort values arriving this week
+          total_demand_w   = fcst[w] + backlog_demand_w
+          capacity_w       = max(0, BegInv_W[w] + rcv[w] - opn[w])
+          ship_w           = min(total_demand_w, capacity_w)
+          unmet_w          = total_demand_w - ship_w
+          -- new cohort (unmet_w, 4 weeks) created when unmet > 1 unit --
+          -- each existing cohort decays: val *= 0.75, weeks_left -= 1     --
+
+        Rollforward rationale (2026-05-28):
+          When we can't fill an order in week W, Amazon typically re-orders
+          in W+1, W+2, etc. at a decaying rate as replenishment need fades.
+          The 4-week / 25%-decay schedule matches observed reorder behaviour
+          from F34/F35 and is the correct model for items with supply
+          constraints (e.g. items with no Inventory Flow data that received
+          a zero-OH placeholder).
 
     `inv_flow` dict (passed by caller from `fetch_inv_flow_qb_rest()` output):
         {
