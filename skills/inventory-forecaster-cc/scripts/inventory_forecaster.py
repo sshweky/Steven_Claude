@@ -1609,7 +1609,49 @@ def _get_styles_field_map():
 _PULL_CACHE_ROOT = Path(__file__).parent.parent / "pull_cache"
 
 
-_PULL_CACHE_MAX_AGE_S = 4 * 3600   # 4-hour hard expiry — refuse stale cache silently
+_PULL_CACHE_MAX_AGE_S = 4 * 3600   # 4-hour hard expiry -- refuse stale cache silently
+
+# ── Amazon Daily Metrics cross-run daily cache ─────────────────────────────
+# Phase 2.5 hits a 10.7M-row table.  We only allow one fresh QB pull per 24h,
+# and ONLY before 6 AM (off-hours).  Daytime runs always use the cached data.
+_DM_DAILY_CACHE_PATH    = Path(__file__).parent.parent / "cache" / "amazon_dm_daily.json"
+_DM_DAILY_CACHE_MAX_AGE_H = 24   # hours before cache is considered stale
+_DM_PULL_CUTOFF_HOUR      = 6    # no fresh QB pull at or after 6:00 AM
+
+
+def _dm_daily_cache_load():
+    """Load the Amazon Daily Metrics cross-run cache.
+
+    Returns (data_dict, age_hours).  If the file is missing or corrupt,
+    returns (None, inf) so the caller knows no data is available.
+    """
+    if not _DM_DAILY_CACHE_PATH.exists():
+        return None, float("inf")
+    try:
+        obj = json.load(open(_DM_DAILY_CACHE_PATH, encoding="utf-8"))
+        from datetime import datetime as _dt
+        fetched_at = _dt.fromisoformat(obj["fetched_at"])
+        age_h = (_dt.now() - fetched_at).total_seconds() / 3600.0
+        return obj.get("data", {}), age_h
+    except Exception as _e:
+        print(f"      [DM-DAILY-CACHE] read failed: {_e} -- treating as missing", flush=True)
+        return None, float("inf")
+
+
+def _dm_daily_cache_save(data):
+    """Persist the Amazon Daily Metrics result to the cross-run daily cache."""
+    try:
+        from datetime import datetime as _dt
+        _DM_DAILY_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        json.dump(
+            {"fetched_at": _dt.now().isoformat(), "data": data},
+            open(_DM_DAILY_CACHE_PATH, "w", encoding="utf-8"),
+        )
+        size_kb = _DM_DAILY_CACHE_PATH.stat().st_size // 1024
+        print(f"      [DM-DAILY-CACHE] saved {len(data)} mstyles ({size_kb:,} KB) "
+              f"-> {_DM_DAILY_CACHE_PATH.name}", flush=True)
+    except Exception as _e:
+        print(f"      [WARN] DM daily cache write failed: {_e}", flush=True)
 
 
 def _pull_cache_load(name, use_cache):
