@@ -5082,7 +5082,7 @@ async function toggleDetail(key) {
     ${narrativeHtml}
     <div style="overflow-x:auto;padding:8px 12px;">
       ${editToolbar}
-      <table class="dtbl dtbl-sh">
+      <table class="dtbl">
         <thead><tr>${projHdrCells}</tr></thead>
         <tbody>
         <tr>${projCells}</tr>
@@ -5336,7 +5336,7 @@ async function _loadAmzDcInv(r, safeId) {
   let soh = 0, opo = 0, wos = 0;
   let qtyOh = 0, qtyIw = 0, qtyIt = 0, prjWk = 0, custOo = 0;
   let atsNow = 0, atsOh = 0, atsOo = 0;
-  let posL4w = 0, posL13w = 0, posL26w = 0, posL52w = 0, posLw = 0;
+  let posL4w = 0, posL13w = 0, posL26w = 0, posL52w = 0, posLw = 0, posL2w = 0;
   let fetchOk = false;
   // AUR fields (fetched from bqkdjaqi7)
   let aurLw = 0, aurL4w = 0, aurL13w = 0, aurL26w = 0, aurL52w = 0;
@@ -5346,6 +5346,7 @@ async function _loadAmzDcInv(r, safeId) {
                         AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
                         AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO,
                         AF.POS_L4W, AF.POS_L13W, AF.POS_L26W, AF.POS_L52W, AF.POS_LW,
+                        AF.POS_PRIOR_WK,
                        ].filter(v => v != null);
     // Try exact mstyle first, then fallbacks in priority order:
     //   1. Strip /N pack-size suffix  (catalog may store bare mstyle without case-size)
@@ -5391,6 +5392,7 @@ async function _loadAmzDcInv(r, safeId) {
       posL26w = nv(AF.POS_L26W);
       posL52w = nv(AF.POS_L52W);
       posLw   = nv(AF.POS_LW);
+      posL2w  = nv(AF.POS_PRIOR_WK);
       fetchOk = true;
     }
   } catch (e) {
@@ -5464,7 +5466,8 @@ async function _loadAmzDcInv(r, safeId) {
     posBulletHtml = '<b>Amazon POS sales:</b> <span style="color:#999;font-style:italic">no consumer sales data</span>';
   } else {
     const posItems = [];
-    if (posLw  > 0) posItems.push(`<b>LW</b> ${fmtPos(posLw)} u`);
+    if (posLw   > 0) posItems.push(`<b>LW</b> ${fmtPos(posLw)} u`);
+    if (posL2w  > 0) posItems.push(`<b>LW-1</b> ${fmtPos(posL2w)} u`);
     if (posL4w  > 0) posItems.push(`<b>L4W avg</b> ${fmtPos(posL4w)} u/wk`);
     if (posL13w > 0) posItems.push(`<b>L13W avg</b> ${fmtPos(posL13w)} u/wk`);
     if (posL26w > 0) posItems.push(`<b>L26W avg</b> ${fmtPos(posL26w)} u/wk`);
@@ -5563,6 +5566,7 @@ async function _loadAmzDcInv(r, safeId) {
           <tr>
             <th class="row-label" style="width:1%;white-space:nowrap"></th>
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L1W</th>
+            <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L2W</th>
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L4W avg</th>
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L13W avg</th>
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L26W avg</th>
@@ -5571,6 +5575,7 @@ async function _loadAmzDcInv(r, safeId) {
           <tr>
             <td class="row-label" style="color:#1565c0;font-weight:600;white-space:nowrap">POS Units</td>
             <td>${fmtP(posLw)}</td>
+            <td>${fmtP(posL2w)}</td>
             <td>${fmtP(posL4w)}</td>
             <td>${fmtP(posL13w)}</td>
             <td>${fmtP(posL26w)}</td>
