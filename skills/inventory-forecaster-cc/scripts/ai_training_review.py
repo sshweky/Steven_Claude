@@ -310,15 +310,41 @@ def classify_intent_regex(note):
     return "unknown"
 
 
+def _get_anthropic_api_key():
+    """Resolve the Anthropic API key from (in order): env var, ~/.anthropic_api_key
+    file, or skill-local secret file.  Returns the key string or '' if none found.
+    The file-based fallback lets us avoid setx restart pain: drop the key into
+    %USERPROFILE%\\.anthropic_api_key (one line, no quotes) and it works in any
+    Python subprocess regardless of which shell launched it."""
+    key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+    if key:
+        return key
+    # File fallback -- check standard locations
+    candidates = [
+        Path.home() / ".anthropic_api_key",
+        Path(__file__).parent.parent / ".anthropic_api_key",
+    ]
+    for p in candidates:
+        try:
+            if p.is_file():
+                content = p.read_text(encoding="utf-8").strip()
+                if content:
+                    return content
+        except Exception:
+            continue
+    return ""
+
+
 def classify_intent_llm(note, key="", ai_model="", ai_total=0, man_total=0):
     """LLM-based intent classifier using Anthropic Claude.  Returns one of the
     intent labels: 'eol', 'zero', 'launch', 'wrong_model', 'increase',
     'decrease', or 'unknown' if Claude can't determine.
 
-    Triggers only when ANTHROPIC_API_KEY env var is set.  Returns None on any
-    error (network, parse, rate limit) so the caller can fall back to regex.
+    Triggers when an Anthropic API key is resolvable (env var or file
+    fallback -- see _get_anthropic_api_key).  Returns None on any error
+    (network, parse, rate limit) so the caller can fall back to regex.
     """
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    api_key = _get_anthropic_api_key()
     if not api_key or not note:
         return None
 
