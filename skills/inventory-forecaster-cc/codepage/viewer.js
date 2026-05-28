@@ -5078,8 +5078,9 @@ async function toggleDetail(key) {
     ${narrativeHtml}
     <div style="overflow-x:auto;padding:8px 12px;">
       ${editToolbar}
-      <table class="dtbl">
-        <tr>${projHdrCells}</tr>
+      <table class="dtbl dtbl-sh">
+        <thead><tr>${projHdrCells}</tr></thead>
+        <tbody>
         <tr>${projCells}</tr>
         <tr>${aiCells}</tr>
         <tr>${diffCells}</tr>
@@ -5087,6 +5088,7 @@ async function toggleDetail(key) {
         <tr>${opnCells}</tr>
         <tr>${lyOrdCells}</tr>
         <tr>${lyShpCells}</tr>
+        </tbody>
       </table>
     </div>
     ${histHtml}

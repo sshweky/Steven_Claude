@@ -445,6 +445,12 @@ window.QB_CONFIG = {
                         min-width:60px; }
   .dtbl th { background:#f0f4f8; text-align:center; font-weight:600; }
   .dtbl .row-label { text-align:left; font-weight:600; background:#fafafa; min-width:80px; }
+  /* Sticky projection-table header  -  applied only to the main proj table via .dtbl-sh.
+     border-collapse:separate (with border-spacing:0) is required for position:sticky to
+     work in all browsers; box-shadow replaces the border-bottom that collapse provided. */
+  .dtbl-sh { border-collapse: separate !important; border-spacing: 0; }
+  .dtbl-sh thead th { position: sticky; top: var(--frozen-h, 90px); z-index: 5;
+                      box-shadow: inset 0 -1px 0 #bbb; }
   .wk-crit { background:#ffcdd2; font-weight:700; }
   .wk-warn { background:#fff9c4; font-weight:600; }
   .wk-ok   { background:#fff; }
