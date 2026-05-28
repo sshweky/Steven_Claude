@@ -3985,9 +3985,16 @@ function changePage(delta) {
 async function toggleDetail(key) {
   const el = document.getElementById('detail-' + key);
   if (!el) return;
-  if (el.style.display === 'table-row') { el.style.display = 'none'; _openDetailKey = null; return; }
+  if (el.style.display === 'table-row') {
+    el.style.display = 'none';
+    _openDetailKey = null;
+    if (el.previousElementSibling) el.previousElementSibling.classList.remove('detail-open');
+    return;
+  }
   _openDetailKey = key;
   el.style.display = 'table-row';
+  // Freeze the parent row so it stays visible while scrolling through the detail pane
+  if (el.previousElementSibling) el.previousElementSibling.classList.add('detail-open');
   if (el.dataset.loaded === '1') return;
 
   // If this record was served from cache, the heavy detail arrays were stripped

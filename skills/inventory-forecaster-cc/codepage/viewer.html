@@ -457,6 +457,11 @@ window.QB_CONFIG = {
   /* Detail-panel tables (.dtbl) must NOT inherit the global thead sticky rule --
      they live inside a table cell so sticking at --frozen-h causes overlaps. */
   .dtbl thead th { position: static !important; top: auto !important; }
+  /* When a detail pane is open, its parent <tr> freezes just below the toolbar
+     so the planner always sees which record the expanded panel belongs to. */
+  tbody tr.detail-open { position: sticky; top: var(--frozen-h, 90px); z-index: 8;
+                         background: #fff;
+                         box-shadow: 0 3px 6px rgba(0,0,0,0.10); }
   .wk-crit { background:#ffcdd2; font-weight:700; }
   .wk-warn { background:#fff9c4; font-weight:600; }
   .wk-ok   { background:#fff; }
