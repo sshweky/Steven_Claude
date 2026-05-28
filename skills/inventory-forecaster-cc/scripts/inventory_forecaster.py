@@ -2193,6 +2193,51 @@ def build_validation_update_sql(rec):
     )
 
 
+# ─── Open-PO rich-text parser (2026-05-28) ────────────────────────────────────
+
+def _parse_rich_text_po(html_val, w1_date=None):
+    """Parse a QB rich-text open-PO field (Cust Open PO Qty or Msty Open PO Qty).
+
+    Returns (qty, hover_text, week_dist) where:
+      qty        -- visible numeric value (int)
+      hover_text -- raw title= attribute content, ready for a tooltip
+      week_dist  -- {week_num: qty} dict from individual PO CXL-date parsing.
+                    Populated only when w1_date (a datetime.date) is supplied.
+                    Format in hover: 'PO: XXXX Opn Qty: N CXL MM-DD-YYYY'
+
+    Example input:
+      "<div><span title='AMAZON.COM 1864 BB0096 ASIN
+       - 216 pcs
+       PO: 3188DN4V Opn Qty: 36 CXL 06-01-2026
+       PO: 61VH1DTF Opn Qty: 24 CXL 05-27-2026'>
+       <a href=...>216</a></span></div>"
+    """
+    if not html_val:
+        return 0, "", {}
+    # Extract title= hover text
+    _m_title = re.search(r"title='([^']*)'", html_val)
+    if not _m_title:
+        _m_title = re.search(r'title="([^"]*)"', html_val)
+    hover = _m_title.group(1).strip() if _m_title else ""
+    # Extract visible number from <a>...</a> or <b>...</b>
+    _m_qty = re.search(r'<[ab][^>]*>(\d+)</[ab]>', html_val)
+    qty = int(_m_qty.group(1)) if _m_qty else 0
+    # Parse individual POs for week-bucketing (VP-Q4 and F37 use)
+    week_dist = {}
+    if w1_date and hover:
+        for _po_m in re.finditer(r'Opn Qty:\s*(\d+)\s+CXL\s+(\d{2}-\d{2}-\d{4})', hover):
+            _po_qty = int(_po_m.group(1))
+            try:
+                _cxl = date(int(_po_m.group(2)[6:]), int(_po_m.group(2)[0:2]),
+                            int(_po_m.group(2)[3:5]))
+                _days = (_cxl - w1_date).days
+                _wk   = max(1, min(26, (_days // 7) + 1))
+                week_dist[_wk] = week_dist.get(_wk, 0) + _po_qty
+            except (ValueError, AttributeError):
+                pass
+    return qty, hover, week_dist
+
+
 # ─── Forecasting helpers ──────────────────────────────────────────────────────
 
 def snap(qty, mp):
