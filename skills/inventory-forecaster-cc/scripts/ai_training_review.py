@@ -2073,7 +2073,7 @@ def main():
             })
 
     if unparseable:
-        _api_set = bool(os.environ.get("ANTHROPIC_API_KEY"))
+        _api_set = bool(_get_anthropic_api_key())
         print()
         _classifier_used = "LLM+regex fallback" if _api_set else "regex-only (ANTHROPIC_API_KEY not set)"
         print(f"  [!] {len(unparseable)} comment(s) could NOT be parsed by the "
