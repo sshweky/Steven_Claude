@@ -430,6 +430,106 @@ async function discoverOrdHistFids() {
     cust_name: ORD_HIST_CUST_NAME_FID });
 }
 
+// -- Daily Metrics (brgxdpadi) field discovery + L1W/L2W POS fetch -----------
+// Discovers FIDs once via /fields; then queries the last 14 days of daily data
+// for the given mstyle (or ASIN if no mstyle field exists) and returns weekly
+// ordered-unit totals for L1W (days 1-7 before W1_DATE) and L2W (days 8-14).
+async function _discoverDailyMetricsFids() {
+  if (_dmFidsDone) return;
+  _dmFidsDone = true;                        // set before await so parallel calls don't double-fetch
+  const tid = CFG.DAILY_METRICS_TID;
+  if (!tid) return;
+  try {
+    const fields = await qbGet(`/fields?tableId=${tid}`);
+    for (const f of (fields || [])) {
+      // Normalize: lowercase, collapse whitespace+underscores, trim trailing underscore
+      const lbl = (f.label || '').trim().toLowerCase()
+                    .replace(/[\s_]+/g, '_').replace(/_+$/g, '');
+      const id  = f.id;
+      if (!id) continue;
+      if (['mstyle', 'model', 'mstyle_model', 'mstyle(model)'].includes(lbl)) {
+        _DM_MSTYLE_FID = _DM_MSTYLE_FID || id;   // keep first match
+      } else if (lbl === 'asin') {
+        _DM_ASIN_FID = id;
+      } else if (lbl === 'date') {
+        _DM_DATE_FID = id;
+      } else if (['ordered_units', 'ordered_units_', 'units'].includes(lbl)) {
+        _DM_UNITS_FID = id;
+      }
+    }
+    console.info('[DM] FIDs discovered:', {
+      mstyle: _DM_MSTYLE_FID, asin: _DM_ASIN_FID,
+      date: _DM_DATE_FID, units: _DM_UNITS_FID,
+    });
+  } catch (e) {
+    console.warn('[DM] field discovery failed:', e.message || e);
+  }
+}
+
+// Fetch L1W and L2W POS from Daily Metrics for the given mstyle.
+// Returns { l1w, l2w } (both in ordered units), or null on failure.
+// Called from _loadAmzDcInv() after the bqp8vz625 fetch completes.
+async function _fetchDmPosL1L2(mstyle, asinsFromCatalog) {
+  const tid = CFG.DAILY_METRICS_TID;
+  if (!tid || !W1_DATE) return null;
+  await _discoverDailyMetricsFids();
+  if (!_DM_DATE_FID || !_DM_UNITS_FID) return null;
+
+  // Only need 14 days to compute L1W + L2W; a little buffer makes date math safe
+  const startDate = new Date(W1_DATE.getTime() - 15 * 86400000);
+  const endDate   = new Date(W1_DATE.getTime() - 1);
+  const _iso = d => d.toISOString().slice(0, 10);
+  const dateClause = `AND{${_DM_DATE_FID}.OAF.'${_iso(startDate)}'}` +
+                     `AND{${_DM_DATE_FID}.OBF.'${_iso(endDate)}'}`;
+
+  let where;
+  if (_DM_MSTYLE_FID) {
+    // Preferred: direct mstyle filter
+    const escMs = mstyle.replace(/'/g, "''");
+    where = `{${_DM_MSTYLE_FID}.EX.'${escMs}'}${dateClause}`;
+  } else if (_DM_ASIN_FID && asinsFromCatalog && asinsFromCatalog.length) {
+    // Fallback: filter by known ASINs (supplied from bqkdjaqi7 AUR fetch)
+    const asinList = asinsFromCatalog
+      .map(a => `{${_DM_ASIN_FID}.EX.'${String(a).replace(/'/g, "''")}'}`)
+      .join('OR');
+    where = `(${asinList})${dateClause}`;
+  } else {
+    return null;  // no usable join key
+  }
+
+  try {
+    const resp = await qb('/records/query', {
+      from:    tid,
+      select:  [_DM_DATE_FID, _DM_UNITS_FID],
+      where,
+      options: { skip: 0, top: 2000 },
+    });
+
+    const rows = (resp && resp.data) || [];
+    console.info(`[DM] rows for ${mstyle} (last 14d): ${rows.length}`);
+
+    // Sum into L1W (days 1-7 before W1_DATE) and L2W (days 8-14)
+    let l1w = 0, l2w = 0;
+    const _sv = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
+
+    for (const rec of rows) {
+      const rawDate = _sv(rec, _DM_DATE_FID);
+      if (!rawDate) continue;
+      const d = new Date(rawDate);
+      if (isNaN(d.getTime())) continue;
+      const units = parseFloat(_sv(rec, _DM_UNITS_FID) || 0) || 0;
+      if (units <= 0) continue;
+      const daysBack = Math.floor((W1_DATE.getTime() - d.getTime()) / 86400000);
+      if (daysBack >= 1 && daysBack <= 7)  l1w += units;
+      if (daysBack >= 8 && daysBack <= 14) l2w += units;
+    }
+    return { l1w, l2w };
+  } catch (e) {
+    console.warn('[DM] L1W/L2W fetch failed:', e.message || e);
+    return null;
+  }
+}
+
 // -- Build the QB query select list for one row -----------------------------
 function buildSelectFids() {
   const F = CFG.FID;
@@ -530,6 +630,15 @@ let INV_FLOW_ATS_OO_FID   = null;   // ATS_OH_OO_
 let INV_FLOW_ATS_OH_WOS_FID  = null; // ATS_WOS_OH_
 let INV_FLOW_ATS_OO_WOS_FID  = null; // ATS_WOS_OH_OO_
 let INV_FLOW_FIRST_SHPD_FID  = null; // 1st Shpd Date  (first warehouse shipment date)
+
+// Daily Metrics (brgxdpadi) FIDs — discovered lazily on first Amazon detail open.
+// Used only for L1W + L2W ordered-units (week-to-week POS detail).
+// L4W/L13W/L26W/L52W avgs continue to come from bqp8vz625 (pre-aggregated).
+let _DM_DATE_FID   = null;  // "Date" field
+let _DM_UNITS_FID  = null;  // "Ordered Units" / "Ordered_Units"
+let _DM_MSTYLE_FID = null;  // "Mstyle" / "Model" / "Mstyle_model_" (preferred join key)
+let _DM_ASIN_FID   = null;  // "ASIN" (fallback join key if no mstyle field)
+let _dmFidsDone    = false;
 
 // Order History (bpe4maa4c) FIDs — discovered lazily on first detail open
 let ORD_HIST_ACCT_MSTYLE_FID = null;
@@ -5342,11 +5451,12 @@ async function _loadAmzDcInv(r, safeId) {
   let aurLw = 0, aurL4w = 0, aurL13w = 0, aurL26w = 0, aurL52w = 0;
   let aurFetchOk = false;
   try {
+    // POS_LW + POS_PRIOR_WK are now sourced from Daily Metrics (brgxdpadi).
+    // L4W/L13W/L26W/L52W avgs remain here (pre-aggregated, accurate).
     const selectFids = [AF.MSTYLE, AF.SOH, AF.OPO, AF.WOS_OH,
                         AF.QTY_OH, AF.QTY_IW, AF.QTY_IT, AF.PRJ_WK, AF.CUST_OO,
                         AF.ATS_NOW, AF.ATS_OH, AF.ATS_OO,
-                        AF.POS_L4W, AF.POS_L13W, AF.POS_L26W, AF.POS_L52W, AF.POS_LW,
-                        AF.POS_PRIOR_WK,
+                        AF.POS_L4W, AF.POS_L13W, AF.POS_L26W, AF.POS_L52W,
                        ].filter(v => v != null);
     // Try exact mstyle first, then fallbacks in priority order:
     //   1. Strip /N pack-size suffix  (catalog may store bare mstyle without case-size)
@@ -5391,8 +5501,7 @@ async function _loadAmzDcInv(r, safeId) {
       posL13w = nv(AF.POS_L13W);
       posL26w = nv(AF.POS_L26W);
       posL52w = nv(AF.POS_L52W);
-      posLw   = nv(AF.POS_LW);
-      posL2w  = nv(AF.POS_PRIOR_WK);
+      // posLw + posL2w sourced separately from Daily Metrics below
       fetchOk = true;
     }
   } catch (e) {
@@ -5450,6 +5559,21 @@ async function _loadAmzDcInv(r, safeId) {
     }
   }
 
+  // ── Daily Metrics L1W + L2W fetch (brgxdpadi) ────────────────────────────
+  // We pass any ASINs already known (from the AUR row) as a fallback join key
+  // in case Daily Metrics has no mstyle field — usually unnecessary.
+  if (CFG.DAILY_METRICS_TID) {
+    try {
+      const dmPos = await _fetchDmPosL1L2(mstyle, []);
+      if (dmPos) {
+        posLw  = dmPos.l1w;
+        posL2w = dmPos.l2w;
+      }
+    } catch (e) {
+      console.warn('[DM] L1W/L2W not applied:', e.message || e);
+    }
+  }
+
   // ── AI Analysis bullets ───────────────────────────────────────────────────
   const fmt    = n => Math.round(n).toLocaleString('en-US');
   const fmtWos = n => n.toFixed(1);
@@ -5457,8 +5581,8 @@ async function _loadAmzDcInv(r, safeId) {
   const fmtAur = n => '$' + n.toFixed(2);
   const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
 
-  // POS bullet
-  const hasPos = fetchOk && (posL4w > 0 || posL13w > 0 || posL26w > 0 || posL52w > 0);
+  // POS bullet — hasPos covers the avgs; posLw/posL2w may be populated independently
+  const hasPos = fetchOk && (posLw > 0 || posL2w > 0 || posL4w > 0 || posL13w > 0 || posL26w > 0 || posL52w > 0);
   let posBulletHtml;
   if (!fetchOk) {
     posBulletHtml = '<b>Amazon POS sales:</b> <span style="color:#999;font-style:italic">not in catalog (no data)</span>';
