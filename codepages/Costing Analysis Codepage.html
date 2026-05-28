@@ -87,7 +87,7 @@ textarea.inp{resize:vertical;min-height:36px}
 .so-head{background:#BDD7EE;font-weight:bold;text-align:center}
 /* TYPEAHEAD */
 .ta-wrap{position:relative;width:100%}
-.ta-results{position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid #2E75B6;border-top:none;z-index:500;max-height:220px;overflow-y:auto;display:none;box-shadow:0 4px 8px rgba(0,0,0,.2)}
+.ta-results{position:fixed;background:#fff;border:2px solid #2E75B6;border-top:none;z-index:9999;max-height:220px;overflow-y:auto;display:none;box-shadow:0 4px 8px rgba(0,0,0,.2)}
 .ta-results.open{display:block}
 .ta-item{padding:5px 8px;cursor:pointer;font-size:11px;border-bottom:1px solid #eee;line-height:1.4}
 .ta-item:hover,.ta-item.focused{background:#EBF5FB}
@@ -640,7 +640,14 @@ async function onStyleSearch(input,i){
 
 function showTAResults(i,items){
   const el=document.getElementById('ta-results-'+i);
+  const input=document.getElementById('ta-input-'+i);
   if(!el) return;
+  if(input){
+    const r=input.getBoundingClientRect();
+    el.style.top=r.bottom+'px';
+    el.style.left=r.left+'px';
+    el.style.width=r.width+'px';
+  }
   el.innerHTML=items.map((it,idx)=>
     `<div class="ta-item ${it.disabled?'disabled':''}" ${it.disabled?'':` onclick="selectStyle(${i},${idx})"`} data-idx="${idx}">
       ${it.data?`<strong>${esc(it.data.styleNum)}</strong> &mdash; ${esc((it.data.desc||'').substring(0,60))}`:esc(it.label)}
@@ -668,12 +675,15 @@ function selectStyle(rowIdx,itemIdx){
           landed:d.landed, moq:d.moq, leadTime:d.leadTime }
   };
   // Auto-set top-level brand if not already set
-  if(!S.topBrand&&d.brand){ S.topBrand=d.brand; }
+  if(!S.topBrand&&d.brand){ S.topBrand=d.brand; renderBrandSelect(); }
   saveState();
   closeTA(rowIdx);
   renderStylesTable();
   renderCompStyleSelector();
-  setStatus(d.styleNum+' loaded from QB.','success');
+  renderSKUTab();
+  renderCostingTab();
+  renderSalesOverview();
+  setStatus(d.styleNum+' loaded from QB. All tabs updated.','success');
 }
 
 function clearStyleRow(i){
