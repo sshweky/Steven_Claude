@@ -4984,7 +4984,8 @@ async function toggleDetail(key) {
       </table>
     </div>
     ${histHtml}
-    ${isAmazonRec ? `<div id="amz-pos-section-${safeId}"></div>` : posHistHtml}
+    ${posHistHtml}
+    ${isAmazonRec ? `<div id="amz-pos-section-${safeId}"></div>` : ''}
     ${invFlowSectionHtml}
     ${switchoverHtml}
     ${tellAiBlock}
