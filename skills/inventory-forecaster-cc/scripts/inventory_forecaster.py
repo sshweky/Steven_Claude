@@ -10930,8 +10930,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         _pog_iso_idx = max(0, _pog_w_idx_f - 4)  # bad date string
                 else:
                     _pog_iso_idx = max(0, _pog_w_idx_f - 4)  # no date -> POG - 4 weeks
-                # Ramp always starts at POG start week regardless of when ISO ships
-                _pog_ramp_idx = _pog_w_idx_f
+                # Ramp starts 3 weeks after POG launch (pause for sell-through to
+                # stabilize before replenishment ordering begins).
+                _pog_ramp_idx = min(25, _pog_w_idx_f + 3)
 
                 # --- ISO already placed? ---
                 # Backward: large order (>= 50% of ISO qty) in last 8 weeks of history
