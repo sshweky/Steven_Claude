@@ -9822,7 +9822,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
     else:
         # Dense buyer (≥ 50% non-zero): seasonal baseline + ordering pattern shape.
-        _is_ecom_t4 = _is_ecom_cust(cust_name)
+        _is_ecom_t4      = _is_ecom_cust(cust_name)
+        _is_offprice_t4  = _is_offprice_cust(cust_name)
         fcst, cap, meta = seasonal_baseline(hist_for_model, mp, is_amazon=is_amazon,
                                             pos_data=pos_data, description=description,
                                             product_category=product_category,
@@ -9832,7 +9833,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                             is_ecom=_is_ecom_t4,
                                             is_new_launch=_f73_new_ramp,
                                             amz_catalog=amz_catalog,
-                                            rtl_pos=rtl_pos)
+                                            rtl_pos=rtl_pos,
+                                            is_offprice=_is_offprice_t4)
         model    = ("Seasonal Baseline (burst)"
                     if meta.get("model") == "seasonal_baseline_burst"
                     else "Seasonal Baseline")
