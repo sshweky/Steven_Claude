@@ -3141,12 +3141,18 @@ function _analyzeSeasonalPattern(histOrd) {
   return { events, avgGapWks, nextExpectedWk, avgOrderTotal, wksSinceLast };
 }
 
-const SWITCHOVER_MAP            = new Map();  // COS/EC auto-detected
-const MANUAL_SWITCHOVER_MAP     = new Map();  // planner-configured base → new
-const MANUAL_SWITCHOVER_REVERSE = new Map();  // planner-configured new  → base
+// Auto-detected switchovers (EC/COS/AMZ/DS/DTC suffix variants + PCS->PX siblings).
+// Both maps keyed by record key; values include the partner mstyle/key and
+// (if known) the parsed Switchover_Date so badge rendering can decide
+// pre/post-switchover coloring.
+const SWITCHOVER_MAP            = new Map();  // base_key    -> { variantMstyle, variantKey, date }
+const SWITCHOVER_REVERSE        = new Map();  // variant_key -> { baseMstyle, baseKey, date }
+const MANUAL_SWITCHOVER_MAP     = new Map();  // base_key    -> { toMstyle, toKey, date }
+const MANUAL_SWITCHOVER_REVERSE = new Map();  // variant_key -> { fromKey, fromMstyle, date }
 
 function buildSwitchoverMap() {
   SWITCHOVER_MAP.clear();
+  SWITCHOVER_REVERSE.clear();
   MANUAL_SWITCHOVER_MAP.clear();
   MANUAL_SWITCHOVER_REVERSE.clear();
 
