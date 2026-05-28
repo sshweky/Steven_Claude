@@ -5566,21 +5566,26 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
         decays 25% per week for up to 4 weeks (fully expired after W+4).
 
         Per-week math:
-          backlog_demand_w = sum of all active cohort values arriving this week
+          backlog_demand_w = sum of active cohort contributions this week
           total_demand_w   = fcst[w] + backlog_demand_w
           capacity_w       = max(0, BegInv_W[w] + rcv[w] - opn[w])
           ship_w           = min(total_demand_w, capacity_w)
           unmet_w          = total_demand_w - ship_w
-          -- new cohort (unmet_w, 4 weeks) created when unmet > 1 unit --
-          -- each existing cohort decays: val *= 0.75, weeks_left -= 1     --
+
+        Rollforward cohort for unmet_w (born at step=1):
+          W+1 (step 1): unmet_w × 0.75  -- 25% decay from original
+          W+2 (step 2): unmet_w × 0.50  -- 50% decay from original
+          W+3 (step 3): unmet_w × 0.25  -- 75% decay from original
+          W+4+        : 0               -- expired; cohort fully gone
+
+        The decay is always computed from the ORIGINAL unmet qty (linear),
+        not from the prior week's contribution (not compound).
+        Example: 1,000-unit shortfall rolls as 750 / 500 / 250 / 0.
 
         Rollforward rationale (2026-05-28):
           When we can't fill an order in week W, Amazon typically re-orders
-          in W+1, W+2, etc. at a decaying rate as replenishment need fades.
-          The 4-week / 25%-decay schedule matches observed reorder behaviour
-          from F34/F35 and is the correct model for items with supply
-          constraints (e.g. items with no Inventory Flow data that received
-          a zero-OH placeholder).
+          in W+1, W+2, W+3 at a decaying rate as the replenishment urgency
+          fades.  The linear 25%-per-week decay expires naturally in 4 weeks.
 
     `inv_flow` dict (passed by caller from `fetch_inv_flow_qb_rest()` output):
         {
