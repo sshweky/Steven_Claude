@@ -5710,77 +5710,123 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None,
         "used_default":   _used_lt_default,
     }
 
+    # WOS target for MODE A restock calc.  Default to 8.0 (AMZ_WOS_TARGET_MIN
+    # == RTL_WOS_TARGET == 8.0); caller may pass a different value.
+    _wos_target = float(wos_target or 8.0)
+
+    # MODE A: restock-to-WOS -- only when DC inv is known.
+    # If weekly_rate is missing/zero, fall back to mean of non-zero fcst values
+    # so we always have a usable rate when DC inv was supplied.
+    _use_restock = (customer_dc_inv is not None)
+    _weekly_rate = float(weekly_rate or 0)
+    if _use_restock and _weekly_rate <= 0:
+        _nz = [v for v in fcst if v > 0]
+        _weekly_rate = sum(_nz) / len(_nz) if _nz else 0.0
+    if _use_restock and _weekly_rate <= 0:
+        # Rate is genuinely zero; restock demand would always be 0.
+        # Fall through to decay cohort mode so at least a 75/50/25 backlog fires.
+        _use_restock = False
+
     adjusted         = list(fcst)
     adjustments      = []
-    # Backlog cohorts: list of (original_unmet, step).
-    #   original_unmet -- the shortfall qty at the week the cohort was born.
-    #   step           -- which rollforward week this is (1, 2, or 3).
-    #
-    # Contribution schedule (always from original, linear 25% decay each week):
-    #   step=1  W+1: original × 0.75
-    #   step=2  W+2: original × 0.50
-    #   step=3  W+3: original × 0.25
-    #   step=4+    : 0 -- cohort has expired naturally
-    #
-    # "Expire by itself in 4 weeks": the cohort is born in week W and is done
-    # after step=3 (W+3).  No value is carried into W+4 or beyond.
-    backlog_cohorts  = []   # [(original_unmet, step), ...]
 
-    for w in range(min(26, len(fcst))):
-        # --- Step 1: consume active backlog cohorts ---
-        # Each cohort contributes original_unmet × (1 - step×0.25) this week.
-        # A cohort at step=3 is its last application; it expires after.
-        backlog_demand = 0.0
-        next_cohorts   = []
-        for orig_unmet, step in backlog_cohorts:
-            contribution = orig_unmet * (1.0 - step * 0.25)
-            if contribution > 0:
-                backlog_demand += contribution
-            if step < 3:
-                next_cohorts.append((orig_unmet, step + 1))
-            # step == 3 was the last application (0.25×orig); cohort now expired
-        backlog_cohorts = next_cohorts
+    # ── MODE A: Restock-to-WOS ──────────────────────────────────────────────
+    if _use_restock:
+        _was_constrained = False   # True when a prior constrained streak is active
 
-        orig_demand  = float(fcst[w])
-        total_demand = orig_demand + backlog_demand
+        for w in range(min(26, len(fcst))):
+            orig_demand = float(fcst[w])
 
-        # --- Step 2: horizon gate ---
-        # Weeks at or beyond LT+Trans horizon are unconstrained (can still PO).
-        # Backlog demand IS included in unconstrained weeks -- the retailer
-        # re-orders deferred qty regardless of warehouse lead time.
-        if (w + 1) >= _lt_trans_weeks:
-            adjusted[w] = int(round(total_demand))
-            continue
+            # Horizon gate: unconstrained weeks — can still place a PO.
+            # No restock needed; leave AI forecast unchanged.
+            if (w + 1) >= _lt_trans_weeks:
+                adjusted[w] = int(round(orig_demand))
+                _was_constrained = False
+                continue
 
-        # --- Step 3: warehouse capacity cap ---
-        # Capacity = QB-formula Beg Inv for this week + receipts - open orders.
-        # BegInv_W[w] comes directly from Inventory Flow (QB formula field),
-        # NOT simulated from the prior week.
-        # Open Orders are committed customer POs; they take priority.
-        beg_inv_w = beg_inv_wks[w]
-        capacity  = max(0.0, beg_inv_w + rcv[w] - opn[w])
-        ship      = min(total_demand, capacity)
-        adjusted[w] = int(round(ship))
+            beg_inv_w = beg_inv_wks[w]
+            capacity  = max(0.0, beg_inv_w + rcv[w] - opn[w])
 
-        # --- Step 4: rollforward cohort for unmet demand ---
-        # Unmet demand creates a new cohort born at step=1, which will apply
-        # at 75% / 50% / 25% of the original shortfall over the next 3 weeks,
-        # then expire.  Ignore sub-unit noise to avoid trivial cohorts.
-        unmet = total_demand - ship
-        if unmet >= 1.0:
-            backlog_cohorts.append((unmet, 1))
+            # First week back in stock after a constrained streak: add
+            # restock demand to bring customer DC up to wos_target weeks.
+            # Fires exactly ONCE per streak (resets _was_constrained here).
+            restock_demand = 0.0
+            if _was_constrained and capacity > 0:
+                restock_demand = max(0.0, _wos_target * _weekly_rate - customer_dc_inv)
+                _was_constrained = False   # streak ends; restock only fires once
 
-        # Record adjustment whenever the shipped qty differs from the original
-        # AI forecast (either due to cap or due to backlog being added then capped).
-        if adjusted[w] != int(round(orig_demand)):
-            adjustments.append({
-                "week":     w + 1,
-                "original": int(round(orig_demand)),
-                "backlog":  int(round(backlog_demand)),
-                "adjusted": adjusted[w],
-                "capacity": int(round(capacity)),
-                "beg_inv":  int(round(beg_inv_w)),
-            })
+            total_demand = orig_demand + restock_demand
+            ship         = min(total_demand, capacity)
+            adjusted[w]  = int(round(ship))
+
+            # Update constrained flag for next week
+            if capacity <= 0:
+                _was_constrained = True    # still out of stock
+            elif ship < orig_demand:
+                _was_constrained = True    # couldn't fill even normal demand
+
+            if adjusted[w] != int(round(orig_demand)):
+                adjustments.append({
+                    "week":          w + 1,
+                    "original":      int(round(orig_demand)),
+                    "backlog":       int(round(restock_demand)),
+                    "adjusted":      adjusted[w],
+                    "capacity":      int(round(capacity)),
+                    "beg_inv":       int(round(beg_inv_w)),
+                    "restock_mode":  True,
+                })
+
+    # ── MODE B: Decay cohort rollforward (no DC inv data) ───────────────────
+    else:
+        # Backlog cohorts: list of (original_unmet, step).
+        #   original_unmet -- shortfall qty at the week the cohort was born.
+        #   step           -- rollforward week (1, 2, or 3).
+        # Contribution: original × (1 - step × 0.25)
+        #   step=1 → 0.75×orig,  step=2 → 0.50×orig,  step=3 → 0.25×orig.
+        # step=3 is the last application; cohort expires after.
+        backlog_cohorts = []   # [(original_unmet, step), ...]
+
+        for w in range(min(26, len(fcst))):
+            # Consume active cohorts this week
+            backlog_demand = 0.0
+            next_cohorts   = []
+            for orig_unmet, step in backlog_cohorts:
+                contribution = orig_unmet * (1.0 - step * 0.25)
+                if contribution > 0:
+                    backlog_demand += contribution
+                if step < 3:
+                    next_cohorts.append((orig_unmet, step + 1))
+                # step == 3 was last application; cohort expires
+            backlog_cohorts = next_cohorts
+
+            orig_demand  = float(fcst[w])
+            total_demand = orig_demand + backlog_demand
+
+            # Horizon gate: unconstrained — backlog still folded in so the
+            # deferred re-order volume is visible.
+            if (w + 1) >= _lt_trans_weeks:
+                adjusted[w] = int(round(total_demand))
+                continue
+
+            beg_inv_w = beg_inv_wks[w]
+            capacity  = max(0.0, beg_inv_w + rcv[w] - opn[w])
+            ship      = min(total_demand, capacity)
+            adjusted[w] = int(round(ship))
+
+            # New cohort for unmet demand (born at step=1)
+            unmet = total_demand - ship
+            if unmet >= 1.0:
+                backlog_cohorts.append((unmet, 1))
+
+            if adjusted[w] != int(round(orig_demand)):
+                adjustments.append({
+                    "week":     w + 1,
+                    "original": int(round(orig_demand)),
+                    "backlog":  int(round(backlog_demand)),
+                    "adjusted": adjusted[w],
+                    "capacity": int(round(capacity)),
+                    "beg_inv":  int(round(beg_inv_w)),
+                })
 
     return adjusted, adjustments, lt_info
 
