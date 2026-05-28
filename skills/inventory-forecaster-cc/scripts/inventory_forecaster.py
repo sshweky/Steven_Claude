@@ -5546,35 +5546,27 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
           "lt_trans_days": float,       # LT+ Trans Days (FID 225); 0 means missing
         }
 
-    KEY METHODOLOGY (2026-05-26 correction):
+    KEY METHODOLOGY (Beg Inv -- unchanged from v2):
         Beg Inv for each week comes directly from the QB-formula fields in the
         Inventory Flow table (INV_FLOW_BEG_FIDS in viewer.html).  These fields
         are computed by QB against actual planner-managed inventory data.  Do
-        NOT simulate/cascade from Wk1 -- that approach compounded errors week
-        over week because it used AI demand as surrogate ship qty.
+        NOT simulate/cascade from Wk1.
 
         capacity_w = max(0, BegInv_W[w] + rcv[w] - opn[w])
 
         where BegInv_W[w] = beg_inv_wks[w] (directly from QB).
 
-    LT+Trans horizon gate (2026-05-26):
-        For any forecast week W that falls on or AFTER the LT+Trans Days
-        horizon (converted to weeks by ceiling division), the inventory cap is
-        NOT applied.  The reasoning: if W >= ceil(lt_trans_days / 7), we can
-        still place a purchase order today and receive the goods by that week,
-        so the current inventory position is irrelevant.  The cap only
-        constrains the "no-order window" -- weeks so near-term that any new
-        PO would arrive too late to help.
+    LT+Trans horizon gate:
+        Weeks at or beyond the LT+Trans Days horizon are unconstrained --
+        a new PO placed today would arrive in time so warehouse position is
+        irrelevant.  Backlog demand IS still folded into unconstrained weeks
+        (the retailer will re-order the deferred qty regardless of lead time).
 
         If lt_trans_days is 0 or missing, a conservative DEFAULT of 150 days
         (~22 weeks) is used and a flag is set so the planner can be alerted.
 
-    Per-week math (within the no-order window):
-        capacity_w = max(0, BegInv_W[w] + rcv[w] - opn[w])
-        ship_w     = min(demand_w, capacity_w)
-
-    Open Orders take priority over forecast demand (Open Orders are confirmed
-    customer POs that MUST ship; they're deducted from capacity).
+    Open Orders take priority over forecast demand (confirmed customer POs
+    that MUST ship; deducted from capacity before AI demand is considered).
 
     `inv_flow=None` -> skip F37 entirely (backwards-compat for callers without
     Inv Flow data, e.g. unit tests).
