@@ -8599,7 +8599,7 @@ async function npmSave() {
 
     // Build a minimal stub record and prepend so it appears first in the table
     const stub = {
-      key:    newKey,
+      key:    savedKey,
       mstyle: mstyle,
       cust:   custName,
       acct_num: acct.acct,
