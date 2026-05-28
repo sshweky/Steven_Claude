@@ -2211,3 +2211,75 @@ NameError: name '_f59h_opo' is not defined. Did you mean: '_f59h_wos'?
 
 [2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 2262 mstyles ...
   [watchdog] still running -- 39s since last output | last: [2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 2262 mstyles
+  [watchdog] still running -- 99s since last output | last: [2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 2262 mstyles
+      2259 mstyles with Inv Flow data loaded (QB REST API)
+      viewer_amz_cache.json refreshed (1653 mstyles)
+
+[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 5480 keys (w1_date=2026-05-24) ...
+      [vp-q4] BULK fetch: running QB report #27 on table bp8r4dejr (replaces per-account loop) ...
+      [vp-q4] 10,790 rows in 4.4s (1 API call vs ~137 per-account calls)
+      [vp-q4] cached ΓåÆ open_pos_report.json (reused for 0h)
+      [vp-q4] bucketed 8,373 in-scope rows across 1,754 keys (skipped: 2,347 out-of-scope ┬╖ 0 zero-qty ┬╖ 0 no-date ┬╖ 70 outside-26w)
+      1754 keys have confirmed forward POs (total open qty: 1,320,164 units)
+
+[2.9] VP-ATS: fetching ATS L26W history for 2262 mstyles ...
+      [vp-ats] fetching ATS L26W history from bv2sxg2ji (2262 mstyles) ...
+      [vp-ats] 265 mstyles with ATS history loaded  (735 filtered out)
+      265 mstyles loaded, 182 with at least one non-zero ATS week
+
+[F70] Switchover index: 57 base style(s) have active variant conflicts
+         34 variant style(s) have base-territory pre-switchover weeks to zero (F70b)
+         29 base style(s) vacated (variant in scope, base manual all-zeros -- F70c)
+      Mstyle-family index: 2015 mstyles with active siblings
+      Customer-baseline  : 119 customers  (global median wk-rate: 27.0)
+      Account-cadence    : 105 accounts indexed
+
+[3/3] Validating manual projections for 5480 records ...
+Traceback (most recent call last):
+  File "C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 18085, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 17074, in main
+    val_results = run_validation(rows, master_pack, args, amazon_pos=amazon_pos,
+                                 amazon_catalog_us=amazon_catalog_us,
+    ...<6 lines>...
+                                 vacated_bases=vacated_base_index,
+                                 inv_flow_data=inv_flow_data)
+  File "C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 14981, in run_validation
+    fr = forecast_record(row, master_pack, account_interval=acct_iv,
+                         amazon_pos=amazon_pos, season_map=season_map,
+    ...<5 lines>...
+                         vacated_bases=vacated_base_index,
+                         inv_flow_data=inv_flow_data)
+  File "C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 14260, in forecast_record
+    if isinstance(fcst, list) and isinstance(_effective_po_wk, list):
+                                             ^^^^^^^^^^^
+NameError: name '_opn_row_wk' is not defined. Did you mean: 'open_po_wk'?
+
+  [watchdog] Process exited with code 1.
+  [watchdog] Restarting (inner attempt 2/3) ...
+
+============================================================
+  [watchdog] Starting forecaster (inner attempt 2/3)
+============================================================
+  [auto-throttle] --all detected ΓåÆ workers=2, rate_limit_ms=150, bulk_writeback=on
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster ΓÇö Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_24_W1 -> 11_15_W26
+
+[1/4] Pulling projections from Quickbase ...
+      [QB REST] fetching field map ...
+      [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+  [watchdog] still running -- 31s since last output | last:       [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+      5480 records retrieved (QB REST API)
+
+[1.5] Amazon switchover auto-link + Switchover_Date backfill ...
+      [Switchover] Alerts (no variant projections): 28 record(s)
+
+[2/4] Pulling master pack + Season from Styles ...
+      [QB REST] fetching Styles field map ...
