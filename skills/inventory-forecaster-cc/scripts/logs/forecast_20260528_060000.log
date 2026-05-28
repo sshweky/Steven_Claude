@@ -2210,3 +2210,4 @@ NameError: name '_f59h_opo' is not defined. Did you mean: '_f59h_wos'?
       572 acct-mstyle combos with retailer POS data
 
 [2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 2262 mstyles ...
+  [watchdog] still running -- 39s since last output | last: [2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 2262 mstyles
