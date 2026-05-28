@@ -2910,9 +2910,9 @@ function toggleDetail(key) {{
     const aiDiff = aiVal - w.projection;
     const aiCls  = aiDiff > 0 ? 'color:#2e7d32' : aiDiff < 0 ? 'color:#c62828' : 'color:#888';
     aiCells   += `<td style="${{aiCls}};font-weight:600">${{fmtN(aiVal)}}</td>`;
-    const opnVal = (r.opn_w || [])[i] || 0;
-    opnTot    += opnVal;
-    opnCells  += `<td style="${{opnVal === 0 ? 'color:#bbb' : 'color:#6d4c00;font-weight:600'}};font-size:10px">${{fmtN(opnVal)}}</td>`;
+    // 2026-05-28: opn_w (Opn_W1..Opn_W26) was always zero (broken process).
+    // Per-week cells show dashes; total column shows Cust Open PO Qty# with hover.
+    opnCells  += `<td style="color:#bbb;font-size:10px;background:#fefaf3">—</td>`;
     const lyOrdVal = lyOrd[i] || 0;
     lyOrdTot += lyOrdVal;
     lyOrdCells += `<td style="${{lyOrdVal === 0 ? 'color:#bbb' : 'color:#2e7d32'}};font-size:10px">${{fmtN(lyOrdVal)}}</td>`;
