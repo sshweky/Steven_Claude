@@ -271,9 +271,9 @@ textarea.inp{resize:vertical;min-height:36px}
     <p>Enter your QB User Token to auto-populate style data from ProductTrack (Styles table). Your token is stored only in this browser's local storage.</p>
     <div class="form-grid" style="grid-template-columns:100px 1fr;margin-bottom:12px">
       <label>QB Realm:</label>
-      <input class="inp" type="text" id="qbRealm" value="pim.quickbase.com" placeholder="your-realm.quickbase.com">
+      <input class="inp" type="text" id="qbRealm" value="pim.quickbase.com" placeholder="your-realm.quickbase.com" autocomplete="url">
       <label>User Token:</label>
-      <input class="inp" type="password" id="qbTokenInput" placeholder="b39re4_xxxx...">
+      <input class="inp" type="password" id="qbTokenInput" placeholder="b39re4_xxxx..." autocomplete="current-password">
     </div>
     <div style="display:flex;gap:8px;margin-top:4px">
       <button class="btn btn-green" onclick="saveToken()">Save &amp; Connect</button>
@@ -630,7 +630,7 @@ function renderStylesTable(){
       <td style="min-width:180px">
         <div class="ta-wrap">
           <input class="inp" type="text" id="ta-input-${i}" value="${esc(st.num)}"
-            placeholder="Type to search styles..." autocomplete="off"
+            placeholder="Type to search styles..." autocomplete="one-time-code"
             oninput="onStyleSearch(this,${i})"
             onfocus="onStyleFocus(this,${i})"
             onblur="setTimeout(()=>closeTA(${i}),200)"
