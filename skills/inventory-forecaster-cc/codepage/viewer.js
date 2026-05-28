@@ -5381,6 +5381,16 @@ async function _loadOpenOrderDetails(r, safeId) {
     const _sv  = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
     const _num = (rec, fid) => parseFloat(_sv(rec, fid) || 0) || 0;
 
+    // OPN_FIDS[0] = Wk0 (past-due), OPN_FIDS[1] = Wk1, OPN_FIDS[2] = Wk2, ...
+    // Inv Flow display merges Wk0+Wk1 into W1 (i=0); W2..W26 = Wk2..Wk26 (i=1..25).
+    // For i=0: sum opnFids[0]+opnFids[1] (Wk0+Wk1).
+    // For i>=1: use opnFids[i+1] (Wk(i+1)), i.e. offset by 1 relative to display index.
+    const _qtyForDisplayWk = (rec, wi) => {
+      if (wi === 0) return _num(rec, opnFids[0]) + (opnFids.length > 1 ? _num(rec, opnFids[1]) : 0);
+      const fidIdx = wi + 1;
+      return fidIdx < opnFids.length ? _num(rec, opnFids[fidIdx]) : 0;
+    };
+
     for (let i = 0; i < 26; i++) {
       const cell = document.getElementById('opn-cell-' + safeId + '-' + i);
       if (!cell) continue;
@@ -5389,7 +5399,7 @@ async function _loadOpenOrderDetails(r, safeId) {
       const custEntries = [];
       let weekTotal = 0;
       for (const rec of data) {
-        const qty = _num(rec, opnFids[i]);
+        const qty = _qtyForDisplayWk(rec, i);
         if (qty <= 0) continue;
         const cust = (String(_sv(rec, custFid) || '')).trim() || 'Customer';
         custEntries.push({ cust, qty });
