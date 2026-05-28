@@ -654,9 +654,11 @@ def analyze_comment(comment, projection, man_fids, note_fid, l4w_fid):
     key  = sval(comment, C_ACCT_MSTYLE)
     note = sval(comment, note_fid) if note_fid else ""
     ts   = sval(comment, C_DATE)
+    rid  = fval(comment, C_RECORD_ID)
 
     if not projection:
         return {
+            "comment_rid": int(rid) if rid else None,
             "key": key, "note": note, "ts": ts,
             "intent": "unknown", "fit": "no_projection",
             "diagnosis": "No matching projection record found.",
