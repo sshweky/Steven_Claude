@@ -410,7 +410,7 @@ def classify_intent(note, key="", ai_model="", ai_total=0, man_total=0):
     LLM call fails or the key isn't present.  Logs which path was used so
     the operator can verify the LLM actually ran.
     """
-    api_key_present = bool(os.environ.get("ANTHROPIC_API_KEY"))
+    api_key_present = bool(_get_anthropic_api_key())
     if api_key_present:
         llm_label = classify_intent_llm(note, key=key, ai_model=ai_model,
                                         ai_total=ai_total, man_total=man_total)
