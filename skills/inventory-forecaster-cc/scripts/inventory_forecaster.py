@@ -8870,6 +8870,40 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         or (_f73_sc_new and _f73_l26_nz_wks <= 13)         # Status=NEW, still ramping
     )
 
+    # F_HOLD — Hard short-circuit for Status @ Cust = "A: HOLD" (planner
+    # directive, 2026-05-27).  The planner has explicitly paused this record
+    # pending a decision; the AI should not generate any forecast.  Returns
+    # zeros across all 26 weeks with a clear "On Hold" model label so the
+    # narrative explains why no projection appears.  Runs before every other
+    # routing rule so no downstream logic (POS-WOS, Croston, ramp, F37, etc.)
+    # can override it.
+    _sc_upper = (row.get("Status_Cust") or "").upper().strip()
+    if _sc_upper == "A: HOLD" or _sc_upper.startswith("A: HOLD"):
+        _fire("F_HOLD")
+        _hold_manual = [float(row.get(c) or 0) for c in ORIG_PRJ_COLS]
+        _hold_prior  = sum(_hold_manual)
+        return {
+            "key":         row.get("Acct_MStyle_Key_", ""),
+            "mstyle":      row.get("Mstyle", ""),
+            "cust":        cust_name,
+            "mp":          mp,
+            "model":       "On Hold (Status @ Cust = A: HOLD)",
+            "biweekly":    False,
+            "iso":         False,
+            "iso_settle":  False,
+            "forecast":    [0] * 26,
+            "manual":      _hold_manual,
+            "cap_base":    0,
+            "new_total":   0,
+            "prior_total": _hold_prior,
+            "pct_diff":    100 if _hold_prior > 0 else 0,
+            "alert":       (
+                "F_HOLD: Status @ Cust is 'A: HOLD' -- planner has paused this "
+                "record pending a decision. AI forecast suppressed; W1-W26 = 0. "
+                "Change Status_Cust to a non-HOLD value to re-enable forecasting."
+            ),
+        }
+
     # R1 — One-Time-Buy detection (2026-04-22).  Off-price / closeout retailers
     # (Burlington, Ross, Kohl's, CVS closeout, Variety Wholesalers, etc.) often
     # have L52W history of 1-4 big orders with nothing in between.  Sparse
