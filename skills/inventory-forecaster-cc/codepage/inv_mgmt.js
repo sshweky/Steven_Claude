@@ -1837,11 +1837,9 @@ function renderDetail(r) {
         var cardBg     = ss.checked ? '#f1f8e9' : '#fff';
         var hdrBg      = s.key === 'main' ? '#283593' : '#3f51b5';
 
-        // Default ETD: receipt date minus this supplier's lead time
-        var defaultEtd = ss.etd || (_rcptIso && s.lt ? (function(){
-          var d = new Date(_rcptIso); d.setDate(d.getDate() - s.lt);
-          return d.toISOString().slice(0,10);
-        })() : '');
+        // Default ETD: same receipt-needed-by date for all suppliers
+        // (supplier knows their own lead time; we communicate one target date)
+        var defaultEtd = ss.etd || _rcptIso;
 
         var cardId    = 'suppCard_'+_msId+'_'+s.key;
         var inputsId  = 'suppInputs_'+_msId+'_'+s.key;
