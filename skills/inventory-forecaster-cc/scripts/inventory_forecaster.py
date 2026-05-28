@@ -2693,6 +2693,11 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
         # Skip both F6b and F26 -- let the L13 nz-avg baseline stand;
         # downstream smoothing handles the recovery pace.
         _f6_applied = "F50_stockout_skip"
+    elif is_offprice:
+        # Off-price accounts routinely have quiet L4 windows between seasonal
+        # buys -- this is their normal order cadence, not demand decay.
+        # Skip F6b/F26/F27 so the L26 baseline is not penalized for a gap.
+        _f6_applied = "offprice_skip"
     elif (len(_l4_nz_f6) >= 2 and len(_l13_nz_f6) >= 3):
         _l4_avg_f6  = sum(_l4_nz_f6)  / len(_l4_nz_f6)
         _l13_avg_f6 = sum(_l13_nz_f6) / len(_l13_nz_f6)
