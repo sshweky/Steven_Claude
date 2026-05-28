@@ -5185,24 +5185,7 @@ async function toggleDetail(key) {
     }
   }
 
-  // Sticky summary bar -- stays pinned below topbar+toolbar as the user scrolls
-  // through the expanded detail panel.  Shows the key identity fields so the
-  // planner always knows which record they are looking at.
-  const _sumCustLabel = _friendlyCustName(r.cust || '');
-  const _sumDesc      = (r.desc || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-  const _summaryBarHtml = `
-    <div style="position:sticky;top:var(--frozen-h,90px);z-index:10;
-                background:#fff;border-bottom:1px solid #e0e0e0;
-                padding:4px 14px;display:flex;align-items:center;gap:14px;
-                font-size:12px;box-shadow:0 2px 4px rgba(0,0,0,0.06);">
-      <span style="font-weight:700;color:#4a148c;letter-spacing:0.2px;">${_esc(r.key)}</span>
-      <span style="color:#444;">${_sumCustLabel}</span>
-      <span style="color:#555;font-weight:600;">${_esc(r.mstyle)}</span>
-      ${_sumDesc ? `<span style="color:#888;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${_sumDesc}">${_sumDesc}</span>` : ''}
-    </div>`;
-
   el.innerHTML = `<td colspan="23" style="padding:0">
-    ${_summaryBarHtml}
     ${poPrjAlertHtml}
     ${autoProjectBtn}
     ${fdStatusHtml}
