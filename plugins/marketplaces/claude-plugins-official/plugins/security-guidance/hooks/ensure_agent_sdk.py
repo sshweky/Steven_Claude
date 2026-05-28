@@ -28,7 +28,9 @@ NOOP_SYSTEM = 0      # claude_agent_sdk already importable in system python
 NOOP_VENV = 1        # venv already built and SDK imports from it
 BUILT = 2            # venv created + SDK pip-installed this run
 BUILD_FAILED = 3     # venv create or pip install raised/timed out
-SKIP_WIN32 = 4       # Windows; consumer glob doesn't handle Lib/ layout
+# Outcome 4 was previously SKIP_WIN32; retired now that the consumer glob in
+# llm.py also matches Windows venv layout (Lib/site-packages). Don't reuse the
+# value — telemetry rows from older plugin builds still emit 4.
 SKIP_SENTINEL = 5    # another SessionStart is currently building
 
 
@@ -60,13 +62,6 @@ def main() -> tuple[int, str, str]:
     err_phase / err_kind are non-empty only on BUILD_FAILED — they let
     telemetry split bootstrap failures by root cause.
     """
-    # Windows venv layout (Lib/site-packages, no python* subdir) isn't
-    # handled by the consumer's glob in security_reminder_hook.py; skip the
-    # bootstrap entirely rather than build a venv that's never read.
-    if sys.platform == "win32":
-        return SKIP_WIN32, "", ""
-
-
     if _sdk_on_syspath():
         return NOOP_SYSTEM, "", ""
 
@@ -75,7 +70,11 @@ def main() -> tuple[int, str, str]:
         or os.path.expanduser("~/.claude/security")
     )
     venv = state_dir / "agent-sdk-venv"
-    venv_py = venv / "bin" / "python"
+    # Windows venvs put the interpreter at Scripts\python.exe; POSIX uses bin/python.
+    if sys.platform == "win32":
+        venv_py = venv / "Scripts" / "python.exe"
+    else:
+        venv_py = venv / "bin" / "python"
 
     # Another SessionStart (concurrent CC instance, same plugin) may already
     # be building. The sentinel lives NEXT TO the venv, not inside it —
@@ -125,10 +124,20 @@ def main() -> tuple[int, str, str]:
         # the user's machine, pip's own default registry applies — that's the same
         # exposure the user would have running `pip install` themselves, so
         # we're not widening the supply-chain surface.
+        #
+        # --prefer-binary: on ARM64 Windows, pip's default resolver picks a
+        # `cryptography` version with no published binary wheel and tries to
+        # build from source, which needs Rust/Cargo (almost never present
+        # on user machines). The build fails and the whole bootstrap returns
+        # BUILD_FAILED. A binary wheel exists on PyPI for an adjacent
+        # version (`cryptography-46.0.3-cp311-abi3-win_arm64.whl`);
+        # --prefer-binary tells pip to pick it. Cross-platform safe: no-op
+        # on platforms where the latest version already has a wheel.
         err_phase = "pip"
         subprocess.run(
             [str(venv_py), "-m", "pip", "install", "--quiet",
-             "--disable-pip-version-check", "claude-agent-sdk"],
+             "--disable-pip-version-check", "--prefer-binary",
+             "claude-agent-sdk"],
             capture_output=True, timeout=120, check=True,
         )
         return BUILT, "", ""

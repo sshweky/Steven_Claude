@@ -31,6 +31,67 @@ from _base import debug_log, _record_usage, _PV, PROVENANCE_TAG  # noqa: F401
 from session_state import with_locked_state
 
 
+def _inject_agent_sdk_venv_into_syspath(state_dir):
+    """Prepend the agent-SDK venv's site-packages to sys.path so the SDK
+    import below picks it up when the user's system Python doesn't have it.
+
+    Called from two fallback sites (3P SDK + agentic_review); shared here so
+    Windows pywin32 handling stays in one place.
+
+    Returns True if any path was added.
+
+    POSIX venv layout: `agent-sdk-venv/lib/pythonX.Y/site-packages`
+    Windows venv layout: `agent-sdk-venv/Lib/site-packages` (capital L, no
+    pythonX.Y subdir). The SDK transitively imports pywin32 on Windows, and
+    pywin32's `.pth` files (which add `win32/`, `win32/lib/` to sys.path and
+    register the DLL search dir via `pywin32_bootstrap.py`) are processed
+    ONLY by Python's `site.py` at interpreter startup — not when we manually
+    insert a path here. Without the bootstrap, the SDK's
+    `mcp.client.stdio → mcp.os.win32.utilities → pywintypes` import chain
+    fails with `ModuleNotFoundError: pywintypes` and the agentic reviewer
+    falls back to single-shot silently. Replicate what site.py would do.
+    """
+    venv_root = os.path.join(state_dir, "agent-sdk-venv")
+    candidates = (
+        glob.glob(os.path.join(venv_root, "lib", "python*", "site-packages"))
+        + glob.glob(os.path.join(venv_root, "Lib", "site-packages"))
+    )
+    added = False
+    for sp in candidates:
+        if not os.path.isdir(sp) or sp in sys.path:
+            continue
+        sys.path.insert(0, sp)
+        added = True
+        if sys.platform == "win32":
+            _bootstrap_pywin32(sp)
+    return added
+
+
+def _bootstrap_pywin32(site_packages_dir):
+    """Manually replicate the pywin32 `.pth` bootstrap so a venv added via
+    `sys.path.insert()` (not site.py) can still import `pywintypes`. No-op
+    when the venv doesn't include pywin32. Failures are swallowed — the
+    SDK import below will raise its own ImportError and the caller's
+    fallback path handles it cleanly."""
+    try:
+        win32 = os.path.join(site_packages_dir, "win32")
+        win32_lib = os.path.join(win32, "lib")
+        for d in (win32, win32_lib):
+            if os.path.isdir(d) and d not in sys.path:
+                sys.path.insert(0, d)
+        bootstrap = os.path.join(win32_lib, "pywin32_bootstrap.py")
+        if os.path.isfile(bootstrap):
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(
+                "pywin32_bootstrap", bootstrap,
+            )
+            if spec and spec.loader:
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+    except Exception as e:
+        debug_log(f"pywin32 bootstrap failed (may break SDK import on Windows): {e}")
+
+
 # Plan Security Check Configuration
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 # OAuth access token — Claude Code passes this for /login users.
@@ -298,12 +359,7 @@ def _call_claude_via_sdk(prompt, output_schema, *, max_tokens=16000, model=None)
             "SECURITY_WARNINGS_STATE_DIR",
             os.path.expanduser("~/.claude/security"),
         )
-        for _sp in glob.glob(
-            os.path.join(_state_dir, "agent-sdk-venv", "lib",
-                         "python*", "site-packages")
-        ):
-            if os.path.isdir(_sp) and _sp not in sys.path:
-                sys.path.insert(0, _sp)
+        _inject_agent_sdk_venv_into_syspath(_state_dir)
         try:
             import asyncio as _asyncio  # noqa: F811
             from claude_agent_sdk import (  # noqa: F401,F811
@@ -1089,18 +1145,11 @@ def agentic_review(
         # ~/.claude/security/ with the SDK installed; try that as a fallback
         # before giving up. The system import is attempted first so users
         # who DO have it never touch the venv.
-        _venv_tried = False
         _state_dir = os.environ.get(
             "SECURITY_WARNINGS_STATE_DIR",
             os.path.expanduser("~/.claude/security"),
         )
-        for _sp in glob.glob(
-            os.path.join(_state_dir, "agent-sdk-venv", "lib",
-                         "python*", "site-packages")
-        ):
-            if os.path.isdir(_sp) and _sp not in sys.path:
-                sys.path.insert(0, _sp)
-                _venv_tried = True
+        _venv_tried = _inject_agent_sdk_venv_into_syspath(_state_dir)
         try:
             import asyncio as _asyncio  # noqa: F811
 
