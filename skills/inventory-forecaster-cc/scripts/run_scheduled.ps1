@@ -139,16 +139,21 @@ $HtmlBody = @"
 </div>
 "@
 
-# ── Send via Outlook COM ──────────────────────────────────────────────────────
+# ── Send via Python SMTP (no Outlook required) ────────────────────────────────
 try {
     Add-Type -AssemblyName System.Web | Out-Null
-    $Outlook = New-Object -ComObject Outlook.Application
-    $Mail    = $Outlook.CreateItem(0)
-    $Mail.To        = $MailTo
-    $Mail.Subject   = $Subject
-    $Mail.HTMLBody  = $HtmlBody
-    $Mail.Send()
-    "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email sent to $MailTo" |
+    $TempHtml = "$LogDir\forecast_email_$Timestamp.html"
+    [System.IO.File]::WriteAllText($TempHtml, $HtmlBody, [System.Text.Encoding]::UTF8)
+
+    $SendResult = & $Python "$ScriptDir\send_email.py" `
+        --to $MailTo `
+        --subject $Subject `
+        --body $HtmlBody `
+        --html 2>&1
+
+    Remove-Item $TempHtml -ErrorAction SilentlyContinue
+
+    "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email result: $SendResult" |
         Out-File $LogFile -Append -Encoding UTF8
 } catch {
     "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email send failed: $_" |

@@ -1753,44 +1753,27 @@ def _build_systemic_html(systemic_impacts, all_recs):
 
 
 # ---------------------------------------------------------------------------
-# Step 6 -- Send email via Outlook COM
+# Step 6 -- Send email via SMTP (Office 365, no Outlook required)
 # ---------------------------------------------------------------------------
 def send_email(subject, body_html, report_path, dry_run):
     if dry_run:
         print("  [DRY RUN] Email not sent.")
         return
 
+    # Use shared send_email.py utility (Office 365 SMTP, credentials from .env)
     try:
-        import win32com.client
-        outlook  = win32com.client.Dispatch("Outlook.Application")
-        mail     = outlook.CreateItem(0)
-        mail.To  = RECIPIENT
-        mail.Subject = subject
-        mail.HTMLBody = body_html
-        mail.Send()
-        print(f"  Email sent to {RECIPIENT}")
-        return
-    except ImportError:
-        pass
+        import sys as _sys
+        _scripts_dir = Path(__file__).parent
+        if str(_scripts_dir) not in _sys.path:
+            _sys.path.insert(0, str(_scripts_dir))
+        from send_email import send_email as _smtp_send
+        ok = _smtp_send(subject, body_html, to=RECIPIENT, is_html=True)
+        if ok:
+            print(f"  Email sent to {RECIPIENT}")
+            return
+        print(f"  [WARN] SMTP send returned failure — report saved at: {report_path}")
     except Exception as e:
-        print(f"  [WARN] Outlook COM failed: {e}. Trying SMTP fallback.")
-
-    # SMTP fallback (no auth -- relies on local relay or Exchange direct)
-    import smtplib
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = RECIPIENT
-    msg["To"]      = RECIPIENT
-    msg.attach(MIMEText(body_html, "html"))
-    try:
-        with smtplib.SMTP("localhost", 25, timeout=10) as s:
-            s.sendmail(RECIPIENT, [RECIPIENT], msg.as_string())
-        print(f"  Email sent via SMTP to {RECIPIENT}")
-    except Exception as e:
-        print(f"  [WARN] SMTP also failed: {e}")
-        print(f"  Report saved at: {report_path}")
+        print(f"  [WARN] SMTP send failed: {e} — report saved at: {report_path}")
 
 
 def build_email_html(analyses, all_recs, report_path, run_date, days,
