@@ -1481,6 +1481,7 @@ def fetch_projections_qb_rest(prj_cols, args):
          "PT_Item_Status", "Div", "Shpd_Wk_L13W_cust_", "Last_Ord_Date", "Last_Shp_Date",
          "Inventory_Manager", "Flagged", "Auto_Project", "POG_Launch_Date", "POG_End_Date",
          "Store_Count", "Estimated_ISO", "UPSPW",
+         "ISO_Ship_Date",               # FID 1060 — planner/request ISO shipment arrival date
          "Product_Category", "Product_Subcategory", "Brand",
          "Baseline_Override",           # FID 1614 — planner-set manual baseline (units/wk)
          "Baseline_Override_Date",      # FID 1615 — date the override was set; auto-expires after 30 days
@@ -10917,9 +10918,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _pog_iso_qty = _pog_est_iso if _pog_est_iso > 0 else (_pog_stores * mp)
                 _pog_iso_qty = snap(_pog_iso_qty, mp) if _pog_iso_qty >= mp else 0
 
-                # ISO ship week = 4 weeks before POG start; min 0 (W1)
-                _pog_iso_idx = max(0, _pog_w_idx_f - 4)
-                # Ramp always starts at POG start week (iso_ship + 4 = pog_week)
+                # ISO ship week: use ISO_Ship_Date if set, else default to POG - 4 weeks
+                _pog_iso_ship_str = (str(row.get("ISO_Ship_Date") or "")).strip()[:10]
+                if _pog_iso_ship_str:
+                    try:
+                        _pog_iso_date_f = date.fromisoformat(_pog_iso_ship_str)
+                        _pog_iso_idx    = max(0, (_pog_iso_date_f - _pog_w1_f).days // 7)
+                    except ValueError:
+                        _pog_iso_idx = max(0, _pog_w_idx_f - 4)  # bad date string
+                else:
+                    _pog_iso_idx = max(0, _pog_w_idx_f - 4)  # no date -> POG - 4 weeks
+                # Ramp always starts at POG start week regardless of when ISO ships
                 _pog_ramp_idx = _pog_w_idx_f
 
                 # --- ISO already placed? ---
@@ -11038,6 +11047,30 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         )
         except (ValueError, AttributeError, TypeError):
             pass   # malformed POG date or missing fields — fall through to normal model
+
+    # F_POG_MISSING_DATES — warn when an item looks like a new-store/POG setup
+    # (has Store Count, UPSPW, or Estimated ISO configured) but has NEITHER a
+    # POG Launch Date NOR an ISO Ship Date.  Without at least one anchor the
+    # ramp forecast above cannot fire.
+    _fmiss_iso_ship  = (str(row.get("ISO_Ship_Date") or "")).strip()[:10]
+    if (
+        not _pog_launch_str_f
+        and not _fmiss_iso_ship
+        and not is_amazon
+        and model not in ("Inactive", "OTB (zero)")
+    ):
+        _fmiss_stores = int(float(row.get("Store_Count") or 0))
+        _fmiss_upspw  = float(row.get("UPSPW") or 0)
+        _fmiss_iso_q  = int(float(row.get("Estimated_ISO") or 0))
+        if _fmiss_stores > 0 or _fmiss_upspw > 0 or _fmiss_iso_q > 0:
+            meta.setdefault("drivers", []).append(
+                "F_POG_MISSING_DATES WARNING: Store Count / UPSPW / ISO qty are set on this "
+                "record but neither POG Launch Date nor ISO Ship Date is present. "
+                "The new-store ramp forecast cannot be applied -- this item will NOT be "
+                "forecasted using the POG ramp model. "
+                "Action required: enter a POG Launch Date (ISO ship defaults to 4 wks prior) "
+                "or enter ISO Ship Date directly in the Inventory Plan block."
+            )
 
     # F_POG_END_ZERO / F_POG_END_WARN — POG End Date behavior (2026-05-26)
     # F_POG_END_ZERO: Status starts with "FD" (Future Delete) + POG End Date set
@@ -14470,6 +14503,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "auto_project":  bool(row.get("Auto_Project") in (True, 1, "true", "1", "yes")),
         "pog_launch":    (str(row.get("POG_Launch_Date") or ""))[:10],
         "pog_end":       (str(row.get("POG_End_Date") or ""))[:10],
+        "iso_ship_date": (str(row.get("ISO_Ship_Date") or ""))[:10],  # FID 1060
         "store_count":   int(float(row.get("Store_Count") or 0)),
         "estimated_iso": int(float(row.get("Estimated_ISO") or 0)),
         "upspw":         float(row.get("UPSPW") or 0),
@@ -14802,6 +14836,7 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         "auto_project":  bool(row.get("Auto_Project") in (True, 1, "true", "1", "yes")),
         "pog_launch":    (str(row.get("POG_Launch_Date") or ""))[:10],
         "pog_end":       (str(row.get("POG_End_Date") or ""))[:10],
+        "iso_ship_date": (str(row.get("ISO_Ship_Date") or ""))[:10],  # FID 1060
         "store_count":   int(float(row.get("Store_Count") or 0)),
         "estimated_iso": int(float(row.get("Estimated_ISO") or 0)),
         "upspw":         float(row.get("UPSPW") or 0),
