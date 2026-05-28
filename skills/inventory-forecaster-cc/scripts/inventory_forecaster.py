@@ -10916,8 +10916,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _pog_upspw   = float(row.get("UPSPW")              or 0)
                 _pog_est_iso = int(float(row.get("Estimated_ISO")  or 0))
 
-                # ISO qty: planner estimate first, then store count × mp
-                _pog_iso_qty = _pog_est_iso if _pog_est_iso > 0 else (_pog_stores * mp)
+                # ISO qty: planner estimate first, then store count x 1.5 MP (stocking standard)
+                _pog_iso_qty = _pog_est_iso if _pog_est_iso > 0 else int(round(_pog_stores * mp * 1.5))
                 _pog_iso_qty = snap(_pog_iso_qty, mp) if _pog_iso_qty >= mp else 0
 
                 # ISO ship week: use ISO_Ship_Date if set, else default to POG - 4 weeks
