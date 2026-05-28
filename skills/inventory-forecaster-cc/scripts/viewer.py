@@ -3032,6 +3032,21 @@ function toggleDetail(key) {{
     rcvCells += _rcv ? `<td style="font-weight:700;color:#1565c0;background:#f0f7ff">${{fmtN(rcvTot)}}</td>` : `<td style="color:#bbb;background:#f0f7ff">—</td>`;
     wosCells += `<td style="color:#bbb;background:#f8f0fb" title="WOS total is not meaningful">—</td>`;
 
+    // Open POs row — Msty Open PO Qty (all-customer mstyle total) with QB-style hover
+    // 2026-05-28: Uses Msty Open PO Qty (FID 803) rich-text field; hover mimics
+    // QB's per-customer PO detail breakdown.  Per-week cells are dashes -- this
+    // is a mstyle-level total, not distributed across weeks in the viewer.
+    const _mstyOpnQty   = r.msty_open_po_qty || 0;
+    const _mstyOpnHvr   = (r.msty_open_po_hover || '').replace(/"/g, '&quot;').replace(/\n/g, '&#10;');
+    const _mstyOpnTAttr = _mstyOpnHvr ? ` title="${{_mstyOpnHvr}}"` : '';
+    let opnIfCells = `<td class="row-label" style="color:#5d1a7e;font-weight:600;background:#fdf4ff" title="Open POs for this mstyle across all accounts — hover the total cell for per-customer detail">Open POs (all accts)</td>`;
+    for (let _oi = 0; _oi < 26; _oi++) {{
+      opnIfCells += `<td style="color:#bbb;font-size:10px;background:#fdf4ff">—</td>`;
+    }}
+    opnIfCells += _mstyOpnQty > 0
+      ? `<td style="font-weight:700;color:#5d1a7e;background:#fdf4ff"${{_mstyOpnTAttr}}>${{fmtN(_mstyOpnQty)}}</td>`
+      : `<td style="color:#bbb;background:#fdf4ff">—</td>`;
+
     // Gap banner — Replen items only
     let gapBannerHtml = '';
     if (_hasInvFlow && _optWos > 0 && _isReplen) {{
