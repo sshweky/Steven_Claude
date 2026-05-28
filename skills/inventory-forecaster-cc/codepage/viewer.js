@@ -430,102 +430,96 @@ async function discoverOrdHistFids() {
     cust_name: ORD_HIST_CUST_NAME_FID });
 }
 
-// -- Daily Metrics (brgxdpadi) field discovery + L1W/L2W POS fetch -----------
-// Discovers FIDs once via /fields; then queries the last 14 days of daily data
-// for the given mstyle (or ASIN if no mstyle field exists) and returns weekly
-// ordered-unit totals for L1W (days 1-7 before W1_DATE) and L2W (days 8-14).
-async function _discoverDailyMetricsFids() {
+// -- Daily Metrics (brgxdpadi) setup + full POS/OH weekly history fetch ------
+// FIDs are hardcoded from QB_CONFIG (DATE=81, POS_UNITS=162, MSTYLE=213, OH_UNITS=79).
+// Fetches 13 weeks of daily data, groups by Sunday-week, returns:
+//   { l1w, l2w, weeks: [{weekStart:'YYYY-MM-DD', pos, oh}, ...] }  newest-first.
+// L1W = most recent completed Sun-Sat week before W1_DATE.
+// L2W = the week before that.
+// OH is the last (most recent) daily snapshot within each Sun-Sat week.
+function _initDailyMetricsFids() {
   if (_dmFidsDone) return;
-  _dmFidsDone = true;                        // set before await so parallel calls don't double-fetch
-  const tid = CFG.DAILY_METRICS_TID;
-  if (!tid) return;
-  try {
-    const fields = await qbGet(`/fields?tableId=${tid}`);
-    for (const f of (fields || [])) {
-      // Normalize: lowercase, collapse whitespace+underscores, trim trailing underscore
-      const lbl = (f.label || '').trim().toLowerCase()
-                    .replace(/[\s_]+/g, '_').replace(/_+$/g, '');
-      const id  = f.id;
-      if (!id) continue;
-      if (['mstyle', 'model', 'mstyle_model', 'mstyle(model)'].includes(lbl)) {
-        _DM_MSTYLE_FID = _DM_MSTYLE_FID || id;   // keep first match
-      } else if (lbl === 'asin') {
-        _DM_ASIN_FID = id;
-      } else if (lbl === 'date') {
-        _DM_DATE_FID = id;
-      } else if (['ordered_units', 'ordered_units_', 'units'].includes(lbl)) {
-        _DM_UNITS_FID = id;
-      }
-    }
-    console.info('[DM] FIDs discovered:', {
-      mstyle: _DM_MSTYLE_FID, asin: _DM_ASIN_FID,
-      date: _DM_DATE_FID, units: _DM_UNITS_FID,
-    });
-  } catch (e) {
-    console.warn('[DM] field discovery failed:', e.message || e);
-  }
+  _dmFidsDone = true;
+  const fids = CFG.DAILY_METRICS_FID || {};
+  _DM_DATE_FID   = fids.DATE      || null;
+  _DM_UNITS_FID  = fids.POS_UNITS || null;
+  _DM_MSTYLE_FID = fids.MSTYLE   || null;
+  _DM_OH_FID     = fids.OH_UNITS  || null;
 }
 
-// Fetch L1W and L2W POS from Daily Metrics for the given mstyle.
-// Returns { l1w, l2w } (both in ordered units), or null on failure.
-// Called from _loadAmzDcInv() after the bqp8vz625 fetch completes.
-async function _fetchDmPosL1L2(mstyle, asinsFromCatalog) {
+async function _fetchDailyMetricsPOS(mstyle) {
+  _initDailyMetricsFids();
   const tid = CFG.DAILY_METRICS_TID;
-  if (!tid || !W1_DATE) return null;
-  await _discoverDailyMetricsFids();
-  if (!_DM_DATE_FID || !_DM_UNITS_FID) return null;
+  if (!tid || !W1_DATE || !_DM_DATE_FID || !_DM_UNITS_FID || !_DM_MSTYLE_FID) return null;
 
-  // Only need 14 days to compute L1W + L2W; a little buffer makes date math safe
-  const startDate = new Date(W1_DATE.getTime() - 15 * 86400000);
-  const endDate   = new Date(W1_DATE.getTime() - 1);
+  // Fetch 13 full Sun-Sat weeks + 1 extra day buffer
+  const WEEKS = 13;
+  const startDate = new Date(W1_DATE.getTime() - (WEEKS * 7 + 1) * 86400000);
+  const endDate   = new Date(W1_DATE.getTime() - 1);  // day before forecast W1
   const _iso = d => d.toISOString().slice(0, 10);
-  const dateClause = `AND{${_DM_DATE_FID}.OAF.'${_iso(startDate)}'}` +
-                     `AND{${_DM_DATE_FID}.OBF.'${_iso(endDate)}'}`;
+  const escMs = mstyle.replace(/'/g, "''");
 
-  let where;
-  if (_DM_MSTYLE_FID) {
-    // Preferred: direct mstyle filter
-    const escMs = mstyle.replace(/'/g, "''");
-    where = `{${_DM_MSTYLE_FID}.EX.'${escMs}'}${dateClause}`;
-  } else if (_DM_ASIN_FID && asinsFromCatalog && asinsFromCatalog.length) {
-    // Fallback: filter by known ASINs (supplied from bqkdjaqi7 AUR fetch)
-    const asinList = asinsFromCatalog
-      .map(a => `{${_DM_ASIN_FID}.EX.'${String(a).replace(/'/g, "''")}'}`)
-      .join('OR');
-    where = `(${asinList})${dateClause}`;
-  } else {
-    return null;  // no usable join key
-  }
+  const selectFids = [_DM_DATE_FID, _DM_UNITS_FID];
+  if (_DM_OH_FID) selectFids.push(_DM_OH_FID);
 
   try {
     const resp = await qb('/records/query', {
       from:    tid,
-      select:  [_DM_DATE_FID, _DM_UNITS_FID],
-      where,
+      select:  selectFids,
+      where:   `{${_DM_MSTYLE_FID}.EX.'${escMs}'}` +
+               `AND{${_DM_DATE_FID}.OAF.'${_iso(startDate)}'}` +
+               `AND{${_DM_DATE_FID}.OBF.'${_iso(endDate)}'}`,
       options: { skip: 0, top: 2000 },
     });
 
     const rows = (resp && resp.data) || [];
-    console.info(`[DM] rows for ${mstyle} (last 14d): ${rows.length}`);
+    console.info(`[DM] ${rows.length} rows for ${mstyle} (${WEEKS}w)`);
+    if (!rows.length) return null;
 
-    // Sum into L1W (days 1-7 before W1_DATE) and L2W (days 8-14)
-    let l1w = 0, l2w = 0;
-    const _sv = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
+    const _sv  = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
+    const _num = (rec, fid) => parseFloat(_sv(rec, fid) || 0) || 0;
 
+    // Group daily rows into Sun-Sat weeks.
+    // pos = sum of daily ordered units; oh = last daily snapshot (most recent day in week).
+    const weekMap = {};
     for (const rec of rows) {
       const rawDate = _sv(rec, _DM_DATE_FID);
       if (!rawDate) continue;
       const d = new Date(rawDate);
       if (isNaN(d.getTime())) continue;
-      const units = parseFloat(_sv(rec, _DM_UNITS_FID) || 0) || 0;
-      if (units <= 0) continue;
-      const daysBack = Math.floor((W1_DATE.getTime() - d.getTime()) / 86400000);
-      if (daysBack >= 1 && daysBack <= 7)  l1w += units;
-      if (daysBack >= 8 && daysBack <= 14) l2w += units;
+
+      // Sunday start: go back d.getDay() days (0=Sun so Sun stays put)
+      const sun = new Date(d);
+      sun.setUTCDate(sun.getUTCDate() - sun.getUTCDay());
+      const sunISO = sun.toISOString().slice(0, 10);
+
+      if (!weekMap[sunISO]) weekMap[sunISO] = { pos: 0, oh: 0, ohDate: '' };
+      weekMap[sunISO].pos += _num(rec, _DM_UNITS_FID);
+
+      if (_DM_OH_FID) {
+        const dateStr = rawDate.slice(0, 10);
+        if (dateStr >= weekMap[sunISO].ohDate) {
+          weekMap[sunISO].oh     = _num(rec, _DM_OH_FID);  // last reading wins
+          weekMap[sunISO].ohDate = dateStr;
+        }
+      }
     }
-    return { l1w, l2w };
+
+    // Sort newest-first (ISO string sort = chronological)
+    const sortedISO = Object.keys(weekMap).sort().reverse();
+    const weeks = sortedISO.map(iso => ({
+      weekStart: iso,
+      pos: Math.round(weekMap[iso].pos),
+      oh:  Math.round(weekMap[iso].oh),
+    }));
+
+    return {
+      l1w:   weeks[0] ? weeks[0].pos : 0,
+      l2w:   weeks[1] ? weeks[1].pos : 0,
+      weeks,
+    };
   } catch (e) {
-    console.warn('[DM] L1W/L2W fetch failed:', e.message || e);
+    console.warn('[DM] POS fetch failed:', e.message || e);
     return null;
   }
 }
@@ -5570,18 +5564,18 @@ async function _loadAmzDcInv(r, safeId) {
     }
   }
 
-  // ── Daily Metrics L1W + L2W fetch (brgxdpadi) ────────────────────────────
-  // We pass any ASINs already known (from the AUR row) as a fallback join key
-  // in case Daily Metrics has no mstyle field — usually unnecessary.
+  // ── Daily Metrics POS + OH weekly history (brgxdpadi) ────────────────────
+  let dmWeeks = null;
   if (CFG.DAILY_METRICS_TID) {
     try {
-      const dmPos = await _fetchDmPosL1L2(mstyle, []);
+      const dmPos = await _fetchDailyMetricsPOS(mstyle);
       if (dmPos) {
-        posLw  = dmPos.l1w;
-        posL2w = dmPos.l2w;
+        posLw   = dmPos.l1w;
+        posL2w  = dmPos.l2w;
+        dmWeeks = dmPos.weeks;
       }
     } catch (e) {
-      console.warn('[DM] L1W/L2W not applied:', e.message || e);
+      console.warn('[DM] POS history not applied:', e.message || e);
     }
   }
 
@@ -5678,27 +5672,65 @@ async function _loadAmzDcInv(r, safeId) {
 
   // ATS cards are now sourced from Inventory Flow and rendered inline.
 
-  // -- Amazon Consumer POS summary table ----------------------------------------
-  // Inject a compact table below the L26W history section (the placeholder
-  // <div id="amz-pos-section-{safeId}"> was set in the detail-pane template).
-  // Shows LW / L4W / L13W / L26W / L52W consumer sell-through velocity so
-  // planners can compare order cadence against actual consumer demand.
+  // -- Amazon Consumer POS history table ----------------------------------------
+  // Injects into <div id="amz-pos-section-{safeId}"> from the detail-pane template.
+  // Primary display: 13-week weekly history from Daily Metrics (brgxdpadi),
+  //   Row 1 = POS Units (blue, sum of daily ordered units per week)
+  //   Row 2 = OH Units  (green, last daily snapshot within each week)
+  //   Columns = Sunday week-start dates, newest on the left.
+  // Fallback: if no Daily Metrics data, shows the avg summary table instead.
   const posSection = document.getElementById('amz-pos-section-' + safeId);
   if (posSection) {
-    const fmtP = n => n === 0 ? '<span style="color:#bbb">-</span>'
-                               : `<span style="color:#1565c0;font-weight:600">${fmtPos(n)}</span>`;
+    const fmtP  = n => n === 0 ? '<span style="color:#bbb">-</span>'
+                                : `<span style="color:#1565c0;font-weight:600">${Math.round(n).toLocaleString('en-US')}</span>`;
+    const fmtOH = n => n === 0 ? '<span style="color:#bbb">-</span>'
+                                : `<span style="color:#2e7d32;font-weight:600">${Math.round(n).toLocaleString('en-US')}</span>`;
+    const fmtAvg = n => n === 0 ? '<span style="color:#bbb">-</span>'
+                                 : `<span style="color:#1565c0;font-weight:600">${fmtPos(n)}</span>`;
+
     if (!fetchOk) {
       posSection.innerHTML = `
       <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e3f2fd;">
         <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS</div>
         <div style="font-size:11px;color:#999;font-style:italic;padding:2px 0 4px 0;">No catalog data available for this style.</div>
       </div>`;
+    } else if (dmWeeks && dmWeeks.length > 0) {
+      // ── Weekly history from Daily Metrics ──────────────────────────────────
+      const thCells = dmWeeks.map(w => {
+        const d   = new Date(w.weekStart + 'T00:00:00Z');
+        const mo  = d.getUTCMonth() + 1;
+        const day = d.getUTCDate();
+        return `<th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap;text-align:right">${mo}/${day}</th>`;
+      }).join('');
+      const posCells = dmWeeks.map(w => `<td style="text-align:right;padding:2px 5px">${fmtP(w.pos)}</td>`).join('');
+      const ohCells  = dmWeeks.map(w => `<td style="text-align:right;padding:2px 5px">${fmtOH(w.oh)}</td>`).join('');
+      posSection.innerHTML = `
+      <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e3f2fd;">
+        <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS (Weekly)</div>
+        <table class="dtbl" style="font-size:11px">
+          <thead><tr>
+            <th class="row-label" style="width:1%;white-space:nowrap"></th>
+            ${thCells}
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="row-label" style="color:#1565c0;font-weight:600;white-space:nowrap">POS Units</td>
+              ${posCells}
+            </tr>
+            <tr>
+              <td class="row-label" style="color:#2e7d32;font-weight:600;white-space:nowrap">OH Units</td>
+              ${ohCells}
+            </tr>
+          </tbody>
+        </table>
+      </div>`;
     } else {
+      // ── Fallback: avg summary table ─────────────────────────────────────────
       posSection.innerHTML = `
       <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e3f2fd;">
         <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS</div>
         <table class="dtbl">
-          <tr>
+          <thead><tr>
             <th class="row-label" style="width:1%;white-space:nowrap"></th>
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L1W</th>
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L2W</th>
@@ -5706,16 +5738,16 @@ async function _loadAmzDcInv(r, safeId) {
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L13W avg</th>
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L26W avg</th>
             <th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap">L52W avg</th>
-          </tr>
-          <tr>
+          </tr></thead>
+          <tbody><tr>
             <td class="row-label" style="color:#1565c0;font-weight:600;white-space:nowrap">POS Units</td>
-            <td>${fmtP(posLw)}</td>
-            <td>${fmtP(posL2w)}</td>
-            <td>${fmtP(posL4w)}</td>
-            <td>${fmtP(posL13w)}</td>
-            <td>${fmtP(posL26w)}</td>
-            <td>${fmtP(posL52w)}</td>
-          </tr>
+            <td style="text-align:right">${fmtAvg(posLw)}</td>
+            <td style="text-align:right">${fmtAvg(posL2w)}</td>
+            <td style="text-align:right">${fmtAvg(posL4w)}</td>
+            <td style="text-align:right">${fmtAvg(posL13w)}</td>
+            <td style="text-align:right">${fmtAvg(posL26w)}</td>
+            <td style="text-align:right">${fmtAvg(posL52w)}</td>
+          </tr></tbody>
         </table>
       </div>`;
     }
