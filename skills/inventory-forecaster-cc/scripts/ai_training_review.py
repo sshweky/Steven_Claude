@@ -2037,21 +2037,30 @@ def main():
         if intent and intent != "unknown":
             understood_rids.append(rid)
         else:
+            # Use sval for text fields (key, note) -- fval returns float and
+            # silently yields 0.0 / '' on string values.
+            _note_fid_for_dump = note_fid if isinstance(note_fid, int) and note_fid else 6
             unparseable.append({
                 "rid":  rid,
-                "key":  fval(c, C_ACCT_MSTYLE),
-                "note": (fval(c, 6) or "")[:300],
+                "key":  sval(c, C_ACCT_MSTYLE),
+                "note": (sval(c, _note_fid_for_dump) or "")[:300],
             })
 
     if unparseable:
+        _api_set = bool(os.environ.get("ANTHROPIC_API_KEY"))
         print()
-        print(f"  [!] {len(unparseable)} comment(s) could NOT be parsed by the regex "
-              f"classifier -- left flagged 'AI training' for re-review:")
+        _classifier_used = "LLM+regex fallback" if _api_set else "regex-only (ANTHROPIC_API_KEY not set)"
+        print(f"  [!] {len(unparseable)} comment(s) could NOT be parsed by the "
+              f"{_classifier_used} classifier -- left flagged 'AI training' for re-review:")
         for u in unparseable:
             print(f"      RID={u['rid']}  Key={u['key']}")
             print(f"        Note: {u['note']!r}")
-        print(f"  [!] These comments are NOT marked Reviewed.  Re-run with an LLM-based")
-        print(f"  [!] classifier (set ANTHROPIC_API_KEY) OR review manually in QB.")
+        if _api_set:
+            print(f"  [!] LLM was tried but didn't return a recognized label.  Review manually in QB.")
+        else:
+            print(f"  [!] Set ANTHROPIC_API_KEY in your shell so the LLM classifier runs:")
+            print(f"  [!]   PowerShell:  $env:ANTHROPIC_API_KEY = 'sk-ant-...'")
+            print(f"  [!]   then re-run this script in the SAME shell session.")
         print()
 
     mark_reviewed_in_qb(understood_rids, args.dry_run)
