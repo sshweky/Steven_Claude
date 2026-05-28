@@ -1449,6 +1449,13 @@ def fetch_projections_qb_rest(prj_cols, args):
         + SHP_COLS
         + INV_OH_COLS
         + OPN_COLS
+        # 2026-05-28: Correct customer-specific open PO fields (FIDs 410, 810, 803).
+        # Replaces the per-week Opn_W1..Opn_W26 fields (always zero -- broken process)
+        # as the signal for VP-Q4 zeroing and F37 capacity calculation.
+        + ["Cust_Open_PO_Qty_",   # FID 410 -- numeric total customer open PO qty
+           "Cust_Open_PO_Qty",    # FID 810 -- rich-text with PO-level hover (cust-specific)
+           "Msty_Open_PO_Qty",    # FID 803 -- rich-text with mstyle-total hover (all customers)
+           ]
     )
 
     select_fids = []
