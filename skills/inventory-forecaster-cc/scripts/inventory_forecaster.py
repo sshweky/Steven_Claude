@@ -14013,6 +14013,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "po_zeroed_weeks":   (meta.get("po_zeroed_weeks", []) if isinstance(meta, dict) else []),
         "po_total_qty":      (meta.get("po_total_qty", 0)    if isinstance(meta, dict) else 0),
         "po_total_removed":  (meta.get("po_total_removed",0) if isinstance(meta, dict) else 0),
+        # 2026-05-28: customer-specific and mstyle-level open PO data for viewer hover.
+        # cust_open_po_qty  = FID 410 (numeric total for this account-mstyle)
+        # cust_open_po_hover = FID 810 title= text (individual POs with CXL dates)
+        # msty_open_po_qty  = visible number from FID 803 (mstyle total, all accounts)
+        # msty_open_po_hover = FID 803 title= text (this account's qty + context)
+        "cust_open_po_qty":   float(row.get("Cust_Open_PO_Qty_") or 0),
+        "cust_open_po_hover": (_parse_rich_text_po(row.get("Cust_Open_PO_Qty") or "")[1]),
+        "msty_open_po_qty":   (_parse_rich_text_po(row.get("Msty_Open_PO_Qty") or "")[0]),
+        "msty_open_po_hover": (_parse_rich_text_po(row.get("Msty_Open_PO_Qty") or "")[1]),
         # F37 v2 cap detail (2026-05-26): list of weeks where AI demand was
         # capped by inventory shortfall, with original/adjusted/capacity per
         # week.  Surfaced for the codepage viewer so it can render the capped
