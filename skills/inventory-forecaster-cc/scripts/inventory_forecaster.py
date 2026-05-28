@@ -11014,7 +11014,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 if isinstance(meta, dict):
                     _piso_src = (
                         f"Est. ISO {_pog_iso_qty:,}u" if _pog_est_iso > 0
-                        else f"Stores({_pog_stores}) x MP({mp}) = {_pog_iso_qty:,}u"
+                        else f"Stores({_pog_stores}) x MP({mp}) x 1.5 = {_pog_iso_qty:,}u"
                     )
                     _piso_note = (
                         "ISO already placed (skipped)"
