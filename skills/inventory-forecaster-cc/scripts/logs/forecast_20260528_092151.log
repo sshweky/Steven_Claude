@@ -1,0 +1,36 @@
+﻿[2026-05-28 09:21:51] Starting scheduled forecast run (--all --validate)
+
+============================================================
+  [watchdog] Starting forecaster (inner attempt 1/3)
+============================================================
+  [auto-throttle] --all detected ΓåÆ workers=2, rate_limit_ms=150, bulk_writeback=on
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster ΓÇö Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_24_W1 -> 11_15_W26
+
+[1/4] Pulling projections from Quickbase ...
+      [QB REST] fetching field map ...
+      [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+  [watchdog] still running -- 48s since last output | last:       [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+      5480 records retrieved (QB REST API)
+
+[1.5] Amazon switchover auto-link + Switchover_Date backfill ...
+      [Switchover] Alerts (no variant projections): 28 record(s)
+
+[2/4] Pulling master pack + Season from Styles ...
+      [QB REST] fetching Styles field map ...
+  [watchdog] still running -- 26s since last output | last:       [QB REST] fetching Styles field map ...
+      2259 master pack records loaded (168 with Season tag) (QB REST API)
+
+[2.5] Pulling Amazon catalog POS for 1892 mstyles ...
+      [DM-DAILY-CACHE] using cached data (0.2h old, limit 24h) -- 1649 mstyles
+      1649 mstyles with POS data loaded
+      viewer_pos_cache.json refreshed (1649 mstyles)
+
+[2.6] Pulling Amazon Catalog US (F38 signals) for 1892 mstyles ...
+  [watchdog] still running -- 35s since last output | last: [2.6] Pulling Amazon Catalog US (F38 signals) for 1892 mstyles ...
