@@ -142,6 +142,7 @@ textarea.inp{resize:vertical;min-height:36px}
   <div class="toolbar">
     <button class="btn btn-primary" onclick="renderAll()">Refresh All Tabs</button>
     <button class="btn btn-gray" onclick="clearData()">Clear All Data</button>
+    <button class="btn btn-red btn-sm" onclick="if(confirm('Reset all local storage and reload?')){localStorage.clear();location.reload();}">Reset Cache</button>
     <span id="loadStatus" class="text-muted" style="font-size:11px"></span>
   </div>
   <div class="legend">
