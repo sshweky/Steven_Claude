@@ -3141,6 +3141,64 @@ function _analyzeSeasonalPattern(histOrd) {
   return { events, avgGapWks, nextExpectedWk, avgOrderTotal, wksSinceLast };
 }
 
+// Parse a Switchover_Date string (ISO 'YYYY-MM-DD' or empty) to a JS Date at
+// midnight, or null when no date is set.  Centralized so all switchover code
+// paths interpret the field the same way.
+function _parseSwitchoverDate(s) {
+  if (!s) return null;
+  const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const d = new Date(+m[1], +m[2] - 1, +m[3]);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// Return the switchover badge HTML for a record, or empty string if not part
+// of any switchover relationship.  Color logic per planner directive
+// (2026-05-27):
+//   BASE/original side:
+//     - Switchover_Date is in the FUTURE (or unset): GREEN -- base still owns demand
+//     - Switchover_Date is in the PAST: DARK GREY  -- base is closed out
+//   VARIANT/new side (inverse):
+//     - Switchover_Date is in the FUTURE (or unset): DARK GREY -- variant waiting
+//     - Switchover_Date is in the PAST: GREEN -- variant now active
+// Tooltip distinguishes Auto-detected (EC/COS/AMZ/DS/DTC + PCS->PX) from Manual
+// (planner-set via Switchover_To_MStyle field).
+function _switchoverBadgeForRow(r) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let info = null;  // { side: 'base'|'variant', type: 'auto'|'manual', other, date }
+  const mSw    = MANUAL_SWITCHOVER_MAP.get(r.key);
+  const mRev   = MANUAL_SWITCHOVER_REVERSE.get(r.key);
+  if (mSw)        info = { side: 'base',    type: 'manual', other: mSw.toMstyle,     date: mSw.date };
+  else if (mRev)  info = { side: 'variant', type: 'manual', other: mRev.fromMstyle,  date: mRev.date };
+  else {
+    const aSw  = SWITCHOVER_MAP.get(r.key);
+    const aRev = SWITCHOVER_REVERSE.get(r.key);
+    if (aSw)       info = { side: 'base',    type: 'auto', other: aSw.variantMstyle, date: aSw.date };
+    else if (aRev) info = { side: 'variant', type: 'auto', other: aRev.baseMstyle,   date: aRev.date };
+  }
+  if (!info) return '';
+
+  const past   = info.date instanceof Date && info.date <= today;
+  // Base: green when pre-switchover (or no date), grey when complete.
+  // Variant: opposite -- grey while waiting, green once active.
+  const color = info.side === 'base'
+    ? (past ? '#555' : '#2e7d32')
+    : (past ? '#2e7d32' : '#555');
+
+  const dateStr = info.date
+    ? `${info.date.getMonth()+1}/${info.date.getDate()}/${String(info.date.getFullYear()).slice(2)}`
+    : 'no date';
+  const statusWord = past ? 'completed' : (info.date ? 'upcoming' : 'date not set');
+  const typeWord   = info.type === 'auto' ? 'Auto-detected' : 'Manual';
+  const sideWord   = info.side === 'base' ? `base -> ${info.other}` : `variant <- ${info.other}`;
+  const title = `${typeWord} switchover (${sideWord}); date ${dateStr} -- ${statusWord}`;
+
+  return `<span class="switchover-badge" style="color:${color}" title="${title.replace(/"/g,'&quot;')}">&#x21C4;</span>`;
+}
+
+
 // Auto-detected switchovers (EC/COS/AMZ/DS/DTC suffix variants + PCS->PX siblings).
 // Both maps keyed by record key; values include the partner mstyle/key and
 // (if known) the parsed Switchover_Date so badge rendering can decide
