@@ -8275,6 +8275,401 @@ window.ignorePoPrj    = ignorePoPrj;
 window.unignorePoPrj  = unignorePoPrj;
 window.changePage     = changePage;
 
+// ============================================================
+// New Projection Modal
+// ============================================================
+
+const _NPM = {
+  el:               null,
+  acctCache:        {},      // div -> [{acct, name}]
+  selectedDiv:      '',
+  selectedAcct:     null,    // {acct: Number, name: String}
+  selectedMstyle:   '',
+  selectedMstyleDesc: '',
+  searchTimer:      null,
+};
+
+function showNewPrjModal() {
+  if (!_NPM.el) _npmInit();
+  _NPM.selectedDiv    = '';
+  _NPM.selectedAcct   = null;
+  _NPM.selectedMstyle = '';
+  _NPM.selectedMstyleDesc = '';
+  document.getElementById('npm-div').value          = '';
+  document.getElementById('npm-acct').innerHTML     = '<option value="">-- select division first --</option>';
+  document.getElementById('npm-acct').disabled      = true;
+  document.getElementById('npm-mstyle-input').value = '';
+  document.getElementById('npm-mstyle-input').disabled = true;
+  document.getElementById('npm-mstyle-input').placeholder = 'Type to search mstyle...';
+  document.getElementById('npm-mstyle-hidden').value = '';
+  document.getElementById('npm-mstyle-desc').textContent = '';
+  document.getElementById('npm-status').textContent  = '';
+  document.getElementById('npm-save-btn').disabled   = false;
+  _npmHideStylesList();
+  _NPM.el.style.display = 'flex';
+  setTimeout(() => document.getElementById('npm-div').focus(), 60);
+}
+
+function closeNewPrjModal() {
+  if (_NPM.el) _NPM.el.style.display = 'none';
+}
+
+function _npmInit() {
+  const overlay = document.createElement('div');
+  overlay.id = 'newPrjModal';
+  overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:5000;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:8px;box-shadow:0 6px 32px rgba(0,0,0,0.28);padding:28px 32px;min-width:500px;max-width:640px;width:90%;font-family:'Segoe UI',Arial,sans-serif;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+        <h2 style="font-size:18px;font-weight:700;color:#1a1a2e;margin:0;">+ New Projection</h2>
+        <button onclick="closeNewPrjModal()" style="background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:#999;padding:0 4px;">&times;</button>
+      </div>
+
+      <div style="display:grid;gap:18px;">
+
+        <!-- Division -->
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Division</label>
+          <select id="npm-div" onchange="npmDivChanged()"
+            style="width:100%;padding:9px 11px;border:1px solid #ccc;border-radius:5px;font-size:14px;background:#fff;cursor:pointer;">
+            <option value="">-- select division --</option>
+            <option value="BB">BB</option>
+            <option value="FF">FF</option>
+          </select>
+        </div>
+
+        <!-- Customer Account -->
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Customer Account</label>
+          <select id="npm-acct" onchange="npmAcctChanged()" disabled
+            style="width:100%;padding:9px 11px;border:1px solid #ccc;border-radius:5px;font-size:14px;background:#fff;cursor:pointer;">
+            <option value="">-- select division first --</option>
+          </select>
+          <div id="npm-acct-loading" style="font-size:11px;color:#888;margin-top:4px;display:none;">Loading accounts...</div>
+        </div>
+
+        <!-- MStyle typeahead -->
+        <div style="position:relative;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">MStyle</label>
+          <input id="npm-mstyle-input" type="text" placeholder="Type to search mstyle..." autocomplete="off" disabled
+            oninput="npmMstyleInput()" onfocus="npmMstyleFocus()" onblur="npmMstyleBlur()"
+            style="width:100%;padding:9px 11px;border:1px solid #ccc;border-radius:5px;font-size:14px;box-sizing:border-box;">
+          <input id="npm-mstyle-hidden" type="hidden" value="">
+          <div id="npm-mstyle-desc" style="font-size:11px;color:#1565c0;font-weight:600;margin-top:4px;min-height:16px;"></div>
+          <div id="npm-styles-list"
+            style="display:none;position:absolute;top:calc(100% - 16px);left:0;right:0;background:#fff;border:1px solid #bbb;border-top:none;border-radius:0 0 5px 5px;max-height:230px;overflow-y:auto;z-index:5100;box-shadow:0 6px 14px rgba(0,0,0,0.13);">
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-top:26px;">
+        <span id="npm-status" style="font-size:12px;color:#c62828;flex:1;"></span>
+        <button onclick="closeNewPrjModal()"
+          style="padding:9px 22px;border:1px solid #ccc;background:#fff;border-radius:5px;cursor:pointer;font-size:14px;color:#444;">
+          Cancel
+        </button>
+        <button id="npm-save-btn" onclick="npmSave()"
+          style="padding:9px 26px;background:#1565c0;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:14px;font-weight:700;">
+          Save Projection
+        </button>
+      </div>
+    </div>`;
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeNewPrjModal(); });
+  document.body.appendChild(overlay);
+  _NPM.el = overlay;
+}
+
+async function npmDivChanged() {
+  const div = document.getElementById('npm-div').value;
+  _NPM.selectedDiv  = div;
+  _NPM.selectedAcct = null;
+  _NPM.selectedMstyle = '';
+  _NPM.selectedMstyleDesc = '';
+
+  const acctSel    = document.getElementById('npm-acct');
+  const mstyleInp  = document.getElementById('npm-mstyle-input');
+  const loadingEl  = document.getElementById('npm-acct-loading');
+
+  // Reset downstream controls
+  acctSel.innerHTML = '<option value="">-- loading... --</option>';
+  acctSel.disabled  = true;
+  mstyleInp.value   = '';
+  mstyleInp.disabled = true;
+  mstyleInp.placeholder = 'Type to search mstyle...';
+  document.getElementById('npm-mstyle-hidden').value = '';
+  document.getElementById('npm-mstyle-desc').textContent = '';
+  _npmHideStylesList();
+  document.getElementById('npm-status').textContent = '';
+
+  if (!div) {
+    acctSel.innerHTML = '<option value="">-- select division first --</option>';
+    return;
+  }
+
+  try {
+    loadingEl.style.display = '';
+    const accounts = await _npmFetchAccounts(div);
+    loadingEl.style.display = 'none';
+    acctSel.innerHTML = '<option value="">-- select account --</option>'
+      + accounts.map(a =>
+          `<option value="${a.acct}" data-name="${(a.name||'').replace(/"/g,'&quot;')}">${a.acct} - ${a.name}</option>`
+        ).join('');
+    acctSel.disabled   = false;
+    mstyleInp.disabled = false;
+    mstyleInp.placeholder = `Search ${div} mstyle...`;
+  } catch (e) {
+    loadingEl.style.display = 'none';
+    acctSel.innerHTML = '<option value="">-- error loading --</option>';
+    console.error('[NewPrj] fetchAccounts error:', e);
+    document.getElementById('npm-status').textContent = 'Failed to load accounts: ' + (e.message || 'error');
+  }
+}
+
+function npmAcctChanged() {
+  const sel = document.getElementById('npm-acct');
+  const opt = sel.selectedOptions && sel.selectedOptions[0];
+  if (!sel.value || !opt) { _NPM.selectedAcct = null; return; }
+  _NPM.selectedAcct = { acct: Number(sel.value), name: (opt.dataset && opt.dataset.name) || '' };
+  document.getElementById('npm-status').textContent = '';
+}
+
+async function _npmFetchAccounts(div) {
+  if (_NPM.acctCache[div]) return _NPM.acctCache[div];
+  const CF = CFG.CUST_FID;
+  const resp = await qb('/records/query', {
+    from:    CFG.CUSTOMERS_TID,
+    select:  [CF.ACCT, CF.NAME, CF.DIV],
+    where:   `{${CF.DIV}.EX.'${div}'}`,
+    sortBy:  [{ fieldId: CF.ACCT, order: 'ASC' }],
+    options: { top: 500 },
+  });
+  const rows  = (resp && resp.data) || [];
+  const accts = rows.map(row => ({
+    acct: Number(((row[String(CF.ACCT)] || {}).value) || 0),
+    name: String(((row[String(CF.NAME)] || {}).value) || ''),
+  })).filter(a => a.acct > 0);
+  _NPM.acctCache[div] = accts;
+  return accts;
+}
+
+let _npmSearchTimer = null;
+function npmMstyleInput() {
+  // Clear previous confirmed selection
+  document.getElementById('npm-mstyle-hidden').value = '';
+  document.getElementById('npm-mstyle-desc').textContent = '';
+  _NPM.selectedMstyle = '';
+  _NPM.selectedMstyleDesc = '';
+  clearTimeout(_npmSearchTimer);
+  const q = (document.getElementById('npm-mstyle-input').value || '').trim();
+  if (q.length < 2) { _npmHideStylesList(); return; }
+  _npmSearchTimer = setTimeout(() => _npmDoSearch(q), 280);
+}
+
+function npmMstyleFocus() {
+  const q = (document.getElementById('npm-mstyle-input').value || '').trim();
+  if (q.length >= 2 && !_NPM.selectedMstyle) _npmDoSearch(q);
+}
+
+function npmMstyleBlur() {
+  // Delay so onmousedown on a list item fires first
+  setTimeout(_npmHideStylesList, 220);
+}
+
+async function _npmDoSearch(q) {
+  const listEl = document.getElementById('npm-styles-list');
+  if (!listEl) return;
+  listEl.style.display = '';
+  listEl.innerHTML = '<div style="padding:8px 12px;color:#888;font-size:12px;">Searching...</div>';
+
+  const div = _NPM.selectedDiv;
+  const SF  = CFG.STYLE_FID;
+  const statusClause = `({${SF.STATUS}.CT.'Active'} OR {${SF.STATUS}.CT.'In Prodn'} OR {${SF.STATUS}.CT.'Future Delete'})`;
+  const divClause    = div ? ` AND {${SF.DIV}.EX.'${div}'}` : '';
+  const escaped      = q.replace(/'/g, "''");
+  const where        = `{${SF.MSTYLE}.CT.'${escaped}'}${divClause} AND ${statusClause}`;
+
+  try {
+    const resp = await qb('/records/query', {
+      from:    CFG.STYLES_TID,
+      select:  [SF.MSTYLE, SF.DESC, SF.STATUS],
+      where,
+      sortBy:  [{ fieldId: SF.MSTYLE, order: 'ASC' }],
+      options: { top: 30 },
+    });
+    const rows = (resp && resp.data) || [];
+
+    if (!rows.length) {
+      listEl.innerHTML = '<div style="padding:8px 12px;color:#999;font-size:12px;">No active styles found for "' + q + '"</div>';
+      return;
+    }
+
+    listEl.innerHTML = rows.map(row => {
+      const ms  = String(((row[String(SF.MSTYLE)] || {}).value) || '');
+      const dsc = String(((row[String(SF.DESC)]   || {}).value) || '');
+      const sts = String(((row[String(SF.STATUS)] || {}).value) || '');
+      const msSafe  = ms.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const dscSafe = dsc.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      return `<div
+        onmousedown="npmSelectStyle('${msSafe}','${dscSafe}');event.preventDefault();"
+        style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;display:flex;align-items:baseline;gap:8px;"
+        onmouseover="this.style.background='#e3f2fd'" onmouseout="this.style.background=''">
+        <span style="font-weight:700;color:#1a1a2e;white-space:nowrap;">${ms}</span>
+        <span style="color:#555;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${dsc}</span>
+        <span style="color:#aaa;font-size:10px;white-space:nowrap;margin-left:auto;">${sts}</span>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<div style="padding:8px 12px;color:#c62828;font-size:12px;">Search error: ' + (e.message || 'unknown') + '</div>';
+    console.error('[NewPrj] style search failed:', e);
+  }
+}
+
+function npmSelectStyle(mstyle, desc) {
+  document.getElementById('npm-mstyle-input').value  = mstyle;
+  document.getElementById('npm-mstyle-hidden').value = mstyle;
+  document.getElementById('npm-mstyle-desc').textContent = desc;
+  _NPM.selectedMstyle     = mstyle;
+  _NPM.selectedMstyleDesc = desc;
+  _npmHideStylesList();
+  document.getElementById('npm-status').textContent = '';
+}
+
+function _npmHideStylesList() {
+  const el = document.getElementById('npm-styles-list');
+  if (el) { el.style.display = 'none'; el.innerHTML = ''; }
+}
+
+async function npmSave() {
+  const div    = _NPM.selectedDiv;
+  const acct   = _NPM.selectedAcct;
+  const mstyle = _NPM.selectedMstyle;
+  const statusEl = document.getElementById('npm-status');
+  const saveBtn  = document.getElementById('npm-save-btn');
+
+  // Validation
+  if (!div)    { statusEl.textContent = 'Please select a Division.'; return; }
+  if (!acct)   { statusEl.textContent = 'Please select a Customer Account.'; return; }
+  if (!mstyle) { statusEl.textContent = 'Please select an MStyle from the list.'; return; }
+
+  statusEl.style.color = '#888';
+  statusEl.textContent = 'Saving...';
+  saveBtn.disabled = true;
+
+  try {
+    const F = CFG.FID;
+    const resp = await qb('/records', {
+      to:   CFG.PROJECTIONS_TID,
+      data: [{
+        [F.DIV]:      { value: div },
+        [F.ACCT_NUM]: { value: acct.acct },
+        [F.MSTYLE]:   { value: mstyle },
+      }],
+      fieldsToReturn: [3, F.KEY, F.MSTYLE, F.CUST, F.DESCRIPTION, F.BRAND_NAME, F.ACCT_NUM, F.STATUS_CUST],
+    });
+
+    // QB returns formula fields (like Acct#-MStyle Key, FID 292) in data[]
+    const returned  = (resp.data || [])[0] || {};
+    const newKey    = String(((returned[String(F.KEY)]         || {}).value) || `${acct.acct}-${mstyle}`);
+    const desc      = String(((returned[String(F.DESCRIPTION)] || {}).value) || _NPM.selectedMstyleDesc || '');
+    const brand     = String(((returned[String(F.BRAND_NAME)]  || {}).value) || '');
+    const custName  = String(((returned[String(F.CUST)]        || {}).value) || acct.name || '');
+
+    // Build a minimal stub record and prepend so it appears first in the table
+    const stub = {
+      key:    newKey,
+      mstyle: mstyle,
+      cust:   custName,
+      acct_num: acct.acct,
+      div:    div,
+      brand:  brand,
+      desc:   desc,
+      item_status:    '',
+      asin_status:    '',
+      inv_manager:    '',
+      cust_sku:       '',
+      severity:       '',
+      volume:         '',
+      pattern:        '',
+      priority:       0,
+      max_sev:        '',
+      fcst_status:    '',
+      shp_wk:         0,
+      proj_wk:        0,
+      ai_wk:          0,
+      proj_total:     0,
+      ai_total:       0,
+      shpd_wk_l4:     0,
+      shpd_wk_l13:    0,
+      ord_wk_l4:      0,
+      shpd_wk:        0,
+      last_ord_date:  '',
+      ai_vs_l13:      null,
+      man_vs_l13:     null,
+      flagged:               false,
+      planner_reply_pending: false,
+      manager_reply_pending: false,
+      auto_project:          false,
+      switchover_active:     false,
+      switchover_to_mstyle:  '',
+      switchover_date:       '',
+      switchover_from:       '',
+      has_po_prj_conflict:   false,
+      hist_ord:   Array(26).fill(0),
+      hist_shp:   Array(26).fill(0),
+      ats_hist:   null,
+      pos_hist:   undefined,
+      weeks_slim: Array(26).fill(null).map(() => ({ projection: 0, ai_proj: 0, locked: false })),
+      prj_wk:     Array(26).fill(0),
+      ai_prj:     Array(26).fill(0),
+      opn_wk:     Array(26).fill(0),
+      has_comments: false,
+      is_new_prj: true,
+    };
+
+    ALL_RECORDS.unshift(stub);
+    applyFilters();   // re-renders table; stub appears at top when sorted by default
+
+    // Flash-highlight the new row
+    setTimeout(() => {
+      const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(newKey)}"]`);
+      if (tr) {
+        tr.classList.add('npm-new-row');
+        tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 120);
+
+    closeNewPrjModal();
+    _npmToast(`Projection created: ${newKey}`);
+  } catch (e) {
+    statusEl.style.color = '#c62828';
+    statusEl.textContent = (e.message || 'Save failed').slice(0, 160);
+    saveBtn.disabled = false;
+    console.error('[NewPrj] save error:', e);
+  }
+}
+
+function _npmToast(msg, color) {
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;bottom:24px;right:24px;background:${color||'#1565c0'};color:#fff;`
+    + `padding:12px 22px;border-radius:6px;font-size:14px;font-weight:600;z-index:9999;`
+    + `box-shadow:0 2px 16px rgba(0,0,0,0.22);transition:opacity 0.4s;pointer-events:none;`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 420); }, 3200);
+}
+
+window.showNewPrjModal  = showNewPrjModal;
+window.closeNewPrjModal = closeNewPrjModal;
+window.npmDivChanged    = npmDivChanged;
+window.npmAcctChanged   = npmAcctChanged;
+window.npmMstyleInput   = npmMstyleInput;
+window.npmMstyleFocus   = npmMstyleFocus;
+window.npmMstyleBlur    = npmMstyleBlur;
+window.npmSelectStyle   = npmSelectStyle;
+window.npmSave          = npmSave;
+
 // -- Bootstrap --------------------------------------------------------------
 async function bootstrap() {
   const t0 = performance.now();
