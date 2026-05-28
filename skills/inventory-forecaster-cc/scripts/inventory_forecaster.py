@@ -2591,7 +2591,21 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     # Lulls are real demand reality and stay in the all-weeks average; the
     # seasonal profile handles the lull-week positioning in the forecast.
 
-    if len(l13_nz) >= 4:
+    # F_OFFPRICE (2026-05-28) — L26 all-weeks baseline for off-price retailers.
+    # Ross, Burlington, TJX and similar retailers order sporadically in large
+    # seasonal buys spread across 6-12 week gaps.  L13 captures too narrow a
+    # window — often just 1-2 orders — making the baseline volatile and
+    # sensitive to whether the most recent buy happened to fall inside the L13
+    # window.  L26 all-weeks avg smooths over those natural gaps and gives a
+    # more stable picture of the true per-week demand rate.  Zeros are kept in
+    # the average (they represent real inter-order gaps, not OOS artifacts).
+    if is_offprice and sum(history[-26:]) > 0:
+        _l26_all = history[-26:]
+        _l26_active = sum(1 for v in _l26_all if v > 0)
+        ord_baseline   = sum(_l26_all) / 26.0
+        _baseline_mode = (f"L26 all-weeks avg (off-price: "
+                          f"{_l26_active}/26 active weeks)")
+    elif len(l13_nz) >= 4:
         if _has_oos:
             ord_baseline   = sum(l13_nz) / len(l13_nz)
             _baseline_mode = (f"L13 nz-avg (OOS: fill-rate "
