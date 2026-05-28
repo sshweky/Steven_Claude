@@ -5343,7 +5343,32 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
         )
 
     rcv = inv_flow.get("rcv") or [0.0] * 26
-    opn = inv_flow.get("opn") or [0.0] * 26
+    # F37 opn[] (2026-05-28): use customer-specific Cust Open PO Qty# (FID 410)
+    # instead of the mstyle-level Inventory Flow Opn_Wk totals.  The mstyle-level
+    # data combines all accounts -- using it for a single-account row incorrectly
+    # reduces that account's available capacity by OTHER accounts' committed POs.
+    # Cust Open PO Qty# is the confirmed open customer PO total for THIS account.
+    # CXL-date bucketing from the rich-text field distributes across weeks; if
+    # no per-PO detail is available, the full quantity is placed in W1.
+    _f37_cust_opn_total = float(row.get("Cust_Open_PO_Qty_") or 0)
+    _f37_cust_opn_html  = row.get("Cust_Open_PO_Qty") or ""
+    _f37_w1_date = None
+    if ORIG_PRJ_COLS:
+        try:
+            _c0 = ORIG_PRJ_COLS[0]
+            _f37_w1_date = date(date.today().year, int(_c0[0:2]), int(_c0[3:5]))
+            if (date.today() - _f37_w1_date).days > 180:
+                _f37_w1_date = date(date.today().year + 1, int(_c0[0:2]), int(_c0[3:5]))
+        except Exception:
+            _f37_w1_date = None
+    if _f37_cust_opn_html and _f37_cust_opn_total > 0:
+        _, _, _f37_wd = _parse_rich_text_po(_f37_cust_opn_html, _f37_w1_date)
+        if _f37_wd:
+            opn = [float(_f37_wd.get(w + 1, 0)) for w in range(26)]
+        else:
+            opn = [_f37_cust_opn_total] + [0.0] * 25
+    else:
+        opn = [_f37_cust_opn_total] + [0.0] * 25
     # Defensive: pad/truncate to exactly 26 entries
     rcv = (list(rcv) + [0.0] * 26)[:26]
     opn = (list(opn) + [0.0] * 26)[:26]
