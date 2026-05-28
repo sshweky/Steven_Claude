@@ -9134,7 +9134,7 @@ document.addEventListener('keydown', function _selEscHandler(e) {
 async function bulkZeroOut() {
   const keys = [...SELECTED_KEYS];
   if (!keys.length) return;
-  if (!confirm('Stage zero-out for all 26 manual projection weeks on ' + keys.length + ' record(s)?\n\nChanges will be queued -- click "Save All" to write to QB.')) return;
+  if (!confirm('Zero out MAN PRJ for ' + keys.length + ' selected record(s)?\n\nAll 26 weekly values will be set to 0 for each. Changes will be queued -- click "Save All" to write to QB.')) return;
   let staged = 0;
   for (const key of keys) {
     const rec = ALL_RECORDS.find(x => x.key === key);
