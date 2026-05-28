@@ -1145,7 +1145,7 @@ def _fetch_retailer_pos(rows):
             time.sleep(RETAILER_POS_PAGE_DELAY_S)
 
     if not raw_rows:
-        return {}
+        return {}, frozenset()
 
     # Parse: group by (acct_str, mstyle_str), dedup by date
     from collections import defaultdict
@@ -1220,7 +1220,11 @@ def _fetch_retailer_pos(rows):
               f"(out of {len(ms_list)} non-Amazon mstyles). "
               f"F15 / F_RTL_WOS will see absent POS for those records.",
               flush=True)
-    return result
+    # Build inclusion set: only account numbers that actually appear in the
+    # Retailer Sales table.  Used by _prep_record_signals() to gate the POS
+    # lookup so records for retailers with no data are never accidentally matched.
+    rtl_pos_accts = frozenset(k.split('-')[0] for k in result)
+    return result, rtl_pos_accts
 
 
 def qb_get_field_map(table_id, force_refresh=False):
@@ -8025,7 +8029,7 @@ def _detect_otb(history, is_amazon=False, is_offprice=False, manual_total=None):
 def _prep_record_signals(row, master_pack, oos_entry=None,
                          amazon_pos=None, season_map=None,
                          amazon_catalog_us=None, ats_hist_l26=None,
-                         retailer_pos=None):
+                         retailer_pos=None, retailer_pos_accts=None):
     """
     Shared initial prep used by both forecast_record() and validate_record()
     (extracted 2026-05-06 to eliminate near-duplicate code between the two
@@ -8103,7 +8107,16 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     rtl_pos = None
     if not is_amazon and not is_international and retailer_pos:
         _rtl_key = row.get("Acct_MStyle_Key_", "")
-        if _rtl_key:
+        if _rtl_key and '-' in _rtl_key:
+            _rtl_acct = _rtl_key.split('-', 1)[0]
+        else:
+            _rtl_acct = ""
+        # Inclusion guard: only attempt POS lookup for accounts that actually
+        # have data in Retailer Sales (bv2izcn5b).  Prevents false matches when
+        # a retailer acct# shares no records in the table but happens to appear
+        # in a combined key that might collide with another acct's POS data.
+        _acct_in_rtl = bool(_rtl_acct and _rtl_acct in (retailer_pos_accts or set()))
+        if _rtl_key and _acct_in_rtl:
             _rtl_entry = retailer_pos.get(_rtl_key)
             # Retailer-suffix fallback: some retailers append a 2-3 letter
             # code to the mstyle in Projections (e.g. "FF11926KL" for Kohls,
@@ -8976,7 +8989,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     season_map=None, oos_entry=None, open_po_wk=None,
                     amazon_catalog_us=None, ai_comments=None, ats_hist=None,
                     switchover_weeks=None, variant_zero_weeks=None,
-                    retailer_pos=None, vacated_bases=None, inv_flow_data=None):
+                    retailer_pos=None, retailer_pos_accts=None,
+                    vacated_bases=None, inv_flow_data=None):
     # Reset rule-fire tracker for this record (used by deck-harvest tooling).
     _start_rule_fires()
     # Shared prep (mp, hist + F35 stockout normalization, customer flags,
@@ -8986,7 +9000,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 amazon_pos=amazon_pos, season_map=season_map,
                                 amazon_catalog_us=amazon_catalog_us,
                                 ats_hist_l26=ats_hist,
-                                retailer_pos=retailer_pos)
+                                retailer_pos=retailer_pos,
+                                retailer_pos_accts=retailer_pos_accts)
     mp               = _sig["mp"]
     hist             = _sig["hist"]
     cust_name        = _sig["cust_name"]
@@ -14448,7 +14463,8 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
                     low_mult=VALID_LOW_MULT, spike_mult=VALID_SPIKE_MULT,
                     oos_entry=None, open_po_wk=None, ats_hist=None,
                     switchover_weeks=None, amazon_pos=None, season_map=None,
-                    amazon_catalog_us=None, retailer_pos=None):
+                    amazon_catalog_us=None, retailer_pos=None,
+                    retailer_pos_accts=None):
     """
     Compare manual projections against historical order patterns.
     Flags weeks where the projection looks anomalous relative to what
@@ -14467,7 +14483,8 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
                                                season_map=season_map,
                                                amazon_catalog_us=amazon_catalog_us,
                                                ats_hist_l26=ats_hist,
-                                               retailer_pos=retailer_pos)
+                                               retailer_pos=retailer_pos,
+                                               retailer_pos_accts=retailer_pos_accts)
     mp                  = _sig["mp"]
     hist                = _sig["hist"]
     is_amazon           = _sig["is_amazon"]
@@ -14948,7 +14965,8 @@ def _build_record_narrative(r):
 def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
                    oos_data=None, open_pos_data=None, amazon_catalog_us=None,
                    ats_data=None, switchover_weeks=None, acct_cadences=None,
-                   retailer_pos=None, vacated_bases=None, inv_flow_data=None):
+                   retailer_pos=None, retailer_pos_accts=None,
+                   vacated_bases=None, inv_flow_data=None):
     """Run projection validation + AI forecast for each record."""
     high = getattr(args, "threshold", VALID_HIGH_MULT)
     oos_data        = oos_data        or {}
@@ -14974,7 +14992,8 @@ def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
                             switchover_weeks=switchover_weeks,
                             amazon_pos=amazon_pos, season_map=season_map,
                             amazon_catalog_us=amazon_catalog_us,
-                            retailer_pos=retailer_pos)
+                            retailer_pos=retailer_pos,
+                            retailer_pos_accts=retailer_pos_accts)
         # Also run the AI forecast so we can show it in the viewer
         prefix = key.split("-")[0] if "-" in key else key
         acct_iv = acct_cadences.get(prefix)
@@ -14985,6 +15004,7 @@ def run_validation(rows, master_pack, args, amazon_pos=None, season_map=None,
                              ats_hist=ats_hist,
                              switchover_weeks=switchover_weeks,
                              retailer_pos=retailer_pos,
+                             retailer_pos_accts=retailer_pos_accts,
                              vacated_bases=vacated_base_index,
                              inv_flow_data=inv_flow_data)
         r["ai_forecast"] = fr["forecast"]
@@ -16857,6 +16877,7 @@ def main():
     # F18 Croston z-adjustment) is reused; the retailer WOS rule (F_RTL_WOS)
     # is then applied post-model in forecast_record().
     retailer_pos = {}
+    retailer_pos_accts = frozenset()
     _rtl_rows = [r for r in rows if AMAZON_CUST_SUBSTR not in
                  (r.get("Customr_Name") or "").upper()]
     if _rtl_rows:
@@ -16866,15 +16887,19 @@ def main():
         _p26c_cached, _p26c_hit = _pull_cache_load("phase2_6c", _use_pc)
         if _p26c_hit:
             retailer_pos = _p26c_cached
+            retailer_pos_accts = frozenset(k.split('-')[0] for k in retailer_pos)
             print(f"      {len(retailer_pos)} acct-mstyle combos from pull cache", flush=True)
         else:
             try:
-                retailer_pos = _fetch_retailer_pos(_rtl_rows)
+                retailer_pos, retailer_pos_accts = _fetch_retailer_pos(_rtl_rows)
                 print(f"      {len(retailer_pos)} acct-mstyle combos with retailer POS data")
             except Exception as _e:
                 print(f"      [WARN] retailer_pos fetch failed: {_e} -- "
                       f"F15 POS blend and F_RTL_WOS disabled this run", flush=True)
             _pull_cache_save("phase2_6c", retailer_pos)
+        if retailer_pos_accts:
+            print(f"      Retailer POS active accounts (inclusion list): "
+                  f"{sorted(retailer_pos_accts)}", flush=True)
     else:
         print(f"\n[2.6c] Retailer POS skipped (no non-Amazon records in scope)",
               flush=True)
@@ -17079,6 +17104,7 @@ def main():
                                      switchover_weeks=switchover_index,
                                      acct_cadences=acct_cadences,
                                      retailer_pos=retailer_pos,
+                                     retailer_pos_accts=retailer_pos_accts,
                                      vacated_bases=vacated_base_index,
                                      inv_flow_data=inv_flow_data)
         elapsed_val = time.time() - t_val
@@ -17531,6 +17557,7 @@ def main():
                             inv_flow_data=inv_flow_data,
                             variant_zero_weeks=variant_zero_index,
                             retailer_pos=retailer_pos,
+                            retailer_pos_accts=retailer_pos_accts,
                             vacated_bases=vacated_base_index)
         # Build AI Analysis narrative — stored as a rich-text HTML string so
         # the QB codepage viewer can display it without re-deriving on the
@@ -17599,7 +17626,8 @@ def main():
                                      amazon_pos=amazon_pos,
                                      season_map=season_map,
                                      amazon_catalog_us=amazon_catalog_us,
-                                     retailer_pos=retailer_pos)
+                                     retailer_pos=retailer_pos,
+                                     retailer_pos_accts=retailer_pos_accts)
                 # On-Plan override: AI and Man are aligned -- nothing to review.
                 # Two cases: (1) both zero; (2) plan entered and gap <= 7.5%.
                 _man_tot = sum(float(row.get(c) or 0) for c in ORIG_PRJ_COLS)
