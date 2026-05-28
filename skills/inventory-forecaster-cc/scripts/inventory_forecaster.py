@@ -12187,6 +12187,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _f59_oos_active = False
     _f59h_wos = 0.0
     _f59h_soh = 0.0
+    _f59h_opo = 0.0   # Amazon open-PO qty (unreliable per comment; defaulted to 0)
     _f59a_floor = 0.0
     _f59a_momentum = False
     _f59_f18_capped = False
