@@ -1,12 +1,10 @@
-# run_scheduled.ps1 - launched by Windows Task Scheduler every 2 hours Mon-Fri
-# Runs the inventory forecaster and logs all output with a timestamped log file.
-# Keeps the 20 most recent log files; older ones are deleted automatically.
-# Sends the log by email on completion if C:\ProgramData\PPForecast\mail_config.txt exists.
+# run_scheduled.ps1 - launched by Windows Task Scheduler (PP Inventory Forecaster)
+# Runs Mon-Fri at 6:00 AM. Captures all output, sends email summary via Outlook on completion.
 
 $Python    = "C:\Python314\python.exe"
 $ScriptDir = 'C:\Users\StevenShweky(Fetch&B\.claude\skills\inventory-forecaster-cc\scripts'
 $LogDir    = "$ScriptDir\logs"
-$MailCfg   = "C:\ProgramData\PPForecast\mail_config.txt"
+$MailTo    = "s.shweky@petspeople.com"
 
 if (-not (Test-Path $LogDir)) {
     New-Item -ItemType Directory -Path $LogDir | Out-Null
@@ -24,13 +22,17 @@ try {
     & $Python "$ScriptDir\run_forecast.py" "--all" "--validate" 2>&1 |
         Out-File $LogFile -Append -Encoding UTF8
     $ExitCode = $LASTEXITCODE
-    "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Finished. Exit code: $ExitCode" |
-        Out-File $LogFile -Append -Encoding UTF8
 } catch {
     $ExitCode = 1
     "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] ERROR: $_" |
         Out-File $LogFile -Append -Encoding UTF8
 }
+
+$EndTime  = [datetime]::Now
+$Duration = [math]::Round(($EndTime - $StartTime).TotalMinutes, 1)
+
+"[$($EndTime.ToString('yyyy-MM-dd HH:mm:ss'))] Finished. Exit code: $ExitCode  Duration: ${Duration}m" |
+    Out-File $LogFile -Append -Encoding UTF8
 
 # Rotate: keep only the 20 most recent log files
 Get-ChildItem "$LogDir\forecast_*.log" |
@@ -38,54 +40,122 @@ Get-ChildItem "$LogDir\forecast_*.log" |
     Select-Object -Skip 20 |
     Remove-Item -Force
 
-# Send email via Microsoft Graph API if mail_config.txt exists.
-# Required keys: GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, MAIL_FROM, MAIL_TO
-# One-time setup: register an Azure AD app with Mail.Send application permission.
-if (Test-Path $MailCfg) {
-    try {
-        $cfg = @{}
-        Get-Content $MailCfg | ForEach-Object {
-            if ($_ -match '^(\w+)=(.+)$') { $cfg[$Matches[1]] = $Matches[2].Trim() }
-        }
+# ── Parse log for run stats ───────────────────────────────────────────────────
+$LogText = Get-Content $LogFile -Raw -Encoding UTF8
 
-        $Duration = [math]::Round(([datetime]::Now - $StartTime).TotalMinutes, 1)
-        $Status   = if ($ExitCode -eq 0) { "OK" } else { "FAILED (exit $ExitCode)" }
-        $Subject  = "[$Status] PP Forecast run $($StartTime.ToString('MM/dd HH:mm'))"
-        $LogText  = Get-Content $LogFile -Raw -Encoding UTF8
+# Records processed
+$RecordsMatch = [regex]::Match($LogText, '(\d[\d,]+)\s+records?\s+retrieved')
+$Records = if ($RecordsMatch.Success) { $RecordsMatch.Groups[1].Value } else { "?" }
 
-        # Step 1 — Get OAuth2 access token via client credentials flow
-        $TokenUrl  = "https://login.microsoftonline.com/$($cfg['GRAPH_TENANT_ID'])/oauth2/v2.0/token"
-        $TokenBody = @{
-            grant_type    = "client_credentials"
-            client_id     = $cfg['GRAPH_CLIENT_ID']
-            client_secret = $cfg['GRAPH_CLIENT_SECRET']
-            scope         = "https://graph.microsoft.com/.default"
-        }
-        $TokenResp   = Invoke-RestMethod -Method Post -Uri $TokenUrl -Body $TokenBody
-        $AccessToken = $TokenResp.access_token
+# Forecasts complete
+$FcstMatch = [regex]::Match($LogText, '(\d+)\s+forecasts? complete')
+$Forecasts = if ($FcstMatch.Success) { $FcstMatch.Groups[1].Value } else { "?" }
 
-        # Step 2 — Send via Graph sendMail endpoint
-        # Truncate log body to 1 MB to stay within Graph message size limits
-        $MaxBody  = 1048576
-        $BodyText = "Run completed in $Duration min.`n`n" +
-                    $(if ($LogText.Length -gt $MaxBody) { $LogText.Substring(0, $MaxBody) + "`n...[truncated]" } else { $LogText })
+# Model breakdown from COMPLETE summary
+$SeasonalMatch  = [regex]::Match($LogText, 'Seasonal:\s*(\d+)')
+$CrostonsMatch  = [regex]::Match($LogText, "Croston.s:\s*(\d+)")
+$HeuristicMatch = [regex]::Match($LogText, 'Heuristic:\s*(\d+)')
+$InactiveMatch  = [regex]::Match($LogText, 'Inactive:\s*(\d+)')
+$BiweeklyMatch  = [regex]::Match($LogText, 'Bi-weekly:\s*(\d+)')
 
-        $MailPayload = @{
-            message = @{
-                subject = $Subject
-                body    = @{ contentType = "Text"; content = $BodyText }
-                toRecipients = @( @{ emailAddress = @{ address = $cfg['MAIL_TO'] } } )
-            }
-        } | ConvertTo-Json -Depth 6
+$ModelSeasonal  = if ($SeasonalMatch.Success)  { $SeasonalMatch.Groups[1].Value  } else { "-" }
+$ModelCrostons  = if ($CrostonsMatch.Success)  { $CrostonsMatch.Groups[1].Value  } else { "-" }
+$ModelHeuristic = if ($HeuristicMatch.Success) { $HeuristicMatch.Groups[1].Value } else { "-" }
+$ModelInactive  = if ($InactiveMatch.Success)  { $InactiveMatch.Groups[1].Value  } else { "-" }
+$ModelBiweekly  = if ($BiweeklyMatch.Success)  { $BiweeklyMatch.Groups[1].Value  } else { "-" }
 
-        $GraphUrl = "https://graph.microsoft.com/v1.0/users/$($cfg['MAIL_FROM'])/sendMail"
-        Invoke-RestMethod -Method Post -Uri $GraphUrl -Body $MailPayload `
-            -Headers @{ Authorization = "Bearer $AccessToken"; "Content-Type" = "application/json" }
+# Total 26-week demand
+$DemandMatch = [regex]::Match($LogText, 'Total 26w demand:\s*([\d,]+)')
+$Demand = if ($DemandMatch.Success) { $DemandMatch.Groups[1].Value } else { "?" }
 
-        "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email sent to $($cfg['MAIL_TO'])" |
-            Out-File $LogFile -Append -Encoding UTF8
-    } catch {
-        "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email send failed: $_" |
-            Out-File $LogFile -Append -Encoding UTF8
-    }
+# Writeback stats
+$WbMatch = [regex]::Match($LogText, 'ok=(\d+)\s+fail=(\d+)')
+$WbOk   = if ($WbMatch.Success) { $WbMatch.Groups[1].Value } else { "?" }
+$WbFail = if ($WbMatch.Success) { $WbMatch.Groups[2].Value } else { "?" }
+
+# Alert count
+$AlertMatch = [regex]::Match($LogText, 'ALERTS\s+\((\d+)\s+records')
+$AlertCount = if ($AlertMatch.Success) { $AlertMatch.Groups[1].Value } else { "0" }
+
+# Errors/tracebacks
+$ErrorLines = ($LogText -split "`n" | Where-Object { $_ -match 'ERROR|Traceback|NameError|Exception' }) -join "`n"
+$HasErrors  = $ErrorLines.Length -gt 0
+
+# ── Build email ───────────────────────────────────────────────────────────────
+$Status      = if ($ExitCode -eq 0 -and -not $HasErrors) { "OK" } else { "CHECK ERRORS" }
+$StatusColor = if ($Status -eq "OK") { "#2e7d32" } else { "#c62828" }
+$Subject     = "[PP Forecast $Status] $($StartTime.ToString('ddd MM/dd')) - ${Duration}m"
+
+# Truncate full log to ~200 lines for email body
+$LogLines    = $LogText -split "`n"
+$LogPreview  = if ($LogLines.Count -gt 200) {
+    ($LogLines | Select-Object -Last 200) -join "`n"
+    $TruncNote = "<p style='color:#888;font-size:12px'>[Log truncated to last 200 lines. Full log: $LogFile]</p>"
+} else {
+    $LogText
+    $TruncNote = ""
+}
+
+$AlertRow = if ([int]$AlertCount -gt 0) {
+    "<tr><td style='padding:4px 12px;color:#888'>Alerts</td><td style='padding:4px 12px;color:#e65100;font-weight:bold'>$AlertCount records flagged</td></tr>"
+} else { "" }
+
+$ErrorRow = if ($HasErrors) {
+    "<tr><td style='padding:4px 12px;color:#888'>Errors</td><td style='padding:4px 12px;color:#c62828;font-weight:bold'>YES - see log below</td></tr>"
+} else { "" }
+
+$HtmlBody = @"
+<div style="font-family:Calibri,Arial,sans-serif;font-size:14px;max-width:800px">
+
+  <h2 style="margin-bottom:4px;color:$StatusColor">PP Inventory Forecaster - $Status</h2>
+  <p style="color:#555;margin-top:0">Run completed $($EndTime.ToString('dddd, MMMM d yyyy')) at $($EndTime.ToString('h:mm tt'))</p>
+
+  <table style="border-collapse:collapse;background:#f9f9f9;border-radius:6px;margin-bottom:20px">
+    <tr><td style="padding:4px 12px;color:#888">Start</td><td style="padding:4px 12px">$($StartTime.ToString('h:mm tt'))</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">End</td><td style="padding:4px 12px">$($EndTime.ToString('h:mm tt'))</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Duration</td><td style="padding:4px 12px">${Duration} min</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Exit Code</td><td style="padding:4px 12px">$ExitCode</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Records Pulled</td><td style="padding:4px 12px">$Records</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Forecasts Run</td><td style="padding:4px 12px">$Forecasts</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Total 26w Demand</td><td style="padding:4px 12px">$Demand units</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Write-back</td><td style="padding:4px 12px">ok=$WbOk  fail=$WbFail</td></tr>
+    $AlertRow
+    $ErrorRow
+  </table>
+
+  <h3 style="color:#333;margin-bottom:4px">Model Breakdown</h3>
+  <table style="border-collapse:collapse;background:#f9f9f9;border-radius:6px;margin-bottom:20px">
+    <tr><td style="padding:4px 12px;color:#888">Seasonal Baseline</td><td style="padding:4px 12px">$ModelSeasonal</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Croston's</td><td style="padding:4px 12px">$ModelCrostons</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Heuristic</td><td style="padding:4px 12px">$ModelHeuristic</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Inactive</td><td style="padding:4px 12px">$ModelInactive</td></tr>
+    <tr><td style="padding:4px 12px;color:#888">Bi-weekly</td><td style="padding:4px 12px">$ModelBiweekly</td></tr>
+  </table>
+
+  <h3 style="color:#333;margin-bottom:4px">Run Log</h3>
+  $TruncNote
+  <pre style="background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:6px;font-size:12px;overflow-x:auto;white-space:pre-wrap">$([System.Web.HttpUtility]::HtmlEncode($LogPreview))</pre>
+
+</div>
+"@
+
+# ── Send via Python SMTP (no Outlook required) ────────────────────────────────
+try {
+    Add-Type -AssemblyName System.Web | Out-Null
+    $TempHtml = "$LogDir\forecast_email_$Timestamp.html"
+    [System.IO.File]::WriteAllText($TempHtml, $HtmlBody, [System.Text.Encoding]::UTF8)
+
+    $SendResult = & $Python "$ScriptDir\send_email.py" `
+        --to $MailTo `
+        --subject $Subject `
+        --body $HtmlBody `
+        --html 2>&1
+
+    Remove-Item $TempHtml -ErrorAction SilentlyContinue
+
+    "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email result: $SendResult" |
+        Out-File $LogFile -Append -Encoding UTF8
+} catch {
+    "[$([datetime]::Now.ToString('yyyy-MM-dd HH:mm:ss'))] Email send failed: $_" |
+        Out-File $LogFile -Append -Encoding UTF8
 }
