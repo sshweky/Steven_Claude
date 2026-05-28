@@ -341,6 +341,25 @@ def _enrich_from_quickbase(recs):
         rec["pog_launch"]  = _as_iso_date(src.get("POG_Launch_Date"))
         rec["pog_end"]     = _as_iso_date(src.get("POG_End_Date"))
         rec["opn_w"]       = [_as_int(src.get(f"Opn_W{w}")) for w in range(1, 27)]
+        # 2026-05-28: correct customer-specific open PO fields.
+        # CData returns the rich-text HTML; strip to just title= content for hover.
+        import re as _re_vw
+        def _po_hover(html):
+            if not html: return ""
+            m = _re_vw.search(r"title='([^']*)'", str(html)) or \
+                _re_vw.search(r'title="([^"]*)"', str(html))
+            return m.group(1).strip() if m else ""
+        def _po_qty(html):
+            if not html: return 0
+            m = _re_vw.search(r'<[ab][^>]*>(\d+)</[ab]>', str(html))
+            return int(m.group(1)) if m else 0
+        _cust_html = src.get("Cust Open PO Qty") or src.get("Cust_Open_PO_Qty") or ""
+        _msty_html = src.get("Msty Open PO Qty") or src.get("Msty_Open_PO_Qty") or ""
+        rec["cust_open_po_qty"]   = _as_int(src.get("Cust Open PO Qty#") or
+                                             src.get("Cust_Open_PO_Qty_") or 0)
+        rec["cust_open_po_hover"] = _po_hover(_cust_html)
+        rec["msty_open_po_qty"]   = _po_qty(_msty_html)
+        rec["msty_open_po_hover"] = _po_hover(_msty_html)
 
 
 # Inventory Flow numeric W1..W26 column fids (stable IDs — see
