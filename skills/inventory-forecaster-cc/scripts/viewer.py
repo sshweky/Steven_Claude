@@ -2894,7 +2894,9 @@ function toggleDetail(key) {{
   // The hover from Cust Open PO Qty (FID 810) shows individual POs with CXL dates.
   const _custOpnQty   = r.cust_open_po_qty   || 0;
   const _custOpnHover = r.cust_open_po_hover  || '';
-  const _opnRowTitle  = _custOpnHover ? ` title="${{_custOpnHover.replace(/"/g,"&quot;")}}"` : '';
+  const _opnRowTitle  = _custOpnHover
+    ? ` title="${{_custOpnHover.replace(/"/g,'&quot;').replace(/\n/g,'&#10;')}}"`
+    : '';
   let opnCells  = `<td class="row-label" style="color:#6d4c00;font-weight:600"${{_opnRowTitle}}>Open Customer POs</td>`;
   let lyOrdCells = '<td class="row-label" style="color:#2e7d32;font-weight:600">Ordered LY</td>';
   let lyShpCells = '<td class="row-label" style="color:#1565c0;font-weight:600">Shipped LY</td>';
