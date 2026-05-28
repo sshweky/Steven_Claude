@@ -3293,7 +3293,7 @@ function buildSwitchoverMap() {
     // Derive the target key: same account prefix, different mstyle
     // Key format: AcctNum-MStyle  →  replace mstyle part
     const toKey = r.key.replace(r.mstyle, toMstyle);
-    const date  = r.switchover_date ? new Date(r.switchover_date) : null;
+    const date  = _parseSwitchoverDate(r.switchover_date);
     MANUAL_SWITCHOVER_MAP.set(r.key, { toMstyle, toKey, date });
     MANUAL_SWITCHOVER_REVERSE.set(toKey, { fromKey: r.key, fromMstyle: r.mstyle, date });
   }
