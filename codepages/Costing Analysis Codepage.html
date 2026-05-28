@@ -464,17 +464,7 @@ function setStatus(msg,type=''){
 
 // ==================== QB TEMP AUTH ====================
 async function tryAutoAuth(){
-  try {
-    const resp = await fetch(`https://${S.qbRealm}/v0/auth/temporary/${QB_PT_STYLES_TABLE}`, {credentials:'include'});
-    if(!resp.ok) return false;
-    const data = await resp.json();
-    if(data.temporaryAuthorization){
-      S.qbToken = data.temporaryAuthorization;
-      S.qbTempAuth = true;
-      return true;
-    }
-  } catch(e){}
-  return false;
+  return false; // Always use hardcoded user token — temp tokens are table-scoped and break cross-table calls
 }
 
 // ==================== TOKEN MODAL ====================
