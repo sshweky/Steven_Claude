@@ -11775,10 +11775,47 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"Near-term forecast constrained to 0 until row is populated."
             )
 
+    # Derive customer DC inventory + weekly rate for F37 MODE A (restock-to-WOS).
+    # MODE A fires when we know the retailer's/Amazon's DC SOH.
+    # MODE B (decay cohort) fires when DC inv is unavailable (customer_dc_inv=None).
+    #
+    # Amazon: Inv_SOH from amz_catalog (amz_catalog["Inv_SOH"]) + W1/W2 open POs
+    #   from inv_flow so the effective SOH matches what F85/F89 already uses.
+    #   Rate = POS Avg_Units_Wk_L13w (consumer sell-through, not order history).
+    #
+    # Non-Amazon retailer with POS data: OH_Units_LW from rtl_pos.
+    #   Rate = Avg_Units_Wk_L13w from rtl_pos.
+    #
+    # No DC data (or data is zero/missing): customer_dc_inv=None → MODE B.
+    _f37_cust_dc_inv = None
+    _f37_weekly_rate = None
+    _f37_wos_target  = AMZ_WOS_TARGET_MIN if is_amazon else RTL_WOS_TARGET
+
+    if is_amazon and amz_catalog:
+        _f37_amz_soh  = float((amz_catalog or {}).get("Inv_SOH") or 0)
+        _f37_amz_pos  = float((pos_data  or {}).get("Avg_Units_Wk_L13w") or 0)
+        if _f37_amz_soh > 0 or _f37_amz_pos > 0:
+            # Effective SOH = raw SOH + W1+W2 open POs already committed to ship
+            _f37_opn = (_inv_flow_rec or {}).get("opn") or []
+            _f37_opn_w12 = ((_f37_opn[0] if _f37_opn else 0.0)
+                          + (_f37_opn[1] if len(_f37_opn) > 1 else 0.0))
+            _f37_cust_dc_inv = _f37_amz_soh + _f37_opn_w12
+            _f37_weekly_rate = _f37_amz_pos if _f37_amz_pos > 0 else None
+
+    elif rtl_pos:
+        _f37_rtl_oh   = float((rtl_pos or {}).get("OH_Units_LW") or 0)
+        _f37_rtl_rate = float((rtl_pos or {}).get("Avg_Units_Wk_L13w") or 0)
+        if _f37_rtl_oh > 0:
+            _f37_cust_dc_inv = _f37_rtl_oh
+            _f37_weekly_rate = _f37_rtl_rate if _f37_rtl_rate > 0 else None
+
     _f37_skip = (not _inv_flow_rec)   # only skip if creation also failed
     if model not in ("Inactive",) and not _f37_skip:
         _adjusted_f37, _f37_adjustments, _f37_lt_info = apply_oh_shortfall_adjustment(
-            row, fcst, inv_flow=_inv_flow_rec)
+            row, fcst, inv_flow=_inv_flow_rec,
+            customer_dc_inv=_f37_cust_dc_inv,
+            weekly_rate=_f37_weekly_rate,
+            wos_target=_f37_wos_target)
         if isinstance(meta, dict) and _f37_lt_info.get("used_default"):
             # LT+Trans Days was missing or zero -- planner must verify.
             # Use [ALERT] prefix so it surfaces in alert filtering.
