@@ -3060,15 +3060,34 @@ function toggleDetail(key) {{
     wosCells += `<td style="color:#bbb;background:#f8f0fb" title="WOS total is not meaningful">—</td>`;
 
     // Open POs row — Msty Open PO Qty (all-customer mstyle total) with QB-style hover
-    // 2026-05-28: Uses Msty Open PO Qty (FID 803) rich-text field; hover mimics
-    // QB's per-customer PO detail breakdown.  Per-week cells are dashes -- this
-    // is a mstyle-level total, not distributed across weeks in the viewer.
+    // 2026-05-28: Parse CXL dates from Msty Open PO Qty hover to get per-week
+    // distribution.  Falls back to total-in-W1 if no CXL dates present.
     const _mstyOpnQty   = r.msty_open_po_qty || 0;
-    const _mstyOpnHvr   = (r.msty_open_po_hover || '').replace(/"/g, '&quot;').replace(/\n/g, '&#10;');
+    const _mstyOpnHvRaw = r.msty_open_po_hover || '';
+    const _mstyOpnHvr   = _mstyOpnHvRaw.replace(/"/g, '&quot;').replace(/\n/g, '&#10;');
     const _mstyOpnTAttr = _mstyOpnHvr ? ` title="${{_mstyOpnHvr}}"` : '';
+    // CXL-date bucketing (same pattern as Cust Open PO Qty)
+    const _mstyOpnWkDist = (() => {{
+      const dist = new Array(26).fill(0);
+      if (!_mstyOpnHvRaw || !W1_DATE) return dist;
+      const re = /Opn Qty:\s*(\d+)\s+CXL\s+(\d{{2}})-(\d{{2}})-(\d{{4}})/g;
+      let m;
+      while ((m = re.exec(_mstyOpnHvRaw)) !== null) {{
+        const qty = parseInt(m[1], 10);
+        const cxl = new Date(parseInt(m[4], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+        const days = Math.floor((cxl.getTime() - W1_DATE.getTime()) / 86400000);
+        const wk   = Math.max(0, Math.min(25, Math.floor(days / 7)));
+        dist[wk]  += qty;
+      }}
+      return dist;
+    }})();
+    const _mstyOpnHasDist = _mstyOpnWkDist.some(v => v > 0);
+    const _mstyOpnWkArr   = _mstyOpnHasDist ? _mstyOpnWkDist
+      : (_mstyOpnQty > 0 ? [_mstyOpnQty, ...new Array(25).fill(0)] : new Array(26).fill(0));
     let opnIfCells = `<td class="row-label" style="color:#5d1a7e;font-weight:600;background:#fdf4ff" title="Open POs for this mstyle across all accounts — hover the total cell for per-customer detail">Open POs (all accts)</td>`;
     for (let _oi = 0; _oi < 26; _oi++) {{
-      opnIfCells += `<td style="color:#bbb;font-size:10px;background:#fdf4ff">—</td>`;
+      const _mOpnV = _mstyOpnWkArr[_oi] || 0;
+      opnIfCells += `<td style="${{_mOpnV > 0 ? 'color:#5d1a7e;font-weight:600' : 'color:#bbb'}};font-size:10px;background:#fdf4ff">${{_mOpnV > 0 ? fmtN(_mOpnV) : '&mdash;'}}</td>`;
     }}
     opnIfCells += _mstyOpnQty > 0
       ? `<td style="font-weight:700;color:#5d1a7e;background:#fdf4ff"${{_mstyOpnTAttr}}>${{fmtN(_mstyOpnQty)}}</td>`
