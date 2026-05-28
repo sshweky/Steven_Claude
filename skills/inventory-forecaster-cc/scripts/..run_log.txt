@@ -494,3 +494,6 @@ NameError: name '_opn_row_wk' is not defined. Did you mean: 'open_po_wk'?
       viewer_pos_cache.json refreshed (1653 mstyles)
 
 [2.6] Pulling Amazon Catalog US (F38 signals) for 1892 mstyles ...
+      1653 mstyles with Amazon Catalog US signals loaded (QB REST API)
+
+[2.6b] Pulling Amazon Inventory Health for 1653 ASINs ...

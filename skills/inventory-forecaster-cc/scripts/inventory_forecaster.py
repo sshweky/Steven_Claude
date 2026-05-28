@@ -1919,6 +1919,140 @@ def fetch_amazon_pos_qb_rest(amazon_mstyles):
     return amazon_pos
 
 
+def fetch_amazon_daily_metrics_pos(amazon_mstyles):
+    """Phase 2.5 (2026-05-28): Amazon POS from Daily Metrics (brgxdpadi).
+
+    Replaces fetch_amazon_pos_qb_rest() for Amazon accounts.  Queries daily
+    Ordered Units (FID 162) by Mstyle (FID 213) and Date (FID 81) for the
+    last 26 COMPLETE Sunday-based weeks.  The current in-progress week is
+    always excluded.  Daily rows are summed into weekly totals, then LW,
+    Prior_Wk, L4w, L13w, L26w averages are computed.  Returns the same dict
+    shape as the legacy function so all downstream code (amazon_pos_rate(),
+    F15 blend, F38, viewer POS table) works unchanged.
+
+    Why replace: Daily Metrics is updated daily from SP-API and reflects actual
+    consumer Ordered Units -- fresher and more accurate than the pre-aggregated
+    weekly summary fields in InventoryTrack.Amazon_Catalog (bqp8vz625) which
+    had a weekly refresh lag and occasional L13w=0 gaps.
+
+    Notes:
+    - L52w is set to L26w (only 26 weeks queried per user spec).
+    - Mstyles with no Daily Metrics rows return no entry (caller falls back
+      to pos_data=None / amazon_pos_rate returns 0, same as before).
+    - Date filter uses QB OAF (on or after) and BF (before) operators.
+    """
+    if not amazon_mstyles:
+        return {}
+
+    # ── Date window: last 26 complete Sunday-based weeks ──────────────────────
+    today = date.today()
+    days_to_sun      = (today.weekday() + 1) % 7          # days back to this week's Sunday
+    current_week_sun = today - timedelta(days=days_to_sun) # partial week -- exclude
+    oldest_sun       = current_week_sun - timedelta(weeks=26)
+    last_complete_sun = current_week_sun - timedelta(weeks=1)
+
+    start_str = oldest_sun.strftime('%m-%d-%Y')        # QB date: MM-DD-YYYY
+    end_str   = current_week_sun.strftime('%m-%d-%Y')  # exclusive upper bound (BF)
+
+    print(f"  [Phase2.5-DM] Daily Metrics POS window: "
+          f"{oldest_sun} .. {last_complete_sun} (26 complete weeks)", flush=True)
+
+    # ── Batched REST pull ──────────────────────────────────────────────────────
+    DMX_MSTYLE_FID = 213
+    DMX_DATE_FID   = 81
+    DMX_ORD_FID    = 162
+    BATCH          = 50      # conservative -- daily rows are more numerous
+    PAGE_SZ        = 10000
+    QB_URL         = "https://api.quickbase.com/v1/records/query"
+
+    mstyle_list = sorted({m for m in amazon_mstyles if m})
+    all_raw     = []
+    n_batches   = (len(mstyle_list) + BATCH - 1) // BATCH
+
+    for bi, start_idx in enumerate(range(0, len(mstyle_list), BATCH)):
+        batch    = mstyle_list[start_idx:start_idx + BATCH]
+        or_parts = "OR".join(f"{{{DMX_MSTYLE_FID}.EX.'{ms}'}}" for ms in batch)
+        where    = (f"({or_parts})"
+                    f" AND {{{DMX_DATE_FID}.OAF.'{start_str}'}}"
+                    f" AND {{{DMX_DATE_FID}.BF.'{end_str}'}}")
+        skip = 0
+        while True:
+            payload = json.dumps({
+                "from":    QB_DAILY_METRICS_TABLE,
+                "select":  [DMX_MSTYLE_FID, DMX_DATE_FID, DMX_ORD_FID],
+                "where":   where,
+                "options": {"skip": skip, "top": PAGE_SZ},
+            }).encode("utf-8")
+            req = urllib.request.Request(
+                QB_URL, data=payload, headers=_QB_PROJ_HEADERS, method="POST")
+            resp_data = None
+            for attempt in range(1, QB_REST_MAX_RETRIES + 1):
+                try:
+                    with urllib.request.urlopen(req, timeout=120) as resp:
+                        resp_data = json.loads(resp.read())
+                    break
+                except Exception as e:
+                    if attempt == QB_REST_MAX_RETRIES:
+                        raise RuntimeError(
+                            f"[Phase2.5-DM] batch {bi+1}/{n_batches} failed: {e}")
+                    time.sleep(2 ** attempt)
+            records = resp_data.get("data", [])
+            all_raw.extend(records)
+            if len(records) < PAGE_SZ:
+                break
+            skip += PAGE_SZ
+        print(f"  [Phase2.5-DM] Batch {bi+1}/{n_batches} "
+              f"({len(batch)} mstyles) -> {len(all_raw)} daily rows total", flush=True)
+
+    # ── Aggregate by (mstyle, sunday_week) ────────────────────────────────────
+    from collections import defaultdict
+    wk_units = defaultdict(lambda: defaultdict(int))  # {mstyle: {sunday: units}}
+    str_ms  = str(DMX_MSTYLE_FID)
+    str_dt  = str(DMX_DATE_FID)
+    str_ord = str(DMX_ORD_FID)
+
+    for record in all_raw:
+        ms    = (record.get(str_ms)  or {}).get("value") or ""
+        d_raw = (record.get(str_dt)  or {}).get("value") or ""
+        units = (record.get(str_ord) or {}).get("value") or 0
+        if not ms or not d_raw:
+            continue
+        try:
+            d = date.fromisoformat(str(d_raw)[:10])
+        except ValueError:
+            continue
+        sunday = d - timedelta(days=(d.weekday() + 1) % 7)
+        if sunday >= current_week_sun:   # skip partial current week
+            continue
+        wk_units[ms][sunday] += int(units) if units else 0
+
+    # ── Build output dict (same shape as fetch_amazon_pos_qb_rest) ─────────────
+    result = {}
+    for ms, by_week in wk_units.items():
+        sorted_suns = sorted(by_week.keys(), reverse=True)   # newest first
+        vals = [by_week[s] for s in sorted_suns]
+        if not vals:
+            continue
+        l4_vals  = vals[:4]
+        l13_vals = vals[:13]
+        l26_vals = vals[:26]
+        l4w  = round(sum(l4_vals)  / max(len(l4_vals),  1), 1)
+        l13w = round(sum(l13_vals) / max(len(l13_vals), 1), 1)
+        l26w = round(sum(l26_vals) / max(len(l26_vals), 1), 1)
+        result[ms] = {
+            "Ordered_Units_LW":       vals[0],
+            "Ordered_Units_Prior_Wk": vals[1] if len(vals) >= 2 else 0,
+            "Avg_Units_Wk_L4w":       l4w,
+            "Avg_Units_Wk_L13w":      l13w,
+            "Avg_Units_Wk_L26w":      l26w,
+            "Avg_Units_Wk_L52w":      l26w,  # 52-week not queried; L26 used as proxy
+        }
+
+    print(f"  [Phase2.5-DM] Done: {len(result)}/{len(mstyle_list)} mstyles have data, "
+          f"{len(all_raw)} raw daily rows", flush=True)
+    return result
+
+
 def fetch_amazon_catalog_us_qb_rest(amazon_mstyles):
     """Phase 2.6: pull Amazon Catalog US (F38 signals) via REST.
 
