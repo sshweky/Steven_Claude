@@ -11407,19 +11407,36 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # the confirmed PO IS the demand signal for that week; downstream replen
     # already counts the PO, so the AI projection on top would be double-count.
     #
-    # PO signal priority (2026-05-17 fix):
-    #   1. Opn_W1..Opn_W26 from the Projections row  — already week-grid-aligned,
-    #      matches exactly what planners see in the viewer.  Use this when the
-    #      row has any nonzero open-PO quantity at all.
-    #   2. fetch_open_pos_forward() (report #27, bucketed by cancel date) — fallback
-    #      only when the Opn_W fields are all zero.  Its cancel-date bucketing can
-    #      shift by ±1 week vs the forecast grid, so we prefer the QB row fields.
-    _opn_row_wk = [float(row.get(c) or 0) for c in OPN_COLS]
-    _opn_row_total = sum(_opn_row_wk)
-    if _opn_row_total > 0:
-        _effective_po_wk = _opn_row_wk          # use QB Opn_W fields (grid-aligned)
+    # PO signal priority (2026-05-28 fix -- Cust Open PO Qty# replaces Opn_W1..Opn_W26):
+    #   1. Parse individual PO cancel dates from Cust Open PO Qty rich-text (FID 810).
+    #      CXL dates map to forecast weeks, giving precise week-grid alignment.
+    #   2. Cust Open PO Qty# (FID 410) > 0 with no CXL-date detail -- put full qty
+    #      in W1 (conservative: confirmed PO but no week distribution).
+    #   3. fetch_open_pos_forward() (report #27) as final fallback.
+    #   Removed: Opn_W1..Opn_W26 (always zero -- populated by a broken external process).
+    _cust_opn_qty  = float(row.get("Cust_Open_PO_Qty_") or 0)   # FID 410, numeric
+    _cust_opn_html = row.get("Cust_Open_PO_Qty") or ""           # FID 810, rich-text
+    _vp_w1_date = None
+    if ORIG_PRJ_COLS:
+        try:
+            _c0 = ORIG_PRJ_COLS[0]
+            _vp_w1_date = date(date.today().year, int(_c0[0:2]), int(_c0[3:5]))
+            if (date.today() - _vp_w1_date).days > 180:
+                _vp_w1_date = date(date.today().year + 1, int(_c0[0:2]), int(_c0[3:5]))
+        except Exception:
+            _vp_w1_date = None
+    _cust_opn_week_dist = {}
+    if _cust_opn_html and _cust_opn_qty > 0:
+        _, _, _cust_opn_week_dist = _parse_rich_text_po(_cust_opn_html, _vp_w1_date)
+
+    if _cust_opn_week_dist:
+        # Best case: per-PO CXL dates give precise week bucketing
+        _effective_po_wk = [float(_cust_opn_week_dist.get(w, 0)) for w in range(1, 27)]
+    elif _cust_opn_qty > 0:
+        # Has confirmed open PO but no CXL-date detail -- treat as W1
+        _effective_po_wk = [_cust_opn_qty] + [0.0] * 25
     elif open_po_wk:
-        _effective_po_wk = list(open_po_wk)     # fall back to fetched PO report
+        _effective_po_wk = list(open_po_wk)     # fall back to report #27
     else:
         _effective_po_wk = []
     _vp_q4_zeroed_idx = set()   # 0-based indexes VP-Q4 set to 0 — F59d/F59a must skip
