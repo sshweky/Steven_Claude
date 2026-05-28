@@ -5551,7 +5551,9 @@ def nz_rate(history, window=26):
     return sum(1 for v in h if v > 0) / len(h)
 
 
-def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
+def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None,
+                                  customer_dc_inv=None, weekly_rate=None,
+                                  wos_target=None):
     """
     F37 v3 — Forward inventory-shortfall adjustment with 4-week decay rollforward
     (restored 2026-05-28 per planner directive).
@@ -16674,7 +16676,7 @@ def main():
     if args.rate_limit_ms < 0:
         args.rate_limit_ms = 150 if _is_wide_scope else 0
     if args.bulk_writeback is None:
-        args.bulk_writeback = _is_wide_scope    # True for --all, False otherwise
+        args.bulk_writeback = True   # bulk REST is safe at any scope; only --no-bulk-writeback disables
     # Audit Finding #8 (2026-05-25) safety gate: refuse the legacy per-record
     # CData UPDATE path unless the user explicitly opts in.  The legacy path
     # issues one UPDATE per record (5,500 calls for --all) which is the #1
