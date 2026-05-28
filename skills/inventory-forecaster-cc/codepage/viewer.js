@@ -447,6 +447,7 @@ function buildSelectFids() {
     ...(F.SWITCHOVER_ACTIVE      ? [F.SWITCHOVER_ACTIVE]      : []),
     ...(F.SWITCHOVER_TO_MSTYLE   ? [F.SWITCHOVER_TO_MSTYLE]   : []),
     ...(F.SWITCHOVER_DATE        ? [F.SWITCHOVER_DATE]        : []),
+    ...(F.SWITCHOVER_FROM        ? [F.SWITCHOVER_FROM]        : []),
   ];
   CFG.AI_PRJ_FIDS.forEach(fid => sel.push(fid));
   CFG.OPN_FIDS.forEach(fid => sel.push(fid));
@@ -821,7 +822,12 @@ async function _lazyLoadDetail(r) {
 
   const forecast = CFG.AI_PRJ_FIDS.map(fid => num(row, fid));
   const manual   = MAN_PRJ_FIDS  .map(fid => num(row, fid));
+  // F-Wed: re-apply cutoff override (detail load fetches fresh QB data that
+  // would otherwise restore the pre-override Wk1 value set by adaptRow).
+  if (_pastWedCutoffEST() && manual[0] === 0) forecast[0] = 0;
   r.ai_fcst   = forecast;
+  r.ai_total  = forecast.reduce((a, b) => a + b, 0);   // keep total consistent with override
+  r.ai_wk     = Math.round(((r.ai_total + (r.opn_total || 0)) / 26) * 10) / 10;
   r.opn_w     = CFG.OPN_FIDS.map(fid => num(row, fid));
   // Recompute conflict with fresh PO + manual data (r.is_offprice preserved from adaptRow)
   const { conflicts: _lazyCfls, hasConflict: _lazyCfl } =
@@ -1203,6 +1209,87 @@ async function _fetchAtsForMstyle(r) {
     console.warn('[AtsHist] single-mstyle fetch failed:', e);
     return null;
   }
+}
+
+// -- Normalized L13w parser --------------------------------------------------
+// Extracts normalized L13W avg from AI_ANALYSIS narrative when the forecaster
+// wrote: "Normalized Ord/Wk L13w: 1,506/wk (raw L13W: 1,900/wk -- reason)"
+// Returns { norm, raw, reason } or null when the bullet is not present.
+function _parseNormL13w(narrative) {
+  if (!narrative) return null;
+  // Primary: machine-readable hidden span (always present in narratives written
+  // after 2026-05-27).  Attribute order is fixed by the forecaster so a single
+  // pass captures norm, raw, and reason reliably.
+  const spanM = narrative.match(
+    /class="norm-l13w-data"\s+data-norm="(\d+)"\s+data-raw="(\d+)"\s+data-reason="([^"]*)"\s+data-strips="([^"]*)"/i
+  );
+  if (spanM) return {
+    norm:   parseInt(spanM[1], 10),
+    raw:    parseInt(spanM[2], 10),
+    reason: spanM[3] || null,
+    strips: spanM[4] ? spanM[4].split('|').filter(Boolean) : [],
+  };
+  // Fallback for spans without data-strips (older narratives before 2026-05-27).
+  const spanOld = narrative.match(
+    /class="norm-l13w-data"\s+data-norm="(\d+)"\s+data-raw="(\d+)"\s+data-reason="([^"]*)"/i
+  );
+  if (spanOld) return {
+    norm:   parseInt(spanOld[1], 10),
+    raw:    parseInt(spanOld[2], 10),
+    reason: spanOld[3] || null,
+    strips: [],
+  };
+  // Fallback: text format for older narratives.
+  // Use [^0-9]+ to skip the </b> tag the forecaster places between the label
+  // and the value -- [:\s]+ would fail on the '<' character.
+  const m = narrative.match(
+    /Normalized Ord\/Wk L13w[^0-9]+([\d,]+)\/wk[^(]*\(raw L13W[^0-9]+([\d,]+)\/wk\s*--\s*([^)]+)\)/i
+  );
+  if (!m) return null;
+  return {
+    norm:   parseInt(m[1].replace(/,/g, ''), 10),
+    raw:    parseInt(m[2].replace(/,/g, ''), 10),
+    reason: m[3].trim(),
+  };
+}
+
+// Builds the Normalized Ord/Wk L13W bullet as a plain HTML string (no outer
+// wrapper) for injection as the first <li> in the AI Analysis section.
+// Always returns a non-empty string so planners see the metric on every expanded
+// row regardless of history depth.
+function _buildNormL13wHtml(r) {
+  const rawL13  = Math.round(r.shp_wk || 0);
+  const parsed  = _parseNormL13w(r.narrative || '');
+  const normL13 = parsed ? parsed.norm : rawL13;
+  const diff    = normL13 - rawL13;
+  const normFmt = fmtN(normL13);
+  let diffHtml  = '';
+  if (rawL13 === 0) {
+    diffHtml = ' <span style="color:#aaa;font-size:11px">(no recent order history)</span>';
+  } else if (diff !== 0) {
+    const sign    = diff > 0 ? '+' : '-';
+    const diffClr = diff < 0 ? '#c62828' : '#2e7d32';
+    const pct     = (diff / rawL13 * 100).toFixed(1);
+    const strips  = (parsed && parsed.strips && parsed.strips.length) ? parsed.strips : [];
+    let tip;
+    if (strips.length) {
+      // Pre-formatted business-language sentences from the forecaster.
+      tip = strips.join('\n');
+    } else {
+      // Fallback for older narratives that predate data-strips (before 2026-05-27).
+      const reason = (parsed && parsed.reason) ? parsed.reason : 'demand adjustments applied';
+      tip = 'Raw Ord/Wk L13W: ' + fmtN(rawL13) + '/wk'
+        + ' -- Normalized to: ' + normFmt + '/wk'
+        + ' (' + sign + fmtN(Math.abs(diff)) + '/wk, ' + pct + '%)'
+        + '. Reason: ' + reason + '.';
+    }
+    const tipEsc = tip.replace(/"/g, '&quot;').replace(/\n/g, '&#10;');
+    diffHtml = ' <span style="color:' + diffClr + ';font-size:11px;cursor:help"'
+      + ' title="' + tipEsc + '">(' + sign + fmtN(Math.abs(diff)) + ' vs raw)</span>';
+  } else {
+    diffHtml = ' <span style="color:#aaa;font-size:11px">(no adjustments)</span>';
+  }
+  return '<b>Normalized Ord/Wk L13W:</b> ' + normFmt + '/wk' + diffHtml;
 }
 
 // -- F35 normalization note --------------------------------------------------
@@ -2207,6 +2294,27 @@ function _buildOrderTrendInsight(histOrd, lyOrd, custLabel) {
   return `${header} ${expl}`;
 }
 
+// F-Wed: Returns true when the current local time is on or past Wednesday 9am
+// US Eastern Time -- the weekly order cutoff.  Used to suppress AI Wk1 when
+// no order / MAN PRJ has been entered by that deadline.
+function _pastWedCutoffEST() {
+  try {
+    const now   = new Date();
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      weekday:  'short',
+      hour:     'numeric',
+      hour12:   false,
+    }).formatToParts(now);
+    const wd  = parts.find(p => p.type === 'weekday').value;  // 'Sun','Mon',...
+    const hr  = parseInt(parts.find(p => p.type === 'hour').value, 10);
+    const day = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 }[wd] ?? 0;
+    return day > 3 || (day === 3 && hr >= 9);
+  } catch (_) {
+    return false;  // timezone API unavailable -- don't suppress AI forecast
+  }
+}
+
 function adaptRow(row) {
   const F = CFG.FID;
   const forecast = CFG.AI_PRJ_FIDS.map(fid => num(row, fid));
@@ -2251,6 +2359,10 @@ function adaptRow(row) {
       break;
     }
   }
+
+  // F-Wed: order window closed (Wed 9am EST passed) with no MAN PRJ entered --
+  // zero out AI Wk1 so the planner doesn't see a phantom open-order suggestion.
+  if (_pastWedCutoffEST() && manual[0] === 0) forecast[0] = 0;
 
   const ai_total     = forecast.reduce((a,b) => a+b, 0);
   const manual_total = manual.reduce((a,b) => a+b, 0);
@@ -2405,6 +2517,7 @@ function adaptRow(row) {
     switchover_active:   F.SWITCHOVER_ACTIVE    ? bool(row, F.SWITCHOVER_ACTIVE)    : false,
     switchover_to_mstyle:F.SWITCHOVER_TO_MSTYLE ? str(row, F.SWITCHOVER_TO_MSTYLE)  : '',
     switchover_date:     F.SWITCHOVER_DATE      ? str(row, F.SWITCHOVER_DATE)        : '',
+    switchover_from:     F.SWITCHOVER_FROM      ? str(row, F.SWITCHOVER_FROM)        : '',
     opn_w:             opn,           // [Opn_W1..Opn_W26] open customer PO quantities
     opn_total:         opn_total,    // sum of opn_w; used in proj_wk/ai_wk recalcs
     inv_flow_beg:        null,        // [Wk1..Wk26] beginning balances
@@ -2702,53 +2815,6 @@ function snooze48(key) {
   const rec = ALL_RECORDS.find(r => r.key === key);
   if (rec) rec._snoozed = true;
   applyFilters();
-}
-
-// -- Duplicate-demand alert ignore tracking ---------------------------------
-// Planner can dismiss the "DUPLICATE DEMAND" alert per record when the PO+MAN
-// overlap is intentional (e.g. a separate second order is genuinely expected).
-// Stored in localStorage as { recordKey: {hash, ts} }.  The hash captures the
-// current PO+MAN conflict pattern so the alert REAPPEARS automatically if the
-// underlying values change (planner edits manual prj, new PO arrives, etc.).
-function _getDupAlertIgnores() {
-  try { return JSON.parse(localStorage.getItem('pp_dupAlertIgnored') || '{}'); }
-  catch (_) { return {}; }
-}
-function _saveDupAlertIgnores(m) {
-  try { localStorage.setItem('pp_dupAlertIgnored', JSON.stringify(m)); } catch (_) {}
-}
-function _dupConflictHash(conflicts) {
-  return (conflicts || [])
-    .map(c => `W${c.poWk}:${c.poQty}|W${c.prjWk}:${c.prjQty}`)
-    .sort().join(';');
-}
-function isDupAlertIgnored(r) {
-  if (!r || !r.po_prj_conflicts || !r.po_prj_conflicts.length) return false;
-  const m = _getDupAlertIgnores();
-  const e = m[r.key];
-  if (!e) return false;
-  return e.hash === _dupConflictHash(r.po_prj_conflicts);
-}
-function ignoreDupAlert(key, safeKey) {
-  const rec = ALL_RECORDS.find(x => x.key === key);
-  if (!rec) return;
-  const m = _getDupAlertIgnores();
-  m[key] = {
-    hash: _dupConflictHash(rec.po_prj_conflicts || []),
-    ts:   Date.now(),
-  };
-  _saveDupAlertIgnores(m);
-  // Hide the alert + the row's warning icon immediately
-  const el = document.getElementById('po-prj-alert-' + safeKey);
-  if (el) el.style.display = 'none';
-  const rowSafeId = key.replace(/[^a-zA-Z0-9]/g, '_');
-  const badge = document.getElementById('conflict-badge-' + rowSafeId);
-  if (badge) badge.style.display = 'none';
-}
-function unignoreDupAlert(key) {
-  const m = _getDupAlertIgnores();
-  delete m[key];
-  _saveDupAlertIgnores(m);
 }
 function unsnooze(key) {
   const s = _getSnoozes();
@@ -3110,9 +3176,11 @@ async function toggleAutoProject(key) {
 }
 
 function updateFlagCount() {
-  const n = ALL_RECORDS.filter(r => r.flagged).length;
+  // Directors see ALL records with an active comment flag.
+  // Planners see only records where they are the Sent-To recipient.
+  const n = _isDirector() ? _ALL_COMMENT_FLAGGED_KEYS.size : _FOR_ME_KEYS.size;
   const el = document.getElementById('flagCount');
-  if (el) el.textContent = n + ' flagged for manager';
+  if (el) el.textContent = n + ' flagged';
 }
 
 // -- Unified attention banner ------------------------------------------------
@@ -3188,76 +3256,12 @@ function _analyzeSeasonalPattern(histOrd) {
   return { events, avgGapWks, nextExpectedWk, avgOrderTotal, wksSinceLast };
 }
 
-// Parse a Switchover_Date string (ISO 'YYYY-MM-DD' or empty) to a JS Date at
-// midnight, or null when no date is set.  Centralized so all switchover code
-// paths interpret the field the same way.
-function _parseSwitchoverDate(s) {
-  if (!s) return null;
-  const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!m) return null;
-  const d = new Date(+m[1], +m[2] - 1, +m[3]);
-  return isNaN(d.getTime()) ? null : d;
-}
-
-// Return the switchover badge HTML for a record, or empty string if not part
-// of any switchover relationship.  Color logic per planner directive
-// (2026-05-27):
-//   BASE/original side:
-//     - Switchover_Date is in the FUTURE (or unset): GREEN -- base still owns demand
-//     - Switchover_Date is in the PAST: DARK GREY  -- base is closed out
-//   VARIANT/new side (inverse):
-//     - Switchover_Date is in the FUTURE (or unset): DARK GREY -- variant waiting
-//     - Switchover_Date is in the PAST: GREEN -- variant now active
-// Tooltip distinguishes Auto-detected (EC/COS/AMZ/DS/DTC + PCS->PX) from Manual
-// (planner-set via Switchover_To_MStyle field).
-function _switchoverBadgeForRow(r) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  let info = null;  // { side: 'base'|'variant', type: 'auto'|'manual', other, date }
-  const mSw    = MANUAL_SWITCHOVER_MAP.get(r.key);
-  const mRev   = MANUAL_SWITCHOVER_REVERSE.get(r.key);
-  if (mSw)        info = { side: 'base',    type: 'manual', other: mSw.toMstyle,     date: mSw.date };
-  else if (mRev)  info = { side: 'variant', type: 'manual', other: mRev.fromMstyle,  date: mRev.date };
-  else {
-    const aSw  = SWITCHOVER_MAP.get(r.key);
-    const aRev = SWITCHOVER_REVERSE.get(r.key);
-    if (aSw)       info = { side: 'base',    type: 'auto', other: aSw.variantMstyle, date: aSw.date };
-    else if (aRev) info = { side: 'variant', type: 'auto', other: aRev.baseMstyle,   date: aRev.date };
-  }
-  if (!info) return '';
-
-  const past   = info.date instanceof Date && info.date <= today;
-  // Base: green when pre-switchover (or no date), grey when complete.
-  // Variant: opposite -- grey while waiting, green once active.
-  const color = info.side === 'base'
-    ? (past ? '#555' : '#2e7d32')
-    : (past ? '#2e7d32' : '#555');
-
-  const dateStr = info.date
-    ? `${info.date.getMonth()+1}/${info.date.getDate()}/${String(info.date.getFullYear()).slice(2)}`
-    : 'no date';
-  const statusWord = past ? 'completed' : (info.date ? 'upcoming' : 'date not set');
-  const typeWord   = info.type === 'auto' ? 'Auto-detected' : 'Manual';
-  const sideWord   = info.side === 'base' ? `base -> ${info.other}` : `variant <- ${info.other}`;
-  const title = `${typeWord} switchover (${sideWord}); date ${dateStr} -- ${statusWord}`;
-
-  return `<span class="switchover-badge" style="color:${color}" title="${title.replace(/"/g,'&quot;')}">&#x21C4;</span>`;
-}
-
-
-// Auto-detected switchovers (EC/COS/AMZ/DS/DTC suffix variants + PCS->PX siblings).
-// Both maps keyed by record key; values include the partner mstyle/key and
-// (if known) the parsed Switchover_Date so badge rendering can decide
-// pre/post-switchover coloring.
-const SWITCHOVER_MAP            = new Map();  // base_key    -> { variantMstyle, variantKey, date }
-const SWITCHOVER_REVERSE        = new Map();  // variant_key -> { baseMstyle, baseKey, date }
-const MANUAL_SWITCHOVER_MAP     = new Map();  // base_key    -> { toMstyle, toKey, date }
-const MANUAL_SWITCHOVER_REVERSE = new Map();  // variant_key -> { fromKey, fromMstyle, date }
+const SWITCHOVER_MAP            = new Map();  // COS/EC auto-detected
+const MANUAL_SWITCHOVER_MAP     = new Map();  // planner-configured base → new
+const MANUAL_SWITCHOVER_REVERSE = new Map();  // planner-configured new  → base
 
 function buildSwitchoverMap() {
   SWITCHOVER_MAP.clear();
-  SWITCHOVER_REVERSE.clear();
   MANUAL_SWITCHOVER_MAP.clear();
   MANUAL_SWITCHOVER_REVERSE.clear();
 
@@ -3288,24 +3292,14 @@ function buildSwitchoverMap() {
     // Pattern 1 -- I'm a variant (ends in EC/COS/AMZ/DS/DTC). Look up base.
     const sfxM = r.mstyle.match(_swSuffixRe);
     if (sfxM) {
-      const baseMstyle = sfxM[1];
-      const baseKey    = _swSiblingKey(r, baseMstyle);
-      const baseRec    = _swByKey.get(baseKey);
-      if (baseRec) {
-        // Register the relationship whenever base AND variant are both in
-        // scope -- no longer gated on the variant having activity, so the
-        // badge shows on every base/variant pair the planner can see.
-        const baseDate = _parseSwitchoverDate(baseRec.switchover_date);
-        SWITCHOVER_MAP.set(baseKey, {
-          variantMstyle: r.mstyle,
-          variantKey:    r.key,
-          date:          baseDate,
-        });
-        SWITCHOVER_REVERSE.set(r.key, {
-          baseMstyle: baseMstyle,
-          baseKey:    baseKey,
-          date:       baseDate,
-        });
+      const hasOrders = r.hist_ord   && r.hist_ord.some(v => v > 0);
+      const hasProjs  = r.weeks_slim && r.weeks_slim.some(w => (w.projection || 0) > 0);
+      if (hasOrders || hasProjs) {
+        const baseMstyle = sfxM[1];
+        const baseKey    = _swSiblingKey(r, baseMstyle);
+        if (_swByKey.has(baseKey)) {
+          SWITCHOVER_MAP.set(baseKey, r.mstyle);
+        }
       }
     }
 
@@ -3316,18 +3310,12 @@ function buildSwitchoverMap() {
       const newKey    = _swSiblingKey(r, newMstyle);
       const newRec    = _swByKey.get(newKey);
       if (newRec) {
-        // r is the OLD/base (PCS), newRec is the NEW/variant (PX).
-        const baseDate = _parseSwitchoverDate(r.switchover_date);
-        SWITCHOVER_MAP.set(r.key, {
-          variantMstyle: newMstyle,
-          variantKey:    newKey,
-          date:          baseDate,
-        });
-        SWITCHOVER_REVERSE.set(newKey, {
-          baseMstyle: r.mstyle,
-          baseKey:    r.key,
-          date:       baseDate,
-        });
+        const newHasOrders = newRec.hist_ord   && newRec.hist_ord.some(v => v > 0);
+        const newHasProjs  = newRec.weeks_slim && newRec.weeks_slim.some(w => (w.projection || 0) > 0);
+        if (newHasOrders || newHasProjs) {
+          // The OLD (PCS) record gets the badge; value is the NEW (PX) mstyle.
+          SWITCHOVER_MAP.set(r.key, newMstyle);
+        }
       }
     }
   }
@@ -3340,7 +3328,7 @@ function buildSwitchoverMap() {
     // Derive the target key: same account prefix, different mstyle
     // Key format: AcctNum-MStyle  →  replace mstyle part
     const toKey = r.key.replace(r.mstyle, toMstyle);
-    const date  = _parseSwitchoverDate(r.switchover_date);
+    const date  = r.switchover_date ? new Date(r.switchover_date) : null;
     MANUAL_SWITCHOVER_MAP.set(r.key, { toMstyle, toKey, date });
     MANUAL_SWITCHOVER_REVERSE.set(toKey, { fromKey: r.key, fromMstyle: r.mstyle, date });
   }
@@ -3394,6 +3382,8 @@ async function saveSwitchoverField(key, field, value) {
   if (statusEl) statusEl.textContent = 'Saving...';
   const fields = {};
   fields[CFG.FID.KEY] = { value: key };
+  // Capture old mstyle before overwriting so we can clear switchover_from on the old variant
+  const _prevSwToMstyle = rec.switchover_to_mstyle || '';
   if (field === 'active') {
     rec.switchover_active = !!value;
     fields[CFG.FID.SWITCHOVER_ACTIVE] = { value: !!value };
@@ -3409,19 +3399,59 @@ async function saveSwitchoverField(key, field, value) {
   }
   try {
     await qb('/records', { to: CFG.PROJECTIONS_TID, data: [fields], mergeFieldId: CFG.FID.KEY });
+
+    // Auto-write switchover_from on the variant record (fire-and-forget secondary writes).
+    // Fires whenever the base style is active + has a target mstyle set.
+    if (CFG.FID.SWITCHOVER_FROM) {
+      const _swActive    = rec.switchover_active;
+      const _swToMstyle  = (rec.switchover_to_mstyle || '').trim();
+      const _baseMstyle  = rec.mstyle || rec.key.split('-').slice(1).join('-');
+      const _acct        = rec.key.split('-', 1)[0];
+      if (_swActive && _swToMstyle && _baseMstyle) {
+        const _variantKey = _acct + '-' + _swToMstyle;
+        const _variantRec = ALL_RECORDS.find(x => x.key === _variantKey);
+        const _vFields    = {};
+        _vFields[CFG.FID.KEY]             = { value: _variantKey };
+        _vFields[CFG.FID.SWITCHOVER_FROM] = { value: _baseMstyle };
+        qb('/records', { to: CFG.PROJECTIONS_TID, data: [_vFields], mergeFieldId: CFG.FID.KEY })
+          .then(() => { if (_variantRec) _variantRec.switchover_from = _baseMstyle; })
+          .catch(err => console.warn('[Switchover] switchover_from write failed:', err));
+      }
+      // Clear switchover_from on the old variant when the mstyle target changed
+      if (field === 'mstyle' && _prevSwToMstyle && _prevSwToMstyle !== _swToMstyle) {
+        const _oldVariantKey = _acct + '-' + _prevSwToMstyle;
+        const _oldVariantRec = ALL_RECORDS.find(x => x.key === _oldVariantKey);
+        const _clrFields     = {};
+        _clrFields[CFG.FID.KEY]             = { value: _oldVariantKey };
+        _clrFields[CFG.FID.SWITCHOVER_FROM] = { value: '' };
+        qb('/records', { to: CFG.PROJECTIONS_TID, data: [_clrFields], mergeFieldId: CFG.FID.KEY })
+          .then(() => { if (_oldVariantRec) _oldVariantRec.switchover_from = ''; })
+          .catch(err => console.warn('[Switchover] clear old switchover_from failed:', err));
+      }
+      // Also clear switchover_from when deactivating the switchover
+      if (field === 'active' && !value && _prevSwToMstyle) {
+        const _deactKey = _acct + '-' + _prevSwToMstyle;
+        const _deactRec = ALL_RECORDS.find(x => x.key === _deactKey);
+        const _clrF     = {};
+        _clrF[CFG.FID.KEY]             = { value: _deactKey };
+        _clrF[CFG.FID.SWITCHOVER_FROM] = { value: '' };
+        qb('/records', { to: CFG.PROJECTIONS_TID, data: [_clrF], mergeFieldId: CFG.FID.KEY })
+          .then(() => { if (_deactRec) _deactRec.switchover_from = ''; })
+          .catch(err => console.warn('[Switchover] clear deactivated switchover_from failed:', err));
+      }
+    }
+
     // Rebuild the switchover map so week locking reflects the change immediately.
     // Invalidate the week-date cache in case date changed.
     if (field === 'date') _weekDateCache = null;
     buildSwitchoverMap();
-    // Refresh the row badge using the unified renderer so date + side coloring
-    // updates correctly when the planner toggles Switchover_Active or edits
-    // Switchover_To_MStyle / Switchover_Date inline.
+    // Refresh the row badge
     const badgeCell = document.getElementById('row-badges-' + safeId);
     if (badgeCell) {
       const sb = badgeCell.querySelector('.switchover-badge');
-      if (sb) sb.remove();
-      const newBadge = _switchoverBadgeForRow(rec);
-      if (newBadge) badgeCell.insertAdjacentHTML('beforeend', newBadge);
+      const hasSw = MANUAL_SWITCHOVER_MAP.has(key);
+      if (!sb && hasSw)  badgeCell.insertAdjacentHTML('beforeend', '<span class="switchover-badge" title="Manual switchover configured">&#x21C4;</span>');
+      if (sb  && !hasSw && !SWITCHOVER_MAP.has(key)) sb.remove();
     }
     // Collapse and re-expand to re-render locked weeks and card status line
     const tr = document.getElementById('detail-' + safeId);
@@ -3438,12 +3468,13 @@ async function saveSwitchoverField(key, field, value) {
       if (!ALL_RECORDS.some(x => x.key === newKey)) {
         if (statusEl) { statusEl.style.color = '#1565c0'; statusEl.textContent = 'Saved - creating record...'; }
         const nf = {};
-        nf[CFG.FID.KEY]         = { value: newKey };
-        nf[CFG.FID.MSTYLE]      = { value: toMstyle };
-        nf[CFG.FID.ACCT_NUM]    = { value: parseInt(acctNum, 10) || 0 };
-        nf[CFG.FID.ACCT_TXT]    = { value: acctNum };
-        nf[CFG.FID.CUST]        = { value: rec.cust || '' };
-        nf[CFG.FID.STATUS_CUST] = { value: 'AUTO ADD' };
+        nf[CFG.FID.KEY]             = { value: newKey };
+        nf[CFG.FID.MSTYLE]          = { value: toMstyle };
+        nf[CFG.FID.ACCT_NUM]        = { value: parseInt(acctNum, 10) || 0 };
+        nf[CFG.FID.ACCT_TXT]        = { value: acctNum };
+        nf[CFG.FID.CUST]            = { value: rec.cust || '' };
+        nf[CFG.FID.STATUS_CUST]     = { value: 'AUTO ADD' };
+        if (CFG.FID.SWITCHOVER_FROM) nf[CFG.FID.SWITCHOVER_FROM] = { value: rec.mstyle || '' };
         try {
           await qb('/records', { to: CFG.PROJECTIONS_TID, data: [nf], mergeFieldId: CFG.FID.KEY });
           // Add a minimal in-memory stub so the new row is immediately visible in
@@ -3465,6 +3496,7 @@ async function saveSwitchoverField(key, field, value) {
             switchover_active:     false,
             switchover_to_mstyle:  '',
             switchover_date:       '',
+            switchover_from:       rec.mstyle || '',
           });
           buildSwitchoverMap();
           if (statusEl) {
@@ -3604,6 +3636,36 @@ async function refreshForMeKeys() {
   } catch (_) { /* non-fatal — filter falls back to empty set */ }
 }
 
+// -- All-comment-flagged keys (Director/VP view for "Show Flagged" button) -----
+// Projection keys where ANY active comment flag exists (Needs Action, Manager
+// Response, Planner Response) regardless of SEND_TO.  Used by "Show Flagged"
+// when the current user is a Director/VP so they see ALL open flags, not just
+// ones addressed to them personally.  Refreshed alongside refreshForMeKeys().
+let _ALL_COMMENT_FLAGGED_KEYS = new Set();
+
+async function refreshAllCommentFlaggedKeys() {
+  // Only Directors/VPs need this set -- planners use _FOR_ME_KEYS instead.
+  if (!_isDirector()) { updateFlagCount(); return; }
+  try {
+    const F = CFG.COMMENT_FID;
+    const activeFlags = ['Needs Action', 'Planner Response', 'Manager Response'];
+    const where = activeFlags.map(f => `{${F.FLAG}.EX.'${f}'}`).join('OR');
+    const resp = await qb('/records/query', {
+      from:    CFG.COMMENTS_TID,
+      select:  [F.ACCT_MSTYLE],
+      where,
+      options: { top: 5000 },
+    });
+    _ALL_COMMENT_FLAGGED_KEYS = new Set(
+      (resp.data || [])
+        .map(row => row[F.ACCT_MSTYLE] && row[F.ACCT_MSTYLE].value)
+        .filter(Boolean)
+    );
+    updateFlagCount();
+    if (FLAGGED_ONLY) applyFilters();  // refresh visible rows if filter is active
+  } catch (_) { /* non-fatal */ }
+}
+
 let SHOW_FOR_ME_ONLY = false;
 function toggleForMe() {
   SHOW_FOR_ME_ONLY = !SHOW_FOR_ME_ONLY;
@@ -3642,8 +3704,8 @@ function renderPage(page) {
 
     const _safeId2 = r.key.replace(/[^a-zA-Z0-9]/g,'_');
     tr.innerHTML = `
-      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">[R]</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>' : ''}${_switchoverBadgeForRow(r)}${r.auto_project ? '<span style="display:inline-block;background:#1b5e20;color:#fff;border-radius:3px;padding:0 4px;font-size:10px;font-weight:700;letter-spacing:0.3px;margin-left:2px;" title="Auto Project: AI projections will replace manual projections on each forecast run">[A]</span>' : ''}</td>
-      <td class="clickable" onclick="toggleDetail('${r.key}')"><span id="conflict-badge-${_safeId2}" style="display:${r.has_po_prj_conflict && !isDupAlertIgnored(r) ? 'inline' : 'none'};color:#e65100;font-size:14px;font-weight:700;margin-right:3px;vertical-align:middle;cursor:pointer;" title="Open PO and Manual Projection overlap — potential double-count. Click to see details.">&#x26A0;</span>${r.key}</td>
+      <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">[R]</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>' : ''}${SWITCHOVER_MAP.has(r.key) && !MANUAL_SWITCHOVER_MAP.has(r.key) ? '<span class="switchover-badge" style="color:#2e7d32" title="Auto-detected switchover to ' + (SWITCHOVER_MAP.get(r.key)||'').replace(/"/g,'&quot;') + ' — variant has activity, mark this projection CLOSED">&#x21C4;</span>' : ''}${MANUAL_SWITCHOVER_MAP.has(r.key) ? '<span class="switchover-badge" title="Manual switchover to ' + ((MANUAL_SWITCHOVER_MAP.get(r.key)||{}).toMstyle||'').replace(/"/g,'&quot;') + '">&#x21C4;</span>' : ''}${r.auto_project ? '<span style="display:inline-block;background:#1b5e20;color:#fff;border-radius:3px;padding:0 4px;font-size:10px;font-weight:700;letter-spacing:0.3px;margin-left:2px;" title="Auto Project: AI projections will replace manual projections on each forecast run">[A]</span>' : ''}</td>
+      <td class="clickable" onclick="toggleDetail('${r.key}')"><span id="conflict-badge-${_safeId2}" style="display:${r.has_po_prj_conflict && !_PO_DUP_IGNORED.has(r.key) ? 'inline' : 'none'};color:#e65100;font-size:14px;font-weight:700;margin-right:3px;vertical-align:middle;cursor:pointer;" title="Open PO and Manual Projection overlap -- potential double-count. Click to see details.">&#x26A0;</span>${r.key}</td>
       <td style="font-size:11px;white-space:nowrap">${r.inv_manager||''}</td>
       <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.brand||'').replace(/"/g,'&quot;')}">${r.brand||''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')">${r.cust}</td>
@@ -4512,7 +4574,12 @@ async function toggleDetail(key) {
   let _narParts = (r.narrative || '')
     .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n')
     .replace(/<br\s*\/?>/gi, '\n')
-    .split('\n').filter(s => s.trim());
+    .split('\n').filter(s => s.trim())
+    // Remove any existing Normalized Ord/Wk L13w bullet from the narrative --
+    // it will be re-injected first (via _buildNormL13wHtml) to guarantee position.
+    .filter(s => !/Normalized Ord\/Wk L13w/i.test(s));
+  // Always the first bullet so planners see the normalized rate at a glance.
+  _narParts.unshift(_buildNormL13wHtml(r));
   // Seasonal / off-price bullet: inject into AI Analysis for any item that is
   // A: OffPrice OR has a Season tag.  These items have lumpy demand and need
   // cadence context so planners know when to expect the next buy window.
@@ -4583,8 +4650,8 @@ async function toggleDetail(key) {
   const safeId   = r.key.replace(/[^a-zA-Z0-9]/g, '_');
   const flagCls2 = 'flag-btn' + (r.flagged ? ' flagged' : '');
   // Comment block  -  Flag/Mgr conversation thread (planner <-> inventory mgr).
-  // 25% Add-a-Comment input | 75% Comment History (filtered to NON-AI
-  // comments only).  Tell-AI dialogue lives in its own block above.
+  // 25% Add-a-Comment input | 75% Comment History (flag comments only).
+  // Tell-AI dialogue lives in its own block above.
   const autoProjectBtn = CFG.FID.AUTO_PROJECT ? `
   <div style="margin:6px 12px 0 12px;">
     <button id="autoproj-${safeId}" onclick="toggleAutoProject('${safeKey}')"
@@ -4630,7 +4697,7 @@ async function toggleDetail(key) {
         </div>
         <div id="cmt-msg-${safeKey}" style="font-size:11px;color:#666;margin-top:4px;"></div>
       </div>
-      <!-- RIGHT: Mgr/Flag comment history (75%)  -  non-AI comments only -->
+      <!-- RIGHT: Mgr/Flag comment history (75%)  -  flag comments only -->
       <div style="flex:1 1 75%;min-width:0;">
         <div style="font-weight:600;color:#8b2252;margin-bottom:6px;font-size:12px;display:flex;align-items:center;justify-content:space-between;">
           <span> Comment History <span style="font-weight:400;color:#999;font-size:10px;">  -  last 90 days, oldest first  |  planner <-> mgr</span></span>
@@ -4739,7 +4806,7 @@ async function toggleDetail(key) {
   // -- COS / EC Switchover alert (base style only) ---------------------------
   // Shown when a COS or EC variant of this style has started receiving orders
   // or manual projections, signalling that this base style should be closed.
-  const _variantMstyle   = (SWITCHOVER_MAP.get(r.key) || {}).variantMstyle;
+  const _variantMstyle   = SWITCHOVER_MAP.get(r.key);
   const _cosEcHtml       = _variantMstyle ? `
     <div id="switchover-alert-${safeKey}" style="margin:8px 12px 0 12px;padding:10px 14px;background:#fff8e1;border:2px solid #f9a825;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
       <span style="font-size:18px;line-height:1;">&#x26A0;&#xFE0F;</span>
@@ -4766,12 +4833,18 @@ async function toggleDetail(key) {
   const _esc        = s => (s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]);
 
   // Receiving-side banner (shown on the NEW style's row)
+  // _manSwRev comes from MANUAL_SWITCHOVER_REVERSE (base record in current view).
+  // Fallback: use r.switchover_from from QB if the base record is out of scope.
   const _receivingHtml = _manSwRev ? `
     <div style="margin:8px 12px 0 12px;padding:8px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px;font-size:12px;color:#0d47a1;">
       &#x21C4; <b>Receiving switchover from ${_esc(_manSwRev.fromMstyle)}</b>
       ${_manSwRev.date ? '&mdash; effective ' + _manSwRev.date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''}
       &mdash; pre-switchover order history is included in demand calculations.
-    </div>` : '';
+    </div>` : (r.switchover_from ? `
+    <div style="margin:8px 12px 0 12px;padding:8px 14px;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px;font-size:12px;color:#0d47a1;">
+      &#x21C4; <b>Switchover from ${_esc(r.switchover_from)}</b>
+      &mdash; this is a variant style; planning has moved here from the base style.
+    </div>` : '');
 
   const _manualSwitchoverCard = `
     <div id="sw-card-${safeKey}" style="margin:8px 12px 0 12px;padding:10px 14px;background:#fafafa;border:1px solid #e0e0e0;border-radius:6px;font-size:12px;">
@@ -4784,12 +4857,16 @@ async function toggleDetail(key) {
           Switchover Active
         </label>
         <label style="display:flex;align-items:center;gap:6px;">
-          <span style="color:#555;">New MStyle:</span>
+          <span style="color:#555;">Switchover to MStyle:</span>
           <input type="text" id="sw-mstyle-${safeKey}" value="${_swToVal}" placeholder="e.g. BB38259"
             style="font-size:12px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;width:110px;text-transform:uppercase;"
             onblur="saveSwitchoverField('${r.key.replace(/'/g,"\\'")}','mstyle',this.value)"
             onkeydown="if(event.key==='Enter')this.blur()">
         </label>
+        ${r.switchover_from ? `<label style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#555;">Switchover from MStyle:</span>
+          <span style="font-size:12px;font-weight:600;color:#1565c0;">${_esc(r.switchover_from)}</span>
+        </label>` : ''}
         <label style="display:flex;align-items:center;gap:6px;">
           <span style="color:#555;">Switch Date:</span>
           <input type="date" id="sw-date-${safeKey}" value="${_swDateVal}"
@@ -4829,13 +4906,12 @@ async function toggleDetail(key) {
     </div>` : '';
 
   // -- PO / Manual Projection conflict alert ----------------------------------
-  // Skip rendering when the planner has dismissed this exact conflict pattern.
-  // _dupConflictHash captures the current PO+MAN values, so the alert
-  // reappears automatically if those values change after dismissal.
   let poPrjAlertHtml = '';
-  if (r.has_po_prj_conflict && r.po_prj_conflicts && r.po_prj_conflicts.length
-      && !isDupAlertIgnored(r)) {
-    const _isOP = r.is_offprice;
+  if (r.has_po_prj_conflict && r.po_prj_conflicts && r.po_prj_conflicts.length) {
+    const _isOP      = r.is_offprice;
+    const _ignored   = _PO_DUP_IGNORED.has(r.key);
+    const _sk        = r.key.replace(/[^a-zA-Z0-9]/g, '_');
+    const _safeK     = r.key.replace(/'/g, "\\'");
     const _conflictLines = r.po_prj_conflicts.map(c => {
       if (c.poWk === c.prjWk) {
         return `W${c.poWk}: Open PO ${fmtN(c.poQty)} units  |  Manual Prj ${fmtN(c.prjQty)} units  (same week)`;
@@ -4844,33 +4920,47 @@ async function toggleDetail(key) {
         return `Open PO ${fmtN(c.poQty)} units (W${c.poWk})  +  Manual Prj ${fmtN(c.prjQty)} units (W${c.prjWk})  -- ${gap} wk apart`;
       }
     });
-    const _alertTitle = _isOP
-      ? 'DUPLICATE DEMAND: Off-Price Open PO + Manual Projection overlap'
-      : 'DUPLICATE DEMAND: Open PO and Manual Projection in the Same Week';
-    const _alertDesc = _isOP
-      ? 'Off-price POs ship the same or following week. A Manual Projection within 4 weeks of an Open PO double-counts that demand and overstates replenishment requirements. Zero out the overlapping Manual Projection weeks unless you expect a completely separate additional order.'
-      : 'One or more weeks have BOTH a confirmed Open Customer PO and a Manual Projection. The PO is already a committed order -- the Manual Projection on top of it double-counts demand. Zero out the Manual Projection for conflicting weeks unless you expect a second independent order in the same week.';
-    const _safeKeyForBtn = r.key.replace(/[^a-zA-Z0-9]/g, '_');
-    poPrjAlertHtml = `
-      <div id="po-prj-alert-${_safeKeyForBtn}" style="margin:10px 12px 0 12px;padding:14px 16px;background:#ffebee;border:3px solid #c62828;border-radius:6px;">
-        <div style="font-weight:700;font-size:14px;color:#b71c1c;margin-bottom:6px;">&#9888; ${escHtml(_alertTitle)}</div>
-        <div style="font-size:12px;color:#7f0000;line-height:1.6;margin-bottom:10px;">${escHtml(_alertDesc)}</div>
-        <div style="font-size:11px;font-family:monospace;line-height:1.8;color:#7f0000;background:#fff8f8;padding:8px 12px;border-radius:4px;border:1px solid #ef9a9a;margin-bottom:10px;">
-          ${_conflictLines.map(l => escHtml(l)).join('<br>')}
-        </div>
-        <button id="zero-dup-btn-${_safeKeyForBtn}"
-          onclick="zeroDuplicateManPrj('${r.key.replace(/'/g, "\\'")}', '${_safeKeyForBtn}')"
-          style="background:#c62828;color:#fff;border:none;padding:7px 16px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;">
-          Zero Duplicate MAN PRJ Weeks
-        </button>
-        <button id="ignore-dup-btn-${_safeKeyForBtn}"
-          onclick="ignoreDupAlert('${r.key.replace(/'/g, "\\'")}', '${_safeKeyForBtn}')"
-          title="Dismiss this alert -- the overlap is intentional (a separate second order is genuinely expected). Re-appears automatically if PO or Manual Projection values change."
-          style="background:#fff;color:#c62828;border:1px solid #c62828;padding:7px 14px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;margin-left:8px;">
-          Ignore
-        </button>
-        <span style="font-size:10px;color:#b71c1c;margin-left:10px;">Changes will be staged -- click Save All to write to QB.</span>
-      </div>`;
+    if (_ignored) {
+      // Grayed-out / silenced state -- planner expects a separate additional order
+      poPrjAlertHtml = `
+        <div id="po-prj-alert-${_sk}" style="margin:10px 12px 0 12px;padding:10px 16px;background:#f5f5f5;border:2px solid #bdbdbd;border-radius:6px;opacity:0.75;">
+          <div style="font-weight:600;font-size:12px;color:#9e9e9e;margin-bottom:4px;">&#x26A0; Duplicate demand warning IGNORED</div>
+          <div style="font-size:11px;font-family:monospace;color:#bdbdbd;line-height:1.8;margin-bottom:8px;">
+            ${_conflictLines.map(l => escHtml(l)).join('<br>')}
+          </div>
+          <button onclick="unignorePoPrj('${_safeK}','${_sk}')"
+            style="background:#fff;color:#757575;border:1px solid #bdbdbd;padding:5px 14px;font-size:11px;font-weight:600;border-radius:4px;cursor:pointer;">
+            Unignore
+          </button>
+          <span style="font-size:10px;color:#bdbdbd;margin-left:10px;">Re-enable this warning if additional orders are no longer expected.</span>
+        </div>`;
+    } else {
+      // Active warning state
+      const _alertTitle = _isOP
+        ? 'DUPLICATE DEMAND: Off-Price Open PO + Manual Projection overlap'
+        : 'DUPLICATE DEMAND: Open PO and Manual Projection in the Same Week';
+      const _alertDesc = _isOP
+        ? 'Off-price POs ship the same or following week. A Manual Projection within 4 weeks of an Open PO double-counts that demand and overstates replenishment requirements. Zero out the overlapping Manual Projection weeks unless you expect a completely separate additional order.'
+        : 'One or more weeks have BOTH a confirmed Open Customer PO and a Manual Projection. The PO is already a committed order -- the Manual Projection on top of it double-counts demand. Zero out the Manual Projection for conflicting weeks unless you expect a second independent order in the same week.';
+      poPrjAlertHtml = `
+        <div id="po-prj-alert-${_sk}" style="margin:10px 12px 0 12px;padding:14px 16px;background:#ffebee;border:3px solid #c62828;border-radius:6px;">
+          <div style="font-weight:700;font-size:14px;color:#b71c1c;margin-bottom:6px;">&#9888; ${escHtml(_alertTitle)}</div>
+          <div style="font-size:12px;color:#7f0000;line-height:1.6;margin-bottom:10px;">${escHtml(_alertDesc)}</div>
+          <div style="font-size:11px;font-family:monospace;line-height:1.8;color:#7f0000;background:#fff8f8;padding:8px 12px;border-radius:4px;border:1px solid #ef9a9a;margin-bottom:10px;">
+            ${_conflictLines.map(l => escHtml(l)).join('<br>')}
+          </div>
+          <button id="zero-dup-btn-${_sk}"
+            onclick="zeroDuplicateManPrj('${_safeK}','${_sk}')"
+            style="background:#c62828;color:#fff;border:none;padding:7px 16px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;">
+            Zero Duplicate MAN PRJ Weeks
+          </button>
+          <button onclick="ignorePoPrj('${_safeK}','${_sk}')"
+            style="background:#fff;color:#e65100;border:1px solid #e65100;padding:7px 14px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;margin-left:8px;">
+            Ignore
+          </button>
+          <span style="font-size:10px;color:#b71c1c;margin-left:10px;">Zero changes will be staged -- click Save All to write to QB.</span>
+        </div>`;
+    }
   }
 
   el.innerHTML = `<td colspan="22" style="padding:0">
@@ -5409,7 +5499,27 @@ async function _loadRtlPos(r, safeId) {
       sortBy:  [{ fieldId: RF.DATE, order: 'DESC' }],
       options: { top: 120 },
     });
-    const rawRows = rtlResp.data || [];
+    let rawRows = rtlResp.data || [];
+
+    // Fallback: if acct filter returned nothing, try mstyle-only.
+    // Handles acct# mismatch between Projections key and Retailer Sales table
+    // (e.g. "TARGET CTRL INV PRCSNG" account vs actual store account number).
+    if (!rawRows.length && acctStr) {
+      console.warn('[RTL POS] acct=' + acctStr + ' filter returned 0 rows for ' + mstyle
+        + ' -- trying mstyle-only fallback');
+      try {
+        const _fbResp = await qb('/records/query', {
+          from:    CFG.RTL_POS_TID,
+          select:  selectFids,
+          where:   `{${RF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}`,
+          sortBy:  [{ fieldId: RF.DATE, order: 'DESC' }],
+          options: { top: 120 },
+        });
+        rawRows = _fbResp.data || [];
+      } catch (_fbErr) {
+        console.warn('[RTL POS] mstyle-only fallback also failed:', _fbErr);
+      }
+    }
 
     // Deduplicate by date (each week-ending Sunday appears exactly twice)
     const seen = new Set();
@@ -5912,7 +6022,7 @@ async function addComment(key) {
         badgeCell.insertAdjacentHTML('beforeend', '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>');
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) tr.classList.add('row-mgr-pending');
-      refreshForMeKeys();
+      refreshForMeKeys(); refreshAllCommentFlaggedKeys();
     }
 
     if (flag === 'Planner Response') {
@@ -5955,7 +6065,7 @@ async function addComment(key) {
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) { tr.classList.add('row-reply-pending'); tr.classList.remove('row-mgr-pending'); }
       updateReplyCount();
-      refreshForMeKeys();
+      refreshForMeKeys(); refreshAllCommentFlaggedKeys();
     }
 
     if (flag === 'Manager Response' && CFG.FID.MANAGER_REPLY_PENDING) {
@@ -5976,7 +6086,7 @@ async function addComment(key) {
       const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
       if (tr) { tr.classList.add('row-mgr-pending'); tr.classList.remove('row-reply-pending'); }
       updateReplyCount();
-      refreshForMeKeys();
+      refreshForMeKeys(); refreshAllCommentFlaggedKeys();
     }
 
     if (flag === 'Resolved') {
@@ -5996,7 +6106,7 @@ async function addComment(key) {
         const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(key)}"]`);
         if (tr) tr.classList.remove('row-reply-pending', 'row-mgr-pending');
         updateReplyCount();
-        refreshForMeKeys();
+        refreshForMeKeys(); refreshAllCommentFlaggedKeys();
       }
     }
   } catch (e) {
@@ -6466,60 +6576,90 @@ function _setManRange(key, fromIdx, toIdx, val) {
 }
 
 // VP-Q4 duplicate demand: zero out MAN PRJ weeks that overlap with confirmed
-// Open POs AND auto-save the record to QB (no separate Save All click needed).
-// Only fires for weeks listed in po_prj_conflicts.
-async function zeroDuplicateManPrj(key, safeKey) {
+// Open POs.  Stages changes as dirty edits (yellow) -- user still clicks
+// Save All to write to QB.  Only fires for weeks listed in po_prj_conflicts.
+function zeroDuplicateManPrj(key, safeKey) {
   const r = ALL_RECORDS.find(x => x.key === key);
   if (!r || !r.po_prj_conflicts || !r.po_prj_conflicts.length) return;
-  const btnId = 'zero-dup-btn-' + (safeKey || key.replace(/[^a-zA-Z0-9]/g, '_'));
-  const btn   = document.getElementById(btnId);
-
-  // Stage zero edits for each conflict week (PRJ side, 0-based).
+  // Collect unique 0-based week indices from the PRJ side of each conflict
   const toZero = new Set(r.po_prj_conflicts.map(c => c.prjWk - 1));
   for (const idx of toZero) {
     _setManRange(key, idx, idx, 0);
   }
   updateSaveAllBadge();
-
-  // Auto-save just THIS record's edits via saveRecordEdits().
+  // Update the button to show action was taken
+  const btn = document.getElementById('zero-dup-btn-' + (safeKey || key.replace(/[^a-zA-Z0-9]/g,'_')));
   if (btn) {
-    btn.textContent = 'Zeroing + saving ...';
+    btn.textContent = 'Zeroed -- click Save All to commit';
     btn.disabled = true;
     btn.style.background = '#888';
-    btn.style.cursor = 'wait';
+    btn.style.cursor = 'default';
   }
-  try {
-    await saveRecordEdits(key);
-    if (btn) {
-      btn.textContent = 'Saved';
-      btn.style.background = '#2e7d32';
-      btn.style.cursor = 'default';
+}
+
+// Ignore / Unignore a PO+PRJ duplicate conflict warning.
+// Persists in localStorage ('pp_po_prj_ignored_v1') so the choice survives
+// page reloads.  Updates the alert div in-place and toggles the row badge.
+function ignorePoPrj(key, safeKey) {
+  _PO_DUP_IGNORED.add(key);
+  _savePoDupIgnored();
+  _refreshPoPrjAlert(key, safeKey);
+}
+
+function unignorePoPrj(key, safeKey) {
+  _PO_DUP_IGNORED.delete(key);
+  _savePoDupIgnored();
+  _refreshPoPrjAlert(key, safeKey);
+}
+
+function _refreshPoPrjAlert(key, safeKey) {
+  const sk      = safeKey || key.replace(/[^a-zA-Z0-9]/g, '_');
+  const safeK   = key.replace(/'/g, "\\'");
+  const ignored = _PO_DUP_IGNORED.has(key);
+
+  // Toggle the conflict badge on the main table row
+  const badge = document.getElementById('conflict-badge-' + sk);
+  if (badge) badge.style.display = ignored ? 'none' : 'inline';
+
+  // Rebuild the alert div if the detail pane is open
+  const alertEl = document.getElementById('po-prj-alert-' + sk);
+  if (!alertEl) { if (DUPES_ONLY) applyFilters(); return; }
+  const r = ALL_RECORDS.find(x => x.key === key);
+  if (!r || !r.po_prj_conflicts || !r.po_prj_conflicts.length) return;
+
+  const _lines = r.po_prj_conflicts.map(c => {
+    if (c.poWk === c.prjWk) {
+      return escHtml(`W${c.poWk}: Open PO ${fmtN(c.poQty)} units  |  Manual Prj ${fmtN(c.prjQty)} units  (same week)`);
     }
-    // Recompute conflicts -- they should be gone now that MAN PRJ is 0.
-    const rec = ALL_RECORDS.find(x => x.key === key);
-    if (rec) {
-      const { conflicts, hasConflict } = _computePoPrjConflicts(
-        rec.opn_w || [],
-        (rec.weeks_slim || []).map(w => w.projection || 0),
-        rec.is_offprice || false
-      );
-      rec.po_prj_conflicts    = conflicts;
-      rec.has_po_prj_conflict = hasConflict;
-      // Hide the alert banner + row warning since the conflict is resolved
-      const alertEl = document.getElementById('po-prj-alert-' + (safeKey || key.replace(/[^a-zA-Z0-9]/g,'_')));
-      if (alertEl) alertEl.style.display = 'none';
-      const badgeEl = document.getElementById('conflict-badge-' + key.replace(/[^a-zA-Z0-9]/g, '_'));
-      if (badgeEl && !hasConflict) badgeEl.style.display = 'none';
-    }
-  } catch (e) {
-    console.error('[ZeroDup] auto-save failed:', e);
-    if (btn) {
-      btn.textContent = 'Save failed -- retry with Save All';
-      btn.style.background = '#c62828';
-      btn.style.cursor = 'default';
-      btn.disabled = false;
-    }
+    const gap = Math.abs(c.poWk - c.prjWk);
+    return escHtml(`Open PO ${fmtN(c.poQty)} units (W${c.poWk})  +  Manual Prj ${fmtN(c.prjQty)} units (W${c.prjWk})  -- ${gap} wk apart`);
+  }).join('<br>');
+
+  if (ignored) {
+    alertEl.style.cssText = 'margin:10px 12px 0 12px;padding:10px 16px;background:#f5f5f5;border:2px solid #bdbdbd;border-radius:6px;opacity:0.75;';
+    alertEl.innerHTML =
+      `<div style="font-weight:600;font-size:12px;color:#9e9e9e;margin-bottom:4px;">&#x26A0; Duplicate demand warning IGNORED</div>` +
+      `<div style="font-size:11px;font-family:monospace;color:#bdbdbd;line-height:1.8;margin-bottom:8px;">${_lines}</div>` +
+      `<button onclick="unignorePoPrj('${safeK}','${sk}')" style="background:#fff;color:#757575;border:1px solid #bdbdbd;padding:5px 14px;font-size:11px;font-weight:600;border-radius:4px;cursor:pointer;">Unignore</button>` +
+      `<span style="font-size:10px;color:#bdbdbd;margin-left:10px;">Re-enable this warning if additional orders are no longer expected.</span>`;
+  } else {
+    const _isOP = r.is_offprice;
+    const _title = _isOP
+      ? 'DUPLICATE DEMAND: Off-Price Open PO + Manual Projection overlap'
+      : 'DUPLICATE DEMAND: Open PO and Manual Projection in the Same Week';
+    const _desc = _isOP
+      ? 'Off-price POs ship the same or following week. A Manual Projection within 4 weeks of an Open PO double-counts that demand and overstates replenishment requirements. Zero out the overlapping Manual Projection weeks unless you expect a completely separate additional order.'
+      : 'One or more weeks have BOTH a confirmed Open Customer PO and a Manual Projection. The PO is already a committed order -- the Manual Projection on top of it double-counts demand. Zero out the Manual Projection for conflicting weeks unless you expect a second independent order in the same week.';
+    alertEl.style.cssText = 'margin:10px 12px 0 12px;padding:14px 16px;background:#ffebee;border:3px solid #c62828;border-radius:6px;';
+    alertEl.innerHTML =
+      `<div style="font-weight:700;font-size:14px;color:#b71c1c;margin-bottom:6px;">&#9888; ${escHtml(_title)}</div>` +
+      `<div style="font-size:12px;color:#7f0000;line-height:1.6;margin-bottom:10px;">${escHtml(_desc)}</div>` +
+      `<div style="font-size:11px;font-family:monospace;line-height:1.8;color:#7f0000;background:#fff8f8;padding:8px 12px;border-radius:4px;border:1px solid #ef9a9a;margin-bottom:10px;">${_lines}</div>` +
+      `<button id="zero-dup-btn-${sk}" onclick="zeroDuplicateManPrj('${safeK}','${sk}')" style="background:#c62828;color:#fff;border:none;padding:7px 16px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;">Zero Duplicate MAN PRJ Weeks</button>` +
+      ` <button onclick="ignorePoPrj('${safeK}','${sk}')" style="background:#fff;color:#e65100;border:1px solid #e65100;padding:7px 14px;font-size:12px;font-weight:600;border-radius:4px;cursor:pointer;margin-left:8px;">Ignore</button>` +
+      `<span style="font-size:10px;color:#b71c1c;margin-left:10px;">Zero changes will be staged -- click Save All to write to QB.</span>`;
   }
+  if (DUPES_ONLY) applyFilters();
 }
 
 // Stage AI: copy 26 source values into the editable inputs as
@@ -7758,21 +7898,42 @@ function toggleFlaggedOnly() {
 function _syncFlaggedOnlyButton() {
   const btn = document.getElementById('flaggedOnlyBtn');
   if (!btn) return;
+  const _isDir = _isDirector();
   if (FLAGGED_ONLY) {
     btn.style.background = '#c62828';
     btn.style.color = '#fff';
-    btn.title = 'Currently showing flagged records only  -  click to show all';
+    btn.title = _isDir
+      ? 'Showing all records with any active comment flag -- click to show all'
+      : 'Showing records flagged for your attention (Sent To: you) -- click to show all';
   } else {
     btn.style.background = '#fff';
     btn.style.color = '#c62828';
-    btn.title = 'Show only records flagged for inventory mgr review (toggle)';
+    btn.title = _isDir
+      ? 'Show all records with any active comment flag (Needs Action / Manager Response / Planner Response)'
+      : 'Show records where you are the Sent-To recipient of an active comment flag';
   }
 }
 
 // Sticky toggle for the "Show Duplicates" toolbar button.  When true,
 // applyFilters() only retains records where r.has_po_prj_conflict === true
-// (a Manual Projection and an Open Customer PO overlap in the same week).
+// AND the conflict has not been explicitly ignored by the planner.
 let DUPES_ONLY = false;
+
+// Per-browser localStorage set of Acct-MStyle keys whose PO+PRJ duplicate
+// conflict warning has been explicitly ignored.  Planners mark Ignore when
+// they expect a separate second order in the same week.  Stored as a JSON
+// array under 'pp_po_prj_ignored_v1'.
+const _PO_DUP_IGNORED_LSKEY = 'pp_po_prj_ignored_v1';
+let _PO_DUP_IGNORED = (() => {
+  try {
+    const raw = localStorage.getItem(_PO_DUP_IGNORED_LSKEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (_) { return new Set(); }
+})();
+function _savePoDupIgnored() {
+  try { localStorage.setItem(_PO_DUP_IGNORED_LSKEY, JSON.stringify([..._PO_DUP_IGNORED])); }
+  catch (_) {}
+}
 
 function toggleDupesOnly() {
   DUPES_ONLY = !DUPES_ONLY;
@@ -7875,8 +8036,15 @@ function applyFilters() {
 
   FILTERED_RECORDS = ALL_RECORDS.filter(r => {
     // Flagged-only toggle (top-priority  -  short-circuit before other checks)
-    if (DUPES_ONLY         && !r.has_po_prj_conflict)   return false;
-    if (FLAGGED_ONLY       && !r.flagged)               return false;
+    if (DUPES_ONLY         && (!r.has_po_prj_conflict || _PO_DUP_IGNORED.has(r.key)))   return false;
+    // "Show Flagged": Directors see ALL records with any active comment flag;
+    // planners see only records where they are the Sent-To recipient.
+    if (FLAGGED_ONLY) {
+      const _inFlagSet = _isDirector()
+        ? _ALL_COMMENT_FLAGGED_KEYS.has(r.key)
+        : _FOR_ME_KEYS.has(r.key);
+      if (!_inFlagSet) return false;
+    }
     if (SNOOZED_ONLY       && !r._snoozed)              return false;
     if (CLOSE_ONLY         && r.fcst_status !== 'Inactive' && !SWITCHOVER_MAP.has(r.key)) return false;
     if (SHOW_REPLY_ONLY    && !r.planner_reply_pending) return false;
@@ -8073,6 +8241,8 @@ window.fillRowFromFocused  = fillRowFromFocused;
 window.fillRowConst        = fillRowConst;
 window.resetRow            = resetRow;
 window.clearAllFlags  = clearAllFlags;
+window.ignorePoPrj    = ignorePoPrj;
+window.unignorePoPrj  = unignorePoPrj;
 window.changePage     = changePage;
 
 // -- Bootstrap --------------------------------------------------------------
@@ -8259,7 +8429,8 @@ async function bootstrap() {
     renderTable();
     applyFilters();
     updateReplyCount();   // show 💬 banner if planner replies exist (directors)
-    refreshForMeKeys();   // async — populates _FOR_ME_KEYS from SEND_TO on active comments, then calls updateForMeCount
+    refreshForMeKeys();             // async — populates _FOR_ME_KEYS (planner Sent-To), then updateForMeCount
+    refreshAllCommentFlaggedKeys(); // async — populates _ALL_COMMENT_FLAGGED_KEYS (director "Show Flagged" view)
 
     const ms = (performance.now() - t0).toFixed(0);
     console.log(`Codepage viewer bootstrap completed in ${ms}ms`);

@@ -18,7 +18,7 @@ var QB_TOKEN  = 'QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s';
 var INVF_TID  = 'bpsaju5pm';
 var PROJ_TID  = 'bpd237tvm';
 var CACHE_KEY     = 'pp_inv_mgmt_v3';          // main (phase 1) IDB key
-var CACHE_KEY_DTL = 'pp_inv_mgmt_dtl_v3';      // detail (phase 2) IDB key
+var CACHE_KEY_DTL = 'pp_inv_mgmt_dtl_v4';      // detail (phase 2) IDB key -- v4: added need_qty/etd per supplier
 var CACHE_KEY_SS  = 'pp_inv_mgmt_ss_v4';       // sessionStorage fast-path key (bump to evict v3 stale data)
 var CACHE_TTL     = 24 * 60 * 60 * 1000;       // 24h (was 6h)
 // Pre-filter: exclude truly inactive items (qty_oh=0 AND opt_wos=0).
@@ -121,7 +121,12 @@ var IF_F = {
   // Alt Supplier 3
   Alt3Name:1704, Alt3FOB:1707, Alt3MOQ:1710, Alt3LT:1713,
   Alt3ELC_NJ:1818, Alt3ELC_LA:1815, Alt3MU_NJ:1821, Alt3MU_LA:1824,
-  Alt3QtyOrd:1837, Alt3PctOrd:1840
+  Alt3QtyOrd:1837, Alt3PctOrd:1840,
+  // Need-to-order per supplier (created 2026-05-27)
+  NeedQtyMain:1918, NeedETDMain:1919,
+  NeedQtyAlt1:1920, NeedETDAlt1:1921,
+  NeedQtyAlt2:1922, NeedETDAlt2:1923,
+  NeedQtyAlt3:1924, NeedETDAlt3:1925
 };
 // Supplier FIDs that are only needed for the detail panel (phase 2 load)
 var IF_SUPP_FIDS = [
@@ -135,7 +140,11 @@ var IF_SUPP_FIDS = [
   IF_F.Alt2QtyOrd, IF_F.Alt2PctOrd,
   IF_F.Alt3Name, IF_F.Alt3FOB, IF_F.Alt3MOQ, IF_F.Alt3LT,
   IF_F.Alt3ELC_NJ, IF_F.Alt3ELC_LA, IF_F.Alt3MU_NJ, IF_F.Alt3MU_LA,
-  IF_F.Alt3QtyOrd, IF_F.Alt3PctOrd
+  IF_F.Alt3QtyOrd, IF_F.Alt3PctOrd,
+  IF_F.NeedQtyMain, IF_F.NeedETDMain,
+  IF_F.NeedQtyAlt1, IF_F.NeedETDAlt1,
+  IF_F.NeedQtyAlt2, IF_F.NeedETDAlt2,
+  IF_F.NeedQtyAlt3, IF_F.NeedETDAlt3
 ];
 // Main scalar FIDs: everything in IF_F except supplier detail fields
 var IF_F_MAIN_FIDS = Object.values(IF_F).filter(function(fid) {
@@ -148,6 +157,33 @@ var IF_ATS = [716,717,718,719,720,715,722,723,724,725,726,727,728,729,730,731,90
 
 var PRJ_F = { Mstyle:196, CustName:376, StatusCust:10, PTItemStatus:374, Brand:398, Description:399, AcctMStyleKey:292, POGEndDate:1595 };
 var PRJ_MANUAL = [22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97];
+
+// Orders and Shipments (bphc3vs5h) -- for Open Customer PO per-week data + hover
+var ORDS_TID = 'bphc3vs5h';
+// A-Open W1..W26 FIDs (index 0=W1 .. 25=W26)
+var ORDS_AOPEN_FIDS = [184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209];
+var _custOrderCache = {};  // mstyle -> array of order objects (fetched on panel open)
+
+async function fetchCustOrders(mstyle) {
+  if (_custOrderCache[mstyle]) return _custOrderCache[mstyle];
+  var fids = [11, 76, 7, 14, 15, 10, 80].concat(ORDS_AOPEN_FIDS);
+  // FID 11=Mstyle, 76=CustName, 7=AcctNum, 14=QtyOrd, 15=QtyOpen, 10=CancelDate, 80=StartShip
+  var rows = await qbQuery(ORDS_TID, fids, '{11.EX.\'' + mstyle + '\'}{15.GT.0}', 0, 500);
+  var orders = rows.map(function(row) {
+    var g = function(fid) { var v = row[fid]; return v ? v.value : null; };
+    return {
+      custName:   String(g(76) || ''),
+      acctNum:    toNum(g(7)),
+      qtyOrd:     toNum(g(14)),
+      qtyOpen:    toNum(g(15)),
+      cancelDate: g(10) || null,
+      startShip:  g(80) || null,
+      weekQtys:   ORDS_AOPEN_FIDS.map(function(fid) { return toNum(g(fid)); })
+    };
+  }).filter(function(o) { return o.qtyOpen > 0; });
+  _custOrderCache[mstyle] = orders;
+  return orders;
+}
 
 // -- QB API --------------------------------------------------------------------
 async function qbQuery(tableId, fieldIds, where, skip, top) {
@@ -345,7 +381,7 @@ var selMgrs       = new Set();
 var selPriorities = new Set();
 var selStockStatus = new Set();
 var recoSheet = [];
-var purchaseSelections = {};   // keyed by mstyle; { needQty: number, chosenSupplier: string }
+var purchaseSelections = {};   // keyed by mstyle; { main:{checked,needQty,etd}, alt1:{...}, alt2:{...}, alt3:{...} }
 
 // -- Multi-select dropdown helpers ---------------------------------------------
 function toggleDd(evt, ddId) {
@@ -647,7 +683,11 @@ async function attachDetailData(records) {
       alt2_qty_ord:toNum(gv(IF_F.Alt2QtyOrd)), alt2_pct_ord:toNum(gv(IF_F.Alt2PctOrd)),
       alt3_name: String(gv(IF_F.Alt3Name)||''), alt3_fob:toNum(gv(IF_F.Alt3FOB)), alt3_moq:toNum(gv(IF_F.Alt3MOQ)), alt3_lt:toNum(gv(IF_F.Alt3LT)),
       alt3_elc_nj:toNum(gv(IF_F.Alt3ELC_NJ)), alt3_elc_la:toNum(gv(IF_F.Alt3ELC_LA)), alt3_mu_nj:toNum(gv(IF_F.Alt3MU_NJ)), alt3_mu_la:toNum(gv(IF_F.Alt3MU_LA)),
-      alt3_qty_ord:toNum(gv(IF_F.Alt3QtyOrd)), alt3_pct_ord:toNum(gv(IF_F.Alt3PctOrd))
+      alt3_qty_ord:toNum(gv(IF_F.Alt3QtyOrd)), alt3_pct_ord:toNum(gv(IF_F.Alt3PctOrd)),
+      need_qty_main:toNum(gv(IF_F.NeedQtyMain)), need_etd_main:String(gv(IF_F.NeedETDMain)||''),
+      need_qty_alt1:toNum(gv(IF_F.NeedQtyAlt1)), need_etd_alt1:String(gv(IF_F.NeedETDAlt1)||''),
+      need_qty_alt2:toNum(gv(IF_F.NeedQtyAlt2)), need_etd_alt2:String(gv(IF_F.NeedETDAlt2)||''),
+      need_qty_alt3:toNum(gv(IF_F.NeedQtyAlt3)), need_etd_alt3:String(gv(IF_F.NeedETDAlt3)||'')
     };
   });
   _applyDetailMap(records, map);
@@ -682,6 +722,10 @@ function _applyDetailMap(records, map) {
     rec.alt3_name = d.alt3_name; rec.alt3_fob = d.alt3_fob; rec.alt3_moq = d.alt3_moq; rec.alt3_lt = d.alt3_lt;
     rec.alt3_elc_nj = d.alt3_elc_nj; rec.alt3_elc_la = d.alt3_elc_la; rec.alt3_mu_nj = d.alt3_mu_nj; rec.alt3_mu_la = d.alt3_mu_la;
     rec.alt3_qty_ord = d.alt3_qty_ord; rec.alt3_pct_ord = d.alt3_pct_ord;
+    rec.need_qty_main = d.need_qty_main; rec.need_etd_main = d.need_etd_main;
+    rec.need_qty_alt1 = d.need_qty_alt1; rec.need_etd_alt1 = d.need_etd_alt1;
+    rec.need_qty_alt2 = d.need_qty_alt2; rec.need_etd_alt2 = d.need_etd_alt2;
+    rec.need_qty_alt3 = d.need_qty_alt3; rec.need_etd_alt3 = d.need_etd_alt3;
     rec._detail_loaded = true;
     // Re-run purchase_rec computation now that supplier data is available
     computeDerived(rec, today);
@@ -1244,6 +1288,25 @@ function goPage(p) {
   if(wrap&&wrap.parentElement)wrap.parentElement.scrollTop=0;
 }
 
+// Fetch Open Customer PO data for a record and re-render its detail panel once loaded.
+// Called after each initial renderDetail() -- no-op if already cached on the record.
+function _loadCustOrdersAndUpdate(r, dtr) {
+  if (r.cust_orders) return;
+  fetchCustOrders(r.mstyle).then(function(orders) {
+    r.cust_orders = orders;
+    if (dtr && dtr.style.display === 'table-row') {
+      try {
+        dtr.querySelector('td').innerHTML = renderDetail(r);
+        dtr.dataset.loaded = '1';
+      } catch(e) {
+        console.error('[InvMgmt] cust-orders re-render failed:', e);
+      }
+    }
+  }).catch(function(e) {
+    console.warn('[InvMgmt] fetchCustOrders failed for ' + r.mstyle + ':', e);
+  });
+}
+
 function toggleDetail(mstyle) {
   var id='detail-'+mstyle.replace(/[^a-zA-Z0-9]/g,'_');
   var dtr=document.getElementById(id);
@@ -1262,6 +1325,7 @@ function toggleDetail(mstyle) {
         try {
           dtr.querySelector('td').innerHTML = renderDetail(r);
           dtr.dataset.loaded = '1';
+          _loadCustOrdersAndUpdate(r, dtr);
         } catch(e) {
           dtr.querySelector('td').innerHTML = '<div style="padding:20px;color:#c62828;">Error rendering detail panel: ' + esc(String(e)) + '</div>';
           dtr.dataset.loaded = '1';
@@ -1274,6 +1338,7 @@ function toggleDetail(mstyle) {
   try {
     dtr.querySelector('td').innerHTML = renderDetail(r);
     dtr.dataset.loaded = '1';
+    _loadCustOrdersAndUpdate(r, dtr);
   } catch(e) {
     dtr.querySelector('td').innerHTML = '<div style="padding:20px;color:#c62828;">Error rendering detail panel: ' + esc(String(e)) + '</div>';
     dtr.dataset.loaded = '1';
@@ -1342,6 +1407,30 @@ function renderDetail(r) {
     sorted.forEach(function(c){h+='- '+(c.customer||'(unknown)')+': '+fmt(c.qty)+'\n';});
     return h;
   }
+  function fmtCpoHover(wi, custOrds) {
+    if (!custOrds.length) return '';
+    var hasData = custOrds.some(function(o){ return (o.weekQtys[wi]||0) > 0; });
+    if (!hasData) return '';
+    var wkDate = (new Date(w1sun.getTime()+wi*7*86400000)).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    var h = 'Open Cust POs - W'+(wi+1)+' (week of '+wkDate+')\n'+new Array(38).join('-')+'\n';
+    custOrds.forEach(function(o) {
+      var wkQty = Math.round(o.weekQtys[wi]||0);
+      if (!wkQty) return;
+      var cancel = o.cancelDate ? new Date(o.cancelDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '--';
+      h += (o.custName||'Unknown')+': '+fmt(wkQty)+' | Cancel: '+cancel+'\n';
+    });
+    return h;
+  }
+  function fmtCpoTotalHover(custOrds) {
+    if (!custOrds.length) return '';
+    var h = 'Open Customer POs\n'+new Array(38).join('-')+'\n';
+    custOrds.slice().sort(function(a,b){return b.qtyOpen-a.qtyOpen;}).forEach(function(o) {
+      var cancel = o.cancelDate ? new Date(o.cancelDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '--';
+      var start  = o.startShip  ? new Date(o.startShip).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '--';
+      h += (o.custName||'Unknown')+': '+fmt(Math.round(o.qtyOpen))+' open of '+fmt(Math.round(o.qtyOrd))+' ord | Strt: '+start+' | Cancel: '+cancel+'\n';
+    });
+    return h;
+  }
 
   // Rec action by PO for rcv row highlighting
   var recByPo={};
@@ -1397,9 +1486,10 @@ function renderDetail(r) {
   var begCells = '<td class="lbl" style="color:#6d4c00;font-weight:600;background:#fffbea" title="Beginning-of-week projected warehouse inventory (Wk1..Wk26)">Beg Inv</td>';
   var prjCells = '<td class="lbl" style="color:#2e7d32;font-weight:600;background:#f1f8e9" title="Projected demand this week (Prj Wk1..Prj Wk26) - hover for customer breakdown">Prj Demand</td>';
   var rcvCells = '<td class="lbl" style="color:#1565c0;font-weight:600;background:#f0f7ff" title="Expected supplier receipts that week (RcvWk1..RcvWk26) - hover for PO detail">Expected Receipts</td>';
-  var opnCells = '<td class="lbl" style="color:#00695c;font-weight:600;background:#e0f2f1" title="Open supplier PO qty landing this week (I/T + I/W by warehouse ETA)">Open Supplier POs</td>';
+  var cpoCells = '<td class="lbl" style="color:#6a1b9a;font-weight:600;background:#f3e5f5" title="Open customer PO qty by week (A-Open W1-W26). Hover cells for customer / cancel date detail.">Open Customer POs</td>';
+  var endCells = '<td class="lbl" style="color:#37474f;font-weight:600;background:#eceff1" title="Ending Inv = Beg Inv - Prj Demand - Open Customer POs + Expected Receipts">Ending Inv</td>';
   var wosCells = '<td class="lbl" style="color:#4a148c;font-weight:600;background:#f8f0fb" title="Weeks of Supply Onhand: forward simulation from Beg Inv over projected demand">WOS OH</td>';
-  var begTot = 0, prjTot = 0, rcvTot = 0, opnTot = 0;
+  var begTot = 0, prjTot = 0, rcvTot = 0;
 
   for (var i = 0; i < 26; i++) {
     // -- Beg Inv: color-coded by health vs projected demand --
@@ -1430,14 +1520,20 @@ function renderDetail(r) {
     var rcvHlS = rcvHL(i) || '';
     rcvCells += '<td style="color:'+rcvClr+';font-size:10px;background:#f0f7ff;'+(rcvTip?'cursor:help;':'')+rcvHlS+'"'+rcvTA+'>'+(rv>0?fmt(rv):'&#8212;')+'</td>';
 
-    // -- Open Supplier POs: I/T + I/W quantities landing this week by ETA --
-    var opnQty = 0;
-    var opnPos = poByWeek[i] || [];
-    for (var opi = 0; opi < opnPos.length; opi++) {
-      opnQty += (opnPos[opi].in_transit_qty || 0) + (opnPos[opi].in_work_qty || 0);
-    }
-    opnTot += opnQty;
-    opnCells += '<td style="color:'+(opnQty>0?'#00695c':'#bbb')+';font-size:10px;background:#e0f2f1;">'+(opnQty>0?fmt(opnQty):'&#8212;')+'</td>';
+    // -- Open Customer POs: per-week from A-Open W1..W26 (fetched async on panel open) --
+    var _custOrds = r.cust_orders || [];
+    var cpoWkVal = 0;
+    _custOrds.forEach(function(o){ cpoWkVal += (o.weekQtys[i] || 0); });
+    cpoWkVal = Math.round(cpoWkVal);
+    var cpoTip = fmtCpoHover(i, _custOrds);
+    var cpoTA  = cpoTip ? ' title="'+cpoTip.replace(/"/g,'&quot;')+'"' : '';
+    var cpoClr = cpoWkVal > 0 ? '#6a1b9a' : '#bbb';
+    cpoCells += '<td style="color:'+cpoClr+';font-size:10px;background:#f3e5f5;'+(cpoTip?'cursor:help;':'')+'"'+cpoTA+'>'+(cpoWkVal>0?fmt(cpoWkVal):'&#8212;')+'</td>';
+
+    // -- Ending Inv per week: Beg - Prj - OpenCustPO + Receipts --
+    var ev = Math.round(bv - pv - cpoWkVal + rv);
+    var evClr = ev < 0 ? '#c62828' : (ev === 0 ? '#bbb' : '#37474f');
+    endCells += '<td style="color:'+evClr+';font-size:10px;background:#eceff1;">'+fmt(ev)+'</td>';
 
     // -- WOS OH: forward simulation; gap weeks highlighted in red --
     var wosVal, wosTxt, wosClr, wosCellBg = '#f8f0fb';
@@ -1468,7 +1564,16 @@ function renderDetail(r) {
   begCells += '<td style="font-weight:700;color:#6d4c00;background:#fffbea">'+fmt(Math.round(begTot))+'</td>';
   prjCells += '<td style="font-weight:700;color:#2e7d32;background:#f1f8e9">'+fmt(Math.round(prjTot))+'</td>';
   rcvCells += '<td style="font-weight:700;color:#1565c0;background:#f0f7ff">'+fmt(Math.round(rcvTot))+'</td>';
-  opnCells += '<td style="font-weight:700;color:#00695c;background:#e0f2f1">'+fmt(opnTot)+'</td>';
+  var _custOrdsFinal = r.cust_orders || [];
+  var cpTot = _custOrdsFinal.length
+    ? Math.round(_custOrdsFinal.reduce(function(s,o){return s+o.qtyOpen;},0))
+    : (r.open_cust_po_qty || 0);
+  var cpoTotTip = fmtCpoTotalHover(_custOrdsFinal);
+  var cpoTotTA  = cpoTotTip ? ' title="'+cpoTotTip.replace(/"/g,'&quot;')+'"' : '';
+  cpoCells += '<td style="font-weight:700;color:#6a1b9a;background:#f3e5f5;'+(_custOrdsFinal.length?'cursor:help;':'')+'"'+cpoTotTA+'>'+fmt(cpTot)+'</td>';
+  var endTot = Math.round((r.beg_inv[0]||0) - prjTot - cpTot + rcvTot);
+  var endTotClr = endTot < 0 ? '#c62828' : '#37474f';
+  endCells += '<td style="font-weight:700;color:'+endTotClr+';background:#eceff1;">'+fmt(endTot)+'</td>';
   wosCells += '<td style="color:#bbb;background:#f8f0fb" title="WOS total not meaningful"> - </td>';
 
   // Header row with MM/DD week dates
@@ -1488,7 +1593,8 @@ function renderDetail(r) {
     +'<tr>'+begCells+'</tr>'
     +'<tr>'+prjCells+'</tr>'
     +'<tr>'+rcvCells+'</tr>'
-    +'<tr>'+opnCells+'</tr>'
+    +'<tr>'+cpoCells+'</tr>'
+    +'<tr>'+endCells+'</tr>'
     +'<tr>'+wosCells+'</tr>'
     +'</table>';
 
@@ -1501,10 +1607,11 @@ function renderDetail(r) {
       : 'unknown';
     var _nrWkStr = (_ifGap.nextRcptWeekIdx >= 0 && _ifGap.nextRcptWeekIdx <= 25)
       ? '(W'+(_ifGap.nextRcptWeekIdx+1)+')' : (_ifGap.nextRcptWeekIdx > 25 ? '(beyond W26)' : '');
+    var _fmLink = '<a href="https://pim.quickbase.com/db/bpd24h9wy?a=dbpage&pageID=50&search='+encodeURIComponent(r.mstyle)+'" target="_blank" style="color:inherit;font-weight:700;text-decoration:underline;">View in Forecast Manager &#8599;</a>';
     if (_ifGap.weeks.length === 0) {
-      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;font-size:11px;color:#1b5e20;">&#10003; <b>No gaps:</b> all weeks through next receipt '+_nrStr+' '+_nrWkStr+' maintain '+_optStr+' WOS (Opt WOS).</div>';
+      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;font-size:11px;color:#1b5e20;">&#10003; <b>No gaps:</b> all weeks through next receipt '+_nrStr+' '+_nrWkStr+' maintain '+_optStr+' WOS (Opt WOS). &nbsp;'+_fmLink+'</div>';
     } else {
-      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;font-size:11px;color:#b71c1c;">&#x26a0; <b>Inventory Gap:</b> '+_ifGap.weeks.length+' week'+(_ifGap.weeks.length===1?'':'s')+' below Opt WOS ('+_optStr+') before next receipt '+_nrStr+' '+_nrWkStr+'. Moving up open POs may close this gap.</div>';
+      invGapBanner = '<div style="margin-top:6px;padding:6px 10px;background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;font-size:11px;color:#b71c1c;">&#x26a0; <b>Inventory Gap:</b> '+_ifGap.weeks.length+' week'+(_ifGap.weeks.length===1?'':'s')+' below Opt WOS ('+_optStr+') before next receipt '+_nrStr+' '+_nrWkStr+'. Moving up open POs may close this gap. &nbsp;'+_fmLink+'</div>';
     }
   } else if (!r.is_replen) {
     invGapBanner = '<div style="margin-top:6px;padding:4px 10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px;font-size:10px;color:#888;font-style:italic;">Gap analysis only runs on Replen items (Status: '+esc(r.item_status_flow||'unknown')+').</div>';
@@ -1621,12 +1728,23 @@ function renderDetail(r) {
   if (!r.is_replen || r.prj_wk <= 0 || r.moq <= 0 || r.lt_trans_days <= 0 || r.opt_oh <= 0) {
     purRecSection = '';
   } else if (r.purchase_rec > 0) {
-    // Retrieve persisted selections for this mstyle
-    var purSel = purchaseSelections[r.mstyle] || {};
-    var needQtyVal = purSel.needQty != null ? purSel.needQty : r.purchase_rec;
-    var chosenSupplier = purSel.chosenSupplier || '';
+    // Initialize purchaseSelections from QB-stored values on first render
+    var _msId = r.mstyle.replace(/[^a-zA-Z0-9]/g, '_');
+    if (!purchaseSelections[r.mstyle]) {
+      purchaseSelections[r.mstyle] = {
+        main: { checked:(r.need_qty_main||0)>0, needQty:r.need_qty_main||0, etd:r.need_etd_main||'' },
+        alt1: { checked:(r.need_qty_alt1||0)>0, needQty:r.need_qty_alt1||0, etd:r.need_etd_alt1||'' },
+        alt2: { checked:(r.need_qty_alt2||0)>0, needQty:r.need_qty_alt2||0, etd:r.need_etd_alt2||'' },
+        alt3: { checked:(r.need_qty_alt3||0)>0, needQty:r.need_qty_alt3||0, etd:r.need_etd_alt3||'' }
+      };
+    }
+    var purSel = purchaseSelections[r.mstyle];
 
-    // Summary bar: Rec Qty | Need Qty | Required ETD | Receipt Needed By
+    // Compute total need qty across checked suppliers
+    var totalNeedQty = 0;
+    ['main','alt1','alt2','alt3'].forEach(function(k){var ss=purSel[k]||{};if(ss.checked)totalNeedQty+=(ss.needQty||0);});
+
+    // Summary bar: Rec Qty | Total Need Qty (read-only) | Required ETD (baseline) | Receipt Needed By
     var etdColor = r.purchase_rec_push_supplier ? '#c62828' : '#e65100';
     var etdDisplay = r.purchase_rec_etd ? fmtDate(r.purchase_rec_etd) : '&#8212;';
     var pushBadge = r.purchase_rec_push_supplier
@@ -1637,28 +1755,22 @@ function renderDetail(r) {
       : '';
 
     var purSummary = '<div style="display:flex;gap:0;flex-wrap:wrap;align-items:stretch;background:#e8eaf6;border:1px solid #c5cae9;border-radius:6px;margin-bottom:16px;overflow:hidden;">'
-      // Rec Qty
       +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
         +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Recommended Qty</div>'
         +'<div style="font-size:24px;font-weight:700;color:#1a237e;line-height:1;">'+fmtInt(r.purchase_rec)+'</div>'
         +'<div style="font-size:10px;color:#888;margin-top:1px;">units</div>'
       +'</div>'
-      // Need Qty (editable)
       +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
-        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Need Qty</div>'
-        +'<input type="number" id="needQty_'+esc(r.mstyle)+'" value="'+needQtyVal+'" min="0" step="1" '
-          +'style="width:110px;font-size:18px;font-weight:700;color:#1a237e;border:2px solid #7986cb;border-radius:4px;padding:2px 6px;text-align:right;font-family:inherit;background:#fff;" '
-          +'onchange="(function(el){var ms=\''+esc(r.mstyle)+'\';if(!purchaseSelections[ms])purchaseSelections[ms]={};purchaseSelections[ms].needQty=parseInt(el.value)||0;})(this)">'
-        +'<div style="font-size:10px;color:#888;margin-top:1px;">&nbsp;</div>'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Total Need Qty</div>'
+        +'<div style="font-size:24px;font-weight:700;color:#1a237e;line-height:1;" id="purTotalNeedQty_'+_msId+'">'+(totalNeedQty||0).toLocaleString()+'</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">sum of checked suppliers</div>'
       +'</div>'
-      // Required ETD
       +'<div style="flex:0 0 auto;padding:12px 20px;border-right:1px solid #c5cae9;">'
-        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Required ETD</div>'
+        +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Baseline Required ETD</div>'
         +'<div style="font-size:18px;font-weight:700;color:'+etdColor+';">'+etdDisplay+pushBadge+'</div>'
         +nxtAvlNote
-        +'<div style="font-size:10px;color:#888;margin-top:1px;">Receipt - '+r.transit_days+'d transit</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:1px;">use to set per-supplier ETD below</div>'
       +'</div>'
-      // Receipt Needed By
       +'<div style="flex:0 0 auto;padding:12px 20px;">'
         +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Receipt Needed By</div>'
         +'<div style="font-size:18px;font-weight:700;color:#333;">'+(r.purchase_rec_receipt_date?fmtDate(r.purchase_rec_receipt_date):'&#8212;')+'</div>'
@@ -1666,7 +1778,7 @@ function renderDetail(r) {
       +'</div>'
       +'</div>';
 
-    // Build supplier columns - extract main name from before first <br> in supplier_info
+    // Build supplier columns
     var suppCols = [];
     var mainName = '';
     if (r.supplier_info) {
@@ -1693,49 +1805,52 @@ function renderDetail(r) {
       elc_nj:r.alt3_elc_nj, elc_la:r.alt3_elc_la, mu_nj:r.alt3_mu_nj, mu_la:r.alt3_mu_la,
       qty_ord:r.alt3_qty_ord, pct_ord:r.alt3_pct_ord });
 
-    // Best MU% NJ for green highlight
     var bestMU = suppCols.reduce(function(b, s){ return (s.mu_nj||0) > b ? (s.mu_nj||0) : b; }, 0);
 
-    // Card row helpers
     function scRow(lbl, val, hl) {
       var vStyle = hl ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
       return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
-        +'<span style="color:#666;">'+lbl+'</span>'
-        +'<span style="'+vStyle+'">'+val+'</span>'
-        +'</div>';
+        +'<span style="color:#666;">'+lbl+'</span><span style="'+vStyle+'">'+val+'</span></div>';
     }
-    // Two values on one line, each with its own sub-label
     function scRowPair(lbl1, val1, lbl2, val2, hl1, hl2) {
       var s1 = hl1 ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
       var s2 = hl2 ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
       return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
-        +'<span style="color:#666;">'+lbl1+'</span>'
-        +'<span style="'+s1+'margin-right:10px;">'+val1+'</span>'
-        +'<span style="color:#666;">'+lbl2+'</span>'
-        +'<span style="'+s2+'">'+val2+'</span>'
-        +'</div>';
+        +'<span style="color:#666;">'+lbl1+'</span><span style="'+s1+'margin-right:10px;">'+val1+'</span>'
+        +'<span style="color:#666;">'+lbl2+'</span><span style="'+s2+'">'+val2+'</span></div>';
     }
-    // Section divider with label inside the card body
     function scSection(lbl) {
       return '<div style="font-size:9px;font-weight:700;color:#9e9e9e;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 2px;">'+lbl+'</div>';
     }
+
+    // Receipt date ISO string for ETD default calculation
+    var _rcptIso = r.purchase_rec_receipt_date ? r.purchase_rec_receipt_date.toISOString().slice(0,10) : '';
 
     var suppCards = '<div style="display:flex;gap:12px;flex-wrap:wrap;">';
     if (suppCols.length === 0) {
       suppCards += '<div style="color:#888;font-style:italic;font-size:12px;">No supplier data available for this item.</div>';
     } else {
       suppCols.forEach(function(s) {
-        var isChosen = chosenSupplier === s.key;
+        var ss = purSel[s.key] || { checked:false, needQty:0, etd:'' };
         var isBestMU = (s.mu_nj||0) === bestMU && bestMU > 0;
-        var cardBorder = isChosen ? '2px solid #1b5e20' : (isBestMU ? '2px solid #43a047' : '1px solid #ddd');
-        var cardBg = isChosen ? '#f1f8e9' : '#fff';
-        var hdrBg = s.key === 'main' ? '#283593' : '#3f51b5';
-        var btnStyle = isChosen
-          ? 'width:100%;padding:7px;font-size:11px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:#1b5e20;color:#fff;font-family:inherit;'
-          : 'width:100%;padding:7px;font-size:11px;font-weight:600;border:1px solid #7986cb;border-radius:4px;cursor:pointer;background:#fff;color:#3f51b5;font-family:inherit;';
-        var btnLabel = isChosen ? '&#10003; Selected' : 'Choose this Supplier';
+        var cardBorder = ss.checked ? '2px solid #1b5e20' : (isBestMU ? '2px solid #43a047' : '1px solid #ddd');
+        var cardBg     = ss.checked ? '#f1f8e9' : '#fff';
+        var hdrBg      = s.key === 'main' ? '#283593' : '#3f51b5';
 
-        suppCards += '<div style="flex:1;min-width:190px;max-width:260px;border:'+cardBorder+';border-radius:6px;background:'+cardBg+';overflow:hidden;">'
+        // Default ETD: receipt date minus this supplier's lead time
+        var defaultEtd = ss.etd || (_rcptIso && s.lt ? (function(){
+          var d = new Date(_rcptIso); d.setDate(d.getDate() - s.lt);
+          return d.toISOString().slice(0,10);
+        })() : '');
+
+        var cardId    = 'suppCard_'+_msId+'_'+s.key;
+        var inputsId  = 'suppInputs_'+_msId+'_'+s.key;
+        var chkId     = 'suppChk_'+_msId+'_'+s.key;
+        var nqId      = 'suppNQ_'+_msId+'_'+s.key;
+        var etdId     = 'suppETD_'+_msId+'_'+s.key;
+        var msEsc     = esc(r.mstyle);
+
+        suppCards += '<div id="'+cardId+'" style="flex:1;min-width:190px;max-width:270px;border:'+cardBorder+';border-radius:6px;background:'+cardBg+';overflow:hidden;">'
           +'<div style="background:'+hdrBg+';color:#fff;padding:8px 10px;">'
             +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;opacity:0.8;margin-bottom:2px;">'+esc(s.badge)+'</div>'
             +'<div style="font-size:13px;font-weight:700;line-height:1.25;">'+esc(s.label)+'</div>'
@@ -1749,21 +1864,45 @@ function renderDetail(r) {
             +scRowPair('Units', s.qty_ord ? fmtInt(s.qty_ord) : '&#8212;', '% Total', s.pct_ord ? fmtPct(s.pct_ord) : '&#8212;')
           +'</div>'
           +'<div style="padding:8px 10px;border-top:1px solid #eee;">'
-            +'<button style="'+btnStyle+'" '
-              +'onclick="(function(){var ms=\''+esc(r.mstyle)+'\';var key=\''+s.key+'\';'
-                +'if(!purchaseSelections[ms])purchaseSelections[ms]={};'
-                +'purchaseSelections[ms].chosenSupplier=key;'
-                +'renderDetailForMstyle(ms);})()">'
-            +btnLabel+'</button>'
+            // Use this Supplier checkbox
+            +'<label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;cursor:pointer;color:'+(ss.checked?'#1b5e20':'#3f51b5')+';margin-bottom:8px;">'
+              +'<input type="checkbox" id="'+chkId+'" '+(ss.checked?'checked':'')+' '
+                +'onchange="toggleSuppSelection(\''+msEsc+'\',\''+s.key+'\',this.checked)" '
+                +'style="cursor:pointer;accent-color:#1b5e20;width:14px;height:14px;">'
+              +'Use this Supplier'
+            +'</label>'
+            // Need Qty + Needed ETD inputs (shown when checked)
+            +'<div id="'+inputsId+'" style="display:'+(ss.checked?'block':'none')+';margin-top:4px;">'
+              +'<div style="margin-bottom:6px;">'
+                +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;">Need Qty</div>'
+                +'<input type="number" id="'+nqId+'" value="'+(ss.needQty||0)+'" min="0" step="1" '
+                  +'style="width:100%;font-size:15px;font-weight:700;color:#1a237e;border:2px solid #7986cb;border-radius:4px;padding:3px 6px;text-align:right;font-family:inherit;background:#fff;" '
+                  +'oninput="updateSuppNeedQty(\''+msEsc+'\',\''+s.key+'\',this.value)">'
+              +'</div>'
+              +'<div>'
+                +'<div style="font-size:10px;font-weight:700;color:#5c6bc0;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;">Needed ETD</div>'
+                +'<input type="date" id="'+etdId+'" value="'+esc(defaultEtd)+'" '
+                  +'style="width:100%;font-size:13px;font-weight:600;color:#e65100;border:2px solid #ffcc80;border-radius:4px;padding:3px 6px;font-family:inherit;background:#fff;" '
+                  +'oninput="updateSuppETD(\''+msEsc+'\',\''+s.key+'\',this.value)">'
+              +'</div>'
+            +'</div>'
           +'</div>'
           +'</div>';
       });
     }
     suppCards += '</div>';
 
+    // Save to QB button
+    var saveBtnHtml = '<div style="margin-top:14px;display:flex;align-items:center;gap:12px;">'
+      +'<button onclick="saveSupplierSelections(\''+esc(r.mstyle)+'\')" '
+        +'style="padding:8px 20px;font-size:12px;font-weight:700;background:#1565c0;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:inherit;">&#128190; Save to QB</button>'
+      +'<span id="purSaveStatus_'+_msId+'" style="font-size:11px;color:#888;"></span>'
+      +'</div>';
+
     purRecSection = '<div class="section"><h3>&#128722; Recommended Purchase</h3>'
       +purSummary
       +suppCards
+      +saveBtnHtml
       +'</div>';
   } else {
     purRecSection = '<div class="section"><h3>&#128722; Recommended Purchase</h3>'
@@ -1806,6 +1945,69 @@ function generateRecoSheet() {
   var csv=[headers].concat(rows).map(function(row){return row.map(function(v){return'"'+String(v!=null?v:'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
   var blob=new Blob([''+csv],{type:'text/csv;charset=utf-8;'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PO_Recommendations_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+
+// -- Supplier selection helpers (called from inline event handlers) ------------
+function toggleSuppSelection(ms, key, checked) {
+  if (!purchaseSelections[ms]) purchaseSelections[ms] = {};
+  if (!purchaseSelections[ms][key]) purchaseSelections[ms][key] = { checked:false, needQty:0, etd:'' };
+  purchaseSelections[ms][key].checked = checked;
+  var _id = ms.replace(/[^a-zA-Z0-9]/g,'_');
+  var inp = document.getElementById('suppInputs_'+_id+'_'+key);
+  if (inp) inp.style.display = checked ? 'block' : 'none';
+  var lbl = document.getElementById('suppChk_'+_id+'_'+key);
+  if (lbl && lbl.parentNode) lbl.parentNode.style.color = checked ? '#1b5e20' : '#3f51b5';
+  if (lbl && lbl.parentNode) lbl.parentNode.style.fontWeight = checked ? '700' : '600';
+  var card = document.getElementById('suppCard_'+_id+'_'+key);
+  if (card) { card.style.border = checked ? '2px solid #1b5e20' : '1px solid #ddd'; card.style.background = checked ? '#f1f8e9' : '#fff'; }
+  updatePurTotalNeedQty(ms);
+}
+function updateSuppNeedQty(ms, key, val) {
+  if (!purchaseSelections[ms]) purchaseSelections[ms] = {};
+  if (!purchaseSelections[ms][key]) purchaseSelections[ms][key] = { checked:true, needQty:0, etd:'' };
+  purchaseSelections[ms][key].needQty = parseInt(val) || 0;
+  updatePurTotalNeedQty(ms);
+}
+function updateSuppETD(ms, key, val) {
+  if (!purchaseSelections[ms]) purchaseSelections[ms] = {};
+  if (!purchaseSelections[ms][key]) purchaseSelections[ms][key] = { checked:true, needQty:0, etd:'' };
+  purchaseSelections[ms][key].etd = val;
+}
+function updatePurTotalNeedQty(ms) {
+  var purSel = purchaseSelections[ms] || {};
+  var total = 0;
+  ['main','alt1','alt2','alt3'].forEach(function(k){var ss=purSel[k]||{};if(ss.checked)total+=(ss.needQty||0);});
+  var el = document.getElementById('purTotalNeedQty_'+ms.replace(/[^a-zA-Z0-9]/g,'_'));
+  if (el) el.textContent = total.toLocaleString();
+}
+function saveSupplierSelections(ms) {
+  var purSel = purchaseSelections[ms];
+  if (!purSel) { return; }
+  var statusEl = document.getElementById('purSaveStatus_'+ms.replace(/[^a-zA-Z0-9]/g,'_'));
+  if (statusEl) { statusEl.textContent = 'Saving...'; statusEl.style.color = '#888'; }
+  var data = {};
+  data[IF_F.Mstyle]     = { value: ms };
+  data[IF_F.NeedQtyMain] = { value: (purSel.main&&purSel.main.checked) ? (purSel.main.needQty||0) : 0 };
+  data[IF_F.NeedETDMain] = { value: (purSel.main&&purSel.main.checked&&purSel.main.etd) ? purSel.main.etd : null };
+  data[IF_F.NeedQtyAlt1] = { value: (purSel.alt1&&purSel.alt1.checked) ? (purSel.alt1.needQty||0) : 0 };
+  data[IF_F.NeedETDAlt1] = { value: (purSel.alt1&&purSel.alt1.checked&&purSel.alt1.etd) ? purSel.alt1.etd : null };
+  data[IF_F.NeedQtyAlt2] = { value: (purSel.alt2&&purSel.alt2.checked) ? (purSel.alt2.needQty||0) : 0 };
+  data[IF_F.NeedETDAlt2] = { value: (purSel.alt2&&purSel.alt2.checked&&purSel.alt2.etd) ? purSel.alt2.etd : null };
+  data[IF_F.NeedQtyAlt3] = { value: (purSel.alt3&&purSel.alt3.checked) ? (purSel.alt3.needQty||0) : 0 };
+  data[IF_F.NeedETDAlt3] = { value: (purSel.alt3&&purSel.alt3.checked&&purSel.alt3.etd) ? purSel.alt3.etd : null };
+  fetch('https://api.quickbase.com/v1/records', {
+    method: 'POST',
+    headers: { 'QB-Realm-Hostname':QB_REALM, 'Authorization':QB_TOKEN, 'Content-Type':'application/json', 'User-Agent':'petspeople-inv-mgmt-viewer/1.0' },
+    body: JSON.stringify({ to: INVF_TID, data: [data], mergeFieldId: IF_F.Mstyle, fieldsToReturn: [] })
+  })
+  .then(function(resp){return resp.json().then(function(j){return{ok:resp.ok,body:j};});})
+  .then(function(res){
+    if (statusEl) {
+      statusEl.textContent = res.ok ? 'Saved to QB' : 'Save failed: '+(res.body.message||'unknown');
+      statusEl.style.color = res.ok ? '#1b5e20' : '#c62828';
+    }
+  })
+  .catch(function(e){if(statusEl){statusEl.textContent='Error: '+e.message;statusEl.style.color='#c62828';}});
 }
 
 // -- Boot ----------------------------------------------------------------------

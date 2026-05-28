@@ -79,7 +79,7 @@ from config import (
     F59K_EOL_POS_DECLINE, F59K_REAL_HISTORY_THRESH, F59K_POS_CREDIBILITY,
     F59J_POS_FLOOR,
     # WOS targets (retailer + Amazon)
-    RTL_WOS_TARGET, AMZ_WOS_TARGET_MIN, AMZ_WOS_TARGET_MAX,
+    RTL_WOS_TARGET, RTL_WOS_TARGET_MAX, AMZ_WOS_TARGET_MIN, AMZ_WOS_TARGET_MAX,
     # Writeback
     SCHEMA_VERSION,
 )
@@ -4183,6 +4183,25 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
     if _burst_driver:
         meta.setdefault("drivers", []).append(_burst_driver)
 
+    # F-NORM (2026-05-27): Post-model rescaling -- if the 26-week forecast average
+    # exceeds the normalized L13W avg by more than 5%, scale it back down.
+    # Preserves week-to-week shape while anchoring volume to the normalized order rate.
+    # Skip when: OOS fill-rate anomaly, F4 L52W widening, or F-STEADY buyer (their
+    # baseline adjustments represent legitimate upward corrections).
+    _fnorm_fcst_mean = sum(forecast) / 26 if forecast else 0
+    if (_fnorm_fcst_mean > l13_avg * 1.05
+            and l13_avg > 0
+            and not _has_oos
+            and not _f4_applied
+            and not _is_steady_buyer):
+        _fnorm_scale = l13_avg / _fnorm_fcst_mean
+        forecast = [v * _fnorm_scale for v in forecast]
+        _fnorm_note = (
+            f"F-NORM: model avg {_fnorm_fcst_mean:.0f}/wk scaled to "
+            f"normalized L13W {l13_avg:.0f}/wk (x{_fnorm_scale:.3f})"
+        )
+        meta.setdefault("drivers", []).append(_fnorm_note)
+
     return forecast, round(cap_base, 1), meta
 
 
@@ -5885,9 +5904,10 @@ def _switchover_backfill(rows, prj_cols):
     # non-zero MAN PRJ week.  Variant-record creation only fires for case
     # (1) since auto-detected pairs only exist when both sides are already
     # in scope.
-    date_computed = 0
-    date_cleared  = 0
-    no_proj_alert = 0
+    date_computed    = 0
+    date_cleared     = 0
+    active_activated = 0
+    no_proj_alert    = 0
     variant_to_create = 0
     for r in rows:
         k = r.get("Acct_MStyle_Key_", "")
@@ -5980,21 +6000,32 @@ def _switchover_backfill(rows, prj_cols):
             no_proj_alert += 1
             continue
 
-        # Compute Switchover_Date from the column's calendar date
-        d_iso = _col_to_date[first_nonzero_col].isoformat()
-        existing_date = (r.get("Switchover_Date") or "")[:10]
-        if existing_date != d_iso:
-            out["updates"].append({
-                "key": k,
-                "fields": {"Switchover Date": d_iso},
-            })
-            r["Switchover_Date"] = d_iso
-            date_computed += 1
+        # Compute Switchover_Date from the column's calendar date.
+        # Also ensure Switchover_Active is True on the base record -- the
+        # forecaster auto-configured the switchover, so the field should
+        # reflect that automatically (user request 2026-05-27).
+        d_iso          = _col_to_date[first_nonzero_col].isoformat()
+        existing_date  = (r.get("Switchover_Date") or "")[:10]
+        already_active = bool(r.get("Switchover_Active"))
+        date_changed   = (existing_date != d_iso)
+        if date_changed or not already_active:
+            upd_fields = {}
+            if date_changed:
+                upd_fields["Switchover Date"] = d_iso
+                r["Switchover_Date"] = d_iso
+                date_computed += 1
+            if not already_active:
+                upd_fields["Switchover Active"] = True
+                r["Switchover_Active"] = True
+                active_activated += 1
+            out["updates"].append({"key": k, "fields": upd_fields})
 
     if date_computed:
         print(f"      [Switchover] Switchover_Date auto-set: {date_computed} record(s)")
     if date_cleared:
         print(f"      [Switchover] Switchover_Date cleared (stale): {date_cleared} record(s)")
+    if active_activated:
+        print(f"      [Switchover] Switchover_Active auto-set True: {active_activated} record(s)")
     if no_proj_alert:
         print(f"      [Switchover] Alerts (no variant projections): {no_proj_alert} record(s)")
     if variant_to_create:
@@ -8592,14 +8623,15 @@ def _compute_pos_baseline(l4w, l13w, lw=0, amz_aur_data=None):
 def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
                            description, product_category, product_subcategory,
                            brand, brand_pt, season,
-                           wos_target=None, amz_aur_data=None):
+                           wos_target=None, amz_aur_data=None,
+                           opn_w_list=None):
     """
     Unified POS + DC-inventory WOS forecast.
 
     Originally the non-Amazon retailer model; now also used for Amazon F85
     via the wos_target + amz_aur_data parameters.  The two paths share
     everything except:
-      - WOS fill target: Amazon = AMZ_WOS_TARGET_MIN (10wks),
+      - WOS fill target: Amazon = AMZ_WOS_TARGET_MIN (8wks),
                           retailers = RTL_WOS_TARGET (8wks).
       - Baseline rule: Amazon uses AUR-aware spike detection;
                        retailers use the simple L4W blend.
@@ -8639,7 +8671,7 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     # rather than consumer sell-through too small to fill even one master pack.
     if snap(baseline_pps, mp) == 0:
         return None   # POS baseline snaps to 0 at this MP -- fall through to order-history model
-    # -- Step 2: WOS fill ----------------------------------------------------
+    # -- Step 2: WOS fill (with projected-OH correction) ----------------------
     # F86 (2026-05-25) OH data guard: if oh_lw == 0 AND oh_wos == 0, the
     # retailer did not report DC inventory for this item this week.  Don't
     # assume the DC is empty (which would generate an 8-WOS fill of ~64K
@@ -8647,12 +8679,39 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     # seasonal mults for all 26 weeks.  When OH IS reported (oh_lw > 0 or
     # oh_wos > 0), compute the normal deficit fill.
     _oh_data_available = (oh_lw > 0 or oh_wos > 0)
-    fill_units  = max(0.0, wos_target * baseline_pps - oh_lw) if _oh_data_available else 0.0
-    _has_opn_w1 = float(opn_w1 or 0) > 0
-    if _has_opn_w1:
-        fill_start, fill_end = 1, 3   # 0-indexed: W2-W3
-    else:
-        fill_start, fill_end = 0, 2   # 0-indexed: W1-W2
+
+    # Build per-week open-PO list: prefer full list passed in, fall back to
+    # single W1 value.
+    _opn_wl = [float(v or 0) for v in (opn_w_list or [])]
+    if not _opn_wl and opn_w1:
+        _opn_wl = [float(opn_w1 or 0)]
+
+    # Find fill_start: advance past consecutive PO-covered weeks (max 4-week
+    # scan -- beyond 4 weeks the planning horizon logic takes over).
+    # A confirmed open PO for week W means P&P's warehouse will ship that week;
+    # placing an additional fill order there would double-count demand.
+    fill_start = 0
+    for _wi in range(min(4, len(_opn_wl))):
+        if _opn_wl[_wi] > 0:
+            fill_start = _wi + 1
+        else:
+            break
+    fill_end = fill_start + 2   # always a 2-week fill window
+    _has_opn_w1 = fill_start > 0   # True when W1 is already covered by a confirmed open PO
+
+    # Project DC OH to fill_start: deduct consumer demand for each wait week.
+    # Do NOT add the incoming PO deliveries -- those are already committed
+    # shipments the planner cannot change.  The fill-order decision for W3
+    # should reflect how depleted the DC will be after selling through the
+    # wait period, independent of what P&P is already shipping in W1-W2.
+    # Without this deduction the AI uses today's OH and under-estimates the
+    # order needed once the DC has sold down over the wait period.
+    _proj_oh = oh_lw
+    for _wi in range(fill_start):
+        _proj_oh -= baseline_pps
+        _proj_oh  = max(0.0, _proj_oh)
+
+    fill_units  = max(0.0, wos_target * baseline_pps - _proj_oh) if _oh_data_available else 0.0
     fill_per_wk = snap(fill_units / 2.0, mp) if fill_units > 0 else 0
 
     # -- Step 3: build 26-week forecast --------------------------------------
@@ -9084,7 +9143,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _rtl_wos_r = _retailer_wos_forecast(
             rtl_pos, mp, _opn_w1,
             description, product_category, product_subcategory,
-            brand, brand_pt, season)
+            brand, brand_pt, season,
+            opn_w_list=[float(row.get(f"Opn_W{i}") or 0) for i in range(1, 27)])
 
     elif (is_amazon
           and pos_data is not None
@@ -9099,33 +9159,47 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         #   2. Fill W1-W2 if DC WOS < RTL_WOS_TARGET (8 wks) to bring it back up.
         #   3. Remaining weeks = baseline x category seasonal / holiday multipliers.
         #
-        # DC inventory sources (in order of preference):
-        #   Inv_WOS  — direct WOS field in Amazon Catalog (most authoritative)
-        #   Inv_SOH  — sellable SOH; compute WOS = (SOH + OPO) / POS_L13W
-        #   Inv_OPO  — open PO qty already inbound (included in WOS calc)
+        # DC inventory sources:
+        #   Inv_WOS  — direct WOS field in Amazon Catalog
+        #   Inv_SOH  — sellable SOH; WOS = (SOH + W1+W2 open orders) / POS_L13W
+        #   Inv_OPO  — NOT used: Amazon's aggregate open PO qty is rarely correct
+        #
+        # F89 (2026-05-27): W1+W2 open orders from Inventory Flow are added to
+        # effective SOH before computing WOS.  Amazon's Inv_WOS / WOS_OH only
+        # reflects their current DC SOH; our open orders committed to ship in
+        # W1-W2 represent real near-term coverage and should count toward WOS.
+        # We always recompute from (SOH + opn_w1 + opn_w2) when SOH data is
+        # present so the fill-units calc also benefits from the fuller picture.
+        # Inv_OPO from Amazon POS data is never used -- it is rarely correct.
         #
         # Guard: only engage when at least one DC signal is present.  If all
-        # three are zero / missing, we can't tell "DC is empty" from "no data"
-        # and should not trigger an erroneous 8-WOS fill-up; fall through to
+        # signals are zero / missing, we can't tell "DC is empty" from "no data"
+        # and should not trigger an erroneous fill-up; fall through to
         # F84 (Seasonal Baseline + F15 POS anchor) instead.
-        _f85_pos_l13 = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
-        _f85_soh     = float((amz_catalog or {}).get("Inv_SOH") or 0)
-        _f85_opo     = float((amz_catalog or {}).get("Inv_OPO") or 0)
-        _f85_wos     = float((amz_catalog or {}).get("Inv_WOS") or 0)
-        if _f85_wos <= 0 and _f85_pos_l13 > 0:
-            _f85_wos = (_f85_soh + _f85_opo) / _f85_pos_l13
-        _f85_has_dc = _f85_wos > 0 or _f85_soh > 0 or _f85_opo > 0
+        _f85_pos_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
+        _f85_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
+        _f85_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
+        # F89: W1+W2 open orders from Inventory Flow
+        _f85_if_rec   = (inv_flow_data or {}).get(row.get("Mstyle", ""))
+        _f85_opn_list = (_f85_if_rec or {}).get("opn") or []
+        _f85_opn_w12  = ((_f85_opn_list[0] if len(_f85_opn_list) > 0 else 0.0)
+                       + (_f85_opn_list[1] if len(_f85_opn_list) > 1 else 0.0))
+        _f85_eff_soh  = _f85_soh + _f85_opn_w12
+        if _f85_pos_l13 > 0 and _f85_eff_soh > 0:
+            _f85_wos = _f85_eff_soh / _f85_pos_l13
+        # (no OPO fallback -- Amazon Inv_OPO is unreliable)
+        _f85_has_dc = _f85_wos > 0 or _f85_eff_soh > 0
         if _f85_has_dc:
             _f85_synth = {
                 "Avg_Units_Wk_L4w":  pos_data.get("Avg_Units_Wk_L4w")  or 0,
                 "Avg_Units_Wk_L13w": _f85_pos_l13,
                 "Ordered_Units_LW":  pos_data.get("Ordered_Units_LW")  or 0,   # LW POS proxy
-                "OH_Units_LW":       _f85_soh,
+                "OH_Units_LW":       _f85_eff_soh,   # SOH + W1+W2 open orders (F89)
                 "OH_WOS":            _f85_wos,
             }
             # Amazon-only: pass AUR + MAP so the baseline rule applies the
             # spike-vs-promo check (see _compute_pos_baseline).  WOS target
-            # set to AMZ_WOS_TARGET_MIN (10wks) -- non-Amazon retailers
+            # set to AMZ_WOS_TARGET_MIN (8wks) -- non-Amazon retailers
             # default to RTL_WOS_TARGET (8wks).
             _f85_aur = {
                 "aur_l4w":   float((amz_catalog or {}).get("AUR_L4w")   or 0),
@@ -9136,7 +9210,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 description, product_category, product_subcategory,
                 brand, brand_pt, season,
                 wos_target=AMZ_WOS_TARGET_MIN,
-                amz_aur_data=_f85_aur)
+                amz_aur_data=_f85_aur,
+                opn_w_list=[float(v or 0) for v in _f85_opn_list[:26]])
 
     if _baseline_override > 0 and not _f73_new_ramp:
         _fire("F_BASELINE_OVR")
@@ -9149,10 +9224,28 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             # Retailer path: apply WOS fill on top of the override baseline
             _oh_lw_o  = float(rtl_pos.get("OH_Units_LW") or 0)
             _oh_wos_o = float(rtl_pos.get("OH_WOS")      or 0)
-            _fill_u   = max(0.0, RTL_WOS_TARGET * _baseline_override - _oh_lw_o)
-            _has_ow1  = _opn_w1 > 0
-            _fs, _fe  = (1, 3) if _has_ow1 else (0, 2)  # 0-indexed fill window
-            _fpw      = snap(_fill_u / 2.0, mp) if _fill_u > 0 else 0
+            # Find fill window start: advance past consecutive open-PO weeks.
+            # A PO already covering a week means P&P ships that week; don't
+            # double-count by also placing a fill order there.
+            _fs = 0
+            for _wi in range(4):
+                if float(row.get(f"Opn_W{_wi + 1}") or 0) > 0:
+                    _fs = _wi + 1
+                else:
+                    break
+            _fe = _fs + 2   # always a 2-week fill window
+
+            # Project DC OH to fill window start: deduct consumer demand for
+            # each wait week.  Do NOT add the incoming PO deliveries -- those
+            # are already committed shipments the planner cannot change.  The
+            # W3 order should reflect DC depletion during the wait period,
+            # not an inflated OH that counts in-transit POs as available stock.
+            _proj_oh_ovr = _oh_lw_o
+            for _wi in range(_fs):
+                _proj_oh_ovr -= _baseline_override
+                _proj_oh_ovr  = max(0.0, _proj_oh_ovr)
+            _fill_u = max(0.0, RTL_WOS_TARGET * _baseline_override - _proj_oh_ovr)
+            _fpw    = snap(_fill_u / 2.0, mp) if _fill_u > 0 else 0
             fcst = []
             for _w in range(26):
                 if _fpw > 0 and _fs <= _w < _fe:
@@ -9173,8 +9266,9 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 "fill_end_wk":       _fe,
                 "drivers": [
                     f"F_BASELINE_OVR: manual {_baseline_override:,.0f}/wk; "
-                    f"DC OH {_oh_wos_o:.1f}wks ({_oh_lw_o:,.0f}u); "
-                    f"fill {_fill_u:,.0f}u in W{_fs+1}-W{_fe} ({_fpw:,.0f}u/wk each); "
+                    f"DC OH {_oh_wos_o:.1f}wks ({_oh_lw_o:,.0f}u now"
+                    + (f", proj {_proj_oh_ovr:,.0f}u at W{_fs+1}" if _fs > 0 else "")
+                    + f"); fill {_fill_u:,.0f}u in W{_fs+1}-W{_fe} ({_fpw:,.0f}u/wk each); "
                     + ("category seasonal lifts applied" if _ovr_mults else "no cat mults")
                 ],
             }
@@ -10340,16 +10434,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _f66i_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
                 if _f66i_wos <= 0:
                     _f66i_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
-                    _f66i_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
                     _f66i_pl  = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
                     if _f66i_pl > 0:
-                        _f66i_wos = (_f66i_soh + _f66i_opo) / _f66i_pl
-                _f66i_threshold = AMZ_WOS_TARGET_MIN - 2.0   # 8.0
+                        _f66i_wos = _f66i_soh / _f66i_pl   # Inv_OPO not used (unreliable)
+                _f66i_threshold = AMZ_WOS_TARGET_MIN - 2.0   # 6.0 (MIN=8 - 2)
                 _f66i_target    = f"{AMZ_WOS_TARGET_MIN:.0f}-{AMZ_WOS_TARGET_MAX:.0f}wks"
             else:
                 _f66i_wos       = float(rtl_pos.get("OH_WOS") or 0) if rtl_pos else 0.0
                 _f66i_threshold = RTL_WOS_TARGET - 2.0        # 6.0
-                _f66i_target    = f"{RTL_WOS_TARGET:.0f}wks"
+                _f66i_target    = f"{RTL_WOS_TARGET:.0f}-{RTL_WOS_TARGET_MAX:.0f}wks"
             if _f66i_wos > 0 and _f66i_wos >= _f66i_threshold:
                 _f66_mult     = 1.0
                 _f66i_clamped = True
@@ -11859,7 +11952,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     _f59_oos_active = False
     _f59h_wos = 0.0
     _f59h_soh = 0.0
-    _f59h_opo = 0.0
     _f59a_floor = 0.0
     _f59a_momentum = False
     _f59_f18_capped = False
@@ -12109,19 +12201,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         # Placement: after F59g (high-vol buffer) but before F58 (AI comment
         # replay), so planners can override via AI comments if needed.
         _f59h_soh = float((amz_catalog or {}).get("Inv_SOH") or 0)
-        _f59h_opo = float((amz_catalog or {}).get("Inv_OPO") or 0)
         _f59h_wos = float((amz_catalog or {}).get("Inv_WOS") or 0)
-        # Fallback: if Inv_WOS not populated (ASIN lookup miss or field absent)
-        # but SOH/OPO are present, derive WOS from position / POS velocity.
-        # Mirrors the same fallback already used in F69-WOS (2026-05-20).
-        if _f59h_wos <= 0 and (_f59h_soh > 0 or _f59h_opo > 0):
+        # Fallback: if Inv_WOS not populated, derive from SOH only.
+        # Inv_OPO not used -- Amazon's aggregate open PO qty is rarely correct.
+        if _f59h_wos <= 0 and _f59h_soh > 0:
             _f59h_pos_fb = float((pos_data or {}).get("Avg_Units_Wk_L13w") or 0)
             if _f59h_pos_fb > 0:
-                _f59h_wos = (_f59h_soh + _f59h_opo) / _f59h_pos_fb
+                _f59h_wos = _f59h_soh / _f59h_pos_fb
 
         if is_amazon and amz_catalog and _f59h_wos > 0:
-            _f59h_vel     = _f59_l13w_avg if _f59_l13w_avg > 0 else max(sum(fcst) / 26, 1)
-            _f59h_opo_wos = _f59h_opo / max(_f59h_vel, 1)
+            _f59h_vel = _f59_l13w_avg if _f59_l13w_avg > 0 else max(sum(fcst) / 26, 1)
             # F59h replen gate: use order BEHAVIOR (model classification) as the
             # primary signal, not just the QB PT_Item_Status label.  Seasonal
             # Baseline = ≥50% non-zero weeks = orders most weeks = replenishment
@@ -12134,22 +12223,22 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 or model in ("Seasonal Baseline", "Heuristic")
             )
 
-            if _f59h_wos > 12:
+            if _f59h_wos > AMZ_WOS_TARGET_MAX:
                 if _f59h_is_replen:
                     # FXX — Amazon Replen overstock: power-curve dampening across
                     # all 26 weeks.  Amazon has many independent DCs so some sporadic
                     # demand persists even when aggregate WOS is high — floor at 10%.
-                    # Formula: max(0.10, (12 / wos) ^ 1.5)
-                    # wos=16 → 53%  wos=20 → 38%  wos=24 → 27%  wos=29 → 21%  wos=40+ → 10%
-                    _f59h_dampen = max(0.10, (12.0 / _f59h_wos) ** 1.5)
+                    # Formula: max(0.10, (AMZ_WOS_TARGET_MAX / wos) ^ 1.5)
+                    # wos=14 → 60%  wos=16 → 49%  wos=20 → 35%  wos=24 → 25%  wos=35+ → 10%
+                    _f59h_dampen = max(0.10, (AMZ_WOS_TARGET_MAX / _f59h_wos) ** 1.5)
                     fcst = [snap(max(0, v * _f59h_dampen), mp) if v > 0 else 0
                             for v in fcst]
                     _fire("F59h")
                     if isinstance(meta, dict):
                         meta.setdefault("drivers", []).append(
                             f"F59h Amazon-Replen overstock dampen: WOS={_f59h_wos:.1f}wks "
-                            f"(target 12wks) — all 26W x{_f59h_dampen:.0%} "
-                            f"(floor 10%); SOH={_f59h_soh:,.0f}u OPO={_f59h_opo:,.0f}u"
+                            f"(target {AMZ_WOS_TARGET_MAX:.0f}wks) — all 26W x{_f59h_dampen:.0%} "
+                            f"(floor 10%); SOH={_f59h_soh:,.0f}u"
                         )
                 else:
                     if _f59h_wos > 20:
@@ -12160,11 +12249,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                         # entirely until inventory burns down to target.  The mild
                         # 1.5%/wk taper is not meaningful at this level.
                         #
-                        # Burn-down weeks = round(WOS - 12), capped at 16 so stale
-                        # WOS data does not zero out more than 60% of the horizon.
-                        # Amazon's target range is 8-12 wks; after burn-down,
+                        # Burn-down weeks = round(WOS - AMZ_WOS_TARGET_MAX), capped at 16
+                        # so stale WOS data does not zero out more than 60% of horizon.
+                        # Amazon's target range is 8-10 wks; after burn-down,
                         # anchor remaining weeks to POS L13W (true consumer velocity).
-                        _f59h_burn = min(int(round(_f59h_wos - 12)), 16)
+                        _f59h_burn = min(int(round(_f59h_wos - AMZ_WOS_TARGET_MAX)), 16)
                         # F88: respect F87 deceleration on post-burn anchor velocity.
                         # If L4W POS is >20% below L13W POS (structural decline),
                         # anchor the post-burn period to L4W rather than L13W so we
@@ -12199,38 +12288,34 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             )
                             meta.setdefault("drivers", []).append(
                                 f"F59h extreme overstock: WOS={_f59h_wos:.1f}wks "
-                                f"(target 12wks) -- W1-W{_f59h_burn} zeroed (burn-down); "
+                                f"(target {AMZ_WOS_TARGET_MAX:.0f}wks) -- W1-W{_f59h_burn} zeroed (burn-down); "
                                 f"{_f59h_post}. "
-                                f"SOH={_f59h_soh:,.0f}u OPO={_f59h_opo:,.0f}u"
+                                f"SOH={_f59h_soh:,.0f}u"
                             )
                     else:
-                        # Moderately above target range (12 < WOS <= 20): soft taper.
-                        # 1.5% per week above 12, cap 20%.
+                        # Moderately above target range (AMZ_WOS_TARGET_MAX < WOS <= 20):
+                        # soft taper.  1.5% per week above AMZ_WOS_TARGET_MAX, cap 20%.
                         # Mild by design: DC-level ordering from individual DCs
                         # continues even when the aggregate network WOS is above
                         # target, so we do not cut projections aggressively.
-                        _f59h_trim = min(0.20, (_f59h_wos - 12) * 0.015)
+                        _f59h_trim = min(0.20, (_f59h_wos - AMZ_WOS_TARGET_MAX) * 0.015)
                         for i in range(min(8, len(fcst))):
                             fcst[i] = snap(max(0, fcst[i] * (1 - _f59h_trim)), mp)
                         _fire("F59h")
                         if isinstance(meta, dict):
                             meta.setdefault("drivers", []).append(
                                 f"F59h DC above target range: WOS={_f59h_wos:.1f}wks "
-                                f"(target 8-12wks), SOH={_f59h_soh:,.0f}u, "
+                                f"(target {AMZ_WOS_TARGET_MIN:.0f}-{AMZ_WOS_TARGET_MAX:.0f}wks), SOH={_f59h_soh:,.0f}u, "
                                 f"OPO={_f59h_opo:,.0f}u -- W1-W8 -{_f59h_trim*100:.0f}% soft taper"
                             )
             elif _f59h_wos < 3 and _f59h_opo == 0:
                 _fire("F59h")
                 if isinstance(meta, dict):
                     meta.setdefault("drivers", []).append(
-                        f"F59h DC low-stock alert: WOS={_f59h_wos:.1f}wks, OPO=0 — "
+                        f"F59h DC low-stock alert: WOS={_f59h_wos:.1f}wks — "
                         f"reorder risk; projections NOT suppressed"
                     )
-            elif _f59h_opo_wos >= 8 and isinstance(meta, dict):
-                meta.setdefault("drivers", []).append(
-                    f"F59h OPO coverage: {_f59h_opo:,.0f}u open PO ≈ {_f59h_opo_wos:.1f}wks "
-                    f"forward supply — near-term gap pre-covered"
-                )
+            # (F59h OPO coverage note removed -- Inv_OPO from Amazon POS is unreliable)
 
     # ── F_RTL_WOS — Retailer OH inventory WOS correction (revised 2026-05-25) ──
     # Phase-aware WOS adjustment for brick-and-mortar retailers with POS + OH data.
@@ -12252,8 +12337,8 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     #     Retailer will accelerate reorders.  Uniform boost:
     #     +4% per wk below RTL_WOS_TARGET, capped at +20%.
     #
-    #   NEAR-TARGET (7.5-10.5 WOS): no adjustment.
-    _RTL_WOS_TARGET_HIGH = 10.0
+    #   NEAR-TARGET (RTL_WOS_TARGET-0.5 to RTL_WOS_TARGET_MAX+0.5 WOS): no adjustment.
+    _RTL_WOS_TARGET_HIGH = RTL_WOS_TARGET_MAX
     if rtl_pos and not is_amazon and model not in ("Inactive", "OTB (zero)",
                                                     "Pre-launch NEW (manual passthrough)",
                                                     "Retailer WOS (POS)",
@@ -12346,10 +12431,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
         if is_amazon and amz_catalog and pos_data:
             _fdclag_dc_oh      = float(amz_catalog.get("Inv_SOH") or 0)
-            _fdclag_opo        = float(amz_catalog.get("Inv_OPO") or 0)
+            _fdclag_opo        = 0.0   # Inv_OPO not used (Amazon aggregate OPO is unreliable)
             _fdclag_lw_pos     = float(pos_data.get("Ordered_Units_LW") or 0)
             _fdclag_rate       = float(pos_data.get("Avg_Units_Wk_L4w") or 0)
-            _fdclag_target_wos = AMZ_WOS_TARGET_MIN   # 10.0 wks
+            _fdclag_target_wos = AMZ_WOS_TARGET_MIN   # 8.0 wks
         elif not is_amazon and rtl_pos:
             _fdclag_dc_oh  = float(rtl_pos.get("OH_Units_LW")  or 0)
             _fdclag_opo    = 0.0   # open PO not tracked in retailer POS table
@@ -12377,7 +12462,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     meta.setdefault("drivers", []).append(
                         f"F_DC_LAG ({_fdclag_ch}): "
                         f"raw_OH={_fdclag_dc_oh:,.0f}u "
-                        f"OPO={_fdclag_opo:,.0f}u "
                         f"LW_POS={_fdclag_lw_pos:,.0f}u "
                         f"-> adj_OH={_fdclag_adj_oh:,.0f}u "
                         f"adj_WOS={_fdclag_adj_wos:.1f}wks "
@@ -13572,21 +13656,21 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             if _rpl_wos > 0 or _rpl_dc_depleted:
                 _rpl_adj1, _rpl_adj2 = 0, 1
 
-                if not _rpl_dc_depleted and _rpl_wos > 12:
+                if not _rpl_dc_depleted and _rpl_wos > AMZ_WOS_TARGET_MAX:
                     # Overstocked: W1+W2 already hold the steady-state demand
                     # from Fix 1 (_rpl_rates[0/1]).  Do NOT zero them -- planner
                     # must always see the ongoing demand signal and decide whether
                     # to actually place an order.  No extra fill is added.
                     _rpl_inv_note = (
-                        f"DC WOS={_rpl_wos:.1f} > 12 (overstocked) -- "
+                        f"DC WOS={_rpl_wos:.1f} > {AMZ_WOS_TARGET_MAX:.0f} (overstocked) -- "
                         f"steady-state demand shown in W1+W2; no fill order added"
                     )
-                elif _rpl_dc_depleted or _rpl_wos < 10:
+                elif _rpl_dc_depleted or _rpl_wos < AMZ_WOS_TARGET_MIN:
                     # Understocked or DC fully depleted (WOS=0, SOH=0, OPO=0):
                     # simple gap fill -- order exactly enough to bridge current
-                    # WOS to 10 WOS target.  _rpl_wos=0.0 when depleted, so
-                    # fill = 10 * corr_demand split over W1+W2.
-                    _rpl_window = max(0.0, (10.0 - _rpl_wos) * _rpl_corr_demand)
+                    # WOS to AMZ_WOS_TARGET_MIN.  _rpl_wos=0.0 when depleted, so
+                    # fill = AMZ_WOS_TARGET_MIN * corr_demand split over W1+W2.
+                    _rpl_window = max(0.0, (AMZ_WOS_TARGET_MIN - _rpl_wos) * _rpl_corr_demand)
                     _rpl_each   = snap(_rpl_window / 2.0, mp)
                     # Guard: W1 must never fall below the steady-state demand rate.
                     # When corr_demand is near-zero (POS feed thin/absent) but
@@ -13603,19 +13687,20 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                             f"DC WOS=0.0 (depleted/inferred; SOH=0 OPO=0 -- "
                             f"no Inventory Health record) -- "
                             f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
-                            f"{_rpl_each:.0f}/ea (gap fill to 10 WOS; "
+                            f"{_rpl_each:.0f}/ea (gap fill to {AMZ_WOS_TARGET_MIN:.0f} WOS; "
                             f"corr basis={_rpl_corr_demand:.0f}/wk)"
                         )
                     else:
                         _rpl_inv_note = (
-                            f"DC WOS={_rpl_wos:.1f} < 10 (understocked) -- "
+                            f"DC WOS={_rpl_wos:.1f} < {AMZ_WOS_TARGET_MIN:.0f} (understocked) -- "
                             f"W{_rpl_adj1+1}+W{_rpl_adj2+1} set to "
-                            f"{_rpl_each:.0f}/ea (gap fill to 10 WOS; "
+                            f"{_rpl_each:.0f}/ea (gap fill to {AMZ_WOS_TARGET_MIN:.0f} WOS; "
                             f"corr basis={_rpl_corr_demand:.0f}/wk)"
                         )
                 else:
                     _rpl_inv_note = (
-                        f"DC WOS={_rpl_wos:.1f} in target range (10-12) -- "
+                        f"DC WOS={_rpl_wos:.1f} in target range "
+                        f"({AMZ_WOS_TARGET_MIN:.0f}-{AMZ_WOS_TARGET_MAX:.0f}) -- "
                         f"no inventory adjustment"
                     )
             else:
@@ -13986,6 +14071,38 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         season       = season,
     )
 
+    # Build business-language strip log so the codepage tooltip can show
+    # sentences like "Stripped out 5,512 pcs due to Phantom Demand created
+    # by OOS" instead of raw rule names.  Pipe-delimited; no quotes inside
+    # sentences so the string is safe as an HTML data-* attribute value.
+    _norm_strips_parts = []
+    for _c in _f35_corrections:
+        if _c.get("removed", 0) > 0:
+            _norm_strips_parts.append(
+                f"Stripped out {int(round(_c['removed'])):,} pcs due to Phantom Demand created by OOS"
+            )
+    for _c in _f47_corrections:
+        if _c.get("removed_total", 0) > 0:
+            _norm_strips_parts.append(
+                f"Removed {int(round(_c['removed_total'])):,} pcs due to OOS Rebuild Ramp order inflation"
+            )
+    for _c in _f41_corrections:
+        if _c.get("zeroed_value", 0) > 0:
+            _norm_strips_parts.append(
+                f"Removed {int(round(_c['zeroed_value'])):,} pcs due to phantom or unshipped order"
+            )
+    for _c in _f39_corrections:
+        _dup_qty = _c.get("value", 0) * max(0, _c.get("length", 1) - 1)
+        if _dup_qty > 0:
+            _norm_strips_parts.append(
+                f"Removed {int(round(_dup_qty)):,} pcs due to duplicate order run"
+            )
+    if iso.get("is_iso") and iso.get("iso_qty", 0) > 0:
+        _norm_strips_parts.append(
+            f"Removed {int(round(iso['iso_qty'])):,} pcs due to ISO order (Initial Stocking Order)"
+        )
+    _norm_strips_str = "|".join(_norm_strips_parts)
+
     return {
         "key":         row["Acct_MStyle_Key_"],
         "mstyle":      row.get("Mstyle", ""),
@@ -14002,12 +14119,17 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "prior_total": int(prior),
         "pct_diff":    round(pct * 100, 1),
         "confidence":  _confidence,
-        # Normalized L13W avg (post-F35/F41/F43/F47/ATS normalization).
-        # This is the per-week order rate with duplicates, catch-up stock-up
-        # orders, and OOS distortion removed.  Stored so build_ai_analysis()
-        # can surface a "Normalized Ord/Wk L13w" bullet when it differs
-        # materially from the raw L13W order rate (2026-05-25).
+        # Normalized Ord/Wk L4w / L13w / L26w (post-F35/F41/F43/F47/ATS normalization).
+        # Per-week order rate with duplicates, catch-up stock-up orders, and OOS
+        # distortion removed.  All three are written to QB Projections each run so
+        # planners can compare normalized demand across time horizons.  L13w is also
+        # surfaced in build_ai_analysis() when it differs materially from the raw rate.
+        "norm_l4w":    round(sum(float(v) for v in hist[-4:])  / 4,  1),
         "norm_l13w":   round(sum(float(v) for v in hist[-13:]) / 13, 1),
+        "norm_l26w":   round(sum(float(v) for v in hist[-26:]) / 26, 1),
+        # Business-language strip sentences for codepage tooltip (2026-05-27).
+        # Pipe-delimited; viewer parses via split('|').
+        "norm_strips": _norm_strips_str,
         # F56 — surface VP-Q4 PO-zeroed context so narrative can show
         # "Total forward demand = AI + confirmed POs" alongside visible AI.
         "po_zeroed_weeks":   (meta.get("po_zeroed_weeks", []) if isinstance(meta, dict) else []),
@@ -15935,12 +16057,33 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
         )
         parts.append(_conf_badge)
     # Normalized Ord/Wk L13w bullet (2026-05-25).
-    # Show when normalization (F35/F41/F43/F47/ATS) removed meaningful demand
-    # from the raw L13W order rate -- e.g. phantom duplicates, catch-up stock-up
-    # orders after a stockout, or OOS ramp distortion.  Threshold: differs by
-    # > 5% of raw L13W OR > 50 units/wk (whichever is larger).
+    # Always embed a hidden machine-readable span so the codepage viewer can
+    # display the exact normalized value regardless of whether the visible
+    # bullet fires.  Visible bullet: only when diff > 5% of raw OR > 50 u/wk
+    # (threshold keeps the narrative uncluttered for clean-history items).
     _raw_l13w_val  = sum(hist[-13:]) / 13   # raw from ORD_L26_COLS (last 13 weeks)
     _norm_l13w_val = rec.get("norm_l13w")
+    # Build hidden span (piggybacked on last bullet -- no extra blank <li>)
+    _norm_span = ''
+    if _norm_l13w_val is not None:
+        _norm_diff_pct = (
+            abs(_raw_l13w_val - _norm_l13w_val) / _raw_l13w_val * 100
+            if _raw_l13w_val > 0 else 0.0
+        )
+        _norm_reason = (
+            'duplicates and spikes removed'
+            if abs(_raw_l13w_val - _norm_l13w_val) > max(50.0, 0.05 * _raw_l13w_val)
+            else 'no adjustment -- history is clean'
+        )
+        _strips_attr = (rec.get("norm_strips") or "").replace('"', "''")
+        _norm_span = (
+            f'<span class="norm-l13w-data"'
+            f' data-norm="{int(round(_norm_l13w_val))}"'
+            f' data-raw="{int(round(_raw_l13w_val))}"'
+            f' data-reason="{_norm_reason}"'
+            f' data-strips="{_strips_attr}" hidden></span>'
+        )
+    # Visible bullet (threshold-gated so clean items stay uncluttered)
     if (_norm_l13w_val is not None
             and _raw_l13w_val > 0
             and abs(_raw_l13w_val - _norm_l13w_val) > max(50.0, 0.05 * _raw_l13w_val)):
@@ -15959,7 +16102,11 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
     parts.extend(pinned_last)                           # always last
 
     if not parts:
-        return ""
+        # No bullets at all -- still surface norm data for the codepage bar
+        return _sanitize_for_qb(_norm_span)
+    # Piggyback hidden span on the last bullet so no extra blank <li> is created
+    if _norm_span:
+        parts[-1] = parts[-1] + _norm_span
     # Join paragraphs with <br><br> for QB rich-text display
     return _sanitize_for_qb("<br><br>".join(parts))
 
@@ -17339,6 +17486,11 @@ def main():
         ai_analysis_fid   = fmap.get("AI Analysis")  # fid 1590 — rich-text narrative
         ai_confidence_fid = fmap.get("AI_Confidence") or fmap.get("AI Confidence") or 1612
         di_ord_hist_fid   = fmap.get("DI Ord History") or 1613  # L26W DI weekly qtys for codepage highlight
+        # Normalized Ord/Wk fields — FIDs 1626/1627/1628 created 2026-05-27.
+        # Fall back to hardcoded FIDs so a stale field-map cache never silently drops these.
+        norm_ord_l4w_fid  = fmap.get("Normalized Ord/Wk L4w")  or 1626
+        norm_ord_l13w_fid = fmap.get("Normalized Ord/Wk L13w") or 1627
+        norm_ord_l26w_fid = fmap.get("Normalized Ord/Wk L26w") or 1628
         wk_fids           = [fmap.get(f"AI PRJ W{i}") or fmap.get(f"AI_PRJ_W{i}")
                            for i in range(1, 27)]
         if not all(wk_fids) or not ai_alert_fid:
@@ -17444,6 +17596,13 @@ def main():
                     row[pog_end_fid] = _default_pog_end
                 except ValueError:
                     pass  # malformed date — skip silently
+            # Normalized Ord/Wk L4w / L13w / L26w (post-normalization avg weekly order rate)
+            if norm_ord_l4w_fid  and rec.get("norm_l4w")  is not None:
+                row[norm_ord_l4w_fid]  = rec["norm_l4w"]
+            if norm_ord_l13w_fid and rec.get("norm_l13w") is not None:
+                row[norm_ord_l13w_fid] = rec["norm_l13w"]
+            if norm_ord_l26w_fid and rec.get("norm_l26w") is not None:
+                row[norm_ord_l26w_fid] = rec["norm_l26w"]
             payload.append(row)
         n_ok, n_fail, errors = qb_bulk_update(QB_PROJ_TABLE, payload, merge_fid)
         # Audit Finding #7 (2026-05-25): tighten the resumability rule -- a key

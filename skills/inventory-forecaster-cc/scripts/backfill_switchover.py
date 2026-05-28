@@ -159,30 +159,40 @@ def main():
             continue
         acct = key.split("-", 1)[0]
 
-        # Skip if planner already set Switchover_To_MStyle
-        # Note: row keys use QB's original label (with spaces), not underscore form
+        already_active = bool(r.get("Switchover Active") or r.get("Switchover_Active"))
+
+        # Planner-set Switchover_To_MStyle -- handle date + active together
         existing_sw_ms = (r.get("Switchover To MStyle") or r.get("Switchover_To_MStyle") or "").strip()
         if existing_sw_ms:
-            # Check if we still need to compute the date
-            existing_sw_dt = (r.get("Switchover_Date") or "")[:10]
+            existing_sw_dt = (r.get("Switchover Date") or r.get("Switchover_Date") or "")[:10]
             v_row = by_acct_ms.get((acct, existing_sw_ms))
-            if v_row and not existing_sw_dt:
-                # Has mstyle but no date -- compute it
-                sw_date = None
+
+            # Compute date from variant's first non-zero MAN PRJ week (if variant in scope)
+            sw_date = None
+            if v_row:
                 for wn in sorted(prj_fids.keys()):
                     label = f2l.get(prj_fids[wn], str(prj_fids[wn]))
                     val   = float(v_row.get(label) or 0)
                     if val > 0:
                         sw_date = col_dates.get(wn)
                         break
-                if sw_date:
-                    updates.append({
-                        "key":           key,
-                        "sw_to_mstyle":  existing_sw_ms,
-                        "sw_date":       sw_date.isoformat(),
-                        "set_active":    False,  # already planner-set, don't override
-                        "reason":        "date-only (planner mstyle set, date missing)",
-                    })
+
+            date_changed = bool(sw_date) and sw_date.isoformat() != existing_sw_dt
+            # Auto-activate whenever the switchover is valid (date computable or already set)
+            need_active  = not already_active and (sw_date is not None or bool(existing_sw_dt))
+
+            if date_changed or need_active:
+                new_date = sw_date.isoformat() if date_changed else (existing_sw_dt or None)
+                reason   = ("date+active" if date_changed and need_active
+                            else "active-only (date already set)" if need_active
+                            else "date-only")
+                updates.append({
+                    "key":          key,
+                    "sw_to_mstyle": existing_sw_ms,
+                    "sw_date":      new_date,
+                    "set_active":   need_active,
+                    "reason":       reason,
+                })
             continue
 
         # Auto-detect: find first variant suffix sibling in scope
@@ -204,11 +214,17 @@ def main():
                 sw_date = col_dates.get(wn)
                 break
 
+        new_date     = sw_date.isoformat() if sw_date else None
+        existing_sw_dt = (r.get("Switchover Date") or r.get("Switchover_Date") or "")[:10]
+        date_changed = bool(new_date) and new_date != existing_sw_dt
+        need_active  = not already_active
+        if not date_changed and not need_active:
+            continue  # already fully configured
         updates.append({
             "key":          key,
             "sw_to_mstyle": variant_found,
-            "sw_date":      sw_date.isoformat() if sw_date else None,
-            "set_active":   True,
+            "sw_date":      new_date,
+            "set_active":   need_active,
             "reason":       f"auto-detected {variant_found}",
         })
 

@@ -3293,7 +3293,7 @@ function toggleDetail(key) {{
   </div>`;
 
   // Comment block — Flag/Mgr conversation thread (planner ↔ inventory mgr).
-  // 25% Add-a-Comment | 75% Comment History (filtered to NON-AI comments).
+  // 25% Add-a-Comment | 75% Comment History (flag comments only).
   const commentBlock = `
   <div style="margin:10px 12px 12px 12px;padding:12px;background:#f7f9fc;border:1px solid #d8dce3;border-radius:6px;">
     <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11px;color:#555;cursor:pointer;">
@@ -3319,7 +3319,7 @@ function toggleDetail(key) {{
     </div>
     <div id="cmt-msg-${{safeKey}}" style="font-size:11px;color:#666;margin-top:4px;"></div>
       </div>
-      <!-- RIGHT: Mgr/Flag comment history (75%) — non-AI comments only -->
+      <!-- RIGHT: Mgr/Flag comment history (75%) — flag comments only -->
       <div style="flex:1 1 75%;min-width:0;">
         <div style="font-weight:600;color:#8b2252;margin-bottom:6px;font-size:12px;display:flex;align-items:center;justify-content:space-between;">
           <span>📋 Comment History <span style="font-weight:400;color:#999;font-size:10px;">— last 30 days, oldest first · planner ↔ mgr</span></span>
