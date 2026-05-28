@@ -11,6 +11,9 @@ Usage (CLI):
                          --body "Hello" \
                          [--html]
 
+    # For large HTML bodies, use --body-file to avoid command-line length limits:
+    python send_email.py --subject "Test" --body-file email.html --html
+
 Usage (import):
     from send_email import send_email
     send_email("Subject", html_body, to="s.shweky@petspeople.com")
@@ -27,7 +30,6 @@ from pathlib import Path
 
 # ── Load .env ─────────────────────────────────────────────────────────────────
 def _load_env():
-    """Load .env from Claude Home if dotenv not installed."""
     env_path = Path(r"C:\Users\steven\Desktop\Dropbox (Personal)\Working Docs\Claude Home\.env")
     if not env_path.exists():
         return
@@ -92,11 +94,21 @@ def send_email(subject, body, to=None, is_html=True):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description="Send email via Office 365 SMTP")
-    p.add_argument("--to",      default=None,  help="Recipient (default: SMTP_FROM)")
-    p.add_argument("--subject", required=True,  help="Subject line")
-    p.add_argument("--body",    required=True,  help="Body text or HTML")
-    p.add_argument("--html",    action="store_true", help="Treat body as HTML")
+    p.add_argument("--to",        default=None,  help="Recipient (default: SMTP_FROM)")
+    p.add_argument("--subject",   required=True, help="Subject line")
+    p.add_argument("--body",      default=None,  help="Body text or HTML (inline)")
+    p.add_argument("--body-file", default=None,  dest="body_file",
+                   help="Path to file containing body (avoids command-line length limits)")
+    p.add_argument("--html",      action="store_true", help="Treat body as HTML")
     args = p.parse_args()
 
-    ok = send_email(args.subject, args.body, to=args.to, is_html=args.html)
+    if args.body_file:
+        body = Path(args.body_file).read_text(encoding="utf-8")
+    elif args.body:
+        body = args.body
+    else:
+        print("ERROR: --body or --body-file required", file=sys.stderr)
+        sys.exit(1)
+
+    ok = send_email(args.subject, body, to=args.to, is_html=args.html)
     sys.exit(0 if ok else 1)
