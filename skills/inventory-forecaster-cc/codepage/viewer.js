@@ -5240,100 +5240,85 @@ async function _loadOrdHistCxld(r, safeId) {
 }
 
 // -- Open order hover: per-customer breakdown with cancel date ----------------
-// Queries Order History for rows where Qty_Open > 0, groups by customer +
-// cancel date, and rewrites the title attr on each opn-cell-* <td> so hovering
-// shows a breakdown rather than the generic "all customers combined" fallback.
+// Queries the Projections table (REST, one call) for all customer records that
+// share this mstyle.  Each Projections record is one customer, so r.opn_w[i]
+// gives that customer's open PO qty for week i.  Cancel date = the week-start
+// date for each bucket (W1_DATE + i*7 days) — same granularity as the open-PO
+// columns themselves.  This is more reliable than querying Order History, which
+// stores cancellation history (Qty_Cxld) and typically has no Qty_Open rows.
 async function _loadOpenOrderDetails(r, safeId) {
-  if (!CFG.ORDER_HIST_TID || !W1_DATE) return;
-
+  if (!W1_DATE || !CFG.PROJECTIONS_TID) return;
   try {
-    await discoverOrdHistFids();
-    if (!ORD_HIST_QTY_OPEN_FID || !ORD_HIST_ACCT_MSTYLE_FID || !ORD_HIST_CANCEL_DATE_FID) return;
-
-    // Query ALL customers for this mstyle — Inv Flow "Open Orders" is all-customer
-    // combined so the hover breakdown must match.  Acct-MStyle field (33) stores
-    // "ACCT-MSTYLE"; CT with hyphen prefix avoids partial-mstyle false matches.
     const escMstyle = (r.mstyle || '').replace(/'/g, "''");
-    const select = [ORD_HIST_CANCEL_DATE_FID, ORD_HIST_QTY_OPEN_FID, ORD_HIST_ACCT_MSTYLE_FID];
-    if (ORD_HIST_CUST_NAME_FID) select.push(ORD_HIST_CUST_NAME_FID);
+    const mstyleFid = CFG.FID.MSTYLE;   // 196
+    const custFid   = CFG.FID.CUST;     // 874
+    const opnFids   = CFG.OPN_FIDS;     // [223, 224, ..., 248]
 
-    const where  = `{${ORD_HIST_ACCT_MSTYLE_FID}.CT.'-${escMstyle}'}` +
-                   `AND{${ORD_HIST_QTY_OPEN_FID}.GT.0}`;
-
+    // Fetch ALL customer records for this mstyle — one REST call covers all 26 weeks.
+    // No status filter: open POs from any customer status are relevant.
     const resp = await qb('/records/query', {
-      from: CFG.ORDER_HIST_TID,
-      select,
-      where,
-      options: { skip: 0, top: 2000 },
+      from: CFG.PROJECTIONS_TID,
+      select: [custFid, ...opnFids],
+      where: `{${mstyleFid}.EX.'${escMstyle}'}`,
+      options: { skip: 0, top: 200 },
     });
 
     const data = (resp && resp.data) || [];
-    console.info(`[OrdHist] open orders (all custs) for mstyle ${r.mstyle}: ${data.length} rows`);
-    if (!data.length) {
-      // No open-order detail found — replace loading placeholder with a clear note.
-      for (let _ci = 0; _ci < 26; _ci++) {
-        const _c = document.getElementById('opn-cell-' + safeId + '-' + _ci);
-        if (_c) _c.title = _c.title.replace('\n(loading cancel date...)', '\n(no order detail in Order History)');
-      }
-      return;
-    }
+    console.info(`[OpenOrd] Projections rows for ${r.mstyle}: ${data.length}`);
 
-    const _sv = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
-    const _fmtDate = d => {
-      const s = new Date(d).toISOString().slice(0, 10);
-      return s.slice(5, 7) + '/' + s.slice(8, 10);
+    const _sv  = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
+    const _num = (rec, fid) => parseFloat(_sv(rec, fid) || 0) || 0;
+
+    // Return the week-start date as the cancel date label for week bucket i
+    const weekCancelDate = (i) => {
+      const d = new Date(W1_DATE.getTime() + i * 7 * 86400000);
+      return String(d.getMonth() + 1).padStart(2, '0') + '/' +
+             String(d.getDate()).padStart(2, '0');
     };
 
-    // byWeek[i] = array of { cust, qty, cancelDate } for cell index i (0=W1..25=W26)
-    const byWeek = Array.from({ length: 26 }, () => []);
-
-    for (const rec of data) {
-      const rawDate = _sv(rec, ORD_HIST_CANCEL_DATE_FID);
-      if (!rawDate) continue;
-      const cancelDate = new Date(rawDate);
-      if (isNaN(cancelDate.getTime())) continue;
-      const qty = parseFloat(_sv(rec, ORD_HIST_QTY_OPEN_FID)) || 0;
-      if (qty <= 0) continue;
-
-      // Forward-week bucketing: cell 0 = W1 (includes past-due), cell i = W(i+1)
-      const daysDiff = Math.floor((cancelDate.getTime() - W1_DATE.getTime()) / 86400000);
-      let cellIdx = Math.floor(daysDiff / 7);
-      if (cellIdx < 0) cellIdx = 0;   // past-due -> cell 0 (W1)
-      if (cellIdx >= 26) continue;    // beyond forecast horizon
-
-      const cust = ORD_HIST_CUST_NAME_FID ? (String(_sv(rec, ORD_HIST_CUST_NAME_FID) || '')).trim() : '';
-      byWeek[cellIdx].push({ cust: cust || 'Customer', qty, cancelDate: _fmtDate(rawDate) });
-    }
-
     for (let i = 0; i < 26; i++) {
-      const entries = byWeek[i];
-      if (!entries.length) continue;
       const cell = document.getElementById('opn-cell-' + safeId + '-' + i);
       if (!cell) continue;
 
-      // Aggregate by customer — a customer may have multiple open POs in the week
-      const custMap = {};
+      // Collect each customer's qty for this week
+      const custEntries = [];
       let weekTotal = 0;
-      for (const e of entries) {
-        if (!custMap[e.cust]) custMap[e.cust] = { qty: 0, dates: new Set() };
-        custMap[e.cust].qty += e.qty;
-        custMap[e.cust].dates.add(e.cancelDate);
-        weekTotal += e.qty;
+      for (const rec of data) {
+        const qty = _num(rec, opnFids[i]);
+        if (qty <= 0) continue;
+        const cust = (String(_sv(rec, custFid) || '')).trim() || 'Customer';
+        custEntries.push({ cust, qty });
+        weekTotal += qty;
       }
 
-      // Header line: total for the week, then one line per customer
+      if (!custEntries.length) {
+        // No open orders in this week — clear the loading placeholder
+        if (cell.title.includes('(loading cancel date...)')) {
+          cell.title = cell.title.replace('\n(loading cancel date...)', '');
+        }
+        continue;
+      }
+
+      // Header + one line per customer, sorted by qty desc
+      const cancelDate = weekCancelDate(i);
+      const sorted = custEntries.sort((a, b) => b.qty - a.qty);
       const lines = [`All customers: ${fmtN(weekTotal)} units`];
-      // Sort by qty descending so largest orders appear first
-      const sorted = Object.entries(custMap).sort((a, b) => b[1].qty - a[1].qty);
-      for (const [cust, info] of sorted) {
-        const dateStr = [...info.dates].sort().join(', ');
-        lines.push(`  ${cust}  |  ${fmtN(info.qty)} u  |  cancel ${dateStr}`);
+      for (const { cust, qty } of sorted) {
+        lines.push(`  ${cust}  |  ${fmtN(qty)} u  |  cancel ${cancelDate}`);
       }
       cell.title = lines.join('\n');
       cell.style.cursor = 'help';
     }
+
+    // Clear any remaining loading placeholders on weeks with zero open POs
+    for (let i = 0; i < 26; i++) {
+      const c = document.getElementById('opn-cell-' + safeId + '-' + i);
+      if (c && c.title.includes('(loading cancel date...)')) {
+        c.title = c.title.replace('\n(loading cancel date...)', '');
+      }
+    }
   } catch (e) {
-    console.warn('[OrdHist] open order hover load failed:', e.message || e);
+    console.warn('[OpenOrd] open order hover load failed:', e.message || e);
   }
 }
 
