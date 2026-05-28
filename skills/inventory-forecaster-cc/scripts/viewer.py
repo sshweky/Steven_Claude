@@ -3099,6 +3099,7 @@ function toggleDetail(key) {{
             <tr>${{hdrCells}}</tr>
             <tr>${{begCells}}</tr>
             <tr>${{rcvCells}}</tr>
+            <tr>${{opnIfCells}}</tr>
             <tr>${{wosCells}}</tr>
           </table>
         </div>
