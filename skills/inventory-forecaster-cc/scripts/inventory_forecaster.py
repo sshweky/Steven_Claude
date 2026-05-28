@@ -13604,6 +13604,44 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"switchover; AI zeroed all weeks."
                 )
 
+    # ── F70d — Planner-configured Switchover_Date cutoff (2026-05-28) ───────────
+    # When Switchover_Active=True and Switchover_Date is set, zero AI for every
+    # week whose calendar date >= Switchover_Date.  F70 can't catch this case
+    # when the variant has no manual projections yet (nothing to conflict on),
+    # or when the variant is out of scope for this run.  F70d uses the date
+    # directly so the base style is cleanly handed off regardless of variant state.
+    # Runs after F70c; skips Pre-launch / F58 passthrough records.
+    _sw_active_f70d = bool(row.get("Switchover_Active"))
+    _sw_date_str_f70d = (row.get("Switchover_Date") or "")[:10]
+    if _sw_active_f70d and _sw_date_str_f70d and ORIG_PRJ_COLS and not _f70_planner_protected:
+        try:
+            from datetime import date as _d70d, timedelta as _td70d
+            _sw_dt_f70d = _d70d.fromisoformat(_sw_date_str_f70d)
+            _col0_f70d  = ORIG_PRJ_COLS[0]   # e.g. "05_26_W1"
+            _w1m_f70d, _w1d_f70d = int(_col0_f70d[0:2]), int(_col0_f70d[3:5])
+            _today_f70d = _d70d.today()
+            _w1_f70d    = _d70d(_today_f70d.year, _w1m_f70d, _w1d_f70d)
+            if (_w1_f70d - _today_f70d).days < -180:
+                _w1_f70d = _d70d(_today_f70d.year + 1, _w1m_f70d, _w1d_f70d)
+            _f70d_zeroed = []
+            for _wi in range(26):
+                _wk_dt_f70d = _w1_f70d + _td70d(weeks=_wi)
+                if _wk_dt_f70d >= _sw_dt_f70d and fcst[_wi] != 0:
+                    fcst[_wi] = 0
+                    _f70d_zeroed.append(_wi)
+            if _f70d_zeroed:
+                _fire("F70d")
+                _f70d_zeroed_str = ", ".join(f"W{wi + 1}" for wi in _f70d_zeroed)
+                _sw_to_ms = (row.get("Switchover_To_MStyle") or "?").strip()
+                if isinstance(meta, dict):
+                    meta.setdefault("drivers", []).append(
+                        f"F70d Switchover date cutoff: Switchover_Date={_sw_date_str_f70d}; "
+                        f"zeroed base-style AI for {_f70d_zeroed_str} "
+                        f"(weeks belong to new style {_sw_to_ms})."
+                    )
+        except (ValueError, TypeError):
+            pass
+
     # ── F_YOY_CADENCE — LY promo/holiday window timing replication (2026-05-26) ──
     # On items with a full year of order history, replace the within-window
     # week-to-week distribution for promotional and holiday lift periods with last
