@@ -372,35 +372,65 @@ Planner's comment:
 
 Respond with ONLY the label.  Nothing else.  No explanation, no punctuation, no quotes."""
 
-    try:
-        body = json.dumps({
-            "model": "claude-3-5-sonnet-20241022",
-            "max_tokens": 16,
-            "messages": [{"role": "user", "content": prompt}],
-        }).encode("utf-8")
-        req = urllib.request.Request(
-            "https://api.anthropic.com/v1/messages",
-            data=body,
-            headers={
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=30) as r:
-            resp = json.loads(r.read())
-        text = (resp.get("content") or [{}])[0].get("text", "").strip().lower()
-        # Strip anything Claude wrapped around the label
-        text = re.sub(r"[^a-z_]", " ", text).strip().split()
-        if not text:
+    # Model fallback chain -- tries the most-recent Claude Sonnet first, then
+    # progressively older / cheaper models if the API returns 404 for any of
+    # them (deprecation or account-tier-not-entitled).  Haiku is plenty for a
+    # 7-class label task.
+    _MODEL_CHAIN = [
+        "claude-sonnet-4-5",
+        "claude-haiku-4-5",
+        "claude-3-5-sonnet-latest",
+        "claude-3-haiku-20240307",
+    ]
+    last_err = None
+    for model_id in _MODEL_CHAIN:
+        try:
+            body = json.dumps({
+                "model": model_id,
+                "max_tokens": 16,
+                "messages": [{"role": "user", "content": prompt}],
+            }).encode("utf-8")
+            req = urllib.request.Request(
+                "https://api.anthropic.com/v1/messages",
+                data=body,
+                headers={
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=30) as r:
+                resp = json.loads(r.read())
+            text = (resp.get("content") or [{}])[0].get("text", "").strip().lower()
+            text = re.sub(r"[^a-z_]", " ", text).strip().split()
+            if not text:
+                return None
+            label = text[0]
+            valid = {"eol", "zero", "launch", "wrong_model", "increase", "decrease", "unknown"}
+            if label in valid:
+                return label
             return None
-        label = text[0]
-        valid = {"eol", "zero", "launch", "wrong_model", "increase", "decrease", "unknown"}
-        return label if label in valid else None
-    except Exception as e:
-        print(f"  [LLM] classify failed ({type(e).__name__}: {e}) -- falling back to regex")
-        return None
+        except urllib.error.HTTPError as e:
+            # 404 = model not found / not entitled.  Try next model in chain.
+            if e.code == 404:
+                last_err = f"HTTP 404 on model={model_id}"
+                continue
+            # 401/403 = auth issue; no point retrying.  429 = rate limit; bail.
+            try:
+                err_body = e.read().decode("utf-8", errors="replace")[:300]
+            except Exception:
+                err_body = "(no body)"
+            print(f"  [LLM] HTTP {e.code} on model={model_id}: {err_body}")
+            return None
+        except Exception as e:
+            last_err = f"{type(e).__name__}: {e}"
+            print(f"  [LLM] classify failed ({last_err}) -- falling back to regex")
+            return None
+    # Exhausted the chain
+    print(f"  [LLM] all models in chain returned 404 (last: {last_err}). "
+          f"Check Anthropic account tier / available models.")
+    return None
 
 
 def classify_intent(note, key="", ai_model="", ai_total=0, man_total=0):
