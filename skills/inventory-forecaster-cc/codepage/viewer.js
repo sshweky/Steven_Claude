@@ -4692,7 +4692,7 @@ async function toggleDetail(key) {
   // -- COS / EC Switchover alert (base style only) ---------------------------
   // Shown when a COS or EC variant of this style has started receiving orders
   // or manual projections, signalling that this base style should be closed.
-  const _variantMstyle   = SWITCHOVER_MAP.get(r.key);
+  const _variantMstyle   = (SWITCHOVER_MAP.get(r.key) || {}).variantMstyle;
   const _cosEcHtml       = _variantMstyle ? `
     <div id="switchover-alert-${safeKey}" style="margin:8px 12px 0 12px;padding:10px 14px;background:#fff8e1;border:2px solid #f9a825;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
       <span style="font-size:18px;line-height:1;">&#x26A0;&#xFE0F;</span>
