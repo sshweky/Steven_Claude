@@ -272,6 +272,8 @@ let MAN_PRJ_LABELS   = [];
 // discardAllManEdits(). Survives detail-pane collapse/re-expand because the
 // renderer reads from this map when (re)building the projection row.
 const DIRTY_EDITS = new Map();
+// Keys of projections the user has currently checked for bulk operations.
+const SELECTED_KEYS = new Set();
 let ORD_HIST_FIDS    = [];   // 26 fids for Ord LW + Ord LW-1..Ord LW-25 (oldest>newest)
 let SHP_HIST_FIDS    = [];   // 26 fids for Shp LW + Shp LW-1..Shp LW-25 (oldest>newest)
 // Last-Year actuals: weeks 27..52 ago, aligned to W1..W26 (oldest>newest).
@@ -3810,6 +3812,7 @@ function renderPage(page) {
 
     const _safeId2 = r.key.replace(/[^a-zA-Z0-9]/g,'_');
     tr.innerHTML = `
+      <td style="width:32px;text-align:center;padding:2px;"><input type="checkbox" class="row-sel-cb" data-key="${r.key.replace(/"/g,'&quot;')}" onchange="onRowSelChange(this)"${SELECTED_KEYS.has(r.key) ? ' checked' : ''}></td>
       <td id="row-badges-${_safeId2}" style="white-space:nowrap;text-align:center;">${r.planner_reply_pending ? '<span class="reply-badge" title="Planner reply awaiting director review">[R]</span>' : ''}${r.manager_reply_pending ? '<span class="mgr-badge" title="Manager flagged - planner action required">[M]</span>' : ''}${SWITCHOVER_MAP.has(r.key) && !MANUAL_SWITCHOVER_MAP.has(r.key) ? '<span class="switchover-badge" style="color:#2e7d32" title="Auto-detected switchover to ' + (SWITCHOVER_MAP.get(r.key)||'').replace(/"/g,'&quot;') + ' — variant has activity, mark this projection CLOSED">&#x21C4;</span>' : ''}${MANUAL_SWITCHOVER_MAP.has(r.key) ? '<span class="switchover-badge" title="Manual switchover to ' + ((MANUAL_SWITCHOVER_MAP.get(r.key)||{}).toMstyle||'').replace(/"/g,'&quot;') + '">&#x21C4;</span>' : ''}${r.auto_project ? '<span style="display:inline-block;background:#1b5e20;color:#fff;border-radius:3px;padding:0 4px;font-size:10px;font-weight:700;letter-spacing:0.3px;margin-left:2px;" title="Auto Project: AI projections will replace manual projections on each forecast run">[A]</span>' : ''}</td>
       <td class="clickable" onclick="toggleDetail('${r.key}')"><span id="conflict-badge-${_safeId2}" style="display:${r.has_po_prj_conflict && !_PO_DUP_IGNORED.has(r.key) ? 'inline' : 'none'};color:#e65100;font-size:14px;font-weight:700;margin-right:3px;vertical-align:middle;cursor:pointer;" title="Open PO and Manual Projection overlap -- potential double-count. Click to see details.">&#x26A0;</span>${r.key}</td>
       <td style="font-size:11px;white-space:nowrap">${r.inv_manager||''}</td>
@@ -3844,12 +3847,13 @@ function renderPage(page) {
     dtr.className = 'detail-pane';
     dtr.id = 'detail-' + r.key;
     dtr.dataset.loaded = '0';
-    dtr.innerHTML = `<td colspan="26"></td>`;
+    dtr.innerHTML = `<td colspan="27"></td>`;
     tb.appendChild(dtr);
   });
   updatePageNav();
   updateFlagCount();
   updateReplyCount();
+  _syncSelAllCb();
 }
 function renderTable() { renderPage(0); }
 
@@ -3885,11 +3889,11 @@ async function toggleDetail(key) {
   // to keep the cache small.  Fetch just this one record's arrays from QB now.
   const _lazyRec = ALL_RECORDS.find(x => x.key === key);
   if (_lazyRec && _lazyRec._needs_detail) {
-    el.innerHTML = `<td colspan="25" style="padding:10px 16px;color:#888;font-style:italic;font-size:12px">Loading detail...</td>`;
+    el.innerHTML = `<td colspan="26" style="padding:10px 16px;color:#888;font-style:italic;font-size:12px">Loading detail...</td>`;
     try {
       await _lazyLoadDetail(_lazyRec);
     } catch (_le) {
-      el.innerHTML = `<td colspan="25" style="padding:12px 16px;background:#fff3e0"><b style="color:#c62828">Could not load detail: ${_le.message}</b> - <a href="?nocache=1" style="color:#1565c0">reload fresh</a></td>`;
+      el.innerHTML = `<td colspan="26" style="padding:12px 16px;background:#fff3e0"><b style="color:#c62828">Could not load detail: ${_le.message}</b> - <a href="?nocache=1" style="color:#1565c0">reload fresh</a></td>`;
       el.dataset.loaded = '1';
       return;
     }
@@ -3912,7 +3916,7 @@ async function toggleDetail(key) {
     console.warn('[toggleDetail] record not found in ALL_RECORDS for key:', JSON.stringify(key),
                  '| ALL_RECORDS.length:', ALL_RECORDS.length,
                  '| sample keys:', ALL_RECORDS.slice(0,3).map(x => x.key));
-    el.innerHTML = `<td colspan="22" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
+    el.innerHTML = `<td colspan="23" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
       <b style="color:#e65100">&#x26A0; Detail panel could not load for this record.</b><br>
       <span style="font-size:11px;color:#555;">Key: <code>${key || '(empty)'}</code> was not found in the loaded record set (${ALL_RECORDS.length} records loaded).
       Try refreshing with <a href="?nocache=1" style="color:#1565c0">?nocache=1</a> to force a fresh pull from Quickbase.
@@ -5069,7 +5073,7 @@ async function toggleDetail(key) {
     }
   }
 
-  el.innerHTML = `<td colspan="22" style="padding:0">
+  el.innerHTML = `<td colspan="23" style="padding:0">
     ${poPrjAlertHtml}
     ${autoProjectBtn}
     ${fdStatusHtml}
@@ -5119,7 +5123,7 @@ async function toggleDetail(key) {
     // Something threw while building the detail HTML. Surface the error
     // inside the pane instead of leaving it blank.
     console.error('[toggleDetail] render error for key', JSON.stringify(key), err);
-    el.innerHTML = `<td colspan="22" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
+    el.innerHTML = `<td colspan="23" style="padding:12px 16px;background:#fff3e0;border-top:2px solid #ffb74d;">
       <b style="color:#e65100">&#x26A0; Detail panel render error</b><br>
       <span style="font-size:11px;color:#555;">Key: <code>${key || '(empty)'}</code><br>
       Error: <code>${(err && err.message) ? err.message.replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]) : String(err)}</code><br>
@@ -9060,5 +9064,249 @@ if (typeof ResizeObserver !== 'undefined') {
     if (tlb) _stickyRO.observe(tlb);
   }, 100);
 }
+
+// -- Multi-select: checkboxes, selection bar, bulk operations -----------------
+
+function onRowSelChange(cb) {
+  const key = cb.dataset.key;
+  if (cb.checked) SELECTED_KEYS.add(key);
+  else            SELECTED_KEYS.delete(key);
+  _updateSelBar();
+  _syncSelAllCb();
+}
+window.onRowSelChange = onRowSelChange;
+
+// Select / deselect all VISIBLE rows (current page only).
+// Keys from previous pages remain in SELECTED_KEYS even when not visible.
+function selAll(cb) {
+  const checked = cb.checked;
+  document.querySelectorAll('.row-sel-cb').forEach(rcb => {
+    rcb.checked = checked;
+    const k = rcb.dataset.key;
+    if (checked) SELECTED_KEYS.add(k);
+    else         SELECTED_KEYS.delete(k);
+  });
+  _updateSelBar();
+}
+window.selAll = selAll;
+
+function _syncSelAllCb() {
+  const allCbs = [...document.querySelectorAll('.row-sel-cb')];
+  const nChk   = allCbs.filter(c => c.checked).length;
+  const allCb  = document.getElementById('sel-all-cb');
+  if (!allCb) return;
+  if (nChk === 0)                { allCb.checked = false; allCb.indeterminate = false; }
+  else if (nChk === allCbs.length) { allCb.checked = true;  allCb.indeterminate = false; }
+  else                           { allCb.checked = false; allCb.indeterminate = true;  }
+}
+
+function _updateSelBar() {
+  const n   = SELECTED_KEYS.size;
+  const bar = document.getElementById('sel-bar');
+  if (!bar) return;
+  bar.style.display = n > 0 ? 'flex' : 'none';
+  const ce = document.getElementById('sel-bar-count');
+  if (ce) ce.textContent = n + ' selected';
+  // Flag+Comment button only shown for Directors/VPs
+  const fw = document.getElementById('sel-bar-flag-btn-wrap');
+  if (fw) fw.style.display = _isDirector() ? 'inline' : 'none';
+}
+
+function _clearSelection() {
+  SELECTED_KEYS.clear();
+  document.querySelectorAll('.row-sel-cb').forEach(cb => { cb.checked = false; });
+  const allCb = document.getElementById('sel-all-cb');
+  if (allCb) { allCb.checked = false; allCb.indeterminate = false; }
+  _updateSelBar();
+}
+window._clearSelection = _clearSelection;
+
+// Esc key: clear selection (only when no modal is open)
+document.addEventListener('keydown', function _selEscHandler(e) {
+  if (e.key !== 'Escape' || !SELECTED_KEYS.size) return;
+  const modal = document.getElementById('bulk-flag-modal');
+  if (!modal || modal.style.display === 'none') _clearSelection();
+});
+
+// -- Bulk Zero Out -----------------------------------------------------------
+// Stages zero values for all 26 MAN PRJ weeks on every selected key.
+// Uses the DIRTY_EDITS path so the user reviews and clicks Save All.
+async function bulkZeroOut() {
+  const keys = [...SELECTED_KEYS];
+  if (!keys.length) return;
+  if (!confirm('Stage zero-out for all 26 manual projection weeks on ' + keys.length + ' record(s)?\n\nChanges will be queued -- click "Save All" to write to QB.')) return;
+  let staged = 0;
+  for (const key of keys) {
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    if (!rec || !rec.weeks_slim) continue;
+    for (let i = 0; i < 26; i++) {
+      const origVal = Math.round((rec.weeks_slim[i] && rec.weeks_slim[i].projection) || 0);
+      const dk      = key + '|' + i;
+      if (origVal !== 0) {
+        DIRTY_EDITS.set(dk, { key, weekIdx: i, oldVal: origVal, newVal: 0 });
+      } else {
+        DIRTY_EDITS.delete(dk);  // already 0 -- keep set clean
+      }
+    }
+    staged++;
+    // Refresh any currently open detail panel for this record
+    document.querySelectorAll('.man-edit[data-key="' + key.replace(/"/g, '\\"') + '"]').forEach(function(el) {
+      const ov = parseInt(el.dataset.orig, 10) || 0;
+      el.value = 0;
+      if (ov !== 0) el.classList.add('dirty');
+    });
+    var sid    = key.replace(/[^a-zA-Z0-9]/g, '_');
+    var totEl  = document.getElementById('man-total-'  + sid);
+    var avgEl  = document.getElementById('man-avgwk-'  + sid);
+    var difEl  = document.getElementById('diff-total-' + sid);
+    var difAvg = document.getElementById('diff-avg-'   + sid);
+    if (totEl) totEl.textContent = '0';
+    if (avgEl) avgEl.textContent = '0';
+    if (difEl) {
+      var aiTot = parseFloat(difEl.dataset.aiTotal) || 0;
+      var diff  = -aiTot;
+      var clr   = diff < 0 ? '#c62828' : diff > 0 ? '#2e7d32' : '#555';
+      var sign  = diff > 0 ? '+' : '';
+      difEl.style.cssText  = 'font-weight:700;color:' + clr;
+      difEl.textContent    = sign + fmtN(diff);
+    }
+    if (difAvg) {
+      var aiAvg  = parseFloat(difAvg.dataset.aiAvg) || 0;
+      var davg   = -aiAvg;
+      var davgClr = davg < 0 ? '#c62828' : davg > 0 ? '#2e7d32' : '#555';
+      difAvg.style.cssText = 'font-weight:700;color:' + davgClr;
+      difAvg.textContent   = (davg > 0 ? '+' : '') + fmtN(davg);
+    }
+  }
+  updateSaveAllBadge();
+  _clearSelection();
+  var st = document.getElementById('saveStatus');
+  if (st) { st.style.color = '#e65100'; st.textContent = staged + ' record(s) zeroed out -- click Save All to write to QB.'; }
+}
+window.bulkZeroOut = bulkZeroOut;
+
+// -- Bulk Flag + Comment (Director/VP only) ----------------------------------
+function bulkFlagComment() {
+  if (!_isDirector() || !SELECTED_KEYS.size) return;
+  var n  = SELECTED_KEYS.size;
+  var ce = document.getElementById('bulk-flag-count');
+  var cb = document.getElementById('bulk-flag-count-btn');
+  if (ce) ce.textContent = n;
+  if (cb) cb.textContent = n;
+  var msg = document.getElementById('bulk-flag-msg');
+  if (msg) { msg.textContent = ''; }
+  var ta = document.getElementById('bulk-flag-text');
+  if (ta) ta.value = '';
+  var modal = document.getElementById('bulk-flag-modal');
+  if (modal) modal.style.display = 'flex';
+}
+window.bulkFlagComment = bulkFlagComment;
+
+function closeBulkFlagModal() {
+  var modal = document.getElementById('bulk-flag-modal');
+  if (modal) modal.style.display = 'none';
+}
+window.closeBulkFlagModal = closeBulkFlagModal;
+
+async function submitBulkFlagComment() {
+  if (!_isDirector()) return;
+  var keys = [...SELECTED_KEYS];
+  if (!keys.length) return;
+  var flag = (document.getElementById('bulk-flag-type')  || {}).value || 'Needs Action';
+  var txt  = ((document.getElementById('bulk-flag-text') || {}).value || '').trim();
+  var msg  = document.getElementById('bulk-flag-msg');
+  var btn  = document.getElementById('bulk-flag-submit-btn');
+  if (!txt) {
+    if (msg) { msg.textContent = 'Comment cannot be empty.'; msg.style.color = '#c62828'; }
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+  if (msg) msg.textContent = '';
+
+  await _USER_READY;
+
+  var CHUNK = 25;
+  var done  = 0;
+  var failed = 0;
+
+  try {
+    // Step 1: INSERT one comment record per selected key, in batches of 25
+    for (var ci = 0; ci < keys.length; ci += CHUNK) {
+      var slice   = keys.slice(ci, ci + CHUNK);
+      var records = slice.map(function(key) {
+        var recData = ALL_RECORDS.find(function(x) { return x.key === key; });
+        var f = {};
+        f[CFG.COMMENT_FID.NOTE]        = { value: txt };
+        f[CFG.COMMENT_FID.ACCT_MSTYLE] = { value: key };
+        if (flag) f[CFG.COMMENT_FID.FLAG] = { value: flag };
+        if (CFG.COMMENT_FID.AUTHOR      && CURRENT_USER.name)  f[CFG.COMMENT_FID.AUTHOR]      = { value: CURRENT_USER.name };
+        if (CFG.COMMENT_FID.AUTHOR_USER && CURRENT_USER.email) f[CFG.COMMENT_FID.AUTHOR_USER] = { value: CURRENT_USER.email };
+        // SEND_TO routing (mirrors single-comment logic)
+        if (flag !== 'FYI' && flag !== 'AI training') {
+          if (flag === 'Needs Action' || flag === 'Manager Response') {
+            var im = recData && recData.inv_manager;
+            if (im && CFG.COMMENT_FID.SEND_TO)      f[CFG.COMMENT_FID.SEND_TO]      = { value: im };
+            var ime = recData && recData.inv_manager_email;
+            if (ime && CFG.COMMENT_FID.SEND_TO_USER) f[CFG.COMMENT_FID.SEND_TO_USER] = { value: ime };
+          } else if (flag === 'Planner Response') {
+            var dirTxt = CFG.MANAGER_NAMES ? CFG.MANAGER_NAMES.join(', ') : 'Director';
+            if (CFG.COMMENT_FID.SEND_TO) f[CFG.COMMENT_FID.SEND_TO] = { value: dirTxt };
+            var dirEml = CFG.MANAGER_EMAILS && CFG.MANAGER_EMAILS[0];
+            if (dirEml && CFG.COMMENT_FID.SEND_TO_USER) f[CFG.COMMENT_FID.SEND_TO_USER] = { value: dirEml };
+          }
+        }
+        return f;
+      });
+      try {
+        await qb('/records', { to: CFG.COMMENTS_TID, data: records });
+        done += slice.length;
+      } catch (_e) {
+        failed += slice.length;
+        console.error('[bulkFlagComment] comment batch failed:', _e);
+      }
+      if (msg) { msg.style.color = '#1565c0'; msg.textContent = 'Saved ' + done + ' / ' + keys.length + '...'; }
+    }
+
+    // Step 2: Set FLAGGED=true on Projections for non-FYI / non-AI-training flags
+    if (flag !== 'FYI' && flag !== 'AI training' && done > 0) {
+      var flagRecs = keys.map(function(key) {
+        var flds = {};
+        flds[CFG.FID.KEY]     = { value: key };
+        flds[CFG.FID.FLAGGED] = { value: true };
+        return flds;
+      });
+      for (var fi = 0; fi < flagRecs.length; fi += 100) {
+        try {
+          await qb('/records', {
+            to: CFG.PROJECTIONS_TID,
+            data: flagRecs.slice(fi, fi + 100),
+            mergeFieldId: CFG.FID.KEY,
+          });
+        } catch (_e2) { /* non-critical -- comment already saved */ }
+      }
+      // Update in-memory flagged state so rows repaint correctly
+      keys.forEach(function(key) {
+        var recMem = ALL_RECORDS.find(function(x) { return x.key === key; });
+        if (recMem) recMem.flagged = true;
+      });
+    }
+
+    // Step 3: Show result, close modal, clear selection, refresh rows
+    if (failed === 0) {
+      if (msg) { msg.style.color = '#2e7d32'; msg.textContent = done + ' comment(s) saved successfully.'; }
+      setTimeout(function() {
+        closeBulkFlagModal();
+        _clearSelection();
+        updateFlagCount();
+        applyFilters();
+      }, 1200);
+    } else {
+      if (msg) { msg.style.color = '#c62828'; msg.textContent = 'Saved ' + done + ', failed ' + failed + '. Check browser console (F12) for details.'; }
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Apply to ' + keys.length + ' records'; }
+  }
+}
+window.submitBulkFlagComment = submitBulkFlagComment;
 
 bootstrap();
