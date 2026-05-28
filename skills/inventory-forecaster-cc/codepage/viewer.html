@@ -104,10 +104,19 @@ window.QB_CONFIG = {
     BASELINE_OVERRIDE_DATE: 1615, // date     -  when the override was set; auto-expires after 30 days
     // AI PRJ W1..W26 are consecutive: 1511..1536
     AI_PRJ_W1:    1511,
+    DIV:           375,  // Division text field ("BB" / "FF")
   },
 
   // AI PRJ W1..W26 fids (consecutive 1511..1536)
   AI_PRJ_FIDS: Array.from({length: 26}, (_, i) => 1511 + i),
+
+  // -- New Projection modal data sources -----------------------------------
+  // Customers table: Acct# + Name dropdown (filtered by Div)
+  CUSTOMERS_TID: "bptt4t9ef",
+  CUST_FID: { ACCT: 8, NAME: 10, DIV: 7 },
+  // Styles table: Mstyle typeahead (filtered by status + Div)
+  STYLES_TID: "bphzqfkev",
+  STYLE_FID: { MSTYLE: 6, DESC: 15, STATUS: 14, DIV: 108 },
 
   // Open Customer PO Wk1..Wk26 fids (consecutive 223..248)
   OPN_FIDS: Array.from({length: 26}, (_, i) => 223 + i),

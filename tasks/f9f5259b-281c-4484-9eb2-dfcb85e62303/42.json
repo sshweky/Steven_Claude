@@ -1,0 +1,9 @@
+{
+  "id": "42",
+  "subject": "Run --all --validate + push with off-price L26/F_OP_BULK changes",
+  "description": "Production run to push updated off-price forecasts (F_OFFPRICE L26 baseline + F_OP_BULK always-on) to all active records, then push validation results.",
+  "activeForm": "Running --all --validate with off-price changes",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
