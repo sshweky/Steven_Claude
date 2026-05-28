@@ -5574,20 +5574,27 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None,
           ship_w           = min(total_demand_w, capacity_w)
           unmet_w          = total_demand_w - ship_w
 
-        Rollforward cohort for unmet_w (born at step=1):
-          W+1 (step 1): unmet_w × 0.75  -- 25% decay from original
-          W+2 (step 2): unmet_w × 0.50  -- 50% decay from original
-          W+3 (step 3): unmet_w × 0.25  -- 75% decay from original
-          W+4+        : 0               -- expired; cohort fully gone
+    Two rollforward modes -- selected by whether customer_dc_inv is provided:
 
-        The decay is always computed from the ORIGINAL unmet qty (linear),
-        not from the prior week's contribution (not compound).
+    MODE A -- Restock-to-WOS (when customer_dc_inv is supplied):
+        Used when we know the retailer's/Amazon's DC inventory on hand.
+        When we're back in stock (capacity > 0) after one or more constrained
+        weeks, fire a single restock order:
+          restock = max(0, wos_target * weekly_rate - customer_dc_inv)
+        This fires exactly once per constrained streak, in the first week
+        capacity returns.  No decay cohorts.
+
+    MODE B -- Decay cohort rollforward (when customer_dc_inv is None):
+        Used when we do NOT have DC inventory data.  Unmet demand in week W
+        is rolled forward at 75% / 50% / 25% of the original shortfall over
+        the next 3 weeks, then expires:
+          W+1 (step 1): unmet_w × 0.75
+          W+2 (step 2): unmet_w × 0.50
+          W+3 (step 3): unmet_w × 0.25
+          W+4+        : 0  -- expired naturally
+
+        The decay is always from the ORIGINAL unmet qty (linear, not compound).
         Example: 1,000-unit shortfall rolls as 750 / 500 / 250 / 0.
-
-        Rollforward rationale (2026-05-28):
-          When we can't fill an order in week W, Amazon typically re-orders
-          in W+1, W+2, W+3 at a decaying rate as the replenishment urgency
-          fades.  The linear 25%-per-week decay expires naturally in 4 weeks.
 
     `inv_flow` dict (passed by caller from `fetch_inv_flow_qb_rest()` output):
         {
