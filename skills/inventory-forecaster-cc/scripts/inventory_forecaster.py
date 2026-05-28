@@ -2419,7 +2419,7 @@ def seasonal_baseline(history, mp, is_amazon=False, pos_data=None, description=N
                       product_category=None, product_subcategory=None,
                       brand=None, brand_pt=None, shpd_l13=0.0, season=None,
                       is_ecom=False, is_new_launch=False, amz_catalog=None,
-                      rtl_pos=None):
+                      rtl_pos=None, is_offprice=False):
     """
     Forecasting model for dense CPG replenishment (orders most weeks):
 
