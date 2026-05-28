@@ -8654,7 +8654,7 @@ async function npmSave() {
 
     // Flash-highlight the new row
     setTimeout(() => {
-      const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(newKey)}"]`);
+      const tr = document.querySelector(`tbody tr[data-key="${CSS.escape(savedKey)}"]`);
       if (tr) {
         tr.classList.add('npm-new-row');
         tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
