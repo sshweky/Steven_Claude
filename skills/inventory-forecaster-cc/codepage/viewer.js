@@ -448,6 +448,7 @@ function buildSelectFids() {
     ...(F.SWITCHOVER_TO_MSTYLE   ? [F.SWITCHOVER_TO_MSTYLE]   : []),
     ...(F.SWITCHOVER_DATE        ? [F.SWITCHOVER_DATE]        : []),
     ...(F.SWITCHOVER_FROM        ? [F.SWITCHOVER_FROM]        : []),
+    ...(F.INV_REQ_ID             ? [F.INV_REQ_ID]             : []),
   ];
   CFG.AI_PRJ_FIDS.forEach(fid => sel.push(fid));
   CFG.OPN_FIDS.forEach(fid => sel.push(fid));
@@ -1796,6 +1797,7 @@ function _buildPogBlockHtml(r) {
   const pogLaunch   = r.pog_launch    || '';
   const pogEnd      = r.pog_end       || '';
   const stores      = Number(r.store_count   || 0);
+  const attachedReqId = Number(r.inv_req_id  || 0);
   const mp          = Number(r.master_pack   || 1);
   const estIso      = Number(r.est_iso_qty   || 0);   // formula field (read-only)
   const estIsoInput = Number(r.est_iso_input || 0);   // planner-entered ISO qty (FID 1606)
@@ -1857,14 +1859,19 @@ function _buildPogBlockHtml(r) {
       <div style="font-weight:700;margin-bottom:6px;color:#1b5e20;"> POG Information</div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #d4ead0;flex-wrap:wrap;">
         <b style="white-space:nowrap;">Inventory Request:</b>
-        <input type="number" min="1" step="1" id="pog-req-id-${safeKey}"
-               placeholder="Request ID #"
-               onkeydown="if(event.key==='Enter'){lookupInvRequest('${safeKey}',this.value);}"
-               style="font-size:11px;padding:2px 6px;border:1px solid #c7e2bf;border-radius:3px;
-                      background:#fff;color:#2e4f24;font-family:inherit;width:110px;">
-        <button onclick="lookupInvRequest('${safeKey}',document.getElementById('pog-req-id-${safeKey}').value)"
-                style="font-size:10px;padding:2px 8px;border:1px solid #a5c99a;border-radius:3px;
-                       background:#e8f5e9;color:#1b5e20;cursor:pointer;white-space:nowrap;">Load</button>
+        ${attachedReqId > 0
+          ? `<span style="font-weight:600;color:#1b5e20;">Request #${attachedReqId}</span>
+             <button onclick="unattachInvRequest('${safeKey}')"
+                     style="font-size:10px;padding:2px 8px;border:1px solid #c7a5a5;border-radius:3px;
+                            background:#fce8e8;color:#9b1c1c;cursor:pointer;white-space:nowrap;">Unattach</button>`
+          : `<input type="number" min="1" step="1" id="pog-req-id-${safeKey}"
+                    placeholder="Request ID #"
+                    onkeydown="if(event.key==='Enter'){lookupInvRequest('${safeKey}',this.value);}"
+                    style="font-size:11px;padding:2px 6px;border:1px solid #c7e2bf;border-radius:3px;
+                           background:#fff;color:#2e4f24;font-family:inherit;width:110px;">
+             <button onclick="lookupInvRequest('${safeKey}',document.getElementById('pog-req-id-${safeKey}').value)"
+                     style="font-size:10px;padding:2px 8px;border:1px solid #a5c99a;border-radius:3px;
+                            background:#e8f5e9;color:#1b5e20;cursor:pointer;white-space:nowrap;">Load</button>`}
         <span id="pog-req-msg-${safeKey}" style="font-size:10px;color:#555;flex:1;"></span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:18px 24px;align-items:center;">
@@ -2153,11 +2160,75 @@ async function lookupInvRequest(key, requestIdStr) {
     if (filled.length) { msg += `: ${filled.join(', ')}.`; } else { msg += ' (no POG data found).'; }
     if (isoPipe)       { msg += ` ISO Pipeline: ${Math.round(isoPipe).toLocaleString()} units.`; }
     setMsg(msg, '#1b5e20');
+
+    // Attach the request ID to this Projections record so it persists
+    await attachInvRequest(key, rid);
+
   } catch (e) {
     setMsg('Lookup failed: ' + (e.message || e), '#c00');
   }
 }
 window.lookupInvRequest = lookupInvRequest;
+
+// -- Save the linked Inventory Request ID to Projections (FID 1629) ----------
+async function attachInvRequest(key, rid) {
+  if (!CFG.FID.INV_REQ_ID) return;
+  try {
+    const fields = {};
+    fields[CFG.FID.KEY]        = { value: key };
+    fields[CFG.FID.INV_REQ_ID] = { value: rid };
+    await qb('/records', {
+      to:           CFG.PROJECTIONS_TID,
+      data:         [fields],
+      mergeFieldId: CFG.FID.KEY,
+    });
+    // Mirror locally so the panel re-renders with attached state on next expand
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    if (rec) rec.inv_req_id = rid;
+    // Re-render the POG block so the input disappears and "Request #N [Unattach]" appears
+    const detailEl = document.getElementById('detail-' + key.replace(/'/g, '&#39;'));
+    if (detailEl) {
+      const pogBlock = detailEl.querySelector('[data-pog-block]');
+      if (pogBlock && rec) pogBlock.outerHTML = _buildPogBlockHtml(rec);
+    }
+  } catch (e) {
+    console.warn('[attachInvRequest] save failed:', e.message || e);
+  }
+}
+window.attachInvRequest = attachInvRequest;
+
+// -- Clear the linked Inventory Request ID from Projections ------------------
+async function unattachInvRequest(key) {
+  const safeKey = key.replace(/'/g, '&#39;');
+  const msgEl   = document.getElementById('pog-req-msg-' + safeKey);
+  const setMsg  = (txt, color) => { if (msgEl) { msgEl.textContent = txt; msgEl.style.color = color || '#555'; } };
+  if (!CFG.FID.INV_REQ_ID) return;
+  setMsg('Removing...', '#888');
+  try {
+    const fields = {};
+    fields[CFG.FID.KEY]        = { value: key };
+    fields[CFG.FID.INV_REQ_ID] = { value: 0 };
+    await qb('/records', {
+      to:           CFG.PROJECTIONS_TID,
+      data:         [fields],
+      mergeFieldId: CFG.FID.KEY,
+    });
+    // Mirror locally
+    const rec = ALL_RECORDS.find(x => x.key === key);
+    if (rec) rec.inv_req_id = 0;
+    setMsg('Inventory Request unattached.', '#1b5e20');
+    setTimeout(() => { if (msgEl) msgEl.textContent = ''; }, 2500);
+    // Re-render the POG block to restore the input + Load button
+    const detailEl = document.getElementById('detail-' + safeKey);
+    if (detailEl) {
+      const pogBlock = detailEl.querySelector('[data-pog-block]');
+      if (pogBlock && rec) pogBlock.outerHTML = _buildPogBlockHtml(rec);
+    }
+  } catch (e) {
+    setMsg('Unattach failed: ' + (e.message || e), '#c00');
+  }
+}
+window.unattachInvRequest = unattachInvRequest;
 
 // Client-side ordered-units WoW line for non-POS records.  The multi-window
 // L4/L13/L26/L52 "order rate" panel was REMOVED 2026-05-08 per planner
@@ -2518,6 +2589,7 @@ function adaptRow(row) {
     switchover_to_mstyle:F.SWITCHOVER_TO_MSTYLE ? str(row, F.SWITCHOVER_TO_MSTYLE)  : '',
     switchover_date:     F.SWITCHOVER_DATE      ? str(row, F.SWITCHOVER_DATE)        : '',
     switchover_from:     F.SWITCHOVER_FROM      ? str(row, F.SWITCHOVER_FROM)        : '',
+    inv_req_id:          F.INV_REQ_ID           ? num(row, F.INV_REQ_ID)             : 0,
     opn_w:             opn,           // [Opn_W1..Opn_W26] open customer PO quantities
     opn_total:         opn_total,    // sum of opn_w; used in proj_wk/ai_wk recalcs
     inv_flow_beg:        null,        // [Wk1..Wk26] beginning balances
