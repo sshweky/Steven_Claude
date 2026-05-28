@@ -11049,6 +11049,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _pog_w1_f = date(_pw1_today.year + 1, _pw1_m, _pw1_d)
             _pog_delta   = (_pog_date_f - _pog_w1_f).days
             _pog_w_idx_f = _pog_delta // 7   # 0-based; W1=0, W2=1, ...
+            # DEBUG TEMP
+            _dbg_key = row.get("Acct_MStyle_Key_","")
+            if "8909" in str(_dbg_key):
+                print(f"  [POG-DEBUG] key={_dbg_key} pcol0={_pcol0} pog_launch={_pog_launch_str_f}"
+                      f" w1={_pog_w1_f} pog_delta={_pog_delta} w_idx={_pog_w_idx_f}"
+                      f" iso_ship={row.get('ISO_Ship_Date')} est_iso={row.get('Estimated_ISO')}"
+                      f" stores={row.get('Store_Count')} upspw={row.get('UPSPW')} mp={mp}", flush=True)
 
             if 1 <= _pog_w_idx_f <= 25:
                 # --- field reads ---
