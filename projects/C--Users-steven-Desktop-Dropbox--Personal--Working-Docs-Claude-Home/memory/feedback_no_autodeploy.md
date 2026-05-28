@@ -22,10 +22,23 @@ so each deploy auto-busts the IndexedDB projection cache for all 80 users.
 - `inv_mgmt.js`        -> pageID=56  (Inventory Management JS logic)
 - `inv_mgmt_full.html` -> pageID=52  (Inventory Management HTML shell)
 
-## Authorization
-User has authorized Claude to deploy using Chrome MCP **when the user explicitly confirms the deploy scope** in the conversation (e.g. "deploy viewer.js", "ok to deploy", "deploy now"). No separate "are you sure?" prompt needed once scope is confirmed.
+## Authorization & Deploy Prompt Rule (updated 2026-05-28)
 
-**Do NOT deploy proactively or without explicit confirmation.** Deploying overwrites the live QB page immediately for all planners. After editing codepage files, summarize what changed and wait for the user to say to deploy.
+**Always ask "Ready to deploy to QB now?" after editing any QB-deployable file.**
+
+QB-deployable files (any change to these triggers the prompt):
+- `codepage/viewer.js` (pageID=49)
+- `codepage/viewer.html` (pageID=50)
+- `codepage/inv_mgmt.js` (pageID=56)
+- `codepage/inv_mgmt_full.html` (pageID=52)
+- `scripts/viewer.py` (Python local viewer -- changes here should also prompt deploy since planners use the codepage viewer which mirrors the same features)
+
+After every editing session that touches any of the above, end the response with:
+> "Ready to deploy to QB now?"
+
+Wait for explicit confirmation before running deploy_pages.py. Do NOT deploy proactively. Deploying overwrites the live QB page immediately for all 80 planners.
+
+Once the user says "yes" / "deploy now" / similar, proceed with the Chrome MCP deploy flow (no extra confirmation needed).
 
 ## JS snippet template (viewer.js example)
 ```javascript
