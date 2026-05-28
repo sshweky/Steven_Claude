@@ -11665,45 +11665,51 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # scope for both F61 and F37, and the second was burning CPU re-walking the
     # cat-profile dict on every record.
 
-    # F37 — Forward inventory-shortfall adjustment (2026-05-05).
-    # Reads anticipated on-hand for the next 26 weeks (Inv_Wk1..Inv_Wk26)
-    # which already have the current AI projection deducted.  When a week
-    # would run short, cap the AI projection to what we can ship and roll
-    # the unmet portion forward as a backlog cohort that decays 25% per
-    # week of non-shipment (matches F34/F35 schedule; fully lost at age 4+).
+    # F37 — Forward inventory-shortfall adjustment (v3, 2026-05-28).
+    # Caps forecast at warehouse capacity for near-term weeks (within LT+Trans
+    # horizon) and rolls unmet demand forward 4 weeks at 25% decay per week.
     # apply_oh_shortfall_adjustment returns int-rounded values; we snap to
     # MP here in the orchestrator (single snap pass).
-    # F37 skip logic (2026-05-26 -- v2 update):
-    #   - Status_Cust=NEW: keep skip.  New-launch ordering is concurrent with
-    #     warehouse-restocking; capping on current SOH zeros W1-W2 incorrectly.
-    #   - active-growth bypass REMOVED.  The 2026-05-24 active-growth gate
-    #     (L4_avg >= 0.8 * L13_avg) was a workaround for F37 v1's staleness
-    #     bug -- v1 read Inv_Wk* fields cascaded against the PREVIOUS run's
-    #     AI projection, so on actively-ordering items the stale Inv_Wk*
-    #     incorrectly showed depleted inventory and F37 over-capped W1-W2.
-    #     F37 v2 cascades fresh, so this workaround is no longer needed.
-    #     Critically, removing it ALSO unblocks F37 for the high-volume
-    #     actively-ordering records where inventory pressure matters most
-    #     (FF8651/8 type: 286K capacity vs 295K demand -- F37 v1 + bypass
-    #     never trimmed; v2 + no-bypass correctly trims ~7K).
-    #   - F37h-cat bypass REMOVED 2026-05-26: previously skipped F37 for
-    #     curated cat-profile items because stale Inv_Wk* gave wrong inventory.
-    #     v2 fresh cascade eliminates that bug; cat-profile items now go
-    #     through F37 normally.
+    #
+    # Skip logic (v3 -- 2026-05-28):
+    #   - Status_Cust=NEW bypass REMOVED.  NEW-launch items should be
+    #     constrained by actual warehouse OH just like any other status;
+    #     if they have no inventory yet the forecast will correctly show 0
+    #     for near-term weeks and then re-project once stock arrives.
+    #   - Missing inv_flow record: auto-create a placeholder row in QB
+    #     Inventory Flow with just Mstyle set (all OH/rcv/opn = 0) and
+    #     continue F37 with the zero-inventory dict.  This ensures every
+    #     active record goes through F37 and flags the data gap via ALERT.
+    #   - Inactive model: still skipped (no demand to constrain).
+    #
     # Look up this record's Inv Flow data (mstyle-keyed; each acct-mstyle
     # assumes the full mstyle inventory is available -- planner allocates
     # across customers at gametime).
-    _f37_status_new = "NEW" in (row.get("Status_Cust") or "").upper()
-    _ms_for_inv = (row.get("Mstyle") or "").strip()
+    _ms_for_inv   = (row.get("Mstyle") or "").strip()
     _inv_flow_rec = (inv_flow_data or {}).get(_ms_for_inv)
-    _f37_skip = _f37_status_new or (not _inv_flow_rec)
+
+    # Auto-create placeholder when no Inv Flow row exists for this mstyle
+    if not _inv_flow_rec and _ms_for_inv and model not in ("Inactive",):
+        _inv_flow_rec = _create_inv_flow_placeholder(_ms_for_inv)
+        # Cache in inv_flow_data so sibling acct rows skip the extra insert
+        if isinstance(inv_flow_data, dict):
+            inv_flow_data[_ms_for_inv] = _inv_flow_rec
+        if isinstance(meta, dict):
+            meta.setdefault("drivers", []).append(
+                f"[ALERT] F37: No Inventory Flow record found for "
+                f"mstyle={_ms_for_inv!r} -- auto-created placeholder (OH=0, "
+                f"no receipts, no open orders). Planner must update Inventory "
+                f"Flow with actual on-hand, inbound POs, and LT+Trans Days. "
+                f"Near-term forecast constrained to 0 until row is populated."
+            )
+
+    _f37_skip = (not _inv_flow_rec)   # only skip if creation also failed
     if model not in ("Inactive",) and not _f37_skip:
         _adjusted_f37, _f37_adjustments, _f37_lt_info = apply_oh_shortfall_adjustment(
             row, fcst, inv_flow=_inv_flow_rec)
         if isinstance(meta, dict) and _f37_lt_info.get("used_default"):
             # LT+Trans Days was missing or zero -- planner must verify.
-            # This is a data quality issue; use a prominent ALERT prefix so
-            # it surfaces in the AI_ANALYSIS narrative and in alert filtering.
+            # Use [ALERT] prefix so it surfaces in alert filtering.
             _ms_lt = row.get("Mstyle") or row.get("Acct_MStyle_Key_") or "?"
             meta.setdefault("drivers", []).append(
                 f"[ALERT] F37: LT+Trans Days missing for mstyle={_ms_lt!r} -- "
@@ -11729,17 +11735,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"(cohort fully expired by W+5)."
                 )
     elif _f37_skip and isinstance(meta, dict):
-        if not _inv_flow_rec:
-            _f37_skip_reason = f"no Inv Flow data for mstyle={_ms_for_inv!r}"
-        else:
-            _f37_skip_reason = "Status_Cust=NEW"
-        # NOTE: don't put "F37" at the front of the driver string -- the
-        # rule_fires regex would match it as a fire event when it's actually
-        # a skip. Use "[F37-skip]" with brackets to make the intent explicit
-        # and avoid the regex.
+        # NOTE: don't start with "F37" -- the rule_fires regex would count it
+        # as a fire event.  Use "[F37-skip]" bracket form instead.
         meta.setdefault("drivers", []).append(
-            f"P6 OH-shortfall guard activated: {_f37_skip_reason} -- "
-            f"NEW-launch / missing-data items bypass F37 inventory constraint"
+            f"[F37-skip] Inventory Flow placeholder creation failed for "
+            f"mstyle={_ms_for_inv!r} -- F37 inventory constraint bypassed "
+            f"(network error or empty mstyle). Planner should verify manually."
         )
 
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
