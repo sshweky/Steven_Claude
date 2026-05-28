@@ -3183,14 +3183,24 @@ function buildSwitchoverMap() {
     // Pattern 1 -- I'm a variant (ends in EC/COS/AMZ/DS/DTC). Look up base.
     const sfxM = r.mstyle.match(_swSuffixRe);
     if (sfxM) {
-      const hasOrders = r.hist_ord   && r.hist_ord.some(v => v > 0);
-      const hasProjs  = r.weeks_slim && r.weeks_slim.some(w => (w.projection || 0) > 0);
-      if (hasOrders || hasProjs) {
-        const baseMstyle = sfxM[1];
-        const baseKey    = _swSiblingKey(r, baseMstyle);
-        if (_swByKey.has(baseKey)) {
-          SWITCHOVER_MAP.set(baseKey, r.mstyle);
-        }
+      const baseMstyle = sfxM[1];
+      const baseKey    = _swSiblingKey(r, baseMstyle);
+      const baseRec    = _swByKey.get(baseKey);
+      if (baseRec) {
+        // Register the relationship whenever base AND variant are both in
+        // scope -- no longer gated on the variant having activity, so the
+        // badge shows on every base/variant pair the planner can see.
+        const baseDate = _parseSwitchoverDate(baseRec.switchover_date);
+        SWITCHOVER_MAP.set(baseKey, {
+          variantMstyle: r.mstyle,
+          variantKey:    r.key,
+          date:          baseDate,
+        });
+        SWITCHOVER_REVERSE.set(r.key, {
+          baseMstyle: baseMstyle,
+          baseKey:    baseKey,
+          date:       baseDate,
+        });
       }
     }
 
@@ -3201,12 +3211,18 @@ function buildSwitchoverMap() {
       const newKey    = _swSiblingKey(r, newMstyle);
       const newRec    = _swByKey.get(newKey);
       if (newRec) {
-        const newHasOrders = newRec.hist_ord   && newRec.hist_ord.some(v => v > 0);
-        const newHasProjs  = newRec.weeks_slim && newRec.weeks_slim.some(w => (w.projection || 0) > 0);
-        if (newHasOrders || newHasProjs) {
-          // The OLD (PCS) record gets the badge; value is the NEW (PX) mstyle.
-          SWITCHOVER_MAP.set(r.key, newMstyle);
-        }
+        // r is the OLD/base (PCS), newRec is the NEW/variant (PX).
+        const baseDate = _parseSwitchoverDate(r.switchover_date);
+        SWITCHOVER_MAP.set(r.key, {
+          variantMstyle: newMstyle,
+          variantKey:    newKey,
+          date:          baseDate,
+        });
+        SWITCHOVER_REVERSE.set(newKey, {
+          baseMstyle: r.mstyle,
+          baseKey:    r.key,
+          date:       baseDate,
+        });
       }
     }
   }
