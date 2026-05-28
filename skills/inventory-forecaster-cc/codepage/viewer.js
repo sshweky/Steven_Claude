@@ -3366,13 +3366,15 @@ async function saveSwitchoverField(key, field, value) {
     // Invalidate the week-date cache in case date changed.
     if (field === 'date') _weekDateCache = null;
     buildSwitchoverMap();
-    // Refresh the row badge
+    // Refresh the row badge using the unified renderer so date + side coloring
+    // updates correctly when the planner toggles Switchover_Active or edits
+    // Switchover_To_MStyle / Switchover_Date inline.
     const badgeCell = document.getElementById('row-badges-' + safeId);
     if (badgeCell) {
       const sb = badgeCell.querySelector('.switchover-badge');
-      const hasSw = MANUAL_SWITCHOVER_MAP.has(key);
-      if (!sb && hasSw)  badgeCell.insertAdjacentHTML('beforeend', '<span class="switchover-badge" title="Manual switchover configured">&#x21C4;</span>');
-      if (sb  && !hasSw && !SWITCHOVER_MAP.has(key)) sb.remove();
+      if (sb) sb.remove();
+      const newBadge = _switchoverBadgeForRow(rec);
+      if (newBadge) badgeCell.insertAdjacentHTML('beforeend', newBadge);
     }
     // Collapse and re-expand to re-render locked weeks and card status line
     const tr = document.getElementById('detail-' + safeId);
