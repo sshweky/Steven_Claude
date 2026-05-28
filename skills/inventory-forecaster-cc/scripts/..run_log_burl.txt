@@ -1,0 +1,216 @@
+
+============================================================
+  [watchdog] Starting forecaster (inner attempt 1/3)
+============================================================
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_24_W1 -> 11_15_W26
+
+[1/4] Pulling projections from Quickbase ...
+      [QB REST] fetching field map ...
+      [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+      130 records retrieved (QB REST API)
+
+[1.5] Amazon switchover auto-link + Switchover_Date backfill ...
+
+[2/4] Pulling master pack + Season from Styles ...
+      [QB REST] fetching Styles field map ...
+      130 master pack records loaded (0 with Season tag) (QB REST API)
+
+[2.6c] Retailer POS + OH: fetching for 130 non-Amazon mstyles ...
+      49 acct-mstyle combos with retailer POS data
+
+[2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 130 mstyles ...
+      130 mstyles with Inv Flow data loaded (QB REST API)
+
+[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 130 keys (w1_date=2026-05-24) ...
+      [vp-q4] BULK fetch: running QB report #27 on table bp8r4dejr (replaces per-account loop) ...
+      [vp-q4] 10,790 rows in 2.6s (1 API call vs ~1 per-account calls)
+      [vp-q4] cached → open_pos_report.json (reused for 0h)
+      [vp-q4] bucketed 174 in-scope rows across 47 keys (skipped: 10,614 out-of-scope · 0 zero-qty · 0 no-date · 2 outside-26w)
+      47 keys have confirmed forward POs (total open qty: 232,466 units)
+
+[2.9] VP-ATS: fetching ATS L26W history for 130 mstyles ...
+      [vp-ats] fetching ATS L26W history from bv2sxg2ji (130 mstyles) ...
+  [watchdog] still running -- 10s since last output | last:       [vp-ats] fetching ATS L26W history from bv2sxg2ji (130 mstyles) ...
+      [vp-ats] 18 mstyles with ATS history loaded  (982 filtered out)
+      18 mstyles loaded, 18 with at least one non-zero ATS week
+      Mstyle-family index: 115 mstyles with active siblings
+      Customer-baseline  : 1 customers  (global median wk-rate: 96.2)
+      Account-cadence    : 1 accounts indexed
+
+[3/4] Running forecasts ...
+
+[2.9] F60 -- EC transition history inheritance ...
+      0 EC variants inherited parent history
+
+[2.9b] F69 — DI direct-import sibling history pull ...
+      0 DI sibling variant(s) blended into 0 base record(s)
+  [F58] Loaded 19 active AI adjustments (last 60 days)
+Traceback (most recent call last):
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 17863, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 17303, in main
+    r = forecast_record(row, master_pack, account_interval=acct_iv,
+                        amazon_pos=amazon_pos, season_map=season_map,
+    ...<6 lines>...
+                        retailer_pos=retailer_pos,
+                        vacated_bases=vacated_base_index)
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 14079, in forecast_record
+    if isinstance(fcst, list) and isinstance(_opn_row_wk, list):
+                                             ^^^^^^^^^^^
+NameError: name '_opn_row_wk' is not defined. Did you mean: 'open_po_wk'?
+
+  [watchdog] Process exited with code 1.
+  [watchdog] Restarting (inner attempt 2/3) ...
+
+============================================================
+  [watchdog] Starting forecaster (inner attempt 2/3)
+============================================================
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_24_W1 -> 11_15_W26
+
+[1/4] Pulling projections from Quickbase ...
+      [QB REST] fetching field map ...
+      [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+      130 records retrieved (QB REST API)
+
+[1.5] Amazon switchover auto-link + Switchover_Date backfill ...
+
+[2/4] Pulling master pack + Season from Styles ...
+      [QB REST] fetching Styles field map ...
+      130 master pack records loaded (0 with Season tag) (QB REST API)
+
+[2.6c] Retailer POS + OH: fetching for 130 non-Amazon mstyles ...
+      49 acct-mstyle combos with retailer POS data
+
+[2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 130 mstyles ...
+      130 mstyles with Inv Flow data loaded (QB REST API)
+
+[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 130 keys (w1_date=2026-05-24) ...
+      [vp-q4] BULK fetch: running QB report #27 on table bp8r4dejr (replaces per-account loop) ...
+      [vp-q4] 10,790 rows in 2.9s (1 API call vs ~1 per-account calls)
+      [vp-q4] cached → open_pos_report.json (reused for 0h)
+      [vp-q4] bucketed 174 in-scope rows across 47 keys (skipped: 10,614 out-of-scope · 0 zero-qty · 0 no-date · 2 outside-26w)
+      47 keys have confirmed forward POs (total open qty: 232,466 units)
+
+[2.9] VP-ATS: fetching ATS L26W history for 130 mstyles ...
+      [vp-ats] fetching ATS L26W history from bv2sxg2ji (130 mstyles) ...
+      [vp-ats] 18 mstyles with ATS history loaded  (982 filtered out)
+      18 mstyles loaded, 18 with at least one non-zero ATS week
+      Mstyle-family index: 115 mstyles with active siblings
+      Customer-baseline  : 1 customers  (global median wk-rate: 96.2)
+      Account-cadence    : 1 accounts indexed
+
+[3/4] Running forecasts ...
+
+[2.9] F60 -- EC transition history inheritance ...
+      0 EC variants inherited parent history
+
+[2.9b] F69 — DI direct-import sibling history pull ...
+      0 DI sibling variant(s) blended into 0 base record(s)
+  [F58] Loaded 19 active AI adjustments (last 60 days)
+Traceback (most recent call last):
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 17863, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 17303, in main
+    r = forecast_record(row, master_pack, account_interval=acct_iv,
+                        amazon_pos=amazon_pos, season_map=season_map,
+    ...<6 lines>...
+                        retailer_pos=retailer_pos,
+                        vacated_bases=vacated_base_index)
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 14079, in forecast_record
+    if isinstance(fcst, list) and isinstance(_opn_row_wk, list):
+                                             ^^^^^^^^^^^
+NameError: name '_opn_row_wk' is not defined. Did you mean: 'open_po_wk'?
+
+  [watchdog] Process exited with code 1.
+  [watchdog] Restarting (inner attempt 3/3) ...
+
+============================================================
+  [watchdog] Starting forecaster (inner attempt 3/3)
+============================================================
+  [fresh-data] disk cache bypassed; all QB data will be re-fetched on this run (use --allow-stale-cache to override)
+
+==================================================================
+  Inventory Forecaster — Pets+People
+==================================================================
+  [CData] priming session (getInstructions) ...
+  [CData] session ready.
+  Manual projection columns: 05_24_W1 -> 11_15_W26
+
+[1/4] Pulling projections from Quickbase ...
+      [QB REST] fetching field map ...
+      [WARN] 1 columns absent from QB field map (first 5: ['UPSPW'])
+      130 records retrieved (QB REST API)
+
+[1.5] Amazon switchover auto-link + Switchover_Date backfill ...
+
+[2/4] Pulling master pack + Season from Styles ...
+      [QB REST] fetching Styles field map ...
+      130 master pack records loaded (0 with Season tag) (QB REST API)
+
+[2.6c] Retailer POS + OH: fetching for 130 non-Amazon mstyles ...
+      49 acct-mstyle combos with retailer POS data
+
+[2.6d] Pulling Inventory Flow (Beg Inv + Recpts + OpenPOs + LT) for 130 mstyles ...
+      130 mstyles with Inv Flow data loaded (QB REST API)
+
+[2.8] VP-Q4 forward-PO zero: fetching confirmed open POs in forward 26w window for 130 keys (w1_date=2026-05-24) ...
+      [vp-q4] BULK fetch: running QB report #27 on table bp8r4dejr (replaces per-account loop) ...
+      [vp-q4] 10,790 rows in 2.8s (1 API call vs ~1 per-account calls)
+      [vp-q4] cached → open_pos_report.json (reused for 0h)
+      [vp-q4] bucketed 174 in-scope rows across 47 keys (skipped: 10,614 out-of-scope · 0 zero-qty · 0 no-date · 2 outside-26w)
+      47 keys have confirmed forward POs (total open qty: 232,466 units)
+
+[2.9] VP-ATS: fetching ATS L26W history for 130 mstyles ...
+      [vp-ats] fetching ATS L26W history from bv2sxg2ji (130 mstyles) ...
+      [vp-ats] 18 mstyles with ATS history loaded  (982 filtered out)
+      18 mstyles loaded, 18 with at least one non-zero ATS week
+      Mstyle-family index: 115 mstyles with active siblings
+      Customer-baseline  : 1 customers  (global median wk-rate: 96.2)
+      Account-cadence    : 1 accounts indexed
+
+[3/4] Running forecasts ...
+
+[2.9] F60 -- EC transition history inheritance ...
+      0 EC variants inherited parent history
+
+[2.9b] F69 — DI direct-import sibling history pull ...
+      0 DI sibling variant(s) blended into 0 base record(s)
+  [F58] Loaded 19 active AI adjustments (last 60 days)
+Traceback (most recent call last):
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 17863, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 17303, in main
+    r = forecast_record(row, master_pack, account_interval=acct_iv,
+                        amazon_pos=amazon_pos, season_map=season_map,
+    ...<6 lines>...
+                        retailer_pos=retailer_pos,
+                        vacated_bases=vacated_base_index)
+  File "C:\Users\steven\.claude\skills\inventory-forecaster-cc\scripts\inventory_forecaster.py", line 14079, in forecast_record
+    if isinstance(fcst, list) and isinstance(_opn_row_wk, list):
+                                             ^^^^^^^^^^^
+NameError: name '_opn_row_wk' is not defined. Did you mean: 'open_po_wk'?
+
+  [watchdog] Process exited with code 1.
+
+  [outer-retry] Inner watchdog failed (exit 1).
+
+############################################################
+  [outer-retry] Attempt 2/10 -- cooling off 3 min before retry
+############################################################
