@@ -292,8 +292,8 @@ def fetch_projections(keys, man_fids, l4w_fid):
 # ---------------------------------------------------------------------------
 # Step 3 -- Analyze each comment
 # ---------------------------------------------------------------------------
-def classify_intent(note):
-    """Return primary planner intent from comment text."""
+def classify_intent_regex(note):
+    """Regex-based fallback classifier (used when LLM is unavailable)."""
     n = note or ""
     if EOL_RE.search(n):
         return "eol"
@@ -308,6 +308,86 @@ def classify_intent(note):
     if DECREASE_RE.search(n):
         return "decrease"
     return "unknown"
+
+
+def classify_intent_llm(note, key="", ai_model="", ai_total=0, man_total=0):
+    """LLM-based intent classifier using Anthropic Claude.  Returns one of the
+    intent labels: 'eol', 'zero', 'launch', 'wrong_model', 'increase',
+    'decrease', or 'unknown' if Claude can't determine.
+
+    Triggers only when ANTHROPIC_API_KEY env var is set.  Returns None on any
+    error (network, parse, rate limit) so the caller can fall back to regex.
+    """
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key or not note:
+        return None
+
+    prompt = f"""You are classifying a planner's free-text comment about an AI demand forecast for inventory planning.  Pick exactly ONE label from this list:
+
+  - eol            -- item is being discontinued / wound down / phased out
+  - zero           -- planner wants the forecast zeroed out (PO already covers, closeout, etc.)
+  - launch         -- new launch / pre-launch / ramp-up
+  - wrong_model    -- model is structurally wrong (flat when it should vary, missing seasonal/T5 lifts, using wrong baseline, etc.)
+  - increase       -- planner wants the AI to project MORE units (distribution gain, new customer, growth)
+  - decrease       -- planner wants the AI to project FEWER units (lost customer, anomaly, declining trend)
+  - unknown        -- truly cannot determine intent
+
+Context:
+  Record key:  {key}
+  AI model:    {ai_model}
+  AI 26w:      {ai_total:,}
+  Manual 26w:  {man_total:,}
+  Gap (MAN-AI):{man_total - ai_total:+,}
+
+Planner's comment:
+\"\"\"
+{note}
+\"\"\"
+
+Respond with ONLY the label.  Nothing else.  No explanation, no punctuation, no quotes."""
+
+    try:
+        body = json.dumps({
+            "model": "claude-3-5-sonnet-20241022",
+            "max_tokens": 16,
+            "messages": [{"role": "user", "content": prompt}],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            "https://api.anthropic.com/v1/messages",
+            data=body,
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as r:
+            resp = json.loads(r.read())
+        text = (resp.get("content") or [{}])[0].get("text", "").strip().lower()
+        # Strip anything Claude wrapped around the label
+        text = re.sub(r"[^a-z_]", " ", text).strip().split()
+        if not text:
+            return None
+        label = text[0]
+        valid = {"eol", "zero", "launch", "wrong_model", "increase", "decrease", "unknown"}
+        return label if label in valid else None
+    except Exception as e:
+        print(f"  [LLM] classify failed ({type(e).__name__}: {e}) -- falling back to regex")
+        return None
+
+
+def classify_intent(note, key="", ai_model="", ai_total=0, man_total=0):
+    """Return primary planner intent from comment text.
+
+    Tries LLM first when ANTHROPIC_API_KEY is set; falls back to regex if the
+    LLM call fails or the key isn't present.  Logs which path was used.
+    """
+    llm_label = classify_intent_llm(note, key=key, ai_model=ai_model,
+                                    ai_total=ai_total, man_total=man_total)
+    if llm_label is not None:
+        return llm_label
+    return classify_intent_regex(note)
 
 
 def assess_model_fit(intent, ai_model, ai_total, man_total, l13w, l4w, item_status):
