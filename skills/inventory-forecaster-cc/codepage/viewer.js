@@ -5947,14 +5947,18 @@ async function addComment(key) {
   msg.textContent = recId ? 'Saved (rec #' + recId + ')' : 'Saved';
   msg.style.color = '#2e7d32';
   document.getElementById('cmt-text-' + key).value = '';
+  // Look up rec FIRST -- referenced in the dropdown-reset branch below.
+  // (Older code declared this after the reset block, hitting a TDZ
+  // ReferenceError that aborted the rest of the function, leaving the Save
+  // button stuck on "Saving...".)
+  const rec    = ALL_RECORDS.find(x => x.key === key);
+  const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   // Reset comment form flag control after save
   const _fyiChkReset     = document.getElementById('cmt-fyi-'     + key);
   const _aiTrainChkReset = document.getElementById('cmt-aitrain-' + key);
   if (_fyiChkReset) { _fyiChkReset.checked = false; }
   if (_aiTrainChkReset) { _aiTrainChkReset.checked = false; }
   if (!_fyiChkReset) { const _sel = document.getElementById('cmt-flag-' + key); if (_sel) _sel.value = (rec && rec.manager_reply_pending) ? 'Planner Response' : (rec && rec.planner_reply_pending) ? 'Manager Response' : 'Needs Action'; }
-  const rec    = ALL_RECORDS.find(x => x.key === key);
-  const safeId = key.replace(/[^a-zA-Z0-9]/g, '_');
   // Deferred auto-flag QB write: only now that the comment is saved do we
   // write Flagged=true to QB (autoFlagOnComment updated UI only, not QB).
   if (rec && rec._auto_flagged && rec.flagged && flag !== 'FYI' && flag !== 'AI training') {
