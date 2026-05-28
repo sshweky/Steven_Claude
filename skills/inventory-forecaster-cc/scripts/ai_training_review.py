@@ -1922,9 +1922,45 @@ def main():
     )
     send_email(subject, email_html, report_path, args.dry_run)
 
-    # Mark processed comments as Reviewed in QB so they don't re-appear
-    comment_rids = [str(int(fval(c, C_RECORD_ID))) for c in comments]
-    mark_reviewed_in_qb(comment_rids, args.dry_run)
+    # Mark UNDERSTOOD comments as Reviewed in QB so they don't re-appear.
+    # CRITICAL SAFETY GUARD (2026-05-27 -- after epic failure where unparseable
+    # comment was silently marked Reviewed with NEUTRAL verdict): we only mark
+    # a comment Reviewed when the analyzer successfully classified its intent.
+    # Comments with intent=='unknown' stay flagged as 'AI training' so they
+    # surface on the next run for re-analysis (manual or with LLM assist).
+    # Build lookup: comment RID -> analysis intent
+    _rid_to_intent = {}
+    for a in analyses:
+        _rid = a.get("comment_rid") or a.get("rid")
+        if _rid:
+            _rid_to_intent[str(int(_rid))] = a.get("intent", "unknown")
+
+    understood_rids = []
+    unparseable     = []
+    for c in comments:
+        rid = str(int(fval(c, C_RECORD_ID)))
+        intent = _rid_to_intent.get(rid, "unknown")
+        if intent and intent != "unknown":
+            understood_rids.append(rid)
+        else:
+            unparseable.append({
+                "rid":  rid,
+                "key":  fval(c, C_ACCT_MSTYLE),
+                "note": (fval(c, 6) or "")[:300],
+            })
+
+    if unparseable:
+        print()
+        print(f"  [!] {len(unparseable)} comment(s) could NOT be parsed by the regex "
+              f"classifier -- left flagged 'AI training' for re-review:")
+        for u in unparseable:
+            print(f"      RID={u['rid']}  Key={u['key']}")
+            print(f"        Note: {u['note']!r}")
+        print(f"  [!] These comments are NOT marked Reviewed.  Re-run with an LLM-based")
+        print(f"  [!] classifier (set ANTHROPIC_API_KEY) OR review manually in QB.")
+        print()
+
+    mark_reviewed_in_qb(understood_rids, args.dry_run)
 
     # Print summary
     total_gap = sum(a["unit_gap"] for a in analyses)
