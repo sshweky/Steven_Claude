@@ -11803,7 +11803,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             )
             _fire("VP-OP")
 
-    # F_OP_BULK (2026-05-24) — Off-price discrete bulk-order reshaper.
+    # F_OP_BULK (2026-05-24, updated 2026-05-28) — Off-price discrete bulk-order reshaper.
     # After VP-Q4 + VP-OP determine the available forecast weeks, the seasonal
     # baseline produces smooth weekly values (e.g., ~3,900/wk for 11 weeks).
     # Off-price customers don't order every week -- they buy in large batches
@@ -11811,9 +11811,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # into discrete bulk order events placed at the customer's historical
     # inter-order interval, zeroing weeks between order slots.
     #
-    # Only fires when VP-OP was active (confirmed POs exist) -- without confirmed
-    # POs the standard model already handles off-price adequately.
-    if _op_po_weeks and _is_offprice_cust(cust_name):
+    # Previously required confirmed POs to activate.  Now always fires for
+    # off-price accounts: VP-Q4 has already zeroed any confirmed PO weeks
+    # above, so placing bulk order slots in remaining non-zero weeks never
+    # double-counts existing commitments.  This ensures the forecast looks
+    # like a monthly buy plan even when no POs are yet in the system.
+    if _is_offprice_cust(cust_name):
         _bulk_avail  = [i for i in range(26) if fcst[i] > 0]
         _bulk_total  = sum(fcst[i] for i in _bulk_avail)
 
