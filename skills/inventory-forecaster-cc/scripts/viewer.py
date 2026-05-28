@@ -2924,7 +2924,10 @@ function toggleDetail(key) {{
   hdrCells  += '<th>Total</th>';
   projCells += `<td style="font-weight:700">${{fmtN(r.proj_total)}}</td>`;
   aiCells   += `<td style="font-weight:700;color:#1565c0">${{fmtN(r.ai_total)}}</td>`;
-  opnCells  += `<td style="font-weight:700;color:#6d4c00">${{fmtN(opnTot)}}</td>`;
+  // 2026-05-28: Total cell shows Cust Open PO Qty# (FID 410) with CXL-date hover.
+  opnCells  += _custOpnQty > 0
+    ? `<td style="font-weight:700;color:#6d4c00;background:#fefaf3"${{_opnRowTitle}}>${{fmtN(_custOpnQty)}}</td>`
+    : `<td style="color:#bbb;background:#fefaf3">—</td>`;
   lyOrdCells += `<td style="font-weight:700;color:#2e7d32">${{fmtN(lyOrdTot)}}</td>`;
   lyShpCells += `<td style="font-weight:700;color:#1565c0">${{fmtN(lyShpTot)}}</td>`;
 
