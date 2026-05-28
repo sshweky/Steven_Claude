@@ -2267,6 +2267,51 @@ _INV_FLOW_FALLBACK_FIDS = {
 }
 
 
+def _create_inv_flow_placeholder(mstyle):
+    """
+    Auto-create a skeleton Inventory Flow record for a mstyle that has no
+    existing row.  Only Mstyle (FID 20) is set -- all inventory/receipt/open-
+    order fields default to 0 (QB numeric defaults).  The planner must update
+    the row with actual on-hand, receipts, and LT+Trans Days.
+
+    Called at forecast time when F37 finds no inv_flow record and the mstyle
+    is non-empty.  The insert is a best-effort: if it fails (e.g. network error,
+    duplicate key), F37 continues with a zero-inventory dict and logs a warning.
+
+    Returns:
+        A zero-inventory inv_flow dict (same shape as fetch_inv_flow_qb_rest
+        output) for immediate use by F37 in the current run.
+    """
+    _zero_inv_flow = {
+        "beg_inv_w1":   0.0,
+        "beg_inv_wks":  [0.0] * 26,
+        "rcv":          [0.0] * 26,
+        "opn":          [0.0] * 26,
+        "lt_trans_days": 0.0,
+    }
+    if not mstyle:
+        return _zero_inv_flow
+    try:
+        body = {
+            "to":            QB_INV_FLOW_TABLE,
+            "data":          [{"20": {"value": mstyle}}],
+            "fieldsToReturn": [],
+        }
+        resp    = _qb_request("POST", "/records", body=body, timeout=30)
+        created = (resp.get("metadata") or {}).get("createdRecordIds", [])
+        if created:
+            print(f"  [F37] Auto-created Inventory Flow placeholder for "
+                  f"mstyle={mstyle!r} (rid={created[0]}) -- "
+                  f"planner must update OH, receipts, and LT+Trans Days.")
+        else:
+            print(f"  [F37] Inventory Flow insert for mstyle={mstyle!r} "
+                  f"returned no RID (may already exist or silent no-op).")
+    except Exception as _e:
+        print(f"  [F37-WARN] Could not auto-create Inventory Flow row for "
+              f"mstyle={mstyle!r}: {_e}")
+    return _zero_inv_flow
+
+
 def fetch_inv_flow_qb_rest(mstyles):
     """Phase 2.7: pull Inventory_Flow per-mstyle for F37 v2 direct-BegInv.
 
