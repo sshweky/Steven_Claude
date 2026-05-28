@@ -122,9 +122,11 @@ def main():
         done = i + len(batch_rows)
         pct  = done / total * 100
         print(f"  {done:>5}/{total}  ({pct:.0f}%)  batch ok={ok} fail={fail}", flush=True)
-        # Brief pause between batches to stay friendly to QB
+        # Pause between batches to let QB drain its write queue.
+        # 0.8s adds ~9s to a 12-batch run but avoids saturating the
+        # shared realm when this runs back-to-back with the forecast writeback.
         if not args.dry_run and i + bs < total:
-            time.sleep(0.3)
+            time.sleep(0.8)
 
     elapsed = time.time() - t0
     print(f"\n{'='*50}", flush=True)
