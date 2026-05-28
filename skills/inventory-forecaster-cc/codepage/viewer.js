@@ -2703,6 +2703,53 @@ function snooze48(key) {
   if (rec) rec._snoozed = true;
   applyFilters();
 }
+
+// -- Duplicate-demand alert ignore tracking ---------------------------------
+// Planner can dismiss the "DUPLICATE DEMAND" alert per record when the PO+MAN
+// overlap is intentional (e.g. a separate second order is genuinely expected).
+// Stored in localStorage as { recordKey: {hash, ts} }.  The hash captures the
+// current PO+MAN conflict pattern so the alert REAPPEARS automatically if the
+// underlying values change (planner edits manual prj, new PO arrives, etc.).
+function _getDupAlertIgnores() {
+  try { return JSON.parse(localStorage.getItem('pp_dupAlertIgnored') || '{}'); }
+  catch (_) { return {}; }
+}
+function _saveDupAlertIgnores(m) {
+  try { localStorage.setItem('pp_dupAlertIgnored', JSON.stringify(m)); } catch (_) {}
+}
+function _dupConflictHash(conflicts) {
+  return (conflicts || [])
+    .map(c => `W${c.poWk}:${c.poQty}|W${c.prjWk}:${c.prjQty}`)
+    .sort().join(';');
+}
+function isDupAlertIgnored(r) {
+  if (!r || !r.po_prj_conflicts || !r.po_prj_conflicts.length) return false;
+  const m = _getDupAlertIgnores();
+  const e = m[r.key];
+  if (!e) return false;
+  return e.hash === _dupConflictHash(r.po_prj_conflicts);
+}
+function ignoreDupAlert(key, safeKey) {
+  const rec = ALL_RECORDS.find(x => x.key === key);
+  if (!rec) return;
+  const m = _getDupAlertIgnores();
+  m[key] = {
+    hash: _dupConflictHash(rec.po_prj_conflicts || []),
+    ts:   Date.now(),
+  };
+  _saveDupAlertIgnores(m);
+  // Hide the alert + the row's warning icon immediately
+  const el = document.getElementById('po-prj-alert-' + safeKey);
+  if (el) el.style.display = 'none';
+  const rowSafeId = key.replace(/[^a-zA-Z0-9]/g, '_');
+  const badge = document.getElementById('conflict-badge-' + rowSafeId);
+  if (badge) badge.style.display = 'none';
+}
+function unignoreDupAlert(key) {
+  const m = _getDupAlertIgnores();
+  delete m[key];
+  _saveDupAlertIgnores(m);
+}
 function unsnooze(key) {
   const s = _getSnoozes();
   delete s[key];
