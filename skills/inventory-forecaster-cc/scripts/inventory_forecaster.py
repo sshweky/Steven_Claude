@@ -11675,16 +11675,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _changed_weeks = sorted({a["week"] for a in _f37_adjustments})
                 _lt_wks = _f37_lt_info["lt_trans_weeks"]
                 meta.setdefault("drivers", []).append(
-                    f"F37 OH-shortfall adjustment (v2 cap-only, no rollforward): "
-                    f"{len(_f37_adjustments)} weeks capped at warehouse OH "
+                    f"F37 OH-shortfall adjustment (v3 cap + 4-wk 25%-decay rollforward): "
+                    f"{len(_f37_adjustments)} weeks adjusted at warehouse OH "
                     f"(weeks {','.join(map(str, _changed_weeks[:8]))}"
                     f"{'...' if len(_changed_weeks) > 8 else ''}); "
                     f"constraint lifted from W{_lt_wks}+ (LT+Trans={_f37_lt_info['lt_trans_days']}d). "
-                    f"Unmet demand in capped weeks is NOT rolled forward -- Amazon "
-                    f"orders that week's reduced amount and re-orders on its normal "
-                    f"cadence; downstream event lifts (Prime Day, T5, Black Friday) "
-                    f"land on their scheduled ordering weeks rather than being masked "
-                    f"by phantom catch-up cohorts."
+                    f"Unmet demand rolled forward up to 4 weeks at 25% decay/wk "
+                    f"(cohort fully expired by W+5)."
                 )
     elif _f37_skip and isinstance(meta, dict):
         if not _inv_flow_rec:
