@@ -5250,11 +5250,14 @@ async function _loadOpenOrderDetails(r, safeId) {
     await discoverOrdHistFids();
     if (!ORD_HIST_QTY_OPEN_FID || !ORD_HIST_ACCT_MSTYLE_FID || !ORD_HIST_CANCEL_DATE_FID) return;
 
-    const select = [ORD_HIST_CANCEL_DATE_FID, ORD_HIST_QTY_OPEN_FID];
+    // Query ALL customers for this mstyle — Inv Flow "Open Orders" is all-customer
+    // combined so the hover breakdown must match.  Acct-MStyle field (33) stores
+    // "ACCT-MSTYLE"; CT with hyphen prefix avoids partial-mstyle false matches.
+    const escMstyle = (r.mstyle || '').replace(/'/g, "''");
+    const select = [ORD_HIST_CANCEL_DATE_FID, ORD_HIST_QTY_OPEN_FID, ORD_HIST_ACCT_MSTYLE_FID];
     if (ORD_HIST_CUST_NAME_FID) select.push(ORD_HIST_CUST_NAME_FID);
 
-    const escKey = r.key.replace(/'/g, "''");
-    const where  = `{${ORD_HIST_ACCT_MSTYLE_FID}.EX.'${escKey}'}` +
+    const where  = `{${ORD_HIST_ACCT_MSTYLE_FID}.CT.'-${escMstyle}'}` +
                    `AND{${ORD_HIST_QTY_OPEN_FID}.GT.0}`;
 
     const resp = await qb('/records/query', {
@@ -5265,13 +5268,12 @@ async function _loadOpenOrderDetails(r, safeId) {
     });
 
     const data = (resp && resp.data) || [];
-    console.info(`[OrdHist] open orders for ${r.key}: ${data.length} rows  FIDs: acct=${ORD_HIST_ACCT_MSTYLE_FID} cancel=${ORD_HIST_CANCEL_DATE_FID} qty_open=${ORD_HIST_QTY_OPEN_FID} cust=${ORD_HIST_CUST_NAME_FID}`);
+    console.info(`[OrdHist] open orders (all custs) for mstyle ${r.mstyle}: ${data.length} rows`);
     if (!data.length) {
-      // No open-order detail in Order History — strip the "loading" placeholder
-      // from every opn-cell tooltip so it doesn't appear stuck.
+      // No open-order detail found — replace loading placeholder with a clear note.
       for (let _ci = 0; _ci < 26; _ci++) {
         const _c = document.getElementById('opn-cell-' + safeId + '-' + _ci);
-        if (_c) _c.title = _c.title.replace('\n(loading cancel date...)', '');
+        if (_c) _c.title = _c.title.replace('\n(loading cancel date...)', '\n(no order detail in Order History)');
       }
       return;
     }
@@ -5627,24 +5629,13 @@ async function _loadRtlPos(r, safeId) {
     });
     let rawRows = rtlResp.data || [];
 
-    // Fallback: if acct filter returned nothing, try mstyle-only.
-    // Handles acct# mismatch between Projections key and Retailer Sales table
-    // (e.g. "TARGET CTRL INV PRCSNG" account vs actual store account number).
+    // Note: mstyle-only fallback removed -- it caused wrong-retailer bleed
+    // (e.g. Chewy records showing Amazon/Walmart POS data for the same mstyle).
+    // All retailers with POS coverage (Walmart 23011, Petsmart 16553, Petco 16579,
+    // Kohl's 11169, Target 20006) have matching acct#s in Retailer Sales and work
+    // correctly with the primary acct+mstyle filter above.
     if (!rawRows.length && acctStr) {
-      console.warn('[RTL POS] acct=' + acctStr + ' filter returned 0 rows for ' + mstyle
-        + ' -- trying mstyle-only fallback');
-      try {
-        const _fbResp = await qb('/records/query', {
-          from:    CFG.RTL_POS_TID,
-          select:  selectFids,
-          where:   `{${RF.MSTYLE}.EX.'${mstyle.replace(/'/g, "''")}'}`,
-          sortBy:  [{ fieldId: RF.DATE, order: 'DESC' }],
-          options: { top: 120 },
-        });
-        rawRows = _fbResp.data || [];
-      } catch (_fbErr) {
-        console.warn('[RTL POS] mstyle-only fallback also failed:', _fbErr);
-      }
+      console.info('[RTL POS] no data for acct=' + acctStr + ' mstyle=' + mstyle + ' -- no POS coverage for this account');
     }
 
     // Deduplicate by date (each week-ending Sunday appears exactly twice)
