@@ -8553,15 +8553,36 @@ async function npmSave() {
   if (!acct)   { statusEl.textContent = 'Please select a Customer Account.'; return; }
   if (!mstyle) { statusEl.textContent = 'Please select an MStyle from the list.'; return; }
 
+  // Formulate the key exactly as QB stores it: "{acct}-{mstyle}"
+  const newKey = `${acct.acct}-${mstyle}`;
+
   statusEl.style.color = '#888';
-  statusEl.textContent = 'Saving...';
+  statusEl.textContent = 'Checking for duplicates...';
   saveBtn.disabled = true;
 
   try {
     const F = CFG.FID;
+
+    // Duplicate check — query Projections by key (FID 292) before inserting
+    const chkResp = await qb('/records/query', {
+      from:    CFG.PROJECTIONS_TID,
+      select:  [F.KEY],
+      where:   `{${F.KEY}.EX.'${newKey.replace(/'/g, "''")}'}`,
+      options: { top: 1 },
+    });
+    if ((chkResp.data || []).length > 0) {
+      statusEl.style.color = '#c62828';
+      statusEl.textContent = `Projection ${newKey} already exists in the table.`;
+      saveBtn.disabled = false;
+      return;
+    }
+
+    statusEl.textContent = 'Saving...';
+
     const resp = await qb('/records', {
       to:   CFG.PROJECTIONS_TID,
       data: [{
+        [F.KEY]:      { value: newKey },   // FID 292 — required text key field
         [F.DIV]:      { value: div },
         [F.ACCT_NUM]: { value: acct.acct },
         [F.MSTYLE]:   { value: mstyle },
@@ -8569,9 +8590,9 @@ async function npmSave() {
       fieldsToReturn: [3, F.KEY, F.MSTYLE, F.CUST, F.DESCRIPTION, F.BRAND_NAME, F.ACCT_NUM, F.STATUS_CUST],
     });
 
-    // QB returns formula fields (like Acct#-MStyle Key, FID 292) in data[]
+    // Confirm key from returned data (falls back to client-computed key)
     const returned  = (resp.data || [])[0] || {};
-    const newKey    = String(((returned[String(F.KEY)]         || {}).value) || `${acct.acct}-${mstyle}`);
+    const savedKey  = String(((returned[String(F.KEY)] || {}).value) || newKey);
     const desc      = String(((returned[String(F.DESCRIPTION)] || {}).value) || _NPM.selectedMstyleDesc || '');
     const brand     = String(((returned[String(F.BRAND_NAME)]  || {}).value) || '');
     const custName  = String(((returned[String(F.CUST)]        || {}).value) || acct.name || '');
