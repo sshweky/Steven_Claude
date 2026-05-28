@@ -37,7 +37,8 @@ window.QB_CONFIG = {
   INV_FLOW_TID:       "bpsaju5pm",   // InventoryTrack > Inventory Flow (warehouse projected balances by week)
   ORDER_HIST_TID:     "bpe4maa4c",   // InventoryTrack > Order History (cancellation detail)
   INV_REQ_DETAIL_TID: "btjf9wtis",   // InventoryTrack > Inventory Request Detail (sales request POG data)
-  DAILY_METRICS_TID:  "brgxdpadi",   // AdTrack > Daily Metrics (ASIN-level daily ordered units; L1W + L2W POS)
+  DAILY_METRICS_TID:  "brgxdpadi",   // AdTrack > Daily Metrics (daily ordered units + OH; L1W/L2W + weekly history)
+  DAILY_METRICS_FID: { DATE: 81, POS_UNITS: 162, MSTYLE: 213, OH_UNITS: 79 },
 
   // Field IDs on Inventory Request Detail (btjf9wtis)
   INV_REQ_FID: {
@@ -453,6 +454,9 @@ window.QB_CONFIG = {
   .dtbl-sh { border-collapse: separate !important; border-spacing: 0; }
   .dtbl-sh thead th { position: sticky; top: var(--frozen-h, 90px); z-index: 5;
                       box-shadow: inset 0 -1px 0 #bbb; }
+  /* Detail-panel tables (.dtbl) must NOT inherit the global thead sticky rule --
+     they live inside a table cell so sticking at --frozen-h causes overlaps. */
+  .dtbl thead th { position: static !important; top: auto !important; }
   .wk-crit { background:#ffcdd2; font-weight:700; }
   .wk-warn { background:#fff9c4; font-weight:600; }
   .wk-ok   { background:#fff; }

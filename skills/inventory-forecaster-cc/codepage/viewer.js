@@ -631,13 +631,15 @@ let INV_FLOW_ATS_OH_WOS_FID  = null; // ATS_WOS_OH_
 let INV_FLOW_ATS_OO_WOS_FID  = null; // ATS_WOS_OH_OO_
 let INV_FLOW_FIRST_SHPD_FID  = null; // 1st Shpd Date  (first warehouse shipment date)
 
-// Daily Metrics (brgxdpadi) FIDs — discovered lazily on first Amazon detail open.
-// Used only for L1W + L2W ordered-units (week-to-week POS detail).
-// L4W/L13W/L26W/L52W avgs continue to come from bqp8vz625 (pre-aggregated).
-let _DM_DATE_FID   = null;  // "Date" field
-let _DM_UNITS_FID  = null;  // "Ordered Units" / "Ordered_Units"
-let _DM_MSTYLE_FID = null;  // "Mstyle" / "Model" / "Mstyle_model_" (preferred join key)
-let _DM_ASIN_FID   = null;  // "ASIN" (fallback join key if no mstyle field)
+// Daily Metrics (brgxdpadi) FIDs — loaded from QB_CONFIG (hardcoded; no runtime discovery).
+// Used for L1W + L2W + full 13-week POS/OH history table.
+// L4W/L13W/L26W/L52W avgs stay in bqp8vz625 (pre-aggregated).
+// FIDs: DATE=81, POS_UNITS=162, MSTYLE=213, OH_UNITS=79
+let _DM_DATE_FID   = null;
+let _DM_UNITS_FID  = null;
+let _DM_MSTYLE_FID = null;
+let _DM_ASIN_FID   = null;  // reserved
+let _DM_OH_FID     = null;  // OH Units daily snapshot (Amazon on-hand)
 let _dmFidsDone    = false;
 
 // Order History (bpe4maa4c) FIDs — discovered lazily on first detail open
@@ -4436,7 +4438,7 @@ async function toggleDetail(key) {
         const ov = _opn[i];
         opnTot += ov;
         opnCells += ov > 0
-          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help" title="All customers: ${fmtN(ov)} units\n(loading cancel date...)">${fmtN(ov)}</td>`
+          ? `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#00695c;font-weight:600;font-size:10px;background:#e0f2f1;cursor:help" title="${fmtN(ov)} u (loading breakdown...)">${fmtN(ov)}</td>`
           : `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
       } else {
         opnCells += `<td id="opn-cell-${safeIdForTotal}-${i}" style="color:#bbb;font-size:10px;background:#e0f2f1"> - </td>`;
@@ -5182,7 +5184,24 @@ async function toggleDetail(key) {
     }
   }
 
+  // Sticky summary bar -- stays pinned below topbar+toolbar as the user scrolls
+  // through the expanded detail panel.  Shows the key identity fields so the
+  // planner always knows which record they are looking at.
+  const _sumCustLabel = _friendlyCustName(r.cust || '');
+  const _sumDesc      = (r.desc || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  const _summaryBarHtml = `
+    <div style="position:sticky;top:var(--frozen-h,90px);z-index:10;
+                background:#fff;border-bottom:1px solid #e0e0e0;
+                padding:4px 14px;display:flex;align-items:center;gap:14px;
+                font-size:12px;box-shadow:0 2px 4px rgba(0,0,0,0.06);">
+      <span style="font-weight:700;color:#4a148c;letter-spacing:0.2px;">${_esc(r.key)}</span>
+      <span style="color:#444;">${_sumCustLabel}</span>
+      <span style="color:#555;font-weight:600;">${_esc(r.mstyle)}</span>
+      ${_sumDesc ? `<span style="color:#888;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${_sumDesc}">${_sumDesc}</span>` : ''}
+    </div>`;
+
   el.innerHTML = `<td colspan="23" style="padding:0">
+    ${_summaryBarHtml}
     ${poPrjAlertHtml}
     ${autoProjectBtn}
     ${fdStatusHtml}
@@ -5378,13 +5397,6 @@ async function _loadOpenOrderDetails(r, safeId) {
     const _sv  = (rec, fid) => (rec[fid] && rec[fid].value != null) ? rec[fid].value : null;
     const _num = (rec, fid) => parseFloat(_sv(rec, fid) || 0) || 0;
 
-    // Return the week-start date as the cancel date label for week bucket i
-    const weekCancelDate = (i) => {
-      const d = new Date(W1_DATE.getTime() + i * 7 * 86400000);
-      return String(d.getMonth() + 1).padStart(2, '0') + '/' +
-             String(d.getDate()).padStart(2, '0');
-    };
-
     for (let i = 0; i < 26; i++) {
       const cell = document.getElementById('opn-cell-' + safeId + '-' + i);
       if (!cell) continue;
@@ -5408,12 +5420,11 @@ async function _loadOpenOrderDetails(r, safeId) {
         continue;
       }
 
-      // Header + one line per customer, sorted by qty desc
-      const cancelDate = weekCancelDate(i);
+      // Per-customer breakdown (no cancel date per planner preference)
       const sorted = custEntries.sort((a, b) => b.qty - a.qty);
-      const lines = [`All customers: ${fmtN(weekTotal)} units`];
+      const lines = sorted.length > 1 ? [`All: ${fmtN(weekTotal)} u`] : [];
       for (const { cust, qty } of sorted) {
-        lines.push(`  ${cust}  |  ${fmtN(qty)} u  |  cancel ${cancelDate}`);
+        lines.push(`${_friendlyCustName(cust)}: ${fmtN(qty)} u`);
       }
       cell.title = lines.join('\n');
       cell.style.cursor = 'help';
@@ -5422,8 +5433,8 @@ async function _loadOpenOrderDetails(r, safeId) {
     // Clear any remaining loading placeholders on weeks with zero open POs
     for (let i = 0; i < 26; i++) {
       const c = document.getElementById('opn-cell-' + safeId + '-' + i);
-      if (c && c.title.includes('(loading cancel date...)')) {
-        c.title = c.title.replace('\n(loading cancel date...)', '');
+      if (c && c.title.includes('(loading breakdown...)')) {
+        c.title = c.title.replace(' (loading breakdown...)', '');
       }
     }
   } catch (e) {
