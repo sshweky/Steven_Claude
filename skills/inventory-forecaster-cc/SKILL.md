@@ -26,6 +26,68 @@ Runs `scripts/inventory_forecaster.py` to execute the full forecasting pipeline.
 - **Never revert** Phase 1 (Projections, `bpd237tvm`) or Phase 2 (Styles, `bphzqfkev` — FIDs Mstyle=6, Master_Pack=110, Season=437) to CData. When a new heavy CData read is added or discovered, migrate it to REST using the `fetch_projections_qb_rest()` / `fetch_master_pack_qb_rest()` pattern (cached field map + paginated POST `/v1/records/query`) and add it to this list.
 - CData remains the right tool for: master pack lookups against small reference tables, ad-hoc one-shot exploration, and write-back UPDATE SQL (Phase 4 write-back is still on CData pending a future migration to REST `POST /records` with `mergeFieldId`).
 
+---
+
+## QB Chat Call Discipline (ENFORCED -- skill level)
+
+**Root cause:** On 2026-05-28 at 4:40pm, 5 back-to-back QB REST calls during an ad-hoc xref build spiked QB metadata latency to 5,477ms, degrading the shared realm for all 80 users.
+
+These rules apply to every ad-hoc QB call made from within this skill session (chat queries, inline Python snippets, diagnostic calls). Scripts running via Task Scheduler follow the same rules via `config.py` constants.
+
+### Hard limits (never override without explicit user approval)
+
+| Rule | Business hours (8am-7pm) | Off-hours |
+|---|---|---|
+| Max QB REST calls per turn | **3** | 4 |
+| Pause between sequential calls | **3 seconds** | 2 seconds |
+| Latency check before 3+ call session | **Required** | Required |
+| Verify-reads after writes | **Never** | Never |
+
+### Mandatory latency check
+
+Before any session involving 3 or more QB calls, run a single `top:1` probe first:
+
+```python
+# Latency probe -- run this BEFORE any multi-call sequence
+import time, requests
+t0 = time.time()
+r = requests.post("https://api.quickbase.com/v1/records/query",
+    headers={"QB-Realm-Hostname": "pim.quickbase.com",
+             "Authorization": "QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s",
+             "Content-Type": "application/json"},
+    json={"from": "bpd237tvm", "select": [3], "where": "{3.GT.0}", "options": {"top": 1}})
+latency_ms = (time.time() - t0) * 1000
+print(f"QB latency probe: {latency_ms:.0f}ms")
+# Staircase: >1,000ms = warn user; >3,000ms = stop and wait 10 min before proceeding
+```
+
+- **<1,000ms** -- proceed normally
+- **1,000ms-3,000ms** -- warn user, reduce call count, add 5s pauses
+- **>3,000ms** -- STOP. Tell user realm is under load. Wait 10 min before any further QB calls
+
+### Batching requirement
+
+Never make separate per-retailer, per-mstyle, or per-account QB calls when a single batched call can retrieve the same data. Use `IN(...)` clauses and `mergeFieldId` patterns. Example:
+
+```python
+# BAD: 4 separate calls = 4x realm load
+for acct in [11169, 16553, 23011, 1864]:
+    r = qb_query(f"WHERE {{6.EQ.{acct}}}")
+
+# GOOD: 1 batched call
+r = qb_query("WHERE {6.EX.11169}OR{6.EX.16553}OR{6.EX.23011}OR{6.EX.1864}")
+```
+
+### Business hours restriction
+
+During business hours (8am-7pm local), defer any exploratory or non-urgent QB queries to off-hours (2am-5am). If a call is urgently needed:
+- Pre-announce the call count to the user
+- Batch everything into the minimum number of requests
+- Use 3-second pauses between calls (not the standard 2s)
+- Abort immediately at the first throttle signal (IncompleteRead, 429, 502, 504, 0-byte)
+
+**Full rules:** `reference_quickbase_api_rules.md` Section 0 (Ad-hoc/Conversational QB Calls).
+
 **F37 v2b -- Forward inventory-shortfall, direct-BegInv (2026-05-26 correction):** Replaces F37 v2a (same date) which cascaded from Wk1 using the AI projection as surrogate demand -- that compounded week-over-week errors and caused false caps. v2b reads QB-formula Beg Inv DIRECTLY per week from `beg_inv_wks[w]` (Wk1..Wk26 FIDs in Inventory Flow, computed by QB against planner-managed data). Per-week capacity = `max(0, BegInv_W[w] + rcv[w] - opn[w])`; ship = `min(demand, capacity)`. No cascade, no rollforward of unmet demand. LT+Trans horizon gate: weeks at/beyond `ceil(lt_trans_days/7)` are uncapped (new PO can still arrive in time). If `lt_trans_days` is 0/missing, conservative default of 150d (~22wks) is used with a planner alert. F37 is skipped for `Status_Cust=NEW` and when no Inventory Flow record exists for the mstyle. Inventory is treated per-mstyle (each acct-mstyle gets the full mstyle pool; planner allocates cross-account at game-time). History: v1 (2026-05-05) read stale `Inv_Wk*` from Projections; v2a (2026-05-26) added fresh cascade from Wk1 (wrong -- used AI demand as surrogate); v2b (2026-05-26) uses QB direct per-week values.
 
 ---

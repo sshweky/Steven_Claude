@@ -31,6 +31,40 @@ QB_REST_MAX_RETRIES = int(os.environ.get("QB_REST_MAX_RETRIES", "3"))  # QB REST
 # Audit Finding #15+16 (2026-05-25): REST sites previously used hard-coded 3;
 # centralised here.  Total backoff budget per CLAUDE.md = 2+4+8 = 14s.
 
+# ── QB Chat Call Discipline (added 2026-05-28) ────────────────────────────────
+# Root cause: 5 back-to-back QB REST calls at 4:40pm caused a 5,477ms metadata
+# latency spike, degrading the shared realm for all 80 users.
+#
+# SCRIPTS (Task Scheduler, CLI runs): use QB_INTER_CALL_DELAY_S between every
+# sequential REST call and QB_LATENCY_WARN_MS / QB_LATENCY_ABORT_MS to decide
+# whether to proceed or abort.
+#
+# CHAT / AD-HOC PYTHON SNIPPETS: same thresholds apply.  Claude Code reads
+# SKILL.md Section "QB Chat Call Discipline" at skill startup and enforces the
+# call-per-turn cap (3 during business hours 8am-7pm, 4 off-hours), mandatory
+# pauses, and the latency probe requirement before any 3+ call sequence.
+#
+# Full policy: reference_quickbase_api_rules.md Section 0.
+# ─────────────────────────────────────────────────────────────────────────────
+QB_INTER_CALL_DELAY_S  = float(os.environ.get("QB_INTER_CALL_DELAY_S",  "2.0"))
+"""Seconds to pause between sequential QB REST API calls.
+Business hours: increase to 3.0 manually or set env var QB_INTER_CALL_DELAY_S=3.
+Higher = less realm pressure; lower = faster pipeline (use off-hours only)."""
+
+QB_LATENCY_WARN_MS     = float(os.environ.get("QB_LATENCY_WARN_MS",  "1000.0"))
+"""If a QB REST call takes longer than this (ms), log a warning and add extra delay.
+Maps to the latency staircase: 200ms -> 1s -> 5s+ = pause and warn."""
+
+QB_LATENCY_ABORT_MS    = float(os.environ.get("QB_LATENCY_ABORT_MS", "3000.0"))
+"""If a QB REST call takes longer than this (ms), treat as a throttle signal.
+Stop all further QB calls for QB_THROTTLE_COOLDOWN_S seconds.
+Mirrors the CLAUDE.md hard stop on 3,000ms+ probe latency."""
+
+QB_THROTTLE_COOLDOWN_S = int(os.environ.get("QB_THROTTLE_COOLDOWN_S", "600"))
+"""Seconds to wait after a throttle signal before resuming QB calls (default 10 min).
+The realm needs time to recover; 600s matches the CLAUDE.md 15-min guidance
+for two hard failures (10 min is the minimum safe floor)."""
+
 # Pacer for paginated retailer-POS reads.  Keeps the realm from saturating
 # while iterating Retailer Sales (bv2izcn5b) pages.  Audit Finding #18
 # (2026-05-25): previously a bare time.sleep(0.15) literal.
