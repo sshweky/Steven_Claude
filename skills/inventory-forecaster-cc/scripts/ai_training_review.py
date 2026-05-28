@@ -1679,14 +1679,30 @@ def _build_systemic_html(systemic_impacts, all_recs):
     return f"""
 <h3 style="margin:28px 0 6px 0;font-size:15px;color:#37474f;border-top:2px solid #eceff1;
            padding-top:18px">Systemic Impact Estimate</h3>
-<p style="margin:0 0 10px 0;font-size:12px;color:#757575">
-  Systemic impact is computed <b>before</b> recommendations are finalized.
-  VALIDATED = fix narrows MAN-AI gap and is recommended.
-  REJECTED = fix widens gap; recommendation has been replaced with directional-guard guidance.
-  ISOLATED = 0 records match criteria; individual fix only.
-  Each row tests its fix <i>in isolation</i>. The shaded Combined row is the additive sum of individual rows (no re-query -- each model type is non-overlapping so the true simultaneous effect is additive).
-  <i>Variance = MAN PRJ minus AI PRJ (flagged records only). % = gap as % of current AI.</i>
-</p>
+<div style="margin:0 0 12px 0;font-size:12px;color:#424242;background:#fafafa;
+            border-left:3px solid #1565c0;padding:10px 14px;line-height:1.55;border-radius:0 4px 4px 0">
+  <b style="color:#1565c0">What this section shows:</b>
+  For each proposed change, we simulate applying it across every active record
+  to see if it actually narrows the gap between Manual and AI projections.
+  Verdicts:
+  <ul style="margin:6px 0 0 18px;padding:0">
+    <li><b style="color:#1b5e20">VALIDATED</b> -- the fix narrows the gap. Recommended.</li>
+    <li><b style="color:#b71c1c">REJECTED</b> -- the fix would <i>widen</i> the gap. Don't apply blindly; see the directional-guard guidance noted on the row.</li>
+    <li><b style="color:#e65100">ISOLATED</b> -- only one item matched; no systemic pattern. Handle the record individually rather than changing a model rule.</li>
+    <li><b style="color:#616161">NEUTRAL</b> -- not enough signal to simulate a fix (typical for unparseable planner comments).</li>
+  </ul>
+  <div style="margin-top:8px"><b style="color:#1565c0">Column glossary:</b></div>
+  <ul style="margin:4px 0 0 18px;padding:0">
+    <li><b>In Scope</b> -- total active records evaluated for this change.</li>
+    <li><b>Flagged</b> -- subset matching the change's criteria (those the fix actually touches).</li>
+    <li><b>MAN-AI Before</b> -- sum of (Manual 26w &minus; AI 26w) across the Flagged records, today.</li>
+    <li><b>MAN-AI After</b> -- the same sum after applying the change in simulation. Smaller absolute = better.</li>
+    <li><b>AI Change</b> -- how the AI 26-week total moves once the fix is applied.</li>
+  </ul>
+  <div style="margin-top:6px;font-size:11px;color:#757575">
+    The shaded <b>Combined</b> row (when shown) is the additive stack of individual rows -- each proposed change targets a different model class, so they don't overlap and the totals add cleanly.
+  </div>
+</div>
 <table style="width:100%;border-collapse:collapse;font-size:13px">
   <thead>
     <tr>
