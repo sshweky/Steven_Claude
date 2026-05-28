@@ -14257,10 +14257,10 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     # (F69-WOS rescale, F37, etc.) can re-inflate weeks -- this unconditional
     # loop runs last and catches all W1-W26.
     # Runs for all customers (replaces the former W1-only F_W1_PO_ZERO guard).
-    if isinstance(fcst, list) and isinstance(_opn_row_wk, list):
+    if isinstance(fcst, list) and isinstance(_effective_po_wk, list):
         _po_zero_removed = {}
         for _wi in range(min(26, len(fcst))):
-            _po_qty_wi = _opn_row_wk[_wi] if _wi < len(_opn_row_wk) else 0.0
+            _po_qty_wi = _effective_po_wk[_wi] if _wi < len(_effective_po_wk) else 0.0
             if _po_qty_wi > 0 and fcst[_wi] > 0:
                 _po_zero_removed[_wi + 1] = (int(round(fcst[_wi])), int(round(_po_qty_wi)))
                 fcst[_wi] = 0
