@@ -371,7 +371,10 @@ async function loadBrands(){
     const data=await qbFetch('/records/query',{method:'POST',body:JSON.stringify(body)});
     S._brands=(data.data||[]).map(r=>((r[6]||{}).value||'')).filter(Boolean).sort();
     renderBrandSelect();
-  }catch(e){ console.warn('Brand load failed:',e.message); }
+  }catch(e){
+    console.error('Brand load failed:',e);
+    setStatus('QB error loading brands: '+e.message,'error');
+  }
 }
 
 function renderBrandSelect(){
@@ -1133,21 +1136,34 @@ function saveSalesData(styleNum,key,val){
 }
 
 // ==================== INIT ====================
+window.onerror = function(msg,src,line,col,err){
+  setStatus('JS Error: '+msg+' (line '+line+')','error');
+  console.error(msg,src,line,col,err);
+};
+window.onunhandledrejection = function(e){
+  setStatus('Async error: '+(e.reason&&e.reason.message||e.reason),'error');
+  console.error('Unhandled rejection:',e.reason);
+};
+
 async function init(){
-  loadState();
-  const authed = await tryAutoAuth();
-  // Modal only shown via QB Settings button — token is pre-configured
-  updateQBStatus();
-  renderCompetitorChecks();
-  renderTab1Fields();
-  renderCompStyleSelector();
-  // Set initial comp style if styles exist
-  const nums=getStyleNums();
-  if(nums.length){ const sel=document.getElementById('compStyleSel'); if(sel) sel.value=nums[0]; }
-  const hn=S.launchName?'Costing Analysis - '+S.launchName:'Costing Analysis';
-  document.getElementById('headerTitle').textContent=hn;
-  if(S.topBrand) document.getElementById('headerSub').textContent=S.topBrand+(S.petsOrPeople?' | '+S.petsOrPeople:'');
-  if(S.qbToken){ loadBrands(); autoLoadMissingQBData(); }
+  try{
+    loadState();
+    const authed = await tryAutoAuth();
+    updateQBStatus();
+    renderCompetitorChecks();
+    renderTab1Fields();
+    renderCompStyleSelector();
+    const nums=getStyleNums();
+    if(nums.length){ const sel=document.getElementById('compStyleSel'); if(sel) sel.value=nums[0]; }
+    const hn=S.launchName?'Costing Analysis - '+S.launchName:'Costing Analysis';
+    document.getElementById('headerTitle').textContent=hn;
+    if(S.topBrand) document.getElementById('headerSub').textContent=S.topBrand+(S.petsOrPeople?' | '+S.petsOrPeople:'');
+    if(S.qbToken){ loadBrands(); autoLoadMissingQBData(); }
+    else setStatus('No QB token — QB features unavailable.','error');
+  }catch(e){
+    setStatus('Init failed: '+e.message,'error');
+    console.error('Init error:',e);
+  }
 }
 
 // Sync input fields back to state on page events
