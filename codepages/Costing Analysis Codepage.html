@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Costing Analysis</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:12px;background:#e8e8e8;color:#000}
+/* HEADER */
+.app-header{background:#1F3864;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
+.app-title{font-size:17px;font-weight:bold}
+.header-right{display:flex;align-items:center;gap:10px;font-size:11px}
+.qb-status{padding:3px 8px;border-radius:10px;font-size:11px;background:#28a745;color:#fff}
+.qb-status.disconnected{background:#dc3545}
+/* TABS */
+.tab-bar{background:#2E75B6;display:flex;gap:2px;padding:0 12px}
+.tab-btn{background:rgba(255,255,255,0.15);border:none;color:#ddd;padding:9px 16px;cursor:pointer;font-size:11px;font-weight:bold;border-radius:4px 4px 0 0;margin-top:4px;transition:background .15s}
+.tab-btn:hover{background:rgba(255,255,255,0.3);color:#fff}
+.tab-btn.active{background:#fff;color:#1F3864}
+/* CONTENT */
+.tab-content{display:none;padding:14px;background:#f5f5f5;min-height:calc(100vh - 80px)}
+.tab-content.active{display:block}
+/* CARDS */
+.card{background:#fff;border:1px solid #ccc;border-radius:3px;padding:12px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.card-title{font-weight:bold;font-size:13px;color:#1F3864;border-bottom:2px solid #2E75B6;padding-bottom:5px;margin-bottom:10px}
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+/* SECTION HEADERS */
+.sh{background:#1F3864;color:#fff;padding:5px 10px;font-weight:bold;font-size:12px;border-radius:2px;margin:10px 0 4px}
+.sh-blue{background:#2E75B6;color:#fff;padding:5px 10px;font-weight:bold;border-radius:2px;margin:8px 0 3px;display:flex;justify-content:space-between;align-items:center}
+/* TABLES */
+table{border-collapse:collapse;width:100%;font-size:11px}
+th{background:#BDD7EE;text-align:center;padding:4px 6px;border:1px solid #9DC3E6;font-weight:bold;white-space:nowrap;color:#000;font-size:11px}
+td{border:1px solid #d4d4d4;padding:3px 5px;background:#fff;vertical-align:middle}
+.tr-even td{background:#F2F2F2}
+/* INPUT TYPES */
+.inp{border:1px solid #aaa;padding:3px 5px;font-size:11px;font-family:Arial,sans-serif;width:100%;background:#FFFFD9}
+.inp:focus{outline:2px solid #4BACC6;background:#EBF5FB}
+.inp.qb{background:#E8F4E8;color:#155724;border-color:#82c482}
+.inp.calc{background:#EEF2F7;color:#333;pointer-events:none;border-color:#bcc8d8}
+select.inp{cursor:pointer}
+textarea.inp{resize:vertical;min-height:36px}
+/* BUTTON */
+.btn{padding:5px 12px;border:none;border-radius:3px;cursor:pointer;font-size:11px;font-weight:bold;font-family:Arial,sans-serif;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-primary{background:#2E75B6;color:#fff}
+.btn-green{background:#217346;color:#fff}
+.btn-gray{background:#6c757d;color:#fff}
+.btn-red{background:#c0392b;color:#fff}
+.btn-sm{padding:2px 7px;font-size:10px}
+/* FORM GRID */
+.form-grid{display:grid;grid-template-columns:140px 1fr;gap:6px 10px;align-items:center}
+.form-grid label{text-align:right;font-weight:bold;color:#333}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* CHECKBOX LIST */
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px}
+.check-item{display:flex;align-items:center;gap:5px;padding:2px 0}
+.check-item input{width:auto;margin:0;cursor:pointer}
+/* COLORS */
+.col-mass th{background:#DEEAF1}
+.col-spec th{background:#E2EFDA}
+.cell-mass{background:#DEEAF1!important}
+.cell-spec{background:#E2EFDA!important}
+.cell-calc{background:#EEF2F7!important;color:#333}
+/* STARS */
+.stars{color:#FFB800;font-size:13px;letter-spacing:2px}
+/* LEGEND */
+.legend{display:flex;gap:14px;align-items:center;font-size:10px;margin-bottom:6px}
+.lg-box{width:12px;height:12px;border:1px solid #999;display:inline-block;vertical-align:middle;margin-right:3px}
+/* MODAL */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;padding:24px;border-radius:6px;width:460px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.modal h2{color:#1F3864;margin-bottom:10px}
+.modal p{font-size:12px;color:#555;margin-bottom:10px;line-height:1.5}
+/* ALERT */
+.alert{padding:6px 10px;border-radius:3px;font-size:11px;margin-bottom:8px}
+.alert-info{background:#d1ecf1;border:1px solid #bee5eb;color:#0c5460}
+.alert-success{background:#d4edda;border:1px solid #c3e6cb;color:#155724}
+.alert-warn{background:#fff3cd;border:1px solid #ffeeba;color:#856404}
+/* TABLE SCROLL */
+.tscroll{overflow-x:auto;width:100%}
+/* SALES OVERVIEW */
+.so-row{display:grid;grid-template-columns:60px 110px 1fr 120px 120px 1fr 1fr 1fr 1fr;gap:0;border:1px solid #ccc;margin-bottom:4px}
+.so-cell{padding:5px 7px;border-right:1px solid #ccc;font-size:11px}
+.so-cell:last-child{border-right:none}
+.so-head{background:#BDD7EE;font-weight:bold;text-align:center}
+/* PRINT */
+@media print{
+  .app-header,.tab-bar,.toolbar,.btn,.modal-overlay{display:none!important}
+  .tab-content{display:block!important;padding:4px;page-break-before:always}
+  .tab-content:first-of-type{page-break-before:avoid}
+  body{background:#fff;font-size:10px}
+  .card{box-shadow:none;border:1px solid #999}
+}
+/* MISC */
+.nowrap{white-space:nowrap}
+.right{text-align:right}
+.center{text-align:center}
+.bold{font-weight:bold}
+.text-muted{color:#888}
+.full-w{width:100%}
+.mb-8{margin-bottom:8px}
+.comp-avg-bar{background:#F7FBFF;border:1px solid #9DC3E6;padding:6px 10px;border-radius:3px;margin-bottom:8px;display:flex;gap:20px;align-items:center;font-size:11px}
+.comp-avg-bar strong{color:#1F3864}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div>
+    <div class="app-title" id="headerTitle">Costing Analysis</div>
+    <div style="font-size:11px;opacity:.8" id="headerSub"></div>
+  </div>
+  <div class="header-right">
+    <span class="qb-status disconnected" id="qbStatusBadge">QB: Not Connected</span>
+    <button class="btn btn-gray" onclick="showTokenModal()">QB Settings</button>
+    <button class="btn btn-primary" onclick="window.print()">Print</button>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">1. Initial Info</button>
+  <button class="tab-btn" onclick="switchTab(1)">2. Comp Analysis</button>
+  <button class="tab-btn" onclick="switchTab(2)">3. SKU List</button>
+  <button class="tab-btn" onclick="switchTab(3)">4. Costing</button>
+  <button class="tab-btn" onclick="switchTab(4)">5. Sales Overview</button>
+</div>
+
+<!-- ===== TAB 1: INITIAL INFORMATION ===== -->
+<div class="tab-content active" id="tab0">
+  <div class="toolbar">
+    <button class="btn btn-green" onclick="loadAllQBData()">Load Style Data from QB</button>
+    <button class="btn btn-primary" onclick="renderAll()">Refresh All Tabs</button>
+    <button class="btn btn-gray" onclick="clearData()">Clear All Data</button>
+    <span id="loadStatus" class="text-muted" style="font-size:11px"></span>
+  </div>
+  <div class="legend">
+    <span><span class="lg-box" style="background:#FFFFD9"></span>User input</span>
+    <span><span class="lg-box" style="background:#E8F4E8"></span>Auto-filled from QB</span>
+    <span><span class="lg-box" style="background:#EEF2F7"></span>Calculated</span>
+  </div>
+  <div class="form-2col">
+    <div class="card">
+      <div class="card-title">Launch Details</div>
+      <div class="form-grid">
+        <label>Launch Name:</label>
+        <input class="inp" type="text" id="launchName" oninput="saveAndRefreshHeader()" placeholder="e.g. Q3 2025 Pet Launch">
+        <label>Brand:</label>
+        <input class="inp" type="text" id="topBrand" oninput="saveState()" placeholder="e.g. Fetch, BioSilk">
+        <label>Pets or People:</label>
+        <select class="inp" id="petsOrPeople" onchange="saveState()">
+          <option value="">-- Select --</option>
+          <option>Pets</option>
+          <option>People</option>
+        </select>
+        <label>Compare:</label>
+        <select class="inp" id="massOrSpecialty" onchange="saveState()">
+          <option value="">-- Select --</option>
+          <option>Mass</option>
+          <option>Specialty</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Competitor &amp; Retailer Selection</div>
+      <div class="form-2col">
+        <div>
+          <div class="bold mb-8" style="font-size:11px">Top Competitors</div>
+          <div class="check-grid" id="competitorChecks"></div>
+        </div>
+        <div>
+          <div class="bold mb-8" style="font-size:11px">Retailer Information</div>
+          <div class="check-grid" id="retailerChecks"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Styles for Costing Analysis</div>
+    <div class="tscroll">
+      <table id="stylesTable">
+        <thead>
+          <tr>
+            <th style="width:30px">#</th>
+            <th style="width:110px">Style Number</th>
+            <th style="width:220px">Description (QB)</th>
+            <th style="width:100px">Brand (QB)</th>
+            <th style="width:100px">Category (QB)</th>
+            <th style="width:100px">Supplier (QB)</th>
+            <th style="width:100px">Country (QB)</th>
+            <th style="width:80px">FOB Cost (QB)</th>
+            <th style="width:80px">Landed Cost (QB)</th>
+            <th style="width:60px">MOQ (QB)</th>
+            <th style="width:80px">Lead Time (QB)</th>
+            <th style="width:80px">Action</th>
+          </tr>
+        </thead>
+        <tbody id="stylesTbody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:8px">
+      <button class="btn btn-primary btn-sm" onclick="addStyleRow()">+ Add Style</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 2: COMP ANALYSIS ===== -->
+<div class="tab-content" id="tab1">
+  <div class="toolbar">
+    <label style="font-weight:bold;font-size:12px">Style:</label>
+    <select class="inp" id="compStyleSel" onchange="renderCompTab()" style="width:160px"></select>
+    <label style="font-weight:bold;font-size:12px">Products per retailer:</label>
+    <input class="inp" type="number" id="productsPerRetailer" value="4" min="1" max="10" style="width:55px" onchange="renderCompTab()">
+    <label style="font-weight:bold;font-size:12px">Filter:</label>
+    <select class="inp" id="compRetailerFilter" onchange="renderCompTab()" style="width:130px">
+      <option value="">All Retailers</option>
+    </select>
+  </div>
+  <div id="compAvgBar" class="comp-avg-bar" style="display:none">
+    <span><strong>Avg MASS Price:</strong> <span id="avgMassDisp">--</span></span>
+    <span><strong>Avg SPECIALTY Price:</strong> <span id="avgSpecDisp">--</span></span>
+  </div>
+  <div id="compBody"></div>
+</div>
+
+<!-- ===== TAB 3: SKU LIST ===== -->
+<div class="tab-content" id="tab2">
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="renderSKUTab()">Refresh</button>
+  </div>
+  <div id="skuBody"></div>
+</div>
+
+<!-- ===== TAB 4: COSTING ===== -->
+<div class="tab-content" id="tab3">
+  <div class="toolbar">
+    <label style="font-weight:bold">Compare:</label>
+    <select class="inp" id="costingCompare" style="width:120px" onchange="saveState();renderCostingTab()">
+      <option value="">-- Select --</option>
+      <option>Mass</option>
+      <option>Specialty</option>
+    </select>
+    <button class="btn btn-primary" onclick="renderCostingTab()">Refresh</button>
+  </div>
+  <div id="costingBody"></div>
+</div>
+
+<!-- ===== TAB 5: SALES OVERVIEW ===== -->
+<div class="tab-content" id="tab4">
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="renderSalesOverview()">Refresh</button>
+  </div>
+  <div id="salesBody"></div>
+</div>
+
+<!-- ===== QB TOKEN MODAL ===== -->
+<div class="modal-overlay" id="tokenModal">
+  <div class="modal">
+    <h2>QuickBase Connection</h2>
+    <p>Enter your QB User Token to auto-populate style data from ProductTrack (Styles table). Your token is stored only in this browser's local storage.</p>
+    <div class="form-grid" style="grid-template-columns:100px 1fr;margin-bottom:12px">
+      <label>QB Realm:</label>
+      <input class="inp" type="text" id="qbRealm" value="pim.quickbase.com" placeholder="your-realm.quickbase.com">
+      <label>User Token:</label>
+      <input class="inp" type="password" id="qbTokenInput" placeholder="b39re4_xxxx...">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-green" onclick="saveToken()">Save &amp; Connect</button>
+      <button class="btn btn-gray" onclick="hideTokenModal()">Cancel</button>
+      <button class="btn btn-red btn-sm" onclick="clearToken()" style="margin-left:auto">Disconnect</button>
+    </div>
+    <div id="tokenStatus" style="margin-top:8px;font-size:11px"></div>
+  </div>
+</div>
+
+<script>
+// ==================== CONSTANTS ====================
+const QB_STYLES_TABLE = 'bphzqfkev';
+const QB_FIELDS = { mstyle:6, description:15, brand:16, category:20, subcategory:21,
+  supplier:118, fragrance:120, fobCost:121, dutyRate:122, landedCost:123,
+  country:140, leadTime:168, moq:173, sizeCount:219 };
+
+const RETAILERS = [
+  {name:'Amazon',channel:'Direct to Customer'},
+  {name:'Walmart',channel:'Mass Market'},
+  {name:'Target',channel:'Mass Market'},
+  {name:'PetSmart',channel:'Pet Specialty'},
+  {name:'Petco',channel:'Pet Specialty'},
+  {name:'Chewy',channel:'Pet Specialty'},
+  {name:'Lowes',channel:'Hardware'},
+  {name:'Pet Supplies Plus',channel:'Pet Specialty'},
+  {name:'TJX / Marshalls',channel:'Off-Price'},
+  {name:'Costco',channel:'Wholesale Club'},
+  {name:'Dollar General',channel:'Dollar Store'},
+  {name:'Kroger',channel:'Supermarket'},
+  {name:'CVS / Walgreens',channel:'Drug Store'},
+];
+const CHANNEL_TYPE = {
+  'Direct to Customer':'Mass','Off-Price':'Mass','Pet Specialty':'Specialty',
+  'Mass Market':'Mass','Dollar Store':'Mass','Supermarket':'Mass',
+  'Home Improvement':'Mass','Specialty':'Specialty','Wholesale Club':'Mass',
+  'Hardware':'Mass','Closeouts':'Mass','Drug Store':'Mass'
+};
+const LABEL_TYPES = ['Adhesive','Shrink Wrap','Printed','Hang Tag'];
+const PACKAGING_TYPES = ['Bag','Box','Bottle','Blister','Clamshell','Jar','Pouch','Tube','Other'];
+const SIZING_UNITS = ['oz','fl oz','lbs','kg','g','ml','L','ct','in','mm','cm'];
+const MAX_STYLES = 10;
+
+// ==================== STATE ====================
+let S = {
+  launchName:'', topBrand:'', petsOrPeople:'', massOrSpecialty:'',
+  styles:[], // {num, qb:{desc,brand,cat,supplier,country,fob,landed,moq,leadTime,fragrance}}
+  competitors:{}, // {retailerName: {selectedComp, selectedRetail}}
+  compData:{}, // {styleNum: {retailerName: [{brand,product,count,size,unit,flavor,labelType,packType,price,fop,features,rating,reviews,amazonReviews,bsNum,nielsen}]}}
+  skuData:{}, // {styleNum: [{count,size,unit,flavor,packaging,fop,features,comments}]}
+  costingData:{}, // {styleNum: [{finalCosting,addToSales,count,size,unit,flavor,labelType,packType,massMSRP,specMSRP,moqPkg,moldFee,comments}]}
+  salesData:{}, // {styleNum:{justification,comments}}
+  qbToken:'', qbRealm:'pim.quickbase.com'
+};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem('costingAnalysis_v1');
+    if(raw) S = Object.assign(S, JSON.parse(raw));
+    const tok = localStorage.getItem('costingAnalysis_token');
+    if(tok){ S.qbToken=tok; S.qbRealm=localStorage.getItem('costingAnalysis_realm')||'pim.quickbase.com'; }
+  }catch(e){}
+}
+function saveState(){
+  const toSave = Object.assign({}, S);
+  delete toSave.qbToken; delete toSave.qbRealm;
+  localStorage.setItem('costingAnalysis_v1', JSON.stringify(toSave));
+}
+function clearData(){
+  if(!confirm('Clear all data? This cannot be undone.')) return;
+  localStorage.removeItem('costingAnalysis_v1');
+  S = {launchName:'',topBrand:'',petsOrPeople:'',massOrSpecialty:'',styles:[],competitors:{},compData:{},skuData:{},costingData:{},salesData:{},qbToken:S.qbToken,qbRealm:S.qbRealm};
+  renderAll();
+}
+
+// ==================== QB API ====================
+async function qbFetch(path, opts={}){
+  const headers = {
+    'QB-Realm-Hostname': S.qbRealm,
+    'Authorization': 'QB-USER-TOKEN ' + S.qbToken,
+    'Content-Type': 'application/json'
+  };
+  const resp = await fetch('https://api.quickbase.com/v1' + path, {method:'GET',...opts,headers:{...headers,...(opts.headers||{})}});
+  if(!resp.ok) throw new Error('QB API ' + resp.status);
+  return resp.json();
+}
+
+async function fetchStyleDataFromQB(styleNums){
+  if(!S.qbToken) return null;
+  const nums = styleNums.filter(n=>n&&n.trim());
+  if(!nums.length) return {};
+  // Build WHERE clause
+  const where = nums.map(n=>'{6.EX.\''+n.trim().toUpperCase()+'\'}'). join(' OR ');
+  const sel = Object.values(QB_FIELDS);
+  const body = {from:QB_STYLES_TABLE,select:sel,where,options:{top:50}};
+  const data = await qbFetch('/records/query',{method:'POST',body:JSON.stringify(body)});
+  const result = {};
+  (data.data||[]).forEach(row=>{
+    const mstyle = (row[QB_FIELDS.mstyle]||{}).value||'';
+    if(!mstyle) return;
+    result[mstyle.toUpperCase()] = {
+      desc: (row[QB_FIELDS.description]||{}).value||'',
+      brand: (row[QB_FIELDS.brand]||{}).value||'',
+      cat: (row[QB_FIELDS.category]||{}).value||'',
+      supplier: (row[QB_FIELDS.supplier]||{}).value||'',
+      fragrance: (row[QB_FIELDS.fragrance]||{}).value||'',
+      fob: (row[QB_FIELDS.fobCost]||{}).value||'',
+      landed: (row[QB_FIELDS.landedCost]||{}).value||'',
+      moq: (row[QB_FIELDS.moq]||{}).value||'',
+      leadTime: (row[QB_FIELDS.leadTime]||{}).value||'',
+      country: (row[QB_FIELDS.country]||{}).value||''
+    };
+  });
+  return result;
+}
+
+async function loadAllQBData(){
+  if(!S.qbToken){ showTokenModal(); return; }
+  const nums = S.styles.map(s=>s.num).filter(n=>n&&n.trim());
+  if(!nums.length){ setStatus('No styles entered.'); return; }
+  setStatus('Loading from QB...');
+  try{
+    const data = await fetchStyleDataFromQB(nums);
+    S.styles.forEach(st=>{
+      const k = st.num.trim().toUpperCase();
+      if(data[k]) st.qb = data[k];
+    });
+    saveState();
+    renderAll();
+    setStatus('QB data loaded: ' + Object.keys(data).length + ' style(s) found.', 'success');
+  }catch(e){
+    setStatus('QB Error: '+e.message, 'error');
+  }
+}
+
+async function loadSingleStyle(idx){
+  if(!S.qbToken){ showTokenModal(); return; }
+  const st = S.styles[idx];
+  if(!st||!st.num) return;
+  setStatus('Fetching '+st.num+'...');
+  try{
+    const data = await fetchStyleDataFromQB([st.num]);
+    const k = st.num.trim().toUpperCase();
+    if(data[k]){ st.qb=data[k]; setStatus(st.num+' loaded from QB.','success'); }
+    else setStatus(st.num+' not found in QB.','warn');
+    saveState();
+    renderTab1Fields();
+  }catch(e){ setStatus('QB Error: '+e.message,'error'); }
+}
+
+function setStatus(msg,type=''){
+  const el=document.getElementById('loadStatus');
+  if(!el) return;
+  el.textContent=msg;
+  el.style.color = type==='success'?'#155724':type==='error'?'#721c24':type==='warn'?'#856404':'#555';
+}
+
+// ==================== TOKEN MODAL ====================
+function showTokenModal(){
+  document.getElementById('qbTokenInput').value=S.qbToken||'';
+  document.getElementById('qbRealm').value=S.qbRealm||'pim.quickbase.com';
+  document.getElementById('tokenModal').style.display='flex';
+}
+function hideTokenModal(){ document.getElementById('tokenModal').style.display='none'; }
+function saveToken(){
+  S.qbToken = document.getElementById('qbTokenInput').value.trim();
+  S.qbRealm = document.getElementById('qbRealm').value.trim()||'pim.quickbase.com';
+  localStorage.setItem('costingAnalysis_token', S.qbToken);
+  localStorage.setItem('costingAnalysis_realm', S.qbRealm);
+  updateQBStatus();
+  hideTokenModal();
+}
+function clearToken(){
+  S.qbToken=''; localStorage.removeItem('costingAnalysis_token');
+  updateQBStatus(); hideTokenModal();
+}
+function updateQBStatus(){
+  const el=document.getElementById('qbStatusBadge');
+  if(S.qbToken){ el.textContent='QB: Connected'; el.className='qb-status'; }
+  else { el.textContent='QB: Not Connected'; el.className='qb-status disconnected'; }
+}
+
+// ==================== HELPERS ====================
+function fmt$(v){ if(v===''||v===null||v===undefined) return ''; const n=parseFloat(v); return isNaN(n)?'':'$'+n.toFixed(2); }
+function fmtPct(v){ if(v===''||v===null||v===undefined) return ''; const n=parseFloat(v); return isNaN(n)?'':(n*100).toFixed(1)+'%'; }
+function calcMU(retail,cost){ const r=parseFloat(retail),c=parseFloat(cost); if(!r||isNaN(r)||isNaN(c)) return ''; return fmtPct((r-c)/r); }
+function calcUnitPrice(price,count,size){ const p=parseFloat(price),c=parseFloat(count),sz=parseFloat(size); if(isNaN(p)) return ''; if(!isNaN(c)&&c>1) return fmt$(p/c)+' / piece'; if(!isNaN(sz)&&sz>0) return fmt$(p/sz); return fmt$(p); }
+function renderStars(rating){
+  const r=parseFloat(rating); if(isNaN(r)||r<=0) return '';
+  let s=''; for(let i=1;i<=5;i++){ if(r>=i) s+='&#9733;'; else if(r>i-1) s+='&#9734;'; else s+='&#9734;'; }
+  return '<span class="stars">'+s+'</span> <span style="font-size:10px">('+r.toFixed(1)+')</span>';
+}
+function esc(str){ if(!str) return ''; return str.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function getRetailerType(channel){ return CHANNEL_TYPE[channel]||'Mass'; }
+function getSelectedRetailers(){ return RETAILERS.filter(r=>{ const c=S.competitors[r.name]||{}; return c.selectedRetail; }); }
+function getSelectedCompetitors(){ return RETAILERS.filter(r=>{ const c=S.competitors[r.name]||{}; return c.selectedComp; }); }
+function getStyleNums(){ return S.styles.filter(s=>s&&s.num&&s.num.trim()).map(s=>s.num.trim().toUpperCase()); }
+function ensureCompData(style,retailer){ if(!S.compData[style]) S.compData[style]={}; if(!S.compData[style][retailer]) S.compData[style][retailer]=[]; return S.compData[style][retailer]; }
+function getComp(style,retailer,i){ const arr=ensureCompData(style,retailer); return arr[i]||{}; }
+function setComp(style,retailer,i,key,val){ const arr=ensureCompData(style,retailer); if(!arr[i]) arr[i]={}; arr[i][key]=val; saveState(); }
+function getSKU(style){ if(!S.skuData[style]) S.skuData[style]=[{}]; return S.skuData[style][0]||{}; }
+function setSKU(style,key,val){ if(!S.skuData[style]) S.skuData[style]=[{}]; if(!S.skuData[style][0]) S.skuData[style][0]={}; S.skuData[style][0][key]=val; saveState(); }
+function getCosting(style){ if(!S.costingData[style]) S.costingData[style]=[{}]; return S.costingData[style][0]||{}; }
+function setCosting(style,key,val){ if(!S.costingData[style]) S.costingData[style]=[{}]; if(!S.costingData[style][0]) S.costingData[style][0]={}; S.costingData[style][0][key]=val; saveState(); }
+
+function calcAvgRetailType(styleNum, type){
+  const retailers = RETAILERS.filter(r=>{
+    const rt = getRetailerType(r.channel);
+    return rt===type && (S.competitors[r.name]||{}).selectedRetail;
+  });
+  const prices=[];
+  retailers.forEach(r=>{
+    const arr=ensureCompData(styleNum,r.name);
+    arr.forEach(row=>{ const p=parseFloat(row.price); if(!isNaN(p)&&p>0) prices.push(p); });
+  });
+  if(!prices.length) return null;
+  return prices.reduce((a,b)=>a+b,0)/prices.length;
+}
+
+// ==================== TAB SWITCHING ====================
+const TABS=5;
+function switchTab(idx){
+  for(let i=0;i<TABS;i++){
+    document.getElementById('tab'+i).classList.toggle('active',i===idx);
+    document.querySelectorAll('.tab-btn')[i].classList.toggle('active',i===idx);
+  }
+  if(idx===1){
+    renderCompStyleSelector();
+    // Auto-select first style if none selected
+    const sel=document.getElementById('compStyleSel');
+    if(!sel.value){ const nums=getStyleNums(); if(nums.length) sel.value=nums[0]; }
+    renderCompRetailerFilter();
+    renderCompTab();
+  }
+  if(idx===2) renderSKUTab();
+  if(idx===3){ renderCompStyleSelector(); renderCostingTab(); }
+  if(idx===4) renderSalesOverview();
+}
+
+// ==================== RENDER ALL ====================
+function renderAll(){
+  syncFieldsToState();
+  renderTab1Fields();
+  renderCompStyleSelector();
+  renderSKUTab();
+  renderCostingTab();
+  renderSalesOverview();
+  updateQBStatus();
+  const hn=S.launchName?'Costing Analysis - '+S.launchName:'Costing Analysis';
+  document.getElementById('headerTitle').textContent=hn;
+  document.getElementById('headerSub').textContent=S.topBrand?(S.topBrand+(S.petsOrPeople?' | '+S.petsOrPeople:'')):'';
+}
+
+function syncFieldsToState(){
+  const ln=document.getElementById('launchName'); if(ln) S.launchName=ln.value;
+  const tb=document.getElementById('topBrand'); if(tb) S.topBrand=tb.value;
+  const pop=document.getElementById('petsOrPeople'); if(pop) S.petsOrPeople=pop.value;
+  const mos=document.getElementById('massOrSpecialty'); if(mos) S.massOrSpecialty=mos.value;
+}
+
+function saveAndRefreshHeader(){
+  syncFieldsToState(); saveState();
+  const hn=S.launchName?'Costing Analysis - '+S.launchName:'Costing Analysis';
+  document.getElementById('headerTitle').textContent=hn;
+}
+
+// ==================== TAB 1: RENDER ====================
+function renderTab1Fields(){
+  document.getElementById('launchName').value=S.launchName||'';
+  document.getElementById('topBrand').value=S.topBrand||'';
+  document.getElementById('petsOrPeople').value=S.petsOrPeople||'';
+  document.getElementById('massOrSpecialty').value=S.massOrSpecialty||'';
+  renderCompetitorChecks();
+  renderStylesTable();
+}
+
+function renderCompetitorChecks(){
+  const compEl=document.getElementById('competitorChecks');
+  const retEl=document.getElementById('retailerChecks');
+  compEl.innerHTML=''; retEl.innerHTML='';
+  RETAILERS.forEach(r=>{
+    const c=S.competitors[r.name]||{};
+    compEl.innerHTML+=`<div class="check-item">
+      <input type="checkbox" ${c.selectedComp?'checked':''} onchange="toggleComp('${r.name}','comp',this.checked)">
+      <span>${esc(r.name)}</span></div>`;
+    retEl.innerHTML+=`<div class="check-item">
+      <input type="checkbox" ${c.selectedRetail?'checked':''} onchange="toggleComp('${r.name}','retail',this.checked)">
+      <span>${esc(r.name)}</span></div>`;
+  });
+}
+
+function toggleComp(name, which, val){
+  if(!S.competitors[name]) S.competitors[name]={};
+  if(which==='comp') S.competitors[name].selectedComp=val;
+  else S.competitors[name].selectedRetail=val;
+  saveState();
+  renderCompRetailerFilter();
+}
+
+function renderStylesTable(){
+  const tbody=document.getElementById('stylesTbody');
+  if(!S.styles.length) S.styles=[{num:'',qb:{}}];
+  let html='';
+  S.styles.forEach((st,i)=>{
+    const q=st.qb||{};
+    const ev=i%2===1?'tr-even':'';
+    html+=`<tr class="${ev}">
+      <td class="center">${i+1}</td>
+      <td><input class="inp" type="text" value="${esc(st.num)}" onchange="setStyleNum(${i},this.value)" onblur="setStyleNum(${i},this.value)" placeholder="e.g. FFP7258" style="text-transform:uppercase"></td>
+      <td><input class="inp ${q.desc?'qb':''}" type="text" value="${esc(q.desc)}" ${q.desc?'readonly':''} placeholder="(auto-fill from QB)" oninput="setQBField(${i},'desc',this.value)"></td>
+      <td><input class="inp ${q.brand?'qb':''}" type="text" value="${esc(q.brand)}" ${q.brand?'readonly':''} placeholder="Brand" oninput="setQBField(${i},'brand',this.value)"></td>
+      <td><input class="inp ${q.cat?'qb':''}" type="text" value="${esc(q.cat)}" ${q.cat?'readonly':''} placeholder="Category" oninput="setQBField(${i},'cat',this.value)"></td>
+      <td><input class="inp ${q.supplier?'qb':''}" type="text" value="${esc(q.supplier)}" ${q.supplier?'readonly':''} placeholder="Supplier" oninput="setQBField(${i},'supplier',this.value)"></td>
+      <td><input class="inp ${q.country?'qb':''}" type="text" value="${esc(q.country)}" ${q.country?'readonly':''} placeholder="Country" oninput="setQBField(${i},'country',this.value)"></td>
+      <td class="right"><input class="inp ${q.fob!==''&&q.fob!==undefined?'qb':''}" type="number" step="0.01" value="${q.fob||''}" ${q.fob?'readonly':''} placeholder="0.00" oninput="setQBField(${i},'fob',this.value)" style="text-align:right"></td>
+      <td class="right"><input class="inp ${q.landed!==''&&q.landed!==undefined?'qb':''}" type="number" step="0.01" value="${q.landed||''}" ${q.landed?'readonly':''} placeholder="0.00" oninput="setQBField(${i},'landed',this.value)" style="text-align:right"></td>
+      <td class="right"><input class="inp ${q.moq?'qb':''}" type="number" value="${q.moq||''}" ${q.moq?'readonly':''} placeholder="0" oninput="setQBField(${i},'moq',this.value)" style="text-align:right"></td>
+      <td class="center"><input class="inp ${q.leadTime?'qb':''}" type="text" value="${esc(q.leadTime)}" ${q.leadTime?'readonly':''} placeholder="days" oninput="setQBField(${i},'leadTime',this.value)"></td>
+      <td class="center nowrap">
+        <button class="btn btn-primary btn-sm" onclick="loadSingleStyle(${i})" title="Load from QB">QB</button>
+        ${i>0?`<button class="btn btn-red btn-sm" onclick="removeStyle(${i})" title="Remove">x</button>`:''}
+      </td>
+    </tr>`;
+  });
+  tbody.innerHTML=html;
+}
+
+function setStyleNum(i,val){
+  S.styles[i].num=val.trim().toUpperCase();
+  S.styles[i].qb={};
+  saveState();
+}
+function setQBField(i,key,val){ if(!S.styles[i].qb) S.styles[i].qb={}; S.styles[i].qb[key]=val; saveState(); }
+function addStyleRow(){ if(S.styles.length>=MAX_STYLES) return; S.styles.push({num:'',qb:{}}); saveState(); renderStylesTable(); }
+function removeStyle(i){ S.styles.splice(i,1); saveState(); renderStylesTable(); }
+
+// ==================== TAB 2: COMP ANALYSIS ====================
+function renderCompStyleSelector(){
+  const sel=document.getElementById('compStyleSel');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">-- Select Style --</option>';
+  getStyleNums().forEach(n=>{ sel.innerHTML+=`<option value="${n}" ${n===cur?'selected':''}>${n}</option>`; });
+  renderCompRetailerFilter();
+}
+function renderCompRetailerFilter(){
+  const sel=document.getElementById('compRetailerFilter');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">All Retailers</option>';
+  getSelectedRetailers().forEach(r=>{ sel.innerHTML+=`<option value="${r.name}" ${r.name===cur?'selected':''}>${r.name}</option>`; });
+}
+
+function renderCompTab(){
+  const styleNum=document.getElementById('compStyleSel').value;
+  const ppr=parseInt(document.getElementById('productsPerRetailer').value)||4;
+  const filterRet=document.getElementById('compRetailerFilter').value;
+  const body=document.getElementById('compBody');
+  if(!styleNum){ body.innerHTML='<div class="alert alert-info">Select a style above.</div>'; return; }
+  const retailers=getSelectedRetailers().filter(r=>!filterRet||r.name===filterRet);
+  if(!retailers.length){ body.innerHTML='<div class="alert alert-warn">No retailers selected. Check "Retailer Information" boxes in Tab 1.</div>'; return; }
+
+  // Avg prices bar
+  const avgMass=calcAvgRetailType(styleNum,'Mass');
+  const avgSpec=calcAvgRetailType(styleNum,'Specialty');
+  document.getElementById('compAvgBar').style.display='flex';
+  document.getElementById('avgMassDisp').textContent=avgMass!==null?fmt$(avgMass):'--';
+  document.getElementById('avgSpecDisp').textContent=avgSpec!==null?fmt$(avgSpec):'--';
+
+  let html='';
+  retailers.forEach(retailer=>{
+    const rtype=getRetailerType(retailer.channel);
+    html+=`<div class="sh-blue">
+      <span>${esc(retailer.name)} <span style="opacity:.7;font-size:10px">${esc(retailer.channel)} | <em>${rtype}</em></span></span>
+    </div>
+    <div class="tscroll"><table>
+      <thead><tr>
+        <th>#</th><th>Brand</th><th>Product Name</th><th>Best Seller #</th><th>Nielsen Top?</th>
+        <th>Count</th><th>Size</th><th>Unit</th><th>Flavor/Fragrance</th>
+        <th>Label Type</th><th>Packaging</th><th>Retail Price</th><th>Price/Unit</th>
+        <th>FOP Claims</th><th>Features</th><th>Rating</th><th>Stars</th><th>Reviews</th><th>Amazon Reviews</th>
+      </tr></thead><tbody>`;
+    for(let i=0;i<ppr;i++){
+      const d=getComp(styleNum,retailer.name,i);
+      const ev=i%2===1?'tr-even':'';
+      const unitPr=calcUnitPrice(d.price,d.count,d.size);
+      const si=`'${styleNum}','${retailer.name.replace(/'/g,"\\'")}',${i}`;
+      html+=`<tr class="${ev}">
+        <td class="center">${i+1}</td>
+        <td><input class="inp" type="text" value="${esc(d.brand)}" oninput="setComp(${si},'brand',this.value)" placeholder="Brand"></td>
+        <td><input class="inp" type="text" value="${esc(d.product)}" oninput="setComp(${si},'product',this.value)" placeholder="Product name" style="min-width:140px"></td>
+        <td><input class="inp" type="text" value="${esc(d.bsNum)}" oninput="setComp(${si},'bsNum',this.value)" placeholder="#" style="width:50px"></td>
+        <td class="center"><input type="checkbox" ${d.nielsen?'checked':''} onchange="setComp(${si},'nielsen',this.checked)" style="cursor:pointer"></td>
+        <td><input class="inp" type="number" value="${d.count||''}" oninput="setComp(${si},'count',this.value);updateUnitPrice(this)" style="width:55px;text-align:right"></td>
+        <td><input class="inp" type="number" step="0.1" value="${d.size||''}" oninput="setComp(${si},'size',this.value);updateUnitPrice(this)" style="width:60px;text-align:right"></td>
+        <td><select class="inp" onchange="setComp(${si},'unit',this.value)" style="width:65px">
+          ${SIZING_UNITS.map(u=>`<option ${d.unit===u?'selected':''}>${u}</option>`).join('')}
+        </select></td>
+        <td><input class="inp" type="text" value="${esc(d.flavor)}" oninput="setComp(${si},'flavor',this.value)" placeholder="Flavor/Frag"></td>
+        <td><select class="inp" onchange="setComp(${si},'labelType',this.value)" style="width:90px">
+          <option value=""></option>${LABEL_TYPES.map(l=>`<option ${d.labelType===l?'selected':''}>${l}</option>`).join('')}
+        </select></td>
+        <td><select class="inp" onchange="setComp(${si},'packType',this.value)" style="width:90px">
+          <option value=""></option>${PACKAGING_TYPES.map(p=>`<option ${d.packType===p?'selected':''}>${p}</option>`).join('')}
+        </select></td>
+        <td><input class="inp" type="number" step="0.01" value="${d.price||''}" oninput="setComp(${si},'price',this.value);updateUnitPrice(this)" style="width:75px;text-align:right" placeholder="$0.00"></td>
+        <td class="cell-calc nowrap" style="min-width:70px">${unitPr}</td>
+        <td><input class="inp" type="text" value="${esc(d.fop)}" oninput="setComp(${si},'fop',this.value)" placeholder="Claims" style="min-width:100px"></td>
+        <td><textarea class="inp" oninput="setComp(${si},'features',this.value)" placeholder="Features" rows="1" style="min-width:120px">${esc(d.features)}</textarea></td>
+        <td><input class="inp" type="number" step="0.1" min="0" max="5" value="${d.rating||''}" oninput="setComp(${si},'rating',this.value);this.closest('tr').querySelector('.star-cell').innerHTML=renderStars(this.value)" style="width:50px;text-align:right" placeholder="4.5"></td>
+        <td class="star-cell center">${renderStars(d.rating)}</td>
+        <td><input class="inp" type="number" value="${d.reviews||''}" oninput="setComp(${si},'reviews',this.value)" style="width:75px;text-align:right" placeholder="0"></td>
+        <td><textarea class="inp" oninput="setComp(${si},'amazonReviews',this.value)" placeholder="Amazon review text" rows="1" style="min-width:110px">${esc(d.amazonReviews)}</textarea></td>
+      </tr>`;
+    }
+    html+=`</tbody></table></div>`;
+  });
+  body.innerHTML=html;
+}
+
+function updateUnitPrice(el){
+  const tr=el.closest('tr');
+  const cells=tr.querySelectorAll('input[type=number]');
+  // Find price, count, size inputs by position
+  const priceInp=tr.querySelector('td:nth-child(12) input');
+  const countInp=tr.querySelector('td:nth-child(6) input');
+  const sizeInp=tr.querySelector('td:nth-child(7) input');
+  const calcCell=tr.querySelector('.cell-calc');
+  if(priceInp&&calcCell) calcCell.textContent=calcUnitPrice(priceInp.value,countInp?countInp.value:'',sizeInp?sizeInp.value:'');
+}
+
+// ==================== TAB 3: SKU LIST ====================
+function renderSKUTab(){
+  const body=document.getElementById('skuBody');
+  const styles=getStyleNums();
+  if(!styles.length){ body.innerHTML='<div class="alert alert-info">Enter styles in Tab 1 first.</div>'; return; }
+  let html='';
+  styles.forEach(styleNum=>{
+    const st=S.styles.find(s=>s.num===styleNum)||{};
+    const q=st.qb||{};
+    const sku=getSKU(styleNum);
+    const avgM=calcAvgRetailType(styleNum,'Mass');
+    const avgS=calcAvgRetailType(styleNum,'Specialty');
+    html+=`<div class="sh">Style: ${esc(styleNum)} ${q.desc?'&mdash; '+esc(q.desc):''}</div>
+    <div class="card">
+      <div class="tscroll"><table>
+        <thead><tr>
+          <th>Style #</th><th>Description</th><th>Count</th><th>Size</th><th>Sizing Unit</th>
+          <th>Flavor/Fragrance</th><th>Packaging Suggestions</th>
+          <th class="cell-mass">Avg MASS Price (Competitors)</th>
+          <th class="cell-spec">Avg SPECIALTY Price (Competitors)</th>
+          <th>FOP Claims</th><th>Features / Ingredients</th><th>Additional Comments</th>
+        </tr></thead>
+        <tbody><tr>
+          <td class="bold">${esc(styleNum)}</td>
+          <td class="${q.desc?'qb':''}">${esc(q.desc)||'<span class="text-muted">(enter in Tab 1)</span>'}</td>
+          <td><input class="inp" type="number" value="${sku.count||''}" oninput="setSKU('${styleNum}','count',this.value)" style="width:55px;text-align:right"></td>
+          <td><input class="inp" type="number" step="0.1" value="${sku.size||''}" oninput="setSKU('${styleNum}','size',this.value)" style="width:65px;text-align:right"></td>
+          <td><select class="inp" onchange="setSKU('${styleNum}','unit',this.value)" style="width:70px">
+            <option value=""></option>${SIZING_UNITS.map(u=>`<option ${sku.unit===u?'selected':''}>${u}</option>`).join('')}
+          </select></td>
+          <td><input class="inp" type="text" value="${esc(sku.flavor||q.fragrance)}" oninput="setSKU('${styleNum}','flavor',this.value)" placeholder="Flavor/Fragrance"></td>
+          <td><textarea class="inp" oninput="setSKU('${styleNum}','packaging',this.value)" placeholder="Packaging suggestions" rows="2">${esc(sku.packaging)}</textarea></td>
+          <td class="cell-mass cell-calc center">${avgM!==null?fmt$(avgM):'<span class="text-muted">--</span>'}</td>
+          <td class="cell-spec cell-calc center">${avgS!==null?fmt$(avgS):'<span class="text-muted">--</span>'}</td>
+          <td><textarea class="inp" oninput="setSKU('${styleNum}','fop',this.value)" placeholder="FOP Claims" rows="2">${esc(sku.fop)}</textarea></td>
+          <td><textarea class="inp" oninput="setSKU('${styleNum}','features',this.value)" placeholder="Key features/ingredients" rows="2">${esc(sku.features)}</textarea></td>
+          <td><textarea class="inp" oninput="setSKU('${styleNum}','comments',this.value)" placeholder="Additional comments" rows="2">${esc(sku.comments)}</textarea></td>
+        </tr></tbody>
+      </table></div>
+
+      <div class="sh-blue" style="margin-top:10px"><span>Competitor Comparison for ${esc(styleNum)}</span></div>`;
+
+    const retailers=getSelectedRetailers();
+    if(!retailers.length){ html+='<div class="alert alert-warn" style="margin:6px 0">No retailers selected in Tab 1.</div>'; }
+    else{
+      html+=`<div class="tscroll"><table>
+        <thead><tr>
+          <th>Retailer</th><th>Type</th><th>Brand</th><th>Product</th>
+          <th>Count</th><th>Size</th><th>Unit</th><th>Flavor</th>
+          <th>Label</th><th>Packaging</th><th>Retail $</th><th>$/Unit</th>
+          <th>FOP Claims</th><th>Features</th><th>Rating</th>
+        </tr></thead><tbody>`;
+      retailers.forEach((r,ri)=>{
+        const arr=ensureCompData(styleNum,r.name);
+        const rtype=getRetailerType(r.channel);
+        arr.forEach((d,i)=>{
+          if(!d||!d.brand) return;
+          const ev=(ri+i)%2===1?'tr-even':'';
+          html+=`<tr class="${ev}">
+            ${i===0?`<td rowspan="${arr.filter(x=>x&&x.brand).length}" class="bold nowrap">${esc(r.name)}<br><span class="text-muted" style="font-size:10px">${rtype}</span></td>`:''}
+            ${i===0?`<td rowspan="${arr.filter(x=>x&&x.brand).length}" class="${rtype==='Mass'?'cell-mass':'cell-spec'} center">${rtype}</td>`:''}
+            <td>${esc(d.brand)}</td><td>${esc(d.product)}</td>
+            <td class="right">${d.count||''}</td><td class="right">${d.size||''}</td><td>${esc(d.unit)}</td><td>${esc(d.flavor)}</td>
+            <td>${esc(d.labelType)}</td><td>${esc(d.packType)}</td>
+            <td class="right">${d.price?fmt$(d.price):''}</td>
+            <td class="right cell-calc">${calcUnitPrice(d.price,d.count,d.size)}</td>
+            <td>${esc(d.fop)}</td><td>${esc(d.features)}</td>
+            <td class="center">${renderStars(d.rating)}</td>
+          </tr>`;
+        });
+      });
+      html+=`</tbody></table></div>`;
+    }
+    html+=`</div>`;
+  });
+  body.innerHTML=html;
+}
+
+// ==================== TAB 4: COSTING ====================
+function renderCostingTab(){
+  const body=document.getElementById('costingBody');
+  const styles=getStyleNums();
+  const compare=document.getElementById('costingCompare').value;
+  if(!S.massOrSpecialty&&compare) S.massOrSpecialty=compare;
+  if(!styles.length){ body.innerHTML='<div class="alert alert-info">Enter styles in Tab 1 first.</div>'; return; }
+  let html='';
+  html+=`<div class="card" style="margin-bottom:8px">
+    <div class="tscroll"><table>
+      <thead><tr>
+        <th>Style #</th><th>Description</th>
+        <th>Final Costing?</th><th>Add to Sales Overview?</th>
+        <th>Factory / Supplier</th><th>Country</th>
+        <th>Count</th><th>Size</th><th>Unit</th><th>Flavor/Fragrance</th>
+        <th>Label Type</th><th>Packaging Type</th>
+        <th>${compare==='Specialty'?'Retail $ Specialty':'Retail $ MASS'}</th>
+        <th>Price / Unit</th>
+        <th>FOP Claims</th><th>Features</th>
+        <th>MOQ</th><th>Pkg MOQ</th><th>Lead Time</th>
+        <th>Mold Fee</th><th>FOB Cost</th><th>Landed Cost</th>
+        <th class="cell-mass">Retail $ MASS</th><th class="cell-mass">MASS MU%</th>
+        <th class="cell-spec">Retail $ SPECIALTY</th><th class="cell-spec">SPECIALTY MU%</th>
+        <th>Comments</th>
+      </tr></thead><tbody>`;
+  styles.forEach((styleNum,si)=>{
+    const st=S.styles.find(s=>s.num===styleNum)||{};
+    const q=st.qb||{};
+    const c=getCosting(styleNum);
+    const sku=getSKU(styleNum);
+    const massMU=calcMU(c.massMSRP,c.landedCost||q.landed||c.fobCost||q.fob);
+    const specMU=calcMU(c.specMSRP,c.landedCost||q.landed||c.fobCost||q.fob);
+    const showRetail=compare==='Specialty'?c.specMSRP:c.massMSRP;
+    const unitPr=calcUnitPrice(showRetail,c.count,c.size);
+    const landed=c.landedCost||q.landed||'';
+    const fob=c.fobCost||q.fob||'';
+    const ev=si%2===1?'tr-even':'';
+    html+=`<tr class="${ev}">
+      <td class="bold nowrap">${esc(styleNum)}</td>
+      <td class="${q.desc?'qb':''} nowrap">${esc(q.desc)}</td>
+      <td class="center"><input type="checkbox" ${c.finalCosting?'checked':''} onchange="setCosting('${styleNum}','finalCosting',this.checked)" style="cursor:pointer"></td>
+      <td class="center"><input type="checkbox" ${c.addToSales?'checked':''} onchange="setCosting('${styleNum}','addToSales',this.checked)" style="cursor:pointer"></td>
+      <td><input class="inp ${q.supplier&&!c.factory?'qb':''}" type="text" value="${esc(c.factory||q.supplier)}" oninput="setCosting('${styleNum}','factory',this.value)" placeholder="Factory/Supplier" style="min-width:110px"></td>
+      <td><input class="inp ${q.country&&!c.country?'qb':''}" type="text" value="${esc(c.country||q.country)}" oninput="setCosting('${styleNum}','country',this.value)" placeholder="Country" style="min-width:80px"></td>
+      <td><input class="inp" type="number" value="${c.count||sku.count||''}" oninput="setCosting('${styleNum}','count',this.value);recalcCostingRow(this)" style="width:55px;text-align:right"></td>
+      <td><input class="inp" type="number" step="0.1" value="${c.size||sku.size||''}" oninput="setCosting('${styleNum}','size',this.value);recalcCostingRow(this)" style="width:65px;text-align:right"></td>
+      <td><select class="inp" onchange="setCosting('${styleNum}','unit',this.value)" style="width:70px">
+        <option value=""></option>${SIZING_UNITS.map(u=>`<option ${(c.unit||sku.unit)===u?'selected':''}>${u}</option>`).join('')}
+      </select></td>
+      <td><input class="inp" type="text" value="${esc(c.flavor||sku.flavor||q.fragrance)}" oninput="setCosting('${styleNum}','flavor',this.value)" placeholder="Flavor" style="min-width:80px"></td>
+      <td><select class="inp" onchange="setCosting('${styleNum}','labelType',this.value)" style="width:90px">
+        <option value=""></option>${LABEL_TYPES.map(l=>`<option ${c.labelType===l?'selected':''}>${l}</option>`).join('')}
+      </select></td>
+      <td><select class="inp" onchange="setCosting('${styleNum}','packType',this.value)" style="width:90px">
+        <option value=""></option>${PACKAGING_TYPES.map(p=>`<option ${c.packType===p?'selected':''}>${p}</option>`).join('')}
+      </select></td>
+      <td class="right"><input class="inp" type="number" step="0.01" value="${showRetail||''}" oninput="setCosting('${styleNum}',${compare==='Specialty'?`'specMSRP'`:`'massMSRP'`},this.value);recalcCostingRow(this)" placeholder="$0.00" style="width:80px;text-align:right"></td>
+      <td class="cell-calc right nowrap" data-unitpr="${styleNum}">${unitPr}</td>
+      <td><textarea class="inp" oninput="setCosting('${styleNum}','fop',this.value)" rows="1" placeholder="FOP Claims" style="min-width:100px">${esc(c.fop||sku.fop)}</textarea></td>
+      <td><textarea class="inp" oninput="setCosting('${styleNum}','features',this.value)" rows="1" placeholder="Features" style="min-width:110px">${esc(c.features||sku.features)}</textarea></td>
+      <td><input class="inp ${q.moq&&!c.moq?'qb':''}" type="number" value="${c.moq||q.moq||''}" oninput="setCosting('${styleNum}','moq',this.value)" style="width:65px;text-align:right" placeholder="MOQ"></td>
+      <td><input class="inp" type="number" value="${c.moqPkg||''}" oninput="setCosting('${styleNum}','moqPkg',this.value)" style="width:65px;text-align:right" placeholder="Pkg MOQ"></td>
+      <td><input class="inp ${q.leadTime&&!c.leadTime?'qb':''}" type="text" value="${esc(c.leadTime||q.leadTime)}" oninput="setCosting('${styleNum}','leadTime',this.value)" placeholder="days" style="width:65px"></td>
+      <td><input class="inp" type="number" step="0.01" value="${c.moldFee||''}" oninput="setCosting('${styleNum}','moldFee',this.value)" style="width:70px;text-align:right" placeholder="$0.00"></td>
+      <td><input class="inp ${q.fob&&!c.fobCost?'qb':''}" type="number" step="0.01" value="${c.fobCost||q.fob||''}" oninput="setCosting('${styleNum}','fobCost',this.value);recalcCostingRow(this)" style="width:75px;text-align:right" placeholder="$0.00"></td>
+      <td><input class="inp ${q.landed&&!c.landedCost?'qb':''}" type="number" step="0.01" value="${c.landedCost||q.landed||''}" oninput="setCosting('${styleNum}','landedCost',this.value);recalcCostingRow(this)" style="width:75px;text-align:right" placeholder="$0.00"></td>
+      <td class="cell-mass"><input class="inp" type="number" step="0.01" value="${c.massMSRP||''}" oninput="setCosting('${styleNum}','massMSRP',this.value);recalcCostingRow(this)" placeholder="$0.00" style="width:80px;text-align:right"></td>
+      <td class="cell-mass cell-calc right" data-massmu="${styleNum}">${massMU}</td>
+      <td class="cell-spec"><input class="inp" type="number" step="0.01" value="${c.specMSRP||''}" oninput="setCosting('${styleNum}','specMSRP',this.value);recalcCostingRow(this)" placeholder="$0.00" style="width:80px;text-align:right"></td>
+      <td class="cell-spec cell-calc right" data-specmu="${styleNum}">${specMU}</td>
+      <td><textarea class="inp" oninput="setCosting('${styleNum}','comments',this.value)" rows="1" placeholder="Comments" style="min-width:120px">${esc(c.comments)}</textarea></td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div>`;
+
+  // Comp analysis section in costing tab
+  html+=`<div class="sh">Competitor Comparison</div>`;
+  const retailers=getSelectedRetailers();
+  if(!retailers.length){ html+='<div class="alert alert-warn">No retailers selected in Tab 1.</div>'; }
+  else{
+    html+=`<div class="card"><div class="form-grid" style="grid-template-columns:120px 1fr;margin-bottom:8px">
+      <label>View style:</label>
+      <select class="inp" id="costingCompStyle" onchange="renderCostingCompSection()" style="width:140px">
+        <option value="">-- Select --</option>
+        ${getStyleNums().map(n=>`<option>${n}</option>`).join('')}
+      </select></div>
+      <div id="costingCompSection"></div></div>`;
+  }
+  body.innerHTML=html;
+  // Also sync the compare dropdown
+  const dc=document.getElementById('costingCompare'); if(dc&&!dc.value&&S.massOrSpecialty) dc.value=S.massOrSpecialty;
+}
+
+function recalcCostingRow(el){
+  const tr=el.closest('tr');
+  const styleNum=tr.querySelector('.bold.nowrap')?.textContent;
+  if(!styleNum) return;
+  const c=getCosting(styleNum);
+  const compare=document.getElementById('costingCompare').value;
+  const showRetail=compare==='Specialty'?c.specMSRP:c.massMSRP;
+  const unitPr=calcUnitPrice(showRetail,c.count,c.size);
+  const massMU=calcMU(c.massMSRP,c.landedCost||c.fobCost);
+  const specMU=calcMU(c.specMSRP,c.landedCost||c.fobCost);
+  const up=document.querySelector(`[data-unitpr="${styleNum}"]`); if(up) up.textContent=unitPr;
+  const mm=document.querySelector(`[data-massmu="${styleNum}"]`); if(mm) mm.textContent=massMU;
+  const sm=document.querySelector(`[data-specmu="${styleNum}"]`); if(sm) sm.textContent=specMU;
+}
+
+function renderCostingCompSection(){
+  const styleNum=document.getElementById('costingCompStyle')?.value;
+  const sec=document.getElementById('costingCompSection');
+  if(!sec||!styleNum){ if(sec) sec.innerHTML=''; return; }
+  const retailers=getSelectedRetailers();
+  const avgM=calcAvgRetailType(styleNum,'Mass');
+  const avgS=calcAvgRetailType(styleNum,'Specialty');
+  let html=`<div class="comp-avg-bar">
+    <span><strong>Avg MASS:</strong> ${avgM!==null?fmt$(avgM):'--'}</span>
+    <span><strong>Avg SPECIALTY:</strong> ${avgS!==null?fmt$(avgS):'--'}</span>
+  </div><div class="tscroll"><table>
+    <thead><tr><th>Retailer</th><th>Type</th><th>Brand</th><th>Product</th><th>Retail $</th><th>$/Unit</th><th>Rating</th><th>Reviews</th></tr></thead><tbody>`;
+  retailers.forEach((r,ri)=>{
+    const arr=ensureCompData(styleNum,r.name);
+    const rtype=getRetailerType(r.channel);
+    arr.forEach((d,i)=>{
+      if(!d||!d.brand) return;
+      const ev=(ri+i)%2===1?'tr-even':'';
+      html+=`<tr class="${ev}">
+        ${i===0?`<td rowspan="${arr.filter(x=>x&&x.brand).length}" class="bold">${esc(r.name)}</td>`:''}
+        ${i===0?`<td rowspan="${arr.filter(x=>x&&x.brand).length}" class="${rtype==='Mass'?'cell-mass':'cell-spec'} center">${rtype}</td>`:''}
+        <td>${esc(d.brand)}</td><td>${esc(d.product)}</td>
+        <td class="right">${d.price?fmt$(d.price):''}</td>
+        <td class="right cell-calc">${calcUnitPrice(d.price,d.count,d.size)}</td>
+        <td class="center">${renderStars(d.rating)}</td>
+        <td class="right">${d.reviews||''}</td>
+      </tr>`;
+    });
+  });
+  html+=`</tbody></table></div>`;
+  sec.innerHTML=html;
+}
+
+// ==================== TAB 5: SALES OVERVIEW ====================
+function renderSalesOverview(){
+  const body=document.getElementById('salesBody');
+  const styles=getStyleNums().filter(sn=>{ const c=getCosting(sn); return c.addToSales; });
+  if(!styles.length){
+    body.innerHTML='<div class="alert alert-info">No styles marked "Add to Sales Overview" in Tab 4. Check the box there to include styles here.</div>';
+    return;
+  }
+  let html=`<div class="card"><div class="card-title">Sales Overview</div>
+    <div class="alert alert-info" style="margin-bottom:8px">Showing ${styles.length} style(s) flagged for Sales Overview.</div>`;
+  html+=`<div class="tscroll"><table>
+    <thead>
+      <tr>
+        <th>Style #</th>
+        <th>Description - Count - Size - Flavor</th>
+        <th>Label / Packaging</th>
+        <th class="cell-spec">Suggested MSRP<br>SPECIALTY</th>
+        <th class="cell-spec">Main Competitor<br>(Specialty)</th>
+        <th class="cell-mass">Suggested MSRP<br>MASS</th>
+        <th class="cell-mass">Main Competitor<br>(Mass)</th>
+        <th>Justification for Retail</th>
+        <th>Comments from Sales</th>
+      </tr>
+    </thead><tbody>`;
+  styles.forEach((styleNum,si)=>{
+    const st=S.styles.find(s=>s.num===styleNum)||{};
+    const q=st.qb||{};
+    const c=getCosting(styleNum);
+    const sku=getSKU(styleNum);
+    const sd=S.salesData[styleNum]||{};
+    const desc=q.desc||'';
+    const cnt=c.count||sku.count||'';
+    const sz=c.size||sku.size||'';
+    const unit=c.unit||sku.unit||'';
+    const flavor=c.flavor||sku.flavor||q.fragrance||'';
+    const descLine=[desc,cnt&&sz?cnt+(cnt>1?' pcs':' pc')+' / '+sz+' '+unit:'',flavor].filter(Boolean).join(' | ');
+    const labelPkg=[c.labelType,c.packType].filter(Boolean).join(' / ');
+
+    // Best competitor for Mass and Specialty
+    const bestComp=(type)=>{
+      let best=null;
+      getSelectedRetailers().filter(r=>getRetailerType(r.channel)===type).forEach(r=>{
+        const arr=ensureCompData(styleNum,r.name);
+        arr.forEach(d=>{ if(d&&d.brand&&d.product) best=d; });
+      });
+      return best?esc(best.brand)+' &mdash; '+esc(best.product)+(best.price?' ('+fmt$(best.price)+')':''):'&ndash;';
+    };
+
+    const ev=si%2===1?'tr-even':'';
+    html+=`<tr class="${ev}">
+      <td class="bold nowrap">${esc(styleNum)}</td>
+      <td>${esc(descLine)||'<span class="text-muted">--</span>'}</td>
+      <td>${esc(labelPkg)||'<span class="text-muted">--</span>'}</td>
+      <td class="cell-spec right"><input class="inp" type="number" step="0.01" value="${c.specMSRP||''}" oninput="setCosting('${styleNum}','specMSRP',this.value)" placeholder="$0.00" style="width:80px;text-align:right"></td>
+      <td class="cell-spec" style="font-size:10px">${bestComp('Specialty')}</td>
+      <td class="cell-mass right"><input class="inp" type="number" step="0.01" value="${c.massMSRP||''}" oninput="setCosting('${styleNum}','massMSRP',this.value)" placeholder="$0.00" style="width:80px;text-align:right"></td>
+      <td class="cell-mass" style="font-size:10px">${bestComp('Mass')}</td>
+      <td><textarea class="inp" oninput="saveSalesData('${styleNum}','justification',this.value)" rows="2" placeholder="Pricing justification" style="min-width:130px">${esc(sd.justification)}</textarea></td>
+      <td><textarea class="inp" oninput="saveSalesData('${styleNum}','comments',this.value)" rows="2" placeholder="Sales comments" style="min-width:130px">${esc(sd.comments)}</textarea></td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div></div>`;
+  body.innerHTML=html;
+}
+
+function saveSalesData(styleNum,key,val){
+  if(!S.salesData[styleNum]) S.salesData[styleNum]={};
+  S.salesData[styleNum][key]=val;
+  saveState();
+}
+
+// ==================== INIT ====================
+function init(){
+  loadState();
+  updateQBStatus();
+  renderCompetitorChecks();
+  renderTab1Fields();
+  renderCompStyleSelector();
+  // Set initial comp style if styles exist
+  const nums=getStyleNums();
+  if(nums.length){ const sel=document.getElementById('compStyleSel'); if(sel) sel.value=nums[0]; }
+  const hn=S.launchName?'Costing Analysis - '+S.launchName:'Costing Analysis';
+  document.getElementById('headerTitle').textContent=hn;
+  if(S.topBrand) document.getElementById('headerSub').textContent=S.topBrand+(S.petsOrPeople?' | '+S.petsOrPeople:'');
+  if(!S.qbToken) showTokenModal();
+}
+
+// Sync input fields back to state on page events
+document.getElementById('launchName').addEventListener('change',()=>{S.launchName=document.getElementById('launchName').value;saveState();saveAndRefreshHeader();});
+document.getElementById('topBrand').addEventListener('change',()=>{S.topBrand=document.getElementById('topBrand').value;saveState();});
+document.getElementById('petsOrPeople').addEventListener('change',()=>{S.petsOrPeople=document.getElementById('petsOrPeople').value;saveState();});
+document.getElementById('massOrSpecialty').addEventListener('change',()=>{S.massOrSpecialty=document.getElementById('massOrSpecialty').value;saveState();});
+
+init();
+</script>
+</body>
+</html>
