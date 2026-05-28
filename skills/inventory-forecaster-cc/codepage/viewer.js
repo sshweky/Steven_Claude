@@ -5311,18 +5311,23 @@ async function _loadOpenOrderDetails(r, safeId) {
       const cell = document.getElementById('opn-cell-' + safeId + '-' + i);
       if (!cell) continue;
 
-      // Aggregate by customer (a customer may have multiple open POs in the week)
+      // Aggregate by customer — a customer may have multiple open POs in the week
       const custMap = {};
+      let weekTotal = 0;
       for (const e of entries) {
         if (!custMap[e.cust]) custMap[e.cust] = { qty: 0, dates: new Set() };
         custMap[e.cust].qty += e.qty;
         custMap[e.cust].dates.add(e.cancelDate);
+        weekTotal += e.qty;
       }
 
-      const lines = [];
-      for (const [cust, info] of Object.entries(custMap)) {
+      // Header line: total for the week, then one line per customer
+      const lines = [`All customers: ${fmtN(weekTotal)} units`];
+      // Sort by qty descending so largest orders appear first
+      const sorted = Object.entries(custMap).sort((a, b) => b[1].qty - a[1].qty);
+      for (const [cust, info] of sorted) {
         const dateStr = [...info.dates].sort().join(', ');
-        lines.push(`${cust}: ${fmtN(info.qty)} units | cancel ${dateStr}`);
+        lines.push(`  ${cust}  |  ${fmtN(info.qty)} u  |  cancel ${dateStr}`);
       }
       cell.title = lines.join('\n');
       cell.style.cursor = 'help';
