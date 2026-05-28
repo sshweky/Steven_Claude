@@ -5760,6 +5760,25 @@ async function loadCommentHistory(key, force) {
               <div style="font-size:11px;color:#333;white-space:pre-wrap;line-height:1.35;margin-top:3px;">${escHtml(note)}</div>
             </div>`;
         }).join('');
+        // Cache the most-recent manager-side author so addComment() can route
+        // "Planner Response" back to whoever authored the thread (not always Mikey).
+        // "Manager side" = any flag that is NOT Planner Response / FYI / AI training.
+        const _lastMgrRow = [...rows].reverse().find(r => {
+          const _rf = (r[F.FLAG] && r[F.FLAG].value) || '';
+          return _rf !== 'Planner Response' && _rf !== 'FYI' && _rf !== 'AI training';
+        });
+        if (_lastMgrRow) {
+          const _lmrRec = ALL_RECORDS.find(x => x.key === key);
+          if (_lmrRec) {
+            const _lmrAuthTxt  = (_lastMgrRow[F.AUTHOR]      && _lastMgrRow[F.AUTHOR].value)      || '';
+            const _lmrAuthUser = F.AUTHOR_USER && _lastMgrRow[F.AUTHOR_USER] && _lastMgrRow[F.AUTHOR_USER].value;
+            const _lmrAuthUN   = _lmrAuthUser
+              ? ((_lmrAuthUser.name && _lmrAuthUser.name !== 'Unknown') ? _lmrAuthUser.name : (_lmrAuthUser.email || ''))
+              : '';
+            _lmrRec._last_mgr_author       = (_lmrAuthTxt && _lmrAuthTxt !== 'Unknown') ? _lmrAuthTxt : (_lmrAuthUN || _lmrAuthTxt);
+            _lmrRec._last_mgr_author_email = (_lmrAuthUser && _lmrAuthUser.email) || '';
+          }
+        }
         cmtCont.scrollTop = cmtCont.scrollHeight;
       }
     } catch (e) {
@@ -5899,8 +5918,16 @@ async function addComment(key) {
         _sendToText  = (_recForTo && _recForTo.inv_manager)       || 'Planner';
         _sendToEmail = (_recForTo && _recForTo.inv_manager_email) || '';
       } else if (flag === 'Planner Response') {
-        _sendToText  = CFG.MANAGER_NAMES ? CFG.MANAGER_NAMES.join(', ') : 'Director';
-        _sendToEmail = (CFG.MANAGER_NAMES && CFG.MANAGER_EMAILS && CFG.MANAGER_EMAILS[0]) || '';
+        // Route back to the author of the thread being responded to, not always Mikey.
+        // _last_mgr_author is cached by loadCommentHistory() when the panel opens.
+        if (_recForTo && _recForTo._last_mgr_author) {
+          _sendToText  = _recForTo._last_mgr_author;
+          _sendToEmail = _recForTo._last_mgr_author_email || '';
+        } else {
+          // Fallback: comment history not yet loaded, default to primary manager
+          _sendToText  = CFG.MANAGER_NAMES ? CFG.MANAGER_NAMES.join(', ') : 'Director';
+          _sendToEmail = (CFG.MANAGER_NAMES && CFG.MANAGER_EMAILS && CFG.MANAGER_EMAILS[0]) || '';
+        }
       }
       if (_sendToText  && CFG.COMMENT_FID.SEND_TO)      fields[CFG.COMMENT_FID.SEND_TO]      = { value: _sendToText };
       if (_sendToEmail && CFG.COMMENT_FID.SEND_TO_USER) fields[CFG.COMMENT_FID.SEND_TO_USER] = { value: _sendToEmail };
