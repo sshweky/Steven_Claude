@@ -156,7 +156,7 @@ textarea.inp{resize:vertical;min-height:36px}
         <label>Launch Name:</label>
         <input class="inp" type="text" id="launchName" oninput="saveAndRefreshHeader()" placeholder="e.g. Q3 2025 Pet Launch">
         <label>Brand:</label>
-        <input class="inp" type="text" id="topBrand" oninput="saveState()" placeholder="e.g. Fetch, BioSilk">
+        <select class="inp" id="topBrand" onchange="saveState()"><option value="">-- Select Brand --</option></select>
         <label>Pets or People:</label>
         <select class="inp" id="petsOrPeople" onchange="saveState()">
           <option value="">-- Select --</option>
@@ -424,6 +424,7 @@ function saveToken(){
   localStorage.setItem('costingAnalysis_realm', S.qbRealm);
   updateQBStatus();
   hideTokenModal();
+  if(S.qbToken) loadBrands();
 }
 function clearToken(){
   S.qbToken=''; localStorage.removeItem('costingAnalysis_token');
@@ -1057,6 +1058,7 @@ function init(){
   const hn=S.launchName?'Costing Analysis - '+S.launchName:'Costing Analysis';
   document.getElementById('headerTitle').textContent=hn;
   if(S.topBrand) document.getElementById('headerSub').textContent=S.topBrand+(S.petsOrPeople?' | '+S.petsOrPeople:'');
+  if(S.qbToken) loadBrands();
   if(!S.qbToken) showTokenModal();
 }
 
