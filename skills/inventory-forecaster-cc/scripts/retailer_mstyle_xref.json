@@ -1,0 +1,529 @@
+{
+  "_meta": {
+    "description": "Retailer Mstyle Cross-Reference \u2014 maps retailer-reported mstyle to projection mstyle",
+    "last_updated": "2026-05-28",
+    "retailers": {
+      "KOHLS": {
+        "customer_match": "KOHL",
+        "suffix": "KL",
+        "rule": "Kohl's reports POS under base mstyle (e.g. FF10289). Projection uses KL-suffix (FF10289KL). Strip suffix to look up retailer POS."
+      }
+    }
+  },
+  "by_prj_mstyle": {
+    "FF11926KL": "FF11926",
+    "FF11927KL": "FF11927",
+    "FF12302/24KL": "FF12302/24",
+    "FF12655KL": "FF12655",
+    "FF13063KL": "FF13063",
+    "FF13069KL": "FF13069",
+    "FF13115KL": "FF13115",
+    "FF18908/24KL": "FF18908/24",
+    "FF18909/24KL": "FF18909/24",
+    "FF18911/24KL": "FF18911/24",
+    "FF18912/24KL": "FF18912/24",
+    "FF18913KL": "FF18913",
+    "FF18958KL": "FF18958",
+    "FF22070KL": "FF22070",
+    "FF22071KL": "FF22071",
+    "FF22072KL": "FF22072",
+    "FF22317KL": "FF22317",
+    "FF22323KL": "FF22323",
+    "FF25556KL": "FF25556",
+    "FF25667KL": "FF25667",
+    "FF25670KL": "FF25670",
+    "FF25701KL": "FF25701",
+    "FF26777KL": "FF26777",
+    "FF27332KL": "FF27332",
+    "FF30361KL": "FF30361",
+    "FF30363KL": "FF30363",
+    "FF31062KL": "FF31062",
+    "FF33555KL": "FF33555",
+    "FF33559KL": "FF33559",
+    "FF33569KL": "FF33569",
+    "FF33570KL": "FF33570",
+    "FF33571KL": "FF33571",
+    "FF33572KL": "FF33572",
+    "FF35147KL": "FF35147",
+    "FF36356KL": "FF36356",
+    "FF4771KL": "FF4771",
+    "FF4775KL": "FF4775",
+    "FF4936KL": "FF4936",
+    "FF6305KL": "FF6305",
+    "FF7258KL": "FF7258",
+    "FF7267KL": "FF7267",
+    "FF7297KL": "FF7297",
+    "FF7612KL": "FF7612",
+    "FF7613KL": "FF7613",
+    "FF8423KL": "FF8423",
+    "FF8425KL": "FF8425",
+    "FF8831KL": "FF8831",
+    "FF8832KL": "FF8832",
+    "FF8990KL": "FF8990",
+    "FF8991KL": "FF8991",
+    "FF9297/24KL": "FF9297/24"
+  },
+  "by_retailer_mstyle": {
+    "FF11926": "FF11926KL",
+    "FF11927": "FF11927KL",
+    "FF12302/24": "FF12302/24KL",
+    "FF12655": "FF12655KL",
+    "FF13063": "FF13063KL",
+    "FF13069": "FF13069KL",
+    "FF13115": "FF13115KL",
+    "FF18908/24": "FF18908/24KL",
+    "FF18909/24": "FF18909/24KL",
+    "FF18911/24": "FF18911/24KL",
+    "FF18912/24": "FF18912/24KL",
+    "FF18913": "FF18913KL",
+    "FF18958": "FF18958KL",
+    "FF22070": "FF22070KL",
+    "FF22071": "FF22071KL",
+    "FF22072": "FF22072KL",
+    "FF22317": "FF22317KL",
+    "FF22323": "FF22323KL",
+    "FF25556": "FF25556KL",
+    "FF25667": "FF25667KL",
+    "FF25670": "FF25670KL",
+    "FF25701": "FF25701KL",
+    "FF26777": "FF26777KL",
+    "FF27332": "FF27332KL",
+    "FF30361": "FF30361KL",
+    "FF30363": "FF30363KL",
+    "FF31062": "FF31062KL",
+    "FF33555": "FF33555KL",
+    "FF33559": "FF33559KL",
+    "FF33569": "FF33569KL",
+    "FF33570": "FF33570KL",
+    "FF33571": "FF33571KL",
+    "FF33572": "FF33572KL",
+    "FF35147": "FF35147KL",
+    "FF36356": "FF36356KL",
+    "FF4771": "FF4771KL",
+    "FF4775": "FF4775KL",
+    "FF4936": "FF4936KL",
+    "FF6305": "FF6305KL",
+    "FF7258": "FF7258KL",
+    "FF7267": "FF7267KL",
+    "FF7297": "FF7297KL",
+    "FF7612": "FF7612KL",
+    "FF7613": "FF7613KL",
+    "FF8423": "FF8423KL",
+    "FF8425": "FF8425KL",
+    "FF8831": "FF8831KL",
+    "FF8832": "FF8832KL",
+    "FF8990": "FF8990KL",
+    "FF8991": "FF8991KL",
+    "FF9297/24": "FF9297/24KL"
+  },
+  "entries": [
+    {
+      "retailer_mstyle": "FF11926",
+      "prj_mstyle": "FF11926KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF11927",
+      "prj_mstyle": "FF11927KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF12302/24",
+      "prj_mstyle": "FF12302/24KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF12655",
+      "prj_mstyle": "FF12655KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF13063",
+      "prj_mstyle": "FF13063KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF13069",
+      "prj_mstyle": "FF13069KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF13115",
+      "prj_mstyle": "FF13115KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF18908/24",
+      "prj_mstyle": "FF18908/24KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF18909/24",
+      "prj_mstyle": "FF18909/24KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF18911/24",
+      "prj_mstyle": "FF18911/24KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF18912/24",
+      "prj_mstyle": "FF18912/24KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF18913",
+      "prj_mstyle": "FF18913KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF18958",
+      "prj_mstyle": "FF18958KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF22070",
+      "prj_mstyle": "FF22070KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF22071",
+      "prj_mstyle": "FF22071KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF22072",
+      "prj_mstyle": "FF22072KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF22317",
+      "prj_mstyle": "FF22317KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF22323",
+      "prj_mstyle": "FF22323KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF25556",
+      "prj_mstyle": "FF25556KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF25667",
+      "prj_mstyle": "FF25667KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF25670",
+      "prj_mstyle": "FF25670KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF25701",
+      "prj_mstyle": "FF25701KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF26777",
+      "prj_mstyle": "FF26777KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF27332",
+      "prj_mstyle": "FF27332KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF30361",
+      "prj_mstyle": "FF30361KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF30363",
+      "prj_mstyle": "FF30363KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF31062",
+      "prj_mstyle": "FF31062KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF33555",
+      "prj_mstyle": "FF33555KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF33559",
+      "prj_mstyle": "FF33559KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF33569",
+      "prj_mstyle": "FF33569KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF33570",
+      "prj_mstyle": "FF33570KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF33571",
+      "prj_mstyle": "FF33571KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF33572",
+      "prj_mstyle": "FF33572KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF35147",
+      "prj_mstyle": "FF35147KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF36356",
+      "prj_mstyle": "FF36356KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF4771",
+      "prj_mstyle": "FF4771KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF4775",
+      "prj_mstyle": "FF4775KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF4936",
+      "prj_mstyle": "FF4936KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF6305",
+      "prj_mstyle": "FF6305KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF7258",
+      "prj_mstyle": "FF7258KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF7267",
+      "prj_mstyle": "FF7267KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF7297",
+      "prj_mstyle": "FF7297KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF7612",
+      "prj_mstyle": "FF7612KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF7613",
+      "prj_mstyle": "FF7613KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF8423",
+      "prj_mstyle": "FF8423KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF8425",
+      "prj_mstyle": "FF8425KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF8831",
+      "prj_mstyle": "FF8831KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF8832",
+      "prj_mstyle": "FF8832KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF8990",
+      "prj_mstyle": "FF8990KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF8991",
+      "prj_mstyle": "FF8991KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    },
+    {
+      "retailer_mstyle": "FF9297/24",
+      "prj_mstyle": "FF9297/24KL",
+      "retailer_customer": "KOHL'S DEPT STR",
+      "acct": "11169.0",
+      "suffix": "KL",
+      "notes": "Kohls reports POS under base mstyle without KL suffix"
+    }
+  ]
+}
