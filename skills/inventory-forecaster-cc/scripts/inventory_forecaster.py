@@ -5761,13 +5761,15 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
     return adjusted, adjustments, lt_info
 
 
-# F37 v1 body removed 2026-05-26 -- previously located at this line range,
-# replaced by the v2 direct-BegInv function above.  v1 used to read Inv_Wk1..
-# Inv_Wk26 from Projections (stale -- those columns are computed in QB against
-# the PREVIOUS run's AI projection).  v2a (2026-05-26 initial) replaced that
-# with a cascade simulation from Wk1 using AI demand as surrogate -- also wrong
-# because it compounded week-over-week errors.  v2b (2026-05-26 correction)
-# reads QB-formula Beg Inv directly per week from Inventory Flow table.
+# F37 version history:
+#   v1 (removed 2026-05-26): read stale Inv_Wk1..Inv_Wk26 from Projections
+#      (cascaded against the PREVIOUS run's AI projection -- wrong).
+#   v2a (2026-05-26): cascade simulation from Wk1 using AI demand as surrogate
+#      -- also wrong; compounded week-over-week errors.
+#   v2b (2026-05-26): read QB-formula Beg Inv directly per week from Inv Flow;
+#      removed rollforward cohorts (cap-only, unmet demand dropped).
+#   v3 (2026-05-28): restored 4-week / 25%-decay rollforward cohorts (per
+#      planner directive); Beg Inv still read directly from QB formula fields.
 
 
 def detect_iso(history):
