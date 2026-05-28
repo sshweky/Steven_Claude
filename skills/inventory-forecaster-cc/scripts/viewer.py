@@ -2890,7 +2890,12 @@ function toggleDetail(key) {{
   let hdrCells  = '<th class="row-label"></th>';
   let projCells = '<td class="row-label">Projection</td>';
   let aiCells   = `<td class="row-label" style="color:#1565c0;font-weight:600">AI Forecast<br><span style="font-weight:normal;font-size:10px">${{aiMdl}}</span></td>`;
-  let opnCells  = '<td class="row-label" style="color:#6d4c00;font-weight:600">Open Customer POs</td>';
+  // 2026-05-28: Use Cust Open PO Qty# (FID 410) for projections-row open POs.
+  // The hover from Cust Open PO Qty (FID 810) shows individual POs with CXL dates.
+  const _custOpnQty   = r.cust_open_po_qty   || 0;
+  const _custOpnHover = r.cust_open_po_hover  || '';
+  const _opnRowTitle  = _custOpnHover ? ` title="${{_custOpnHover.replace(/"/g,"&quot;")}}"` : '';
+  let opnCells  = `<td class="row-label" style="color:#6d4c00;font-weight:600"${{_opnRowTitle}}>Open Customer POs</td>`;
   let lyOrdCells = '<td class="row-label" style="color:#2e7d32;font-weight:600">Ordered LY</td>';
   let lyShpCells = '<td class="row-label" style="color:#1565c0;font-weight:600">Shipped LY</td>';
   let opnTot = 0, lyOrdTot = 0, lyShpTot = 0;
