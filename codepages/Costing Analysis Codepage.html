@@ -326,7 +326,7 @@ let S = {
   skuData:{}, // {styleNum: [{count,size,unit,flavor,packaging,fop,features,comments}]}
   costingData:{}, // {styleNum: [{finalCosting,addToSales,count,size,unit,flavor,labelType,packType,massMSRP,specMSRP,moqPkg,moldFee,comments}]}
   salesData:{}, // {styleNum:{justification,comments}}
-  qbToken:'', qbRealm:'pim.quickbase.com', qbTempAuth:false
+  qbToken:'b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s', qbRealm:'pim.quickbase.com', qbTempAuth:false
 };
 
 function loadState(){
@@ -1070,7 +1070,7 @@ function saveSalesData(styleNum,key,val){
 async function init(){
   loadState();
   const authed = await tryAutoAuth();
-  if(!authed && !S.qbToken) showTokenModal();
+  // Modal only shown via QB Settings button — token is pre-configured
   updateQBStatus();
   renderCompetitorChecks();
   renderTab1Fields();
