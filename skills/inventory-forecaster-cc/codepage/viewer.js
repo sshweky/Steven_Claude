@@ -4863,6 +4863,12 @@ async function toggleDetail(key) {
           style="background:#c62828;color:#fff;border:none;padding:7px 16px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;">
           Zero Duplicate MAN PRJ Weeks
         </button>
+        <button id="ignore-dup-btn-${_safeKeyForBtn}"
+          onclick="ignoreDupAlert('${r.key.replace(/'/g, "\\'")}', '${_safeKeyForBtn}')"
+          title="Dismiss this alert -- the overlap is intentional (a separate second order is genuinely expected). Re-appears automatically if PO or Manual Projection values change."
+          style="background:#fff;color:#c62828;border:1px solid #c62828;padding:7px 14px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;margin-left:8px;">
+          Ignore
+        </button>
         <span style="font-size:10px;color:#b71c1c;margin-left:10px;">Changes will be staged -- click Save All to write to QB.</span>
       </div>`;
   }
