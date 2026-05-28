@@ -5651,41 +5651,66 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
         "used_default":   _used_lt_default,
     }
 
-    adjusted    = list(fcst)
-    adjustments = []
+    adjusted         = list(fcst)
+    adjustments      = []
+    # Backlog cohorts: list of [value, weeks_remaining].
+    # Each cohort is added to demand in the current week then decayed 25%
+    # (multiplied by 0.75) for the next week.  A cohort expires after it has
+    # been applied for its full weeks_remaining life (max 4 weeks).
+    backlog_cohorts  = []   # [(value, weeks_remaining), ...]
 
     for w in range(min(26, len(fcst))):
-        demand = float(fcst[w])
+        # --- Step 1: consume active backlog cohorts ---
+        # Each cohort contributes its current value to this week's demand,
+        # then decays 25% for next week.  Cohorts at weeks_remaining=1 expire.
+        backlog_demand = 0.0
+        next_cohorts   = []
+        for cohort_val, cohort_wks in backlog_cohorts:
+            backlog_demand += cohort_val
+            if cohort_wks > 1:
+                next_cohorts.append((cohort_val * 0.75, cohort_wks - 1))
+            # cohort_wks == 1 means this is its last week; let it expire
+        backlog_cohorts = next_cohorts
 
-        # Horizon gate: if this week is at or beyond LT+Trans Days, we can
-        # still order from the supplier -- inventory position is irrelevant.
-        # Leave the AI forecast untouched.
+        orig_demand  = float(fcst[w])
+        total_demand = orig_demand + backlog_demand
+
+        # --- Step 2: horizon gate ---
+        # Weeks at or beyond LT+Trans horizon are unconstrained (can still PO).
+        # Backlog demand IS included in unconstrained weeks -- the retailer
+        # re-orders deferred qty regardless of warehouse lead time.
         if (w + 1) >= _lt_trans_weeks:
+            adjusted[w] = int(round(total_demand))
             continue
 
+        # --- Step 3: warehouse capacity cap ---
         # Capacity = QB-formula Beg Inv for this week + receipts - open orders.
-        # BegInv_W[w] comes directly from the Inventory Flow table (QB formula
-        # field) -- NOT simulated/cascaded from the prior week.
-        # Open Orders are committed customer POs that take priority.
-        # Floor at 0: if already oversold to open orders, AI forecast ships 0.
+        # BegInv_W[w] comes directly from Inventory Flow (QB formula field),
+        # NOT simulated from the prior week.
+        # Open Orders are committed customer POs; they take priority.
         beg_inv_w = beg_inv_wks[w]
-        capacity = max(0.0, beg_inv_w + rcv[w] - opn[w])
-
-        # Cap-only model (no rollforward): we ship min(demand, capacity).
-        # Unmet demand is NOT rolled into future weeks -- Amazon will order
-        # less in W and re-order at its normal cadence later.
-        ship = min(demand, capacity)
-
+        capacity  = max(0.0, beg_inv_w + rcv[w] - opn[w])
+        ship      = min(total_demand, capacity)
         adjusted[w] = int(round(ship))
 
-        if adjusted[w] != int(round(demand)):
+        # --- Step 4: rollforward cohort for unmet demand ---
+        # Unmet demand (anything we couldn't ship) creates a new backlog cohort
+        # that decays 25%/week over 4 weeks before expiring.
+        # Ignore sub-unit rounding noise (< 1.0) to avoid trivial cohorts.
+        unmet = total_demand - ship
+        if unmet >= 1.0:
+            backlog_cohorts.append((unmet, 4))
+
+        # Record adjustment whenever the shipped qty differs from the original
+        # AI forecast (either due to cap or due to backlog being added then capped).
+        if adjusted[w] != int(round(orig_demand)):
             adjustments.append({
                 "week":     w + 1,
-                "original": int(round(demand)),
+                "original": int(round(orig_demand)),
+                "backlog":  int(round(backlog_demand)),
                 "adjusted": adjusted[w],
                 "capacity": int(round(capacity)),
-                "beg_inv":  int(round(beg_inv_w)),  # QB Beg Inv used for this week
-                "backlog":  0,   # legacy field, always 0 -- no rollforward
+                "beg_inv":  int(round(beg_inv_w)),
             })
 
     return adjusted, adjustments, lt_info
