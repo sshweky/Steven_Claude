@@ -329,13 +329,15 @@ let S = {
   qbToken:'b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s', qbRealm:'pim.quickbase.com', qbTempAuth:false
 };
 
+const DEFAULT_TOKEN = 'b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s';
 function loadState(){
   try{
     const raw = localStorage.getItem('costingAnalysis_v1');
-    if(raw) S = Object.assign(S, JSON.parse(raw));
+    if(raw){ const parsed=JSON.parse(raw); delete parsed.qbToken; delete parsed.qbRealm; delete parsed.qbTempAuth; delete parsed._brands; S=Object.assign(S,parsed); }
     const tok = localStorage.getItem('costingAnalysis_token');
     if(tok){ S.qbToken=tok; S.qbRealm=localStorage.getItem('costingAnalysis_realm')||'pim.quickbase.com'; }
-  }catch(e){}
+    if(!S.qbToken) S.qbToken=DEFAULT_TOKEN;
+  }catch(e){ S.qbToken=DEFAULT_TOKEN; }
 }
 function saveState(){
   const toSave = Object.assign({}, S);
@@ -365,7 +367,7 @@ async function qbFetch(path, opts={}){
 async function loadBrands(){
   if(!S.qbToken) return;
   try{
-    const body={from:QB_BRANDS_TABLE,select:[6],where:'{64.EX.true}',options:{top:300,sortBy:[{fieldId:6,order:'ASC'}]}};
+    const body={from:QB_BRANDS_TABLE,select:[6],options:{top:300,sortBy:[{fieldId:6,order:'ASC'}]}};
     const data=await qbFetch('/records/query',{method:'POST',body:JSON.stringify(body)});
     S._brands=(data.data||[]).map(r=>((r[6]||{}).value||'')).filter(Boolean).sort();
     renderBrandSelect();
@@ -587,9 +589,9 @@ function renderStylesTable(){
       <td style="min-width:180px">
         <div class="ta-wrap">
           <input class="inp" type="text" id="ta-input-${i}" value="${esc(st.num)}"
-            placeholder="Type style #..." autocomplete="off"
+            placeholder="Type to search styles..." autocomplete="off"
             oninput="onStyleSearch(this,${i})"
-            onfocus="onStyleSearch(this,${i})"
+            onfocus="onStyleFocus(this,${i})"
             onblur="setTimeout(()=>closeTA(${i}),200)"
             style="padding-right:20px">
           <button class="ta-clear ${hasStyle?'visible':''}" id="ta-clear-${i}"
@@ -614,6 +616,13 @@ function renderStylesTable(){
 
 // ---- Typeahead logic ----
 let _taTimer={};
+function onStyleFocus(input,i){
+  if(!input.value.trim()){
+    showTAResults(i,[{label:'Start typing a style number to search...',disabled:true}]);
+  } else {
+    onStyleSearch(input,i);
+  }
+}
 async function onStyleSearch(input,i){
   const q=input.value.trim();
   clearTimeout(_taTimer[i]);
