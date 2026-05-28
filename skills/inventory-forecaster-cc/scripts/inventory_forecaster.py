@@ -1074,34 +1074,36 @@ def _fetch_retailer_pos(rows):
     AMZ_ACCT  = "1864"          # Acct # for Amazon -- excluded
 
     # ── Load retailer mstyle cross-reference ─────────────────────────────────
-    # Some retailers (e.g. Kohl's) report POS under a different mstyle than the
-    # projection uses.  retailer_mstyle_xref.json maps prj_mstyle -> retailer_mstyle
-    # so we query the retailer sales table under the correct mstyle and then remap
-    # the result back to the projection mstyle key.
-    # Format: xref["by_prj_mstyle"] = {"FF10289KL": "FF10289", ...}
-    _xref_path = Path(__file__).parent / "retailer_mstyle_xref.json"
-    _prj_to_rtl = {}   # prj_mstyle -> retailer_mstyle  (e.g. FF10289KL -> FF10289)
-    _rtl_to_prj = {}   # retailer_mstyle -> prj_mstyle  (e.g. FF10289 -> FF10289KL)
+    # Some retailers report POS under a different mstyle than the projection uses.
+    # retailer_mstyle_xref.json maps "ACCT-RETAILER_MSTYLE" -> prj_mstyle (and
+    # reverse), so we query the retailer sales table under the correct mstyle and
+    # remap the result back to the projection mstyle key.
+    # Keys: "11169-FF10289" -> "FF10289KL"  (acct-retailer_ms -> prj_ms)
+    _xref_path    = Path(__file__).parent / "retailer_mstyle_xref.json"
+    _acct_rtl_to_prj = {}   # "ACCT-retailer_ms" -> prj_ms
+    _acct_prj_to_rtl = {}   # "ACCT-prj_ms"      -> retailer_ms
     if _xref_path.exists():
         try:
-            _xref_data  = json.loads(_xref_path.read_text(encoding="utf-8"))
-            _prj_to_rtl = _xref_data.get("by_prj_mstyle", {})
-            _rtl_to_prj = _xref_data.get("by_retailer_mstyle", {})
+            _xref_data       = json.loads(_xref_path.read_text(encoding="utf-8"))
+            _acct_rtl_to_prj = _xref_data.get("by_acct_retailer_mstyle", {})
+            _acct_prj_to_rtl = _xref_data.get("by_acct_prj_mstyle", {})
         except Exception as _xe:
             print(f"      [WARN] retailer_mstyle_xref.json load failed: {_xe}", flush=True)
 
-    # Collect non-Amazon mstyles from the projection rows
+    # Collect non-Amazon mstyles from the projection rows.
+    # Also expand with any xref'd retailer mstyles so we fetch POS correctly.
     non_amz_mstyles = set()
     for row in rows:
         cust = (row.get("Customr_Name") or "").upper()
         if AMAZON_CUST_SUBSTR in cust:
             continue
-        ms = row.get("Mstyle", "")
+        ms   = row.get("Mstyle", "")
+        acct = str(row.get("Acct_", "") or row.get("Acct_Number", "") or "").split(".")[0]
         if ms:
             non_amz_mstyles.add(ms)
-            # If this prj mstyle has a different retailer mstyle (e.g. KL suffix),
-            # also query under the retailer-reported mstyle.
-            rtl_ms = _prj_to_rtl.get(ms)
+            # If this acct+prj_mstyle has a different retailer mstyle, also
+            # query the retailer sales table under that mstyle.
+            rtl_ms = _acct_prj_to_rtl.get(f"{acct}-{ms}")
             if rtl_ms:
                 non_amz_mstyles.add(rtl_ms)
 
@@ -1233,23 +1235,22 @@ def _fetch_retailer_pos(rows):
         }
 
     # ── Remap retailer mstyle keys back to projection mstyle keys ────────────
-    # For xref'd mstyles (e.g. Kohl's FF10289 -> FF10289KL), the result is
-    # currently keyed as "ACCT-FF10289".  The forecaster looks up "ACCT-FF10289KL".
-    # Re-key those entries so the projection mstyle lookup succeeds.
-    if _rtl_to_prj:
+    # For xref'd mstyles (e.g. 11169-FF10289 -> FF10289KL), the result is
+    # keyed as "11169-FF10289" but the forecaster looks up "11169-FF10289KL".
+    # Re-key those entries using the account-aware xref so the lookup succeeds.
+    if _acct_rtl_to_prj:
         remapped = {}
         for am_key, pos_data in result.items():
-            parts   = am_key.split("-", 1)
-            if len(parts) == 2:
-                acct_part, ms_part = parts
-                prj_ms = _rtl_to_prj.get(ms_part)
-                if prj_ms:
-                    new_key = f"{acct_part}-{prj_ms}"
-                    remapped[new_key] = pos_data
-                    print(f"      [xref] retailer POS remapped: {am_key} -> {new_key}",
-                          flush=True)
-                    continue
-            remapped[am_key] = pos_data
+            prj_ms = _acct_rtl_to_prj.get(am_key)
+            if prj_ms:
+                # Rebuild key with projection mstyle: keep acct, replace mstyle
+                acct_part = am_key.split("-", 1)[0]
+                new_key   = f"{acct_part}-{prj_ms}"
+                remapped[new_key] = pos_data
+                print(f"      [xref] retailer POS remapped: {am_key} -> {new_key}",
+                      flush=True)
+            else:
+                remapped[am_key] = pos_data
         result = remapped
 
     # Audit Finding #4 (2026-05-25): surface partial-failure count to caller.
