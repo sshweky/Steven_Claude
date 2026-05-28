@@ -16677,7 +16677,7 @@ def main():
             print(f"      {len(amazon_pos)} mstyles with POS data from pull cache", flush=True)
         else:
             try:
-                amazon_pos = fetch_amazon_pos_qb_rest(amazon_mstyles)
+                amazon_pos = fetch_amazon_daily_metrics_pos(amazon_mstyles)
             except Exception as _p25_err:
                 print(f"      [WARN] Phase 2.5 QB REST fetch failed: {_p25_err}")
                 amazon_pos = {}
