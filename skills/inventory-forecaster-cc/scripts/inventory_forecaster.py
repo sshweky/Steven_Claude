@@ -5698,23 +5698,33 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
 
     adjusted         = list(fcst)
     adjustments      = []
-    # Backlog cohorts: list of [value, weeks_remaining].
-    # Each cohort is added to demand in the current week then decayed 25%
-    # (multiplied by 0.75) for the next week.  A cohort expires after it has
-    # been applied for its full weeks_remaining life (max 4 weeks).
-    backlog_cohorts  = []   # [(value, weeks_remaining), ...]
+    # Backlog cohorts: list of (original_unmet, step).
+    #   original_unmet -- the shortfall qty at the week the cohort was born.
+    #   step           -- which rollforward week this is (1, 2, or 3).
+    #
+    # Contribution schedule (always from original, linear 25% decay each week):
+    #   step=1  W+1: original × 0.75
+    #   step=2  W+2: original × 0.50
+    #   step=3  W+3: original × 0.25
+    #   step=4+    : 0 -- cohort has expired naturally
+    #
+    # "Expire by itself in 4 weeks": the cohort is born in week W and is done
+    # after step=3 (W+3).  No value is carried into W+4 or beyond.
+    backlog_cohorts  = []   # [(original_unmet, step), ...]
 
     for w in range(min(26, len(fcst))):
         # --- Step 1: consume active backlog cohorts ---
-        # Each cohort contributes its current value to this week's demand,
-        # then decays 25% for next week.  Cohorts at weeks_remaining=1 expire.
+        # Each cohort contributes original_unmet × (1 - step×0.25) this week.
+        # A cohort at step=3 is its last application; it expires after.
         backlog_demand = 0.0
         next_cohorts   = []
-        for cohort_val, cohort_wks in backlog_cohorts:
-            backlog_demand += cohort_val
-            if cohort_wks > 1:
-                next_cohorts.append((cohort_val * 0.75, cohort_wks - 1))
-            # cohort_wks == 1 means this is its last week; let it expire
+        for orig_unmet, step in backlog_cohorts:
+            contribution = orig_unmet * (1.0 - step * 0.25)
+            if contribution > 0:
+                backlog_demand += contribution
+            if step < 3:
+                next_cohorts.append((orig_unmet, step + 1))
+            # step == 3 was the last application (0.25×orig); cohort now expired
         backlog_cohorts = next_cohorts
 
         orig_demand  = float(fcst[w])
@@ -5739,12 +5749,12 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None):
         adjusted[w] = int(round(ship))
 
         # --- Step 4: rollforward cohort for unmet demand ---
-        # Unmet demand (anything we couldn't ship) creates a new backlog cohort
-        # that decays 25%/week over 4 weeks before expiring.
-        # Ignore sub-unit rounding noise (< 1.0) to avoid trivial cohorts.
+        # Unmet demand creates a new cohort born at step=1, which will apply
+        # at 75% / 50% / 25% of the original shortfall over the next 3 weeks,
+        # then expire.  Ignore sub-unit noise to avoid trivial cohorts.
         unmet = total_demand - ship
         if unmet >= 1.0:
-            backlog_cohorts.append((unmet, 4))
+            backlog_cohorts.append((unmet, 1))
 
         # Record adjustment whenever the shipped qty differs from the original
         # AI forecast (either due to cap or due to backlog being added then capped).
