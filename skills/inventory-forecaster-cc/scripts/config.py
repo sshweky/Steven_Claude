@@ -110,9 +110,9 @@ QB_BULK_BATCH         = int(os.environ.get("QB_BULK_BATCH", "500"))
 QB_PRJ_SNAPSHOT_TID   = os.environ.get("QB_PRJ_SNAPSHOT_TID",   "bv34wu9ea")
 QB_ACTUALS_WEEKLY_TID = os.environ.get("QB_ACTUALS_WEEKLY_TID", "bv34wwphk")
 
-# PRJ_Snapshot field IDs (FIDs 6-61 as created by create_accuracy_tables.py)
+# PRJ_Snapshot field IDs (FIDs 6-61, table bv34wu9ea, created 2026-05-29)
 PRJ_SNAP_FIDS = {
-    "Snapshot_Key":  6,   # composite merge key: "Key|Snapshot_Date"
+    "Snapshot_Key":  6,   # composite key: "Key|Snapshot_Date"
     "Key":           7,
     "Snapshot_Date": 8,
     "W1_Date":       9,
@@ -132,9 +132,9 @@ PRJ_SNAP_FIDS = {
     "W25_Actual": 60, "W26_Actual": 61,
 }
 
-# Actuals_Weekly field IDs (FIDs 6-9 as created by create_accuracy_tables.py)
+# Actuals_Weekly field IDs (FIDs 6-9, table bv34wwphk, created 2026-05-29)
 ACT_WEEKLY_FIDS = {
-    "Week_Key":  6,   # composite merge key: "Key|Week_Date"
+    "Week_Key":  6,   # composite key: "Key|Week_Date"
     "Key":       7,
     "Week_Date": 8,
     "Ord_Units": 9,
