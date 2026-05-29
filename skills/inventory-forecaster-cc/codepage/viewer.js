@@ -5692,7 +5692,10 @@ async function _loadAmzDcInv(r, safeId) {
     posBulletHtml = '<b>Amazon POS sales:</b> <span style="color:#999;font-style:italic">no consumer sales data</span>';
   } else {
     const posItems = [];
-    if (posLw   > 0) posItems.push(`<b>LW</b> ${fmtPos(posLw)} u${dmUsedParent ? '<sup style="color:#f57f17" title="Inherited from parent mstyle">*</sup>' : ''}`);
+    const _dmInhNote = dmUsedSwFrom
+      ? `<sup style="color:#f57f17" title="Inherited from switchover predecessor: ${dmUsedSwFrom}">*</sup>`
+      : (dmUsedParent ? `<sup style="color:#f57f17" title="Inherited from parent mstyle">*</sup>` : '');
+    if (posLw   > 0) posItems.push(`<b>LW</b> ${fmtPos(posLw)} u${_dmInhNote}`);
     if (posL2w  > 0) posItems.push(`<b>LW-1</b> ${fmtPos(posL2w)} u`);
     if (posL4w  > 0) posItems.push(`<b>L4W avg</b> ${fmtPos(posL4w)} u/wk`);
     if (posL13w > 0) posItems.push(`<b>L13W avg</b> ${fmtPos(posL13w)} u/wk`);
