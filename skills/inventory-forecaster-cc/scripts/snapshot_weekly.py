@@ -125,12 +125,11 @@ _W1_LABEL_RE = re.compile(r"^\s*(\d{2})\s+(\d{2})\s+W(\d+)", re.IGNORECASE)
 
 
 def _parse_w1_date_from_label(label, reference_year=None):
-    """Parse a W1 field label like '05 24 W1' into the nearest past Sunday.
+    """Parse a W1 field label like '05 24 W1' into the week-start Sunday.
 
     The label format produced by the forecaster is 'MM DD W{n}' where MM DD
-    is the Monday start date of week n.  We return the Sunday of that same
-    ISO week (i.e. the week-ending Sunday, which is Monday - 1 day) because
-    the actual orders field (Ord/LW) reflects Sunday-Saturday weeks at P+P.
+    is the Sunday start date of the projection week (P+P weeks run Sun-Sat).
+    The date in the label IS the week start -- return it as-is.
 
     If we cannot parse, returns today.
     """
@@ -141,17 +140,13 @@ def _parse_w1_date_from_label(label, reference_year=None):
         return date.today()
     month, day, _ = int(m.group(1)), int(m.group(2)), int(m.group(3))
     try:
-        # Build the date in the reference year; if it falls in the future,
-        # try prior year (handles Jan/Feb snapshots taken in Dec)
+        # Build the date in the reference year; if it falls more than 7 days
+        # in the future, try prior year (handles Jan/Feb snapshots in Dec)
         candidate = date(reference_year, month, day)
         if candidate > date.today() + timedelta(days=7):
             candidate = date(reference_year - 1, month, day)
-        # Find the Sunday that starts this week (week runs Sun-Sat at P+P)
-        # The label is the Monday of the week; Sunday is Monday - 1.
-        # weekday(): Mon=0, Sun=6
-        days_since_monday = candidate.weekday()  # 0 for Mon
-        sunday = candidate - timedelta(days=days_since_monday + 1)
-        return sunday
+        # The MM DD in the label IS the Sunday start of the week
+        return candidate
     except ValueError:
         return date.today()
 
