@@ -151,6 +151,12 @@ def main():
         "id": 3, "key": r["key"], "cust": r["cust"], "brand": r["brand"], "mstyle": r["mstyle"],
         "model": r["model"], "mp": infer_mp(r["ai"]),
         "comment": "zero out W10 prj as it have open POs add up to similar volume withing 4 weeks",
+        "rule_fn_id": "f94",
+        "params_schema": [
+            {"name": "week_to_zero", "label": "Week to zero (1-indexed)", "type": "number", "default": 10, "min": 1, "max": 26, "step": 1}
+        ],
+        "default_params": {"week_to_zero": 10},
+        "scope_key": "f94",
         "rule_id": "F94-ITEM",
         "rule_title": "Burlington BB21626 W10 zero (item-level via Tell-AI comment)",
         "rule_summary": "Apply via F58 AI Comment: zero W10 for 13640-BB21626. No broad systemic rule -- tested 3 variants across Sparse Intermittent + msty_opn, all WIDENED the gap (over-zeroed legitimate spikes).",
