@@ -115,6 +115,14 @@ def main():
             "id": cid, "key": r["key"], "cust": r["cust"], "brand": r["brand"], "mstyle": r["mstyle"],
             "model": r["model"], "mp": infer_mp(r["ai"]),
             "comment": "Always zero W1,W2,W3 if their open order exist in the same week in account " + r["cust"],
+            "rule_fn_id": "f93",
+            "params_schema": [
+                {"name": "num_weeks", "label": "Weeks from start to evaluate", "type": "number", "default": 3, "min": 1, "max": 8, "step": 1},
+                {"name": "coverage_mode", "label": "Coverage mode", "type": "select", "options": ["greedy", "full", "per_week"], "default": "greedy"},
+                {"name": "per_week_threshold", "label": "Per-week threshold (per_week mode only)", "type": "number", "default": 0.8, "min": 0.1, "max": 1.5, "step": 0.1}
+            ],
+            "default_params": {"num_weeks": 3, "coverage_mode": "greedy", "per_week_threshold": 0.8},
+            "scope_key": "f93",
             "rule_id": "F93",
             "rule_title": "Forward-PO greedy zero W1-W3",
             "rule_summary": "For Seasonal Baseline / Sparse Intermittent non-Amazon: greedy-consume cust_open_po across W1, W2, W3. Zero a week only if remaining PO qty >= AI for that week.",
