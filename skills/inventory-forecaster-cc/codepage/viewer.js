@@ -4349,8 +4349,9 @@ async function toggleDetail(key) {
     let begCells = `<td class="row-label" style="color:#6d4c00;font-weight:600;background:#fffbea" title="Beginning-of-week projected warehouse inventory (QB Inventory Flow, Wk1..Wk26)">Beg Inv</td>`;
     let prjCells = `<td class="row-label" style="color:#2e7d32;font-weight:600;background:#f1f8e9" title="Projected demand this week (QB Inventory Flow, Prj Wk1..Prj Wk26)">Prj Demand</td>`;
     let rcvCells = `<td class="row-label" style="color:#1565c0;font-weight:600;background:#f0f7ff" title="Expected supplier receipts that week (QB Inventory Flow, RcvWk1..RcvWk26)">Expected Receipts</td>`;
-    let opnCells = `<td class="row-label" style="color:#00695c;font-weight:600;background:#e0f2f1" title="Open customer POs (all customers)  -  W1 = past-due (Wk0) + current week (Wk1) combined; W2-W26 = Wk2-Wk26">Open Orders</td>`;
-    let wosCells = `<td class="row-label" style="color:#4a148c;font-weight:600;background:#f8f0fb" title="Weeks of Supply Onhand = Beg Inv / Prj demand">WOS OH</td>`;
+    let opnCells    = `<td class="row-label" style="color:#00695c;font-weight:600;background:#e0f2f1" title="Open customer POs (all customers)  -  W1 = past-due (Wk0) + current week (Wk1) combined; W2-W26 = Wk2-Wk26">Open Orders</td>`;
+    let endInvCells = `<td class="row-label" style="color:#6d4c00;font-weight:600;background:#fff3e0" title="Ending Inventory = Beg Inv + Expected Receipts - Prj Demand">Ending Inv</td>`;
+    let wosCells    = `<td class="row-label" style="color:#4a148c;font-weight:600;background:#f8f0fb" title="Ending Weeks of Supply = Ending Inv / Prj demand this week">Ending WOS OH</td>`;
     let begTot = 0, prjTot = 0, rcvTot = 0, opnTot = 0;
     const _opn = r.inv_flow_opn || null;
     for (let i = 0; i < 26; i++) {
