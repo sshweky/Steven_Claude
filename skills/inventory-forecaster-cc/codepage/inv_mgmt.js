@@ -1185,8 +1185,6 @@ function buildFilterDropdowns() {
 function _chk(id,def){var el=document.getElementById(id);return el?el.checked:(def===undefined?false:def);}
 function _filterRecords(skipPri) {
   var q=(document.getElementById('searchInput')||{value:''}).value.toLowerCase().trim();
-  var gaps=_chk('gapsOnly',false);
-  var over=_chk('overstockOnly',false);
   var hideInactive=_chk('hideInactive',true);
   var activeCols=[];
   Object.keys(colFilters).forEach(function(cid){var c=COLS.find(function(x){return x.id===cid;});if(c)activeCols.push({c:c,needle:colFilters[cid].toLowerCase()});});
