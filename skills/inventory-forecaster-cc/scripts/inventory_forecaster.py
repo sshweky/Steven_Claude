@@ -5774,6 +5774,12 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None,
                 _was_constrained = False
                 continue
 
+            # DATA_GAP: W1 beg_inv is a null/zero fetch failure, not genuine OOS.
+            # Pass the forecast through unchanged; do not constrain demand.
+            if w in _data_gap_weeks:
+                adjusted[w] = int(round(orig_demand))
+                continue
+
             beg_inv_w = beg_inv_wks[w]
             capacity  = max(0.0, beg_inv_w + rcv[w] - opn[w])
 
