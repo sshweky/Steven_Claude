@@ -1,8 +1,8 @@
 {
   "_meta": {
     "description": "Retailer Mstyle Cross-Reference -- maps retailer-reported mstyle to projection mstyle, keyed by acct#",
-    "last_updated": "2026-05-28",
-    "total_entries": 63,
+    "last_updated": "2026-05-29",
+    "total_entries": 66,
     "lookup_key": "ACCT-RETAILER_MSTYLE (e.g. 11169-FF10289)"
   },
   "by_acct_retailer_mstyle": {
