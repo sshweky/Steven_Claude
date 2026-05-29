@@ -11918,6 +11918,15 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 f"({_f37_lt_info['lt_trans_weeks']}wks). "
                 f"Planner must verify supplier lead time in Inventory Flow."
             )
+        if isinstance(meta, dict) and _f37_lt_info.get("w1_data_gap"):
+            # W1 beg_inv was zero but W2+ shows stock -> likely a null QB value.
+            # F37 bypassed W1 constraint; log for planner visibility.
+            _ms_dg = row.get("Mstyle") or row.get("Acct_MStyle_Key_") or "?"
+            meta.setdefault("drivers", []).append(
+                f"[WARN] F37: W1 beg_inv=0 but W2 inventory present -- null data "
+                f"detected for mstyle={_ms_dg!r}; W1 inventory constraint bypassed "
+                f"(demand passed through unchanged). Verify Inventory Flow data."
+            )
         if _f37_adjustments:
             # Snap to master pack to keep ship qty consistent with cadence
             fcst = [int(round(v / mp)) * int(mp) if v > 0 and mp > 0 else int(v)
