@@ -155,7 +155,7 @@ var IF_RCV = [28,35,36,50,51,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,
 var IF_PRJ = [146,147,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173];
 var IF_ATS = [716,717,718,719,720,715,722,723,724,725,726,727,728,729,730,731,902,903,904,905,906,907,908,909,910,911];
 
-var PRJ_F = { Mstyle:196, CustName:376, StatusCust:10, PTItemStatus:374, Brand:398, Description:399, AcctMStyleKey:292, POGEndDate:1595 };
+var PRJ_F = { Mstyle:196, CustName:874, StatusCust:10, PTItemStatus:374, Brand:197, Description:205, AcctMStyleKey:292, POGEndDate:1595 };
 var PRJ_MANUAL = [22,25,28,31,34,37,40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97];
 
 // Orders and Shipments (bphc3vs5h) -- for Open Customer PO per-week data + hover
