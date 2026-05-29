@@ -455,8 +455,8 @@ async function _fetchDailyMetricsPOS(mstyle) {
   // Fetch 13 full Sun-Sat weeks + 1 extra day buffer
   const WEEKS = 13;
   const startDate = new Date(W1_DATE.getTime() - (WEEKS * 7 + 1) * 86400000);
-  const endDate   = new Date(W1_DATE.getTime() - 1);  // day before forecast W1
-  const _iso = d => d.toISOString().slice(0, 10);
+  // _qbDate: QB REST date filters require MM-DD-YYYY format (not ISO YYYY-MM-DD)
+  const _qbDate = d => { const s = d.toISOString().slice(0, 10); return `${s.slice(5,7)}-${s.slice(8,10)}-${s.slice(0,4)}`; };
   const escMs = mstyle.replace(/'/g, "''");
 
   const selectFids = [_DM_DATE_FID, _DM_UNITS_FID];
@@ -466,9 +466,11 @@ async function _fetchDailyMetricsPOS(mstyle) {
     const resp = await qb('/records/query', {
       from:    tid,
       select:  selectFids,
+      // BF (Before) excludes W1_DATE itself so the current partial week is not included.
+      // OAF (On or After) includes the start Sunday.  Both use QB MM-DD-YYYY format.
       where:   `{${_DM_MSTYLE_FID}.EX.'${escMs}'}` +
-               `AND{${_DM_DATE_FID}.OAF.'${_iso(startDate)}'}` +
-               `AND{${_DM_DATE_FID}.OBF.'${_iso(endDate)}'}`,
+               `AND{${_DM_DATE_FID}.OAF.'${_qbDate(startDate)}'}` +
+               `AND{${_DM_DATE_FID}.BF.'${_qbDate(W1_DATE)}'}`,
       options: { skip: 0, top: 2000 },
     });
 
