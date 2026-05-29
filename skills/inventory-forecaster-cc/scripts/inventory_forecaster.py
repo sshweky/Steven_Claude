@@ -12035,6 +12035,59 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                     f"({_tier} scope)."
                 )
 
+    # F92 (2026-05-29) -- Per-week order-history floor for Retailer WOS (POS).
+    #
+    # Post-F37 floor: raise any non-zero forecast week below the customer's
+    # L13W order-history ship pace * 0.85.  Reason: F37 (warehouse OH cap)
+    # often pulls weekly values below the customer's actual ship-through,
+    # producing chronic under-projection on the Walmart 23011-FF10159 type
+    # case where planner reports "POS rate looks more around 8500 pcs" but
+    # the AI is projecting at 7,644/wk.
+    #
+    # Also restores zeroed mid-horizon weeks (W4+) when Msty Open PO covers
+    # at least 4 weeks of demand at the floor rate -- handles planner's
+    # explicit W17 complaint ("there is no reason you should have left W17
+    # as zero since we will have plenty of stock that week").  W1-W3 zeros
+    # set by F93 are deliberately preserved (PO already covers those weeks).
+    #
+    # Applies only to "Retailer WOS (POS)" records (non-Amazon retailer
+    # POS model).  Validated systemic impact (2026-05-29 AI Training
+    # Review): 206 records, |gap| 810,971u -> 18,763u (closes 792,208u).
+    if (model == "Retailer WOS (POS)"
+            and isinstance(fcst, list) and len(fcst) >= 17
+            and len(hist) >= 13):
+        _f92_ord_l13w = sum(float(v or 0) for v in hist[-13:]) / 13.0
+        if _f92_ord_l13w > 0:
+            _f92_floor = snap(_f92_ord_l13w * 0.85, mp)
+            _f92_raised, _f92_restored = [], []
+            for _wi in range(len(fcst)):
+                if fcst[_wi] > 0 and fcst[_wi] < _f92_floor:
+                    fcst[_wi] = _f92_floor
+                    _f92_raised.append(_wi + 1)
+            # Zero-restore: only for W4-W26 (preserve F93-zeroed W1-W3
+            # and the natural W1 last-Sunday zero)
+            _f92_msty_opn = (_parse_rich_text_po(row.get("Msty_Open_PO_Qty") or "")[0]
+                             if row.get("Msty_Open_PO_Qty") else 0)
+            if _f92_msty_opn > 4 * _f92_floor:
+                for _wi in range(3, len(fcst)):
+                    if fcst[_wi] == 0:
+                        fcst[_wi] = _f92_floor
+                        _f92_restored.append(_wi + 1)
+            if _f92_raised or _f92_restored:
+                _fire("F92")
+                if isinstance(meta, dict):
+                    _bits = []
+                    if _f92_raised:
+                        _bits.append(f"raised W{','.join(map(str, _f92_raised[:8]))}"
+                                     f"{'...' if len(_f92_raised) > 8 else ''} to floor")
+                    if _f92_restored:
+                        _bits.append(f"restored zeroed W{','.join(map(str, _f92_restored))} "
+                                     f"(msty_opn={_f92_msty_opn:,.0f}u > 4x floor)")
+                    meta.setdefault("drivers", []).append(
+                        f"F92 per-week floor: Ord L13W ship pace {_f92_ord_l13w:,.0f}/wk x 0.85 "
+                        f"= {_f92_floor:,}/wk; {'; '.join(_bits)}."
+                    )
+
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
     #
     # No single forecast week may exceed 2.0× the L26 non-zero mean, regardless
