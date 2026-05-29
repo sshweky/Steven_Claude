@@ -6029,8 +6029,11 @@ async function _loadRtlPos(r, safeId) {
   if (rtlPosL13w > 0) posItems.push(`<b>L13W avg</b> ${fmtPos(rtlPosL13w)} u/wk`);
   if (rtlPosL26w > 0) posItems.push(`<b>L26W avg</b> ${fmtPos(rtlPosL26w)} u/wk`);
   if (rtlPosL52w > 0) posItems.push(`<b>L52W avg</b> ${fmtPos(rtlPosL52w)} u/wk`);
+  const _xrefNote = rtlXrefMstyle
+    ? ` <span style="font-weight:400;color:#f57f17;font-size:10px" title="Retailer reports POS under ${rtlXrefMstyle}">(rpt as ${rtlXrefMstyle})</span>`
+    : '';
   const rtlPosBulletHtml = posItems.length
-    ? '<b>' + custName + ' POS sales:</b> ' + posItems.join(sep)
+    ? '<b>' + custName + ' POS sales:</b> ' + posItems.join(sep) + _xrefNote
     : '<b>' + custName + ' POS sales:</b> <span style="color:#999;font-style:italic">no POS data</span>';
 
   // -- Bullet 2: Customer inventory + OH WOS --------------------------------
