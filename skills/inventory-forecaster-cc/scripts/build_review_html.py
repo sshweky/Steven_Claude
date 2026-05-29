@@ -285,6 +285,15 @@ function fmt(n) {
   return (n >= 0 ? '+' : '-') + Math.abs(Math.round(n)).toLocaleString();
 }
 function fmtSimple(n) { return Math.round(n).toLocaleString(); }
+function fmtPct(gap, man) {
+  if (!man || man === 0) return 'n/a';
+  const pct = (gap / man) * 100;
+  return (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+}
+function fmtPctAbs(gap, man) {
+  if (!man || man === 0) return 'n/a';
+  return (Math.abs(gap) / man * 100).toFixed(1) + '%';
+}
 
 function renderProposal(p) {
   const card = document.createElement('div');
