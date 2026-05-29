@@ -663,7 +663,13 @@ function saveAll() {
     generated_at: new Date().toISOString(),
     decisions: STATE.decisions,
     modifications: STATE.modifications,
-    proposals: PROPOSALS.map(p => ({id:p.id, key:p.key, rule_id:p.rule_id, rule_title:p.rule_title}))
+    final_params: STATE.params,
+    final_state: PROPOSALS.map(p => ({
+      id: p.id, key: p.key, rule_id: p.rule_id, rule_title: p.rule_title,
+      item_ai_after: p.item_ai_after, item_gap_after: p.item_gap_after,
+      sys_gap_after: p.sys_gap_after, sys_closed_abs: p.sys_closed_abs,
+      ai_new: p.ai_new,
+    })),
   };
   const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
