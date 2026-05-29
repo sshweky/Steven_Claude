@@ -555,11 +555,12 @@ Location:  ${p.rule_loc}</span>
   - 'zero W1 through W4 instead of W1-W3'
   - 'skip off-price accounts like Burlington'
   - 'do not apply this rule to owned brands'"></textarea>
-      <div style="margin-top:8px;display:flex;gap:8px;">
-        <button class="btn modify" onclick="saveModify(${p.id})">Save Modification</button>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+        <button class="btn modify" onclick="previewUpdate(${p.id})">Preview Update</button>
         <button class="btn reject" onclick="cancelModify(${p.id})">Cancel</button>
+        <span id="preview-status-${p.id}" style="font-size:12px;color:#6b7280;"></span>
       </div>
-      <div class="help-text" style="margin-top:8px">When you commit, I will parse your text, recompute the impact, and show you the new chart + before/after numbers BEFORE any code edit is applied. If my interpretation is off, you can correct it before approving.</div>
+      <div class="help-text" style="margin-top:8px">Click <b>Preview Update</b>, then switch to Claude Code and press Enter. I will interpret your text, recompute the chart + impact, and refresh this card. The card stays PENDING -- once you see the updated recommendation, use the card's Approve / Reject button to decide.</div>
     </div>
   `;
   return card;
