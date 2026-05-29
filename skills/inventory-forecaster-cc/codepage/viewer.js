@@ -8757,52 +8757,103 @@ async function npmDivChanged() {
   _NPM.selectedAcct = null;
   _NPM.selectedMstyle = '';
   _NPM.selectedMstyleDesc = '';
+  _NPM.accts = [];
 
-  const acctSel    = document.getElementById('npm-acct');
+  const acctInp    = document.getElementById('npm-acct-input');
   const mstyleInp  = document.getElementById('npm-mstyle-input');
   const loadingEl  = document.getElementById('npm-acct-loading');
 
   // Reset downstream controls
-  acctSel.innerHTML = '<option value="">-- loading... --</option>';
-  acctSel.disabled  = true;
-  mstyleInp.value   = '';
-  mstyleInp.disabled = true;
+  acctInp.value       = '';
+  acctInp.disabled    = true;
+  acctInp.placeholder = div ? 'Loading...' : '-- select division first --';
+  document.getElementById('npm-acct-hidden').value = '';
+  _npmHideAcctList();
+  mstyleInp.value       = '';
+  mstyleInp.disabled    = true;
   mstyleInp.placeholder = 'Type to search mstyle...';
   document.getElementById('npm-mstyle-hidden').value = '';
   document.getElementById('npm-mstyle-desc').textContent = '';
   _npmHideStylesList();
   document.getElementById('npm-status').textContent = '';
 
-  if (!div) {
-    acctSel.innerHTML = '<option value="">-- select division first --</option>';
-    return;
-  }
+  if (!div) return;
 
   try {
     loadingEl.style.display = '';
     const accounts = await _npmFetchAccounts(div);
     loadingEl.style.display = 'none';
-    acctSel.innerHTML = '<option value="">-- select account --</option>'
-      + accounts.map(a =>
-          `<option value="${a.acct}" data-name="${(a.name||'').replace(/"/g,'&quot;')}">${a.acct} - ${a.name}</option>`
-        ).join('');
-    acctSel.disabled   = false;
-    mstyleInp.disabled = false;
+    _NPM.accts = accounts;
+    acctInp.disabled    = false;
+    acctInp.placeholder = `Type acct # or name to search...`;
+    mstyleInp.disabled  = false;
     mstyleInp.placeholder = `Search ${div} mstyle...`;
   } catch (e) {
     loadingEl.style.display = 'none';
-    acctSel.innerHTML = '<option value="">-- error loading --</option>';
     console.error('[NewPrj] fetchAccounts error:', e);
     document.getElementById('npm-status').textContent = 'Failed to load accounts: ' + (e.message || 'error');
   }
 }
 
-function npmAcctChanged() {
-  const sel = document.getElementById('npm-acct');
-  const opt = sel.selectedOptions && sel.selectedOptions[0];
-  if (!sel.value || !opt) { _NPM.selectedAcct = null; return; }
-  _NPM.selectedAcct = { acct: Number(sel.value), name: (opt.dataset && opt.dataset.name) || '' };
+// -- Customer typeahead -------------------------------------------------------
+let _npmAcctTimer = null;
+function npmAcctInput() {
+  // Clear confirmed selection
+  document.getElementById('npm-acct-hidden').value = '';
+  _NPM.selectedAcct = null;
+  clearTimeout(_npmAcctTimer);
+  const q = (document.getElementById('npm-acct-input').value || '').trim().toLowerCase();
+  if (!q) { _npmHideAcctList(); return; }
+  _npmAcctTimer = setTimeout(() => _npmShowFilteredAccts(q), 120);
+}
+
+function npmAcctFocus() {
+  const q = (document.getElementById('npm-acct-input').value || '').trim().toLowerCase();
+  if (q && !_NPM.selectedAcct) _npmShowFilteredAccts(q);
+}
+
+function npmAcctBlur() {
+  setTimeout(_npmHideAcctList, 220);
+}
+
+function _npmShowFilteredAccts(q) {
+  const listEl = document.getElementById('npm-acct-list');
+  if (!listEl) return;
+  const matches = (_NPM.accts || []).filter(a =>
+    String(a.acct).includes(q) || a.name.toLowerCase().includes(q)
+  ).slice(0, 60);
+  if (!matches.length) {
+    listEl.innerHTML = '<div style="padding:8px 12px;color:#999;font-size:12px;">No accounts match "' + q + '"</div>';
+  } else {
+    listEl.innerHTML = matches.map(a => {
+      const label = `${a.acct} - ${a.name}`;
+      const acctSafe = String(a.acct).replace(/'/g, "\\'");
+      const nameSafe = a.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      return `<div
+        onmousedown="_npmAcctSelect(${a.acct},'${nameSafe}');event.preventDefault();"
+        style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;display:flex;gap:8px;"
+        onmouseover="this.style.background='#e3f2fd'" onmouseout="this.style.background=''">
+        <span style="font-weight:700;color:#1a1a2e;white-space:nowrap;">${a.acct}</span>
+        <span style="color:#555;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name}</span>
+      </div>`;
+    }).join('');
+  }
+  listEl.style.display = '';
+}
+
+function _npmAcctSelect(acct, name) {
+  _NPM.selectedAcct = { acct: Number(acct), name };
+  document.getElementById('npm-acct-input').value  = `${acct} - ${name}`;
+  document.getElementById('npm-acct-hidden').value = String(acct);
+  _npmHideAcctList();
   document.getElementById('npm-status').textContent = '';
+  // Move focus to mstyle
+  setTimeout(() => document.getElementById('npm-mstyle-input').focus(), 40);
+}
+
+function _npmHideAcctList() {
+  const el = document.getElementById('npm-acct-list');
+  if (el) { el.style.display = 'none'; el.innerHTML = ''; }
 }
 
 async function _npmFetchAccounts(div) {
