@@ -8705,14 +8705,17 @@ function _npmInit() {
           </select>
         </div>
 
-        <!-- Customer Account -->
-        <div>
+        <!-- Customer Account -- incremental search typeahead -->
+        <div style="position:relative;">
           <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Customer Account</label>
-          <select id="npm-acct" onchange="npmAcctChanged()" disabled
-            style="width:100%;padding:9px 11px;border:1px solid #ccc;border-radius:5px;font-size:14px;background:#fff;cursor:pointer;">
-            <option value="">-- select division first --</option>
-          </select>
+          <input id="npm-acct-input" type="text" placeholder="-- select division first --" autocomplete="off" disabled
+            oninput="npmAcctInput()" onfocus="npmAcctFocus()" onblur="npmAcctBlur()"
+            style="width:100%;padding:9px 11px;border:1px solid #ccc;border-radius:5px;font-size:14px;box-sizing:border-box;">
+          <input id="npm-acct-hidden" type="hidden" value="">
           <div id="npm-acct-loading" style="font-size:11px;color:#888;margin-top:4px;display:none;">Loading accounts...</div>
+          <div id="npm-acct-list"
+            style="display:none;position:absolute;top:calc(100% - 2px);left:0;right:0;background:#fff;border:1px solid #bbb;border-top:none;border-radius:0 0 5px 5px;max-height:230px;overflow-y:auto;z-index:5100;box-shadow:0 6px 14px rgba(0,0,0,0.13);">
+          </div>
         </div>
 
         <!-- MStyle typeahead -->
@@ -8738,7 +8741,7 @@ function _npmInit() {
         </button>
         <button id="npm-save-btn" onclick="npmSave()"
           style="padding:9px 26px;background:#1565c0;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:14px;font-weight:700;">
-          Save Projection
+          Create Projection
         </button>
       </div>
     </div>`;
