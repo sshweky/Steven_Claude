@@ -5488,6 +5488,11 @@ async function _loadAmzDcInv(r, safeId) {
       const bareBase = baseMstyle.replace(/\/\d+$/, '');
       if (bareBase !== baseMstyle && !tryMstyles.includes(bareBase)) tryMstyles.push(bareBase);
     }
+    // Switchover fallback: if this style replaced an old mstyle, inherit catalog POS from it
+    if (swFrom && !tryMstyles.includes(swFrom)) {
+      tryMstyles.push(swFrom);
+      if (swFromStripped && swFromStripped !== swFrom && !tryMstyles.includes(swFromStripped)) tryMstyles.push(swFromStripped);
+    }
 
     let row = null;
     for (const ms of tryMstyles) {
