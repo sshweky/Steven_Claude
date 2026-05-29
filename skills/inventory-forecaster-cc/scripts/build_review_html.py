@@ -560,7 +560,7 @@ Location:  ${p.rule_loc}</span>
         <button class="btn reject" onclick="cancelModify(${p.id})">Cancel</button>
         <span id="preview-status-${p.id}" style="font-size:12px;color:#6b7280;"></span>
       </div>
-      <div class="help-text" style="margin-top:8px">Click <b>Preview Update</b>, then switch to Claude Code and press Enter. I will interpret your text, recompute the chart + impact, and refresh this card. The card stays PENDING -- once you see the updated recommendation, use the card's Approve / Reject button to decide.</div>
+      <div class="help-text" style="margin-top:8px">Click <b>Preview Update</b>. The local preview server interprets your text, recomputes the chart + impact, and refreshes this card instantly. Card stays PENDING -- review the updated chart, then use Approve / Reject on the card.</div>
     </div>
   `;
   return card;
