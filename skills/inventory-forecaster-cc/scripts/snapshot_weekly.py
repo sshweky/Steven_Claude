@@ -505,7 +505,7 @@ def _check_config():
 # Main entry point
 # ---------------------------------------------------------------------------
 
-def run(dry_run=False):
+def run(dry_run=False, force=False):
     print("=" * 72)
     print("snapshot_weekly.py -- Weekly Projection Snapshot")
     print(f"Run date: {date.today().isoformat()}")
