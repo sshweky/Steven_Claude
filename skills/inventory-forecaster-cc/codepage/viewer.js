@@ -9532,9 +9532,23 @@ function _updateStickyHeights() {
   root.setProperty('--topbar-h', th + 'px');
   root.setProperty('--frozen-h', (th + tbh) + 'px');
 
-  // Keep the spacer that reserves space below the fixed topbar in sync.
-  const spacer = document.getElementById('topbar-spacer');
-  if (spacer) spacer.style.height = th + 'px';
+  // Pin the subbanner immediately below the topbar.  We set position:fixed and
+  // top dynamically here so the subbanner correctly tracks the actual topbar
+  // height even when the topbar flex-wraps to multiple rows on narrow viewports.
+  const spacer    = document.getElementById('topbar-spacer');
+  const subbanner = document.getElementById('subbanner');
+  if (subbanner) {
+    subbanner.style.position = 'fixed';
+    subbanner.style.top      = th + 'px';
+    subbanner.style.left     = '0';
+    subbanner.style.right    = '0';
+    subbanner.style.zIndex   = '299';
+    subbanner.style.width    = '100%';
+    const sbh = subbanner.offsetHeight;
+    if (spacer) spacer.style.height = (th + sbh) + 'px';
+  } else {
+    if (spacer) spacer.style.height = th + 'px';
+  }
 
   // Measure the sortable header row so the filter row sticks exactly beneath it.
   const headerRow = document.querySelector('thead tr:first-child');
