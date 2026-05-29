@@ -370,7 +370,7 @@ function wkIdxForDate(today, dt) {
 // -- State ---------------------------------------------------------------------
 var ALL = [], FILTERED = [];
 var currentSort = { id: null, dir: 1 };
-var DEFAULT_SORT_CHAIN = ['inv_manager','brand','mstyle'];
+var DEFAULT_SORT_CHAIN = ['brand','mstyle'];
 var colFilters = {};
 var currentPage = 0;
 var PAGE_SIZE   = 100;
