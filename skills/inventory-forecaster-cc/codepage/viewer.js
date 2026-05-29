@@ -5571,10 +5571,21 @@ async function _loadAmzDcInv(r, safeId) {
   }
 
   // ── Daily Metrics POS + OH weekly history (brgxdpadi) ────────────────────
+  // EC/COS parent fallback: Daily Metrics rows are keyed by the base mstyle
+  // (e.g. FF9298), not the EC variant (FF9298EC).  If the exact lookup returns
+  // null, retry with the parent mstyle so EC variants inherit POS history.
   let dmWeeks = null;
+  let dmUsedParent = false;
   if (CFG.DAILY_METRICS_TID) {
     try {
-      const dmPos = await _fetchDailyMetricsPOS(mstyle);
+      let dmPos = await _fetchDailyMetricsPOS(mstyle);
+      if (!dmPos) {
+        const _dmParent = mstyle.replace(/(EC|COS|AMZ)$/i, '');
+        if (_dmParent !== mstyle) {
+          dmPos = await _fetchDailyMetricsPOS(_dmParent);
+          if (dmPos) dmUsedParent = true;
+        }
+      }
       if (dmPos) {
         posLw   = dmPos.l1w;
         posL2w  = dmPos.l2w;
