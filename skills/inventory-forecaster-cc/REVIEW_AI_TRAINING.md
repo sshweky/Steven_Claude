@@ -51,9 +51,25 @@ directional-guard version per the training script's REJECTED block.
    ]
    ```
 
-4. **Filter out REJECTED entries** unless the training MD provided a
-   replacement directional-guard version inside the same block. Only
-   VALIDATED and ISOLATED proposals get presented.
+4. **Handling each systemic_status:**
+   - **VALIDATED**: present as-is (script already proved it narrows the gap)
+   - **ISOLATED**: present as-is with the item-level fix
+   - **NEUTRAL**: do NOT show the script's generic "investigate" stub.
+     SYNTHESIZE a concrete model-change recommendation from the comment
+     text + per-item data (AI weekly, MAN weekly, L13W history, open POs,
+     master pack, model). The synthesized rec must include: exact code
+     location, criterion, per-week math, and a computed impact that
+     narrows MAN-AI for the affected items. Per Steven's hard rule, do
+     not present a NEUTRAL as-is -- always upgrade it to actionable.
+   - **REJECTED**: skip unless the training MD provided a replacement
+     directional-guard version inside the same block.
+
+5. **One COMMENT at a time, not one proposal-group.** Steven's design is
+   per-comment. If 4 comments share the same recommendation pattern,
+   walk through 4 individual steps -- but on later items, you may write
+   "(same recommendation as comment #X, applied to this item)" and just
+   show the per-item chart + gap. The user still gets Approve / Reject /
+   Modify for each item individually.
 
 5. Load supporting data:
    - `forecast_results.json` -- current AI 26-week values per key
