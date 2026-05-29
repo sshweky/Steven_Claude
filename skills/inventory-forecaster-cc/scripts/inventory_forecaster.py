@@ -9258,8 +9258,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                                 amazon_catalog_us=amazon_catalog_us,
                                 ats_hist_l26=ats_hist,
                                 retailer_pos=retailer_pos,
-                                retailer_pos_accts=retailer_pos_accts,
-                                meta=meta)
+                                retailer_pos_accts=retailer_pos_accts)
     mp               = _sig["mp"]
     hist             = _sig["hist"]
     cust_name        = _sig["cust_name"]
