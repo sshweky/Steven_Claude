@@ -401,11 +401,19 @@ def build_actuals_rows(records, fids, w1_date):
 
 
 # ---------------------------------------------------------------------------
-# QB batch upsert
+# QB batch insert (plain -- no mergeFieldId)
 # ---------------------------------------------------------------------------
+# QB REST API mergeFieldId only works against the table's built-in key field
+# (Record ID# = FID 3).  Our custom Snapshot_Key / Week_Key text fields cannot
+# be used as mergeFieldId.
+#
+# Each weekly snapshot produces brand-new (Key, Snapshot_Date) combinations,
+# so plain INSERT is correct and safe.  We add a same-day duplicate guard in
+# run() to prevent duplicates when the job is re-run on the same day.
 
-def _upsert_batch(table_id, rows, merge_fid, dry_run=False):
-    """POST up to QB_BULK_BATCH rows at a time.  Returns total upserted count."""
+def _insert_batch(table_id, rows, dry_run=False):
+    """POST up to QB_BULK_BATCH rows at a time as plain INSERTs.
+    Returns (total_inserted, errors)."""
     batch_size = config.QB_BULK_BATCH  # 500
     total = 0
     errors = []
@@ -413,15 +421,14 @@ def _upsert_batch(table_id, rows, merge_fid, dry_run=False):
     for start in range(0, len(rows), batch_size):
         chunk = rows[start : start + batch_size]
         if dry_run:
-            print(f"  [DRY-RUN] Would upsert {len(chunk)} rows to {table_id} "
-                  f"(merge FID {merge_fid})  batch {start//batch_size + 1}")
+            print(f"  [DRY-RUN] Would insert {len(chunk)} rows to {table_id}  "
+                  f"batch {start//batch_size + 1}")
             total += len(chunk)
             continue
 
         payload = {
-            "to":            table_id,
-            "data":          chunk,
-            "mergeFieldId":  merge_fid,
+            "to":             table_id,
+            "data":           chunk,
             "fieldsToReturn": [],
         }
         time.sleep(config.QB_INTER_CALL_DELAY_S)
@@ -430,12 +437,29 @@ def _upsert_batch(table_id, rows, merge_fid, dry_run=False):
             processed = resp.get("metadata", {}).get("totalNumberOfRecordsProcessed", len(chunk))
             total += processed
             if total % 500 == 0:
-                print(f"  Upserted {total} rows so far ...")
+                print(f"  Inserted {total} rows so far ...")
         except Exception as exc:
             errors.append(f"batch {start}-{start+len(chunk)}: {exc}")
             print(f"  [ERROR] {errors[-1]}")
 
     return total, errors
+
+
+def _count_existing_by_date(table_id, fid, date_str):
+    """Return count of existing rows where fid (date field) EX date_str.
+
+    Used to detect same-day duplicate snapshots.
+    """
+    payload = {
+        "from":   table_id,
+        "select": [3],   # just Record ID# -- cheapest possible SELECT
+        "where":  f"{{{fid}.EX.'{date_str}'}}",
+        "options": {"top": 1, "skip": 0},
+    }
+    time.sleep(config.QB_INTER_CALL_DELAY_S)
+    resp = _qb_request("POST", "/records/query", payload)
+    # QB returns metadata.totalRecords for the full match count
+    return resp.get("metadata", {}).get("totalRecords", len(resp.get("data", [])))
 
 
 # ---------------------------------------------------------------------------
