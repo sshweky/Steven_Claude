@@ -9328,6 +9328,14 @@ window.addEventListener('beforeunload', function(e) {
 // during table scroll.  Their heights vary (e.g. badges wrap on narrow screens),
 // so we measure dynamically and publish CSS custom properties that the table
 // <thead> uses to position its own sticky rows BELOW the frozen header.
+//
+// Published properties:
+//   --topbar-h      : height of .topbar
+//   --frozen-h      : topbar + toolbar (where thead header row sticks)
+//   --header-row-h  : height of thead's first <tr> (the sortable column labels)
+//                     The filter row sticks at --frozen-h + --header-row-h so
+//                     it sits flush below the header row regardless of wrapping
+//                     (e.g. "Proj/Wk\n(+Open POs)" cells make the row taller).
 function _updateStickyHeights() {
   const topbar  = document.querySelector('.topbar');
   const toolbar = document.querySelector('.toolbar');
@@ -9337,6 +9345,12 @@ function _updateStickyHeights() {
   const root = document.documentElement.style;
   root.setProperty('--topbar-h', th + 'px');
   root.setProperty('--frozen-h', (th + tbh) + 'px');
+
+  // Measure the sortable header row so the filter row sticks exactly beneath it.
+  const headerRow = document.querySelector('thead tr:first-child');
+  if (headerRow) {
+    root.setProperty('--header-row-h', headerRow.offsetHeight + 'px');
+  }
 }
 window.addEventListener('load',   _updateStickyHeights);
 window.addEventListener('resize', _updateStickyHeights);
@@ -9347,8 +9361,10 @@ if (typeof ResizeObserver !== 'undefined') {
   setTimeout(() => {
     const tb  = document.querySelector('.topbar');
     const tlb = document.querySelector('.toolbar');
+    const thr = document.querySelector('thead tr:first-child');
     if (tb)  _stickyRO.observe(tb);
     if (tlb) _stickyRO.observe(tlb);
+    if (thr) _stickyRO.observe(thr);
   }, 100);
 }
 
