@@ -172,17 +172,17 @@ def _create_table(name, description, dry_run=False):
 # ---------------------------------------------------------------------------
 
 def _prj_snapshot_field_specs():
-    """Return ordered list of (label, type) for PRJ_Snapshot."""
+    """Return ordered list of (label, type[, unique]) for PRJ_Snapshot."""
     specs = [
-        ("Snapshot_Key",  "text"),   # composite merge key: Key|Snapshot_Date
-        ("Key",           "text"),
-        ("Snapshot_Date", "date"),
-        ("W1_Date",       "date"),
+        ("Snapshot_Key",  "text",    True),  # composite merge key: Key|Snapshot_Date -- UNIQUE
+        ("Key",           "text",    False),
+        ("Snapshot_Date", "date",    False),
+        ("W1_Date",       "date",    False),
     ]
     for w in range(1, 27):
-        specs.append((f"W{w:02d}", "numeric"))
+        specs.append((f"W{w:02d}", "numeric", False))
     for w in range(1, 27):
-        specs.append((f"W{w:02d}_Actual", "numeric"))
+        specs.append((f"W{w:02d}_Actual", "numeric", False))
     return specs
 
 
@@ -191,12 +191,12 @@ def _prj_snapshot_field_specs():
 # ---------------------------------------------------------------------------
 
 def _actuals_weekly_field_specs():
-    """Return ordered list of (label, type) for Actuals_Weekly."""
+    """Return ordered list of (label, type[, unique]) for Actuals_Weekly."""
     return [
-        ("Week_Key",   "text"),   # composite merge key: Key|Week_Date
-        ("Key",        "text"),
-        ("Week_Date",  "date"),
-        ("Ord_Units",  "numeric"),
+        ("Week_Key",   "text",    True),   # composite merge key: Key|Week_Date -- UNIQUE
+        ("Key",        "text",    False),
+        ("Week_Date",  "date",    False),
+        ("Ord_Units",  "numeric", False),
     ]
 
 
