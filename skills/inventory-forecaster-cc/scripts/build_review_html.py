@@ -538,10 +538,13 @@ Location:  ${p.rule_loc}</span>
       <button class="btn modify"  onclick="openModify(${p.id})">Modify</button>
     </div>
     <div class="modify-box" id="modbox-${p.id}">
-      <div class="section-title">What do you want to modify?</div>
-      <textarea id="modtext-${p.id}" placeholder="e.g. change L13W floor multiplier from 0.85 to 0.80, or apply only when AI baseline is < 90% of L13W..."></textarea>
+      <div class="section-title">Tune parameters (impact + chart update live)</div>
+      <div class="param-grid" id="modparams-${p.id}">${renderParamInputs(p)}</div>
+      <div class="section-title" style="margin-top:14px">Extra notes (optional, for things not in the parameters)</div>
+      <textarea id="modtext-${p.id}" placeholder="e.g. only apply when item_status starts with 'Active: Replen', or skip Burlington-style off-price items..."></textarea>
       <div style="margin-top:8px;display:flex;gap:8px;">
         <button class="btn modify" onclick="saveModify(${p.id})">Save Modification</button>
+        <button class="btn" style="background:#6b7280;color:#fff" onclick="resetParams(${p.id})">Reset to defaults</button>
         <button class="btn reject" onclick="cancelModify(${p.id})">Cancel</button>
       </div>
     </div>
