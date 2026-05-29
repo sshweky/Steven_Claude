@@ -9171,6 +9171,7 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     #   (closes 792,208u; 25.7% -> 0.6%)
     if amz_aur_data is None and ord_l13w > 0:
         _f92_floor = snap(ord_l13w * 0.85, mp)
+        print(f"  [F92-DEBUG] ord_l13w={ord_l13w:.1f}  floor={_f92_floor}  baseline_pps={baseline_pps:.1f}  fired={_f92_floor > baseline_pps}", flush=True)
         if _f92_floor > baseline_pps:
             baseline_pps = float(_f92_floor)
             _baseline_src = (
