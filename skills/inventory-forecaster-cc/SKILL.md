@@ -280,6 +280,32 @@ See `REVIEW_AI_TRAINING.md` for the full procedure including chart formatting, A
 
 ---
 
+## Trigger: Live Preview Update (auto, no explicit phrase)
+
+**Whenever a Review AI Training session is active** (i.e. the user has the `analysis/training_review_YYYY-MM-DD.html` page open in their Chrome tab), every user message -- even an empty Enter -- should start with this check before doing anything else:
+
+1. Pull from the open Chrome tab:
+   ```
+   javascript_tool({ action: 'javascript_exec', tabId: <tab>, text: 'JSON.stringify(window.__PENDING_PREVIEW || null)' })
+   ```
+2. If the result is non-null, the user has queued a preview update. Process it:
+   a. Read the modification text + proposal id + rule_fn_id + scope_key
+   b. Interpret the text into a concrete parameter change for the rule, e.g.
+      - `"raise floor to 0.95"` -> `params.floor_mult = 0.95`
+      - `"only Active: Replen items"` -> add scope filter `item_status startswith 'Active: Replen'`
+      - `"zero W1 through W4"` -> `params.num_weeks = 4`
+   c. Recompute the per-item AI new array + systemic gap by running the rule logic in a quick inline Python (or by re-reading `analysis/systemic_data_2026-05-29.json`).
+   d. Push the result back into the tab:
+      ```
+      javascript_tool({ action: 'javascript_exec', tabId: <tab>, text: 'window.__UPDATED_RESULT = ' + JSON.stringify({id, ai_new, item_ai_after, item_gap_after, sys_gap_after, interpretation: "..."})  })
+      ```
+   e. In chat, summarize to the user: which proposal was updated, how the text was interpreted, and the new per-item + systemic gap. Tell them to look at the page (chart + impact panels have refreshed) and to use the card's Approve / Reject button.
+3. If no pending preview was found, proceed with whatever the user actually asked.
+
+**Important:** if the interpretation of the text is ambiguous, do NOT push an update -- ask the user to clarify first. Better to slow down than to silently misinterpret.
+
+---
+
 ## Trigger: "Commit Decisions"
 
 When the user types **"commit decisions"**, **"apply decisions"**, **"commit"** (in the context of an open training review session), or **"apply approved"**:
