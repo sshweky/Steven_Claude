@@ -11995,6 +11995,63 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             f"(network error or empty mstyle). Planner should verify manually."
         )
 
+    # F93 (2026-05-29) -- Forward-PO force-zero rule for non-Amazon retailers.
+    #
+    # Planner-driven policy: when a customer has any active Cust Open PO, the
+    # AI should not project additional demand for the immediate window the PO
+    # covers (the PO represents committed inventory flow; AI projecting on top
+    # of it double-counts demand the planner has already booked).
+    #
+    # Two tiers:
+    #   F93a (default systemic, all non-Amazon Seasonal Baseline /
+    #         Sparse Intermittent records with cust_opn > 0):
+    #         Force-zero AI W1.  In current data W1 is usually already 0
+    #         (last-Sunday's week), so today this is a forward-looking policy.
+    #
+    #   F93b (customer override -- {CHEWY.COM, ACE HARDWARE CORPORATION,
+    #         C & S WHOLESALE}): also force-zero W2 and W3.
+    #         These 3 customers' planners explicitly flagged the W1-W3 zero
+    #         pattern in the 2026-05-29 AI Training comments.
+    #
+    # Mode: force_zero (no PO-size check) -- planner literal intent
+    # ("Always zero W1,W2,W3 if their open order exist in the same week").
+    #
+    # Validated systemic impact (2026-05-29 AI Training Review):
+    #   F93a all 588 records: -47,024u -> -47,024u (no measurable impact)
+    #   F93b Chewy 160 recs: +63,502u -> +88,865u (WIDENS 25K -- known
+    #     trade-off; Chewy under-projection is a separate baseline issue
+    #     to be handled in a follow-up rule.  Planner override accepted.)
+    #   F93b Ace 9 recs:     -9,015u -> -6,505u  (closes 2,510u)
+    #   F93b C&S 6 recs:     -1,499u -> -131u    (closes 1,368u)
+    F93B_CUSTS = ("CHEWY.COM", "ACE HARDWARE CORPORATION", "C & S WHOLESALE")
+    _f93_cust_opn = float(row.get("Cust_Open_PO_Qty_") or 0)
+    if (not is_amazon
+            and model in ("Seasonal Baseline", "Sparse Intermittent")
+            and _f93_cust_opn > 0
+            and isinstance(fcst, list) and len(fcst) >= 3):
+        _f93_cust_up = cust_name.upper().strip()
+        _f93_b_active = any(c in _f93_cust_up for c in F93B_CUSTS)
+        _f93_zeroed = []
+        # F93a: force-zero W1 (index 0)
+        if fcst[0] > 0:
+            _f93_zeroed.append(1)
+            fcst[0] = 0
+        # F93b: also force-zero W2 (index 1) and W3 (index 2)
+        if _f93_b_active:
+            for _wi in (1, 2):
+                if fcst[_wi] > 0:
+                    _f93_zeroed.append(_wi + 1)
+                    fcst[_wi] = 0
+        if _f93_zeroed:
+            _fire("F93")
+            if isinstance(meta, dict):
+                _tier = "F93b" if _f93_b_active else "F93a"
+                meta.setdefault("drivers", []).append(
+                    f"{_tier} Forward-PO force-zero W{','.join(map(str, _f93_zeroed))}: "
+                    f"cust_opn={_f93_cust_opn:,.0f}u; customer={cust_name!r} "
+                    f"({_tier} scope)."
+                )
+
     # F45 — Per-week forecast cap (defensive guardrail, 2026-05-06).
     #
     # No single forecast week may exceed 2.0× the L26 non-zero mean, regardless
