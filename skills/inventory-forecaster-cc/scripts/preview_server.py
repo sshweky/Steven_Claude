@@ -295,6 +295,47 @@ def compute_preview(req):
         na = fn(r, params)
         sys_gap_after += r["man_total"] - sum(na)
 
+    # Build updated rule text strings to reflect the modification in the
+    # Recommendation box on the page.
+    title_extra = []
+    summary_extra = []
+    criterion_extra = []
+    if scope_filter.get("customers_include"):
+        custs = ", ".join(scope_filter["customers_include"])
+        title_extra.append(f"({custs} only)")
+        summary_extra.append(f"Restricted to customer(s): {custs}.")
+        criterion_extra.append(f"AND customer IN ({custs})")
+    if scope_filter.get("customers_exclude"):
+        ex = ", ".join(scope_filter["customers_exclude"])
+        title_extra.append(f"(excl. {ex})")
+        summary_extra.append(f"Excludes customer(s): {ex}.")
+        criterion_extra.append(f"AND customer NOT IN ({ex})")
+    if scope_filter.get("exclude_owned_brands"):
+        title_extra.append("(non-owned brands)")
+        summary_extra.append("Excludes owned brands (A&H, Burt's Bees, BioSilk, CHI, Vibrant Life, Glad for Pets, Kingsford, GladWare).")
+        criterion_extra.append("AND brand NOT IN OWNED_BRANDS")
+    if scope_filter.get("exclude_off_price"):
+        title_extra.append("(non-off-price)")
+        summary_extra.append("Excludes off-price accounts (Status starts with 'A: Off-Price').")
+        criterion_extra.append("AND status NOT LIKE 'A: Off-Price%'")
+    if scope_filter.get("exclude_status_substrs"):
+        for s in scope_filter["exclude_status_substrs"]:
+            criterion_extra.append(f"AND status NOT LIKE '%{s}%'")
+            summary_extra.append(f"Excludes items with '{s}' in status.")
+    if scope_filter.get("statuses"):
+        sl = ", ".join(scope_filter["statuses"])
+        title_extra.append(f"({sl} only)")
+        summary_extra.append(f"Restricted to Status: {sl}.")
+        criterion_extra.append(f"AND status IN ({sl})")
+
+    # Build new params summary for the Logic line
+    params_changed = []
+    for k, v in params.items():
+        if v != DEFAULT_PARAMS[rule_fn_id].get(k):
+            params_changed.append(f"{k}={v}")
+    if params_changed:
+        summary_extra.append("Params: " + ", ".join(params_changed) + ".")
+
     return {
         "ok": True,
         "id": rid,
@@ -306,6 +347,10 @@ def compute_preview(req):
         "interpretation": summary,
         "applied_params": params,
         "applied_scope_filter": scope_filter,
+        "title_extra": " ".join(title_extra) if title_extra else "",
+        "summary_extra": " ".join(summary_extra) if summary_extra else "",
+        "criterion_extra": " ".join(criterion_extra) if criterion_extra else "",
+        "params_changed": params_changed,
     }
 
 
