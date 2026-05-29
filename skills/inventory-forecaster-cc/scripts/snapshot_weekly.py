@@ -578,10 +578,8 @@ def run(dry_run=False, force=False):
                 label = snap_fid_inv.get(fid_key, fid_key)
                 print(f"    {label}: {val}")
 
-    print(f"\nWriting PRJ_Snapshot (merge FID {snap_merge_fid}) ...")
-    snap_written, snap_errors = _upsert_batch(
-        snap_tid, snap_rows, snap_merge_fid, dry_run=dry_run
-    )
+    print(f"\nWriting PRJ_Snapshot (plain INSERT) ...")
+    snap_written, snap_errors = _insert_batch(snap_tid, snap_rows, dry_run=dry_run)
 
     # ── Step 4: Build and write Actuals_Weekly rows ───────────────────────
     print(f"\nStep 4: Building Actuals_Weekly rows ...")
