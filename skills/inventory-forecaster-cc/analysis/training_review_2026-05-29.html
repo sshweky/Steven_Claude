@@ -385,15 +385,17 @@ function updateGlobal() {
   document.getElementById('save-btn').disabled = (decided < PROPOSALS.length);
 }
 
+const STATUS_MAP = { approve: 'approved', reject: 'rejected', modify: 'modified' };
 function decide(id, d) {
   STATE.decisions[id] = d;
   if (d !== 'modify') STATE.modifications[id] = null;
+  const past = STATUS_MAP[d] || d;
   const card = document.getElementById('card-' + id);
   card.classList.remove('approved','rejected','modified');
-  card.classList.add(d + 'd');  // 'approved' | 'rejected' | 'modified'
+  card.classList.add(past);
   const status = document.getElementById('status-' + id);
-  status.className = 'tag status-' + d + 'd';
-  status.innerText = d.toUpperCase() + 'D';
+  status.className = 'tag status-' + past;
+  status.innerText = past.toUpperCase();
   updateGlobal();
 }
 
