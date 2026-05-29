@@ -90,6 +90,7 @@ def main():
     f93_scope = [x for x in recs_all if x["model"] in ("Seasonal Baseline", "Sparse Intermittent") and x["cust_opn"] > 0]
     f93_before = sum(x["man_total"] - x["ai_total"] for x in f93_scope)
     f93_after = 0
+    f93_man_total = sum(x["man_total"] for x in f93_scope)
     for x in f93_scope:
         na = f93a_apply(x["ai"], x["cust_opn"])
         f93_after += x["man_total"] - sum(na)
