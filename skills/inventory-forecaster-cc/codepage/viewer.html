@@ -392,10 +392,10 @@ window.QB_CONFIG = {
   thead th.sort-asc  .sort-ind::after { content:"\25B2"; }   /* ^ */
   thead th.sort-desc .sort-ind::after { content:"\25BC"; }   /* v */
   /* Per-column filter row sits just below the sortable header row.
-     Sticky-second-row offset = the header row height (~30px) so it stays
-     visible when the user scrolls. */
+     --header-row-h is measured dynamically in _updateStickyHeights() so the
+     offset tracks the real header row height even when cells wrap/grow. */
   thead tr.col-filter-row th { position:sticky;
-                                top:calc(var(--frozen-h, 90px) + 48px);
+                                top:calc(var(--frozen-h, 90px) + var(--header-row-h, 48px));
                                 background:#fafbfc;
                                 box-shadow: inset 0 -1px 0 #e0e0e0; padding:3px 4px;
                                 cursor:default; font-weight:normal; z-index:4; }
