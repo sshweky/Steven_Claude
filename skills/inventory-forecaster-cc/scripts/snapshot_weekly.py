@@ -587,10 +587,8 @@ def run(dry_run=False, force=False):
     print(f"  {len(act_rows)} actuals rows built")
     print(f"  Week_Date (last week):  {(w1_date - timedelta(days=7)).isoformat()}")
 
-    print(f"\nWriting Actuals_Weekly (merge FID {act_merge_fid}) ...")
-    act_written, act_errors = _upsert_batch(
-        act_tid, act_rows, act_merge_fid, dry_run=dry_run
-    )
+    print(f"\nWriting Actuals_Weekly (plain INSERT) ...")
+    act_written, act_errors = _insert_batch(act_tid, act_rows, dry_run=dry_run)
 
     # ── Summary ──────────────────────────────────────────────────────────
     print()
