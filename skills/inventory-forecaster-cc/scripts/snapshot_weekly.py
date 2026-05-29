@@ -541,6 +541,20 @@ def run(dry_run=False, force=False):
     snapshot_date = date.today()
     w1_date       = fids["w1_date"]
 
+    # ── Duplicate guard: skip if today's snapshot already exists ─────────
+    if not dry_run:
+        sd_fid = snap_fids.get("Snapshot_Date")
+        if sd_fid:
+            print(f"\nChecking for existing snapshot on {snapshot_date} ...")
+            existing_count = _count_existing_by_date(snap_tid, sd_fid, snapshot_date.isoformat())
+            if existing_count > 0 and not force:
+                print(f"  Snapshot for {snapshot_date} already exists "
+                      f"({existing_count} rows). Use --force to re-snapshot.")
+                return
+            if existing_count > 0 and force:
+                print(f"  --force set: {existing_count} existing rows will be left; "
+                      f"new rows with same keys will create duplicates.")
+
     # ── Step 2: Fetch active Projections records ──────────────────────────
     print(f"\nStep 2: Fetching active Projections records ...")
     records = fetch_projections(fids, fids["status_fid"])
