@@ -107,39 +107,37 @@ QB_INV_FLOW_TABLE     = os.environ.get("QB_INV_FLOW_TABLE",     "bpsaju5pm")  # 
 QB_BULK_BATCH         = int(os.environ.get("QB_BULK_BATCH", "500"))
 
 # Projection Accuracy tracking tables (created 2026-05-29)
-# Run create_accuracy_tables.py once to create these tables, then fill in
-# the actual TIDs and FIDs printed by that script.
-QB_PRJ_SNAPSHOT_TID   = os.environ.get("QB_PRJ_SNAPSHOT_TID",   "PLACEHOLDER_TID_A")
-QB_ACTUALS_WEEKLY_TID = os.environ.get("QB_ACTUALS_WEEKLY_TID", "PLACEHOLDER_TID_B")
+QB_PRJ_SNAPSHOT_TID   = os.environ.get("QB_PRJ_SNAPSHOT_TID",   "bv34v84cg")
+QB_ACTUALS_WEEKLY_TID = os.environ.get("QB_ACTUALS_WEEKLY_TID", "bv34wa4ch")
 
-# PRJ_Snapshot field IDs (fill in after running create_accuracy_tables.py)
+# PRJ_Snapshot field IDs (FIDs 6-61 as created by create_accuracy_tables.py)
 PRJ_SNAP_FIDS = {
-    "Snapshot_Key":  0,   # composite merge key: "Key|Snapshot_Date"
-    "Key":           0,
-    "Snapshot_Date": 0,
-    "W1_Date":       0,
+    "Snapshot_Key":  6,   # composite merge key: "Key|Snapshot_Date"
+    "Key":           7,
+    "Snapshot_Date": 8,
+    "W1_Date":       9,
     # Projected units W01-W26 (written by snapshot_weekly.py)
-    "W01": 0, "W02": 0, "W03": 0, "W04": 0, "W05": 0, "W06": 0,
-    "W07": 0, "W08": 0, "W09": 0, "W10": 0, "W11": 0, "W12": 0,
-    "W13": 0, "W14": 0, "W15": 0, "W16": 0, "W17": 0, "W18": 0,
-    "W19": 0, "W20": 0, "W21": 0, "W22": 0, "W23": 0, "W24": 0,
-    "W25": 0, "W26": 0,
+    "W01": 10, "W02": 11, "W03": 12, "W04": 13, "W05": 14, "W06": 15,
+    "W07": 16, "W08": 17, "W09": 18, "W10": 19, "W11": 20, "W12": 21,
+    "W13": 22, "W14": 23, "W15": 24, "W16": 25, "W17": 26, "W18": 27,
+    "W19": 28, "W20": 29, "W21": 30, "W22": 31, "W23": 32, "W24": 33,
+    "W25": 34, "W26": 35,
     # Actual units W01-W26 (filled in by reconcile_accuracy.py)
-    "W01_Actual": 0, "W02_Actual": 0, "W03_Actual": 0, "W04_Actual": 0,
-    "W05_Actual": 0, "W06_Actual": 0, "W07_Actual": 0, "W08_Actual": 0,
-    "W09_Actual": 0, "W10_Actual": 0, "W11_Actual": 0, "W12_Actual": 0,
-    "W13_Actual": 0, "W14_Actual": 0, "W15_Actual": 0, "W16_Actual": 0,
-    "W17_Actual": 0, "W18_Actual": 0, "W19_Actual": 0, "W20_Actual": 0,
-    "W21_Actual": 0, "W22_Actual": 0, "W23_Actual": 0, "W24_Actual": 0,
-    "W25_Actual": 0, "W26_Actual": 0,
+    "W01_Actual": 36, "W02_Actual": 37, "W03_Actual": 38, "W04_Actual": 39,
+    "W05_Actual": 40, "W06_Actual": 41, "W07_Actual": 42, "W08_Actual": 43,
+    "W09_Actual": 44, "W10_Actual": 45, "W11_Actual": 46, "W12_Actual": 47,
+    "W13_Actual": 48, "W14_Actual": 49, "W15_Actual": 50, "W16_Actual": 51,
+    "W17_Actual": 52, "W18_Actual": 53, "W19_Actual": 54, "W20_Actual": 55,
+    "W21_Actual": 56, "W22_Actual": 57, "W23_Actual": 58, "W24_Actual": 59,
+    "W25_Actual": 60, "W26_Actual": 61,
 }
 
-# Actuals_Weekly field IDs (fill in after running create_accuracy_tables.py)
+# Actuals_Weekly field IDs (FIDs 6-9 as created by create_accuracy_tables.py)
 ACT_WEEKLY_FIDS = {
-    "Week_Key":  0,   # composite merge key: "Key|Week_Date"
-    "Key":       0,
-    "Week_Date": 0,
-    "Ord_Units": 0,
+    "Week_Key":  6,   # composite merge key: "Key|Week_Date"
+    "Key":       7,
+    "Week_Date": 8,
+    "Ord_Units": 9,
 }
 
 # QB report for VP-Q4 open-PO data -- bulk fetch in 1 API call.
