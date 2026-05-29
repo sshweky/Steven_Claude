@@ -1,16 +1,16 @@
 # Inventory Flow Health Scan
-Generated: 2026-05-28 20:08 | Records flagged: 1085
+Generated: 2026-05-28 20:11 | Records flagged: 1085
 
 ## Summary
 
 | Issue | Count | Description |
 |---|---|---|
-| **OOS (True)** | 240 | Item is truly out of stock in W1 with no bridge receipt |
-| **Reorder NOW** | 249 | Simulated inventory hits zero in W{stockout_wk} -- within your {lt_wks}-week lead time |
-| **Reorder Watch** | 32 | Projected stockout at W{stockout_wk} |
-| **Low WOS** | 51 | Current WOS {current_wos: |
-| **Overstock** | 162 | Pipeline {pipeline:,} units vs {demand_26w:,} demand |
-| **Demand Mismatch** | 351 | Manual {man_vs_ai_pct}% above AI for {over_ai_weeks} of next 13 weeks |
+| **OOS (True)** | 240 | Item is truly out of stock in W1 with no bridge receipt. |
+| **Reorder NOW** | 249 | Simulated inventory hits zero within lead-time window. Order this week. |
+| **Reorder Watch** | 32 | Projected stockout soon. Order within 2 weeks to stay covered. |
+| **Low WOS** | 51 | Current WOS below 50% of safety target. Thin buffer vs lead time. |
+| **Overstock** | 162 | Pipeline units exceed 26-week demand + safety stock. Consider cancelling POs. |
+| **Demand Mismatch** | 351 | Manual plan is 20%+ above AI for 3+ weeks. Planner may be over-projecting. |
 
 ## OOS (True)  (240 mstyles)
 
