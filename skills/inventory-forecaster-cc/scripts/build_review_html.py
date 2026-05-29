@@ -690,6 +690,8 @@ document.addEventListener('DOMContentLoaded', () => {
 """
 
     js = js.replace("__PROPOSALS_JSON__", proposals_json)
+    js = js.replace("__SCOPE_JSON__", scope_json)
+    js = js.replace("__ITEM_JSON__", item_json)
     return head + body + '<script>' + js + '</script></body></html>'
 
 
