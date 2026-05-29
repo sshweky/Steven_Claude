@@ -5785,9 +5785,12 @@ async function _loadAmzDcInv(r, safeId) {
       const _catNote = _catSuppApplied
         ? ` <span style="font-weight:400;color:#f57f17;font-size:10px">(*from Amazon Catalog)</span>`
         : '';
+      const _parentNote = dmUsedParent
+        ? ` <span style="font-weight:400;color:#f57f17;font-size:10px" title="Daily Metrics data inherited from parent mstyle (EC variant not yet tracked separately)">(parent mstyle POS)</span>`
+        : '';
       posSection.innerHTML = `
       <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e3f2fd;">
-        <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS (Weekly)${_catNote}</div>
+        <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS (Weekly)${_catNote}${_parentNote}</div>
         <table class="dtbl" style="font-size:11px">
           <thead><tr>
             <th class="row-label" style="width:1%;white-space:nowrap"></th>
