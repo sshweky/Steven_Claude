@@ -12778,21 +12778,53 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
 
             if _f59h_wos > AMZ_WOS_TARGET_MAX:
                 if _f59h_is_replen:
-                    # FXX — Amazon Replen overstock: power-curve dampening across
-                    # all 26 weeks.  Amazon has many independent DCs so some sporadic
-                    # demand persists even when aggregate WOS is high — floor at 10%.
-                    # Formula: max(0.10, (AMZ_WOS_TARGET_MAX / wos) ^ 1.5)
-                    # wos=14 → 60%  wos=16 → 49%  wos=20 → 35%  wos=24 → 25%  wos=35+ → 10%
-                    _f59h_dampen = max(0.10, (AMZ_WOS_TARGET_MAX / _f59h_wos) ** 1.5)
-                    fcst = [snap(max(0, v * _f59h_dampen), mp) if v > 0 else 0
-                            for v in fcst]
-                    _fire("F59h")
-                    if isinstance(meta, dict):
-                        meta.setdefault("drivers", []).append(
-                            f"F59h Amazon-Replen overstock dampen: WOS={_f59h_wos:.1f}wks "
-                            f"(target {AMZ_WOS_TARGET_MAX:.0f}wks) — all 26W x{_f59h_dampen:.0%} "
-                            f"(floor 10%); SOH={_f59h_soh:,.0f}u"
-                        )
+                    # F91 (2026-05-28) — F85 / F59h interaction guard.
+                    # F85 (Amazon POS-WOS) already incorporated DC overstock by
+                    # setting fill_units = 0 (no top-up order) and anchoring to
+                    # consumer POS velocity.  Applying the original power-curve
+                    # dampen on top of F85 double-counts the same overstock signal
+                    # and drives the 26-week rate below consumer velocity, causing
+                    # the DC to burn past the target (end WOS < AMZ_WOS_TARGET_MAX).
+                    #
+                    # For F85 records: compute a drawdown steady-state rate instead.
+                    #   excess_inv  = SOH - AMZ_WOS_TARGET_MAX * baseline_pps
+                    #   drawdown    = baseline_pps - excess_inv / 26
+                    #   floor       = 50% of baseline (Amazon never fully stops)
+                    # This targets exactly AMZ_WOS_TARGET_MAX weeks of DC stock
+                    # at the end of the 26-week horizon.
+                    #
+                    # For non-F85 replen models (Seasonal Baseline, Heuristic):
+                    # use the original power-curve dampen -- those models have no
+                    # DC inventory context in their baseline.
+                    if model == "Amazon POS-WOS" and _rtl_wos_r is not None:
+                        _f59h_base = float(_rtl_wos_r.get("baseline_pps") or 0) or max(sum(fcst) / 26.0, 1.0)
+                        _f59h_excess = max(0.0, _f59h_soh - AMZ_WOS_TARGET_MAX * _f59h_base)
+                        _f59h_draw_rate = max(_f59h_base * 0.50, _f59h_base - _f59h_excess / 26.0)
+                        fcst = [snap(max(0, _f59h_draw_rate), mp) if v > 0 else 0
+                                for v in fcst]
+                        _fire("F59h")
+                        if isinstance(meta, dict):
+                            meta.setdefault("drivers", []).append(
+                                f"F59h F85-drawdown: SOH={_f59h_soh:,.0f}u at {_f59h_wos:.1f}wks "
+                                f"(target {AMZ_WOS_TARGET_MAX:.0f}wks) -- excess {_f59h_excess:,.0f}u; "
+                                f"drawdown rate {_f59h_draw_rate:,.0f}/wk "
+                                f"(POS {_f59h_base:,.0f} minus {_f59h_excess/26.0:.0f}/wk); "
+                                f"targets {AMZ_WOS_TARGET_MAX:.0f}wk DC WOS at end of 26w horizon"
+                            )
+                    else:
+                        # Original power-curve dampen for non-F85 replen models.
+                        # Formula: max(0.10, (AMZ_WOS_TARGET_MAX / wos) ^ 1.5)
+                        # wos=14 -> 60%  wos=16 -> 49%  wos=20 -> 35%  wos=24 -> 25%  wos=35+ -> 10%
+                        _f59h_dampen = max(0.10, (AMZ_WOS_TARGET_MAX / _f59h_wos) ** 1.5)
+                        fcst = [snap(max(0, v * _f59h_dampen), mp) if v > 0 else 0
+                                for v in fcst]
+                        _fire("F59h")
+                        if isinstance(meta, dict):
+                            meta.setdefault("drivers", []).append(
+                                f"F59h Amazon-Replen overstock dampen: WOS={_f59h_wos:.1f}wks "
+                                f"(target {AMZ_WOS_TARGET_MAX:.0f}wks) -- all 26W x{_f59h_dampen:.0%} "
+                                f"(floor 10%); SOH={_f59h_soh:,.0f}u"
+                            )
                 else:
                     if _f59h_wos > 20:
                         # Extreme overstock: hard burn-down zero for near-term weeks,
