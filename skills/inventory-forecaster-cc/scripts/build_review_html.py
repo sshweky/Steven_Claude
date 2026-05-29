@@ -692,7 +692,17 @@ async function previewUpdate(id) {
     }
     refreshCard(id);
     STATE.modifications[id] = { notes: text, interpretation: r.interpretation, applied_params: r.applied_params, applied_scope_filter: r.applied_scope_filter };
-    status.innerHTML = '<span style="color:#2e7d32;font-weight:600">Updated.</span> Interpreted as: <i>' + r.interpretation + '</i>. Edit + Preview again, or use Approve / Reject on the card.';
+    // Collapse the modify box, return focus to the card action area
+    document.getElementById('modbox-' + id).classList.remove('open');
+    document.getElementById('modtext-' + id).value = text;  // preserve text for re-edit
+    // Show a summary banner above the action buttons
+    const banner = document.getElementById('modsummary-' + id);
+    if (banner) {
+      banner.style.display = 'block';
+      banner.innerHTML = '<b>Modified preview applied.</b> Interpreted as: <i>' + r.interpretation + '</i>. <a href="#" onclick="openModify(' + id + ');return false;" style="color:#0d47a1;font-weight:600;text-decoration:underline">Edit modification</a>';
+    }
+    // Scroll the card's action row into view
+    document.getElementById('card-' + id).scrollIntoView({behavior:'smooth', block:'center'});
     updateGlobal();
   } catch (e) {
     status.innerHTML = '<span style="color:#c62828;font-weight:600">Preview server unreachable.</span> Run: <code style="background:#fee;padding:1px 4px">python scripts/preview_server.py</code> from the skill directory.';

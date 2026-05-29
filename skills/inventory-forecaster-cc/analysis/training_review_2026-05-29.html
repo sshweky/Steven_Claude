@@ -303,7 +303,7 @@ Location:  ${p.rule_loc}</span>
         <button class="btn reject" onclick="cancelModify(${p.id})">Cancel</button>
         <span id="preview-status-${p.id}" style="font-size:12px;color:#6b7280;"></span>
       </div>
-      <div class="help-text" style="margin-top:8px">Click <b>Preview Update</b>, then switch to Claude Code and press Enter. I will interpret your text, recompute the chart + impact, and refresh this card. The card stays PENDING -- once you see the updated recommendation, use the card's Approve / Reject button to decide.</div>
+      <div class="help-text" style="margin-top:8px">Click <b>Preview Update</b>. The local preview server interprets your text, recomputes the chart + impact, and refreshes this card instantly. Card stays PENDING -- review the updated chart, then use Approve / Reject on the card.</div>
     </div>
   `;
   return card;
@@ -394,60 +394,52 @@ function decide(id, d) {
 function openModify(id) {
   document.getElementById('modbox-' + id).classList.add('open');
 }
-// PREVIEW UPDATE flow: send text to Claude via the bridge, await updated AI new values,
-// refresh the card. Card status remains PENDING; user then clicks Approve / Reject.
-function previewUpdate(id) {
+// PREVIEW UPDATE flow: POST modification text directly to localhost preview server.
+// Server interprets the text, recomputes, and returns updated values. Card refreshes
+// without needing a Claude turn. Card stays PENDING; user clicks Approve / Reject.
+const PREVIEW_SERVER_URL = 'http://localhost:8744/preview';
+
+async function previewUpdate(id) {
   const text = document.getElementById('modtext-' + id).value.trim();
   if (!text) { alert('Type a modification first (or click Cancel).'); return; }
   const p = PROPOSALS.find(x => x.id === id);
-  // Queue the request in a known global. Claude polls this on its next turn.
-  window.__PENDING_PREVIEW = {
-    id: id,
-    key: p.key,
-    rule_id: p.rule_id,
-    rule_fn_id: p.rule_fn_id,
-    scope_key: p.scope_key,
-    text: text,
-    queued_at: new Date().toISOString(),
-  };
-  // Stash the modification text on STATE so it persists
-  STATE.modifications[id] = { notes: text, status: 'pending_preview' };
-  // Show banner-style status under the modify box buttons
   const status = document.getElementById('preview-status-' + id);
-  status.innerHTML = '<span style="color:#0d47a1;font-weight:600">Update queued.</span> Switch to Claude Code and press Enter -- I will refresh this card automatically.';
-  // Start polling for the result
-  if (!STATE._previewPoller) {
-    STATE._previewPoller = setInterval(checkForPreviewResult, 1000);
-  }
-}
+  status.innerHTML = '<span style="color:#0d47a1;font-weight:600">Computing update...</span>';
 
-function checkForPreviewResult() {
-  const r = window.__UPDATED_RESULT;
-  if (!r || !r.id) return;
-  const p = PROPOSALS.find(x => x.id === r.id);
-  if (!p) return;
-  // Apply updates: ai_new, item_*, sys_*
-  if (Array.isArray(r.ai_new)) p.ai_new = r.ai_new;
-  if (typeof r.item_ai_after === 'number') p.item_ai_after = r.item_ai_after;
-  if (typeof r.item_gap_after === 'number') p.item_gap_after = r.item_gap_after;
-  if (typeof r.sys_gap_after === 'number') {
-    p.sys_gap_after = r.sys_gap_after;
-    p.sys_closed_abs = Math.abs(p.sys_gap_before) - Math.abs(p.sys_gap_after);
+  // POST to the local preview server
+  try {
+    const resp = await fetch(PREVIEW_SERVER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: id, key: p.key, rule_id: p.rule_id,
+        rule_fn_id: p.rule_fn_id, scope_key: p.scope_key,
+        text: text,
+      }),
+    });
+    if (!resp.ok) throw new Error('Server returned ' + resp.status);
+    const r = await resp.json();
+    if (!r.ok) {
+      const msg = r.errors ? r.errors.join('; ') : (r.error || 'unknown error');
+      status.innerHTML = '<span style="color:#c62828;font-weight:600">Could not interpret:</span> ' + msg + (r.hint ? ' <i>' + r.hint + '</i>' : '');
+      return;
+    }
+    // Apply the result to PROPOSALS + refresh the card
+    if (Array.isArray(r.ai_new)) p.ai_new = r.ai_new;
+    if (typeof r.item_ai_after === 'number') p.item_ai_after = r.item_ai_after;
+    if (typeof r.item_gap_after === 'number') p.item_gap_after = r.item_gap_after;
+    if (typeof r.sys_scope === 'number') p.sys_scope = r.sys_scope;
+    if (typeof r.sys_gap_after === 'number') {
+      p.sys_gap_after = r.sys_gap_after;
+      p.sys_closed_abs = Math.abs(p.sys_gap_before) - Math.abs(p.sys_gap_after);
+    }
+    refreshCard(id);
+    STATE.modifications[id] = { notes: text, interpretation: r.interpretation, applied_params: r.applied_params, applied_scope_filter: r.applied_scope_filter };
+    status.innerHTML = '<span style="color:#2e7d32;font-weight:600">Updated.</span> Interpreted as: <i>' + r.interpretation + '</i>. Edit + Preview again, or use Approve / Reject on the card.';
+    updateGlobal();
+  } catch (e) {
+    status.innerHTML = '<span style="color:#c62828;font-weight:600">Preview server unreachable.</span> Run: <code style="background:#fee;padding:1px 4px">python scripts/preview_server.py</code> from the skill directory.';
   }
-  refreshCard(r.id);
-  // Update status message
-  const status = document.getElementById('preview-status-' + r.id);
-  if (status) {
-    status.innerHTML = '<span style="color:#2e7d32;font-weight:600">Updated.</span> Review the chart above. Edit text + Preview again, or use Approve / Reject on the card.';
-  }
-  // Stash interpretation summary if provided
-  if (r.interpretation) {
-    STATE.modifications[r.id].interpretation = r.interpretation;
-  }
-  // Clear globals so we do not re-apply
-  window.__UPDATED_RESULT = null;
-  window.__PENDING_PREVIEW = null;
-  updateGlobal();
 }
 
 function cancelModify(id) {
