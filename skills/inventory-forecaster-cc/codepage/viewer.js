@@ -5756,7 +5756,9 @@ async function _loadAmzDcInv(r, safeId) {
     const fmtAvg = n => n === 0 ? '<span style="color:#bbb">-</span>'
                                  : `<span style="color:#1565c0;font-weight:600">${fmtPos(n)}</span>`;
 
-    if (!fetchOk) {
+    // Show "no data" only when BOTH catalog query and Daily Metrics returned nothing.
+    // If DM has weekly data (via parent fallback), fall through to the weekly table.
+    if (!fetchOk && !(dmWeeks && dmWeeks.length > 0)) {
       posSection.innerHTML = `
       <div style="overflow-x:auto;padding:4px 12px 8px 12px;border-top:1px solid #e3f2fd;">
         <div style="font-size:11px;color:#555;font-weight:600;padding:4px 0 2px 0;">Amazon Consumer POS</div>
