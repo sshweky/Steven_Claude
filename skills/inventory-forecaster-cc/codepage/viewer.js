@@ -5586,19 +5586,33 @@ async function _loadAmzDcInv(r, safeId) {
   }
 
   // ── Daily Metrics POS + OH weekly history (brgxdpadi) ────────────────────
-  // EC/COS parent fallback: Daily Metrics rows are keyed by the base mstyle
-  // (e.g. FF9298), not the EC variant (FF9298EC).  If the exact lookup returns
-  // null, retry with the parent mstyle so EC variants inherit POS history.
+  // Fallback priority:
+  //   1. Exact mstyle
+  //   2. EC/COS/AMZ parent (strip variant suffix)
+  //   3. switchover_from mstyle (new style inherits old style's history)
+  //   4. switchover_from stripped of pack-size suffix
   let dmWeeks = null;
-  let dmUsedParent = false;
+  let dmUsedParent    = false;  // true when EC/COS parent mstyle supplied the data
+  let dmUsedSwFrom    = '';     // set to old mstyle when switchover_from supplied the data
   if (CFG.DAILY_METRICS_TID) {
     try {
       let dmPos = await _fetchDailyMetricsPOS(mstyle);
+      // EC/COS/AMZ parent fallback
       if (!dmPos) {
         const _dmParent = mstyle.replace(/(EC|COS|AMZ)$/i, '');
         if (_dmParent !== mstyle) {
           dmPos = await _fetchDailyMetricsPOS(_dmParent);
           if (dmPos) dmUsedParent = true;
+        }
+      }
+      // Switchover fallback: inherit history from old mstyle
+      if (!dmPos && swFrom) {
+        dmPos = await _fetchDailyMetricsPOS(swFrom);
+        if (dmPos) dmUsedSwFrom = swFrom;
+        // Also try stripped version of the old mstyle
+        if (!dmPos && swFromStripped && swFromStripped !== swFrom) {
+          dmPos = await _fetchDailyMetricsPOS(swFromStripped);
+          if (dmPos) dmUsedSwFrom = swFromStripped;
         }
       }
       if (dmPos) {
