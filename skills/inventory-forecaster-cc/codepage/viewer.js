@@ -5816,25 +5816,39 @@ async function _loadAmzDcInv(r, safeId) {
         <div style="font-size:11px;color:#999;font-style:italic;padding:2px 0 4px 0;">No catalog data available for this style.</div>
       </div>`;
     } else if (dmWeeks && dmWeeks.length > 0) {
-      // ── Weekly history from Daily Metrics (+ Amazon Catalog fill for W1/W2) ──
+      // ── Weekly history from Daily Metrics (+ Amazon Catalog / L4W fill for W1/W2) ──
       const thCells = dmWeeks.map(w => {
         const d   = new Date(w.weekStart + 'T00:00:00Z');
         const mo  = d.getUTCMonth() + 1;
         const day = d.getUTCDate();
-        const catMark = w.fromCatalog ? '<sup style="color:#f57f17">*</sup>' : '';
+        const catMark = w.fromCatalog ? '<sup style="color:#f57f17">*</sup>'
+                      : w.fromL4wAvg  ? '<sup style="color:#9c27b0" title="L4W weekly average -- actual weekly data not yet available">~</sup>'
+                      : '';
         return `<th style="font-size:10px;font-weight:normal;padding:2px 6px;white-space:nowrap;text-align:right">${mo}/${day}${catMark}</th>`;
       }).join('');
       const posCells = dmWeeks.map(w => {
-        const tip = w.fromCatalog ? ' title="From Amazon Catalog (FID 154/180) -- Daily Metrics not yet available for this week"' : '';
-        const bg  = w.fromCatalog ? 'background:#fff8e1;' : '';
+        const tip = w.fromCatalog ? ' title="From Amazon Catalog (FID 154/180) -- Daily Metrics not yet available for this week"'
+                  : w.fromL4wAvg  ? ' title="L4W weekly average used as proxy -- actual weekly data not yet available in Daily Metrics or Catalog"'
+                  : '';
+        const bg  = w.fromCatalog ? 'background:#fff8e1;'
+                  : w.fromL4wAvg  ? 'background:#f3e5f5;'
+                  : '';
         return `<td style="${bg}text-align:right;padding:2px 5px"${tip}>${fmtP(w.pos)}</td>`;
       }).join('');
       const ohCells  = dmWeeks.map(w => {
-        const bg = w.fromCatalog ? 'background:#fff8e1;' : '';
+        const bg = w.fromCatalog ? 'background:#fff8e1;'
+                 : w.fromL4wAvg  ? 'background:#f3e5f5;'
+                 : '';
         return `<td style="${bg}text-align:right;padding:2px 5px">${fmtOH(w.oh)}</td>`;
       }).join('');
-      const _catNote = _catSuppApplied
+      const _hasCatFill  = dmWeeks.some(w => w.fromCatalog);
+      const _hasAvgFill  = dmWeeks.some(w => w.fromL4wAvg);
+      const _catNote = _hasCatFill && _hasAvgFill
+        ? ` <span style="font-weight:400;color:#f57f17;font-size:10px">(*catalog)</span> <span style="font-weight:400;color:#9c27b0;font-size:10px">(~L4W avg)</span>`
+        : _hasCatFill
         ? ` <span style="font-weight:400;color:#f57f17;font-size:10px">(*from Amazon Catalog)</span>`
+        : _hasAvgFill
+        ? ` <span style="font-weight:400;color:#9c27b0;font-size:10px">(~L4W avg -- recent data not yet in Daily Metrics)</span>`
         : '';
       const _parentNote = dmUsedSwFrom
         ? ` <span style="font-weight:400;color:#f57f17;font-size:10px" title="Daily Metrics POS history inherited from switchover predecessor">(from ${dmUsedSwFrom})</span>`
