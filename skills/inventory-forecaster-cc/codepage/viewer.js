@@ -9106,7 +9106,10 @@ function _npmToast(msg, color) {
 window.showNewPrjModal  = showNewPrjModal;
 window.closeNewPrjModal = closeNewPrjModal;
 window.npmDivChanged    = npmDivChanged;
-window.npmAcctChanged   = npmAcctChanged;
+window.npmAcctInput     = npmAcctInput;
+window.npmAcctFocus     = npmAcctFocus;
+window.npmAcctBlur      = npmAcctBlur;
+window._npmAcctSelect   = _npmAcctSelect;
 window.npmMstyleInput   = npmMstyleInput;
 window.npmMstyleFocus   = npmMstyleFocus;
 window.npmMstyleBlur    = npmMstyleBlur;
