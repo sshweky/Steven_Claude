@@ -555,7 +555,7 @@ Location:  ${p.rule_loc}</span>
 function renderChart(p) {
   const ctx = document.getElementById(`chart-${p.id}`);
   const weeks = Array.from({length: 26}, (_, i) => 'W' + (i + 1));
-  new Chart(ctx, {
+  STATE.charts[p.id] = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: weeks,
