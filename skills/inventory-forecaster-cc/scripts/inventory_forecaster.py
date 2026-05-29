@@ -9683,11 +9683,16 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     if (rtl_pos is not None
             and float(rtl_pos.get("Avg_Units_Wk_L13w") or 0) > 0
             and not _baseline_override):   # skip POS compute when override active
+        # F92 input: order-history L13W avg, computed from the last 13 weeks of
+        # the customer's order history.  Passed in so _retailer_wos_forecast can
+        # use it as a floor independent of the POS L13W (which often runs lower).
+        _f92_ord_l13w = (sum(float(v or 0) for v in hist[-13:]) / 13.0) if len(hist) >= 13 else 0
         _rtl_wos_r = _retailer_wos_forecast(
             rtl_pos, mp, _opn_w1,
             description, product_category, product_subcategory,
             brand, brand_pt, season,
-            opn_w_list=[float(row.get(f"Opn_W{i}") or 0) for i in range(1, 27)])
+            opn_w_list=[float(row.get(f"Opn_W{i}") or 0) for i in range(1, 27)],
+            ord_l13w=_f92_ord_l13w)
 
     elif (is_amazon
           and pos_data is not None
