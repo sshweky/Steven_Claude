@@ -209,8 +209,10 @@ def main():
         print(f"  [{p['id']}] {p['key']} {p['rule_id']:9} item {p['item_gap_before']:+,} -> {p['item_gap_after']:+,}  sys {p['sys_gap_before']:+,} -> {p['sys_gap_after']:+,}  (|sys| closed {p['sys_closed_abs']:+,})")
 
 
-def build_html(proposals):
+def build_html(proposals, scope_data, item_recs):
     proposals_json = json.dumps(proposals).replace("</", "<\\/")
+    scope_json = json.dumps(scope_data).replace("</", "<\\/")
+    item_json = json.dumps(item_recs).replace("</", "<\\/")
 
     css = """
 * { box-sizing: border-box; }
