@@ -9155,30 +9155,6 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
     if snap(baseline_pps, mp) == 0:
         return None   # POS baseline snaps to 0 at this MP -- fall through to order-history model
 
-    # F92 (2026-05-29) -- Order-history baseline floor for non-Amazon retailers.
-    # When the POS-derived baseline falls below 85% of the customer's L13W
-    # ORDER history (i.e. ship-through pace from Projections, not consumer
-    # POS), raise the baseline to that floor.  Reason: planner feedback on
-    # 23011-FF10159 (Walmart / A&H Core Grooming) -- order L13W is ~10,100/wk
-    # but POS-derived baseline computed at ~7,640 (~25% below true ship pace),
-    # producing chronic under-projection across all 26 weeks.
-    #
-    # Applies only to non-Amazon path (amz_aur_data is None). Amazon's F85
-    # has its own AUR-aware baseline logic that handles this differently.
-    #
-    # Validated systemic impact (2026-05-29 AI Training Review):
-    #   206 Retailer WOS (POS) records, |gap| 810,971u -> 18,763u
-    #   (closes 792,208u; 25.7% -> 0.6%)
-    if amz_aur_data is None and ord_l13w > 0:
-        _f92_floor = snap(ord_l13w * 0.85, mp)
-        print(f"  [F92-DEBUG] ord_l13w={ord_l13w:.1f}  floor={_f92_floor}  baseline_pps={baseline_pps:.1f}  fired={_f92_floor > baseline_pps}", flush=True)
-        if _f92_floor > baseline_pps:
-            baseline_pps = float(_f92_floor)
-            _baseline_src = (
-                f"F92 floor (Ord L13W ship pace {ord_l13w:.0f}/wk x 0.85 = "
-                f"{_f92_floor:,}/wk, snap to mp={mp}) [was: {_baseline_src}]"
-            )
-
     # -- Step 2: WOS fill (with projected-OH correction) ----------------------
     # F86 (2026-05-25) OH data guard: if oh_lw == 0 AND oh_wos == 0, the
     # retailer did not report DC inventory for this item this week.  Don't
