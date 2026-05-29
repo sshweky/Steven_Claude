@@ -651,10 +651,6 @@ function decide(id, d) {
 function openModify(id) {
   document.getElementById('modbox-' + id).classList.add('open');
 }
-function cancelModify(id) {
-  document.getElementById('modbox-' + id).classList.remove('open');
-  document.getElementById('modtext-' + id).value = '';
-}
 // PREVIEW UPDATE flow: send text to Claude via the bridge, await updated AI new values,
 // refresh the card. Card status remains PENDING; user then clicks Approve / Reject.
 function previewUpdate(id) {
