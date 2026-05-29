@@ -656,11 +656,8 @@ function cancelModify(id) {
 }
 function saveModify(id) {
   const text = document.getElementById('modtext-' + id).value.trim();
-  // Allow saving with no text (params alone are enough) -- store params + optional text
-  STATE.modifications[id] = {
-    params: JSON.parse(JSON.stringify(STATE.params[id])),
-    notes: text,
-  };
+  if (!text) { alert('Type a modification first (or click Cancel).'); return; }
+  STATE.modifications[id] = { notes: text };
   decide(id, 'modify');
   document.getElementById('modbox-' + id).classList.remove('open');
 }
