@@ -395,6 +395,18 @@ def analyze_mstyle(ms, inv_data, demand_wks, ai_wks, acct_list):
 
 
 # ── Report generation ──────────────────────────────────────────────────────────
+# ISSUE_SUMMARY: static one-liner for the summary table (no format variables)
+ISSUE_SUMMARY = {
+    "OOS_TRUE":     "Item is truly out of stock in W1 with no bridge receipt.",
+    "REORDER_NOW":  "Simulated inventory hits zero within lead-time window. Order this week.",
+    "DATA_GAP":     "W1 Beg Inv = 0 but carry-forward implies stock exists. Likely QB timing lag.",
+    "REORDER_WATCH":"Projected stockout soon. Order within 2 weeks to stay covered.",
+    "LOW_WOS":      "Current WOS below 50% of safety target. Thin buffer vs lead time.",
+    "OVERSTOCK":    "Pipeline units exceed 26-week demand + safety stock. Consider cancelling POs.",
+    "MISMATCH":     "Manual plan is 20%+ above AI for 3+ weeks. Planner may be over-projecting.",
+}
+
+# ISSUE_DESC: per-row action line with format variables filled from each record
 ISSUE_DESC = {
     "OOS_TRUE":     "Item is truly out of stock in W1 with no bridge receipt. "
                     "Orders placed now cannot arrive for {lt_wks} weeks.",
