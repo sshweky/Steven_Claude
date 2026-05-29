@@ -8288,7 +8288,19 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
                                        flags=_re2.IGNORECASE)
             _parent_cat = (amazon_catalog_us or {}).get(_amzcat_parent)
             if _parent_cat:
-                amz_catalog = _parent_cat
+                # Inherit pricing/buyability signals (AUR, MAP, buybox, OOS days,
+                # buyability flag) from the parent ASIN -- these are shared for
+                # variants of the same physical product.
+                # BUT: zero out inventory health fields (Inv_SOH, Inv_OPO, Inv_WOS)
+                # because the EC variant has a different ASIN with separate DC
+                # inventory that we don't have data for.  Applying the parent's
+                # overstock/understock status to an EC variant causes F59h and F85
+                # to over-gate the forecast (e.g. parent has 16 WOS of FF9298 but
+                # FF9298EC inventory is independent and unknown).
+                amz_catalog = dict(_parent_cat)
+                amz_catalog["Inv_SOH"] = 0.0
+                amz_catalog["Inv_OPO"] = 0.0
+                amz_catalog["Inv_WOS"] = 0.0
     # Forward lookup for amz_catalog: base style falls back to variant catalog entry.
     if is_amazon and amz_catalog is None:
         _fwd_base_ms2 = row.get("Mstyle", "")
