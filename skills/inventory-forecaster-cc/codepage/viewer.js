@@ -4408,6 +4408,11 @@ async function toggleDetail(key) {
       let _endInv = null;
       if (_endInvBv !== null && _endInvPv !== null) {
         _endInv = _endInvBv + _endInvRv - _endInvPv;
+        const endColor = _endInv < 0 ? '#c62828' : _endInv === 0 ? '#e65100' : '#6d4c00';
+        const endBold  = _endInv < 0 ? 700 : 400;
+        endInvCells += `<td style="color:${endColor};font-size:10px;background:#fff3e0;font-weight:${endBold}">${fmtN(Math.round(_endInv))}</td>`;
+      } else {
+        endInvCells += `<td style="color:#bbb;font-size:10px;background:#fff3e0"> - </td>`;
       }
       // Ending WOS OH = Ending Inv / Prj demand this week
       if (_endInv !== null && _prj) {
