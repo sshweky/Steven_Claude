@@ -280,6 +280,36 @@ See `REVIEW_AI_TRAINING.md` for the full procedure including chart formatting, A
 
 ---
 
+## Trigger: "Commit Decisions"
+
+When the user types **"commit decisions"**, **"apply decisions"**, **"commit"** (in the context of an open training review session), or **"apply approved"**:
+
+1. Pull the decisions payload from the live browser tab via Chrome MCP:
+   ```
+   javascript_tool({ action: 'javascript_exec', tabId: <tab>, text: 'JSON.stringify(window.__DECISIONS_PAYLOAD || null)' })
+   ```
+2. If the payload is null, ask the user to click "Lock in Decisions" on the page first (or paste the JSON directly into chat).
+3. Parse the payload. For each proposal where `decisions[id] in ('approve','modify')`:
+   - **Approved with default params**: apply the rule's stock implementation (per `rule_loc` field) to `scripts/inventory_forecaster.py` using the Edit tool. Use the next available F-number (search current file for `^# F\d+`).
+   - **Modified**: same code-edit pattern but parameters from `final_params[id]` instead of defaults. Free-text notes in `modifications[id].notes` become a TODO comment in the rule docstring -- do NOT silently apply them, surface them to the user first.
+   - **Item-level (e.g., F94-ITEM Burlington)**: insert an AI Comment row into QB table `bv2jirwts` (FLAG='AI Comment', Note describing the override) via REST API. Do NOT add code to `inventory_forecaster.py`.
+4. Before any code edits land, show the user a one-screen summary:
+   ```
+   COMMIT PLAN -- K approved + M modified, R rejected
+     [1] APPROVE F92 floor_mult=0.85 restore_zeros=true restore_thresh=4.0
+         -> insert new rule in _retailer_wos_forecast() (~line ~9100)
+     [2] APPROVE F93 coverage_mode=greedy num_weeks=3
+         -> insert new rule after F37 in forecast_record()
+     [3] APPROVE F94-ITEM week_to_zero=10
+         -> insert AI Comment row in QB bv2jirwts for 13640-BB21626
+   Type 'go' to apply, 'cancel' to abort.
+   ```
+5. Wait for 'go' (or equivalent). Then apply edits, run a smoke test on the affected items, and report.
+6. After successful apply, mark the source comments as Reviewed in QB (they already are, since today's run pre-marked them; just append the processed IDs to `analysis/ai_training_processed.json` to be safe).
+7. **Do not auto-run the forecast or auto-write to QB.** Stop after edits and let the user drive the next step.
+
+---
+
 ## Prerequisites (one-time)
 
 ```bash
