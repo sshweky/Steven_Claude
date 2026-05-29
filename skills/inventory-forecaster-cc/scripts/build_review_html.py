@@ -665,23 +665,34 @@ function saveModify(id) {
 function saveAll() {
   const out = {
     generated_at: new Date().toISOString(),
+    review_date: '2026-05-29',
     decisions: STATE.decisions,
     modifications: STATE.modifications,
     final_params: STATE.params,
     final_state: PROPOSALS.map(p => ({
-      id: p.id, key: p.key, rule_id: p.rule_id, rule_title: p.rule_title,
-      item_ai_after: p.item_ai_after, item_gap_after: p.item_gap_after,
-      sys_gap_after: p.sys_gap_after, sys_closed_abs: p.sys_closed_abs,
+      id: p.id, key: p.key, rule_id: p.rule_id, rule_fn_id: p.rule_fn_id,
+      rule_title: p.rule_title, rule_loc: p.rule_loc,
+      item_ai_before: p.item_ai_before, item_ai_after: p.item_ai_after,
+      item_gap_before: p.item_gap_before, item_gap_after: p.item_gap_after,
+      sys_scope: p.sys_scope, sys_gap_before: p.sys_gap_before, sys_gap_after: p.sys_gap_after,
+      sys_closed_abs: p.sys_closed_abs, is_item_level: !!p.is_item_level,
       ai_new: p.ai_new,
     })),
   };
-  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'training_review_decisions_2026-05-29.json';
-  a.click();
-  URL.revokeObjectURL(url);
+  // Store on window so Claude Code can grab it via the Chrome MCP browser bridge
+  window.__DECISIONS_PAYLOAD = out;
+  // Also display the JSON on the page as a fallback
+  document.getElementById('commit-payload').innerText = JSON.stringify(out, null, 2);
+  document.getElementById('commit-banner').style.display = 'block';
+  document.getElementById('save-btn').innerText = 'Re-lock (after editing)';
+  document.getElementById('commit-help').innerText = 'Re-click after making changes to update the locked payload.';
+}
+
+function copyPayload() {
+  const txt = document.getElementById('commit-payload').innerText;
+  navigator.clipboard.writeText(txt).then(() => {
+    alert('Payload copied to clipboard. Paste into Claude Code if the browser bridge is unavailable.');
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
