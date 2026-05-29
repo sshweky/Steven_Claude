@@ -17,9 +17,9 @@ var QB_REALM  = 'pim.quickbase.com';
 var QB_TOKEN  = 'QB-USER-TOKEN b39re4_mkf7_du2buby24kr7d4hkcu9cpxn69s';
 var INVF_TID  = 'bpsaju5pm';
 var PROJ_TID  = 'bpd237tvm';
-var CACHE_KEY     = 'pp_inv_mgmt_v3';          // main (phase 1) IDB key
+var CACHE_KEY     = 'pp_inv_mgmt_v4';          // main (phase 1) IDB key -- v4: fixed Brand/Desc FIDs 197/205
 var CACHE_KEY_DTL = 'pp_inv_mgmt_dtl_v4';      // detail (phase 2) IDB key -- v4: added need_qty/etd per supplier
-var CACHE_KEY_SS  = 'pp_inv_mgmt_ss_v4';       // sessionStorage fast-path key (bump to evict v3 stale data)
+var CACHE_KEY_SS  = 'pp_inv_mgmt_ss_v5';       // sessionStorage fast-path key (bump to evict stale data)
 var CACHE_TTL     = 24 * 60 * 60 * 1000;       // 24h (was 6h)
 // Pre-filter: exclude truly inactive items (qty_oh=0 AND opt_wos=0).
 // ItemStatus (fid 294) is a lookup -- cannot be used in QB WHERE -- so we use numeric fields.
