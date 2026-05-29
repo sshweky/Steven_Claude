@@ -14899,14 +14899,19 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "prior_total": int(prior),
         "pct_diff":    round(pct * 100, 1),
         "confidence":  _confidence,
-        # Normalized Ord/Wk L4w / L13w / L26w (post-F35/F41/F43/F47/ATS normalization).
-        # Per-week order rate with duplicates, catch-up stock-up orders, and OOS
-        # distortion removed.  All three are written to QB Projections each run so
-        # planners can compare normalized demand across time horizons.  L13w is also
-        # surfaced in build_ai_analysis() when it differs materially from the raw rate.
-        "norm_l4w":    round(sum(float(v) for v in hist[-4:])  / 4,  1),
-        "norm_l13w":   round(sum(float(v) for v in hist[-13:]) / 13, 1),
-        "norm_l26w":   round(sum(float(v) for v in hist[-26:]) / 26, 1),
+        # Normalized Ord/Wk L4w / L13w / L26w (post-F35/F41/F47/ATS normalization,
+        # but NOT post-F43).  F43 is a forecast-quality cap -- it prevents Croston's
+        # from amplifying spikes but should NOT reduce the demand signal for fully
+        # in-stock items with genuine demand growth.  Using hist_pre_f43 ensures
+        # norm_l13w reflects true demand after removing phantoms/duplicates/OOS
+        # artifacts, without artificially depressing it via F43's spike cap.
+        # All three are written to QB Projections each run so planners can compare
+        # normalized demand across time horizons.  L13w is also surfaced in
+        # build_ai_analysis() when it differs materially from the raw rate.
+        _norm_hist = _sig.get("hist_pre_f43") or hist
+        "norm_l4w":    round(sum(float(v) for v in _norm_hist[-4:])  / 4,  1),
+        "norm_l13w":   round(sum(float(v) for v in _norm_hist[-13:]) / 13, 1),
+        "norm_l26w":   round(sum(float(v) for v in _norm_hist[-26:]) / 26, 1),
         # Business-language strip sentences for codepage tooltip (2026-05-27).
         # Pipe-delimited; viewer parses via split('|').
         "norm_strips": _norm_strips_str,
