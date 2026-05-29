@@ -5460,6 +5460,10 @@ async function _loadAmzDcInv(r, safeId) {
   // AUR fields (fetched from bqkdjaqi7)
   let aurLw = 0, aurL4w = 0, aurL13w = 0, aurL26w = 0, aurL52w = 0;
   let aurFetchOk = false;
+  // Switchover: if this style replaced an old one (r.switchover_from is set),
+  // inherit POS / DM history from the old mstyle when no data exists for the new one.
+  const swFrom = (r.switchover_from || '').trim().toUpperCase();
+  const swFromStripped = swFrom ? swFrom.replace(/\/\d+$/, '') : '';
   try {
     // POS_LW (154) + POS_PRIOR_WK (180) are pre-aggregated weekly totals from
     // Amazon Catalog, updated weekly via Amazon's API.  Also fetched here as
