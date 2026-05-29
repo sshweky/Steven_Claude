@@ -4635,8 +4635,9 @@ async function toggleDetail(key) {
     }
   }
   // -- F60 EC-variant history backfill ---------------------------------------
-  // EC variant rows have all-zero QB order history because Amazon orders
-  // against the parent style (e.g. FF35147), not the EC variant (FF35147EC).
+  // Switchover variant rows (EC, AMZ, COS) have all-zero QB order history
+  // because Amazon orders against the parent style (e.g. FF35147), not the
+  // variant (FF35147EC / FF35147AMZ / FF35147COS).
   // The forecaster inherits the parent's history internally (F60), but never
   // writes it back to QB.  Mirror that here so the detail panel shows the
   // same demand signal the AI used rather than a misleading wall of zeros.
