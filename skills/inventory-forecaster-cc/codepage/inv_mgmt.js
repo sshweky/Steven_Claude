@@ -1050,7 +1050,6 @@ var COLS = [
   { id:'prj_wk', label:'Prj/Wk', align:'right', numeric:true, get:function(r){return r.prj_wk;}, render:function(r){return '<td class="right">'+fmtInt(r.prj_wk)+'</td>';} },
   { id:'prj_l4w_change', label:'+/- L4w', align:'right', numeric:true, get:function(r){return r.prj_l4w_change;},
     render:function(r){var l4w=r.prj_l4w_change;var up=l4w>5,dn=l4w<-5;var clr=up?'#2e7d32':dn?'#c62828':'inherit';var arr=up?'&#9650;':dn?'&#9660;':'';return '<td class="right" style="color:'+clr+';font-weight:'+(up||dn?'600':'400')+'">'+(arr?arr+' ':'')+fmt(l4w)+'%</td>';} },
-  { id:'opt_wos', label:'Opt WOS', align:'right', numeric:true, get:function(r){return r.opt_wos;}, render:function(r){return '<td class="right">'+fmt(r.opt_wos)+'</td>';} },
   { id:'ats_wos_oh', label:'ATS WOS', align:'right', numeric:true, get:function(r){return r.ats_wos_oh;},
     render:function(r){return '<td class="right '+(r.ats_wos_oh>0&&r.ats_wos_oh<r.opt_wos?'pri-HIGH':'')+'">'+fmt(r.ats_wos_oh)+'</td>';} },
   { id:'ats_wos_oh_oo', label:'ATS WOS OH+OO', align:'right', numeric:true, get:function(r){return r.ats_wos_oh_oo;},
