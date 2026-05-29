@@ -542,6 +542,7 @@ Location:  ${p.rule_loc}</span>
       <div class="section-title">26-Week Projections (${p.key})</div>
       <div class="chart-wrap"><canvas id="chart-${p.id}"></canvas></div>
     </div>
+    <div class="mod-summary" id="modsummary-${p.id}" style="display:none;margin-top:14px;padding:10px 14px;background:#fff3e0;border-left:3px solid #ed6c02;border-radius:4px;font-size:13px;color:#7c2d12;"></div>
     <div class="actions">
       <button class="btn approve" onclick="decide(${p.id}, 'approve')">Approve</button>
       <button class="btn reject"  onclick="decide(${p.id}, 'reject')">Reject</button>
@@ -711,7 +712,10 @@ async function previewUpdate(id) {
 
 function cancelModify(id) {
   document.getElementById('modbox-' + id).classList.remove('open');
-  document.getElementById('modtext-' + id).value = '';
+  // Don't wipe the textarea if a modification is already saved -- preserve it for re-edit
+  if (!STATE.modifications[id]) {
+    document.getElementById('modtext-' + id).value = '';
+  }
   document.getElementById('preview-status-' + id).innerHTML = '';
 }
 
