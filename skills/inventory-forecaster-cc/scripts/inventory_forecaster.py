@@ -8364,6 +8364,13 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     # The parent mstyle catalog often HAS valid Inv_SOH (its ASIN IS indexed).
     # EC/COS variants share the vendor DC pool with the base item; borrowing
     # the parent SOH is the correct anchor for the WOS/fill calc.
+    # DEBUG F91 (remove after investigation)
+    _f91_dbg_ms2 = (row.get("Mstyle") or "").upper()
+    if "FF10159" in _f91_dbg_ms2:
+        print(f"      [F91 DEBUG] entering check: ms={_f91_dbg_ms2!r} "
+              f"amz_catalog={'present' if amz_catalog is not None else 'None'} "
+              f"Inv_SOH={float((amz_catalog or {}).get('Inv_SOH') or 0) if amz_catalog else 'N/A'} "
+              f"Sellable_On_Hand_Units={float((amz_catalog or {}).get('Sellable_On_Hand_Units') or 0) if amz_catalog else 'N/A'}", flush=True)
     if amz_catalog is not None and (
         float(amz_catalog.get("Inv_SOH") or 0) == 0 and
         float(amz_catalog.get("Sellable_On_Hand_Units") or 0) == 0
@@ -9713,6 +9720,13 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _f85_pos_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
         _f85_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
         _f85_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
+        # DEBUG F85 (remove after investigation)
+        _f85_dbg_ms = row.get("Mstyle", "")
+        if "FF10159" in _f85_dbg_ms:
+            print(f"      [F85 DEBUG] ms={_f85_dbg_ms!r} amz_catalog={'present' if amz_catalog else 'None'} "
+                  f"Inv_SOH={_f85_soh} Sellable_On_Hand_Units="
+                  f"{float((amz_catalog or {}).get('Sellable_On_Hand_Units') or 0)} "
+                  f"AUR_L4w={float((amz_catalog or {}).get('AUR_L4w') or 0)}", flush=True)
         # F89: W1+W2 open orders from Inventory Flow
         _f85_if_rec   = (inv_flow_data or {}).get(row.get("Mstyle", ""))
         _f85_opn_list = (_f85_if_rec or {}).get("opn") or []
