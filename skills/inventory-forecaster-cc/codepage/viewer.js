@@ -4191,7 +4191,9 @@ async function toggleDetail(key) {
   //   1) Beg Inv          (Wk1..Wk26 numeric, beginning-of-week balance)
   //   2) Prj Demand       (PrjWk1..PrjWk26 numeric, projected weekly demand)
   //   3) Expected Receipts (RcvWk1..RcvWk26 numeric)
-  //   4) WOS OH            = Beg Inv / Prj demand, computed client-side, 1 decimal
+  //   4) Open Orders       (OpnWk1..OpnWk26 from customer POs)
+  //   5) Ending Inv        = Beg Inv + Rcv - Prj Demand, computed client-side
+  //   6) Ending WOS OH     = Ending Inv / Prj demand this week, computed client-side, 1 decimal
   // Always rendered so planners see whether QB has data (dashes when missing).
   const _beg = r.inv_flow_beg || null;
   const _rcv = r.inv_flow_rcv || null;
