@@ -75,9 +75,11 @@ def _qb_request(method, path, payload=None):
                 if not body:
                     raise RuntimeError("Empty 200 response (throttle signal)")
                 if elapsed_ms > config.QB_LATENCY_WARN_MS:
-                    print(f"  [WARN] QB latency {elapsed_ms:.0f}ms")
+                    print(f"  [WARN] QB latency {elapsed_ms:.0f}ms -- realm may be under pressure")
                 if elapsed_ms > config.QB_LATENCY_ABORT_MS:
-                    raise RuntimeError(f"QB latency abort at {elapsed_ms:.0f}ms")
+                    # Warn but do not abort -- reconcile is a weekly batch, not interactive.
+                    print(f"  [WARN] QB latency {elapsed_ms:.0f}ms exceeds abort threshold -- adding 5s cooldown")
+                    time.sleep(5)
                 return json.loads(body)
         except urllib.error.HTTPError as exc:
             body_text = exc.read().decode("utf-8", errors="replace") if exc.fp else ""
