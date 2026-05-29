@@ -1814,6 +1814,12 @@ function renderDetail(r) {
 
     var bestMU = suppCols.reduce(function(b, s){ return (s.mu_nj||0) > b ? (s.mu_nj||0) : b; }, 0);
 
+    // Best-in-class tags (only meaningful when there are 2+ suppliers to compare)
+    var _elcCandidates = suppCols.filter(function(s){ return s.elc_nj > 0; });
+    var _ltCandidates  = suppCols.filter(function(s){ return s.lt > 0; });
+    var bestElcNj = _elcCandidates.length > 1 ? _elcCandidates.reduce(function(b,s){ return s.elc_nj < b ? s.elc_nj : b; }, Infinity) : -1;
+    var bestLt    = _ltCandidates.length  > 1 ? _ltCandidates.reduce(function(b,s){ return s.lt < b ? s.lt : b; }, Infinity)         : -1;
+
     function scRow(lbl, val, hl) {
       var vStyle = hl ? 'font-weight:700;color:#1b5e20;' : 'color:#222;font-weight:500;';
       return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;">'
