@@ -1973,7 +1973,7 @@ def main():
 
     # Step 1: Fetch AI Training comments
     print("\n[1/5] Fetching AI Training comments...", flush=True)
-    comments, note_fid = fetch_ai_training_comments(args.days, note_fid)
+    comments, note_fid = fetch_ai_training_comments(args.days, note_fid, args.flag)
 
     if not comments:
         print("  No new AI Training comments to process.\n")
