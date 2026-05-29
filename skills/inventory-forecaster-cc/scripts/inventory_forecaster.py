@@ -9698,13 +9698,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _f85_pos_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
         _f85_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
         _f85_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
-        # DEBUG F85 (remove after investigation)
-        _f85_dbg_ms = row.get("Mstyle", "")
-        if "FF10159" in _f85_dbg_ms:
-            print(f"      [F85 DEBUG] ms={_f85_dbg_ms!r} amz_catalog={'present' if amz_catalog else 'None'} "
-                  f"Inv_SOH={_f85_soh} Sellable_On_Hand_Units="
-                  f"{float((amz_catalog or {}).get('Sellable_On_Hand_Units') or 0)} "
-                  f"AUR_L4w={float((amz_catalog or {}).get('AUR_L4w') or 0)}", flush=True)
         # F89: W1+W2 open orders from Inventory Flow
         _f85_if_rec   = (inv_flow_data or {}).get(row.get("Mstyle", ""))
         _f85_opn_list = (_f85_if_rec or {}).get("opn") or []
