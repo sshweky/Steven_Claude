@@ -1946,6 +1946,10 @@ def main():
                         help="Look back N days (default: 30)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Analyze but skip email and QB write-back")
+    parser.add_argument("--flag",    type=str, default="AI Training",
+                        help="QB Flag value to query (default: 'AI Training'). "
+                             "Use 'Reviewed' to re-pull already-processed comments "
+                             "for re-analysis -- pair with --dry-run to avoid re-emailing.")
     args = parser.parse_args()
 
     run_date = datetime.now().strftime("%Y-%m-%d")
