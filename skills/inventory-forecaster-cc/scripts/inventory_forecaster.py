@@ -16539,13 +16539,13 @@ def build_ai_analysis(rec, row, ec_superseded=False, pos=None, amz_catalog=None)
                 if ord_lw > 0:
                     _pos_parts.append(f"LW {int(ord_lw):,}u")
                 if l4 > 0:
-                    _pos_parts.append(f"L4W {l4:.0f}/wk")
+                    _pos_parts.append(f"L4W {int(round(l4)):,}/wk")
                 if _l13_display > 0:
-                    _pos_parts.append(f"L13W {_l13_display:.0f}/wk")
+                    _pos_parts.append(f"L13W {int(round(_l13_display)):,}/wk")
                 if l26 > 0:
-                    _pos_parts.append(f"L26W {l26:.0f}/wk")
+                    _pos_parts.append(f"L26W {int(round(l26)):,}/wk")
                 if l52 > 0:
-                    _pos_parts.append(f"L52W {l52:.0f}/wk")
+                    _pos_parts.append(f"L52W {int(round(l52)):,}/wk")
                 if _pos_parts:
                     pinned_last.append(
                         f"<b>Amazon POS Sales:</b> "
