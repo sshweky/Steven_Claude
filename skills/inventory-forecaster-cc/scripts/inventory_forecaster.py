@@ -17277,6 +17277,27 @@ def main():
                 else:
                     print(f"\n[2.6b] Amazon Inventory Health skipped "
                           f"(no ASINs in Catalog US -- field may not exist in that table)")
+            # F90 (2026-05-29): Inv_SOH fallback to Sellable_On_Hand_Units.
+            # When Phase 2.6b returned no data for an ASIN (not indexed in
+            # Amazon Inventory Health -- common for EC/COS variants), Inv_SOH
+            # stays absent from the catalog dict.  Every downstream rule that
+            # reads Inv_SOH (F85, F59h, F59j, Fdclag, F35d, F37, F_AMZ_RPL)
+            # then treats SOH as 0 -- causing false OOS/restock spikes.
+            # Fix once here: copy Sellable_On_Hand_Units (FID 341 from Phase
+            # 2.6, already in the dict) into Inv_SOH when Inv_SOH is absent.
+            # Both fields represent Amazon's sellable DC stock; FID 341 from
+            # Amazon Catalog US and FID 14 from Inventory Health are the same
+            # metric from different tables.
+            _f90_filled = 0
+            for _f90_ms, _f90_cat in amazon_catalog_us.items():
+                if float(_f90_cat.get("Inv_SOH") or 0) == 0:
+                    _f90_soh_fb = float(_f90_cat.get("Sellable_On_Hand_Units") or 0)
+                    if _f90_soh_fb > 0:
+                        _f90_cat["Inv_SOH"] = _f90_soh_fb
+                        _f90_filled += 1
+            if _f90_filled:
+                print(f"      [F90] {_f90_filled} mstyle(s) backfilled Inv_SOH from "
+                      f"Sellable_On_Hand_Units (Inventory Health data absent)")
             # Save cache AFTER health merge so it's a single complete file
             _pull_cache_save("phase2_6", amazon_catalog_us)
 
