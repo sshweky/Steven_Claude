@@ -1126,9 +1126,13 @@ function buildTableHead() {
   var tbl=document.getElementById('mainTable');
   var cg=tbl.querySelector('colgroup');
   if(!cg){cg=document.createElement('colgroup');tbl.insertBefore(cg,tbl.firstChild);}
+  // Auto-fit: distribute columns proportionally across 100% of the available
+  // container width.  COL_WIDTHS still controls relative column proportions;
+  // we just express them as percentages rather than fixed pixels so the table
+  // always fills the viewport without a horizontal scrollbar.
   var totalW=cols.reduce(function(s,c){return s+(COL_WIDTHS[c.id]||62);},0);
-  cg.innerHTML=cols.map(function(c){return '<col style="width:'+(COL_WIDTHS[c.id]||62)+'px">';}).join('');
-  tbl.style.width=totalW+'px';
+  cg.innerHTML=cols.map(function(c){return '<col style="width:'+(((COL_WIDTHS[c.id]||62)/totalW)*100).toFixed(2)+'%">';}).join('');
+  tbl.style.width='100%';
 
   var h1='<tr class="sort-row">';
   cols.forEach(function(c){
