@@ -9681,16 +9681,6 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _f85_pos_l13  = float(pos_data.get("Avg_Units_Wk_L13w") or 0)
         _f85_soh      = float((amz_catalog or {}).get("Inv_SOH") or 0)
         _f85_wos      = float((amz_catalog or {}).get("Inv_WOS") or 0)
-        # F90 (2026-05-29): Inv_SOH fallback to Sellable_On_Hand_Units.
-        # Inv_SOH is populated by Amazon Inventory Health [2.6b].  When [2.6b]
-        # returns no data (ASIN not found in health table -- common for EC/COS
-        # variants that share an ASIN with a parent but aren't directly indexed),
-        # Inv_SOH stays 0.  Sellable_On_Hand_Units from Amazon Catalog US [2.6]
-        # is a reliable substitute -- both represent sellable DC stock.  Use it
-        # when Inv_SOH is absent so F85 WOS calc has a real inventory anchor
-        # rather than treating the DC as empty and firing a massive restock order.
-        if _f85_soh <= 0:
-            _f85_soh = float((amz_catalog or {}).get("Sellable_On_Hand_Units") or 0)
         # F89: W1+W2 open orders from Inventory Flow
         _f85_if_rec   = (inv_flow_data or {}).get(row.get("Mstyle", ""))
         _f85_opn_list = (_f85_if_rec or {}).get("opn") or []
