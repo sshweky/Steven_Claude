@@ -17055,12 +17055,32 @@ def main():
             _dm_fresh  = _dm_age_h < _DM_DAILY_CACHE_MAX_AGE_H    # < 24h old
             _dm_ok_hr  = _now_hour  < _DM_PULL_CUTOFF_HOUR         # before 6 AM
 
-            if _dm_fresh and _dm_data is not None:
-                # Cache is fresh -- use it regardless of time of day
+            # Coverage check: if the cache was built from a narrow single-record
+            # debug run it may have far fewer mstyles than this scope needs.
+            # A cache with < 10% of the expected mstyle count is treated as
+            # effectively missing so the full scope gets fresh DM data.
+            _dm_coverage_ok = (
+                _dm_data is not None
+                and (len(_dm_data) >= max(1, len(amazon_mstyles) * 0.10)
+                     or len(amazon_mstyles) <= 5)  # single-record runs always OK
+            )
+            if _dm_fresh and _dm_data is not None and _dm_coverage_ok:
+                # Cache is fresh AND has adequate coverage -- use it
                 amazon_pos = _dm_data
                 print(f"      [DM-DAILY-CACHE] using cached data "
                       f"({_dm_age_h:.1f}h old, limit {_DM_DAILY_CACHE_MAX_AGE_H}h) "
                       f"-- {len(amazon_pos)} mstyles", flush=True)
+            elif _dm_fresh and _dm_data is not None and not _dm_coverage_ok:
+                # Cache is fresh but was built from a narrow run -- must refresh
+                print(f"      [DM-DAILY-CACHE] cache has {len(_dm_data)} mstyles but "
+                      f"scope needs ~{len(amazon_mstyles)} -- insufficient coverage, "
+                      f"pulling fresh regardless of age", flush=True)
+                try:
+                    amazon_pos = fetch_amazon_daily_metrics_pos(amazon_mstyles)
+                except Exception as _p25_err:
+                    print(f"      [WARN] Phase 2.5 QB REST fetch failed: {_p25_err}")
+                    amazon_pos = _dm_data or {}
+                _dm_daily_cache_save(amazon_pos)
             elif _dm_ok_hr:
                 # Before 6 AM and cache is stale (or missing) -- pull fresh
                 print(f"      [DM-DAILY-CACHE] cache is "
