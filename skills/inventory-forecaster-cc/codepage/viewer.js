@@ -5650,16 +5650,20 @@ async function _loadAmzDcInv(r, safeId) {
   const fmtAur = n => '$' + n.toFixed(2);
   const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
 
-  // POS bullet — hasPos covers the avgs; posLw/posL2w may be populated independently
-  const hasPos = fetchOk && (posLw > 0 || posL2w > 0 || posL4w > 0 || posL13w > 0 || posL26w > 0 || posL52w > 0);
+  // POS bullet — hasPos covers the avgs; posLw/posL2w may be populated
+  // independently from Daily Metrics (including via EC parent fallback).
+  // dmWeeks data is always valid regardless of fetchOk (catalog query result).
+  const _hasDmData = dmWeeks && dmWeeks.length > 0 && (posLw > 0 || posL2w > 0);
+  const hasPos = (fetchOk && (posL4w > 0 || posL13w > 0 || posL26w > 0 || posL52w > 0))
+              || posLw > 0 || posL2w > 0;  // DM weekly data always counts
   let posBulletHtml;
-  if (!fetchOk) {
+  if (!fetchOk && !_hasDmData) {
     posBulletHtml = '<b>Amazon POS sales:</b> <span style="color:#999;font-style:italic">not in catalog (no data)</span>';
   } else if (!hasPos) {
     posBulletHtml = '<b>Amazon POS sales:</b> <span style="color:#999;font-style:italic">no consumer sales data</span>';
   } else {
     const posItems = [];
-    if (posLw   > 0) posItems.push(`<b>LW</b> ${fmtPos(posLw)} u`);
+    if (posLw   > 0) posItems.push(`<b>LW</b> ${fmtPos(posLw)} u${dmUsedParent ? '<sup style="color:#f57f17" title="Inherited from parent mstyle">*</sup>' : ''}`);
     if (posL2w  > 0) posItems.push(`<b>LW-1</b> ${fmtPos(posL2w)} u`);
     if (posL4w  > 0) posItems.push(`<b>L4W avg</b> ${fmtPos(posL4w)} u/wk`);
     if (posL13w > 0) posItems.push(`<b>L13W avg</b> ${fmtPos(posL13w)} u/wk`);
