@@ -2105,8 +2105,6 @@ async function forceRefresh() {
 // (not in <head>) - but this guard handles both placements safely.
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('searchInput').oninput=applyFilters;
-  document.getElementById('gapsOnly').onchange=applyFilters;
-  document.getElementById('overstockOnly').onchange=applyFilters;
   document.getElementById('hideInactive').onchange=applyFilters;
 
   // Wire up static Action dropdown panel checkboxes
