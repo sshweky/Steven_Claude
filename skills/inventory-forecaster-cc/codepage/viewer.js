@@ -4401,41 +4401,50 @@ async function toggleDetail(key) {
       } else {
         rcvCells += `<td style="color:#bbb;font-size:10px;background:#f0f7ff"> - </td>`;
       }
-      // WOS OH = weeks of coverage via forward simulation (NOT bv/pv for this week
-      // alone  -  that blows up on large-order spike weeks).
-      if (_beg && _prj) {
-        const bv = _beg[i];
-        let wos, wosTxt, wosColor;
+      // Ending Inventory = Beg Inv + Expected Receipts - Prj Demand
+      const _endInvBv = _beg ? (_beg[i] || 0) : null;
+      const _endInvRv = _rcv ? (_rcv[i] || 0) : 0;
+      const _endInvPv = _prj ? (_prj[i] || 0) : null;
+      let _endInv = null;
+      if (_endInvBv !== null && _endInvPv !== null) {
+        _endInv = _endInvBv + _endInvRv - _endInvPv;
+      }
+      // Ending WOS OH = Ending Inv / Prj demand this week
+      if (_endInv !== null && _prj) {
+        const bv  = _beg ? (_beg[i] || 0) : 0;
+        const pv  = _prj[i] || 0;
+        let endWos, wosTxt, wosColor;
         let cellBg = '#f8f0fb';
-        if (bv > 0) {
-          wos = _wosForward(bv, _prj, i);
-          const maxWks = 26 - i;   // remaining weeks in the horizon
-          if (wos >= maxWks) {
-            wosTxt = _invFmt1(wos);
-            wosColor = '#1b5e20';                      // covered through horizon
-          } else {
-            wosTxt = _invFmt1(wos);
-            if (wos < 1)             wosColor = '#c62828';
-            else if (wos < _optWos && _optWos > 0) wosColor = '#e65100';
-            else if (wos < 4)        wosColor = '#e65100';
-            else                     wosColor = '#4a148c';
-          }
+        if (_endInv > 0 && pv > 0) {
+          endWos   = _endInv / pv;
+          wosTxt   = _invFmt1(endWos);
+          if (endWos < 1)                               wosColor = '#c62828';
+          else if (_optWos > 0 && endWos < _optWos)     wosColor = '#e65100';
+          else if (endWos < 4)                          wosColor = '#e65100';
+          else                                          wosColor = '#4a148c';
+        } else if (_endInv <= 0) {
+          endWos   = 0;
+          wosTxt   = _endInv < 0 ? _invFmt1(0) : ' - ';
+          wosColor = _endInv < 0 ? '#c62828' : '#bbb';
         } else {
-          wosTxt = ' - ';
+          endWos   = null;
+          wosTxt   = ' - ';
           wosColor = '#bbb';
         }
-        // Gap flag  -  week is BEFORE next receipt AND WOS < Opt WOS -> red highlight
+        // Gap flag uses forward simulation so spike weeks don't mask true coverage
+        const fwdWos    = bv > 0 ? _wosForward(bv, _prj, i) : 0;
         const isGapWeek = _optWos > 0
           && _gap.nextRcptWeekIdx >= 0
           && i <= Math.min(25, _gap.nextRcptWeekIdx)
           && bv > 0
-          && wos < _optWos;
+          && fwdWos < _optWos;
         if (isGapWeek) {
           cellBg   = '#ffebee';
           wosColor = '#c62828';
         }
-        const bold = (isGapWeek || (wos != null && wos < 4 && bv > 0)) ? 700 : 400;
-        wosCells += `<td style="color:${wosColor};font-size:10px;background:${cellBg};font-weight:${bold}"${isGapWeek ? ` title="Gap: WOS ${_invFmt1(wos)} < Opt WOS ${_invFmt1(_optWos)}"` : ''}>${wosTxt}</td>`;
+        const dispWos = endWos != null ? endWos : 0;
+        const bold    = (isGapWeek || (dispWos < 4 && _endInv > 0)) ? 700 : 400;
+        wosCells += `<td style="color:${wosColor};font-size:10px;background:${cellBg};font-weight:${bold}"${isGapWeek ? ` title="Gap: Ending WOS ${_invFmt1(dispWos)} < Opt WOS ${_invFmt1(_optWos)}"` : ''}>${wosTxt}</td>`;
       } else {
         wosCells += `<td style="color:#bbb;font-size:10px;background:#f8f0fb"> - </td>`;
       }
