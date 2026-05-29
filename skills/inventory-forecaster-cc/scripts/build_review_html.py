@@ -532,11 +532,11 @@ function renderProposal(p) {
     <div class="section">
       <div class="section-title">Recommendation (${p.rule_id})</div>
       <div class="rule-box">
-        <b>${p.rule_title}</b><br>
-        ${p.rule_summary}
-        <span class="code">Criterion: ${p.rule_criterion}
-Logic:     ${p.rule_logic}
-Location:  ${p.rule_loc}</span>
+        <b id="rule-title-${p.id}">${p.rule_title}</b><br>
+        <span id="rule-summary-${p.id}">${p.rule_summary}</span>
+        <span class="code"><span id="rule-criterion-${p.id}">Criterion: ${p.rule_criterion}</span>
+<span id="rule-logic-${p.id}">Logic:     ${p.rule_logic}</span>
+<span id="rule-loc-${p.id}">Location:  ${p.rule_loc}</span></span>
       </div>
     </div>
     <div class="section">
