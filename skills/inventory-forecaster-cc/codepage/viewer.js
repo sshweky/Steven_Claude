@@ -8904,12 +8904,13 @@ async function _npmDoSearch(q) {
   listEl.style.display = '';
   listEl.innerHTML = '<div style="padding:8px 12px;color:#888;font-size:12px;">Searching...</div>';
 
-  const div = _NPM.selectedDiv;
   const SF  = CFG.STYLE_FID;
+  // Filter by active/live statuses only. Division is implied by the mstyle prefix
+  // (FF... = Fetch, BB... = Brand Buzz) so we don't apply a separate div field filter --
+  // that field (FID 108) can contain compound values that break exact-match queries.
   const statusClause = `({${SF.STATUS}.CT.'Active'} OR {${SF.STATUS}.CT.'In Prodn'} OR {${SF.STATUS}.CT.'Future Delete'})`;
-  const divClause    = div ? ` AND {${SF.DIV}.EX.'${div}'}` : '';
   const escaped      = q.replace(/'/g, "''");
-  const where        = `{${SF.MSTYLE}.CT.'${escaped}'}${divClause} AND ${statusClause}`;
+  const where        = `{${SF.MSTYLE}.CT.'${escaped}'} AND ${statusClause}`;
 
   try {
     const resp = await qb('/records/query', {
