@@ -106,6 +106,42 @@ QB_AMZ_HEALTH_TABLE   = os.environ.get("QB_AMZ_HEALTH_TABLE",   "bp9akd3js")  # 
 QB_INV_FLOW_TABLE     = os.environ.get("QB_INV_FLOW_TABLE",     "bpsaju5pm")  # InventoryTrack.Inventory_Flow (Phase 2.7 F37 cascade)
 QB_BULK_BATCH         = int(os.environ.get("QB_BULK_BATCH", "500"))
 
+# Projection Accuracy tracking tables (created 2026-05-29)
+# Run create_accuracy_tables.py once to create these tables, then fill in
+# the actual TIDs and FIDs printed by that script.
+QB_PRJ_SNAPSHOT_TID   = os.environ.get("QB_PRJ_SNAPSHOT_TID",   "PLACEHOLDER_TID_A")
+QB_ACTUALS_WEEKLY_TID = os.environ.get("QB_ACTUALS_WEEKLY_TID", "PLACEHOLDER_TID_B")
+
+# PRJ_Snapshot field IDs (fill in after running create_accuracy_tables.py)
+PRJ_SNAP_FIDS = {
+    "Snapshot_Key":  0,   # composite merge key: "Key|Snapshot_Date"
+    "Key":           0,
+    "Snapshot_Date": 0,
+    "W1_Date":       0,
+    # Projected units W01-W26 (written by snapshot_weekly.py)
+    "W01": 0, "W02": 0, "W03": 0, "W04": 0, "W05": 0, "W06": 0,
+    "W07": 0, "W08": 0, "W09": 0, "W10": 0, "W11": 0, "W12": 0,
+    "W13": 0, "W14": 0, "W15": 0, "W16": 0, "W17": 0, "W18": 0,
+    "W19": 0, "W20": 0, "W21": 0, "W22": 0, "W23": 0, "W24": 0,
+    "W25": 0, "W26": 0,
+    # Actual units W01-W26 (filled in by reconcile_accuracy.py)
+    "W01_Actual": 0, "W02_Actual": 0, "W03_Actual": 0, "W04_Actual": 0,
+    "W05_Actual": 0, "W06_Actual": 0, "W07_Actual": 0, "W08_Actual": 0,
+    "W09_Actual": 0, "W10_Actual": 0, "W11_Actual": 0, "W12_Actual": 0,
+    "W13_Actual": 0, "W14_Actual": 0, "W15_Actual": 0, "W16_Actual": 0,
+    "W17_Actual": 0, "W18_Actual": 0, "W19_Actual": 0, "W20_Actual": 0,
+    "W21_Actual": 0, "W22_Actual": 0, "W23_Actual": 0, "W24_Actual": 0,
+    "W25_Actual": 0, "W26_Actual": 0,
+}
+
+# Actuals_Weekly field IDs (fill in after running create_accuracy_tables.py)
+ACT_WEEKLY_FIDS = {
+    "Week_Key":  0,   # composite merge key: "Key|Week_Date"
+    "Key":       0,
+    "Week_Date": 0,
+    "Ord_Units": 0,
+}
+
 # QB report for VP-Q4 open-PO data -- bulk fetch in 1 API call.
 QB_OPEN_POS_TABLE       = os.environ.get("QB_OPEN_POS_TABLE",  "bp8r4dejr")
 QB_OPEN_POS_REPORT      = int(os.environ.get("QB_OPEN_POS_REPORT", "27"))
