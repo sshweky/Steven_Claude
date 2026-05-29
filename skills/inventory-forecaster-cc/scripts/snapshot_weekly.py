@@ -626,5 +626,9 @@ if __name__ == "__main__":
         "--dry-run", action="store_true",
         help="Print what would be written without making any QB writes.",
     )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Skip the same-day duplicate guard and insert anyway.",
+    )
     args = parser.parse_args()
-    run(dry_run=args.dry_run)
+    run(dry_run=args.dry_run, force=args.force)
