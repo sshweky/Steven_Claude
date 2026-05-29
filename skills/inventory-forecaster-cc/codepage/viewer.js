@@ -5536,7 +5536,7 @@ async function _loadAmzDcInv(r, safeId) {
     try {
       const aurSelectFids = [AA.MSTYLE, AA.AUR_L4W, AA.AUR_L13W, AA.AUR_L26W,
                              AA.AUR_L52W, AA.REV_LW, AA.UNITS_LW].filter(v => v != null);
-      // Try exact mstyle, then strip /N pack suffix, then strip EC/COS suffix
+      // Try exact mstyle, then strip /N pack suffix, then strip EC/COS suffix, then switchover_from
       const aurTryMstyles = [mstyle];
       const aurStripped = mstyle.replace(/\/\d+$/, '');
       if (aurStripped !== mstyle) aurTryMstyles.push(aurStripped);
@@ -5545,6 +5545,10 @@ async function _loadAmzDcInv(r, safeId) {
         aurTryMstyles.push(aurBase);
         const aurBareBase = aurBase.replace(/\/\d+$/, '');
         if (aurBareBase !== aurBase && !aurTryMstyles.includes(aurBareBase)) aurTryMstyles.push(aurBareBase);
+      }
+      if (swFrom && !aurTryMstyles.includes(swFrom)) {
+        aurTryMstyles.push(swFrom);
+        if (swFromStripped && swFromStripped !== swFrom && !aurTryMstyles.includes(swFromStripped)) aurTryMstyles.push(swFromStripped);
       }
       let aurRow = null;
       for (const ms of aurTryMstyles) {
