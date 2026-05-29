@@ -1,4 +1,0 @@
-
-=== QB Codepage Deployer (forecast) ===
-Serving C:\Users\steven\.claude\skills\inventory-forecaster-cc\codepage on http://localhost:8743/
-

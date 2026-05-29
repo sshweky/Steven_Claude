@@ -548,15 +548,18 @@ Location:  ${p.rule_loc}</span>
       <button class="btn modify"  onclick="openModify(${p.id})">Modify</button>
     </div>
     <div class="modify-box" id="modbox-${p.id}">
-      <div class="section-title">Tune parameters (impact + chart update live)</div>
-      <div class="param-grid" id="modparams-${p.id}">${renderParamInputs(p)}</div>
-      <div class="section-title" style="margin-top:14px">Extra notes (optional, for things not in the parameters)</div>
-      <textarea id="modtext-${p.id}" placeholder="e.g. only apply when item_status starts with 'Active: Replen', or skip Burlington-style off-price items..."></textarea>
+      <div class="section-title">What do you want to change?</div>
+      <textarea id="modtext-${p.id}" placeholder="Type plain English. Examples:
+  - 'raise the L13W floor from 0.85 to 0.95'
+  - 'only apply to Active: Replen items, skip new launches'
+  - 'zero W1 through W4 instead of W1-W3'
+  - 'skip off-price accounts like Burlington'
+  - 'do not apply this rule to owned brands'"></textarea>
       <div style="margin-top:8px;display:flex;gap:8px;">
         <button class="btn modify" onclick="saveModify(${p.id})">Save Modification</button>
-        <button class="btn" style="background:#6b7280;color:#fff" onclick="resetParams(${p.id})">Reset to defaults</button>
         <button class="btn reject" onclick="cancelModify(${p.id})">Cancel</button>
       </div>
+      <div class="help-text" style="margin-top:8px">When you commit, I will parse your text, recompute the impact, and show you the new chart + before/after numbers BEFORE any code edit is applied. If my interpretation is off, you can correct it before approving.</div>
     </div>
   `;
   return card;
