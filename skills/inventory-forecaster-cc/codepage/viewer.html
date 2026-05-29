@@ -321,12 +321,17 @@ window.QB_CONFIG = {
   /* Sub-banner directly below the title bar.  Lighter background and
      smaller padding so it reads as secondary, and shows live aggregates
      for whatever rows are currently visible in the table.  Updated via
-     updateSubbanner() at the end of applyFilters(). */
+     updateSubbanner() at the end of applyFilters().
+     NOT position:fixed -- the topbar can wrap to multiple rows depending
+     on viewport width, so a fixed top offset would hide the subbanner
+     under the wrapped topbar content.  Instead it sits in normal flow
+     immediately after the topbar-spacer, naturally appearing right
+     below the topbar regardless of its rendered height. */
   .subbanner { background:#fde2e4; color:#3b1b22; padding:6px 18px;
                display:flex; align-items:center; gap:24px; flex-wrap:wrap;
-               position:fixed; top:52px; left:0; right:0; width:100%; z-index:299;
                border-bottom:1px solid #f7c6cd; font-size:12px;
-               box-shadow:0 1px 2px rgba(0,0,0,0.06); }
+               box-shadow:0 1px 2px rgba(0,0,0,0.06);
+               width:100%; box-sizing:border-box; }
   .subbanner .sb-cell { display:flex; flex-direction:column; line-height:1.2; min-width:120px; }
   .subbanner .sb-label { font-size:10px; text-transform:uppercase;
                          letter-spacing:0.5px; color:#7a3d4d; font-weight:600; }
@@ -334,7 +339,7 @@ window.QB_CONFIG = {
   .subbanner .sb-value.bad  { color:#c62828; }
   .subbanner .sb-value.good { color:#2e7d32; }
   .subbanner .sb-divider { width:1px; height:24px; background:#f0a0ab; opacity:0.6; }
-  #topbar-spacer { height:92px; flex-shrink:0; }
+  #topbar-spacer { height:52px; flex-shrink:0; }
   .topbar h1 { font-size:16px; font-weight:600; flex:1; }
   .badge { padding:3px 10px; border-radius:12px;
             font-size:12px; font-weight:700;
