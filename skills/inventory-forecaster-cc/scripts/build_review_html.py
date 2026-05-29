@@ -272,9 +272,15 @@ header .sub { font-size: 13px; opacity: .85; margin-top: 3px; }
 .btn.modify  { background: #ed6c02; color: white; }
 .btn.save    { background: #1565c0; color: white; padding: 10px 22px; font-size: 14px; }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
-.modify-box { display: none; margin-top: 10px; padding: 10px; background: #fff7ed; border-radius: 6px; }
+.modify-box { display: none; margin-top: 10px; padding: 12px 14px; background: #fff7ed; border-radius: 6px; }
 .modify-box.open { display: block; }
-.modify-box textarea { width: 100%; min-height: 70px; font-family: -apple-system, Segoe UI, sans-serif; font-size: 13px; border: 1px solid #e5e7eb; border-radius: 4px; padding: 8px; }
+.modify-box textarea { width: 100%; min-height: 60px; font-family: -apple-system, Segoe UI, sans-serif; font-size: 13px; border: 1px solid #e5e7eb; border-radius: 4px; padding: 8px; }
+.param-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.pin { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #374151; }
+.pin span { font-weight: 600; }
+.pin input[type=number], .pin select { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; background: white; }
+.pin input[type=checkbox] { transform: scale(1.2); margin-right: 6px; }
+label.pin:has(input[type=checkbox]) { flex-direction: row; align-items: center; }
 .commit-bar { margin-top: 24px; padding: 18px; background: white; border-radius: 8px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
 .help-text { font-size: 12px; color: #6b7280; margin-top: 6px; }
 """
