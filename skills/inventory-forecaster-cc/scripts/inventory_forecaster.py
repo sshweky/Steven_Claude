@@ -9107,7 +9107,7 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
                            description, product_category, product_subcategory,
                            brand, brand_pt, season,
                            wos_target=None, amz_aur_data=None,
-                           opn_w_list=None):
+                           opn_w_list=None, ord_l13w=0):
     """
     Unified POS + DC-inventory WOS forecast.
 
