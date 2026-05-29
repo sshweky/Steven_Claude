@@ -5627,11 +5627,16 @@ async function _loadAmzDcInv(r, safeId) {
 
   // ── Supplement missing W1/W2 from Amazon Catalog ─────────────────────────
   // Daily Metrics lags ~2-3 weeks.  Amazon Catalog FID 154 (POS_LW) and
-  // FID 180 (POS_PRIOR_WK) are updated weekly from Amazon's API and are almost
-  // always current.  Inject them into dmWeeks when the most-recent 1-2 Sunday
-  // week slots are absent or zero.
+  // FID 180 (POS_PRIOR_WK) are updated weekly from Amazon's API.
+  // When those specific fields are 0/stale, fall back to the L4W weekly average
+  // (FID 193) as an approximation -- better than a blank dash.
+  //
+  // Priority: DM actual data > Catalog LW/PriorWk (FIDs 154/180) > L4W avg proxy.
+  // fromCatalog: true  = FID 154/180 source (orange asterisk).
+  // fromL4wAvg:  true  = L4W average proxy (purple tilde -- approximate).
   let _catSuppApplied = false;
-  if (W1_DATE && fetchOk && (posLwCat > 0 || posL2wCat > 0)) {
+  // Run supplement whenever the catalog fetch worked AND we have SOME POS signal.
+  if (W1_DATE && fetchOk && (posLwCat > 0 || posL2wCat > 0 || posL4w > 0)) {
     const _isoFmt = d => {
       // Use local date components to avoid UTC-vs-local shift on midnight boundaries
       const y = d.getFullYear(), mo = String(d.getMonth()+1).padStart(2,'0'), dy = String(d.getDate()).padStart(2,'0');
@@ -5645,31 +5650,45 @@ async function _loadAmzDcInv(r, safeId) {
 
     if (!dmWeeks) dmWeeks = [];
 
+    // Resolve fill value: prefer catalog LW, fall back to L4W avg proxy.
+    const _w1Fill    = posLwCat  > 0 ? posLwCat              : (posL4w > 0 ? Math.round(posL4w)  : 0);
+    const _w2Fill    = posL2wCat > 0 ? posL2wCat             : (posL4w > 0 ? Math.round(posL4w)  : 0);
+    const _w1IsAvg   = posLwCat  === 0 && posL4w > 0;
+    const _w2IsAvg   = posL2wCat === 0 && posL4w > 0;
+
     // W1 slot
     const _w1Idx = dmWeeks.findIndex(w => w.weekStart === _w1ISO);
-    if (_w1Idx === -1 && posLwCat > 0) {
-      dmWeeks.unshift({ weekStart: _w1ISO, pos: posLwCat, oh: 0, fromCatalog: true });
+    if (_w1Idx === -1 && _w1Fill > 0) {
+      dmWeeks.unshift({ weekStart: _w1ISO, pos: _w1Fill, oh: 0,
+                        fromCatalog: !_w1IsAvg, fromL4wAvg: _w1IsAvg });
       _catSuppApplied = true;
-    } else if (_w1Idx >= 0 && !dmWeeks[_w1Idx].pos && posLwCat > 0) {
-      dmWeeks[_w1Idx] = Object.assign({}, dmWeeks[_w1Idx], { pos: posLwCat, fromCatalog: true });
+    } else if (_w1Idx >= 0 && !dmWeeks[_w1Idx].pos && _w1Fill > 0) {
+      dmWeeks[_w1Idx] = Object.assign({}, dmWeeks[_w1Idx],
+                          { pos: _w1Fill, fromCatalog: !_w1IsAvg, fromL4wAvg: _w1IsAvg });
       _catSuppApplied = true;
     }
 
     // W2 slot (re-find after possible W1 insert)
     const _w2Idx = dmWeeks.findIndex(w => w.weekStart === _w2ISO);
-    if (_w2Idx === -1 && posL2wCat > 0) {
+    if (_w2Idx === -1 && _w2Fill > 0) {
       const _ins = dmWeeks.findIndex(w => w.weekStart < _w2ISO);
-      if (_ins === -1) dmWeeks.push({ weekStart: _w2ISO, pos: posL2wCat, oh: 0, fromCatalog: true });
-      else dmWeeks.splice(_ins, 0,  { weekStart: _w2ISO, pos: posL2wCat, oh: 0, fromCatalog: true });
+      if (_ins === -1) dmWeeks.push({ weekStart: _w2ISO, pos: _w2Fill, oh: 0,
+                                      fromCatalog: !_w2IsAvg, fromL4wAvg: _w2IsAvg });
+      else dmWeeks.splice(_ins, 0,   { weekStart: _w2ISO, pos: _w2Fill, oh: 0,
+                                        fromCatalog: !_w2IsAvg, fromL4wAvg: _w2IsAvg });
       _catSuppApplied = true;
-    } else if (_w2Idx >= 0 && !dmWeeks[_w2Idx].pos && posL2wCat > 0) {
-      dmWeeks[_w2Idx] = Object.assign({}, dmWeeks[_w2Idx], { pos: posL2wCat, fromCatalog: true });
+    } else if (_w2Idx >= 0 && !dmWeeks[_w2Idx].pos && _w2Fill > 0) {
+      dmWeeks[_w2Idx] = Object.assign({}, dmWeeks[_w2Idx],
+                          { pos: _w2Fill, fromCatalog: !_w2IsAvg, fromL4wAvg: _w2IsAvg });
       _catSuppApplied = true;
     }
 
     // Also fill posLw/posL2w summaries if DM gave nothing (used in AI bullet)
     if (!posLw  && posLwCat)  posLw  = posLwCat;
     if (!posL2w && posL2wCat) posL2w = posL2wCat;
+    // Further fallback: use L4W average for the summary bullet too
+    if (!posLw  && posL4w) posLw  = posL4w;
+    if (!posL2w && posL4w) posL2w = posL4w;
   }
 
   // ── AI Analysis bullets ───────────────────────────────────────────────────
