@@ -11817,6 +11817,14 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
             _f37_weekly_rate = _f37_rtl_rate if _f37_rtl_rate > 0 else None
 
     _f37_skip = (not _inv_flow_rec)   # only skip if creation also failed
+    # F_POG_FUTURE items: F37 inventory-shortfall capping must be skipped.
+    # The ISO fill in the POG forecast represents a PURCHASE ORDER to fill new
+    # store shelves -- there is intentionally zero beginning inventory at that
+    # point.  F37's inventory-cap logic would zero the ISO order and then apply
+    # its restock heuristic, producing a completely wrong schedule.  The POG
+    # rule already owns the entire week-by-week schedule for these items.
+    if model == "F_POG_FUTURE":
+        _f37_skip = True
     if model not in ("Inactive",) and not _f37_skip:
         _adjusted_f37, _f37_adjustments, _f37_lt_info = apply_oh_shortfall_adjustment(
             row, fcst, inv_flow=_inv_flow_rec,
