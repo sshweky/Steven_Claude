@@ -1025,7 +1025,6 @@ var COLS = [
   { id:'brand', label:'Brand', align:'left',
     get:function(r){return r.brand;},
     render:function(r){return '<td title="'+esc(r.brand)+'"><div class="cell-clamp2">'+esc(r.brand)+'</div></td>';} },
-  { id:'country', label:'Country', align:'left', get:function(r){return r.country;}, render:function(r){return '<td>'+esc(r.country)+'</td>';} },
   { id:'inv_manager', label:'Inv Mgr', align:'left',
     get:function(r){return r.inv_manager;},
     render:function(r){return '<td title="'+esc(r.inv_manager)+'"><div class="cell-clamp2">'+esc(r.inv_manager)+'</div></td>';} },
