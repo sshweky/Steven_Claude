@@ -114,14 +114,11 @@ FIELD_TYPE_MAP = {
     "numeric": "numeric",
 }
 
-def _create_field(table_id, label, field_type, unique=False, dry_run=False):
+def _create_field(table_id, label, field_type, dry_run=False):
     """Create a single field in table_id.  Returns created field dict."""
     payload = {"label": label, "fieldType": field_type}
-    if unique:
-        payload["unique"] = True
     if dry_run:
-        uniq_note = " UNIQUE" if unique else ""
-        print(f"    [DRY-RUN] POST /fields?tableId={table_id}  label={label!r} type={field_type}{uniq_note}")
+        print(f"    [DRY-RUN] POST /fields?tableId={table_id}  label={label!r} type={field_type}")
         return {"id": 0, "label": label}
     time.sleep(0.3)  # gentle pacing when creating many fields
     result = _qb_request("POST", f"/fields?tableId={table_id}", payload)
@@ -129,19 +126,14 @@ def _create_field(table_id, label, field_type, unique=False, dry_run=False):
 
 
 def _create_fields_batch(table_id, field_specs, dry_run=False):
-    """Create a list of (label, type[, unique]) fields.  Returns {label: fid} dict.
-
-    field_specs: list of (label, type) or (label, type, unique_bool)
-    """
+    """Create a list of (label, type) tuples.  Returns {label: fid} dict."""
     fid_map = {}
     for spec in field_specs:
         label, ftype = spec[0], spec[1]
-        unique = spec[2] if len(spec) > 2 else False
-        f = _create_field(table_id, label, ftype, unique=unique, dry_run=dry_run)
+        f = _create_field(table_id, label, ftype, dry_run=dry_run)
         fid = f.get("id", 0)
         fid_map[label] = fid
-        uniq_note = " (unique)" if unique else ""
-        print(f"    Created field {label!r} -> FID {fid}{uniq_note}")
+        print(f"    Created field {label!r} -> FID {fid}")
     return fid_map
 
 
