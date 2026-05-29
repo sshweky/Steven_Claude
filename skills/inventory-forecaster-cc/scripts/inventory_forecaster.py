@@ -8338,6 +8338,28 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
             if _fwd_cat:
                 amz_catalog = _fwd_cat
                 break
+    # F38 data-quality guard: amz_catalog found but ALL key DC signals are zero.
+    # This means the ASIN health pull returned empty data (null values -> 0.0).
+    # Treating these as genuine zeros would cause F59h/Fdclag/F37 to fire on
+    # false data while also suppressing F75 POS ceiling (which only fires when
+    # amz_catalog is None).  Nullify so code paths are identical to "no catalog".
+    if amz_catalog is not None:
+        _amzcat_dc_fields = (
+            "Inv_SOH", "Inv_WOS", "AUR_L4w", "AUR_L13w",
+            "Days_Amazon_OOS_L30d_", "Sellable_On_Hand_Units",
+        )
+        _amzcat_has_data = any(
+            float(amz_catalog.get(f) or 0) > 0 for f in _amzcat_dc_fields
+        )
+        if not _amzcat_has_data:
+            amz_catalog = None
+            if isinstance(meta, dict):
+                meta.setdefault("drivers", []).append(
+                    "[WARN] F38: amz_catalog all-zero "
+                    "(Inv_SOH=Inv_WOS=AUR=OOS=Sellable=0) -- "
+                    "DC signals unavailable, likely fetch failure. "
+                    "Treating catalog as absent; F75/F59h/Fdclag/F37-MODE-A bypassed."
+                )
     # Retailer POS lookup — non-Amazon customers only.
     # When retailer POS data is available, populate pos_data with the same
     # field names used by Amazon POS so the existing F15 blend (seasonal_baseline),
