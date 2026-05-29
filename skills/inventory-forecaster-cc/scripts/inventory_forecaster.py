@@ -8372,45 +8372,6 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
         if not _amzcat_has_data:
             amz_catalog = None
             # (F38 warn driver logged by forecast_record via meta if available)
-    # F91 (2026-05-29): EC/COS variant SOH fallback from parent catalog.
-    # When Phase 2.6b (Amazon Inventory Health) has no record for the EC ASIN
-    # (common for EC/COS variants not indexed in health), Inv_SOH stays 0.
-    # If AUR/price data IS present the all-zero guard above does NOT nullify
-    # amz_catalog -- so F85 fires with _f85_eff_soh = 0 + open-POs only,
-    # producing near-zero WOS and a spurious W2-W3 fill spike.
-    # The parent mstyle catalog often HAS valid Inv_SOH (its ASIN IS indexed).
-    # EC/COS variants share the vendor DC pool with the base item; borrowing
-    # the parent SOH is the correct anchor for the WOS/fill calc.
-    # DEBUG F91 (remove after investigation)
-    _f91_dbg_ms2 = (row.get("Mstyle") or "").upper()
-    if "FF10159" in _f91_dbg_ms2:
-        print(f"      [F91 DEBUG] entering check: ms={_f91_dbg_ms2!r} "
-              f"amz_catalog={'present' if amz_catalog is not None else 'None'} "
-              f"Inv_SOH={float((amz_catalog or {}).get('Inv_SOH') or 0) if amz_catalog else 'N/A'} "
-              f"Sellable_On_Hand_Units={float((amz_catalog or {}).get('Sellable_On_Hand_Units') or 0) if amz_catalog else 'N/A'}", flush=True)
-    if amz_catalog is not None and (
-        float(amz_catalog.get("Inv_SOH") or 0) == 0 and
-        float(amz_catalog.get("Sellable_On_Hand_Units") or 0) == 0
-    ):
-        import re as _re91
-        _f91_ms = (row.get("Mstyle") or "").upper()
-        _f91_m = _re91.match(r'^(.+?)(EC|COS)$', _f91_ms, _re91.IGNORECASE)
-        if _f91_m:
-            _f91_parent_ms = _f91_m.group(1)
-            _f91_parent_cat = (amazon_catalog_us or {}).get(_f91_parent_ms)
-            _f91_parent_soh = (
-                float((_f91_parent_cat or {}).get("Inv_SOH") or 0) or
-                float((_f91_parent_cat or {}).get("Sellable_On_Hand_Units") or 0)
-            )
-            if _f91_parent_soh > 0:
-                amz_catalog = dict(amz_catalog)  # shallow copy -- do not mutate shared dict
-                amz_catalog["Inv_SOH"] = _f91_parent_soh
-                if isinstance(meta, dict):
-                    meta.setdefault("drivers", []).append(
-                        f"[INFO] F91: {_f91_ms!r} Inv_SOH absent in health "
-                        f"table; backfilled from parent {_f91_parent_ms!r} "
-                        f"SOH={_f91_parent_soh:.0f}"
-                    )
     # Retailer POS lookup -- non-Amazon customers only.
     # When retailer POS data is available, populate pos_data with the same
     # field names used by Amazon POS so the existing F15 blend (seasonal_baseline),
