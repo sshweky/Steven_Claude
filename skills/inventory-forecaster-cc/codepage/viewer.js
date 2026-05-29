@@ -8618,7 +8618,67 @@ function applyFilters() {
       || _sortKey(a.mstyle     ).localeCompare(_sortKey(b.mstyle     ))
     );
   }
+  updateSubbanner();
   renderPage(0);
+}
+
+// Light-pink sub-banner under the title bar.  Live-driven by FILTERED_RECORDS
+// (i.e. respects every active filter/search/toggle).  Re-runs from
+// applyFilters() at the end of every filter change.
+//
+// Metrics:
+//   Filtered records:    count of rows currently visible in the table
+//   Avg/wk MAN PRJ N26w: sum(MAN 26w totals) / 26  -- weekly volume rate
+//   Avg/wk AI PRJ N26w:  sum(AI  26w totals) / 26
+//   % diff (AI vs MAN):  (AI_total - MAN_total) / MAN_total * 100
+//   Off-Plan (>=7.5%):   count of records where |AI - MAN| / MAN >= 7.5%
+//                        (or records with no plan but AI > 0)
+function updateSubbanner() {
+  const recs = (typeof FILTERED_RECORDS !== 'undefined' && Array.isArray(FILTERED_RECORDS))
+               ? FILTERED_RECORDS : [];
+  const elCount   = document.getElementById('sb-count');
+  const elManAvg  = document.getElementById('sb-man-avg');
+  const elAiAvg   = document.getElementById('sb-ai-avg');
+  const elPct     = document.getElementById('sb-pct');
+  const elOffPlan = document.getElementById('sb-offplan');
+  if (!elCount) return;  // banner not present (page still booting)
+
+  if (recs.length === 0) {
+    [elManAvg, elAiAvg, elPct, elOffPlan].forEach(el => { el.innerText = '-'; el.className = 'sb-value'; });
+    elCount.innerText = '0';
+    return;
+  }
+
+  let manTotal = 0, aiTotal = 0, offPlanCount = 0;
+  for (const r of recs) {
+    const m = +(r.proj_total || 0);
+    const a = +(r.ai_total   || 0);
+    manTotal += m;
+    aiTotal  += a;
+    if (m > 0) {
+      const v = Math.abs((a - m) / m) * 100;
+      if (v >= 7.5) offPlanCount++;
+    } else if (a > 0) {
+      offPlanCount++;  // no plan but AI projecting demand = off-plan
+    }
+  }
+
+  const manAvgWk = manTotal / 26;
+  const aiAvgWk  = aiTotal  / 26;
+  const pct      = manTotal > 0 ? ((aiTotal - manTotal) / manTotal * 100) : 0;
+  const absPct   = Math.abs(pct);
+
+  const fmt = n => Math.round(n).toLocaleString();
+  elCount.innerText   = recs.length.toLocaleString();
+  elManAvg.innerText  = fmt(manAvgWk);
+  elAiAvg.innerText   = fmt(aiAvgWk);
+  const pctStr = (pct >= 0 ? '+' : '') + (absPct >= 100 ? Math.round(pct) : pct.toFixed(1)) + '%';
+  elPct.innerText = pctStr;
+  elPct.className = 'sb-value' + (absPct >= 7.5 ? ' bad' : ' good');
+  const opPct = (offPlanCount / recs.length * 100);
+  elOffPlan.innerText = offPlanCount.toLocaleString() + ' / ' + recs.length.toLocaleString()
+                      + ' (' + opPct.toFixed(0) + '%)';
+  elOffPlan.className = 'sb-value' + (offPlanCount > 0 ? ' bad' : ' good');
 }
 
 // -- Export Flagged to CSV --------------------------------------------------
