@@ -5924,6 +5924,7 @@ async function _loadRtlPos(r, safeId) {
   let rtlTrtStLw = 0, rtlTrtStPrior = 0;
   let rtlPosStLw = 0, rtlPosStPrior = 0;
   let rtlAurLw = 0;
+  let rtlXrefMstyle = '';  // set when xref fallback is used
   let rtlFetchOk = false;
 
   try {
