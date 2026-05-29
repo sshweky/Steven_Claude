@@ -11810,7 +11810,12 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
     if is_amazon and amz_catalog:
         _f37_amz_soh  = float((amz_catalog or {}).get("Inv_SOH") or 0)
         _f37_amz_pos  = float((pos_data  or {}).get("Avg_Units_Wk_L13w") or 0)
-        if _f37_amz_soh > 0 or _f37_amz_pos > 0:
+        # MODE A (restock-to-WOS) ONLY when we have confirmed positive DC SOH.
+        # If Inv_SOH=0 (new/OOS item) but POS>0, DO NOT enter MODE A -- we cannot
+        # distinguish "DC is genuinely empty" from "no ASIN health data yet", and
+        # restock = 8 x pos_rate - 0 = huge spike (e.g. 8x3000 = 24,000u).
+        # Use MODE B (decay cohorts) instead when SOH is 0 or missing.
+        if _f37_amz_soh > 0:
             # Effective SOH = raw SOH + W1+W2 open POs already committed to ship
             _f37_opn = (_inv_flow_rec or {}).get("opn") or []
             _f37_opn_w12 = ((_f37_opn[0] if _f37_opn else 0.0)
