@@ -1481,7 +1481,7 @@ def fetch_projections_qb_rest(prj_cols, args):
         ["Acct_MStyle_Key_", "Mstyle", "Customr_Name", "Description", "Status_Cust",
          "PT_Item_Status", "Div", "Shpd_Wk_L13W_cust_", "Last_Ord_Date", "Last_Shp_Date",
          "Inventory_Manager", "Flagged", "Auto_Project", "POG_Launch_Date", "POG_End_Date",
-         "Store_Count", "Estimated_ISO", "UPSPW",
+         "Store_Count", "Estimated_ISO", "Initial_UPSPW",   # FID 1607 -- QB label "Initial UPSPW"
          "ISO_Ship_Date",               # FID 1060 — planner/request ISO shipment arrival date
          "Product_Category", "Product_Subcategory", "Brand",
          "Baseline_Override",           # FID 1614 — planner-set manual baseline (units/wk)
@@ -11049,18 +11049,11 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _pog_w1_f = date(_pw1_today.year + 1, _pw1_m, _pw1_d)
             _pog_delta   = (_pog_date_f - _pog_w1_f).days
             _pog_w_idx_f = _pog_delta // 7   # 0-based; W1=0, W2=1, ...
-            # DEBUG TEMP
-            _dbg_key = row.get("Acct_MStyle_Key_","")
-            if "8909" in str(_dbg_key):
-                print(f"  [POG-DEBUG] key={_dbg_key} pcol0={_pcol0} pog_launch={_pog_launch_str_f}"
-                      f" w1={_pog_w1_f} pog_delta={_pog_delta} w_idx={_pog_w_idx_f}"
-                      f" iso_ship={row.get('ISO_Ship_Date')} est_iso={row.get('Estimated_ISO')}"
-                      f" stores={row.get('Store_Count')} upspw={row.get('UPSPW')} mp={mp}", flush=True)
 
             if 1 <= _pog_w_idx_f <= 25:
                 # --- field reads ---
                 _pog_stores  = int(float(row.get("Store_Count")   or 0))
-                _pog_upspw   = float(row.get("UPSPW")              or 0)
+                _pog_upspw   = float(row.get("Initial_UPSPW")      or 0)  # FID 1607
                 _pog_est_iso = int(float(row.get("Estimated_ISO")  or 0))
 
                 # ISO qty: planner estimate first, then store count x 1.5 MP (stocking standard)
@@ -11210,7 +11203,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         and model not in ("Inactive", "OTB (zero)")
     ):
         _fmiss_stores = int(float(row.get("Store_Count") or 0))
-        _fmiss_upspw  = float(row.get("UPSPW") or 0)
+        _fmiss_upspw  = float(row.get("Initial_UPSPW") or 0)
         _fmiss_iso_q  = int(float(row.get("Estimated_ISO") or 0))
         if _fmiss_stores > 0 or _fmiss_upspw > 0 or _fmiss_iso_q > 0:
             meta.setdefault("drivers", []).append(
@@ -14706,7 +14699,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         "iso_ship_date": (str(row.get("ISO_Ship_Date") or ""))[:10],  # FID 1060
         "store_count":   int(float(row.get("Store_Count") or 0)),
         "estimated_iso": int(float(row.get("Estimated_ISO") or 0)),
-        "upspw":         float(row.get("UPSPW") or 0),
+        "upspw":         float(row.get("Initial_UPSPW") or 0),
         "opn_w":         [int(float(row.get(c) or 0)) for c in OPN_COLS],
         "status_cust":   (str(row.get("Status_Cust") or "")).strip(),
         "item_status":   (str(row.get("PT_Item_Status") or "")).strip(),
@@ -15039,7 +15032,7 @@ def validate_record(row, master_pack, high_mult=VALID_HIGH_MULT,
         "iso_ship_date": (str(row.get("ISO_Ship_Date") or ""))[:10],  # FID 1060
         "store_count":   int(float(row.get("Store_Count") or 0)),
         "estimated_iso": int(float(row.get("Estimated_ISO") or 0)),
-        "upspw":         float(row.get("UPSPW") or 0),
+        "upspw":         float(row.get("Initial_UPSPW") or 0),
         "opn_w":         [int(float(row.get(c) or 0)) for c in OPN_COLS],
         # Status fields — needed by narrative to detect unexplained planner truncations
         "status_cust":   (str(row.get("Status_Cust") or "")).strip(),

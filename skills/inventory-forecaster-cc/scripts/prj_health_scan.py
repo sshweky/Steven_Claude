@@ -38,7 +38,7 @@ HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE))
 from config import QB_REALM, QB_USER_TOKEN, QB_INV_FLOW_TABLE
 
-QB_API = f"https://api.{QB_REALM}/v1"
+QB_API = "https://api.quickbase.com/v1"   # always api.quickbase.com; QB_REALM goes in headers only
 _HDRS  = {
     "QB-Realm-Hostname": QB_REALM,
     "Authorization":     f"QB-USER-TOKEN {QB_USER_TOKEN}",
