@@ -11844,7 +11844,7 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
                 _f37_mode_desc = (
                     f"MODE A restock-to-{_f37_wos_target:.0f}WOS "
                     f"(DC inv={_f37_cust_dc_inv:.0f}u, "
-                    f"rate={_f37_weekly_rate:.0f}u/wk): "
+                    f"rate={(_f37_weekly_rate or 0):.0f}u/wk): "
                     f"restock demand fired in first back-in-stock week"
                     if _f37_cust_dc_inv is not None
                     else "MODE B 75/50/25% decay cohorts (no DC inv data)"
