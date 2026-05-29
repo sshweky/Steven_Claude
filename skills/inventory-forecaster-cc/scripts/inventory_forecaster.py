@@ -5737,6 +5737,7 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None,
         "lt_trans_days":  int(_effective_lt),
         "lt_trans_weeks": _lt_trans_weeks,
         "used_default":   _used_lt_default,
+        "w1_data_gap":    bool(_data_gap_weeks),
     }
 
     # WOS target for MODE A restock calc.  Default to 8.0 (AMZ_WOS_TARGET_MIN
