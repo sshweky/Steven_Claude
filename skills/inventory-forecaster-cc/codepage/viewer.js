@@ -5648,7 +5648,7 @@ async function _loadAmzDcInv(r, safeId) {
   // ── AI Analysis bullets ───────────────────────────────────────────────────
   const fmt    = n => Math.round(n).toLocaleString('en-US');
   const fmtWos = n => n.toFixed(1);
-  const fmtPos = n => n % 1 === 0 ? Math.round(n).toLocaleString('en-US') : n.toFixed(1);
+  const fmtPos = n => Math.round(n).toLocaleString('en-US');
   const fmtAur = n => '$' + n.toFixed(2);
   const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
 
@@ -5928,7 +5928,7 @@ async function _loadRtlPos(r, safeId) {
 
   const custName = _friendlyCustName(r.cust || '');
   const fmt    = n => Math.round(n).toLocaleString('en-US');
-  const fmtPos = n => n % 1 === 0 ? Math.round(n).toLocaleString('en-US') : n.toFixed(1);
+  const fmtPos = n => Math.round(n).toLocaleString('en-US');
   const fmtAur = n => '$' + n.toFixed(2);
   const fmtPct = n => (n * 100).toFixed(1) + '%';
   const sep    = ' &nbsp;<span style="color:#bbb">|</span>&nbsp; ';
