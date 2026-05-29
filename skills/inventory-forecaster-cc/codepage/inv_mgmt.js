@@ -1055,8 +1055,6 @@ var COLS = [
   { id:'ats_wos_oh_oo', label:'ATS WOS OH+OO', align:'right', numeric:true, get:function(r){return r.ats_wos_oh_oo;},
     render:function(r){return '<td class="right '+(r.ats_wos_oh_oo>0&&r.ats_wos_oh_oo<r.opt_wos?'pri-HIGH':'')+'">'+fmt(r.ats_wos_oh_oo)+'</td>';} },
   { id:'opt_oh', label:'Opt OH', align:'right', numeric:true, get:function(r){return r.opt_oh;}, render:function(r){return '<td class="right">'+fmtInt(r.opt_oh)+'</td>';} },
-  { id:'lt_wks', label:'LT Wks', align:'right', numeric:true, get:function(r){return r.lt_wks;}, render:function(r){return '<td class="right">'+fmt(r.lt_wks)+'</td>';} },
-  { id:'cny_weeks', label:'CNY', align:'right', numeric:true, get:function(r){return r.cny_weeks;}, render:function(r){return '<td class="right">'+fmt(r.cny_weeks)+'</td>';} },
   { id:'days_oos_next_rcpt', label:'Days OOS&#8594;Rcpt', tooltip:'Days OOS until Next Available Receipt', align:'right', numeric:true, get:function(r){return r.days_oos_next_rcpt;},
     render:function(r){return '<td class="right '+(r.days_oos_next_rcpt>0?'pri-CRITICAL':'')+'">'+fmtInt(r.days_oos_next_rcpt)+'</td>';} },
   { id:'next_rcpt_dt', label:'Nxt Avl Rcpt', align:'left',
