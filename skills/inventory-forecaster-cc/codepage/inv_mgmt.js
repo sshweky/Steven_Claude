@@ -380,6 +380,7 @@ var selBrands     = new Set();
 var selMgrs       = new Set();
 var selPriorities = new Set();
 var selStockStatus = new Set();
+var showNeedPurchase = false;  // toggle: only show records where purchase_rec > 0
 var recoSheet = [];
 var purchaseSelections = {};   // keyed by mstyle; { main:{checked,needQty,etd}, alt1:{...}, alt2:{...}, alt3:{...} }
 
