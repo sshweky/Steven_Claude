@@ -182,8 +182,23 @@ def main():
     with open("analysis/training_review_proposals.json", "w") as f:
         json.dump(proposals, f, indent=2)
 
+    # === Build scope data per rule (slim records only) ===
+    def slim(x):
+        return {
+            "key": x["key"], "ai": x["ai"], "man": x["man"],
+            "l13w": x["l13w"], "msty_opn": x["msty_opn"], "cust_opn": x["cust_opn"],
+            "ai_total": x["ai_total"], "man_total": x["man_total"],
+        }
+    scope_data = {
+        "f92": [slim(x) for x in recs_all if x["model"] == "Retailer WOS (POS)" and x["l13w"] > 0],
+        "f93": [slim(x) for x in recs_all if x["model"] in ("Seasonal Baseline", "Sparse Intermittent") and x["cust_opn"] > 0],
+        "f94": [slim(by_key["13640-BB21626"])],  # item-only scope
+    }
+    # Include item records for the per-card view
+    item_recs = {p["key"]: slim(by_key[p["key"]]) for p in proposals}
+
     # === BUILD HTML ===
-    html = build_html(proposals)
+    html = build_html(proposals, scope_data, item_recs)
     out_path = "analysis/training_review_2026-05-29.html"
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
