@@ -420,13 +420,14 @@ function updateGlobal() {
   });
   // Systemic side: sum only unique rules' systemic impacts for approved/modified
   const seen_rules = new Set();
-  let sys_scope = 0, sys_before = 0, sys_after = 0;
+  let sys_scope = 0, sys_before = 0, sys_after = 0, sys_man = 0;
   PROPOSALS.forEach(p => {
     if (seen_rules.has(p.rule_id)) return;
     seen_rules.add(p.rule_id);
     const d = STATE.decisions[p.id];
     sys_scope += p.sys_scope;
     sys_before += p.sys_gap_before;
+    sys_man += p.sys_man_total;
     if (d === 'approve' || d === 'modify') {
       sys_after += p.sys_gap_after;
     } else {
@@ -434,12 +435,15 @@ function updateGlobal() {
     }
   });
   document.getElementById('g-scope').innerText = sys_scope.toLocaleString();
-  document.getElementById('g-man').innerText = man_total.toLocaleString();
-  document.getElementById('g-ai-before').innerText = ai_before_total.toLocaleString();
-  document.getElementById('g-ai-after').innerText = ai_after_total.toLocaleString();
+  document.getElementById('g-man').innerText = sys_man.toLocaleString();
+  document.getElementById('g-ai-before').innerText = (sys_man - sys_before).toLocaleString();
+  document.getElementById('g-ai-after').innerText = (sys_man - sys_after).toLocaleString();
   const gap_b = Math.abs(sys_before);
   const gap_a = Math.abs(sys_after);
+  const pct_b = sys_man ? (gap_b / sys_man * 100).toFixed(1) : '0';
+  const pct_a = sys_man ? (gap_a / sys_man * 100).toFixed(1) : '0';
   document.getElementById('g-gap').innerText = gap_b.toLocaleString() + 'u  ->  ' + gap_a.toLocaleString() + 'u';
+  document.getElementById('g-gap-pct').innerText = pct_b + '%  ->  ' + pct_a + '%';
   document.getElementById('g-help').innerText = decided + ' of ' + PROPOSALS.length + ' proposals decided. ' + (decided === PROPOSALS.length ? 'You can Save Decisions now.' : '');
   document.getElementById('save-btn').disabled = (decided < PROPOSALS.length);
 }
