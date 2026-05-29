@@ -8317,20 +8317,37 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
                                        flags=_re2.IGNORECASE)
             _parent_cat = (amazon_catalog_us or {}).get(_amzcat_parent)
             if _parent_cat:
-                # Do NOT inherit parent amz_catalog for EC/COS/AMZ variants.
+                # Do NOT inherit the full parent amz_catalog for EC/COS/AMZ variants.
                 #
-                # The EC variant has a different ASIN with independent DC inventory.
-                # Inheriting the parent's dict causes all inventory-health rules
-                # (F85, Fdclag, F59h, F37 MODE A) to fire against the PARENT's SOH,
-                # WOS, and OPO -- which have nothing to do with the EC variant.
-                # Zeroing the inv fields doesn't help: F85/Fdclag interpret 0 as
-                # "DC is empty" and add a massive W1-W2 restock spike instead.
+                # The EC variant has a different ASIN; blindly inheriting the parent
+                # dict would fire F85/Fdclag/F59h/F37 against the PARENT'S SOH and
+                # WOS, which belong to a different ASIN.
                 #
-                # Correct behaviour: amz_catalog = None → inventory-health rules
-                # silently skip for EC variants (same as "no catalog entry found").
-                # The seasonal baseline + POS blend (via pos_data) drive the forecast
-                # without an erroneous inventory adjustment.
-                pass   # amz_catalog stays None
+                # EXCEPTION -- F91: if the parent has valid Inv_SOH we DO need it,
+                # specifically for the F85 WOS/fill calc.  Without it, F85 still
+                # fires (because Inventory Flow open-PO qty > 0 makes _f85_eff_soh>0)
+                # but with Inv_SOH=0 it computes near-zero WOS and adds a spurious
+                # W2-W3 restock spike worth tens of thousands of units.
+                # EC/COS items share the vendor DC pool with their base; the parent's
+                # Inv_SOH is the best available proxy when the EC ASIN is not indexed
+                # in Amazon Inventory Health.
+                # Build a MINIMAL synthetic catalog with only the SOH populated --
+                # AUR, OOS, WOS, OPO, and buyability fields are intentionally left 0
+                # so price/health rules do not incorrectly fire against parent data.
+                _f91_parent_soh = (
+                    float(_parent_cat.get("Inv_SOH") or 0) or
+                    float(_parent_cat.get("Sellable_On_Hand_Units") or 0)
+                )
+                if _f91_parent_soh > 0:
+                    amz_catalog = {"Inv_SOH": _f91_parent_soh,
+                                   "_f91_from_parent": _amzcat_parent}
+                    if isinstance(meta, dict):
+                        meta.setdefault("drivers", []).append(
+                            f"[INFO] F91: {_amzcat_ms!r} not in Catalog US; "
+                            f"SOH {_f91_parent_soh:.0f} inherited from parent "
+                            f"{_amzcat_parent!r} for WOS anchor (AUR/health rules bypassed)"
+                        )
+                # else: amz_catalog stays None (no useful SOH to borrow)
     # Forward lookup for amz_catalog: base style falls back to variant catalog entry.
     if is_amazon and amz_catalog is None:
         _fwd_base_ms2 = row.get("Mstyle", "")
