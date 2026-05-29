@@ -270,7 +270,7 @@ def fetch_snapshot_rows(snap_tid, snap_fids, since_date=None):
     rows = []
     for rec in raw:
         row = {
-            "record_id":     _safe_float(rec.get(3), default=0),
+            "record_id":     _safe_float(rec.get("3") or rec.get(3), default=0),
             "snapshot_key":  _safe_str(rec.get(str(snap_fids.get("Snapshot_Key")))
                                         or rec.get(snap_fids.get("Snapshot_Key"))),
             "key":           _safe_str(rec.get(str(snap_fids.get("Key")))
