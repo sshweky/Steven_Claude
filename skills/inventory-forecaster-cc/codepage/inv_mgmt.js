@@ -1194,8 +1194,6 @@ function _filterRecords(skipPri) {
     if(selBrands.size>0&&!selBrands.has(r.brand))return false;
     if(selMgrs.size>0&&!selMgrs.has(r.inv_manager))return false;
     if(hideInactive&&!r.is_replen)return false;
-    if(gaps&&r.gap_weeks.length===0)return false;
-    if(over&&!r.overstocked)return false;
     if(selActions.size>0){
       if(selActions.has('__NONE__')){if(r.recommendations.length!==0)return false;}
       else{if(!r.recommendations.some(function(rc){return selActions.has(rc.action);}))return false;}
