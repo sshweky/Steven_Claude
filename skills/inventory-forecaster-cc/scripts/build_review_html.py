@@ -79,6 +79,7 @@ def main():
         "item_ai_before": sum(r["ai"]), "item_ai_after": sum(new_ai),
         "item_man": r["man_total"],
         "sys_scope": len(f92_scope),
+        "sys_man_total": f92_man_total,
         "sys_gap_before": f92_before,
         "sys_gap_after": f92_after,
         "sys_closed_abs": abs(f92_before) - abs(f92_after),
