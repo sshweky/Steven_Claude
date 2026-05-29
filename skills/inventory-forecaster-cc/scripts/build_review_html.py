@@ -432,17 +432,72 @@ function fmtPctAbs(gap, man) {
   return (Math.abs(gap) / man * 100).toFixed(1) + '%';
 }
 
+function renderImpactGrid(p) {
+  const item_closed = Math.abs(p.item_gap_before) - Math.abs(p.item_gap_after);
+  const sys_closed = Math.abs(p.sys_gap_before) - Math.abs(p.sys_gap_after);
+  return `
+    <div class="impact-grid">
+      <div class="impact-card item">
+        <h4>This item only (${p.key})</h4>
+        <div class="impact-row"><span class="k">MAN 26w</span><span class="v">${fmtSimple(p.item_man)}</span></div>
+        <div class="impact-row"><span class="k">AI 26w before</span><span class="v">${fmtSimple(p.item_ai_before)}</span></div>
+        <div class="impact-row"><span class="k">AI 26w after</span><span class="v">${fmtSimple(p.item_ai_after)}</span></div>
+        <div class="impact-row"><span class="k">Gap MAN-AI before</span><span class="v">${fmt(p.item_gap_before)}u (${fmtPct(p.item_gap_before, p.item_man)})</span></div>
+        <div class="impact-row"><span class="k">Gap MAN-AI after</span><span class="v">${fmt(p.item_gap_after)}u (${fmtPct(p.item_gap_after, p.item_man)})</span></div>
+        <div class="impact-row delta"><span class="k">|Gap| % before / after</span><span class="v">${fmtPctAbs(p.item_gap_before, p.item_man)}  ->  ${fmtPctAbs(p.item_gap_after, p.item_man)}</span></div>
+        <div class="impact-row delta"><span class="k">|Gap| closed</span><span class="v ${item_closed >= 0 ? 'good':'bad'}">${fmt(item_closed)}u</span></div>
+      </div>
+      <div class="impact-card sys">
+        <h4>${p.is_item_level ? 'Item-level only (no systemic rule)' : `Systemic across ${fmtSimple(p.sys_scope)} matching records`}</h4>
+        <div class="impact-row"><span class="k">Records in scope</span><span class="v">${fmtSimple(p.sys_scope)}</span></div>
+        <div class="impact-row"><span class="k">MAN 26w total</span><span class="v">${fmtSimple(p.sys_man_total)}</span></div>
+        <div class="impact-row"><span class="k">Gap before</span><span class="v">${fmt(p.sys_gap_before)}u (${fmtPct(p.sys_gap_before, p.sys_man_total)})</span></div>
+        <div class="impact-row"><span class="k">Gap after</span><span class="v">${fmt(p.sys_gap_after)}u (${fmtPct(p.sys_gap_after, p.sys_man_total)})</span></div>
+        <div class="impact-row delta"><span class="k">|Gap| % before / after</span><span class="v">${fmtPctAbs(p.sys_gap_before, p.sys_man_total)}  ->  ${fmtPctAbs(p.sys_gap_after, p.sys_man_total)}</span></div>
+        <div class="impact-row delta"><span class="k">|Gap| closed</span><span class="v ${sys_closed >= 0 ? 'good':'bad'}">${fmt(sys_closed)}u</span></div>
+        ${p.is_item_level ? '<div class="impact-row"><span class="k" style="font-size:11px;font-style:italic;color:#a16207">Per script: tested 3 systemic variants, all widened gap. Item-level Tell-AI is the right path.</span></div>' : ''}
+      </div>
+    </div>`;
+}
+
+function renderParamInputs(p) {
+  const params = STATE.params[p.id];
+  return p.params_schema.map(s => {
+    const v = params[s.name];
+    if (s.type === 'checkbox') {
+      return `<label class="pin"><input type="checkbox" data-pid="${p.id}" data-name="${s.name}" ${v ? 'checked' : ''} onchange="onParamChange(this)"><span>${s.label}</span></label>`;
+    }
+    if (s.type === 'select') {
+      const opts = s.options.map(o => `<option value="${o}" ${o === v ? 'selected' : ''}>${o}</option>`).join('');
+      return `<label class="pin"><span>${s.label}</span><select data-pid="${p.id}" data-name="${s.name}" onchange="onParamChange(this)">${opts}</select></label>`;
+    }
+    // number
+    return `<label class="pin"><span>${s.label}</span><input type="number" step="${s.step}" min="${s.min}" max="${s.max}" value="${v}" data-pid="${p.id}" data-name="${s.name}" data-type="number" oninput="onParamChange(this)"></label>`;
+  }).join('');
+}
+
+function onParamChange(el) {
+  const pid = +el.dataset.pid;
+  const name = el.dataset.name;
+  let val;
+  if (el.type === 'checkbox') val = el.checked;
+  else if (el.dataset.type === 'number') val = parseFloat(el.value);
+  else val = el.value;
+  STATE.params[pid][name] = val;
+  recompute(pid);
+}
+
+function resetParams(id) {
+  const p = PROPOSALS.find(x => x.id === id);
+  STATE.params[id] = JSON.parse(JSON.stringify(p.default_params));
+  document.getElementById(`modparams-${id}`).innerHTML = renderParamInputs(p);
+  recompute(id);
+}
+
 function renderProposal(p) {
   const card = document.createElement('div');
   card.className = 'card';
   card.id = `card-${p.id}`;
-
-  const item_change = p.item_gap_after - p.item_gap_before;
-  const item_closed = Math.abs(p.item_gap_before) - Math.abs(p.item_gap_after);
-  const sys_closed = p.sys_closed_abs;
-
-  const itemImproves = item_closed >= 0;
-  const sysImproves = sys_closed >= 0;
 
   card.innerHTML = `
     <div class="card-head">
