@@ -263,7 +263,7 @@ header .sub { font-size: 13px; opacity: .85; margin-top: 3px; }
         '      <div class="gm"><div class="lbl">MAN 26w total</div><div class="val" id="g-man">--</div></div>'
         '      <div class="gm"><div class="lbl">AI 26w before</div><div class="val" id="g-ai-before">--</div></div>'
         '      <div class="gm delta"><div class="lbl">AI 26w after</div><div class="val" id="g-ai-after">--</div></div>'
-        '      <div class="gm gap"><div class="lbl">|Gap| MAN-AI before / after</div><div class="val" id="g-gap">--</div></div>'
+        '      <div class="gm gap"><div class="lbl">|Gap| MAN-AI before / after</div><div class="val" id="g-gap">--</div><div class="lbl" id="g-gap-pct" style="margin-top:4px"></div></div>'
         '    </div>'
         '    <div class="help-text" id="g-help">Approve / Reject / Modify each proposal below. Global panel updates live.</div>'
         '  </div>'
