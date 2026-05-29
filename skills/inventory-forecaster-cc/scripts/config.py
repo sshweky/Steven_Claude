@@ -107,8 +107,8 @@ QB_INV_FLOW_TABLE     = os.environ.get("QB_INV_FLOW_TABLE",     "bpsaju5pm")  # 
 QB_BULK_BATCH         = int(os.environ.get("QB_BULK_BATCH", "500"))
 
 # Projection Accuracy tracking tables (created 2026-05-29)
-QB_PRJ_SNAPSHOT_TID   = os.environ.get("QB_PRJ_SNAPSHOT_TID",   "PLACEHOLDER_TID_A")
-QB_ACTUALS_WEEKLY_TID = os.environ.get("QB_ACTUALS_WEEKLY_TID", "PLACEHOLDER_TID_B")
+QB_PRJ_SNAPSHOT_TID   = os.environ.get("QB_PRJ_SNAPSHOT_TID",   "bv34wu9ea")
+QB_ACTUALS_WEEKLY_TID = os.environ.get("QB_ACTUALS_WEEKLY_TID", "bv34wwphk")
 
 # PRJ_Snapshot field IDs (FIDs 6-61 as created by create_accuracy_tables.py)
 PRJ_SNAP_FIDS = {
