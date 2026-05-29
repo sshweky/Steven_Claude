@@ -585,14 +585,14 @@
     },
     {
       "acct": "20006",
-      "retailer_customer": "ACCT 20006",
+      "retailer_customer": "TARGET",
       "retailer_mstyle": "FF10320SCH",
       "prj_mstyle": "FF10320TG",
       "notes": "Retailer reports with SCH suffix; prj uses TG suffix"
     },
     {
       "acct": "20006",
-      "retailer_customer": "ACCT 20006",
+      "retailer_customer": "TARGET",
       "retailer_mstyle": "FF27315SCH",
       "prj_mstyle": "FF27315TG",
       "notes": "Retailer reports with SCH suffix; prj uses TG suffix"
