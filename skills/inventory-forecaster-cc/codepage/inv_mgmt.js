@@ -1061,7 +1061,7 @@ var COLS = [
   { id:'cny_weeks', label:'CNY', align:'right', numeric:true, get:function(r){return r.cny_weeks;}, render:function(r){return '<td class="right">'+fmt(r.cny_weeks)+'</td>';} },
   { id:'days_oos_next_rcpt', label:'Days OOS&#8594;Rcpt', tooltip:'Days OOS until Next Available Receipt', align:'right', numeric:true, get:function(r){return r.days_oos_next_rcpt;},
     render:function(r){return '<td class="right '+(r.days_oos_next_rcpt>0?'pri-CRITICAL':'')+'">'+fmtInt(r.days_oos_next_rcpt)+'</td>';} },
-  { id:'next_rcpt_dt', label:'Next Rcpt', align:'left',
+  { id:'next_rcpt_dt', label:'Nxt Avl Rcpt', align:'left',
     get:function(r){return r.next_rcpt_dt?r.next_rcpt_dt.toISOString():'zzzz';},
     render:function(r){return '<td>'+fmtDate(r.next_rcpt_dt)+'</td>';} },
   { id:'gap_weeks_n', label:'OOS Wks', align:'right', numeric:true,
