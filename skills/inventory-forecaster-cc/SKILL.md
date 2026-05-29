@@ -247,10 +247,36 @@ When the user says **"ai training review"**, **"review ai training comments"**, 
    - `launch` -- launch, new item, new SKU, pre-launch, first order
    - `wrong_model` -- wrong model, flat demand, makes no sense, look at history, should be seasonal
 
-5. **Approval workflow:** After reviewing the emailed report, open Claude Code and say:
-   "Implement AI training recommendation #N" (or list multiple). Claude Code reads the latest `analysis/ai_training_*.md` file and implements the approved changes in `inventory_forecaster.py`.
+5. **Approval workflow:** After reviewing the emailed report, type **"Review AI Training"** in Claude Code (see next trigger section). The interactive workflow walks you through each proposed change one at a time and only edits `inventory_forecaster.py` after you commit.
 
 6. **Cadence:** Designed for daily 5am run via Task Scheduler. Not scheduled until user approves.
+
+---
+
+## Trigger: "Review AI Training"
+
+When the user types **"Review AI Training"** (case-insensitive, exact phrase or close variants like "review training", "go through training", "review training comments"):
+
+1. **Do not run `ai_training_review.py`.** That generates the report. This trigger walks through the existing latest report interactively.
+
+2. Follow the step-by-step procedure in `REVIEW_AI_TRAINING.md` at the skill root. The procedure:
+   - Loads the latest `analysis/ai_training_YYYY-MM-DD.md`
+   - Filters out REJECTED proposals (only VALIDATED + ISOLATED presented)
+   - Presents one proposal at a time with: comment text, recommendation, before/after MAN-AI gap, and a 26-week MAN / AI-now / AI-new compact chart
+   - Waits for **Approve / Reject / Modify** after each
+   - On Modify: prompts for the change, re-renders impact + chart, re-asks
+   - After the last proposal: shows global before/after MAN vs AI totals and per-proposal breakdown
+   - Asks **Commit / OK / yes** to apply; **Cancel** to abort
+   - On commit: edits `inventory_forecaster.py` (Edit tool, not Write) -- one new FXX rule block per approved/modified proposal
+   - Appends processed comment IDs to `analysis/ai_training_processed.json` so they are not re-presented tomorrow
+
+3. **Hard rule (from Steven):** Every proposal must close the MAN-AI divergence. If the training script flagged it REJECTED (gap widens), do NOT present the original; either skip it or present the directional-guard replacement embedded in the rationale.
+
+4. **Owned-brand guardrail:** Reject any proposal that would cut, rationalize, or discontinue SKUs for A&H, Burt's Bees, BioSilk, CHI, Vibrant Life, Glad for Pets, Kingsford, GladWare. Note the rejection briefly and move on.
+
+5. **Never auto-run forecast or auto-write to QB after commit.** Just apply the code edits and report the file changes. The user drives the next dry-run/write step.
+
+See `REVIEW_AI_TRAINING.md` for the full procedure including chart formatting, AI-new computation logic per intent type, and edge cases.
 
 ---
 
