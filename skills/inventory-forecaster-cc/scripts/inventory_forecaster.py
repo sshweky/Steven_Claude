@@ -5708,6 +5708,20 @@ def apply_oh_shortfall_adjustment(row, fcst, inv_flow=None,
     rcv = (list(rcv) + [0.0] * 26)[:26]
     opn = (list(opn) + [0.0] * 26)[:26]
 
+    # DATA_GAP guard: if W1 beg_inv=0 but W2 beg_inv is materially positive
+    # and cannot be explained by W1 receipts alone, W1 is a null QB value
+    # converted to 0.0 -- not genuine OOS.  Mark that week unconstrained so
+    # demand is not incorrectly zeroed by a false-zero inventory reading.
+    # Logic: carry estimate = W2_beg - W1_rcv (what W1 beg must have been to
+    # produce W2_beg after W1 receipts).  If that carry > 500u, W1 had stock.
+    _data_gap_weeks = set()
+    if beg_inv_wks[0] == 0.0 and len(beg_inv_wks) > 1:
+        _w2_beg = beg_inv_wks[1]
+        _w1_rcv = rcv[0]
+        # W2 stock can't be explained purely by W1 receipts -> W1 must have had SOH
+        if _w2_beg > max(_w1_rcv * 1.05, 500.0):
+            _data_gap_weeks.add(0)
+
     # LT+Trans horizon: weeks at or beyond this index are unconstrained.
     _raw_lt = inv_flow.get("lt_trans_days") or 0
     try:
