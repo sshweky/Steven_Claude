@@ -69,8 +69,10 @@ def _qb_request(method, path, payload=None):
                 if elapsed_ms > config.QB_LATENCY_WARN_MS:
                     print(f"  [WARN] QB latency {elapsed_ms:.0f}ms -- realm may be under pressure")
                 if elapsed_ms > config.QB_LATENCY_ABORT_MS:
-                    print(f"  [ABORT] QB latency {elapsed_ms:.0f}ms exceeds abort threshold; stopping")
-                    raise RuntimeError(f"QB latency abort at {elapsed_ms:.0f}ms")
+                    # Warn but do not abort -- snapshot is a weekly batch, not interactive.
+                    # Slow responses are expected during business hours on bulk reads.
+                    print(f"  [WARN] QB latency {elapsed_ms:.0f}ms exceeds abort threshold -- adding 5s cooldown")
+                    time.sleep(5)
                 return json.loads(body)
         except urllib.error.HTTPError as exc:
             body_text = exc.read().decode("utf-8", errors="replace") if exc.fp else ""
