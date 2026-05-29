@@ -1845,7 +1845,9 @@ function renderDetail(r) {
     } else {
       suppCols.forEach(function(s) {
         var ss = purSel[s.key] || { checked:false, needQty:0, etd:'' };
-        var isBestMU = (s.mu_nj||0) === bestMU && bestMU > 0;
+        var isBestMU    = (s.mu_nj||0) === bestMU    && bestMU    > 0;
+        var isBestElcNj = bestElcNj   > 0 && (s.elc_nj||0) === bestElcNj;
+        var isBestLt    = bestLt      > 0 && (s.lt||0)     === bestLt;
         var cardBorder = ss.checked ? '2px solid #1b5e20' : (isBestMU ? '2px solid #43a047' : '1px solid #ddd');
         var cardBg     = ss.checked ? '#f1f8e9' : '#fff';
         var hdrBg      = s.key === 'main' ? '#283593' : '#3f51b5';
