@@ -213,11 +213,12 @@ def _discover_l4w_fid():
 # ---------------------------------------------------------------------------
 # Step 1 -- Fetch unreviewed AI Training comments
 # ---------------------------------------------------------------------------
-def fetch_ai_training_comments(days, note_fid):
-    """Page through Projection Comments WHERE Flag = 'AI Training' in last N days.
+def fetch_ai_training_comments(days, note_fid, flag_value="AI Training"):
+    """Page through Projection Comments WHERE Flag = <flag_value> in last N days.
 
-    Already-reviewed comments have FLAG='Reviewed' in QB and are excluded
-    naturally by the query -- no local state file needed.
+    Default flag_value='AI Training' returns unreviewed comments only.
+    Pass flag_value='Reviewed' to re-pull already-processed comments
+    for re-analysis (pair with --dry-run so QB is not re-marked).
     """
     cutoff_iso = (date.today() - timedelta(days=days)).isoformat()
     rows, skip = [], 0
@@ -225,12 +226,12 @@ def fetch_ai_training_comments(days, note_fid):
     if note_fid:
         select_fids.append(note_fid)
 
-    print(f"  Fetching AI Training comments (last {days} days, cutoff {cutoff_iso})...")
+    print(f"  Fetching '{flag_value}' comments (last {days} days, cutoff {cutoff_iso})...")
     while True:
         result = _qb_post("records/query", {
             "from":   COMMENTS_TABLE,
             "select": select_fids,
-            "where":  f"{{31.EX.'AI Training'}}AND{{{C_DATE}.AF.'{cutoff_iso}'}}",
+            "where":  f"{{31.EX.'{flag_value}'}}AND{{{C_DATE}.AF.'{cutoff_iso}'}}",
             "sortBy": [{"fieldId": C_DATE, "order": "ASC"}],
             "options": {"top": 1000, "skip": skip},
         })
