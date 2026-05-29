@@ -9566,9 +9566,11 @@ if (typeof ResizeObserver !== 'undefined') {
     const tb  = document.querySelector('.topbar');
     const tlb = document.querySelector('.toolbar');
     const thr = document.querySelector('thead tr:first-child');
+    const sb  = document.getElementById('subbanner');
     if (tb)  _stickyRO.observe(tb);
     if (tlb) _stickyRO.observe(tlb);
     if (thr) _stickyRO.observe(thr);
+    if (sb)  _stickyRO.observe(sb);  // re-measure spacer if subbanner height changes
   }, 100);
 }
 
