@@ -8646,6 +8646,7 @@ window.changePage     = changePage;
 const _NPM = {
   el:               null,
   acctCache:        {},      // div -> [{acct, name}]
+  accts:            [],      // flat array for current div (drives typeahead filter)
   selectedDiv:      '',
   selectedAcct:     null,    // {acct: Number, name: String}
   selectedMstyle:   '',
