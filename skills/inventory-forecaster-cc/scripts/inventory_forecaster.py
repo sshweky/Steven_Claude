@@ -8447,6 +8447,13 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
     # pattern.  Runs AFTER F39 so already-deduped phantoms don't trip it.
     # F49 (2026-05-08): pass pos_data so F43 can skip when POS-confirmed
     # acceleration (l4/l13 ≥ 1.20) explains the recent "spikes".
+    #
+    # Snapshot pre-F43 for norm metrics (2026-05-29): F43 is a forecast-quality
+    # cap that prevents Croston's from amplifying spikes.  It should NOT reduce
+    # norm_l13w/l4w/l26w for fully in-stock items with genuine demand growth.
+    # Norm metrics are computed from hist_pre_f43 (post F35/VP-ATS/F47/F41/F39
+    # but not F43) so they reflect true demand, not the model's input signal.
+    hist_pre_f43 = list(hist)
     hist, f43_corrections = attenuate_recent_spikes(hist, pos_data=pos_data)
     return {
         "mp":               mp,
