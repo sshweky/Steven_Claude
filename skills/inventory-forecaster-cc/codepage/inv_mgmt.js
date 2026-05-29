@@ -1032,7 +1032,6 @@ var COLS = [
     get:function(r){return r.item_status_flow||r.item_status||'';},
     filterValue:function(r){return (r.item_status_flow||r.item_status||'');},
     render:function(r){var s=r.item_status_flow||r.item_status||'';return '<td title="'+esc(s)+'"><div class="cell-clamp2">'+esc(s)+'</div></td>';} },
-  { id:'item_rank', label:'Rank', align:'left', get:function(r){return r.item_rank;}, render:function(r){return '<td>'+esc(r.item_rank)+'</td>';} },
   { id:'customer_count', label:'Cust', align:'right', numeric:true, get:function(r){return r.customer_count;}, render:function(r){return '<td class="right">'+r.customer_count+'</td>';} },
   { id:'qty_oh', label:'Qty OH', align:'right', numeric:true, get:function(r){return r.qty_oh;},
     render:function(r){return '<td class="right '+(r.qty_oh<0?'neg':'')+'">'+fmtInt(r.qty_oh)+'</td>';} },
