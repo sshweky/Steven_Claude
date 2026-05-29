@@ -14881,7 +14881,25 @@ def forecast_record(row, master_pack, account_interval=None, amazon_pos=None,
         _norm_strips_parts.append(
             f"Removed {int(round(iso['iso_qty'])):,} pcs due to ISO order (Initial Stocking Order)"
         )
+    # F43 spike-attenuation (2026-05-29): log actual caps (not F49 bypass markers).
+    # F43 is a forecast-quality rule so its impact is shown separately from
+    # demand-normalization strips, but the tooltip should still surface it.
+    for _c in _f43_corrections:
+        if "idx" in _c and _c.get("original", 0) > _c.get("capped", 0):
+            _f43_stripped = _c["original"] - _c["capped"]
+            if _f43_stripped > 0:
+                _norm_strips_parts.append(
+                    f"Spike-capped {int(round(_f43_stripped)):,} pcs "
+                    f"(recent order {_c['ratio']:.1f}x baseline; forecast-quality cap -- "
+                    f"true demand may be higher if item is fully in-stock)"
+                )
     _norm_strips_str = "|".join(_norm_strips_parts)
+
+    # F43 is a forecast-quality cap (prevents Croston amplifying spikes) and
+    # should NOT reduce the normalized demand display for fully in-stock items
+    # with genuine demand growth.  norm_l4w/l13w/l26w use the pre-F43 hist so
+    # they reflect true demand after phantom/duplicate/OOS removal only.
+    _norm_hist = _sig.get("hist_pre_f43") or hist
 
     return {
         "key":         row["Acct_MStyle_Key_"],
