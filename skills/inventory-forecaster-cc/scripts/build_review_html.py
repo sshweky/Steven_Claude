@@ -655,12 +655,66 @@ function cancelModify(id) {
   document.getElementById('modbox-' + id).classList.remove('open');
   document.getElementById('modtext-' + id).value = '';
 }
-function saveModify(id) {
+// PREVIEW UPDATE flow: send text to Claude via the bridge, await updated AI new values,
+// refresh the card. Card status remains PENDING; user then clicks Approve / Reject.
+function previewUpdate(id) {
   const text = document.getElementById('modtext-' + id).value.trim();
   if (!text) { alert('Type a modification first (or click Cancel).'); return; }
-  STATE.modifications[id] = { notes: text };
-  decide(id, 'modify');
+  const p = PROPOSALS.find(x => x.id === id);
+  // Queue the request in a known global. Claude polls this on its next turn.
+  window.__PENDING_PREVIEW = {
+    id: id,
+    key: p.key,
+    rule_id: p.rule_id,
+    rule_fn_id: p.rule_fn_id,
+    scope_key: p.scope_key,
+    text: text,
+    queued_at: new Date().toISOString(),
+  };
+  // Stash the modification text on STATE so it persists
+  STATE.modifications[id] = { notes: text, status: 'pending_preview' };
+  // Show banner-style status under the modify box buttons
+  const status = document.getElementById('preview-status-' + id);
+  status.innerHTML = '<span style="color:#0d47a1;font-weight:600">Update queued.</span> Switch to Claude Code and press Enter -- I will refresh this card automatically.';
+  // Start polling for the result
+  if (!STATE._previewPoller) {
+    STATE._previewPoller = setInterval(checkForPreviewResult, 1000);
+  }
+}
+
+function checkForPreviewResult() {
+  const r = window.__UPDATED_RESULT;
+  if (!r || !r.id) return;
+  const p = PROPOSALS.find(x => x.id === r.id);
+  if (!p) return;
+  // Apply updates: ai_new, item_*, sys_*
+  if (Array.isArray(r.ai_new)) p.ai_new = r.ai_new;
+  if (typeof r.item_ai_after === 'number') p.item_ai_after = r.item_ai_after;
+  if (typeof r.item_gap_after === 'number') p.item_gap_after = r.item_gap_after;
+  if (typeof r.sys_gap_after === 'number') {
+    p.sys_gap_after = r.sys_gap_after;
+    p.sys_closed_abs = Math.abs(p.sys_gap_before) - Math.abs(p.sys_gap_after);
+  }
+  refreshCard(r.id);
+  // Update status message
+  const status = document.getElementById('preview-status-' + r.id);
+  if (status) {
+    status.innerHTML = '<span style="color:#2e7d32;font-weight:600">Updated.</span> Review the chart above. Edit text + Preview again, or use Approve / Reject on the card.';
+  }
+  // Stash interpretation summary if provided
+  if (r.interpretation) {
+    STATE.modifications[r.id].interpretation = r.interpretation;
+  }
+  // Clear globals so we do not re-apply
+  window.__UPDATED_RESULT = null;
+  window.__PENDING_PREVIEW = null;
+  updateGlobal();
+}
+
+function cancelModify(id) {
   document.getElementById('modbox-' + id).classList.remove('open');
+  document.getElementById('modtext-' + id).value = '';
+  document.getElementById('preview-status-' + id).innerHTML = '';
 }
 
 function saveAll() {
