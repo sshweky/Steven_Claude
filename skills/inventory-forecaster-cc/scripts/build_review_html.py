@@ -53,6 +53,7 @@ def main():
     f92_scope = [x for x in recs_all if x["model"] == "Retailer WOS (POS)" and x["l13w"] > 0]
     f92_before = sum(x["man_total"] - x["ai_total"] for x in f92_scope)
     f92_after = 0
+    f92_man_total = sum(x["man_total"] for x in f92_scope)
     for x in f92_scope:
         mp_x = infer_mp(x["ai"])
         fl_x = snap(x["l13w"] * 0.85, mp_x)
