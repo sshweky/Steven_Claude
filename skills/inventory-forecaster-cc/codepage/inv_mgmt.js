@@ -1681,8 +1681,11 @@ function renderDetail(r) {
   if(r.commit_item)flagBadges.push('<span class="badge badge-green">Commit Item</span>');
   if(r.is_multi)flagBadges.push('<span class="badge badge-purple">Multi-Pack (Kit)</span>');
 
-  function kvRow(lbl,val){return '<div style="display:flex;gap:6px;padding:1px 0;font-size:11px;line-height:1.45;"><span style="color:#666;min-width:90px;flex-shrink:0;">'+lbl+'</span><span style="font-weight:500;color:#222;">'+val+'</span></div>';}
-  function kvBox(lbl,rows,bg,flex){return '<div style="flex:'+(flex||'1')+';min-width:160px;background:'+(bg||'#f8f9fa')+';border:1px solid #e4e7eb;border-radius:4px;padding:8px 10px;">'+(lbl?'<div style="font-size:10px;font-weight:700;color:#9e9e9e;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;">'+lbl+'</div>':'')+rows+'</div>';}
+  function kvRow(lbl,val){return '<div style="display:flex;gap:6px;padding:1px 0;font-size:11px;line-height:1.45;"><span style="color:#666;min-width:80px;flex-shrink:0;">'+lbl+'</span><span style="font-weight:500;color:#222;">'+val+'</span></div>';}
+  // kvBox: pass width (e.g. '220px') for a fixed-size box; omit for flex:1 stretchy
+  function kvBox(lbl,rows,bg,flex,width){
+    var flexStyle=width?'flex:0 0 auto;width:'+width+';':'flex:'+(flex||'1')+';min-width:160px;';
+    return '<div style="'+flexStyle+'background:'+(bg||'#f8f9fa')+';border:1px solid #e4e7eb;border-radius:4px;padding:8px 10px;">'+(lbl?'<div style="font-size:10px;font-weight:700;color:#9e9e9e;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;">'+lbl+'</div>':'')+rows+'</div>';}
 
   var identityBox=kvBox('Identity',kvRow('Mstyle','<b>'+esc(r.mstyle)+'</b>')+kvRow('Rank',esc(r.item_rank)||'&#8212;')+kvRow('Status',esc(r.item_status_flow)||'&#8212;')+kvRow('Sub Stat',esc(r.sub_status)||'&#8212;')+(r.season?kvRow('Season',esc(r.season)):'')+( r.size_ct?kvRow('Size/Ct',esc(r.size_ct)):'')+( r.fragrance?kvRow('Fragrance',esc(r.fragrance)):'')+( flagBadges.length?'<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">'+flagBadges.join('')+'</div>':''),'#e3f2fd');
   var itemDataBox=kvBox('Item Data','<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px;"><div>'+kvRow('Inner Pack',r.inner_pack||'&#8212;')+kvRow('Master Pack',r.master_pack||'&#8212;')+kvRow('MOQ',r.moq?fmt(r.moq):'-')+kvRow('Opt OH',fmtInt(r.opt_oh))+'</div><div>'+kvRow('Opt WOS',fmt(r.opt_wos))+kvRow('LT (Wks)',fmt(r.lt_wks))+kvRow('LT + Opt Wks',fmt(r.lt_opt_weeks))+(r.upc?kvRow('UPC #',esc(r.upc)):'')+( r.gtin?kvRow('GTIN #',esc(r.gtin)):'')+'</div></div>','#e8f5e9');
