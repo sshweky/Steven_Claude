@@ -4581,6 +4581,7 @@ async function toggleDetail(key) {
             <tr>${prjCells}</tr>
             <tr>${rcvCells}</tr>
             <tr>${opnCells}</tr>
+            <tr>${endInvCells}</tr>
             <tr>${wosCells}</tr>
           </table>
         </div>
