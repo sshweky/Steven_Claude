@@ -525,29 +525,8 @@ Location:  ${p.rule_loc}</span>
       </div>
     </div>
     <div class="section">
-      <div class="section-title">Impact</div>
-      <div class="impact-grid">
-        <div class="impact-card item">
-          <h4>This item only (${p.key})</h4>
-          <div class="impact-row"><span class="k">MAN 26w</span><span class="v">${fmtSimple(p.item_man)}</span></div>
-          <div class="impact-row"><span class="k">AI 26w before</span><span class="v">${fmtSimple(p.item_ai_before)}</span></div>
-          <div class="impact-row"><span class="k">AI 26w after</span><span class="v">${fmtSimple(p.item_ai_after)}</span></div>
-          <div class="impact-row"><span class="k">Gap MAN-AI before</span><span class="v">${fmt(p.item_gap_before)}u (${fmtPct(p.item_gap_before, p.item_man)})</span></div>
-          <div class="impact-row"><span class="k">Gap MAN-AI after</span><span class="v">${fmt(p.item_gap_after)}u (${fmtPct(p.item_gap_after, p.item_man)})</span></div>
-          <div class="impact-row delta"><span class="k">|Gap| % before / after</span><span class="v">${fmtPctAbs(p.item_gap_before, p.item_man)}  ->  ${fmtPctAbs(p.item_gap_after, p.item_man)}</span></div>
-          <div class="impact-row delta"><span class="k">|Gap| closed</span><span class="v ${item_closed >= 0 ? 'good':'bad'}">${fmt(item_closed)}u</span></div>
-        </div>
-        <div class="impact-card sys">
-          <h4>${p.is_item_level ? 'Item-level only (no systemic rule)' : `Systemic across ${fmtSimple(p.sys_scope)} matching records`}</h4>
-          <div class="impact-row"><span class="k">Records in scope</span><span class="v">${fmtSimple(p.sys_scope)}</span></div>
-          <div class="impact-row"><span class="k">MAN 26w total</span><span class="v">${fmtSimple(p.sys_man_total)}</span></div>
-          <div class="impact-row"><span class="k">Gap before</span><span class="v">${fmt(p.sys_gap_before)}u (${fmtPct(p.sys_gap_before, p.sys_man_total)})</span></div>
-          <div class="impact-row"><span class="k">Gap after</span><span class="v">${fmt(p.sys_gap_after)}u (${fmtPct(p.sys_gap_after, p.sys_man_total)})</span></div>
-          <div class="impact-row delta"><span class="k">|Gap| % before / after</span><span class="v">${fmtPctAbs(p.sys_gap_before, p.sys_man_total)}  ->  ${fmtPctAbs(p.sys_gap_after, p.sys_man_total)}</span></div>
-          <div class="impact-row delta"><span class="k">|Gap| closed</span><span class="v ${sys_closed >= 0 ? 'good':'bad'}">${fmt(sys_closed)}u</span></div>
-          ${p.is_item_level ? '<div class="impact-row"><span class="k" style="font-size:11px;font-style:italic;color:#a16207">Per script: tested 3 systemic variants, all widened gap. Item-level Tell-AI is the right path.</span></div>' : ''}
-        </div>
-      </div>
+      <div class="section-title">Impact (live)</div>
+      <div id="impact-${p.id}">${renderImpactGrid(p)}</div>
     </div>
     <div class="section">
       <div class="section-title">26-Week Projections (${p.key})</div>
