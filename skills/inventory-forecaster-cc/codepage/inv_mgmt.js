@@ -1867,6 +1867,10 @@ function renderDetail(r) {
           +'<div style="background:'+hdrBg+';color:#fff;padding:8px 10px;">'
             +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;opacity:0.8;margin-bottom:2px;">'+esc(s.badge)+'</div>'
             +'<div style="font-size:13px;font-weight:700;line-height:1.25;">'+esc(s.label)+'</div>'
+            +((isBestElcNj || isBestLt) ? '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;">'
+              +(isBestElcNj ? '<span style="display:inline-flex;align-items:center;gap:3px;background:#fdd835;color:#4a3200;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:0.3px;">&#9733; Best Landed Cost</span>' : '')
+              +(isBestLt    ? '<span style="display:inline-flex;align-items:center;gap:3px;background:#00e5ff;color:#003c44;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:0.3px;">&#9889; Fastest LT</span>' : '')
+            +'</div>' : '')
           +'</div>'
           +'<div style="padding:8px 10px;">'
             +scRow('FOB Cost', fmtCur(s.fob))
