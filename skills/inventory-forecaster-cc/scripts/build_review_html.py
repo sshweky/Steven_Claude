@@ -66,6 +66,14 @@ def main():
         "id": 1, "key": r["key"], "cust": r["cust"], "brand": r["brand"], "mstyle": r["mstyle"],
         "model": r["model"], "mp": mp,
         "comment": "baseline at 7470 u is too week when POS rate looks more around 8500 pcs. ALso, there is no reason you should have left W17 as zero since we will have plenty of stock that week.",
+        "rule_fn_id": "f92",
+        "params_schema": [
+            {"name": "floor_mult", "label": "L13W floor multiplier", "type": "number", "default": 0.85, "min": 0.5, "max": 1.2, "step": 0.05},
+            {"name": "restore_zeros", "label": "Restore zeroed weeks (W17-style)", "type": "checkbox", "default": True},
+            {"name": "restore_thresh", "label": "Restore threshold (msty_opn / floor)", "type": "number", "default": 4.0, "min": 1.0, "max": 20.0, "step": 0.5}
+        ],
+        "default_params": {"floor_mult": 0.85, "restore_zeros": True, "restore_thresh": 4.0},
+        "scope_key": "f92",
         "rule_id": "F92",
         "rule_title": "Retailer WOS (POS) baseline floor + zeroed-week restore",
         "rule_summary": "Raise baseline to L13W * 0.85 when below; restore zeroed weeks when Msty Open PO > 4 * baseline.",
