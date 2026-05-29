@@ -697,6 +697,16 @@ async function previewUpdate(id) {
       p.sys_closed_abs = Math.abs(p.sys_gap_before) - Math.abs(p.sys_gap_after);
     }
     refreshCard(id);
+    // Update the Recommendation box text to reflect modifications
+    const titleEl    = document.getElementById('rule-title-' + id);
+    const summaryEl  = document.getElementById('rule-summary-' + id);
+    const critEl     = document.getElementById('rule-criterion-' + id);
+    const origTitle = (STATE.originalRuleText[id] = STATE.originalRuleText[id] || {
+      title: titleEl.innerText, summary: summaryEl.innerText, criterion: critEl.innerText,
+    });
+    titleEl.innerText   = origTitle.title + (r.title_extra ? ' ' + r.title_extra : '');
+    summaryEl.innerText = origTitle.summary + (r.summary_extra ? ' ' + r.summary_extra : '');
+    critEl.innerText    = origTitle.criterion + (r.criterion_extra ? ' ' + r.criterion_extra : '');
     STATE.modifications[id] = { notes: text, interpretation: r.interpretation, applied_params: r.applied_params, applied_scope_filter: r.applied_scope_filter };
     // Collapse the modify box, return focus to the card action area
     document.getElementById('modbox-' + id).classList.remove('open');
