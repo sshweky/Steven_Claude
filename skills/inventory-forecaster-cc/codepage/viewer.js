@@ -9346,6 +9346,10 @@ function _updateStickyHeights() {
   root.setProperty('--topbar-h', th + 'px');
   root.setProperty('--frozen-h', (th + tbh) + 'px');
 
+  // Keep the spacer that reserves space below the fixed topbar in sync.
+  const spacer = document.getElementById('topbar-spacer');
+  if (spacer) spacer.style.height = th + 'px';
+
   // Measure the sortable header row so the filter row sticks exactly beneath it.
   const headerRow = document.querySelector('thead tr:first-child');
   if (headerRow) {
