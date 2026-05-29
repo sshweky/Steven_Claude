@@ -1032,6 +1032,7 @@ for context only. For current behavior and fire location, always check RULES.md.
 | 2026-05-21 | F59o, F59i EC-override, F59m, F59n, F60, VP-Q4 false-abort fix | Seasonal overlay for Heuristic/Croston's; EC parent POS lookup; open-PO guard. |
 | 2026-05-21 | (cleanup) | Removed `holt_winters()` function; renamed F31->F71, F6->F6a/b/c. |
 | 2026-05-17 | F69, F69-WOS | Amazon direct-import sibling history blend + WOS-excess correction. |
+| 2026-05-29 | norm_l13w pre-F43 fix | norm_l13w/l4w/l26w now computed from pre-F43 hist. F43 is a forecast-quality cap (prevents Croston amplifying spikes) -- it was incorrectly reducing the normalized demand display for fully in-stock items with genuine demand growth. Symptom: "Normalized Ord/Wk L13W: X/wk (-584 vs raw)" for FF12655EC despite 26 weeks fully in-stock. Also: F43 corrections now logged in norm_strips tooltip. |
 | 2026-05-17 | F61, F62, F63, F64, F65, F66 | 8-priority sweep: horizon decay, soft trend blend, multi-pack floor, trade fall, zero-vel suppression, per-customer bias. |
 | 2026-05-17 | F67, F68, Kingsford profile shift | Amazon buy-box $0 dampener, ASIN inactive-channel zero, retail-ordering peak shift for grilling. |
 | 2026-05-17 | VP-ATS-Catch | Post-OOS catch-up spike cap. |
