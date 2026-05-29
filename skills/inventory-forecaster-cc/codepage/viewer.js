@@ -5940,11 +5940,27 @@ async function _loadRtlPos(r, safeId) {
 
     // Note: mstyle-only fallback removed -- it caused wrong-retailer bleed
     // (e.g. Chewy records showing Amazon/Walmart POS data for the same mstyle).
-    // All retailers with POS coverage (Walmart 23011, Petsmart 16553, Petco 16579,
-    // Kohl's 11169, Target 20006) have matching acct#s in Retailer Sales and work
-    // correctly with the primary acct+mstyle filter above.
-    if (!rawRows.length && acctStr) {
-      console.info('[RTL POS] no data for acct=' + acctStr + ' mstyle=' + mstyle + ' -- no POS coverage for this account');
+    // Xref fallback: some retailers report POS under a different mstyle than our
+    // projection mstyle (e.g. Kohl's FF11926KL is reported as FF11926).
+    // CFG.RTL_MSTYLE_XREF maps "ACCT-PRJ_MSTYLE" -> retailer-reported mstyle.
+    if (!rawRows.length && acctStr && CFG.RTL_MSTYLE_XREF) {
+      const _xrefKey = acctStr + '-' + mstyle;
+      const _xrefMs  = CFG.RTL_MSTYLE_XREF[_xrefKey];
+      if (_xrefMs) {
+        console.info('[RTL POS] xref fallback: ' + mstyle + ' -> ' + _xrefMs + ' (acct=' + acctStr + ')');
+        const _xrefResp = await qb('/records/query', {
+          from:    CFG.RTL_POS_TID,
+          select:  selectFids,
+          where:   `{${RF.MSTYLE}.EX.'${_xrefMs.replace(/'/g, "''")}'}AND{${RF.ACCT}.EX.${acctStr}}`,
+          sortBy:  [{ fieldId: RF.DATE, order: 'DESC' }],
+          options: { top: 120 },
+        });
+        rawRows = _xrefResp.data || [];
+        if (rawRows.length) rtlXrefMstyle = _xrefMs;
+      }
+      if (!rawRows.length) {
+        console.info('[RTL POS] no data for acct=' + acctStr + ' mstyle=' + mstyle + ' -- no POS coverage');
+      }
     }
 
     // Deduplicate by date (each week-ending Sunday appears exactly twice)
