@@ -251,7 +251,7 @@ def fetch_projections(fids, status_fid):
         payload = {
             "from":   PROJ_TABLE,
             "select": select_fids,
-            "where":  f"{{{status_fid}.CT.'A'}}",
+            "where":  f"{{{status_fid}.SW.'A'}}",
             "options": {
                 "skip":         skip,
                 "top":          page_size,
