@@ -316,8 +316,106 @@ header .sub { font-size: 13px; opacity: .85; margin-top: 3px; }
 
     js = """
 const PROPOSALS = __PROPOSALS_JSON__;
-const STATE = { decisions: {}, modifications: {} };
-PROPOSALS.forEach(p => { STATE.decisions[p.id] = null; });
+const SCOPE_DATA = __SCOPE_JSON__;
+const ITEM_RECS = __ITEM_JSON__;
+const STATE = { decisions: {}, modifications: {}, params: {}, charts: {} };
+PROPOSALS.forEach(p => {
+  STATE.decisions[p.id] = null;
+  STATE.params[p.id] = JSON.parse(JSON.stringify(p.default_params));
+});
+
+// ---- helpers ----
+function snap(v, mp) { return mp > 0 ? Math.round(v / mp) * mp : Math.round(v); }
+function inferMp(arr) {
+  const nz = arr.filter(x => x > 0);
+  if (!nz.length) return 1;
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  return nz.reduce(gcd);
+}
+function sum(arr) { return arr.reduce((a,b) => a+b, 0); }
+
+// ---- rule functions (port of Python logic) ----
+const RULE_FNS = {
+  f92(rec, params) {
+    const mp = inferMp(rec.ai);
+    const floor = snap(rec.l13w * params.floor_mult, mp);
+    const new_ai = rec.ai.map(v => v > 0 ? Math.max(v, floor) : 0);
+    if (params.restore_zeros && new_ai.length > 16 && new_ai[16] === 0 && rec.msty_opn > params.restore_thresh * floor) {
+      new_ai[16] = floor;
+    }
+    return new_ai;
+  },
+  f93(rec, params) {
+    const new_ai = [...rec.ai];
+    const n = Math.min(params.num_weeks, new_ai.length);
+    if (params.coverage_mode === 'greedy') {
+      let opn = rec.cust_opn;
+      for (let i = 0; i < n; i++) {
+        if (opn >= new_ai[i] && new_ai[i] > 0) { opn -= new_ai[i]; new_ai[i] = 0; }
+      }
+    } else if (params.coverage_mode === 'full') {
+      const sum_n = new_ai.slice(0, n).reduce((a,b) => a+b, 0);
+      if (rec.cust_opn >= sum_n && sum_n > 0) {
+        for (let i = 0; i < n; i++) new_ai[i] = 0;
+      }
+    } else if (params.coverage_mode === 'per_week') {
+      for (let i = 0; i < n; i++) {
+        if (rec.cust_opn >= params.per_week_threshold * new_ai[i] && new_ai[i] > 0) new_ai[i] = 0;
+      }
+    }
+    return new_ai;
+  },
+  f94(rec, params) {
+    const new_ai = [...rec.ai];
+    const w = params.week_to_zero - 1;
+    if (w >= 0 && w < new_ai.length) new_ai[w] = 0;
+    return new_ai;
+  },
+};
+
+// ---- recompute: re-run rule with current params, refresh card ----
+function recompute(id) {
+  const p = PROPOSALS.find(x => x.id === id);
+  const params = STATE.params[id];
+  const fn = RULE_FNS[p.rule_fn_id];
+  if (!fn) return;
+
+  // Per-item recompute
+  const itemRec = ITEM_RECS[p.key];
+  const new_ai = fn(itemRec, params);
+  p.ai_new = new_ai;
+  p.item_ai_after = sum(new_ai);
+  p.item_gap_after = p.item_man - p.item_ai_after;
+
+  // Systemic recompute
+  if (p.is_item_level) {
+    p.sys_gap_after = p.item_gap_after;
+  } else {
+    const scope = SCOPE_DATA[p.scope_key] || [];
+    let sys_after = 0;
+    for (const rec of scope) {
+      const na = fn(rec, params);
+      sys_after += rec.man_total - sum(na);
+    }
+    p.sys_gap_after = sys_after;
+  }
+  p.sys_closed_abs = Math.abs(p.sys_gap_before) - Math.abs(p.sys_gap_after);
+
+  refreshCard(id);
+  updateGlobal();
+}
+
+function refreshCard(id) {
+  const p = PROPOSALS.find(x => x.id === id);
+  // Replace inner impact + chart sections
+  document.getElementById(`impact-${id}`).innerHTML = renderImpactGrid(p);
+  // Replace chart data
+  const ch = STATE.charts[id];
+  if (ch) {
+    ch.data.datasets[2].data = p.ai_new;
+    ch.update();
+  }
+}
 
 function fmt(n) {
   const s = Math.round(n).toString();
