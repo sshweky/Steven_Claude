@@ -158,7 +158,7 @@ def _parse_w1_date_from_label(label, reference_year=None):
 # Field discovery for Projections table
 # ---------------------------------------------------------------------------
 
-_MAN_PRJ_LABEL_RE = re.compile(r"^\s*\d{2}\s+\d{2}\s+W(\d+)\s*$", re.IGNORECASE)
+_MAN_PRJ_LABEL_RE = re.compile(r"^\s*\d{2}\s+\d{2}\s+W(\d+)", re.IGNORECASE)
 
 
 def discover_projections_fields(fields):
