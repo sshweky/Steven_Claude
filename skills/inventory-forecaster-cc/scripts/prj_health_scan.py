@@ -458,7 +458,7 @@ def write_report(results, out_path, args):
         cnt = len(by_issue.get(issue, []))
         if cnt > 0:
             lines.append(f"| **{ISSUE_LABEL[issue]}** | {cnt} | "
-                         f"{ISSUE_DESC[issue].split('.')[0]} |")
+                         f"{ISSUE_SUMMARY[issue]} |")
     lines.append("")
 
     # Detail by issue type
