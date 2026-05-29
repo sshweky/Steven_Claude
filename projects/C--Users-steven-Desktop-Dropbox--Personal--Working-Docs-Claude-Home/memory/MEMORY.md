@@ -5,6 +5,7 @@
 - [feedback_forecasting_methodology.md](feedback_forecasting_methodology.md) — Forecasting model tuning: HW trend collapse, Croston's over-projection, baseline should use all-weeks avg, viewer preferences, narrative style
 - [feedback_no_unicode_chars.md](feedback_no_unicode_chars.md) — Never use em-dashes, replacement chars, ellipsis, or any non-ASCII Unicode anywhere -- causes diamond-question-mark in browser
 - [feedback_no_autodeploy.md](feedback_no_autodeploy.md) — Never run deploy_pages.py without explicit user instruction — it overwrites live QB pages immediately
+- [feedback_no_local_viewer.md](feedback_no_local_viewer.md) — Never launch the local viewer (viewer.py / http://127.0.0.1:8765) — user only uses the QB codepage viewer
 
 ## References
 - [reference_github_sync.md](reference_github_sync.md) — GitHub repo (sshweky/Steven_Claude) syncs C:\Users\steven\.claude — git commands, what's included/excluded
