@@ -459,7 +459,7 @@ async function loadData() {
   setStep(3,'active'); setBar(55); setStatus('Loading Projections...');
   // Active projections only (StatusCust starts with 'A') — provides demand + brand/description
   var prjFieldIds = Object.values(PRJ_F).concat(PRJ_MANUAL);
-  var prjRows = await qbQueryAll(PROJ_TID, prjFieldIds, "{10}.CT.'A'", 'Loading Projections');
+  var prjRows = await qbQueryAll(PROJ_TID, prjFieldIds, "{10}.SW.'A'", 'Loading Projections');
 
   setBar(70); setStatus('Processing data...');
 
