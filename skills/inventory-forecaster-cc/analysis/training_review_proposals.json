@@ -8,6 +8,39 @@
     "model": "Retailer WOS (POS)",
     "mp": 6,
     "comment": "baseline at 7470 u is too week when POS rate looks more around 8500 pcs. ALso, there is no reason you should have left W17 as zero since we will have plenty of stock that week.",
+    "rule_fn_id": "f92",
+    "params_schema": [
+      {
+        "name": "floor_mult",
+        "label": "L13W floor multiplier",
+        "type": "number",
+        "default": 0.85,
+        "min": 0.5,
+        "max": 1.2,
+        "step": 0.05
+      },
+      {
+        "name": "restore_zeros",
+        "label": "Restore zeroed weeks (W17-style)",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "name": "restore_thresh",
+        "label": "Restore threshold (msty_opn / floor)",
+        "type": "number",
+        "default": 4.0,
+        "min": 1.0,
+        "max": 20.0,
+        "step": 0.5
+      }
+    ],
+    "default_params": {
+      "floor_mult": 0.85,
+      "restore_zeros": true,
+      "restore_thresh": 4.0
+    },
+    "scope_key": "f92",
     "rule_id": "F92",
     "rule_title": "Retailer WOS (POS) baseline floor + zeroed-week restore",
     "rule_summary": "Raise baseline to L13W * 0.85 when below; restore zeroed weeks when Msty Open PO > 4 * baseline.",
@@ -122,6 +155,44 @@
     "model": "Seasonal Baseline",
     "mp": 12,
     "comment": "Always zero W1,W2,W3 if their open order exist in the same week in account CHEWY.COM",
+    "rule_fn_id": "f93",
+    "params_schema": [
+      {
+        "name": "num_weeks",
+        "label": "Weeks from start to evaluate",
+        "type": "number",
+        "default": 3,
+        "min": 1,
+        "max": 8,
+        "step": 1
+      },
+      {
+        "name": "coverage_mode",
+        "label": "Coverage mode",
+        "type": "select",
+        "options": [
+          "greedy",
+          "full",
+          "per_week"
+        ],
+        "default": "greedy"
+      },
+      {
+        "name": "per_week_threshold",
+        "label": "Per-week threshold (per_week mode only)",
+        "type": "number",
+        "default": 0.8,
+        "min": 0.1,
+        "max": 1.5,
+        "step": 0.1
+      }
+    ],
+    "default_params": {
+      "num_weeks": 3,
+      "coverage_mode": "greedy",
+      "per_week_threshold": 0.8
+    },
+    "scope_key": "f93",
     "rule_id": "F93",
     "rule_title": "Forward-PO greedy zero W1-W3",
     "rule_summary": "For Seasonal Baseline / Sparse Intermittent non-Amazon: greedy-consume cust_open_po across W1, W2, W3. Zero a week only if remaining PO qty >= AI for that week.",
@@ -236,6 +307,22 @@
     "model": "Sparse Intermittent",
     "mp": 18,
     "comment": "zero out W10 prj as it have open POs add up to similar volume withing 4 weeks",
+    "rule_fn_id": "f94",
+    "params_schema": [
+      {
+        "name": "week_to_zero",
+        "label": "Week to zero (1-indexed)",
+        "type": "number",
+        "default": 10,
+        "min": 1,
+        "max": 26,
+        "step": 1
+      }
+    ],
+    "default_params": {
+      "week_to_zero": 10
+    },
+    "scope_key": "f94",
     "rule_id": "F94-ITEM",
     "rule_title": "Burlington BB21626 W10 zero (item-level via Tell-AI comment)",
     "rule_summary": "Apply via F58 AI Comment: zero W10 for 13640-BB21626. No broad systemic rule -- tested 3 variants across Sparse Intermittent + msty_opn, all WIDENED the gap (over-zeroed legitimate spikes).",
@@ -350,6 +437,44 @@
     "model": "Seasonal Baseline",
     "mp": 12,
     "comment": "Always zero W1,W2,W3 if their open order exist in the same week in account ACE HARDWARE CORPORATION",
+    "rule_fn_id": "f93",
+    "params_schema": [
+      {
+        "name": "num_weeks",
+        "label": "Weeks from start to evaluate",
+        "type": "number",
+        "default": 3,
+        "min": 1,
+        "max": 8,
+        "step": 1
+      },
+      {
+        "name": "coverage_mode",
+        "label": "Coverage mode",
+        "type": "select",
+        "options": [
+          "greedy",
+          "full",
+          "per_week"
+        ],
+        "default": "greedy"
+      },
+      {
+        "name": "per_week_threshold",
+        "label": "Per-week threshold (per_week mode only)",
+        "type": "number",
+        "default": 0.8,
+        "min": 0.1,
+        "max": 1.5,
+        "step": 0.1
+      }
+    ],
+    "default_params": {
+      "num_weeks": 3,
+      "coverage_mode": "greedy",
+      "per_week_threshold": 0.8
+    },
+    "scope_key": "f93",
     "rule_id": "F93",
     "rule_title": "Forward-PO greedy zero W1-W3",
     "rule_summary": "For Seasonal Baseline / Sparse Intermittent non-Amazon: greedy-consume cust_open_po across W1, W2, W3. Zero a week only if remaining PO qty >= AI for that week.",
@@ -464,6 +589,44 @@
     "model": "Seasonal Baseline",
     "mp": 1,
     "comment": "Always zero W1,W2,W3 if their open order exist in the same week in account C & S WHOLESALE",
+    "rule_fn_id": "f93",
+    "params_schema": [
+      {
+        "name": "num_weeks",
+        "label": "Weeks from start to evaluate",
+        "type": "number",
+        "default": 3,
+        "min": 1,
+        "max": 8,
+        "step": 1
+      },
+      {
+        "name": "coverage_mode",
+        "label": "Coverage mode",
+        "type": "select",
+        "options": [
+          "greedy",
+          "full",
+          "per_week"
+        ],
+        "default": "greedy"
+      },
+      {
+        "name": "per_week_threshold",
+        "label": "Per-week threshold (per_week mode only)",
+        "type": "number",
+        "default": 0.8,
+        "min": 0.1,
+        "max": 1.5,
+        "step": 0.1
+      }
+    ],
+    "default_params": {
+      "num_weeks": 3,
+      "coverage_mode": "greedy",
+      "per_week_threshold": 0.8
+    },
+    "scope_key": "f93",
     "rule_id": "F93",
     "rule_title": "Forward-PO greedy zero W1-W3",
     "rule_summary": "For Seasonal Baseline / Sparse Intermittent non-Amazon: greedy-consume cust_open_po across W1, W2, W3. Zero a week only if remaining PO qty >= AI for that week.",
