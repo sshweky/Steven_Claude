@@ -582,6 +582,27 @@
       "retailer_mstyle": "FF9290",
       "prj_mstyle": "FF9290/24",
       "notes": ""
+    },
+    {
+      "acct": "20006",
+      "retailer_customer": "ACCT 20006",
+      "retailer_mstyle": "FF10320SCH",
+      "prj_mstyle": "FF10320TG",
+      "notes": "Retailer reports with SCH suffix; prj uses TG suffix"
+    },
+    {
+      "acct": "20006",
+      "retailer_customer": "ACCT 20006",
+      "retailer_mstyle": "FF27315SCH",
+      "prj_mstyle": "FF27315TG",
+      "notes": "Retailer reports with SCH suffix; prj uses TG suffix"
+    },
+    {
+      "acct": "23011",
+      "retailer_customer": "WAL MART STORES",
+      "retailer_mstyle": "FF30879PDQ6",
+      "prj_mstyle": "FF30879PDQ",
+      "notes": "Retailer reports with PDQ6 suffix; prj uses PDQ suffix"
     }
   ]
 }
