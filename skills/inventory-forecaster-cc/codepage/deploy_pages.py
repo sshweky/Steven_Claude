@@ -1,30 +1,34 @@
 #!/usr/bin/env python3
 """
-Deploy viewer.html and viewer.js to QB InventoryTrack codepages.
+Deploy viewer.html / viewer.js / inv_mgmt.js / inv_mgmt_full.html to
+QB InventoryTrack codepages.
 
-HOW IT WORKS (updated 2026-05-25):
+HOW IT WORKS (updated 2026-05-29):
   The legacy API_AddReplaceDBPage endpoint is BROKEN -- returns errcode=0
   but saves nothing (QB platform regression, May 2026). The QB REST API
   has no /v1/pages endpoint.
 
   Working method:
     1. Start a local CORS server on localhost:8743 that serves the files.
-    2. Chrome (logged in to QB) fetches them and injects into the Ace editor
-       on the QB page-editor UI, then clicks Save.
-  This matches exactly what QB's own UI does and is the only method that works.
+    2. Chrome (logged in to QB) fetches each file and injects it into the
+       Ace editor on the QB page-editor UI, then clicks Save.
 
-USAGE (Claude-automated):
-    python deploy_pages.py [forecast|invmgmt|all]
-    -> starts CORS server, prints JS snippets to run in each page editor
-    -> Claude uses Chrome MCP to navigate and inject automatically
+USAGE (Claude-automated) -- REVISED 2026-05-29:
+  Run:
+      python deploy_pages.py [forecast|invmgmt|all]
 
-USAGE (manual):
-    1. Run this script to start the CORS server.
-    2. For each page, open the QB page editor URL printed below.
-    3. Open DevTools console (F12).
-    4. Paste and run the JS snippet printed for that page.
-    5. "Page saved" toast confirms success.
-    6. Ctrl-C this script when done.
+  Claude must follow the steps in the === CLAUDE AUTOMATION PROCEDURE ===
+  block that this script prints.  The critical first step is calling
+  switch_browser so Claude connects to the SAME Chrome window where the
+  user is signed into QB.  Without this, navigation lands on the sign-in
+  page every time.
+
+USAGE (manual fallback):
+  1. Run this script -- it starts the CORS server and prints snippets.
+  2. For each page, open the URL in Chrome (signed into QB).
+  3. Press F12 -> Console, paste the snippet, press Enter.
+  4. Watch for "deployed, length=XXXXX" in the console.
+  5. Ctrl-C this script when done.
 
 PAGE MAP:
     viewer.js          -> pageID=49  (Forecast Manager JS logic)
@@ -32,7 +36,7 @@ PAGE MAP:
     inv_mgmt.js        -> pageID=56  (Inventory Management JS logic)
     inv_mgmt_full.html -> pageID=52  (Inventory Management HTML shell)
 """
-import http.server, socketserver, threading, time, sys, os, datetime
+import http.server, socketserver, threading, time, sys, os
 from pathlib import Path
 
 PORT  = 8743
@@ -85,31 +89,43 @@ class CORSHandler(http.server.BaseHTTPRequestHandler):
 
 def start_server():
     os.chdir(HERE)
-    httpd = socketserver.TCPServer(("", PORT), CORSHandler)
-    t = threading.Thread(target=httpd.serve_forever, daemon=True)
-    t.start()
-    return httpd
+    try:
+        httpd = socketserver.TCPServer(("", PORT), CORSHandler)
+        t = threading.Thread(target=httpd.serve_forever, daemon=True)
+        t.start()
+        print(f"CORS server started on http://localhost:{PORT}/")
+        return httpd
+    except OSError:
+        print(f"CORS server already running on port {PORT} -- reusing it.")
+        return None
 
 
 def js_snippet(filename):
-    # For viewer.js: replace %%BUILD_TS%% with the current epoch so the
-    # IndexedDB projection-cache key changes on every deploy and all users
-    # get a fresh QB fetch automatically (no manual ?nocache=1 required).
+    """One-liner that fetches the file from the local CORS server and saves it."""
     build_ts_sub = (
-        "  const content = (await r.text()).replace(/%%BUILD_TS%%/g, String(Date.now()));\n"
+        "(await r.text()).replace(/%%BUILD_TS%%/g, String(Date.now()))"
         if filename.endswith('.js') else
-        "  const content = await r.text();\n"
+        "await r.text()"
     )
     return (
-        f"(async () => {{\n"
-        f"  const r = await fetch('http://localhost:{PORT}/{filename}');\n"
-        f"  if (!r.ok) return console.error('fetch failed:', r.status);\n"
-        f"{build_ts_sub}"
-        f"  ace.edit(document.querySelector('.ace_editor')).setValue(content);\n"
-        f"  document.getElementById('pagetext').value = content;\n"
-        f"  document.getElementById('btnSaveDone').click();\n"
-        f"  console.log('{filename} deployed, length=' + content.length);\n"
+        f"(async () => {{ "
+        f"const r = await fetch('http://localhost:{PORT}/{filename}'); "
+        f"if (!r.ok) return console.error('fetch failed:', r.status); "
+        f"const c = {build_ts_sub}; "
+        f"ace.edit(document.querySelector('.ace_editor')).setValue(c); "
+        f"document.getElementById('pagetext').value = c; "
+        f"document.getElementById('btnSaveDone').click(); "
+        f"console.log('{filename} DEPLOYED length=' + c.length); "
         f"}})();"
+    )
+
+
+def check_snippet():
+    """Returns 'READY', 'SIGNIN', or 'LOADING' -- run this after navigate to
+    confirm the page editor loaded correctly before running the deploy snippet."""
+    return (
+        "document.querySelector('.ace_editor') ? 'READY' : "
+        "(document.title.includes('Sign In') ? 'SIGNIN' : 'LOADING')"
     )
 
 
@@ -124,26 +140,53 @@ if __name__ == "__main__":
         pages = [("viewer.js", 49), ("viewer.html", 50),
                  ("inv_mgmt.js", 56), ("inv_mgmt_full.html", 52)]
 
-    print(f"\n=== QB Codepage Deployer ({target}) ===")
-    print(f"Serving {HERE} on http://localhost:{PORT}/\n")
+    print(f"\n=== QB Codepage Deployer ({target}) ===\n")
+    start_server()
+    time.sleep(0.3)
 
-    httpd = start_server()
-    time.sleep(0.5)
-    print("Server started.\n")
+    # ------------------------------------------------------------------ #
+    #  CLAUDE AUTOMATION PROCEDURE                                          #
+    #  Follow these steps exactly. Do NOT skip Step 1.                     #
+    # ------------------------------------------------------------------ #
+    print("""
+=== CLAUDE AUTOMATION PROCEDURE ===
+
+STEP 1 -- Connect to the correct Chrome browser (REQUIRED every session):
+  Call switch_browser.  A "Connect" button will pop up in every Chrome window
+  that has the extension installed.  Ask the user to click it in the Chrome
+  window where they are signed into pim.quickbase.com.
+  Wait for switch_browser to confirm the connection before proceeding.
+  This ensures the MCP tab shares the QB session cookie.
+
+STEP 2 -- For each page listed below:
+  a. Call tabs_create_mcp to create a fresh MCP tab (avoids chrome:// restrictions).
+  b. Call navigate on that tab to the page editor URL.
+  c. Wait 4 seconds (page load).
+  d. Call javascript_tool with the CHECK SNIPPET to verify state:
+       READY  -> proceed to deploy
+       SIGNIN -> QB session not found; tell user to sign into QB in this tab,
+                 wait for confirmation, then retry from step (b).
+       LOADING -> wait 2 more seconds and recheck.
+  e. Call javascript_tool with the DEPLOY SNIPPET.
+  f. Wait 3 seconds, then verify with javascript_tool:
+       document.title  ->  should still contain 'Edit Page' (not redirect).
+  g. Confirm "DEPLOYED length=XXXXX" appears in the console output.
+""")
 
     for filename, page_id in pages:
         path = HERE / filename
         size = path.stat().st_size if path.exists() else 0
         print(f"--- {filename} (page {page_id}, {size:,} bytes) ---")
-        print(f"Open: https://{REALM}/nav/app/{APP}/action/pageedit?pageID={page_id}")
-        print("Paste in DevTools console:")
-        print(js_snippet(filename))
+        print(f"  URL:          https://{REALM}/nav/app/{APP}/action/pageedit?pageID={page_id}")
+        print(f"  CHECK:        {check_snippet()}")
+        print(f"  DEPLOY:       {js_snippet(filename)}")
         print()
 
-    print("Waiting for deployments... Ctrl-C when done.")
+    print("CORS server running. Claude: proceed with Step 1 (switch_browser) now.")
+    print("Ctrl-C to stop the server when all pages are deployed.\n")
+
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        httpd.shutdown()
-        print("\nServer stopped. Done.")
+        print("\nServer stopped.")
