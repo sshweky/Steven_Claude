@@ -1232,13 +1232,20 @@ function renderStats() {
   function btn(key,label,color){var active=selPriorities.has(key);return '<button class="pri-btn '+(active?'active':'')+'" data-pri="'+key+'" title="'+PRI_TIPS[key]+'" style="background:'+(active?color:'#ffffff')+';color:'+(active?'#fff':color)+';border:1.5px solid '+color+';">'+label+' <b style="margin-left:4px;">'+(pri[key]||0).toLocaleString()+'</b></button>';}
   var allActive=selPriorities.size===0;
   var allBtn='<button class="pri-btn '+(allActive?'active':'')+'" data-pri="__ALL__" title="All OOS priorities" style="background:'+(allActive?'#37474f':'#ffffff')+';color:'+(allActive?'#fff':'#37474f')+';border:1.5px solid #37474f;">All <b style="margin-left:4px;">'+total.toLocaleString()+'</b></button>';
-  document.getElementById('statsBar').innerHTML=allBtn+btn('CRITICAL','&#128308; Critical','#b71c1c')+btn('HIGH','&#128992; High','#e65100')+btn('MEDIUM','&#129001; Medium','#f9a825')+btn('LOW','&#9898; Low','#5d4037')+btn('NO_OOS','&#9898; No OOS','#9e9e9e')+'<div class="stat" style="margin-left:14px;"><b>'+gapsN+'</b> OOS Risk</div><div class="stat"><b>'+overN+'</b> Overstocked</div><div class="stat"><b>'+inScope.toLocaleString()+'</b> Shown</div>';
+  var needPurchaseN = ALL.filter(function(r){return r.purchase_rec>0;}).length;
+  var npActive = showNeedPurchase;
+  var npBtn = '<button class="pri-btn '+(npActive?'active':'')+'" id="needPurchaseBtn" title="Show only records with a Need to Buy quantity" '
+    +'style="margin-left:14px;background:'+(npActive?'#1b5e20':'#ffffff')+';color:'+(npActive?'#fff':'#1b5e20')+';border:1.5px solid #1b5e20;">'
+    +'&#128722; Need to Buy <b style="margin-left:4px;">'+needPurchaseN.toLocaleString()+'</b></button>';
+  document.getElementById('statsBar').innerHTML=allBtn+btn('CRITICAL','&#128308; Critical','#b71c1c')+btn('HIGH','&#128992; High','#e65100')+btn('MEDIUM','&#129001; Medium','#f9a825')+btn('LOW','&#9898; Low','#5d4037')+btn('NO_OOS','&#9898; No OOS','#9e9e9e')+npBtn+'<div class="stat" style="margin-left:14px;"><b>'+gapsN+'</b> OOS Risk</div><div class="stat"><b>'+overN+'</b> Overstocked</div><div class="stat"><b>'+inScope.toLocaleString()+'</b> Shown</div>';
   document.getElementById('statsBar').querySelectorAll('.pri-btn').forEach(function(b){b.onclick=function(){
     var key=b.dataset.pri;
     if(key==='__ALL__'){selPriorities.clear();}
     else{if(selPriorities.has(key))selPriorities.delete(key);else selPriorities.add(key);}
     syncPriorityDd();applyFilters();
   };});
+  var npEl=document.getElementById('needPurchaseBtn');
+  if(npEl){npEl.onclick=function(){showNeedPurchase=!showNeedPurchase;applyFilters();};}
 }
 function syncPriorityDd(){
   var panel=document.querySelector('#dd-priority .ms-dd-panel');
