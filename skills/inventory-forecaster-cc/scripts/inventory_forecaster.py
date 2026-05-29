@@ -2056,6 +2056,21 @@ def fetch_amazon_daily_metrics_pos(amazon_mstyles):
     QB_URL         = "https://api.quickbase.com/v1/records/query"
 
     mstyle_list = sorted({m for m in amazon_mstyles if m})
+    # EC/COS/AMZ parent expansion: Daily Metrics rows may be keyed by the parent
+    # mstyle (e.g. FF9298 not FF9298EC) because Vendor Central aggregates by the
+    # base product.  The EC parent fallback in _prep_record_signals needs the
+    # parent to be present in the result dict so the POS blend fires correctly.
+    _dm_expanded = set(mstyle_list)
+    for _ms in mstyle_list:
+        if re.search(r'(?:EC|COS|AMZ)$', _ms, flags=re.IGNORECASE):
+            _parent = re.sub(r'(?:EC|COS|AMZ)$', '', _ms, flags=re.IGNORECASE)
+            if _parent and _parent not in _dm_expanded:
+                _dm_expanded.add(_parent)
+    if len(_dm_expanded) > len(mstyle_list):
+        _added = _dm_expanded - set(mstyle_list)
+        print(f"  [Phase2.5-DM] EC/COS parent expansion: +{len(_added)} parent mstyles "
+              f"({', '.join(sorted(_added)[:5])}{'...' if len(_added)>5 else ''})", flush=True)
+        mstyle_list = sorted(_dm_expanded)
     all_raw     = []
     n_batches   = (len(mstyle_list) + BATCH - 1) // BATCH
 
