@@ -9179,6 +9179,13 @@ def _retailer_wos_forecast(rtl_pos, mp, opn_w1,
 
     fill_units  = max(0.0, wos_target * baseline_pps - _proj_oh) if _oh_data_available else 0.0
     fill_per_wk = snap(fill_units / 2.0, mp) if fill_units > 0 else 0
+    # TEMP DEBUG (FF10159EC investigation) -- remove after diagnosis
+    import os as _os_dbg
+    if _os_dbg.environ.get("_WOS_DEBUG"):
+        print(f"[WOS-DBG] oh_lw={oh_lw:.0f} oh_wos={oh_wos:.2f} baseline_pps={baseline_pps:.1f} "
+              f"fill_start={fill_start} _proj_oh={_proj_oh:.0f} "
+              f"fill_units={fill_units:.0f} fill_per_wk={fill_per_wk} "
+              f"opn_wl[:4]={_opn_wl[:4]}", flush=True)
 
     # -- Step 3: build 26-week forecast --------------------------------------
     _cat_mults_rtl = _category_week_multipliers(
