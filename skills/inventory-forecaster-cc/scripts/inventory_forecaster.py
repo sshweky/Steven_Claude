@@ -8354,13 +8354,7 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
         )
         if not _amzcat_has_data:
             amz_catalog = None
-            if isinstance(meta, dict):
-                meta.setdefault("drivers", []).append(
-                    "[WARN] F38: amz_catalog all-zero "
-                    "(Inv_SOH=Inv_WOS=AUR=OOS=Sellable=0) -- "
-                    "DC signals unavailable, likely fetch failure. "
-                    "Treating catalog as absent; F75/F59h/Fdclag/F37-MODE-A bypassed."
-                )
+            # (F38 warn driver logged by forecast_record via meta if available)
     # Retailer POS lookup — non-Amazon customers only.
     # When retailer POS data is available, populate pos_data with the same
     # field names used by Amazon POS so the existing F15 blend (seasonal_baseline),
