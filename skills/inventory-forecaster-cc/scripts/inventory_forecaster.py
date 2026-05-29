@@ -8473,6 +8473,7 @@ def _prep_record_signals(row, master_pack, oos_entry=None,
         "f47_corrections":  f47_corrections,
         "f_ats_corrections":       f_ats_corrections,
         "f_ats_catch_corrections": f_ats_catch_corrections,
+        "hist_pre_f43":     hist_pre_f43,
     }
 
 
