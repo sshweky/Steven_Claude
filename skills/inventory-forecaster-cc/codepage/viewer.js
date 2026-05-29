@@ -4471,7 +4471,8 @@ async function toggleDetail(key) {
     opnCells += (_opn && _opn.length === 26)
       ? `<td style="font-weight:700;color:#00695c;background:#e0f2f1">${fmtN(opnTot)}</td>`
       : `<td style="color:#bbb;background:#e0f2f1"> - </td>`;
-    wosCells += `<td style="color:#bbb;background:#f8f0fb" title="WOS total is not meaningful"> - </td>`;
+    endInvCells += `<td style="color:#bbb;background:#fff3e0" title="Ending Inv total is not meaningful"> - </td>`;
+    wosCells += `<td style="color:#bbb;background:#f8f0fb" title="Ending WOS total is not meaningful"> - </td>`;
 
     // -- Gap analysis banner ---------------------------------------------
     // Only fires for Replen items.  Non-Replen (ISO, phase-out, etc.) skips
